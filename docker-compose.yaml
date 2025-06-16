@@ -10,5 +10,3 @@ services:
       - "8080:8080"             # 호스트:컨테이너 포트 매핑
     env_file:
       - .env                    # 환경 변수 파일 로드
-    depends_on:
-      - db                      # db 서비스가 먼저 실행된 후 app 실행

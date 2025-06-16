@@ -1,44 +1,54 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.0'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'java'                                                  // Java 플러그인 적용
+	id 'org.springframework.boot' version '3.5.0'              // Spring Boot 플러그인 (v3.5.0)
+	id 'io.spring.dependency-management' version '1.1.7'       // 의존성 버전 관리 플러그인
 }
 
-group = 'com.lineinc'
-version = '0.0.1-SNAPSHOT'
+group = 'com.lineinc'                                         // Maven group ID
+version = '0.0.1-SNAPSHOT'                                    // 버전 (개발 중 의미)
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(17)           // Java 17 사용 명시 (JDK 자동 설정 가능)
 	}
 }
 
 configurations {
 	compileOnly {
-		extendsFrom annotationProcessor
+		extendsFrom annotationProcessor                        // compileOnly에도 annotationProcessor 의존성을 포함
 	}
 }
 
 repositories {
-	mavenCentral()
+	mavenCentral()                                             // Maven 중앙 저장소에서 의존성 가져오기
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.postgresql:postgresql'
+	// Spring Boot 주요 스타터
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'       // JPA (Hibernate 포함)
+	implementation 'org.springframework.boot:spring-boot-starter-security'       // Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-validation'     // Bean Validation (Jakarta)
+	implementation 'org.springframework.boot:spring-boot-starter-web'            // Spring MVC (Tomcat 포함)
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'                                        // 컴파일 시에만 필요한 Lombok
+	annotationProcessor 'org.projectlombok:lombok'                                // Lombok 어노테이션 처리기
+
+	// Spring Boot 설정 파일 자동 완성
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// 개발 편의용
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'              // 개발 중 핫리로드 지원
+
+	// DB 드라이버
+	runtimeOnly 'org.postgresql:postgresql'                                      // PostgreSQL JDBC 드라이버
+
+	// 테스트 관련 의존성
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'       // JUnit + Mockito 등 포함
+	testImplementation 'org.springframework.security:spring-security-test'       // Spring Security 테스트 지원
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform()                                                           // JUnit 5 사용 설정
 }
