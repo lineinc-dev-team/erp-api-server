@@ -42,11 +42,14 @@ dependencies {
 
 	// DB 드라이버
 	runtimeOnly 'org.postgresql:postgresql'                                      // PostgreSQL JDBC 드라이버
+	implementation 'org.flywaydb:flyway-core:9.22.0'									 // DB 마이그레이션 툴
 
 	// 테스트 관련 의존성
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'       // JUnit + Mockito 등 포함
 	testImplementation 'org.springframework.security:spring-security-test'       // Spring Security 테스트 지원
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
+
+
 }
 
 tasks.named('test') {

@@ -16,7 +16,7 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration/prod  # 운영용 마이그레이션 스크립트 경로
+    locations: classpath:db/migration
 
 logging:
   level:
