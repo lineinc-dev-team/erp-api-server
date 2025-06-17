@@ -11,19 +11,20 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
-    show-sql: true
+      ddl-auto: none  # Hibernate가 테이블을 자동으로 생성/수정하지 않음 (Flyway가 스키마 관리함)
+    show-sql: true    # 실행되는 SQL을 콘솔에 출력
     properties:
       hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true                             # SQL 출력 포맷팅
+        dialect: org.hibernate.dialect.PostgreSQLDialect  # PostgreSQL 전용 Hibernate 방언 사용
 
   flyway:
-    enabled: true
-    baseline-on-migrate: false
-    locations: classpath:db/migration,classpath:db/seed
+    enabled: true  # Flyway 마이그레이션 기능 활성화
+    baseline-on-migrate: true  # 스키마가 존재하지만 Flyway history 테이블이 없을 경우 기준점 생성 (초기화 문제 방지)
+    locations: classpath:db/migration,classpath:db/seed  # 마이그레이션 및 seed SQL 파일 경로 설정
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.flywaydb.core: DEBUG  # Flyway 관련 디버그 로그 출력
+    org.hibernate.SQL: DEBUG  # Hibernate가 실행하는 SQL 로그 출력
+    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG  # Hibernate가 바인딩하는 파라미터 값 로그 출력
