@@ -1,0 +1,29 @@
+INSERT INTO "user" (
+    id,
+    company_id,
+    login_id,
+    account_type,
+    username,
+    password_hash,
+    phone_number,
+    is_active,
+    locked_at,
+    password_reset_at,
+    last_login_at,
+    created_at,
+    updated_at
+) VALUES (
+             nextval('user_seq'),
+             1,
+             'admin',
+             'ADMIN',
+             '관리자',
+             '$2a$10$9sElG2iBjC1eV5kUdz7nDOWeJYDc9JutZx2vB9YoAVMPA6eMzEfz6',
+             '010-1234-5678',
+             TRUE,
+             NULL,
+             NULL,
+             NULL,
+             NOW(),
+             NOW()
+         );
