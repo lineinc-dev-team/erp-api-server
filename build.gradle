@@ -49,8 +49,11 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'       // Spring Security 테스트 지원
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
 
+    // Swagger(OpenAPI) 문서 자동 생성 및 UI 지원
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()                                                           // JUnit 5 사용 설정
 }
+

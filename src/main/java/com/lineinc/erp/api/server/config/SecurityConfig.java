@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -36,11 +38,15 @@ public class SecurityConfig {
                 // REST API에서는 HTML 폼 로그인을 사용하지 않음
                 .formLogin(AbstractHttpConfigurer::disable)
 
-                // 요청 URL 별 권한 설정
+                // 엔드포인트별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        // 로그인, 로그아웃 엔드포인트는 인증 없이 접근 가능
-                        .requestMatchers("/auth/login", "/auth/logout").permitAll()
-                        // 그 외 모든 요청은 인증 필요
+                        // 인증 없이 접근 가능한 경로 설정
+                        .requestMatchers(
+                                "/auth/login", "/auth/logout",                 // 인증 API
+                                "/swagger-ui/**", "/v3/api-docs/**",          // Swagger 문서
+                                "/swagger-ui.html"                            // Swagger UI HTML
+                        ).permitAll()
+                        // 그 외 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
 
@@ -65,5 +71,20 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .build();
+    }
+
+    /**
+     * 이 메서드는 인증 시 사용자 입력 비밀번호(평문)와 DB에 저장된 비밀번호(해시)를 비교할 때 사용합니다.
+     * - BCrypt는 해시 + 솔트가 포함된 강력한 암호화 알고리즘으로, 비밀번호 보안을 위해 가장 많이 사용됩니다.
+     * <p>
+     * 사용 예시:
+     * passwordEncoder.encode("plainPassword"); // 비밀번호 해시화
+     * passwordEncoder.matches("plain", "hashed"); // 평문 vs 해시 비교
+     *
+     * @return BCryptPasswordEncoder 인스턴스
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

@@ -1,6 +1,6 @@
-package com.lineinc.erp.api.server.domain.user;
+package com.lineinc.erp.api.server.domain.users;
 
-import com.lineinc.erp.api.server.common.BaseEntity;
+import com.lineinc.erp.api.server.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.Company;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User extends BaseEntity implements UserDetails {
+public class Users extends BaseEntity implements UserDetails {
 
     /**
      * 소속 회사 정보 (User - Company : 다대일 관계)
@@ -77,6 +77,6 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Override
     public String getPassword() {
-        return "";
+        return this.passwordHash;
     }
 }

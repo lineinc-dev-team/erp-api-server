@@ -25,12 +25,4 @@ spring:
 
 logging:
   level:
-    org.flywaydb.core: INFO
-    org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor: DEBUG  # 실행 SQL만 출력
-    org.flywaydb.core.internal.parser.Parser: INFO  # 파싱 로그는 생략
-    org.hibernate.SQL: DEBUG  # SQL 출력
-    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG  # 바인딩 파라미터
-
-jwt:
-
-
+    org.hibernate.orm.jdbc.bind: trace

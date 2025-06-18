@@ -1,7 +1,8 @@
 package com.lineinc.erp.api.server.application.auth;
 
-import com.lineinc.erp.api.server.domain.user.UserRepository;
+import com.lineinc.erp.api.server.domain.users.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,11 +12,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        return userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다."));
+    public UserDetails loadUserByUsername(String loginId) {
+        return usersRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new BadCredentialsException("해당 사용자가 존재하지 않습니다."));
     }
 }
