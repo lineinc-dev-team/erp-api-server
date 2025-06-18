@@ -3,5 +3,8 @@
   <component name="DiffGenerationConfig">
     <option name="snapshotDb" value="false" />
     <option name="snapshotModelValue" value="erp-api-server.main:erp-api-server.main" />
+    <option name="sourceDbValue" value="60fa7154-cce8-4c45-89bb-bf1b65bc20cb" />
+    <option name="sourceModelValue" value="erp-api-server.main:erp-api-server.main" />
+    <option name="targetDbValue" value="60fa7154-cce8-4c45-89bb-bf1b65bc20cb" />
   </component>
 </project>

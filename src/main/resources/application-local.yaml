@@ -32,6 +32,5 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: DEBUG  # 바인딩 파라미터
 
 jwt:
-  secret: ${JWT_SECRET}
-  access-token-validity: 15m
-  refresh-token-validity: 7d
+
+

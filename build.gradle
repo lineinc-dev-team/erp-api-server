@@ -1,60 +1,56 @@
 plugins {
-	id 'java'                                                  // Java 플러그인 적용
-	id 'org.springframework.boot' version '3.5.0'              // Spring Boot 플러그인 (v3.5.0)
-	id 'io.spring.dependency-management' version '1.1.7'       // 의존성 버전 관리 플러그인
+    id 'java'                                                  // Java 플러그인 적용
+    id 'org.springframework.boot' version '3.5.0'              // Spring Boot 플러그인 (v3.5.0)
+    id 'io.spring.dependency-management' version '1.1.7'       // 의존성 버전 관리 플러그인
 }
 
 group = 'com.lineinc'                                         // Maven group ID
 version = '0.0.1-SNAPSHOT'                                    // 버전 (개발 중 의미)
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)           // Java 17 사용 명시 (JDK 자동 설정 가능)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)           // Java 17 사용 명시 (JDK 자동 설정 가능)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor                        // compileOnly에도 annotationProcessor 의존성을 포함
-	}
+    compileOnly {
+        extendsFrom annotationProcessor                        // compileOnly에도 annotationProcessor 의존성을 포함
+    }
 }
 
 repositories {
-	mavenCentral()                                             // Maven 중앙 저장소에서 의존성 가져오기
+    mavenCentral()                                             // Maven 중앙 저장소에서 의존성 가져오기
 }
 
 dependencies {
-	// Spring Boot 주요 스타터
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'       // JPA (Hibernate 포함)
-	implementation 'org.springframework.boot:spring-boot-starter-security'       // Spring Security
-	implementation 'org.springframework.boot:spring-boot-starter-validation'     // Bean Validation (Jakarta)
-	implementation 'org.springframework.boot:spring-boot-starter-web'            // Spring MVC (Tomcat 포함)
+    // Spring Boot 주요 스타터
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'       // JPA (Hibernate 포함)
+    implementation 'org.springframework.boot:spring-boot-starter-security'       // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-validation'     // Bean Validation (Jakarta)
+    implementation 'org.springframework.boot:spring-boot-starter-web'            // Spring MVC (Tomcat 포함)
 
-	// Lombok
-	compileOnly 'org.projectlombok:lombok'                                        // 컴파일 시에만 필요한 Lombok
-	annotationProcessor 'org.projectlombok:lombok'                                // Lombok 어노테이션 처리기
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'                                        // 컴파일 시에만 필요한 Lombok
+    annotationProcessor 'org.projectlombok:lombok'                                // Lombok 어노테이션 처리기
 
-	// Spring Boot 설정 파일 자동 완성
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    // Spring Boot 설정 파일 자동 완성
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-	// 개발 편의용
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'              // 개발 중 핫리로드 지원
+    // 개발 편의용
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'              // 개발 중 핫리로드 지원
 
-	// DB 드라이버
-	runtimeOnly 'org.postgresql:postgresql'                                      // PostgreSQL JDBC 드라이버
-	implementation 'org.flywaydb:flyway-core:9.22.0'									 // DB 마이그레이션 툴
+    // DB 드라이버
+    runtimeOnly 'org.postgresql:postgresql'                                      // PostgreSQL JDBC 드라이버
+    implementation 'org.flywaydb:flyway-core:9.22.0'                                     // DB 마이그레이션 툴
 
-	// 테스트 관련 의존성
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'       // JUnit + Mockito 등 포함
-	testImplementation 'org.springframework.security:spring-security-test'       // Spring Security 테스트 지원
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
+    // 테스트 관련 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'       // JUnit + Mockito 등 포함
+    testImplementation 'org.springframework.security:spring-security-test'       // Spring Security 테스트 지원
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
 
-	// JJWT 라이브러리 (JWT 생성, 파싱, 검증)
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'         // 구현체
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'      // JSON 직렬화/역직렬화용 (jackson 기반)
 }
 
 tasks.named('test') {
-	useJUnitPlatform()                                                           // JUnit 5 사용 설정
+    useJUnitPlatform()                                                           // JUnit 5 사용 설정
 }

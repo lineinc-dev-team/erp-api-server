@@ -4,8 +4,12 @@ import com.lineinc.erp.api.server.common.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.Company;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(indexes = {
@@ -14,7 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
 
     /**
      * 소속 회사 정보 (User - Company : 다대일 관계)
@@ -59,4 +63,20 @@ public class User extends BaseEntity {
      */
     @Column
     private LocalDateTime lastLoginAt;
+
+    /**
+     * 권한 목록 반환 (현재는 비워둠)
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    /**
+     * 인증에 사용할 비밀번호 반환
+     */
+    @Override
+    public String getPassword() {
+        return "";
+    }
 }
