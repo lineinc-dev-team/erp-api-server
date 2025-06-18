@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.auth;
+package com.lineinc.erp.api.server.infrastructure.security;
 
 import com.lineinc.erp.api.server.domain.user.User;
 import io.jsonwebtoken.Jwts;

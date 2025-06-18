@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.user;
 
 import com.lineinc.erp.api.server.common.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.Company;
-import com.lineinc.erp.api.server.common.enums.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.common.enums;
+package com.lineinc.erp.api.server.domain.user;
 
 public enum AccountType {
     ADMIN,          // 관리자
