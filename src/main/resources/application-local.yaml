@@ -5,9 +5,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: "jdbc:postgresql://localhost:5432/erpdb"
+    username: "erpuser"
+    password: "erppassword"
 
   jpa:
     hibernate:
@@ -28,3 +28,8 @@ logging:
     org.flywaydb.core: DEBUG  # Flyway 관련 디버그 로그 출력
     org.hibernate.SQL: DEBUG  # Hibernate가 실행하는 SQL 로그 출력
     org.hibernate.type.descriptor.sql.BasicBinder: DEBUG  # Hibernate가 바인딩하는 파라미터 값 로그 출력
+
+jwt:
+  secret: "0123456789abcdef0123456789abcdef"
+  access-token-validity: 15m
+  refresh-token-validity: 7d

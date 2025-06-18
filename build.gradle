@@ -49,7 +49,10 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'       // Spring Security 테스트 지원
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
 
-
+	// JJWT 라이브러리 (JWT 생성, 파싱, 검증)
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'         // 구현체
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'      // JSON 직렬화/역직렬화용 (jackson 기반)
 }
 
 tasks.named('test') {

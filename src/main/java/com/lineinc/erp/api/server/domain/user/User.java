@@ -1,9 +1,11 @@
-package com.lineinc.erp.api.server.domain;
+package com.lineinc.erp.api.server.domain.user;
 
-import com.lineinc.erp.api.server.domain.common.BaseEntity;
-import com.lineinc.erp.api.server.domain.enums.AccountType;
+import com.lineinc.erp.api.server.common.BaseEntity;
+import com.lineinc.erp.api.server.domain.company.Company;
+import com.lineinc.erp.api.server.common.enums.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,7 +15,6 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User extends BaseEntity {
 
     /**
@@ -30,13 +31,13 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private AccountType accountType;
 
-    @Column()
+    @Column
     private String username;
 
-    @Column()
+    @Column
     private String passwordHash;
 
-    @Column()
+    @Column
     private String phoneNumber;
 
     @Column(nullable = false)
@@ -45,18 +46,18 @@ public class User extends BaseEntity {
     /**
      * 계정 잠금 시각 (로그인 실패 등으로 잠긴 시간 저장)
      */
-    @Column()
+    @Column
     private LocalDateTime lockedAt;
 
     /**
      * 비밀번호 초기화 시각 (비밀번호 변경 혹은 초기화된 시간)
      */
-    @Column()
+    @Column
     private LocalDateTime passwordResetAt;
 
     /**
      * 최종 로그인 시각
      */
-    @Column()
+    @Column
     private LocalDateTime lastLoginAt;
 }
