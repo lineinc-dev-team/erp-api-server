@@ -2,13 +2,14 @@ package com.lineinc.erp.api.server.domain.company;
 
 import com.lineinc.erp.api.server.common.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Company extends BaseEntity {
 

@@ -15,8 +15,8 @@ spring:
     show-sql: true    # 실행되는 SQL을 콘솔에 출력
     properties:
       hibernate:
-        format_sql: true                             # SQL 출력 포맷팅
-        dialect: org.hibernate.dialect.PostgreSQLDialect  # PostgreSQL 전용 Hibernate 방언 사용
+        format_sql: true  # SQL 출력 포맷팅
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
     enabled: true
@@ -25,9 +25,11 @@ spring:
 
 logging:
   level:
-    org.flywaydb.core: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
+    org.flywaydb.core: INFO
+    org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor: DEBUG  # 실행 SQL만 출력
+    org.flywaydb.core.internal.parser.Parser: INFO  # 파싱 로그는 생략
+    org.hibernate.SQL: DEBUG  # SQL 출력
+    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG  # 바인딩 파라미터
 
 jwt:
   secret: ${JWT_SECRET}

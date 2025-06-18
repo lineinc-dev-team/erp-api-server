@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
         @Index(columnList = "username")  // username 컬럼에 인덱스 생성 (검색 성능 향상 목적)
 })
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User extends BaseEntity {
 
