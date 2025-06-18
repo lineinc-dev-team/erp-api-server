@@ -5,9 +5,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://localhost:5432/erpdb"
-    username: "erpuser"
-    password: "erppassword"
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:
@@ -19,17 +19,17 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect  # PostgreSQL 전용 Hibernate 방언 사용
 
   flyway:
-    enabled: true  # Flyway 마이그레이션 기능 활성화
-    baseline-on-migrate: true  # 스키마가 존재하지만 Flyway history 테이블이 없을 경우 기준점 생성 (초기화 문제 방지)
-    locations: classpath:db/migration,classpath:db/seed  # 마이그레이션 및 seed SQL 파일 경로 설정
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration,classpath:db/seed
 
 logging:
   level:
-    org.flywaydb.core: DEBUG  # Flyway 관련 디버그 로그 출력
-    org.hibernate.SQL: DEBUG  # Hibernate가 실행하는 SQL 로그 출력
-    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG  # Hibernate가 바인딩하는 파라미터 값 로그 출력
+    org.flywaydb.core: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
 
 jwt:
-  secret: "0123456789abcdef0123456789abcdef"
+  secret: ${JWT_SECRET}
   access-token-validity: 15m
   refresh-token-validity: 7d
