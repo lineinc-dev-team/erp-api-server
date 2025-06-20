@@ -2,12 +2,11 @@ package com.lineinc.erp.api.server.exception;
 
 import com.lineinc.erp.api.server.common.response.ErrorResponse;
 import com.lineinc.erp.api.server.common.response.FieldErrorDetail;
-import org.springframework.http.HttpHeaders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +15,7 @@ import java.util.List;
 /**
  * 컨트롤러 전역에서 발생하는 예외를 처리하는 클래스
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     /**
      * 존재하지 않는 사용자명 예외 처리
      */
-    @ExceptionHandler(UsernameNotFoundException.class)
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ResponseEntity<ErrorResponse> handleUsernameNotFound() {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다.");
     }
@@ -57,7 +57,8 @@ public class GlobalExceptionHandler {
      * 기타 모든 예외 처리
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException() {
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
+        log.error("Unhandled Exception", e);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.");
     }
 

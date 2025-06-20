@@ -24,33 +24,21 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot 주요 스타터
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'       // JPA (Hibernate 포함)
     implementation 'org.springframework.boot:spring-boot-starter-security'       // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-validation'     // Bean Validation (Jakarta)
     implementation 'org.springframework.boot:spring-boot-starter-web'            // Spring MVC (Tomcat 포함)
-
-    // Lombok
     compileOnly 'org.projectlombok:lombok'                                        // 컴파일 시에만 필요한 Lombok
     annotationProcessor 'org.projectlombok:lombok'                                // Lombok 어노테이션 처리기
-
-    // Spring Boot 설정 파일 자동 완성
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-
-    // 개발 편의용
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor' // Spring Boot 설정 파일 자동 완성
     developmentOnly 'org.springframework.boot:spring-boot-devtools'              // 개발 중 핫리로드 지원
-
-    // DB 드라이버
     runtimeOnly 'org.postgresql:postgresql'                                      // PostgreSQL JDBC 드라이버
-    implementation 'org.flywaydb:flyway-core:9.22.0'                                     // DB 마이그레이션 툴
-
-    // 테스트 관련 의존성
+    implementation 'org.flywaydb:flyway-core:9.22.0'                             // DB 마이그레이션 툴
     testImplementation 'org.springframework.boot:spring-boot-starter-test'       // JUnit + Mockito 등 포함
     testImplementation 'org.springframework.security:spring-security-test'       // Spring Security 테스트 지원
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
-
-    // Swagger(OpenAPI) 문서 자동 생성 및 UI 지원
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'     // Swagger(OpenAPI) 문서 자동 생성 및 UI 지원
+    implementation 'org.springframework.session:spring-session-jdbc'             // 스프링 세션 JDBC 의존성 추가
 }
 
 tasks.named('test') {
