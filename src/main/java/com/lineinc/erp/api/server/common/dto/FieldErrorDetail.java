@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.common.response;
+package com.lineinc.erp.api.server.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

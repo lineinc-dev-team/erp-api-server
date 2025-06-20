@@ -1,9 +1,7 @@
-package com.lineinc.erp.api.server.common.response;
+package com.lineinc.erp.api.server.common.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**

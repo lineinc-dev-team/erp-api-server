@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.interfaces.auth;
+package com.lineinc.erp.api.server.presentation.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

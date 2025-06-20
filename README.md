@@ -18,34 +18,30 @@ chmod +x run.sh
 
 ## 🧠 프로젝트 구조 (Domain-Driven Design 기반)
 
-본 프로젝트는 도메인 주도 설계(DDD)를 철저히 반영하여, 도메인 중심으로 책임과 관심사를 분리한 구조를 가지고 있습니다.
-기능(기술 스택)별 구분보다는 비즈니스 도메인별로 묶어, 각 도메인이 독립적으로 관리될 수 있도록 하며, 변경에 유연하게 대응하도록 설계하였습니다.
+본 프로젝트는 도메인 주도 설계(DDD)를 기반으로 계층 간 관심사를 분리하여 설계되었습니다.
+기능 중심이 아닌 **도메인 중심 구조**로, 유지보수성과 확장성, 테스트 용이성을 높였습니다.
 
 ```bash
-src/main/java/com.lineinc.erp.api.server
-├── domain/           # 핵심 도메인 모델 및 비즈니스 로직
-│   ├── company/      # 회사 관련 Entity, Value Object, Repository 등
-│   ├── user/         # 사용자 관련 도메인 모델 및 리포지토리
-│   └── auth/         # 인증/인가 관련 도메인 (예: RefreshToken 등)
+src/main/java/com/lineinc/erp/api/server
+├── domain/             # 비즈니스 핵심 도메인 모델
+│   ├── company/        # 회사 관련 Entity, Enum, Repository
+│   └── users/          # 사용자 관련 Entity, Enum, Repository
 │
-├── application/      # 유스케이스, 서비스, DTO 등 (비즈니스 로직과 외부 데이터 교환 담당)
-│   ├── company/      # 회사 도메인 관련 비즈니스 로직 구현
-│   ├── user/         # 사용자 관련 서비스 구현
-│   └── auth/         # 인증 서비스 구현
+├── application/        # 도메인 서비스 및 유스케이스 구현
+│   └── auth/           # 인증 관련 서비스 계층
 │
-├── interface/        # 외부 요청과의 접점 (웹, API, 보안, 이벤트 등)
-│   ├── user/         # REST API Controller 등
-│   ├── auth/         # 인증 관련 API 컨트롤러 및 필터
-│   └── jwt/          # JWT 관련 구현 (필터, 유틸 등)
+├── presentation/       # 외부 요청을 처리하는 계층 (Controller + DTO)
+│   └── auth/
+│       ├── controller/ # 인증 관련 API 컨트롤러
+│       └── dto/        # 요청/응답 DTO
 │
-├── infrastructure/   # 외부 시스템 연동 및 기술 인프라 구현
-│   ├── persistence/  # DB 연동 구현체, JPA, MyBatis 등
-│   └── security/     # 보안 관련 인프라 (ex. JWT 토큰 생성 유틸리티)
+├── common/             # 공통 모듈
+│   ├── dto/            # 에러 응답 등 범용 DTO
+│   └── entity/         # 공통 Entity (예: BaseEntity 등)
 │
-├── config/           # 애플리케이션 전역 설정 (보안, Swagger, CORS 등)
+├── config/             # 전역 설정 (보안, Swagger, CORS 등)
 │
-├── exception/        # 커스텀 예외 클래스 및 글로벌 예외 처리
+├── exception/          # 전역 예외 처리 및 예외 정의
 │
-└── ErpApiServerApplication.java   # 메인 애플리케이션 실행 진입점
+└── ErpApiServerApplication.java  # 애플리케이션 진입점
 ```
-

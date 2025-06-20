@@ -1,5 +1,6 @@
-package com.lineinc.erp.api.server.interfaces.auth;
+package com.lineinc.erp.api.server.presentation.auth.controller;
 
+import com.lineinc.erp.api.server.presentation.auth.dto.LoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
