@@ -79,7 +79,7 @@ public class AuthController {
     @Operation(summary = "내 정보 조회", description = "현재 로그인된 사용자 정보를 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 정보 반환"),
-            @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/me")
     public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(Authentication authentication) {
@@ -92,6 +92,8 @@ public class AuthController {
                 user.getUsername(),
                 user.getAccountType()
         );
+        System.out.println(">> Response: " + response);
+
 
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
