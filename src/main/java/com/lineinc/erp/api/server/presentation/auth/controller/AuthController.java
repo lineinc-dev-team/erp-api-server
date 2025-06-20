@@ -1,6 +1,10 @@
 package com.lineinc.erp.api.server.presentation.auth.controller;
 
+import com.lineinc.erp.api.server.common.dto.SuccessResponse;
+import com.lineinc.erp.api.server.domain.users.Users;
+import com.lineinc.erp.api.server.domain.users.UsersRepository;
 import com.lineinc.erp.api.server.presentation.auth.dto.LoginRequest;
+import com.lineinc.erp.api.server.presentation.auth.dto.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +23,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth") // 모든 엔드포인트 앞에 "/auth" 경로 접두어 설정
@@ -26,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
+    private final UsersRepository usersRepository;
 
     @Operation(summary = "로그인", description = "사용자 로그인 후 세션 생성 및 쿠키 발급")
     @ApiResponses(value = {
@@ -40,7 +47,7 @@ public class AuthController {
     ) {
         // 1. 로그인 인증 토큰 생성
         UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(request.getLoginId(), request.getPassword());
+                new UsernamePasswordAuthenticationToken(request.loginId(), request.password());
 
         // 2. 실제 인증 수행
         Authentication authentication = authenticationManager.authenticate(token);
@@ -67,5 +74,25 @@ public class AuthController {
     public ResponseEntity<?> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "내 정보 조회", description = "현재 로그인된 사용자 정보를 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 정보 반환"),
+            @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음")
+    })
+    @GetMapping("/me")
+    public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(Authentication authentication) {
+        Users user = usersRepository.findByLoginId(((Users) authentication.getPrincipal()).getLoginId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        UserInfoResponse response = new UserInfoResponse(
+                user.getId(),
+                user.getLoginId(),
+                user.getUsername(),
+                user.getAccountType()
+        );
+
+        return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

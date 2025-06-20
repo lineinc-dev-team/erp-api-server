@@ -54,6 +54,27 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 명시적으로 상태 코드가 설정된 예외
+     */
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(org.springframework.web.server.ResponseStatusException ex) {
+        ErrorResponse response = ErrorResponse.of(
+                ex.getStatusCode().value(),
+                ex.getReason() != null ? ex.getReason() : "요청 처리 중 오류가 발생했습니다.",
+                List.of()
+        );
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
+    }
+
+    /**
+     * 접근 권한이 없는 경우
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+    }
+
+    /**
      * 기타 모든 예외 처리
      */
     @ExceptionHandler(Exception.class)
