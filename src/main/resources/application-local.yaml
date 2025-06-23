@@ -27,3 +27,8 @@ logging:
   level:
     org.hibernate.orm.jdbc.bind: TRACE
     org.flywaydb.core: DEBUG
+
+server:
+  servlet:
+    session:
+      timeout: 60m  # 60분
