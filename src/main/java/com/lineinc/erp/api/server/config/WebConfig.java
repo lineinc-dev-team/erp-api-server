@@ -11,31 +11,30 @@ import java.util.Arrays;
 
 /**
  * WebConfig
- * <p>
- * - CORS(Cross-Origin Resource Sharing) 전역 설정 클래스
  */
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
     private final Environment environment;
 
     /**
      * CORS 매핑 전역 설정
-     * <p>
-     * - 세션 기반 인증을 위해 allowCredentials(true) 설정
-     *
-     * @param registry CORS 설정을 위한 객체
+     * - 환경변수(cors.allowed-origins)에 정의된 Origin들만 허용
+     * - 모든 엔드포인트 경로, HTTP 메서드, 헤더를 허용하며, 자격 증명(쿠키, 세션 등)도 함께 전달 가능
      */
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
-        boolean isLocal = Arrays.asList(environment.getActiveProfiles()).contains("local");
+        // 환경 파일에서 허용된 origin 목록을 배열로 가져옴
+        String[] allowedOrigins = environment.getProperty(
+                "cors.allowed-origins", String[].class, new String[0]
+        );
 
-        if (isLocal) {
-            registry.addMapping("/**")   // 모든 엔드포인트에 대해 CORS 허용
-                    .allowedOriginPatterns("*")     // 모든 Origin 허용
-                    .allowedMethods("*")            // 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
-                    .allowedHeaders("*")            // 모든 헤더 허용
-                    .allowCredentials(true);        // 세션/쿠키 등의 자격 증명 허용
-        }
+        // CORS 설정 등록
+        registry.addMapping("/**")        // 모든 API 엔드포인트 허용
+                .allowedOrigins(allowedOrigins)      // 설정된 Origin만 허용
+                .allowedMethods("*")                 // GET, POST, PUT, DELETE 등 모든 HTTP 메서드 허용
+                .allowedHeaders("*")                 // 모든 요청 헤더 허용
+                .allowCredentials(true);             // 쿠키/세션 등의 인증 정보 포함 허용
     }
 }

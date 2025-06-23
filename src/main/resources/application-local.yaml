@@ -32,3 +32,6 @@ server:
   servlet:
     session:
       timeout: 60m  # 60분
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
