@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.presentation.auth.controller;
 
+import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.dto.SuccessResponse;
 import com.lineinc.erp.api.server.domain.users.Users;
-import com.lineinc.erp.api.server.domain.users.UsersRepository;
 import com.lineinc.erp.api.server.presentation.auth.dto.LoginRequest;
 import com.lineinc.erp.api.server.presentation.auth.dto.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,16 +22,15 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/auth") // 모든 엔드포인트 앞에 "/auth" 경로 접두어 설정
+@RequestMapping(value = "/auth", produces = "application/json")
 @RequiredArgsConstructor // final 필드에 대해 생성자 자동 주입
 @Tag(name = "auth", description = "인증 관련 API")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final UsersRepository usersRepository;
+    private final UsersService usersService;
 
     @Operation(summary = "로그인", description = "사용자 로그인 후 세션 생성 및 쿠키 발급")
     @ApiResponses(value = {
@@ -83,8 +81,7 @@ public class AuthController {
     })
     @GetMapping("/me")
     public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(Authentication authentication) {
-        Users user = usersRepository.findByLoginId(((Users) authentication.getPrincipal()).getLoginId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        Users user = usersService.getUserByLoginIdOrThrow(((Users) authentication.getPrincipal()).getLoginId());
 
         UserInfoResponse response = new UserInfoResponse(
                 user.getId(),
@@ -92,8 +89,6 @@ public class AuthController {
                 user.getUsername(),
                 user.getAccountType()
         );
-        System.out.println(">> Response: " + response);
-
 
         return ResponseEntity.ok(SuccessResponse.of(response));
     }

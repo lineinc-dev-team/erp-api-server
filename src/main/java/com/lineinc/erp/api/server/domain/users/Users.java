@@ -79,4 +79,14 @@ public class Users extends BaseEntity implements UserDetails {
     public String getPassword() {
         return this.passwordHash;
     }
+
+    /**
+     * 비밀번호 수정
+     *
+     * @param newPasswordHash 새롭게 수정할 비밀번호 해시값
+     */
+    public void updatePassword(String newPasswordHash) {
+        this.passwordHash = newPasswordHash;
+        this.passwordResetAt = LocalDateTime.now(); // 비밀번호 변경 시각도 기록
+    }
 }
