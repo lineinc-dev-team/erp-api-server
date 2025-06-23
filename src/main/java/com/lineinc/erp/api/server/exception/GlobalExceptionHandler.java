@@ -41,8 +41,8 @@ public class GlobalExceptionHandler {
      * 존재하지 않는 사용자명 예외 처리
      */
     @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public ResponseEntity<ErrorResponse> handleUsernameNotFound() {
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다.");
+    public ResponseEntity<ErrorResponse> handleInternalAuthenticationException(InternalAuthenticationServiceException ex) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     /**

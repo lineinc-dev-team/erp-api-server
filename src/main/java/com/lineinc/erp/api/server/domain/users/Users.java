@@ -89,4 +89,13 @@ public class Users extends BaseEntity implements UserDetails {
         this.passwordHash = newPasswordHash;
         this.passwordResetAt = LocalDateTime.now(); // 비밀번호 변경 시각도 기록
     }
+
+    /**
+     * 최종 로그인 시각 수정
+     *
+     * @param now 현재 시각
+     */
+    public void updateLastLoginAt(LocalDateTime now) {
+        this.lastLoginAt = now;
+    }
 }

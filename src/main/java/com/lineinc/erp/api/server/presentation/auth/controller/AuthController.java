@@ -50,12 +50,18 @@ public class AuthController {
         // 2. 실제 인증 수행
         Authentication authentication = authenticationManager.authenticate(token);
 
-        // 3. 인증된 사용자 정보 SecurityContext에 저장
+        // 3. 로그인 성공한 사용자 정보
+        Users user = (Users) authentication.getPrincipal();
+
+        // 4. 마지막 로그인 시간 갱신
+        usersService.updateLastLoginAt(user);
+
+        // 5. SecurityContext에 인증 정보 저장
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-        // 4. 세션에 SecurityContext 저장
+        // 6. 세션에 SecurityContext 저장
         httpRequest.getSession(true).setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 context

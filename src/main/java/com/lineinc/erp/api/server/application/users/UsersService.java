@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UsersService {
@@ -34,5 +36,11 @@ public class UsersService {
 
         String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.updatePassword(encodedPassword);
+    }
+
+    @Transactional
+    public void updateLastLoginAt(Users user) {
+        user.updateLastLoginAt(LocalDateTime.now());
+        usersRepository.save(user);
     }
 }
