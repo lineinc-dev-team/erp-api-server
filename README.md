@@ -36,8 +36,7 @@ src/main/java/com/lineinc/erp/api/server
 │       └── dto/        # 요청/응답 DTO
 │
 ├── common/             # 공통 모듈
-│   ├── dto/            # 에러 응답 등 범용 DTO
-│   └── entity/         # 공통 Entity (예: BaseEntity 등)
+│   └── dto/            # 에러 응답 등 범용 DTO
 │
 ├── config/             # 전역 설정 (보안, Swagger, CORS 등)
 │

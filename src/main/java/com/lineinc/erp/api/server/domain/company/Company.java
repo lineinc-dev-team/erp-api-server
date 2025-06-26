@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.company;
 
-import com.lineinc.erp.api.server.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

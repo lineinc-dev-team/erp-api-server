@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.common.entity;
+package com.lineinc.erp.api.server.domain.common;
 
 import jakarta.persistence.*;
 import lombok.Getter;
