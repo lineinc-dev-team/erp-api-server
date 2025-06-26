@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config;
+package com.lineinc.erp.api.server.config.support.audit;
 
 import lombok.NonNull;
 import org.springframework.data.domain.AuditorAware;

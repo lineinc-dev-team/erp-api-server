@@ -23,24 +23,38 @@ chmod +x run.sh
 
 ```bash
 src/main/java/com/lineinc/erp/api/server
-├── domain/             # 비즈니스 핵심 도메인 모델
-│   ├── company/        # 회사 관련 Entity, Enum, Repository
-│   └── users/          # 사용자 관련 Entity, Enum, Repository
+├── domain/                   # 비즈니스 핵심 도메인 모델
+│   ├── common/               # 모든 Entity가 상속하는 BaseEntity
+│   ├── company/              # 회사 도메인 (Entity, Repository 등)
+│   └── users/                # 사용자 도메인 (Entity, Enum, Repository 등)
 │
-├── application/        # 도메인 서비스 및 유스케이스 구현
-│   └── auth/           # 인증 관련 서비스 계층
+├── application/              # 유스케이스 및 서비스 계층
+│   ├── auth/                 # 인증 관련 서비스
+│   └── users/                # 사용자 관련 서비스
 │
-├── presentation/       # 외부 요청을 처리하는 계층 (Controller + DTO)
-│   └── auth/
-│       ├── controller/ # 인증 관련 API 컨트롤러
-│       └── dto/        # 요청/응답 DTO
+├── presentation/             # API 계층 (Controller + DTO)
+│   └── v1/                   # API 버전 1
+│       ├── auth/             # 인증 도메인
+│       │   ├── controller/   # 인증 API 컨트롤러
+│       │   └── dto/          # 인증 요청/응답 DTO
+│       └── users/            # 사용자 도메인
+│           ├── controller/   # 사용자 API 컨트롤러
+│           └── dto/          # 사용자 요청/응답 DTO
 │
-├── common/             # 공통 모듈
-│   └── dto/            # 에러 응답 등 범용 DTO
+├── common/                   # 공통 모듈
+│   └── response/             # 공통 응답 포맷 (성공/에러 DTO)
 │
-├── config/             # 전역 설정 (보안, Swagger, CORS 등)
+├── config/                   # 전역 설정
+│   ├── SecurityConfig.java   # Spring Security 설정
+│   ├── WebConfig.java        # CORS, 인터셉터 등 Web 설정
+│   ├── OpenAPIConfig.java    # Swagger(OpenAPI) 설정
+│   ├── JpaAuditingConfig.java # JPA Auditing 설정
+│   └── support/
+│       └── audit/            # JPA AuditorAware 구현체
+│           └── AuditorAwareImpl.java
 │
-├── exception/          # 전역 예외 처리 및 예외 정의
+├── exception/                # 전역 예외 처리 및 커스텀 예외 정의
+│   └── GlobalExceptionHandler.java
 │
 └── ErpApiServerApplication.java  # 애플리케이션 진입점
 ```

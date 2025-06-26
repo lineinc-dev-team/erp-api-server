@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.config;
 
+import com.lineinc.erp.api.server.config.support.audit.AuditorAwareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
