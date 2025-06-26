@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Spring Boot 기본 로그 설정 불러오기 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 로그 패턴 및 디렉토리 설정 -->
+    <property name="LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} [%thread] %highlight(%-5level) %clr(%logger{36}){cyan} - %msg%n"/>
+    <property name="LOG_DIR" value="logs"/>
+
+    <!-- 콘솔 출력: 색상 적용 -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 일반 로그 파일 (INFO 이하 모두 기록) -->
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!-- 에러 이상 로그는 제외 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>NEUTRAL</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 에러 로그 파일 (ERROR 이상만 기록) -->
+    <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!-- ERROR 레벨 이상만 기록 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- 공통 설정: 모든 환경에서 공통적으로 적용 -->
+    <logger name="org.flywaydb.core" level="INFO"/>
+    <logger name="org.hibernate.SQL" level="INFO"/>
+    <logger name="org.hibernate.orm.jdbc.bind" level="DEBUG"/>
+
+    <!-- 기본 환경 fallback -->
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="File"/>
+        <appender-ref ref="ErrorFile"/>
+    </root>
+
+    <!-- local, dev 환경 공통 설정 -->
+    <springProfile name="local,dev">
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="File"/>
+            <appender-ref ref="ErrorFile"/>
+        </root>
+    </springProfile>
+
+    <!-- prod 환경: 콘솔 제외, 파일 로그만 저장 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="File"/>
+            <appender-ref ref="ErrorFile"/>
+        </root>
+    </springProfile>
+
+</configuration>
