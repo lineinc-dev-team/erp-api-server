@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +16,6 @@ public class AuthService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String loginId) {
         return usersRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new BadCredentialsException("해당 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new BadCredentialsException("존재하지 않는 사용자입니다"));
     }
 }

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/v1/auth")
-@RequiredArgsConstructor // final 필드에 대해 생성자 자동 주입
+@RequiredArgsConstructor
 @Tag(name = "auth", description = "인증 관련 API")
 public class AuthController {
 

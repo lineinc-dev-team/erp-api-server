@@ -5,8 +5,10 @@ import com.lineinc.erp.api.server.domain.company.Company;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +21,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Users extends BaseEntity implements UserDetails {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 소속 회사 정보 (User - Company : 다대일 관계)
@@ -65,11 +71,11 @@ public class Users extends BaseEntity implements UserDetails {
     private LocalDateTime lastLoginAt;
 
     /**
-     * 권한 목록 반환 (현재는 비워둠)
+     * 권한 목록 반환
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + accountType.name()));
     }
 
     /**
