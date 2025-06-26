@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.auth.dto;
+package com.lineinc.erp.api.server.presentation.v1.auth.dto;
 
 import com.lineinc.erp.api.server.domain.users.AccountType;
 import io.swagger.v3.oas.annotations.media.Schema;

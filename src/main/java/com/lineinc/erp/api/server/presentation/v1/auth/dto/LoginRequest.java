@@ -1,7 +1,7 @@
-package com.lineinc.erp.api.server.presentation.auth.dto;
+package com.lineinc.erp.api.server.presentation.v1.auth.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "로그인 요청")
 public record LoginRequest(

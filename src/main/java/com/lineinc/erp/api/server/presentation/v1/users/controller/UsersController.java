@@ -1,7 +1,7 @@
-package com.lineinc.erp.api.server.presentation.users.controller;
+package com.lineinc.erp.api.server.presentation.v1.users.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
-import com.lineinc.erp.api.server.presentation.users.dto.ResetPasswordRequest;
+import com.lineinc.erp.api.server.presentation.v1.users.dto.ResetPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/users", produces = "application/json")
+@RequestMapping(value = "/api/v1/users")
 @RequiredArgsConstructor
 @Tag(name = "users", description = "유저 관련 API")
 public class UsersController {

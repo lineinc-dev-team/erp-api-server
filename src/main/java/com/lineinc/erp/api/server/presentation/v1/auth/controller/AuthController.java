@@ -1,10 +1,10 @@
-package com.lineinc.erp.api.server.presentation.auth.controller;
+package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.dto.SuccessResponse;
 import com.lineinc.erp.api.server.domain.users.Users;
-import com.lineinc.erp.api.server.presentation.auth.dto.LoginRequest;
-import com.lineinc.erp.api.server.presentation.auth.dto.UserInfoResponse;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.LoginRequest;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +24,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/auth", produces = "application/json")
+@RequestMapping(value = "/api/v1/auth")
 @RequiredArgsConstructor // final 필드에 대해 생성자 자동 주입
 @Tag(name = "auth", description = "인증 관련 API")
 public class AuthController {
