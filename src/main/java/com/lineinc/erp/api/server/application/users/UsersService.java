@@ -33,7 +33,6 @@ public class UsersService {
     @Transactional
     public void resetPassword(String loginId) {
         Users user = getUserByLoginIdOrThrow(loginId);
-
         String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.updatePassword(encodedPassword);
     }

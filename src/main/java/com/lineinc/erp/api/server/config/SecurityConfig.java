@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 가능한 경로 설정
                         .requestMatchers(
-                                "/auth/login", "/auth/logout",                 // 인증 API
+                                "api/v1/auth/login", "api/v1/auth/logout",      // 인증 API
                                 "/swagger-ui/**", "/v3/api-docs/**",          // Swagger 문서
                                 "/swagger-ui.html"                            // Swagger UI HTML
                         ).permitAll()
