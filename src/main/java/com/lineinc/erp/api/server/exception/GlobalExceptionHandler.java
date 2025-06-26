@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.exception;
 
-import com.lineinc.erp.api.server.common.dto.ErrorResponse;
-import com.lineinc.erp.api.server.common.dto.FieldErrorDetail;
+import com.lineinc.erp.api.server.common.response.ErrorResponse;
+import com.lineinc.erp.api.server.common.response.FieldErrorDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

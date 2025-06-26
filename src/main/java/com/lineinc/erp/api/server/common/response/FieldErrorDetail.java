@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.common.dto;
+package com.lineinc.erp.api.server.common.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

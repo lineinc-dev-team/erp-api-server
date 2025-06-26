@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
-import com.lineinc.erp.api.server.common.dto.SuccessResponse;
+import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.users.Users;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.LoginRequest;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
