@@ -10,7 +10,8 @@ INSERT INTO users (id,
                    password_reset_at,
                    last_login_at,
                    created_at,
-                   updated_at)
+                   updated_at,
+                   deleted)
 VALUES (nextval('users_seq'),
         1,
         'admin',
@@ -23,4 +24,5 @@ VALUES (nextval('users_seq'),
         NULL,
         NULL,
         NOW(),
-        NOW());
+        NOW(),
+        false);
