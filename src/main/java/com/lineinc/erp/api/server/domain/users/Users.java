@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.users;
 
 import com.lineinc.erp.api.server.domain.common.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.Company;
+import com.lineinc.erp.api.server.domain.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,8 @@ import java.io.Serial;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(indexes = {
@@ -25,7 +28,6 @@ public class Users extends BaseEntity implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
 
-
     /**
      * 소속 회사 정보 (User - Company : 다대일 관계)
      */
@@ -35,10 +37,6 @@ public class Users extends BaseEntity implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String loginId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AccountType accountType;
 
     @Column
     private String username;
@@ -61,12 +59,16 @@ public class Users extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TIMESTAMPTZ")
     private OffsetDateTime lastLoginAt;
 
+
     /**
      * 권한 목록 반환
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + accountType.name()));
+        return List.of();
+//        return roles.stream()
+//                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+//                .collect(Collectors.toSet());
     }
 
     /**

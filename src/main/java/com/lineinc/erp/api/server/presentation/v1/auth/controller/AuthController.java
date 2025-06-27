@@ -105,8 +105,7 @@ public class AuthController {
         UserInfoResponse response = new UserInfoResponse(
                 user.getId(),
                 user.getLoginId(),
-                user.getUsername(),
-                user.getAccountType()
+                user.getUsername()
         );
 
         return ResponseEntity.ok(SuccessResponse.of(response));
