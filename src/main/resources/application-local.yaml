@@ -34,3 +34,12 @@ session:
   timeout:
     default-seconds: 3600      # 일반 로그인 (1시간)
     auto-login-seconds: 604800 # 자동 로그인 (7일)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
