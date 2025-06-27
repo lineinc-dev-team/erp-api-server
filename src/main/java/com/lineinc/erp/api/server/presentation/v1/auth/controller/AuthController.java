@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +30,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "auth", description = "인증 관련 API")
 public class AuthController {
 
+    @Value("${session.timeout.default-seconds}")
+    private int defaultSeconds;
+
+    @Value("${session.timeout.auto-login-seconds}")
+    private int autoLoginSeconds;
+
     private final AuthenticationManager authenticationManager;
     private final UsersService usersService;
 
@@ -43,6 +50,7 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest
     ) {
+
         // 1. 로그인 인증 토큰 생성
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(request.loginId(), request.password());
@@ -62,10 +70,15 @@ public class AuthController {
         SecurityContextHolder.setContext(context);
 
         // 6. 세션에 SecurityContext 저장
-        httpRequest.getSession(true).setAttribute(
+        HttpSession session = httpRequest.getSession(true);
+        session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 context
         );
+
+        session.setMaxInactiveInterval(Boolean.TRUE.equals(request.autoLogin())
+                ? autoLoginSeconds   // 자동 로그인
+                : defaultSeconds);   // 일반 로그인
 
         return ResponseEntity.ok().build();
     }
