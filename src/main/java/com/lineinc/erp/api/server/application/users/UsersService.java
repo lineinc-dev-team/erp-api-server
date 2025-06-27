@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +39,7 @@ public class UsersService {
 
     @Transactional
     public void updateLastLoginAt(Users user) {
-        user.updateLastLoginAt(LocalDateTime.now());
+        user.updateLastLoginAt(OffsetDateTime.now());
         usersRepository.save(user);
     }
 }

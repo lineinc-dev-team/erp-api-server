@@ -5,8 +5,8 @@ CREATE SEQUENCE IF NOT EXISTS users_seq START WITH 1 INCREMENT BY 50;
 CREATE TABLE company
 (
     id         BIGINT       NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE,
-    updated_at TIMESTAMP WITHOUT TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
     created_by VARCHAR(255),
     updated_by VARCHAR(255),
     deleted    BOOLEAN      NOT NULL,
@@ -18,8 +18,8 @@ CREATE TABLE company
 CREATE TABLE users
 (
     id                BIGINT       NOT NULL,
-    created_at        TIMESTAMP WITHOUT TIME ZONE,
-    updated_at        TIMESTAMP WITHOUT TIME ZONE,
+    created_at        TIMESTAMP WITH TIME ZONE,
+    updated_at        TIMESTAMP WITH TIME ZONE,
     created_by        VARCHAR(255),
     updated_by        VARCHAR(255),
     deleted           BOOLEAN      NOT NULL,
@@ -30,9 +30,9 @@ CREATE TABLE users
     password_hash     VARCHAR(255),
     phone_number      VARCHAR(255),
     is_active         BOOLEAN      NOT NULL,
-    locked_at         TIMESTAMP WITHOUT TIME ZONE,
-    password_reset_at TIMESTAMP WITHOUT TIME ZONE,
-    last_login_at     TIMESTAMP WITHOUT TIME ZONE,
+    locked_at         TIMESTAMP WITH TIME ZONE,
+    password_reset_at TIMESTAMP WITH TIME ZONE,
+    last_login_at     TIMESTAMP WITH TIME ZONE,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 

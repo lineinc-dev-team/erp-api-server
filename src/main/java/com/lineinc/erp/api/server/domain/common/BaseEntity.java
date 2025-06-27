@@ -8,7 +8,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * 모든 Entity의 공통 필드를 정의한 추상 클래스입니다.
@@ -33,15 +33,16 @@ public abstract class BaseEntity {
      * - 변경 불가(updatable = false)
      */
     @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+    @Column(updatable = false, columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime createdAt;
 
     /**
      * 수정 일시 자동 저장 필드
      * - 엔티티가 수정될 때 현재 시간으로 자동 업데이트
      */
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    @Column(updatable = false, columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime updatedAt;
 
     /**
      * 생성자 정보 자동 저장 필드

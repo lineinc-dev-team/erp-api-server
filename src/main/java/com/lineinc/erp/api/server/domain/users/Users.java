@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,20 +55,20 @@ public class Users extends BaseEntity implements UserDetails {
     /**
      * 계정 잠금 시각 (로그인 실패 등으로 잠긴 시간 저장)
      */
-    @Column
-    private LocalDateTime lockedAt;
+    @Column(columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime lockedAt;
 
     /**
      * 비밀번호 초기화 시각 (비밀번호 변경 혹은 초기화된 시간)
      */
-    @Column
-    private LocalDateTime passwordResetAt;
+    @Column(columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime passwordResetAt;
 
     /**
      * 최종 로그인 시각
      */
-    @Column
-    private LocalDateTime lastLoginAt;
+    @Column(columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime lastLoginAt;
 
     /**
      * 권한 목록 반환
@@ -93,7 +93,7 @@ public class Users extends BaseEntity implements UserDetails {
      */
     public void updatePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
-        this.passwordResetAt = LocalDateTime.now(); // 비밀번호 변경 시각도 기록
+        this.passwordResetAt = OffsetDateTime.now(); // 비밀번호 변경 시각도 기록
     }
 
     /**
@@ -101,7 +101,7 @@ public class Users extends BaseEntity implements UserDetails {
      *
      * @param now 현재 시각
      */
-    public void updateLastLoginAt(LocalDateTime now) {
+    public void updateLastLoginAt(OffsetDateTime now) {
         this.lastLoginAt = now;
     }
 }
