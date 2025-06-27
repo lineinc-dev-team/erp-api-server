@@ -59,16 +59,21 @@ public class Users extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TIMESTAMPTZ")
     private OffsetDateTime lastLoginAt;
 
+    /**
+     * 권환 목록 반환
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable()
+    private Set<Role> roles;
 
     /**
      * 권한 목록 반환
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-//        return roles.stream()
-//                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-//                .collect(Collectors.toSet());
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .collect(Collectors.toSet());
     }
 
     /**
