@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.domain.role.Role;
 import com.lineinc.erp.api.server.domain.users.Users;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.LoginRequest;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
@@ -23,6 +24,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/auth")
@@ -102,10 +105,15 @@ public class AuthController {
     public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(Authentication authentication) {
         Users user = usersService.getUserByLoginIdOrThrow(((Users) authentication.getPrincipal()).getLoginId());
 
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .toList();
+
         UserInfoResponse response = new UserInfoResponse(
                 user.getId(),
                 user.getLoginId(),
-                user.getUsername()
+                user.getUsername(),
+                roles
         );
 
         return ResponseEntity.ok(SuccessResponse.of(response));

@@ -2,6 +2,8 @@ package com.lineinc.erp.api.server.presentation.v1.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.List;
+
 @Schema(description = "로그인된 사용자 정보 응답")
 public record UserInfoResponse(
         @Schema(description = "사용자 ID", example = "123")
@@ -11,6 +13,9 @@ public record UserInfoResponse(
         String loginId,
 
         @Schema(description = "사용자 이름", example = "홍길동")
-        String name
+        String name,
+
+        @Schema(description = "사용자 권한 목록", example = "[\"ADMIN\", \"MANAGER\"]")
+        List<String> roles
 ) {
 }
