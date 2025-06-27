@@ -69,4 +69,12 @@ public abstract class BaseEntity {
      */
     @Column(nullable = false)
     private boolean deleted = false;
+
+    /**
+     * 삭제 일시 저장 필드 (Soft Delete용)
+     * - 삭제 시점 기록
+     * - 삭제되지 않은 경우 null
+     */
+    @Column(columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime deletedAt;
 }

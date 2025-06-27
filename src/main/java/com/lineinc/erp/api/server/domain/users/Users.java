@@ -49,15 +49,6 @@ public class Users extends BaseEntity implements UserDetails {
     @Column
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private Boolean isActive = true;
-
-    /**
-     * 계정 잠금 시각 (로그인 실패 등으로 잠긴 시간 저장)
-     */
-    @Column(columnDefinition = "TIMESTAMPTZ")
-    private OffsetDateTime lockedAt;
-
     /**
      * 비밀번호 초기화 시각 (비밀번호 변경 혹은 초기화된 시간)
      */
