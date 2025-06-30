@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -102,9 +103,7 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(Authentication authentication) {
-        Users user = usersService.getUserByLoginIdOrThrow(((Users) authentication.getPrincipal()).getLoginId());
-
+    public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(@AuthenticationPrincipal Users user) {
         List<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .toList();
