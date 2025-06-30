@@ -12,10 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serial;
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Builder
 @Entity
 @Table(indexes = {
         @Index(columnList = "username")  // username 컬럼에 인덱스 생성 (검색 성능 향상 목적)

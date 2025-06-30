@@ -32,8 +32,8 @@ user:
 
 session:
   timeout:
-    default-seconds: 3600      # 일반 로그인 (1시간)
-    auto-login-seconds: 604800 # 자동 로그인 (7일)
+    default-seconds: ${SESSION_TIMEOUT_DEFAULT_SECONDS}
+    auto-login-seconds: ${SESSION_TIMEOUT_AUTO_LOGIN_SECONDS}
 
 management:
   endpoints:

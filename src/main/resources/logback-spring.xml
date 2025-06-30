@@ -60,8 +60,8 @@
         <appender-ref ref="ErrorFile"/>
     </root>
 
-    <!-- local, dev 환경 공통 설정 -->
-    <springProfile name="local,dev">
+    <!-- test, local, dev 환경 공통 설정 -->
+    <springProfile name="test,local,dev">
         <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
 
         <root level="INFO">

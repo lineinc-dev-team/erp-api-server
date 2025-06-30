@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/erpdb
+    username: erpuser
+    password: erppassword
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: false
+
+cors:
+  allowed-origins: "*"
+
+user:
+  default-password: "testDefaultPassword"
+
+session:
+  timeout:
+    default-seconds: 3600
+    auto-login-seconds: 604800
+
