@@ -41,7 +41,7 @@ public abstract class BaseEntity {
      * - 엔티티가 수정될 때 현재 시간으로 자동 업데이트
      */
     @UpdateTimestamp
-    @Column(updatable = false, columnDefinition = "TIMESTAMPTZ")
+    @Column(columnDefinition = "TIMESTAMPTZ")
     private OffsetDateTime updatedAt;
 
     /**

@@ -104,17 +104,18 @@ public class AuthController {
     })
     @GetMapping("/me")
     public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(@AuthenticationPrincipal Users user) {
-        List<String> roles = user.getRoles().stream()
+        Users findUser = usersService.getUserByLoginIdOrThrow(user.getLoginId());
+
+        List<String> roles = findUser.getRoles().stream()
                 .map(Role::getName)
                 .toList();
 
         UserInfoResponse response = new UserInfoResponse(
-                user.getId(),
-                user.getLoginId(),
-                user.getUsername(),
+                findUser.getId(),
+                findUser.getLoginId(),
+                findUser.getUsername(),
                 roles
         );
-
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

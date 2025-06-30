@@ -9,7 +9,6 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
-    open-in-view: false
     hibernate:
       ddl-auto: none  # Hibernate가 테이블을 자동으로 생성/수정하지 않음 (Flyway가 스키마 관리함)
     show-sql: true    # 실행되는 SQL을 콘솔에 출력
