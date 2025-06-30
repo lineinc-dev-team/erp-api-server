@@ -10,7 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -42,4 +46,10 @@ public class UsersService {
         user.updateLastLoginAt(OffsetDateTime.now());
         usersRepository.save(user);
     }
+
+    @Transactional(readOnly = true)
+    public Page<Users> getAllUsers(Pageable pageable) {
+        return usersRepository.findAll(pageable);
+    }
+
 }
