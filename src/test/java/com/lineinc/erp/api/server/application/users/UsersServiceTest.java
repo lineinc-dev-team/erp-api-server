@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.users.UsersRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ class UsersServiceTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Value("${user.default-password}")
+    private String defaultPassword;
 
     @Test
     @DisplayName("존재하는 로그인 ID로 사용자 조회 시 Users 반환")
@@ -81,7 +85,7 @@ class UsersServiceTest {
 
         // then
         Users updatedUser = usersRepository.findByLoginId("test123").orElseThrow();
-        assertThat(passwordEncoder.matches("testDefaultPassword", updatedUser.getPassword())).isTrue();
+        assertThat(passwordEncoder.matches(defaultPassword, updatedUser.getPassword())).isTrue();
         assertThat(updatedUser.getPasswordResetAt()).isNotNull();
     }
 
