@@ -15,7 +15,7 @@ public record UserInfoResponse(
         String loginId,
 
         @Schema(description = "사용자 이름", example = "홍길동")
-        String name,
+        String username,
 
         @Schema(description = "사용자 권한 목록", example = "[\"어드민\", \"매니저\"]")
         List<String> roles
