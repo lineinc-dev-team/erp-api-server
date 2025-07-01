@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.application.users;
 
 import com.lineinc.erp.api.server.domain.users.Users;
 import com.lineinc.erp.api.server.domain.users.UsersRepository;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -48,8 +49,8 @@ public class UsersService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Users> getAllUsers(Pageable pageable) {
-        return usersRepository.findAll(pageable);
+    public Page<UserInfoResponse> getAllUsers(Pageable pageable) {
+        return usersRepository.findAll(pageable).map(UserInfoResponse::from);
     }
 
 }

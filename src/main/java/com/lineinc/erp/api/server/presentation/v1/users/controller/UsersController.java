@@ -4,9 +4,10 @@ import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
-import com.lineinc.erp.api.server.domain.role.Role;
+import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.users.dto.ResetPasswordRequest;
+import com.lineinc.erp.api.server.presentation.v1.users.dto.UsersSearchRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,27 +47,25 @@ public class UsersController {
     })
     @GetMapping
     public ResponseEntity<SuccessResponse<PagingResponse<UserInfoResponse>>> getAllUsers(
-            @RequestParam int page,
-            @RequestParam int size
+            @Valid UsersSearchRequest request
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserInfoResponse> pageResult = usersService.getAllUsers(pageable)
-                .map(user -> new UserInfoResponse(
-                        user.getId(),
-                        user.getLoginId(),
-                        user.getUsername(),
-                        user.getRoles().stream().map(Role::getName).toList()
-                ));
+        // 요청 DTO에서 페이지 번호와 페이지 크기 추출
+        int page = request.page();
+        int size = request.size();
 
-        PagingInfo pagingInfo = new PagingInfo(
-                pageResult.getNumber(),
-                pageResult.getSize(),
-                pageResult.getTotalElements(),
-                pageResult.getTotalPages()
-        );
+        // 정렬 조건을 포함한 Pageable 객체 생성
+        Pageable pageable = PageableUtils.createPageable(page, size, request.sort());
 
+        // 사용자 목록 조회 (페이징 처리 포함)
+        Page<UserInfoResponse> pageResult = usersService.getAllUsers(pageable);
+
+        // 페이징 정보 구성
+        PagingInfo pagingInfo = PagingInfo.from(pageResult);
+
+        // 페이징 응답 형태로 변환
         PagingResponse<UserInfoResponse> response = new PagingResponse<>(pagingInfo, pageResult.getContent());
 
+        // 성공 응답 반환
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

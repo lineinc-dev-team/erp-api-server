@@ -16,15 +16,5 @@ public record PagingResponse<T>(
         this.pageInfo = pageInfo;
         this.content = content;
     }
-
-    public static <T> PagingResponse<T> of(org.springframework.data.domain.Page<T> page) {
-        PagingInfo info = new PagingInfo(
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages()
-        );
-        return new PagingResponse<>(info, page.getContent());
-    }
 }
 
