@@ -4,11 +4,13 @@ import com.lineinc.erp.api.server.config.support.audit.AuditorAwareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
  * JPA Auditing 설정 클래스입니다.
  * - @EnableJpaAuditing을 통해 JPA Auditing 기능 활성화
  */
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @Configuration
 public class JpaAuditingConfig {
 
