@@ -23,19 +23,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * CORS 매핑 전역 설정
-     * - 환경변수(cors.allowed-origins)에 정의된 Origin들만 허용
      * - 모든 엔드포인트 경로, HTTP 메서드, 헤더를 허용하며, 자격 증명(쿠키, 세션 등)도 함께 전달 가능
      */
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
-        // 환경 파일에서 허용된 origin 목록을 배열로 가져옴
-        String[] allowedOrigins = environment.getProperty(
-                "cors.allowed-origins", String[].class, new String[0]
-        );
 
         // CORS 설정 등록
         registry.addMapping("/**")        // 모든 API 엔드포인트 허용
-                .allowedOrigins(allowedOrigins)      // 설정된 Origin만 허용
+                .allowedOriginPatterns("*")
                 .allowedMethods("*")                 // GET, POST, PUT, DELETE 등 모든 HTTP 메서드 허용
                 .allowedHeaders("*")                 // 모든 요청 헤더 허용
                 .allowCredentials(true);             // 쿠키/세션 등의 인증 정보 포함 허용

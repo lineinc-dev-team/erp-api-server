@@ -15,7 +15,7 @@ public class ClientCompanyContact extends BaseEntity {
      * 이 담당자가 속한 발주처 엔티티
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "client_company_id", nullable = false)
     private ClientCompany clientCompany;
 
     /**

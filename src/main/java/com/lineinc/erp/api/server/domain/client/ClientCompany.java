@@ -32,6 +32,12 @@ public class ClientCompany extends BaseEntity {
     @Column
     private String address;
 
+    /**
+     * 지역번호 (예: 02, 031)
+     */
+    @Column
+    private String areaCode;
+
     @Column
     private String phoneNumber;
 
@@ -55,7 +61,7 @@ public class ClientCompany extends BaseEntity {
      * 발주처 담당자 목록
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn
+    @JoinColumn(name = "client_company_id")
     @Builder.Default
     private List<ClientCompanyContact> contacts = new ArrayList<>();
 
@@ -63,9 +69,9 @@ public class ClientCompany extends BaseEntity {
      * 발주처 관련 첨부파일 목록
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn
+    @JoinColumn(name = "client_company_id")
     @Builder.Default
-    private List<ClientCompanyFile> attachments = new ArrayList<>();
+    private List<ClientCompanyFile> files = new ArrayList<>();
 
     /**
      * 사용 여부 (true: 사용, false: 미사용)

@@ -2,15 +2,27 @@ package com.lineinc.erp.api.server.domain.client;
 
 import com.lineinc.erp.api.server.domain.common.BaseEntity;
 import jakarta.persistence.*;
+import lombok.*;
+
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class ClientCompanyFile extends BaseEntity {
     /**
      * 이 파일이 연결된 발주처 엔티티
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "client_company_id", nullable = false)
     private ClientCompany clientCompany;
+
+    /**
+     * 문서명 (사용자가 지정하는 파일 이름)
+     */
+    @Column(nullable = false)
+    private String documentName;
 
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL

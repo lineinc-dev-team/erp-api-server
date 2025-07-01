@@ -15,9 +15,6 @@ spring:
   flyway:
     enabled: false
 
-cors:
-  allowed-origins: "*"
-
 user:
   default-password: "testDefaultPassword"
 
