@@ -1,0 +1,32 @@
+package com.lineinc.erp.api.server.domain.client;
+
+import com.lineinc.erp.api.server.domain.common.BaseEntity;
+import jakarta.persistence.*;
+
+@Entity
+public class ClientCompanyFile extends BaseEntity {
+    /**
+     * 이 파일이 연결된 발주처 엔티티
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private ClientCompany clientCompany;
+
+    /**
+     * S3 또는 외부 스토리지에 저장된 파일의 URL
+     */
+    @Column(nullable = false)
+    private String fileUrl; // S3 경로
+
+    /**
+     * 업로드된 파일의 원본 파일명
+     */
+    @Column
+    private String originalFileName;
+
+    /**
+     * 파일에 대한 비고 또는 설명
+     */
+    @Column(columnDefinition = "TEXT")
+    private String memo; // 비고 / 메모
+}
