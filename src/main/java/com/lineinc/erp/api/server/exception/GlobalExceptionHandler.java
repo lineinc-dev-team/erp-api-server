@@ -2,17 +2,22 @@ package com.lineinc.erp.api.server.exception;
 
 import com.lineinc.erp.api.server.common.response.ErrorResponse;
 import com.lineinc.erp.api.server.common.response.FieldErrorDetail;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,6 +26,8 @@ import java.util.List;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String DEFAULT_VALIDATION_ERROR_MESSAGE = "입력값이 유효하지 않습니다.";
 
     /**
      * 정적 리소스 요청 시 해당 리소스가 없을 때 발생하는 예외 처리
@@ -46,7 +53,42 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.BAD_REQUEST.value(),
-                "입력값이 유효하지 않습니다.",
+                DEFAULT_VALIDATION_ERROR_MESSAGE,
+                fieldErrors
+        );
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * JSON 파싱 실패 또는 Enum 값 불일치 시 처리
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        List<FieldErrorDetail> fieldErrors = new ArrayList<>();
+
+        // JSON 역직렬화 중 InvalidFormatException이 발생한 경우 (예: Enum 파싱 실패)
+        if (ex.getCause() instanceof InvalidFormatException invalidFormatException) {
+            invalidFormatException.getPath().forEach(ref -> {
+                String field = ref.getFieldName(); // 문제가 발생한 필드명
+                String rejectedValue = String.valueOf(invalidFormatException.getValue()); // 잘못 전달된 값
+                String allowedValues = "";
+
+                // Enum 타입인 경우 허용된 값 목록을 문자열로 나열
+                if (invalidFormatException.getTargetType().isEnum()) {
+                    Object[] enumConstants = invalidFormatException.getTargetType().getEnumConstants();
+                    allowedValues = " 허용된 값: " + Arrays.toString(enumConstants);
+                }
+
+                // 최종 오류 메시지 구성
+                String message = "잘못된 값: '" + rejectedValue + "'." + allowedValues;
+                fieldErrors.add(new FieldErrorDetail(field, message));
+            });
+        }
+
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                DEFAULT_VALIDATION_ERROR_MESSAGE,
                 fieldErrors
         );
 
@@ -70,37 +112,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 명시적으로 상태 코드가 설정된 예외
+     * 지원하지 않는 Content-Type 요청 처리
      */
-    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
-    public ResponseEntity<ErrorResponse> handleResponseStatusException(org.springframework.web.server.ResponseStatusException ex) {
-        ErrorResponse response = ErrorResponse.of(
-                ex.getStatusCode().value(),
-                ex.getReason() != null ? ex.getReason() : "요청 처리 중 오류가 발생했습니다.",
-                List.of()
-        );
-        return ResponseEntity.status(ex.getStatusCode()).body(response);
-    }
-
-    /**
-     * 접근 권한이 없는 경우
-     */
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
-        return buildErrorResponse(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
-    }
-
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
-        log.error("IO 예외 발생", ex);
-        ErrorResponse response = ErrorResponse.of(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "파일 처리 중 오류가 발생했습니다.",
-                List.of()
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    }
-
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex) {
         log.error("지원되지 않는 Content-Type 요청: {}", ex.getContentType(), ex);
@@ -110,6 +123,28 @@ public class GlobalExceptionHandler {
                 List.of()
         );
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(response);
+    }
+
+    /**
+     * 접근 권한이 없는 경우 처리
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+    }
+
+    /**
+     * 입출력(IO) 예외 처리
+     */
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
+        log.error("IO 예외 발생", ex);
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "파일 처리 중 오류가 발생했습니다.",
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     /**

@@ -74,11 +74,11 @@ public class ClientCompany extends BaseEntity {
     private List<ClientCompanyFile> files = new ArrayList<>();
 
     /**
-     * 사용 여부 (true: 사용, false: 미사용)
+     * 사용 여부
      */
     @Builder.Default
     @Column(nullable = false)
-    private boolean active = true;
+    private boolean isActive = true;
 
     /**
      * 비고 / 메모

@@ -10,14 +10,15 @@ public record ClientCompanyFileRequest(
         @Schema(description = "문서명", example = "계약서_2024")
         String documentName,
 
-        @Schema(description = "파일에 대한 메모", example = "계약서 사본")
-        String memo,
-
         @NotBlank
         @Schema(description = "파일 접근용 URL", example = "https://s3.amazonaws.com/bucket/contract_2024.pdf")
         String fileUrl,
 
+        @NotBlank
         @Schema(description = "원본 파일명", example = "contract_2024.pdf")
-        String originalFileName
+        String originalFileName,
+
+        @Schema(description = "파일에 대한 메모", example = "계약서 사본")
+        String memo
 ) {
 }

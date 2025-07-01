@@ -27,7 +27,7 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "전화번호 지역번호", example = "02")
         String areaCode,
 
-        @Schema(description = "전화번호", example = "12345678")
+        @Schema(description = "전화번호", example = "010-1234-5678")
         String phoneNumber,
 
         @Schema(description = "이메일", example = "example@samsung.com")
@@ -41,6 +41,9 @@ public record ClientCompanyCreateRequest(
 
         @Schema(description = "비고 / 메모")
         String memo,
+
+        @Schema(description = "사용 여부", example = "true")
+        boolean isActive,
 
         @Schema(description = "담당자 목록")
         List<ClientCompanyContactCreateRequest> contacts,
