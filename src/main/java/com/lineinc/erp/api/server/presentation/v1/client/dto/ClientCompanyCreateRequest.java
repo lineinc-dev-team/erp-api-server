@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto;
 
 import com.lineinc.erp.api.server.domain.client.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -47,9 +48,11 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "사용 여부", example = "true")
         boolean isActive,
 
+        @Valid
         @Schema(description = "담당자 목록")
         List<ClientCompanyContactCreateRequest> contacts,
 
+        @Valid
         @Schema(description = "파일 목록")
         List<ClientCompanyFileRequest> files
 ) {

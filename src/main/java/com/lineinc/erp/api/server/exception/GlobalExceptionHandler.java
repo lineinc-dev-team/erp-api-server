@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.exception;
 
 import com.lineinc.erp.api.server.common.response.ErrorResponse;
 import com.lineinc.erp.api.server.common.response.FieldErrorDetail;
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,8 +28,6 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final String DEFAULT_VALIDATION_ERROR_MESSAGE = "입력값이 유효하지 않습니다.";
-
     /**
      * 정적 리소스 요청 시 해당 리소스가 없을 때 발생하는 예외 처리
      */
@@ -36,7 +35,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException ex) {
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.NOT_FOUND.value(),
-                "요청한 리소스를 찾을 수 없습니다.",
+                ValidationMessages.RESOURCE_NOT_FOUND,
                 List.of()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -53,7 +52,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.BAD_REQUEST.value(),
-                DEFAULT_VALIDATION_ERROR_MESSAGE,
+                ValidationMessages.DEFAULT_INVALID_INPUT,
                 fieldErrors
         );
 
@@ -88,7 +87,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.BAD_REQUEST.value(),
-                DEFAULT_VALIDATION_ERROR_MESSAGE,
+                ValidationMessages.DEFAULT_INVALID_INPUT,
                 fieldErrors
         );
 
@@ -108,7 +107,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials() {
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ValidationMessages.PASSWORD_MISMATCH);
     }
 
     /**
@@ -119,7 +118,7 @@ public class GlobalExceptionHandler {
         log.error("지원되지 않는 Content-Type 요청: {}", ex.getContentType(), ex);
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
-                "지원하지 않는 콘텐츠 타입입니다: " + ex.getContentType(),
+                ValidationMessages.UNSUPPORTED_CONTENT_TYPE + ": " + ex.getContentType(),
                 List.of()
         );
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(response);
@@ -130,7 +129,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
-        return buildErrorResponse(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ValidationMessages.ACCESS_DENIED);
     }
 
     /**
@@ -141,7 +140,7 @@ public class GlobalExceptionHandler {
         log.error("IO 예외 발생", ex);
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "파일 처리 중 오류가 발생했습니다.",
+                ValidationMessages.FILE_PROCESS_ERROR,
                 List.of()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -153,7 +152,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
         log.error("Unhandled Exception", e);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.");
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ValidationMessages.INTERNAL_SERVER_ERROR);
     }
 
     /**

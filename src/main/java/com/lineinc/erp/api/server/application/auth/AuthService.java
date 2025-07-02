@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.auth;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.users.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -16,6 +17,6 @@ public class AuthService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String loginId) {
         return usersRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new BadCredentialsException("존재하지 않는 사용자입니다"));
+                .orElseThrow(() -> new BadCredentialsException(ValidationMessages.USER_NOT_FOUND));
     }
 }

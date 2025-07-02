@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.URL;
 
 @Schema(description = "발주처 파일 정보")
 public record ClientCompanyFileRequest(
