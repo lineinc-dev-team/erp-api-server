@@ -91,6 +91,10 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
             // 발주처명에 대해 대소문자 구분 없이 부분 일치 검색
             builder.and(clientCompany.name.containsIgnoreCase(request.name().trim()));
         }
+        if (StringUtils.hasText(request.businessNumber())) {
+            // 사업자번호에 대해 부분 일치 검색
+            builder.and(clientCompany.businessNumber.contains(request.businessNumber().trim()));
+        }
 
         return builder;
     }
