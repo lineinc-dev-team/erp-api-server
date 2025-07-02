@@ -40,7 +40,10 @@ class UsersServiceTest {
     @DisplayName("존재하는 로그인 ID로 사용자 조회 시 Users 반환")
     void getUserByLoginIdOrThrow_success() {
         // given
-        Company company = new Company("testCompany");
+        Company company = Company.builder()
+                .name("testCompany")
+                .build();
+
         companyRepository.save(company);
 
         Users user = Users.builder()
@@ -70,7 +73,10 @@ class UsersServiceTest {
     @DisplayName("비밀번호 리셋 시 기본 비밀번호로 암호화하여 업데이트")
     void resetPassword_updatesPasswordHash() {
         // given
-        Company company = new Company("testCompany");
+        Company company = Company.builder()
+                .name("testCompany")
+                .build();
+
         companyRepository.save(company);
 
         Users user = Users.builder()
@@ -93,7 +99,10 @@ class UsersServiceTest {
     @DisplayName("마지막 로그인 시간 업데이트")
     void updateLastLoginAt_updatesTime() {
         // given
-        Company company = new Company("testCompany");
+        Company company = Company.builder()
+                .name("testCompany")
+                .build();
+        
         companyRepository.save(company);
 
         Users user = Users.builder()

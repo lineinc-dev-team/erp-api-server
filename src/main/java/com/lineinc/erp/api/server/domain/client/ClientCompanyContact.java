@@ -11,6 +11,11 @@ import lombok.*;
 @Builder
 public class ClientCompanyContact extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_contact_seq")
+    @SequenceGenerator(name = "client_company_contact_seq", sequenceName = "client_company_contact_seq", allocationSize = 1)
+    private Long id;
+
     /**
      * 이 담당자가 속한 발주처 엔티티
      */
@@ -29,6 +34,9 @@ public class ClientCompanyContact extends BaseEntity {
      */
     @Column
     private String position;
+
+    @Column
+    private String landlineNumber;
 
     @Column
     private String phoneNumber;

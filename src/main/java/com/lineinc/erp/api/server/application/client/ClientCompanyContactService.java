@@ -6,20 +6,22 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.ClientCompanyContac
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ClientCompanyContactService {
-    public void createClientCompanyContacts(ClientCompany parent, List<ClientCompanyContactCreateRequest> contacts) {
-        if (contacts == null) return;
-        for (var dto : contacts) {
-            parent.getContacts().add(ClientCompanyContact.builder()
-                    .name(dto.name())
-                    .position(dto.position())
-                    .phoneNumber(dto.phoneNumber())
-                    .email(dto.email())
-                    .memo(dto.memo())
-                    .clientCompany(parent)
-                    .build());
-        }
+    public void createClientCompanyContacts(ClientCompany clientCompany, List<ClientCompanyContactCreateRequest> contacts) {
+        if (Objects.isNull(contacts) || contacts.isEmpty()) return;
+        contacts.stream()
+                .map(dto -> ClientCompanyContact.builder()
+                        .name(dto.name())
+                        .position(dto.position())
+                        .landlineNumber(dto.landlineNumber())
+                        .phoneNumber(dto.phoneNumber())
+                        .email(dto.email())
+                        .memo(dto.memo())
+                        .clientCompany(clientCompany)
+                        .build())
+                .forEach(clientCompany.getContacts()::add);
     }
 }

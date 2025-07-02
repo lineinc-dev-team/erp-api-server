@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.auth;
 
+import com.lineinc.erp.api.server.domain.client.ClientCompany;
 import com.lineinc.erp.api.server.domain.company.Company;
 import com.lineinc.erp.api.server.domain.company.CompanyRepository;
 import com.lineinc.erp.api.server.domain.role.RoleRepository;
@@ -34,7 +35,10 @@ class AuthServiceTest {
     @DisplayName("정상적인 로그인 ID를 주면 UserDetails 반환")
     void loadUserByUsername_success() {
         // given: 테스트용 회사와 권한, 사용자 데이터를 DB에 저장
-        Company company = new Company("testCompany");
+        Company company = Company.builder()
+                .name("testCompany")
+                .build();
+        
         companyRepository.save(company);
 
         Users user = Users.builder()

@@ -17,22 +17,26 @@ public class ClientCompanyService {
 
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
-        ClientCompany entity = clientCompanyRepository.save(
-                ClientCompany.builder()
-                        .name(request.name())
-                        .businessNumber(request.businessNumber())
-                        .ceoName(request.ceoName())
-                        .address(request.address())
-                        .areaCode(request.areaCode())
-                        .phoneNumber(request.phoneNumber())
-                        .email(request.email())
-                        .paymentMethod(request.paymentMethod())
-                        .paymentPeriod(request.paymentPeriod())
-                        .memo(request.memo())
-                        .build()
-        );
+        // 1. ClientCompany 객체 먼저 빌드
+        ClientCompany clientCompany = ClientCompany.builder()
+                .name(request.name())
+                .businessNumber(request.businessNumber())
+                .ceoName(request.ceoName())
+                .address(request.address())
+                .areaCode(request.areaCode())
+                .phoneNumber(request.phoneNumber())
+                .email(request.email())
+                .paymentMethod(request.paymentMethod())
+                .paymentPeriod(request.paymentPeriod())
+                .memo(request.memo())
+                .isActive(request.isActive())
+                .build();
 
-        contactService.createClientCompanyContacts(entity, request.contacts());
-        fileService.createClientCompanyFile(entity, request.files());
+        // 2. 자식 엔티티 생성 + 연관관계 설정
+        contactService.createClientCompanyContacts(clientCompany, request.contacts());
+        fileService.createClientCompanyFile(clientCompany, request.files());
+
+        // 3. 모든 연관관계 설정 후 save
+        clientCompanyRepository.save(clientCompany);
     }
 }

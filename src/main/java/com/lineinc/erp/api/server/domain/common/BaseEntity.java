@@ -20,14 +20,6 @@ import java.time.OffsetDateTime;
 public abstract class BaseEntity {
 
     /**
-     * 기본 PK 필드
-     * - 시퀀스 전략을 사용하여 자동 생성
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-
-    /**
      * 생성 일시 자동 저장 필드
      * - 엔티티가 생성될 때 현재 시간으로 자동 설정
      * - 변경 불가(updatable = false)

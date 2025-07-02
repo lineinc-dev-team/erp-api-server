@@ -6,19 +6,20 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.ClientCompanyFileRe
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ClientCompanyFileService {
-    public void createClientCompanyFile(ClientCompany parent, List<ClientCompanyFileRequest> files) {
-        if (files == null) return;
-        for (var dto : files) {
-            parent.getFiles().add(ClientCompanyFile.builder()
-                    .documentName(dto.documentName())
-                    .fileUrl(dto.fileUrl())
-                    .originalFileName(dto.originalFileName())
-                    .memo(dto.memo())
-                    .clientCompany(parent)
-                    .build());
-        }
+    public void createClientCompanyFile(ClientCompany clientCompany, List<ClientCompanyFileRequest> files) {
+        if (Objects.isNull(files) || files.isEmpty()) return;
+        files.stream()
+                .map(dto -> ClientCompanyFile.builder()
+                        .documentName(dto.documentName())
+                        .fileUrl(dto.fileUrl())
+                        .originalFileName(dto.originalFileName())
+                        .memo(dto.memo())
+                        .clientCompany(clientCompany)
+                        .build())
+                .forEach(clientCompany.getFiles()::add);
     }
 }

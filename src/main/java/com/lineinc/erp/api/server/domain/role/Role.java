@@ -16,6 +16,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class Role extends BaseEntity implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")
+    @SequenceGenerator(name = "role_seq", sequenceName = "role_seq", allocationSize = 1)
+    private Long id;
+    
     @Serial
     private static final long serialVersionUID = 1L;
 

@@ -28,6 +28,11 @@ public class Users extends BaseEntity implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    @SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
+    private Long id;
+
     /**
      * 소속 회사 정보 (User - Company : 다대일 관계)
      */

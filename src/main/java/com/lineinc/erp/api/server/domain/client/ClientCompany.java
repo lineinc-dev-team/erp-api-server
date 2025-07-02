@@ -14,6 +14,11 @@ import java.util.List;
 @Builder
 public class ClientCompany extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_seq")
+    @SequenceGenerator(name = "client_company_seq", sequenceName = "client_company_seq", allocationSize = 1)
+    private Long id;
+
     @Column(nullable = false)
     private String name;
 
@@ -60,16 +65,14 @@ public class ClientCompany extends BaseEntity {
     /**
      * 발주처 담당자 목록
      */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "client_company_id")
+    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ClientCompanyContact> contacts = new ArrayList<>();
 
     /**
      * 발주처 관련 첨부파일 목록
      */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "client_company_id")
+    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ClientCompanyFile> files = new ArrayList<>();
 

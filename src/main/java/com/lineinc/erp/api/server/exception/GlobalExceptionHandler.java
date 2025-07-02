@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
                 }
 
                 // 최종 오류 메시지 구성
-                String message = "잘못된 값: '" + rejectedValue + "'." + allowedValues;
+                String message = rejectedValue + "'." + allowedValues;
                 fieldErrors.add(new FieldErrorDetail(field, message));
             });
         }

@@ -2,11 +2,12 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto;
 
 import com.lineinc.erp.api.server.domain.client.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
-@Schema(description = "발주처 등록 요청 DTO")
+@Schema(description = "발주처 등록 요청")
 public record ClientCompanyCreateRequest(
         @NotBlank
         @Schema(description = "발주처명", example = "삼성건설")
@@ -30,6 +31,7 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "전화번호", example = "010-1234-5678")
         String phoneNumber,
 
+        @Email
         @Schema(description = "이메일", example = "example@samsung.com")
         String email,
 

@@ -11,6 +11,12 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ClientCompanyFile extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_file_seq")
+    @SequenceGenerator(name = "client_company_file_seq", sequenceName = "client_company_file_seq", allocationSize = 1)
+    private Long id;
+
     /**
      * 이 파일이 연결된 발주처 엔티티
      */
