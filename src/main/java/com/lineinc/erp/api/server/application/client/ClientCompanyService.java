@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +45,6 @@ public class ClientCompanyService {
 
     @Transactional(readOnly = true)
     public Page<ClientCompanyResponse> getAllClientCompanies(ClientCompanyListRequest request, Pageable pageable) {
-        System.out.println("request = " + request);
-        System.out.println("pageable = " + pageable);
         return clientCompanyRepository.findAll(request, pageable);
     }
 }

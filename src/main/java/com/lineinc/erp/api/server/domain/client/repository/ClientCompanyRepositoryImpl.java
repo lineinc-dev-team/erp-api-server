@@ -1,99 +1,95 @@
 package com.lineinc.erp.api.server.domain.client.repository;
 
+import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.QClientCompany;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Objects;
 
+/**
+ * ClientCompanyRepositoryCustom의 구현체.
+ * 발주처(ClientCompany) 목록 조회 시, QueryDSL을 사용하여 조건 검색 및 페이징 처리.
+ */
 @Repository
 @RequiredArgsConstructor
 public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final QClientCompany clientCompany = QClientCompany.clientCompany;
 
+    // 정렬 필드를 미리 정의하여 정적 매핑. 추후 정렬 기준이 늘어나면 여기에 추가.
+    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
+            "id", QClientCompany.clientCompany.id,
+            "name", QClientCompany.clientCompany.name
+    );
+
+    /**
+     * ClientCompany 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
+     *
+     * @param request  검색 조건 (예: 발주처명)
+     * @param pageable 페이징 및 정렬 정보
+     * @return ClientCompanyResponse 리스트를 담은 Page 객체
+     */
     @Override
     public Page<ClientCompanyResponse> findAll(ClientCompanyListRequest request, Pageable pageable) {
-        QClientCompany clientCompany = QClientCompany.clientCompany;
-
-        BooleanBuilder builder = buildConditions(request, clientCompany);
-
-        OrderSpecifier<?>[] orderSpecifiers = buildOrderSpecifiers(pageable, clientCompany);
+        BooleanBuilder condition = buildCondition(request);
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
+                pageable,
+                SORT_FIELDS,
+                clientCompany.id.desc()
+        );
 
         List<ClientCompany> content = queryFactory
                 .selectFrom(clientCompany)
-                .where(builder)
-                .orderBy(orderSpecifiers)
+                .where(condition)
+                .orderBy(orders)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = queryFactory
+        // count 쿼리를 별도로 수행 (성능 최적화를 위해 fetchResults 대신 직접 분리)
+        Long totalCount = queryFactory
                 .select(clientCompany.count())
                 .from(clientCompany)
-                .where(builder)
+                .where(condition)
                 .fetchOne();
+        long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        return new PageImpl<>(toResponseList(content), pageable, total);
+        List<ClientCompanyResponse> responses = content.stream()
+                .map(ClientCompanyResponse::from)
+                .toList();
+
+        return new PageImpl<>(responses, pageable, total);
     }
 
-    private BooleanBuilder buildConditions(ClientCompanyListRequest request, QClientCompany clientCompany) {
+    /**
+     * 검색 조건을 생성하는 메서드.
+     *
+     * @param request 검색 요청 객체
+     * @return BooleanBuilder (QueryDSL 조건 객체)
+     */
+    private BooleanBuilder buildCondition(ClientCompanyListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (request.name() != null && !request.name().isBlank()) {
+        if (StringUtils.hasText(request.name())) {
+            // 발주처명에 대해 대소문자 구분 없이 부분 일치 검색
             builder.and(clientCompany.name.containsIgnoreCase(request.name().trim()));
         }
 
         return builder;
-    }
-
-    private OrderSpecifier<?>[] buildOrderSpecifiers(Pageable pageable, QClientCompany clientCompany) {
-        if (pageable.getSort().isEmpty()) {
-            return new OrderSpecifier[]{clientCompany.id.desc()};
-        }
-
-        PathBuilder<ClientCompany> entityPath = new PathBuilder<>(ClientCompany.class, "clientCompany");
-
-        return pageable.getSort().stream()
-                .map(order -> {
-                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-                    String property = order.getProperty();
-                    Class<?> type = resolvePropertyType(property);
-
-                    return new OrderSpecifier(direction, (com.querydsl.core.types.Expression<?>) entityPath.get(property, type));
-                })
-                .toArray(OrderSpecifier[]::new);
-    }
-
-    private Class<?> resolvePropertyType(String property) {
-        return switch (property) {
-            case "id" -> Long.class;
-            case "name" -> String.class;
-            // 필요한 필드에 따라 확장 가능
-            default -> String.class;
-        };
-    }
-
-    private List<ClientCompanyResponse> toResponseList(List<ClientCompany> entities) {
-        return entities.stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    private ClientCompanyResponse toResponse(ClientCompany entity) {
-        // 기존 변환 로직
-        return ClientCompanyResponse.from(entity);
     }
 }

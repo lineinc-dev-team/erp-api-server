@@ -1,11 +1,15 @@
 package com.lineinc.erp.api.server.common.util;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PageableUtils {
 
@@ -44,13 +48,35 @@ public class PageableUtils {
     }
 
     /**
-     * Pageable로부터 정렬 정보만 추출하여 QueryDSL에서 사용할 수 있는 형태로 가공
-     * (필요시 OrderSpecifier로 변환 가능)
+     * Pageable의 Sort를 QueryDSL OrderSpecifier 배열로 변환
+     *
+     * @param pageable     페이징 정보
+     * @param fieldMapping 필드명과 QueryDSL Path의 매핑
+     * @param defaultOrder 정렬 조건이 없을 때 사용할 기본 정렬
+     * @return OrderSpecifier 배열
      */
-    public static List<Sort.Order> extractOrders(Pageable pageable) {
-        if (pageable == null || pageable.getSort().isUnsorted()) {
-            return List.of();
+    public static OrderSpecifier<?>[] toOrderSpecifiers(
+            Pageable pageable,
+            Map<String, ComparableExpressionBase<?>> fieldMapping,
+            OrderSpecifier<?> defaultOrder) {
+
+        if (pageable.getSort().isEmpty()) {
+            return new OrderSpecifier[]{defaultOrder};
         }
-        return pageable.getSort().toList();
+
+        return pageable.getSort().stream()
+                .map(order -> {
+                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+                    ComparableExpressionBase<?> path = fieldMapping.get(order.getProperty());
+
+                    // 매핑되지 않은 필드는 기본 정렬 사용
+                    if (path == null) {
+                        return defaultOrder;
+                    }
+
+                    return new OrderSpecifier<>(direction, path);
+                })
+                .toArray(OrderSpecifier[]::new);
     }
+
 }
