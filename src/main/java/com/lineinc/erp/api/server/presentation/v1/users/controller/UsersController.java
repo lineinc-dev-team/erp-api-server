@@ -49,23 +49,11 @@ public class UsersController {
     public ResponseEntity<SuccessResponse<PagingResponse<UserInfoResponse>>> getAllUsers(
             @Valid UsersSearchRequest request
     ) {
-        // 요청 DTO에서 페이지 번호와 페이지 크기 추출
-        int page = request.page();
-        int size = request.size();
-
-        // 정렬 조건을 포함한 Pageable 객체 생성
-        Pageable pageable = PageableUtils.createPageable(page, size, request.sort());
-
-        // 사용자 목록 조회 (페이징 처리 포함)
-        Page<UserInfoResponse> pageResult = usersService.getAllUsers(pageable);
-
-        // 페이징 정보 구성
-        PagingInfo pagingInfo = PagingInfo.from(pageResult);
-
-        // 페이징 응답 형태로 변환
-        PagingResponse<UserInfoResponse> response = new PagingResponse<>(pagingInfo, pageResult.getContent());
-
-        // 성공 응답 반환
-        return ResponseEntity.ok(SuccessResponse.of(response));
+        Page<UserInfoResponse> page = usersService.getAllUsers(
+                PageableUtils.createPageable(request.page(), request.size(), request.sort())
+        );
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+        ));
     }
 }

@@ -13,8 +13,8 @@ public record UsersSearchRequest(
         int page,
 
         @Min(value = 1, message = "size는 1 이상이어야 합니다")
-        @Max(value = 100, message = "size는 최대 100까지 가능합니다")
-        @Schema(description = "한 페이지에 포함될 아이템 수", example = "10")
+        @Max(value = 200, message = "size는 최대 200까지 가능합니다")
+        @Schema(description = "한 페이지에 포함될 아이템 수", example = "20")
         int size,
 
         @Schema(description = "정렬 조건", example = "loginId,asc")

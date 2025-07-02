@@ -1,4 +1,9 @@
 spring:
+  data:
+    web:
+      pageable:
+        max-page-size: 200  # 최대 페이지 크기 제한
+
   jackson:
     time-zone: Asia/Seoul
 
