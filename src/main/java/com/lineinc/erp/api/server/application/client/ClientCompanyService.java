@@ -2,8 +2,12 @@ package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.domain.client.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.ClientCompanyRepository;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.ClientCompanyCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,5 +41,10 @@ public class ClientCompanyService {
 
         // 3. 모든 연관관계 설정 후 save
         clientCompanyRepository.save(clientCompany);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ClientCompanyResponse> getAllClientCompanies(Pageable pageable) {
+        return clientCompanyRepository.findAll(pageable).map(ClientCompanyResponse::from);
     }
 }

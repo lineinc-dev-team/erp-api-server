@@ -22,6 +22,7 @@ spring:
         jdbc:
           time_zone: UTC
         format_sql: true  # SQL 출력 포맷팅
+        default_batch_fetch_size: 200
 
   flyway:
     enabled: true

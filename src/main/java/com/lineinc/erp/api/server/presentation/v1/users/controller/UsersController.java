@@ -7,7 +7,7 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.users.dto.ResetPasswordRequest;
-import com.lineinc.erp.api.server.presentation.v1.users.dto.UsersSearchRequest;
+import com.lineinc.erp.api.server.presentation.v1.users.dto.UserListRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping(value = "/api/v1/users")
@@ -47,7 +46,7 @@ public class UsersController {
     })
     @GetMapping
     public ResponseEntity<SuccessResponse<PagingResponse<UserInfoResponse>>> getAllUsers(
-            @Valid UsersSearchRequest request
+            @Valid UserListRequest request
     ) {
         Page<UserInfoResponse> page = usersService.getAllUsers(
                 PageableUtils.createPageable(request.page(), request.size(), request.sort())

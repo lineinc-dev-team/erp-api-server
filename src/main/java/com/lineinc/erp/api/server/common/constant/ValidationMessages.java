@@ -6,6 +6,7 @@ public final class ValidationMessages {
     } // 인스턴스화 방지
 
     public static final String DEFAULT_INVALID_INPUT = "입력값이 유효하지 않습니다.";
+    public static final String INVALID_PROPERTY_REFERENCE = "요청에 잘못된 정렬 조건 또는 필드명이 포함되어 있습니다.";
     public static final String RESOURCE_NOT_FOUND = "요청한 리소스를 찾을 수 없습니다.";
     public static final String PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다.";
     public static final String UNSUPPORTED_CONTENT_TYPE = "지원하지 않는 콘텐츠 타입입니다.";

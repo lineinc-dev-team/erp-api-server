@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.common.response.FieldErrorDetail;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -147,6 +148,21 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 잘못된 속성 참조 예외 처리 (예: 잘못된 정렬 조건 등)
+     */
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyReferenceException(PropertyReferenceException ex) {
+        log.warn("잘못된 속성 참조: {}", ex.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                ValidationMessages.INVALID_PROPERTY_REFERENCE,
+                List.of()
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * /**
      * 기타 모든 예외 처리
      */
     @ExceptionHandler(Exception.class)
