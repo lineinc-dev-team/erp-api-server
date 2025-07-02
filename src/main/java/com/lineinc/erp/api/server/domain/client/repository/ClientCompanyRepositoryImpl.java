@@ -34,7 +34,9 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
     // 정렬 필드를 미리 정의하여 정적 매핑. 추후 정렬 기준이 늘어나면 여기에 추가.
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
             "id", QClientCompany.clientCompany.id,
-            "name", QClientCompany.clientCompany.name
+            "name", QClientCompany.clientCompany.name,
+            "createdAt", QClientCompany.clientCompany.createdAt,
+            "updatedAt", QClientCompany.clientCompany.updatedAt
     );
 
     /**
