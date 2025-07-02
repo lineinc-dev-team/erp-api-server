@@ -18,6 +18,9 @@ public record ClientCompanyListRequest(
         int size,
 
         @Schema(description = "정렬 조건", example = "id,asc")
-        String sort
+        String sort,
+
+        @Schema(description = "발주처명 검색", example = "삼성")
+        String name
 ) {
 }

@@ -56,6 +56,7 @@ public class ClientCompanyController {
             @Valid ClientCompanyListRequest request
     ) {
         Page<ClientCompanyResponse> page = clientCompanyService.getAllClientCompanies(
+                request.name(),
                 PageableUtils.createPageable(request.page(), request.size(), request.sort())
         );
         return ResponseEntity.ok(SuccessResponse.of(

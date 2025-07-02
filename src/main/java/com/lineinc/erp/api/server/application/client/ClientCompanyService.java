@@ -43,7 +43,12 @@ public class ClientCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ClientCompanyResponse> getAllClientCompanies(Pageable pageable) {
-        return clientCompanyRepository.findAll(pageable).map(ClientCompanyResponse::from);
+    public Page<ClientCompanyResponse> getAllClientCompanies(String name, Pageable pageable) {
+//        if (name != null && !name.isBlank()) {
+//            return clientCompanyRepository.findByNameContainingIgnoreCase(name, pageable)
+//                    .map(ClientCompanyResponse::from);
+//        }
+        return clientCompanyRepository.findAll(pageable)
+                .map(ClientCompanyResponse::from);
     }
 }
