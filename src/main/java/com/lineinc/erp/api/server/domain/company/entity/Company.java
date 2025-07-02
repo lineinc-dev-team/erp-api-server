@@ -1,6 +1,6 @@
-package com.lineinc.erp.api.server.domain.company;
+package com.lineinc.erp.api.server.domain.company.entity;
 
-import com.lineinc.erp.api.server.domain.common.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

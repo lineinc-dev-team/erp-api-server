@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
-import com.lineinc.erp.api.server.domain.users.Users;
+import com.lineinc.erp.api.server.domain.users.entity.Users;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;

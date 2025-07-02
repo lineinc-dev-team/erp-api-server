@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 
-import com.lineinc.erp.api.server.domain.client.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client;
+package com.lineinc.erp.api.server.domain.client.enums;
 
 import lombok.Getter;
 

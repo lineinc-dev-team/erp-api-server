@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.application.users;
 
-import com.lineinc.erp.api.server.domain.users.Users;
-import com.lineinc.erp.api.server.domain.users.UsersRepository;
+import com.lineinc.erp.api.server.domain.users.entity.Users;
+import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

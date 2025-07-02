@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.application.auth;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
-import com.lineinc.erp.api.server.domain.users.UsersRepository;
+import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;

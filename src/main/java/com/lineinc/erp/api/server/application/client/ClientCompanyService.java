@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.application.client;
 
-import com.lineinc.erp.api.server.domain.client.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.ClientCompanyRepository;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;

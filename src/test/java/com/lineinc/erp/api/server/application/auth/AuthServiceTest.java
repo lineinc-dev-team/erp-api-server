@@ -1,11 +1,9 @@
 package com.lineinc.erp.api.server.application.auth;
 
-import com.lineinc.erp.api.server.domain.client.ClientCompany;
-import com.lineinc.erp.api.server.domain.company.Company;
-import com.lineinc.erp.api.server.domain.company.CompanyRepository;
-import com.lineinc.erp.api.server.domain.role.RoleRepository;
-import com.lineinc.erp.api.server.domain.users.Users;
-import com.lineinc.erp.api.server.domain.users.UsersRepository;
+import com.lineinc.erp.api.server.domain.company.entity.Company;
+import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
+import com.lineinc.erp.api.server.domain.users.entity.Users;
+import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,7 @@ class AuthServiceTest {
         Company company = Company.builder()
                 .name("testCompany")
                 .build();
-        
+
         companyRepository.save(company);
 
         Users user = Users.builder()

@@ -1,8 +1,8 @@
-package com.lineinc.erp.api.server.domain.users;
+package com.lineinc.erp.api.server.domain.users.entity;
 
-import com.lineinc.erp.api.server.domain.common.BaseEntity;
-import com.lineinc.erp.api.server.domain.company.Company;
-import com.lineinc.erp.api.server.domain.role.Role;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.company.entity.Company;
+import com.lineinc.erp.api.server.domain.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
