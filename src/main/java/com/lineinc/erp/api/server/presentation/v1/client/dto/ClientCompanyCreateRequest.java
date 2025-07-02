@@ -30,12 +30,8 @@ public record ClientCompanyCreateRequest(
         String address,
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
-        @Schema(description = "전화번호 지역번호", example = "02")
-        String areaCode,
-
-        @MultiConstraint(type = ValidatorType.PHONE)
-        @Schema(description = "전화번호", example = "010-1234-5678")
-        String phoneNumber,
+        @Schema(description = "담당자 유선 전화번호", example = "02-123-5678")
+        String landlineNumber,
 
         @Email
         @Schema(description = "이메일", example = "example@samsung.com")

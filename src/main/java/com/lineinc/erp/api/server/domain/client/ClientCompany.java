@@ -37,14 +37,8 @@ public class ClientCompany extends BaseEntity {
     @Column
     private String address;
 
-    /**
-     * 지역번호 (예: 02, 031)
-     */
     @Column
-    private String areaCode;
-
-    @Column
-    private String phoneNumber;
+    private String landlineNumber;
 
     @Column
     private String email;
