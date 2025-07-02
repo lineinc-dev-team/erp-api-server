@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 
-@Schema(description = "발주처 파일 생성 요청")
+@Schema(description = "발주처 파일 등록 요청")
 public record ClientCompanyFileRequest(
 
         @NotBlank
