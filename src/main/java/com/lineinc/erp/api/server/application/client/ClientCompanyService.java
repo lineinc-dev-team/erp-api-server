@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.application.client;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,12 +44,8 @@ public class ClientCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ClientCompanyResponse> getAllClientCompanies(String name, Pageable pageable) {
-//        if (name != null && !name.isBlank()) {
-//            return clientCompanyRepository.findByNameContainingIgnoreCase(name, pageable)
-//                    .map(ClientCompanyResponse::from);
-//        }
-        return clientCompanyRepository.findAll(pageable)
+    public Page<ClientCompanyResponse> getAllClientCompanies(ClientCompanyListRequest request, Pageable pageable) {
+        return clientCompanyRepository.search(request, pageable)
                 .map(ClientCompanyResponse::from);
     }
 }
