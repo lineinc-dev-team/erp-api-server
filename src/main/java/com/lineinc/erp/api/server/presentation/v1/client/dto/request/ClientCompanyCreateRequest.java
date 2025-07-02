@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.client.dto;
+package com.lineinc.erp.api.server.presentation.v1.client.dto.request;
 
 import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.auth.dto;
+package com.lineinc.erp.api.server.presentation.v1.auth.dto.response;
 
 import com.lineinc.erp.api.server.domain.role.Role;
 import com.lineinc.erp.api.server.domain.users.Users;

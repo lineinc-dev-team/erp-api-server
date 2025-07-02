@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.domain.client.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.ClientCompanyFile;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.ClientCompanyFileRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

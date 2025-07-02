@@ -2,9 +2,8 @@ package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.domain.client.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.ClientCompanyRepository;
-import com.lineinc.erp.api.server.presentation.v1.auth.dto.UserInfoResponse;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.ClientCompanyCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.ClientCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

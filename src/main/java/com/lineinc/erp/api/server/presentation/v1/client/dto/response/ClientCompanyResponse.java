@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.client.dto;
+package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 
 import com.lineinc.erp.api.server.domain.client.ClientCompany;
 import io.swagger.v3.oas.annotations.media.Schema;

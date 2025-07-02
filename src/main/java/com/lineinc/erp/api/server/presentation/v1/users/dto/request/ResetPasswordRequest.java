@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.users.dto;
+package com.lineinc.erp.api.server.presentation.v1.users.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
