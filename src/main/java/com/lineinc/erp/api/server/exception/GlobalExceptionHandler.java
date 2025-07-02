@@ -162,6 +162,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 잘못된 JPA 접근 (예: 존재하지 않는 속성으로 정렬 등)
+     */
+    @ExceptionHandler(org.springframework.dao.InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataAccess(org.springframework.dao.InvalidDataAccessApiUsageException ex) {
+        log.warn("잘못된 JPA 접근 오류: {}", ex.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                ValidationMessages.INVALID_PROPERTY_REFERENCE,
+                List.of()
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
      * /**
      * 기타 모든 예외 처리
      */

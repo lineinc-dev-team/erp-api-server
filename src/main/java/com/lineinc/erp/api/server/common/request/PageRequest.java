@@ -8,16 +8,21 @@ import org.springdoc.core.annotations.ParameterObject;
 @ParameterObject
 @Schema(description = "공통 페이징 요청")
 public record PageRequest(
-        @Min(value = 0)
+        @Min(0)
         @Schema(description = "0부터 시작하는 페이지 번호", example = "0")
-        int page,
+        Integer page,
 
-        @Min(value = 1)
-        @Max(value = 200)
+        @Min(1)
+        @Max(200)
         @Schema(description = "한 페이지에 포함될 아이템 수", example = "20")
-        int size,
+        Integer size,
 
         @Schema(description = "정렬 조건", example = "id,asc")
         String sort
 ) {
+    public PageRequest {
+        if (page == null) page = 0;
+        if (size == null) size = 20;
+        if (sort == null) sort = "id,asc";
+    }
 }
