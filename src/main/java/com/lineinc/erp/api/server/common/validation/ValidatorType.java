@@ -6,29 +6,20 @@ package com.lineinc.erp.api.server.common.validation;
  */
 public enum ValidatorType {
 
-    /**
-     * HTTP 또는 HTTPS URL 형식 검증
-     */
-    URL,
+    URL("유효한 URL 형식이 아닙니다."),
+    PHONE("유효한 휴대폰 번호 형식이 아닙니다."),
+    EMAIL("유효한 이메일 형식이 아닙니다."),
+    BUSINESS_NUMBER("유효한 사업자등록번호 형식이 아닙니다."),
+    LANDLINE_NUMBER("유효한 유선 전화번호 형식이 아닙니다."),
+    CUSTOM("입력값이 유효하지 않습니다.");
 
-    /**
-     * 휴대폰 번호 형식 검증
-     * 예: 010-1234-5678
-     */
-    PHONE,
+    private final String message;
 
-    /**
-     * 이메일 형식 검증
-     */
-    EMAIL,
+    ValidatorType(String message) {
+        this.message = message;
+    }
 
-    /**
-     * 사업자등록번호 형식 검증
-     */
-    BUSINESS_NUMBER,
-
-    /**
-     * 사용자 정의 추가 검증 타입
-     */
-    CUSTOM
+    public String getMessage() {
+        return message;
+    }
 }

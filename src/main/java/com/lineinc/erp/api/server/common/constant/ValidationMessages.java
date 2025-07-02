@@ -1,8 +1,5 @@
 package com.lineinc.erp.api.server.common.constant;
 
-/**
- * 전역에서 재사용할 메시지 상수 모음
- */
 public final class ValidationMessages {
 
     private ValidationMessages() {

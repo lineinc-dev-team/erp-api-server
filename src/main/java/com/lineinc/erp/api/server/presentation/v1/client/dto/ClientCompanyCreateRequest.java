@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.client.dto;
 
+import com.lineinc.erp.api.server.common.validation.MultiConstraint;
+import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import com.lineinc.erp.api.server.domain.client.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -15,6 +17,7 @@ public record ClientCompanyCreateRequest(
         String name,
 
         @NotBlank
+        @MultiConstraint(type = ValidatorType.BUSINESS_NUMBER)
         @Schema(description = "사업자등록번호", example = "123-45-67890")
         String businessNumber,
 
@@ -26,9 +29,11 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "본사 주소", example = "서울시 강남구")
         String address,
 
+        @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
         @Schema(description = "전화번호 지역번호", example = "02")
         String areaCode,
 
+        @MultiConstraint(type = ValidatorType.PHONE)
         @Schema(description = "전화번호", example = "010-1234-5678")
         String phoneNumber,
 

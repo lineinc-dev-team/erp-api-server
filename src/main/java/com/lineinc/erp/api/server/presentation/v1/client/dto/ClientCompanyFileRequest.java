@@ -2,7 +2,8 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.URL;
+import com.lineinc.erp.api.server.common.validation.MultiConstraint;
+import com.lineinc.erp.api.server.common.validation.ValidatorType;
 
 @Schema(description = "발주처 파일 정보")
 public record ClientCompanyFileRequest(
@@ -12,6 +13,7 @@ public record ClientCompanyFileRequest(
         String documentName,
 
         @NotBlank
+        @MultiConstraint(type = ValidatorType.URL)
         @Schema(description = "파일 접근용 URL", example = "https://s3.amazonaws.com/bucket/contract_2024.pdf")
         String fileUrl,
 

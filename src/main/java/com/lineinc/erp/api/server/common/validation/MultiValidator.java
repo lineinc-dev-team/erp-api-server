@@ -33,26 +33,25 @@ public class MultiValidator implements ConstraintValidator<MultiConstraint, Stri
      */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        // null 혹은 빈 문자열은 유효하지 않음
-        // (필요하다면 별도로 @NotBlank 등과 함께 사용 권장)
         if (value == null || value.isBlank()) {
             return false;
         }
 
-        // 타입별 검증 수행
-        switch (type) {
-            case URL:
-                return isValidUrl(value);
-            case PHONE:
-                return isValidPhone(value);
-            case BUSINESS_NUMBER:
-                return isValidBusinessNumber(value);
-            case CUSTOM:
-                // 커스텀 검증 로직이 필요하면 구현
-                return true;
-            default:
-                return false;
+        boolean result = switch (type) {
+            case URL -> isValidUrl(value);
+            case PHONE -> isValidPhone(value);
+            case LANDLINE_NUMBER -> isValidLandlineNumber(value);
+            case BUSINESS_NUMBER -> isValidBusinessNumber(value);
+            default -> false;
+        };
+
+        if (!result) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(type.getMessage())
+                    .addConstraintViolation();
         }
+
+        return result;
     }
 
     /**
@@ -63,7 +62,7 @@ public class MultiValidator implements ConstraintValidator<MultiConstraint, Stri
      */
     private boolean isValidUrl(String value) {
         // 간단한 http/https URL 정규식 패턴
-        return value.matches("^(https?)://[\\w\\-._~:/?#\\[\\]@!$&'()*+,;=.]+$");
+        return value.matches("^(http|https)://[\\w\\-._~:/?#\\[\\]@!$&'()*+,;=.]+$");
     }
 
     /**
@@ -86,5 +85,16 @@ public class MultiValidator implements ConstraintValidator<MultiConstraint, Stri
     private boolean isValidBusinessNumber(String value) {
         // 예: 123-45-67890
         return value.matches("^\\d{3}-\\d{2}-\\d{5}$");
+    }
+
+    /**
+     * 한국 유선 전화번호 형식 검증
+     *
+     * @param value 검증할 문자열
+     * @return 정규식 매칭 결과
+     */
+    private boolean isValidLandlineNumber(String value) {
+        // 예: 02-123-4567 또는 031-1234-5678
+        return value.matches("^0\\d{1,2}-\\d{3,4}-\\d{4}$");
     }
 }
