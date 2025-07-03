@@ -10,6 +10,15 @@ public record ClientCompanyListRequest(
         String name,
 
         @Schema(description = "사업자등록번호", example = "123-45-67890")
-        String businessNumber
+        String businessNumber,
+
+        @Schema(description = "대표자명", example = "홍길동")
+        String ceoName,
+
+        @Schema(description = "발주처 담당자명", example = "홍길동")
+        String contactName,
+
+        @Schema(description = "이메일", example = "example@samsung.com")
+        String email
 ) {
 }

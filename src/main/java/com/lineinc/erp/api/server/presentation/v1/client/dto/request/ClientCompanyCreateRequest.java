@@ -55,6 +55,6 @@ public record ClientCompanyCreateRequest(
 
         @Valid
         @Schema(description = "파일 목록")
-        List<ClientCompanyFileRequest> files
+        List<ClientCompanyFileCreateRequest> files
 ) {
 }

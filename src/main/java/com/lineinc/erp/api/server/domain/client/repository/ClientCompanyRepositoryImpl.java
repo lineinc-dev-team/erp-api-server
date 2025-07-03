@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.client.repository;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.QClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.QClientCompanyContact;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import com.querydsl.core.BooleanBuilder;
@@ -30,6 +31,8 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
 
     private final JPAQueryFactory queryFactory;
     private final QClientCompany clientCompany = QClientCompany.clientCompany;
+    private final QClientCompanyContact clientCompanyContact = QClientCompanyContact.clientCompanyContact;
+
 
     // 정렬 필드를 미리 정의하여 정적 매핑. 추후 정렬 기준이 늘어나면 여기에 추가.
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
@@ -57,6 +60,8 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
 
         List<ClientCompany> content = queryFactory
                 .selectFrom(clientCompany)
+                .distinct()
+                .leftJoin(clientCompany.contacts, clientCompanyContact).fetchJoin()
                 .where(condition)
                 .orderBy(orders)
                 .offset(pageable.getOffset())
@@ -67,6 +72,7 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         Long totalCount = queryFactory
                 .select(clientCompany.count())
                 .from(clientCompany)
+                .leftJoin(clientCompany.contacts, clientCompanyContact)
                 .where(condition)
                 .fetchOne();
         long total = Objects.requireNonNullElse(totalCount, 0L);
@@ -88,12 +94,19 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         BooleanBuilder builder = new BooleanBuilder();
 
         if (StringUtils.hasText(request.name())) {
-            // 발주처명에 대해 대소문자 구분 없이 부분 일치 검색
             builder.and(clientCompany.name.containsIgnoreCase(request.name().trim()));
         }
         if (StringUtils.hasText(request.businessNumber())) {
-            // 사업자번호에 대해 부분 일치 검색
             builder.and(clientCompany.businessNumber.contains(request.businessNumber().trim()));
+        }
+        if (StringUtils.hasText(request.ceoName())) {
+            builder.and(clientCompany.ceoName.containsIgnoreCase(request.ceoName().trim()));
+        }
+        if (StringUtils.hasText(request.contactName())) {
+            builder.and(clientCompanyContact.name.containsIgnoreCase(request.contactName().trim()));
+        }
+        if (StringUtils.hasText(request.email())) {
+            builder.and(clientCompany.email.containsIgnoreCase(request.email().trim()));
         }
 
         return builder;
