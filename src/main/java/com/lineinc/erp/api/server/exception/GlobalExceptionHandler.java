@@ -5,16 +5,19 @@ import com.lineinc.erp.api.server.common.response.FieldErrorDetail;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
@@ -138,8 +141,8 @@ public class GlobalExceptionHandler {
     /**
      * 접근 권한이 없는 경우 처리
      */
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
         return buildErrorResponse(HttpStatus.FORBIDDEN, ValidationMessages.ACCESS_DENIED);
     }
 
@@ -174,8 +177,8 @@ public class GlobalExceptionHandler {
     /**
      * 잘못된 JPA 접근 (예: 존재하지 않는 속성으로 정렬 등)
      */
-    @ExceptionHandler(org.springframework.dao.InvalidDataAccessApiUsageException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidDataAccess(org.springframework.dao.InvalidDataAccessApiUsageException ex) {
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataAccess(InvalidDataAccessApiUsageException ex) {
         log.warn("잘못된 JPA 접근 오류: {}", ex.getMessage());
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.BAD_REQUEST.value(),
@@ -183,6 +186,18 @@ public class GlobalExceptionHandler {
                 List.of()
         );
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex) {
+        log.warn("ResponseStatusException 발생: {}", ex.getMessage());
+
+        ErrorResponse response = ErrorResponse.of(
+                ex.getStatusCode().value(),
+                ex.getReason() != null ? ex.getReason() : ValidationMessages.RESOURCE_NOT_FOUND,
+                List.of()
+        );
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
     }
 
     /**

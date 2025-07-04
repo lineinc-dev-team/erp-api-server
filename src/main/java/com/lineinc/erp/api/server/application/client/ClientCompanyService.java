@@ -8,8 +8,10 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientComp
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +49,17 @@ public class ClientCompanyService {
     @Transactional(readOnly = true)
     public Page<ClientCompanyResponse> getAllClientCompanies(ClientCompanyListRequest request, Pageable pageable) {
         return clientCompanyRepository.findAll(request, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public ClientCompany getClientCompanyByIdOrThrow(Long id) {
+        return clientCompanyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @Transactional
+    public void deleteClientCompany(Long id) {
+        ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
+        clientCompany.markAsDeleted();
     }
 }

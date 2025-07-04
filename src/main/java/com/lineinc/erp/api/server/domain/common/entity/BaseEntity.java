@@ -69,4 +69,14 @@ public abstract class BaseEntity {
      */
     @Column(columnDefinition = "TIMESTAMPTZ")
     private OffsetDateTime deletedAt;
+
+    /**
+     * 소프트 삭제 처리 메서드
+     * - deleted 플래그를 true로 설정하고
+     * - 삭제 일시(deletedAt)를 현재 시간으로 설정합니다.
+     */
+    public void markAsDeleted() {
+        this.deleted = true;
+        this.deletedAt = OffsetDateTime.now();
+    }
 }

@@ -66,4 +66,18 @@ public class ClientCompanyController {
         ));
     }
 
+    @Operation(
+            summary = "발주처 삭제",
+            description = "발주처 ID로 해당 발주처를 삭제합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "발주처 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음", content = @Content()),
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteClientCompany(@PathVariable Long id) {
+        clientCompanyService.deleteClientCompany(id);
+        return ResponseEntity.ok().build();
+    }
+
 }
