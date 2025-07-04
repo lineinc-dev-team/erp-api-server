@@ -93,6 +93,7 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
      */
     private BooleanBuilder buildCondition(ClientCompanyListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(clientCompany.deleted.isFalse());
 
         if (StringUtils.hasText(request.name())) {
             builder.and(clientCompany.name.containsIgnoreCase(request.name().trim()));
