@@ -2,6 +2,9 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @ParameterObject
 @Schema(description = "발주처 검색 및 페이징 요청")
@@ -15,10 +18,24 @@ public record ClientCompanyListRequest(
         @Schema(description = "대표자명", example = "홍길동")
         String ceoName,
 
+        @Schema(description = "담당자 연락처", example = "010-1234-5678")
+        String phoneNumber,
+
         @Schema(description = "발주처 담당자명", example = "홍길동")
         String contactName,
 
         @Schema(description = "이메일", example = "example@samsung.com")
-        String email
+        String email,
+
+        @Schema(description = "등록일 시작일자", example = "2024-01-01")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate startDate,
+
+        @Schema(description = "등록일 종료일자", example = "2024-12-31")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate endDate,
+
+        @Schema(description = "사용 여부", example = "true")
+        Boolean isActive
 ) {
 }

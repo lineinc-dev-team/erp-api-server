@@ -48,7 +48,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         List<FieldErrorDetail> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> new FieldErrorDetail(error.getField(), error.getDefaultMessage()))
+                .map(error -> {
+                    String field = error.getField();
+                    String message = error.getDefaultMessage();
+
+                    // 특정 필드에서 LocalDate 변환 실패시 메시지 가공
+                    if (message != null && message.contains("java.time.LocalDate")) {
+                        message = ValidationMessages.INVALID_DATE_FORMAT;
+                    }
+
+                    return new FieldErrorDetail(field, message);
+                })
                 .toList();
 
         ErrorResponse response = ErrorResponse.of(

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -107,6 +108,33 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         }
         if (StringUtils.hasText(request.email())) {
             builder.and(clientCompany.email.containsIgnoreCase(request.email().trim()));
+        }
+        if (StringUtils.hasText(request.phoneNumber())) {
+            builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
+        }
+
+        if (request.isActive() != null) {
+            builder.and(clientCompany.isActive.eq(request.isActive()));
+        }
+
+        if (request.startDate() != null) {
+            // atOffset(ZoneOffset.UTC)는 LocalDateTime → OffsetDateTime 변환 (UTC 기준)
+            // goe는 Greater or Equal의 약자로 '이상' 조건을 뜻함
+            builder.and(clientCompany.createdAt.goe(
+                    request.startDate()
+                            .atStartOfDay()
+                            .atOffset(ZoneOffset.UTC)
+            ));
+        }
+
+        if (request.endDate() != null) {
+            // lt는 Less Than의 약자로 '미만' 조건을 뜻함
+            builder.and(clientCompany.createdAt.lt(
+                    request.endDate()
+                            .plusDays(1)    // endDate에 하루 더해 다음 날 00시로 만듦 (범위 포함 위해)
+                            .atStartOfDay()
+                            .atOffset(ZoneOffset.UTC)
+            ));
         }
 
         return builder;

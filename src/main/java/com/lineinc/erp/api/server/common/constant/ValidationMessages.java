@@ -14,5 +14,6 @@ public final class ValidationMessages {
     public static final String FILE_PROCESS_ERROR = "파일 처리 중 오류가 발생했습니다.";
     public static final String INTERNAL_SERVER_ERROR = "서버 내부 오류가 발생했습니다.";
     public static final String USER_NOT_FOUND = "존재하지 않는 사용자입니다.";
+    public static final String INVALID_DATE_FORMAT = "날짜 형식이 올바르지 않습니다. (예: yyyy-MM-dd)";
 
 }
