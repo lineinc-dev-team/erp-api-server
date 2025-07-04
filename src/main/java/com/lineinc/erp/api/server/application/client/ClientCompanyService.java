@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ClientCompanyService {
@@ -61,5 +63,12 @@ public class ClientCompanyService {
     public void deleteClientCompany(Long id) {
         ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
         clientCompany.markAsDeleted();
+    }
+
+    @Transactional
+    public void deleteClientCompanies(List<Long> ids) {
+        for (Long id : ids) {
+            deleteClientCompany(id);
+        }
     }
 }
