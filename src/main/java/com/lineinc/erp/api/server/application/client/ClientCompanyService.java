@@ -28,6 +28,7 @@ public class ClientCompanyService {
                 .ceoName(request.ceoName())
                 .address(request.address())
                 .landlineNumber(request.landlineNumber())
+                .phoneNumber(request.phoneNumber())
                 .email(request.email())
                 .paymentMethod(request.paymentMethod())
                 .paymentPeriod(request.paymentPeriod())

@@ -33,6 +33,10 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "담당자 유선 전화번호", example = "02-123-5678")
         String landlineNumber,
 
+        @MultiConstraint(type = ValidatorType.PHONE)
+        @Schema(description = "담당자 연락처", example = "010-1234-5678")
+        String phoneNumber,
+
         @Email
         @Schema(description = "이메일", example = "example@samsung.com")
         String email,

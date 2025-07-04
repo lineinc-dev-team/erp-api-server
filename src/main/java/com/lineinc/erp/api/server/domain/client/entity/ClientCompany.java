@@ -45,6 +45,9 @@ public class ClientCompany extends BaseEntity {
     private String landlineNumber;
 
     @Column
+    private String phoneNumber;
+
+    @Column
     private String email;
 
     /**
@@ -64,6 +67,7 @@ public class ClientCompany extends BaseEntity {
      * 발주처 담당자 목록
      */
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     @Builder.Default
     private List<ClientCompanyContact> contacts = new ArrayList<>();
 

@@ -4,6 +4,9 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Schema(description = "발주처 정보 응답")
 public record ClientCompanyResponse(
@@ -39,7 +42,10 @@ public record ClientCompanyResponse(
         boolean hasFile,
 
         @Schema(description = "비고", example = "기타 메모")
-        String memo
+        String memo,
+
+        @Schema(description = "발주처 담당자 목록")
+        List<ClientCompanyContactResponse> contacts
 ) {
     public static ClientCompanyResponse from(ClientCompany clientCompany) {
         return new ClientCompanyResponse(
@@ -53,8 +59,10 @@ public record ClientCompanyResponse(
                 clientCompany.getCreatedAt(),
                 clientCompany.getUpdatedAt(),
                 clientCompany.getFiles() != null && !clientCompany.getFiles().isEmpty(),
-                clientCompany.getMemo()
-
+                clientCompany.getMemo(),
+                clientCompany.getContacts().stream()
+                        .map(ClientCompanyContactResponse::from)
+                        .collect(Collectors.toList())
         );
     }
 }
