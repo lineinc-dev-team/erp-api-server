@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ClientCompanyFile extends BaseEntity {
+public class ClientCompanyFile extends BaseEntity implements UpdatableFrom<ClientCompanyFileUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_file_seq")
@@ -51,10 +52,12 @@ public class ClientCompanyFile extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고 / 메모
 
+    @Override
     public void updateFrom(ClientCompanyFileUpdateRequest request) {
         Optional.ofNullable(request.documentName()).ifPresent(val -> this.documentName = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
         Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
+
 }

@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import jakarta.transaction.Transactional;
@@ -10,11 +9,7 @@ import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientCompanyContactService {
@@ -53,20 +48,21 @@ public class ClientCompanyContactService {
     @Transactional
     public void updateClientCompanyContacts(ClientCompany clientCompany, List<ClientCompanyContactUpdateRequest> requests) {
         EntitySyncUtils.syncList(
-                clientCompany.getContacts(),
-                requests,
-                ClientCompanyContactUpdateRequest::id,
-                ClientCompanyContact::getId,
-                dto -> ClientCompanyContact.builder()
-                        .name(dto.name())
-                        .position(dto.position())
-                        .landlineNumber(dto.landlineNumber())
-                        .phoneNumber(dto.phoneNumber())
-                        .email(dto.email())
-                        .memo(dto.memo())
-                        .clientCompany(clientCompany)
-                        .build(),
-                clientCompany.getContacts()::add
+                clientCompany.getContacts(),                    // 기존 연락처 리스트
+                requests,                                       // 수정 요청 리스트
+                ClientCompanyContact::getId,                    // 엔티티에서 ID 추출 함수
+                ClientCompanyContactUpdateRequest::id,          // DTO에서 ID 추출 함수
+                (ClientCompanyContactUpdateRequest dto) ->      // 신규 엔티티 생성 함수
+                        ClientCompanyContact.builder()
+                                .name(dto.name())
+                                .position(dto.position())
+                                .landlineNumber(dto.landlineNumber())
+                                .phoneNumber(dto.phoneNumber())
+                                .email(dto.email())
+                                .memo(dto.memo())
+                                .clientCompany(clientCompany)
+                                .build(),
+                clientCompany.getContacts()::add                // 새 엔티티 추가 함수
         );
     }
 }

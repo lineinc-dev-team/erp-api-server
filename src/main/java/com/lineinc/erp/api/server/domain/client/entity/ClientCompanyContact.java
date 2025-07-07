@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +13,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ClientCompanyContact extends BaseEntity {
+public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<ClientCompanyContactUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_contact_seq")
@@ -54,6 +54,7 @@ public class ClientCompanyContact extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    @Override
     public void updateFrom(ClientCompanyContactUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.position()).ifPresent(val -> this.position = val);
@@ -62,4 +63,5 @@ public class ClientCompanyContact extends BaseEntity {
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
+
 }

@@ -44,9 +44,9 @@ public class ClientCompanyFileService {
         EntitySyncUtils.syncList(
                 clientCompany.getFiles(),
                 requests,
-                ClientCompanyFileUpdateRequest::id,
                 ClientCompanyFile::getId,
-                dto -> ClientCompanyFile.builder()
+                ClientCompanyFileUpdateRequest::id,
+                (ClientCompanyFileUpdateRequest dto) -> ClientCompanyFile.builder()
                         .documentName(dto.documentName())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
