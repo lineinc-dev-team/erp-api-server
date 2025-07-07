@@ -2,27 +2,26 @@ spring:
   data:
     web:
       pageable:
-        max-page-size: 200  # 최대 페이지 크기 제한
+        max-page-size: 200  # 최대 페이지 크기 제한 (한 페이지에 최대 200개까지 조회 가능)
 
   jackson:
-    time-zone: Asia/Seoul
+    time-zone: Asia/Seoul  # JSON 직렬화 시 사용되는 시간대 설정
 
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver  # PostgreSQL JDBC 드라이버 클래스
+    url: ${SPRING_DATASOURCE_URL}             # DB 접속 URL (환경변수로 관리)
+    username: ${SPRING_DATASOURCE_USERNAME}   # DB 사용자명 (환경변수로 관리)
+    password: ${SPRING_DATASOURCE_PASSWORD}   # DB 비밀번호 (환경변수로 관리)
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true    # 실행되는 SQL을 콘솔에 출력
+      ddl-auto: update  # 엔티티 변경 시 자동으로 DB 스키마 업데이트
+    show-sql: true       # 실행되는 SQL을 콘솔에 출력
     properties:
       hibernate:
-        jdbc:
-          time_zone: UTC
-        format_sql: true  # SQL 출력 포맷팅
-        default_batch_fetch_size: 200
+        jdbc.time_zone: UTC     # DB와 시간대 동기화를 위해 UTC 사용 권장
+        format_sql: true        # SQL 출력 포맷팅 적용 (가독성 향상)
+        default_batch_fetch_size: 200  # batch fetch 사이즈 설정으로 N+1 문제 완화
 
 user:
   default-password: ${USER_DEFAULT_PASSWORD}
@@ -36,9 +35,8 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health   # health endpoint만 노출하여 시스템 상태 점검 허용
 
   endpoint:
     health:
-      show-details: always
-
+      show-details: always  # health endpoint 상세 정보 항상 표시
