@@ -57,9 +57,6 @@ public class ClientCompanyContactService {
                 requests,
                 ClientCompanyContactUpdateRequest::id,
                 ClientCompanyContact::getId,
-                (entity, dto) -> {
-                    if (!entity.isDeleted()) entity.updateFrom(dto);
-                },
                 dto -> ClientCompanyContact.builder()
                         .name(dto.name())
                         .position(dto.position())
@@ -69,7 +66,6 @@ public class ClientCompanyContactService {
                         .memo(dto.memo())
                         .clientCompany(clientCompany)
                         .build(),
-                BaseEntity::markAsDeleted,
                 clientCompany.getContacts()::add
         );
     }

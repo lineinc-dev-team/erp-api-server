@@ -46,9 +46,6 @@ public class ClientCompanyFileService {
                 requests,
                 ClientCompanyFileUpdateRequest::id,
                 ClientCompanyFile::getId,
-                (entity, dto) -> {
-                    if (!entity.isDeleted()) entity.updateFrom(dto);
-                },
                 dto -> ClientCompanyFile.builder()
                         .documentName(dto.documentName())
                         .fileUrl(dto.fileUrl())
@@ -56,7 +53,6 @@ public class ClientCompanyFileService {
                         .memo(dto.memo())
                         .clientCompany(clientCompany)
                         .build(),
-                BaseEntity::markAsDeleted,
                 clientCompany.getFiles()::add
         );
     }

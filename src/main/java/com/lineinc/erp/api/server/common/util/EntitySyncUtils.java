@@ -23,9 +23,7 @@ public class EntitySyncUtils {
      * @param requests           요청 리스트 (DTO 등)
      * @param requestIdExtractor 요청에서 ID를 추출하는 함수
      * @param entityIdExtractor  엔티티에서 ID를 추출하는 함수
-     * @param updater            기존 엔티티를 요청 기반으로 업데이트하는 함수
      * @param creator            요청으로부터 새 엔티티를 생성하는 함수
-     * @param softDeleter        요청에 없는 기존 엔티티를 soft delete 하는 함수
      * @param adder              새 엔티티를 기존 리스트에 추가하는 함수
      * @param <T>                엔티티 타입
      * @param <R>                요청 DTO 타입
@@ -35,88 +33,50 @@ public class EntitySyncUtils {
             List<R> requests,
             Function<R, Long> requestIdExtractor,
             Function<T, Long> entityIdExtractor,
-            BiConsumer<T, R> updater,
             Function<R, T> creator,
-            Consumer<T> softDeleter,
             Consumer<T> adder
     ) {
         if (requests == null) return;
 
-        Map<Long, T> existingMap = mapById(existingEntities, entityIdExtractor);
-        Set<Long> requestIds = extractRequestIds(requests, requestIdExtractor);
+        Map<Long, T> existingMap = existingEntities.stream()
+                .filter(e -> entityIdExtractor.apply(e) != null)
+                .collect(Collectors.toMap(entityIdExtractor, Function.identity()));
 
-        removeMissingEntities(existingEntities, requestIds, entityIdExtractor, softDeleter);
-        updateExistingEntities(existingMap, requests, requestIdExtractor, updater);
-        createNewEntities(existingMap, requests, requestIdExtractor, creator, adder);
-    }
-
-    /**
-     * 리스트를 ID 기준으로 Map 으로 변환합니다.
-     */
-    private static <T> Map<Long, T> mapById(List<T> list, Function<T, Long> idExtractor) {
-        return list.stream()
-                .filter(e -> idExtractor.apply(e) != null)
-                .collect(Collectors.toMap(idExtractor, Function.identity()));
-    }
-
-    /**
-     * 요청 리스트에서 ID 집합을 추출합니다.
-     */
-    private static <R> Set<Long> extractRequestIds(List<R> requests, Function<R, Long> idExtractor) {
-        return requests.stream()
-                .map(idExtractor)
+        Set<Long> requestIds = requests.stream()
+                .map(requestIdExtractor)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-    }
 
-    /**
-     * 기존 엔티티 중 요청 ID에 없는 항목을 soft delete 처리합니다.
-     */
-    private static <T> void removeMissingEntities(
-            List<T> existingEntities,
-            Set<Long> requestIds,
-            Function<T, Long> idExtractor,
-            Consumer<T> softDeleter
-    ) {
         existingEntities.stream()
                 .filter(e -> {
-                    Long id = idExtractor.apply(e);
+                    Long id = entityIdExtractor.apply(e);
                     return id != null && !requestIds.contains(id);
                 })
-                .forEach(softDeleter);
-    }
+                .forEach(e -> {
+                    try {
+                        e.getClass().getMethod("markAsDeleted").invoke(e);
+                    } catch (Exception ex) {
+                        throw new RuntimeException("Failed to invoke markAsDeleted", ex);
+                    }
+                });
 
-    /**
-     * 요청에 해당하는 기존 엔티티가 있으면 업데이트 수행합니다.
-     */
-    private static <T, R> void updateExistingEntities(
-            Map<Long, T> existingMap,
-            List<R> requests,
-            Function<R, Long> idExtractor,
-            BiConsumer<T, R> updater
-    ) {
         for (R request : requests) {
-            Long id = idExtractor.apply(request);
+            Long id = requestIdExtractor.apply(request);
             if (id != null && existingMap.containsKey(id)) {
-                updater.accept(existingMap.get(id), request);
+                T existingEntity = existingMap.get(id);
+                try {
+                    existingEntity.getClass().getMethod("updateFrom", request.getClass()).invoke(existingEntity, request);
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to invoke updateFrom", e);
+                }
             }
         }
-    }
 
-    /**
-     * 요청 중 ID가 없거나 기존 엔티티에 없는 경우 새 엔티티를 생성하여 추가합니다.
-     */
-    private static <T, R> void createNewEntities(
-            Map<Long, T> existingMap,
-            List<R> requests,
-            Function<R, Long> idExtractor,
-            Function<R, T> creator,
-            Consumer<T> adder
-    ) {
         for (R request : requests) {
-            Long id = idExtractor.apply(request);
+            Long id = requestIdExtractor.apply(request);
             if (id == null || !existingMap.containsKey(id)) {
-                adder.accept(creator.apply(request));
+                T newEntity = creator.apply(request);
+                adder.accept(newEntity);
             }
         }
     }
