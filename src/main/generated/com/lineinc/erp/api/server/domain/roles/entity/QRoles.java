@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.role.entity;
+package com.lineinc.erp.api.server.domain.roles.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -10,14 +10,14 @@ import com.querydsl.core.types.Path;
 
 
 /**
- * QRole is a Querydsl query type for Role
+ * QRoles is a Querydsl query type for Roles
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QRole extends EntityPathBase<Role> {
+public class QRoles extends EntityPathBase<Roles> {
 
-    private static final long serialVersionUID = -919394728L;
+    private static final long serialVersionUID = -2109220686L;
 
-    public static final QRole role = new QRole("role");
+    public static final QRoles roles = new QRoles("roles");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
@@ -43,16 +43,16 @@ public class QRole extends EntityPathBase<Role> {
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
 
-    public QRole(String variable) {
-        super(Role.class, forVariable(variable));
+    public QRoles(String variable) {
+        super(Roles.class, forVariable(variable));
     }
 
-    public QRole(Path<? extends Role> path) {
+    public QRoles(Path<? extends Roles> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QRole(PathMetadata metadata) {
-        super(Role.class, metadata);
+    public QRoles(PathMetadata metadata) {
+        super(Roles.class, metadata);
     }
 
 }

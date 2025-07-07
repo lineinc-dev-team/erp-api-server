@@ -1,4 +1,4 @@
-CREATE TABLE spring_session
+CREATE TABLE IF NOT EXISTS spring_session
 (
     primary_id            VARCHAR(36) NOT NULL,
     session_id            VARCHAR(36) NOT NULL,
@@ -10,10 +10,10 @@ CREATE TABLE spring_session
     CONSTRAINT spring_session_pk PRIMARY KEY (primary_id)
 );
 
-CREATE UNIQUE INDEX spring_session_idx ON spring_session (session_id);
-CREATE INDEX spring_session_principal_name_idx ON spring_session (principal_name);
+CREATE UNIQUE INDEX IF NOT EXISTS spring_session_idx ON spring_session (session_id);
+CREATE INDEX IF NOT EXISTS spring_session_principal_name_idx ON spring_session (principal_name);
 
-CREATE TABLE spring_session_attributes
+CREATE TABLE IF NOT EXISTS spring_session_attributes
 (
     session_primary_id VARCHAR(36)  NOT NULL,
     attribute_name     VARCHAR(200) NOT NULL,

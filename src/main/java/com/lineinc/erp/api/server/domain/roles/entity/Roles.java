@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.role.entity;
+package com.lineinc.erp.api.server.domain.roles.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Role extends BaseEntity implements Serializable {
+public class Roles extends BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")

@@ -33,7 +33,6 @@ dependencies {
 
     // Database
     runtimeOnly 'org.postgresql:postgresql' // PostgreSQL 드라이버
-    implementation 'org.flywaydb:flyway-core:9.22.0' // DB 마이그레이션 도구
     implementation 'org.springframework.session:spring-session-jdbc' // JDBC 기반 세션 관리
 
     // Lombok

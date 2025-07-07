@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.domain.users.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.entity.Company;
-import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.roles.entity.Roles;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,13 +55,13 @@ public class Users extends BaseEntity implements UserDetails {
     /**
      * 비밀번호 초기화 시각 (비밀번호 변경 혹은 초기화된 시간)
      */
-    @Column(columnDefinition = "TIMESTAMPTZ")
+    @Column()
     private OffsetDateTime passwordResetAt;
 
     /**
      * 최종 로그인 시각
      */
-    @Column(columnDefinition = "TIMESTAMPTZ")
+    @Column()
     private OffsetDateTime lastLoginAt;
 
     /**
@@ -69,7 +69,7 @@ public class Users extends BaseEntity implements UserDetails {
      */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable()
-    private Set<Role> roles;
+    private Set<Roles> roles;
 
     /**
      * 권한 목록 반환

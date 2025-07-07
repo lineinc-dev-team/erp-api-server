@@ -25,7 +25,7 @@ public abstract class BaseEntity {
      * - 변경 불가(updatable = false)
      */
     @CreationTimestamp
-    @Column(updatable = false, columnDefinition = "TIMESTAMPTZ")
+    @Column(updatable = false)
     private OffsetDateTime createdAt;
 
     /**
@@ -33,7 +33,7 @@ public abstract class BaseEntity {
      * - 엔티티가 수정될 때 현재 시간으로 자동 업데이트
      */
     @UpdateTimestamp
-    @Column(columnDefinition = "TIMESTAMPTZ")
+    @Column()
     private OffsetDateTime updatedAt;
 
     /**
@@ -67,7 +67,7 @@ public abstract class BaseEntity {
      * - 삭제 시점 기록
      * - 삭제되지 않은 경우 null
      */
-    @Column(columnDefinition = "TIMESTAMPTZ")
+    @Column()
     private OffsetDateTime deletedAt;
 
     /**

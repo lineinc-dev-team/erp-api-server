@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.auth.dto.response;
 
-import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.roles.entity.Roles;
 import com.lineinc.erp.api.server.domain.users.entity.Users;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -26,7 +26,7 @@ public record UserInfoResponse(
                 user.getLoginId(),
                 user.getUsername(),
                 user.getRoles().stream()
-                        .map(Role::getName)
+                        .map(Roles::getName)
                         .toList()
         );
     }

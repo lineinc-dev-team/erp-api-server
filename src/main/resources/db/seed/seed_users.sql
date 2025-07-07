@@ -23,4 +23,5 @@ VALUES (nextval('users_seq'),
         NOW(),
         'system',
         'system',
-        false);
+        false)
+ON CONFLICT (login_id) DO NOTHING;
