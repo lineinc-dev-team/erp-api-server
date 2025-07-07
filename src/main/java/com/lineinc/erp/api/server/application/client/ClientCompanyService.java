@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,8 @@ public class ClientCompanyService {
 
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
-        // 1. ClientCompany 객체 먼저 빌드
+
+//        // 1. ClientCompany 객체 먼저 빌드
         ClientCompany clientCompany = ClientCompany.builder()
                 .name(request.name())
                 .businessNumber(request.businessNumber())
@@ -70,5 +72,19 @@ public class ClientCompanyService {
         for (Long id : ids) {
             deleteClientCompany(id);
         }
+    }
+
+    @Transactional
+    public void updateClientCompany(Long id, ClientCompanyUpdateRequest request) {
+        ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
+
+        // 기본 필드 업데이트
+        clientCompany.updateFrom(request);
+
+        // 담당자 정보 갱신
+        contactService.updateClientCompanyContacts(clientCompany, request.contacts());
+
+        // 첨부파일 정보 갱신
+        fileService.updateClientCompanyFiles(clientCompany, request.files());
     }
 }

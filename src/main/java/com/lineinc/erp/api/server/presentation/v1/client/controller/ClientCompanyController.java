@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -82,4 +83,21 @@ public class ClientCompanyController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "발주처 수정",
+            description = "특정 발주처 정보를 수정합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "발주처 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateClientCompany(
+            @PathVariable Long id,
+            @Valid @RequestBody ClientCompanyUpdateRequest request
+    ) {
+        clientCompanyService.updateClientCompany(id, request);
+        return ResponseEntity.ok().build();
+    }
 }

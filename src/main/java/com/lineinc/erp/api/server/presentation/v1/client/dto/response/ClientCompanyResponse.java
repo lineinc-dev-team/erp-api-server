@@ -30,7 +30,7 @@ public record ClientCompanyResponse(
         String landlineNumber,
 
         @Schema(description = "사용 여부", example = "true")
-        boolean isActive,
+        Boolean isActive,
 
         @Schema(description = "등록일")
         OffsetDateTime createdAt,
@@ -39,7 +39,7 @@ public record ClientCompanyResponse(
         OffsetDateTime updatedAt,
 
         @Schema(description = "첨부파일 존재 여부", example = "true")
-        boolean hasFile,
+        Boolean hasFile,
 
         @Schema(description = "비고", example = "기타 메모")
         String memo,

@@ -34,7 +34,7 @@ public class MultiValidator implements ConstraintValidator<MultiConstraint, Stri
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.isBlank()) {
-            return false;
+            return true;
         }
 
         boolean result = switch (type) {

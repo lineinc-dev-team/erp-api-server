@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "발주처 담당자 정보 응답")
 public record ClientCompanyContactResponse(
 
+        @Schema(description = "발주처 담당자 ID", example = "123")
+        Long id,
+
         @Schema(description = "담당자명", example = "김철수")
         String name,
 
@@ -23,6 +26,7 @@ public record ClientCompanyContactResponse(
 ) {
     public static ClientCompanyContactResponse from(ClientCompanyContact contact) {
         return new ClientCompanyContactResponse(
+                contact.getId(),
                 contact.getName(),
                 contact.getPhoneNumber(),
                 contact.getLandlineNumber(),

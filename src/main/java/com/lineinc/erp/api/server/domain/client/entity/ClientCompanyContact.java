@@ -1,8 +1,12 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -49,4 +53,13 @@ public class ClientCompanyContact extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    public void updateFrom(ClientCompanyContactUpdateRequest request) {
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.position()).ifPresent(val -> this.position = val);
+        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
+        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
+        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }
