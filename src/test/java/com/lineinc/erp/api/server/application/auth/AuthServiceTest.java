@@ -61,6 +61,6 @@ class AuthServiceTest {
         // when-then: 존재하지 않는 ID로 조회 시 BadCredentialsException 발생하는지 검증
         assertThatThrownBy(() -> authService.loadUserByUsername("not_exist"))
                 .isInstanceOf(BadCredentialsException.class)
-                .hasMessage("존재하지 않는 사용자입니다");
+                .hasMessage("존재하지 않는 사용자입니다.");
     }
 }

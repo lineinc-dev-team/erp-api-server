@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.0'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.5.0' // Spring Boot 플러그인
+    id 'io.spring.dependency-management' version '1.1.7' // 의존성 관리 플러그인
 }
 
 group = 'com.lineinc'
@@ -9,58 +9,79 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(17) // Java 17 버전 설정
     }
 }
 
 configurations {
     compileOnly {
-        extendsFrom annotationProcessor
+        extendsFrom annotationProcessor // annotationProcessor도 compileOnly로 확장
     }
 }
 
 repositories {
-    mavenCentral()
+    mavenCentral() // 의존성 저장소: Maven Central
 }
 
 dependencies {
     // Spring Boot Starters
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web' // 웹 애플리케이션
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-security' // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-validation' // Bean Validation
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' // 헬스 체크 등 모니터링
 
     // Database
-    runtimeOnly 'org.postgresql:postgresql'
-    implementation 'org.flywaydb:flyway-core:9.22.0'
-    implementation 'org.springframework.session:spring-session-jdbc'
+    runtimeOnly 'org.postgresql:postgresql' // PostgreSQL 드라이버
+    implementation 'org.flywaydb:flyway-core:9.22.0' // DB 마이그레이션 도구
+    implementation 'org.springframework.session:spring-session-jdbc' // JDBC 기반 세션 관리
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok' // 컴파일 시 Lombok
+    annotationProcessor 'org.projectlombok:lombok' // Lombok 애노테이션 프로세서
 
     // Configuration Processor
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor' // @ConfigurationProperties 지원
 
     // Devtools
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools' // 개발용 핫 리로딩
 
     // Swagger / OpenAPI
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0' // Swagger UI
 
     // QueryDSL
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
-    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta' // QueryDSL JPA 지원
+    annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta' // QueryDSL APT
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api' // JPA 애노테이션 지원
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api' // 기타 Jakarta 애노테이션 지원
+
+    // Apache POI for Excel export
+    implementation 'org.apache.poi:poi-ooxml:5.2.5' // Excel 파일 처리
 
     // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' // 테스트 지원
+    testImplementation 'org.springframework.security:spring-security-test' // Security 테스트 지원
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher' // JUnit 런처
+
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        java {
+            // 기본 소스 폴더(src/main/java) 외에, QueryDSL이 생성하는 코드를 포함하기 위해
+            // 자동 생성 코드 디렉터리를 컴파일 대상에 추가합니다.
+            srcDirs += 'build/generated/querydsl'
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // Java 컴파일 시 자동 생성되는 소스 코드의 출력 디렉터리를 지정합니다.
+    // QueryDSL이 생성하는 Q타입 클래스들이 이 경로에 생성됩니다.
+    // 이렇게 지정함으로써 컴파일러가 자동 생성 코드를 인식할 수 있게 됩니다.
+    options.generatedSourceOutputDirectory.set(file("build/generated/querydsl"))
 }

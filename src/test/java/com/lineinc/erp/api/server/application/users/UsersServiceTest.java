@@ -66,7 +66,7 @@ class UsersServiceTest {
     void getUserByLoginIdOrThrow_fail() {
         assertThatThrownBy(() -> usersService.getUserByLoginIdOrThrow("not_exist"))
                 .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("사용자를 찾을 수 없습니다.");
+                .hasMessageContaining("NOT_FOUND");
     }
 
     @Test
