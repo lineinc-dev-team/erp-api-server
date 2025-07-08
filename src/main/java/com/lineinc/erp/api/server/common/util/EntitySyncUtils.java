@@ -35,7 +35,12 @@ public class EntitySyncUtils {
             Function<R, T> creator
     ) {
         if (requests == null) {
-            // 요청이 null이면 기존 엔티티 모두 삭제
+            // 요청이 null이면 아무 작업도 수행하지 않음
+            return;
+        }
+
+        if (requests.isEmpty()) {
+            // 요청이 빈 리스트라면 기존 엔티티 모두 삭제
             existingEntities.forEach(MarkDeletable::markAsDeleted);
             return;
         }
@@ -45,7 +50,7 @@ public class EntitySyncUtils {
                 .filter(e -> extractId(e) != null)
                 .collect(Collectors.toMap(EntitySyncUtils::extractId, Function.identity()));
 
-        // 2. 요청 리스트에서 ID만 추출하여 Set 생성
+        // 2. 요청 리스트에서 null이 아닌 ID만 추출하여 Set 생성
         Set<Long> requestIds = requests.stream()
                 .map(EntitySyncUtils::extractId)
                 .filter(Objects::nonNull)
@@ -64,7 +69,6 @@ public class EntitySyncUtils {
 
         for (R request : requests) {
             Long id = extractId(request);
-            System.out.println("id = " + id);
 
             if (id != null && existingMap.containsKey(id)) {
                 // 기존 엔티티 업데이트
