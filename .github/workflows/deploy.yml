@@ -1,0 +1,31 @@
+name: Deploy Dev to EC2
+
+on:
+  push:
+    branches: [ dev ]  # ✅ dev 브랜치에만 반응
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 🔐 SSH 키 설정
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEV_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 dev 서버에 접속해서 배포 실행
+        run: |
+          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
+            cd /home/ubuntu/erp-api-server
+            git fetch origin
+            git checkout dev
+            git reset --hard origin/dev
+            chmod +x ./run.sh
+            ./run.sh dev
+          EOF
