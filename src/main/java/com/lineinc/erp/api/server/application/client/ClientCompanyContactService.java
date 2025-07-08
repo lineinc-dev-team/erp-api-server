@@ -50,8 +50,6 @@ public class ClientCompanyContactService {
         EntitySyncUtils.syncList(
                 clientCompany.getContacts(),                    // 기존 연락처 리스트
                 requests,                                       // 수정 요청 리스트
-                ClientCompanyContact::getId,                    // 엔티티에서 ID 추출 함수
-                ClientCompanyContactUpdateRequest::id,          // DTO에서 ID 추출 함수
                 (ClientCompanyContactUpdateRequest dto) ->      // 신규 엔티티 생성 함수
                         ClientCompanyContact.builder()
                                 .name(dto.name())
@@ -61,8 +59,7 @@ public class ClientCompanyContactService {
                                 .email(dto.email())
                                 .memo(dto.memo())
                                 .clientCompany(clientCompany)
-                                .build(),
-                clientCompany.getContacts()::add                // 새 엔티티 추가 함수
+                                .build()
         );
     }
 }
