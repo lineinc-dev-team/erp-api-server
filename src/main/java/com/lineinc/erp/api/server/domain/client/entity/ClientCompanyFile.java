@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Optional;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class ClientCompanyFile extends BaseEntity implements UpdatableFrom<ClientCompanyFileUpdateRequest> {
 
     @Id

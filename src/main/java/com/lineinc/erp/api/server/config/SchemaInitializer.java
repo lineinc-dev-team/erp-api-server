@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
-public class DatabaseSeeder implements ApplicationRunner {
+public class SchemaInitializer implements ApplicationRunner {
 
     private final DataSource dataSource;
 
     @Autowired
-    public DatabaseSeeder(DataSource dataSource) {
+    public SchemaInitializer(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -23,13 +23,9 @@ public class DatabaseSeeder implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
 
-        // resources/db/seed/ 경로의 SQL 파일들을 순서대로 실행
+        // resources/db/migration/ 경로의 SQL 파일들을 순서대로 실행
         populator.addScripts(
-                new ClassPathResource("db/migration/spring_session.sql"),
-                new ClassPathResource("db/seed/seed_company.sql"),
-                new ClassPathResource("db/seed/seed_role.sql"),
-                new ClassPathResource("db/seed/seed_users.sql"),
-                new ClassPathResource("db/seed/seed_users_roles.sql")
+                new ClassPathResource("db/migration/spring_session.sql")
         );
 
         populator.execute(dataSource);

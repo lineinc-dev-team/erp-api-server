@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ import java.util.Optional;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<ClientCompanyContactUpdateRequest> {
 
     @Id

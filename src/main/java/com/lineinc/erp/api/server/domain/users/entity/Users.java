@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.roles.entity.Roles;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +16,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Builder
 @Entity
 @Table(indexes = {
         @Index(columnList = "username")  // username 컬럼에 인덱스 생성 (검색 성능 향상 목적)
@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@SuperBuilder
 public class Users extends BaseEntity implements UserDetails {
 
     @Serial

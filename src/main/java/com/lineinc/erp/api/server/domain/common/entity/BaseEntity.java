@@ -2,7 +2,11 @@ package com.lineinc.erp.api.server.domain.common.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.MarkDeletable;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
@@ -18,6 +22,8 @@ import java.time.OffsetDateTime;
 @Getter
 @MappedSuperclass // JPA 엔티티 클래스가 상속할 경우, 해당 필드들을 자식 테이블 컬럼으로 인식하게 함
 @EntityListeners(AuditingEntityListener.class) // JPA Auditing 기능 활성화: 생성자/수정자, 생성일/수정일 자동 기록
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 public abstract class BaseEntity implements MarkDeletable {
 
     /**
@@ -61,6 +67,7 @@ public abstract class BaseEntity implements MarkDeletable {
      * - 논리 삭제 구현 시 사용
      */
     @Column(nullable = false)
+    @Builder.Default
     private boolean deleted = false;
 
     /**
