@@ -43,7 +43,6 @@ public class PageableUtils {
 
             orders.add(new Sort.Order(direction, field));
         }
-
         return Sort.by(orders);
     }
 
@@ -64,7 +63,27 @@ public class PageableUtils {
             return new OrderSpecifier[]{defaultOrder};
         }
 
-        return pageable.getSort().stream()
+        return toOrderSpecifiers(pageable.getSort(), fieldMapping, defaultOrder);
+    }
+
+    /**
+     * Spring Sort를 QueryDSL OrderSpecifier 배열로 변환
+     *
+     * @param sort         정렬 정보
+     * @param fieldMapping 필드명과 QueryDSL Path의 매핑
+     * @param defaultOrder 정렬 조건이 없을 때 사용할 기본 정렬
+     * @return OrderSpecifier 배열
+     */
+    public static OrderSpecifier<?>[] toOrderSpecifiers(
+            Sort sort,
+            Map<String, ComparableExpressionBase<?>> fieldMapping,
+            OrderSpecifier<?> defaultOrder) {
+
+        if (sort == null || sort.isEmpty()) {
+            return new OrderSpecifier[]{defaultOrder};
+        }
+
+        return sort.stream()
                 .map(order -> {
                     Order direction = order.isAscending() ? Order.ASC : Order.DESC;
                     ComparableExpressionBase<?> path = fieldMapping.get(order.getProperty());
@@ -78,5 +97,4 @@ public class PageableUtils {
                 })
                 .toArray(OrderSpecifier[]::new);
     }
-
 }

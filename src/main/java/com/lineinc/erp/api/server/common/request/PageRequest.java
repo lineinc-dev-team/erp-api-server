@@ -15,20 +15,10 @@ public record PageRequest(
         @Min(1)
         @Max(200)
         @Schema(description = "한 페이지에 포함될 아이템 수", example = "20")
-        Integer size,
-
-        @Schema(description = """
-                허용 필드 예시: id, name, createdAt, updatedAt.
-                정렬 방향은 'asc' (오름차순) 또는 'desc' (내림차순) 사용.
-                API별로 허용하는 필드는 다를 수 있습니다.
-                """,
-                example = "id,asc"
-        )
-        String sort
+        Integer size
 ) {
     public PageRequest {
         if (page == null) page = 0;
         if (size == null) size = 20;
-        if (sort == null) sort = "id,asc";
     }
 }

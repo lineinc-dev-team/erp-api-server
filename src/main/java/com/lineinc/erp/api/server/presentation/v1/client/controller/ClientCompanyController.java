@@ -1,7 +1,9 @@
 package com.lineinc.erp.api.server.presentation.v1.client.controller;
 
 import com.lineinc.erp.api.server.application.client.ClientCompanyService;
+import com.lineinc.erp.api.server.common.request.DownloadableRequest;
 import com.lineinc.erp.api.server.common.request.PageRequest;
+import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
@@ -15,12 +17,18 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -58,11 +66,12 @@ public class ClientCompanyController {
     @GetMapping
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
             @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
             @Valid ClientCompanyListRequest request
     ) {
         Page<ClientCompanyResponse> page = clientCompanyService.getAllClientCompanies(
                 request,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), pageRequest.sort())
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
@@ -99,5 +108,27 @@ public class ClientCompanyController {
     ) {
         clientCompanyService.updateClientCompany(id, request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "발주처 엑셀 다운로드",
+            description = "등록된 발주처 목록을 엑셀 파일로 다운로드합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+    })
+    @GetMapping("/download")
+    public void downloadClientCompaniesExcel(
+            HttpServletResponse response,
+            @Valid SortRequest sortRequest,
+            @Valid ClientCompanyListRequest request,
+            @Valid DownloadableRequest downloadableRequest
+    ) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=client_companies.xlsx");
+
+        Workbook workbook = clientCompanyService.downloadExcel(request, PageableUtils.parseSort(sortRequest.sort()), downloadableRequest.parsedFields());
+        workbook.write(response.getOutputStream());
+        workbook.close();
     }
 }

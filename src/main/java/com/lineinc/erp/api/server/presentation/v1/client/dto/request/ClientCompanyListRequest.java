@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 @ParameterObject
-@Schema(description = "발주처 검색 및 페이징 요청")
+@Schema(description = "발주처 검색 요청")
 public record ClientCompanyListRequest(
         @Schema(description = "발주처명", example = "삼성")
         String name,

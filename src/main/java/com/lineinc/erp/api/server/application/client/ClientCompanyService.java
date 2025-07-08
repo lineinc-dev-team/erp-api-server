@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.client;
 
+import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
@@ -7,8 +8,13 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,5 +92,45 @@ public class ClientCompanyService {
 
         // 첨부파일 정보 갱신
         fileService.updateClientCompanyFiles(clientCompany, request.files());
+    }
+
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(ClientCompanyListRequest request, Sort sort, List<String> fields) {
+        List<ClientCompanyResponse> clientCompanyResponses = clientCompanyRepository.findAllWithoutPaging(request, sort)
+                .stream()
+                .map(ClientCompanyResponse::from)
+                .toList();
+
+        return ExcelExportUtils.generateWorkbook(
+                "발주처 목록",
+                clientCompanyResponses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue
+        );
+    }
+
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "name" -> "이름";
+            case "businessNumber" -> "사업자번호";
+            case "ceoName" -> "대표자명";
+            case "address" -> "주소";
+            // 필요시 추가 필드 매핑
+            default -> field;
+        };
+    }
+
+    private String getExcelCellValue(ClientCompanyResponse company, String field) {
+        return switch (field) {
+            case "id" -> String.valueOf(company.id());
+            case "name" -> company.name();
+            case "businessNumber" -> company.businessNumber();
+            case "ceoName" -> company.ceoName();
+            case "address" -> company.address();
+            // 필요시 추가 필드 매핑
+            default -> "";
+        };
     }
 }

@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.users.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.request.PageRequest;
+import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
@@ -47,11 +48,12 @@ public class UsersController {
     })
     @GetMapping
     public ResponseEntity<SuccessResponse<PagingResponse<UserInfoResponse>>> getAllUsers(
+            @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
             @Valid UserListRequest request
     ) {
         Page<UserInfoResponse> page = usersService.getAllUsers(
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), pageRequest.sort())
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
