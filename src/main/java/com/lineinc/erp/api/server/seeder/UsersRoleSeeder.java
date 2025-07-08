@@ -27,7 +27,7 @@ public class UsersRoleSeeder implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         Optional<Users> adminUserOpt = usersRepository.findByLoginId(adminLoginId);
-        Optional<Roles> adminRoleOpt = roleRepository.findByName("ADMIN");  // 'ADMIN' 권한명 가정
+        Optional<Roles> adminRoleOpt = roleRepository.findByName("관리자");
 
         if (adminUserOpt.isPresent() && adminRoleOpt.isPresent()) {
             Users adminUser = adminUserOpt.get();

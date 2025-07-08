@@ -29,19 +29,20 @@ public class UsersSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+
         Optional<Users> existingAdmin = usersRepository.findByLoginId(adminLoginId);
+        if (existingAdmin.isPresent()) return;
+
         Company company = companyRepository.findById(1L)
                 .orElseThrow(() -> new IllegalStateException("Company with id 1 not found"));
 
-        if (existingAdmin.isEmpty()) {
-            Users admin = Users.builder()
-                    .company(company)
-                    .loginId(adminLoginId)
-                    .username("관리자")
-                    .passwordHash(adminPasswordHash)
-                    .build();
+        Users admin = Users.builder()
+                .company(company)
+                .loginId(adminLoginId)
+                .username("관리자")
+                .passwordHash(adminPasswordHash)
+                .build();
 
-            usersRepository.save(admin);
-        }
+        usersRepository.save(admin);
     }
 }
