@@ -27,7 +27,7 @@ case "$ENV" in
 
   dev|prod)
     echo "🚀 $ENV 환경 실행 중..."
-    docker-compose -f docker-compose.yaml up --build
+    docker-compose -f docker-compose.yaml up --build -d
     ;;
 
   *)
