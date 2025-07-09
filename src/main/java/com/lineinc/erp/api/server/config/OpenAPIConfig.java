@@ -14,7 +14,7 @@ public class OpenAPIConfig {
         return new OpenAPI()
                 .components(new Components())
                 .info(new Info()
-                        .title("ERP 시스템 API 명세서")
+                        .title("ERP 시스템 API 명세서 test")
                         .description("ERP 백엔드 REST API 문서입니다.")
                         .version("v1.0"));
     }
