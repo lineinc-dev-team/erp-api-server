@@ -41,3 +41,6 @@ management:
   endpoint:
     health:
       show-details: always  # health endpoint 상세 정보 항상 표시
+
+swagger:
+  server-url: http://localhost:8080

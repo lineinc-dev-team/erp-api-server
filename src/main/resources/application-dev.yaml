@@ -41,3 +41,6 @@ management:
   endpoint:
     health:
       show-details: always
+
+swagger:
+  server-url: https://dev-erp-api.dooson.it
