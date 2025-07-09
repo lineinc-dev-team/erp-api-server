@@ -15,7 +15,7 @@ jobs:
 
       - name: 🧱 Gradle로 JAR 빌드
         run: ./gradlew bootJar
- 
+
       - name: 🔐 SSH 키 설정
         run: |
           mkdir -p ~/.ssh
@@ -29,16 +29,5 @@ jobs:
       - name: 🚀 EC2에서 JAR 실행
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << EOF
-            export SPRING_DATASOURCE_URL=${{ secrets.DEV_SPRING_DATASOURCE_URL }}
-            export SPRING_DATASOURCE_USERNAME=${{ secrets.DEV_SPRING_DATASOURCE_USERNAME }}
-            export SPRING_DATASOURCE_PASSWORD=${{ secrets.DEV_SPRING_DATASOURCE_PASSWORD }}
-            export SPRING_PROFILES_ACTIVE=dev
-            export USER_DEFAULT_PASSWORD=${{ secrets.DEV_USER_DEFAULT_PASSWORD }}
-            export ADMIN_LOGIN_ID=${{ secrets.DEV_ADMIN_LOGIN_ID }}
-            export ADMIN_PASSWORD=${{ secrets.DEV_ADMIN_PASSWORD }}
-            export SESSION_TIMEOUT_DEFAULT_SECONDS=${{ secrets.DEV_SESSION_TIMEOUT_DEFAULT_SECONDS }}
-            export SESSION_TIMEOUT_AUTO_LOGIN_SECONDS=${{ secrets.DEV_SESSION_TIMEOUT_AUTO_LOGIN_SECONDS }}
-
-            pkill -f 'app.jar' || true
-            nohup java -jar /home/ubuntu/app.jar > /dev/null 2>&1 &
+            sudo systemctl restart myapp.service
           EOF

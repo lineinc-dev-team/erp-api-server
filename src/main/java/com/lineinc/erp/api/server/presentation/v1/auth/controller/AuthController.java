@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,12 +30,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "auth", description = "인증 관련 API")
 public class AuthController {
 
-    @Value("${session.timeout.default-seconds}")
-    private int defaultSeconds;
-
-    @Value("${session.timeout.auto-login-seconds}")
-    private int autoLoginSeconds;
-
     private final AuthenticationManager authenticationManager;
     private final UsersService usersService;
 
@@ -51,6 +44,8 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest
     ) {
+        int defaultSeconds = 1800;        // 예: 30분
+        int autoLoginSeconds = 604800;    // 예: 7일
 
         // 1. 로그인 인증 토큰 생성
         UsernamePasswordAuthenticationToken token =

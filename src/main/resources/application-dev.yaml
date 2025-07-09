@@ -27,11 +27,6 @@ spring:
 user:
   default-password: ${USER_DEFAULT_PASSWORD}
 
-session:
-  timeout:
-    default-seconds: ${SESSION_TIMEOUT_DEFAULT_SECONDS}
-    auto-login-seconds: ${SESSION_TIMEOUT_AUTO_LOGIN_SECONDS}
-
 management:
   endpoints:
     web:

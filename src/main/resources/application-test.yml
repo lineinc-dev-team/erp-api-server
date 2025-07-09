@@ -18,8 +18,3 @@ spring:
 user:
   default-password: "testDefaultPassword"
 
-session:
-  timeout:
-    default-seconds: 3600
-    auto-login-seconds: 604800
-
