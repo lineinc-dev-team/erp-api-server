@@ -27,7 +27,6 @@ case "$ENV" in
 
   dev|prod)
     echo "🚀 $ENV 환경 실행 중..."
-    mkdir -p logs
     docker-compose -f docker-compose.yaml up --build -d
     ;;
 
