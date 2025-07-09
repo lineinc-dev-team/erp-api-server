@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
@@ -124,10 +125,15 @@ public class ClientCompanyController {
             @Valid ClientCompanyListRequest request,
             @Valid DownloadableRequest downloadableRequest
     ) throws IOException {
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=client_companies.xlsx");
+        List<String> allowedFields = List.of("id", "name", "businessNumber", "ceoName", "address");
+        List<String> validatedFields = downloadableRequest.validatedFields(allowedFields);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
 
-        Workbook workbook = clientCompanyService.downloadExcel(request, PageableUtils.parseSort(sortRequest.sort()), downloadableRequest.parsedFields());
+        Workbook workbook = clientCompanyService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                validatedFields
+        );
         workbook.write(response.getOutputStream());
         workbook.close();
     }

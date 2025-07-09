@@ -117,8 +117,7 @@ public class ClientCompanyService {
             case "businessNumber" -> "사업자번호";
             case "ceoName" -> "대표자명";
             case "address" -> "주소";
-            // 필요시 추가 필드 매핑
-            default -> field;
+            default -> null;
         };
     }
 
@@ -129,8 +128,7 @@ public class ClientCompanyService {
             case "businessNumber" -> company.businessNumber();
             case "ceoName" -> company.ceoName();
             case "address" -> company.address();
-            // 필요시 추가 필드 매핑
-            default -> "";
+            default -> null;
         };
     }
 }

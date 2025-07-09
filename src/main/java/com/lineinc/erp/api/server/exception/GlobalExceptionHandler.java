@@ -201,6 +201,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 잘못된 인자 (예: 정의되지 않은 필드 등) 예외 처리
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.warn("잘못된 요청 인자: {}", ex.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                ValidationMessages.INVALID_FIELD,
+                List.of()
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
      * /**
      * 기타 모든 예외 처리
      */
