@@ -13,6 +13,19 @@ jobs:
       - name: ✅ 코드 체크아웃
         uses: actions/checkout@v3
 
+      - name: 🧱 Gradle로 JAR 빌드
+        run: ./gradlew bootJar
+        env:
+          SPRING_DATASOURCE_URL: ${{ secrets.DEV_SPRING_DATASOURCE_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.DEV_SPRING_DATASOURCE_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DEV_SPRING_DATASOURCE_PASSWORD }}
+          SPRING_PROFILES_ACTIVE: dev
+          USER_DEFAULT_PASSWORD: ${{ secrets.DEV_USER_DEFAULT_PASSWORD }}
+          ADMIN_LOGIN_ID: ${{ secrets.DEV_ADMIN_LOGIN_ID }}
+          ADMIN_PASSWORD: ${{ secrets.DEV_ADMIN_PASSWORD }}
+          SESSION_TIMEOUT_DEFAULT_SECONDS: ${{ secrets.DEV_SESSION_TIMEOUT_DEFAULT_SECONDS }}
+          SESSION_TIMEOUT_AUTO_LOGIN_SECONDS: ${{ secrets.DEV_SESSION_TIMEOUT_AUTO_LOGIN_SECONDS }}
+
       - name: 🔐 SSH 키 설정
         run: |
           mkdir -p ~/.ssh
@@ -20,14 +33,12 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🚀 dev 서버에 접속해서 배포 실행
+      - name: 📦 JAR 파일 EC2로 전송
+        run: scp build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app.jar
+
+      - name: 🚀 EC2에서 JAR 실행
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
-            cd /home/ubuntu/erp-api-server
-            git fetch origin
-            git checkout dev
-            git reset --hard origin/dev
-            chmod +x ./run.sh
-            ./run.sh dev
-            docker image prune -f
+            pkill -f 'app.jar' || true
+            nohup java -jar /home/ubuntu/app.jar > /dev/null 2>&1 &
           EOF

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -21,11 +22,12 @@ public class UsersSeeder implements ApplicationRunner {
     @Value("${ADMIN_LOGIN_ID:admin}")
     private String adminLoginId;
 
-    @Value("${ADMIN_PASSWORD_HASH}")
-    private String adminPasswordHash;
+    @Value("${ADMIN_PASSWORD}")
+    private String adminPassword;
 
     private final UsersRepository usersRepository;
     private final CompanyRepository companyRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -40,7 +42,7 @@ public class UsersSeeder implements ApplicationRunner {
                 .company(company)
                 .loginId(adminLoginId)
                 .username("관리자")
-                .passwordHash(adminPasswordHash)
+                .passwordHash(passwordEncoder.encode(adminPassword))
                 .build();
 
         usersRepository.save(admin);
