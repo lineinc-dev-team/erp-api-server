@@ -29,4 +29,5 @@ jobs:
             git reset --hard origin/dev
             chmod +x ./run.sh
             ./run.sh dev
+            docker image prune -f
           EOF
