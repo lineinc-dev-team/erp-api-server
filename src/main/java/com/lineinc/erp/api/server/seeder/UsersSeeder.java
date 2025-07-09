@@ -6,9 +6,6 @@ import com.lineinc.erp.api.server.domain.users.entity.Users;
 import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +13,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-@Order(4)
-public class UsersSeeder implements ApplicationRunner {
+public class UsersSeeder {
 
     @Value("${ADMIN_LOGIN_ID:admin}")
     private String adminLoginId;
@@ -29,9 +25,7 @@ public class UsersSeeder implements ApplicationRunner {
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public void run(ApplicationArguments args) {
-
+    public void seed() {
         Optional<Users> existingAdmin = usersRepository.findByLoginId(adminLoginId);
         if (existingAdmin.isPresent()) return;
 

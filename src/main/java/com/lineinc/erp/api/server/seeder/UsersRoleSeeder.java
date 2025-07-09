@@ -6,17 +6,13 @@ import com.lineinc.erp.api.server.domain.users.entity.Users;
 import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-@Order(3)
-public class UsersRoleSeeder implements ApplicationRunner {
+public class UsersRoleSeeder {
 
     private final UsersRepository usersRepository;
     private final RoleRepository roleRepository;
@@ -24,8 +20,7 @@ public class UsersRoleSeeder implements ApplicationRunner {
     @Value("${ADMIN_LOGIN_ID}")
     private String adminLoginId;
 
-    @Override
-    public void run(ApplicationArguments args) {
+    public void seed() {
         Optional<Users> adminUserOpt = usersRepository.findByLoginId(adminLoginId);
         Optional<Roles> adminRoleOpt = roleRepository.findByName("관리자");
 
