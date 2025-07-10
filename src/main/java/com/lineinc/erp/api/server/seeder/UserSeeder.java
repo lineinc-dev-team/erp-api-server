@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.seeder;
 
+import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -13,10 +14,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UsersSeeder {
-
-    @Value("${ADMIN_LOGIN_ID:admin}")
-    private String adminLoginId;
+public class UserSeeder {
 
     @Value("${ADMIN_PASSWORD}")
     private String adminPassword;
@@ -26,17 +24,22 @@ public class UsersSeeder {
     private final PasswordEncoder passwordEncoder;
 
     public void seed() {
-        Optional<User> existingAdmin = usersRepository.findByLoginId(adminLoginId);
+        Optional<User> existingAdmin = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
         if (existingAdmin.isPresent()) return;
 
-        Company company = companyRepository.findById(1L)
-                .orElseThrow(() -> new IllegalStateException("Company with id 1 not found"));
+        Optional<Company> companyOpt = companyRepository.findByName(AppConstants.COMPANY_MAIN_NAME);
+        if (companyOpt.isEmpty()) {
+            return;
+        }
+        Company company = companyOpt.get();
 
         User admin = User.builder()
                 .company(company)
-                .loginId(adminLoginId)
-                .username("관리자")
+                .loginId(AppConstants.ADMIN_LOGIN_ID)
+                .username(AppConstants.ROLE_ADMIN_NAME)
                 .passwordHash(passwordEncoder.encode(adminPassword))
+                .createdBy(AppConstants.SYSTEM_NAME)
+                .updatedBy(AppConstants.SYSTEM_NAME)
                 .build();
 
         usersRepository.save(admin);

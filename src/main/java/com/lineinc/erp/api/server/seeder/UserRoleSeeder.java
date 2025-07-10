@@ -1,28 +1,27 @@
 package com.lineinc.erp.api.server.seeder;
 
+import com.lineinc.erp.api.server.common.constant.AppConstants;
+
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UsersRoleSeeder {
+public class UserRoleSeeder {
 
     private final UserRepository usersRepository;
     private final RoleRepository roleRepository;
 
-    @Value("${ADMIN_LOGIN_ID}")
-    private String adminLoginId;
 
     public void seed() {
-        Optional<User> adminUserOpt = usersRepository.findByLoginId(adminLoginId);
-        Optional<Role> adminRoleOpt = roleRepository.findByName("관리자");
+        Optional<User> adminUserOpt = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
+        Optional<Role> adminRoleOpt = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME);
 
         if (adminUserOpt.isPresent() && adminRoleOpt.isPresent()) {
             User adminUser = adminUserOpt.get();

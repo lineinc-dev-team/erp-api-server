@@ -5,16 +5,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
 @Component
 @RequiredArgsConstructor
 public class SeederCommandLineRunner implements CommandLineRunner {
 
     private final CompanySeeder companySeeder;
-    private final RolesSeeder rolesSeeder;
-    private final UsersRoleSeeder usersRoleSeeder;
-    private final UsersSeeder usersSeeder;
+    private final RoleSeeder roleSeeder;
+    private final UserRoleSeeder userRoleSeeder;
+    private final UserSeeder userSeeder;
 
     @Value("${seeder.enabled:true}")
     private boolean seederEnabled;
@@ -23,9 +21,9 @@ public class SeederCommandLineRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (seederEnabled) {
             companySeeder.seed();
-            rolesSeeder.seed();
-            usersRoleSeeder.seed();
-            usersSeeder.seed();
+            roleSeeder.seed();
+            userRoleSeeder.seed();
+            userSeeder.seed();
             System.out.println("Database seeding completed.");
         }
     }
