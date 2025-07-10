@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 public class SeederCommandLineRunner implements CommandLineRunner {
 
     private final CompanySeeder companySeeder;
+    private final PermissionSeeder permissionSeeder;
+    private final MenuSeeder menuSeeder;
     private final RoleSeeder roleSeeder;
     private final UserRoleSeeder userRoleSeeder;
     private final UserSeeder userSeeder;
@@ -21,6 +23,8 @@ public class SeederCommandLineRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (seederEnabled) {
             companySeeder.seed();
+            menuSeeder.seed();
+            permissionSeeder.seed();
             roleSeeder.seed();
             userRoleSeeder.seed();
             userSeeder.seed();

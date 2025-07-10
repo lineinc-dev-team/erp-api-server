@@ -36,7 +36,7 @@ public class UserSeeder {
         User admin = User.builder()
                 .company(company)
                 .loginId(AppConstants.ADMIN_LOGIN_ID)
-                .username(AppConstants.ROLE_ADMIN_NAME)
+                .username(AppConstants.ROLE_MASTER_NAME)
                 .passwordHash(passwordEncoder.encode(adminPassword))
                 .createdBy(AppConstants.SYSTEM_NAME)
                 .updatedBy(AppConstants.SYSTEM_NAME)

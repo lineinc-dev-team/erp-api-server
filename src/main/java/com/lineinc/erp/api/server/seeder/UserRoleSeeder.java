@@ -21,7 +21,7 @@ public class UserRoleSeeder {
 
     public void seed() {
         Optional<User> adminUserOpt = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
-        Optional<Role> adminRoleOpt = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME);
+        Optional<Role> adminRoleOpt = roleRepository.findByName(AppConstants.ROLE_MASTER_NAME);
 
         if (adminUserOpt.isPresent() && adminRoleOpt.isPresent()) {
             User adminUser = adminUserOpt.get();

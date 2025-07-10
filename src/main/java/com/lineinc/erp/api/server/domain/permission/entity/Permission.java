@@ -5,12 +5,13 @@ import com.lineinc.erp.api.server.domain.menu.entity.Menu;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Permission extends BaseEntity {
 
     @Id
