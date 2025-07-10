@@ -36,22 +36,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);             // 쿠키/세션 등의 인증 정보 포함 허용
     }
 
-    /**
-     * 크로스 도메인 쿠키 설정
-     * - 로컬 개발 환경에서 다른 포트 간 쿠키 전송을 위한 설정
-     */
-    @Bean
-    public CookieSerializer cookieSerializer() {
-        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setCookieName("JSESSIONID");
-        serializer.setCookiePath("/");
-        serializer.setSameSite("None");              // 크로스 도메인 쿠키 허용
-        serializer.setUseSecureCookie(false);        // 개발환경에서는 false (HTTPS 아닌 환경)
-        serializer.setUseHttpOnlyCookie(true);       // XSS 방지
-        return serializer;
-    }
-
-
     @Bean
     public FilterRegistrationBean<RequestLoggingFilter> requestLoggingFilter() {
         FilterRegistrationBean<RequestLoggingFilter> registrationBean = new FilterRegistrationBean<>();
