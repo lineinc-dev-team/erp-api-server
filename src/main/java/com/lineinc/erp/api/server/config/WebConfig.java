@@ -31,8 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", "https://dev-erp.dooson.it", "https://dev-erp-api.dooson.it") // 프론트엔드 오리진 명시
                 .allowedMethods("*")
                 .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600); // CORS 프리플라이트 요청 캐싱 시간
+                .allowCredentials(true);
     }
 
     @Bean
