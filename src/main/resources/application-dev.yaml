@@ -2,7 +2,7 @@ spring:
   session:
     store-type: jdbc
     jdbc:
-      initialize-schema: create
+      initialize-schema: always
 
   data:
     web:

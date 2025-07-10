@@ -2,7 +2,7 @@ spring:
   session:
     store-type: jdbc
     jdbc:
-      initialize-schema: create
+      initialize-schema: always
       # 애플리케이션 시작 시 spring_session 및 spring_session_attributes 테이블이 없으면 생성
       # 기존 테이블이 있으면 유지, 데이터 삭제 안 함
 
