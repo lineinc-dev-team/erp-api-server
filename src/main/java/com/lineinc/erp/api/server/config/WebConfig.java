@@ -28,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "https://dev-erp.dooson.it", "https://dev-erp-api.dooson.it") // 프론트엔드 오리진 명시
+                .allowedOrigins("http://localhost:3000", "https://localhost:3000", "https://dev-erp.dooson.it", "https://dev-erp-api.dooson.it") // 프론트엔드 오리진 명시
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .allowCredentials(true);
