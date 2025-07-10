@@ -39,3 +39,10 @@ management:
 
 swagger:
   server-url: https://dev-erp-api.dooson.it
+
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: false
