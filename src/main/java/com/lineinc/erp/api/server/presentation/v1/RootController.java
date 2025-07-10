@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "Health")
+@Tag(name = "health")
 public class RootController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content()),

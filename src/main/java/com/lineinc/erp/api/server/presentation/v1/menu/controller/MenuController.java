@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/menus")
 @RequiredArgsConstructor
-@Tag(name = "menus", description = "메뉴 및 권한 관련 API")
+@Tag(name = "menus", description = "메뉴 관련 API")
 public class MenuController {
 
     private final MenuService menuService;
@@ -30,7 +30,7 @@ public class MenuController {
             @ApiResponse(responseCode = "200", description = "메뉴 및 권한 목록 조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
     })
-    @GetMapping("/menus-with-permissions")
+    @GetMapping("/permissions")
     public ResponseEntity<SuccessResponse<List<MenuWithPermissionsResponse>>> getMenusWithPermissions() {
         List<MenuWithPermissionsResponse> responseList = menuService.getMenusWithPermissions();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
