@@ -1,6 +1,6 @@
-package com.lineinc.erp.api.server.domain.roles.repository;
+package com.lineinc.erp.api.server.domain.role.repository;
 
-import com.lineinc.erp.api.server.domain.roles.entity.Role;
+import com.lineinc.erp.api.server.domain.role.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.roles.entity;
+package com.lineinc.erp.api.server.domain.role.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;

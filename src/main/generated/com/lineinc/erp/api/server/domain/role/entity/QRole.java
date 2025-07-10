@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.roles.entity;
+package com.lineinc.erp.api.server.domain.role.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QRole extends EntityPathBase<Role> {
 
-    private static final long serialVersionUID = 1733075937L;
+    private static final long serialVersionUID = -919394728L;
 
     public static final QRole role = new QRole("role");
 

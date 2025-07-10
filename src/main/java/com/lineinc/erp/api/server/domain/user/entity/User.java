@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.entity.Company;
-import com.lineinc.erp.api.server.domain.roles.entity.Role;
+import com.lineinc.erp.api.server.domain.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

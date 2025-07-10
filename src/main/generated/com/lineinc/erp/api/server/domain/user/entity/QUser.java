@@ -50,7 +50,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath phoneNumber = createString("phoneNumber");
 
-    public final SetPath<com.lineinc.erp.api.server.domain.roles.entity.Role, com.lineinc.erp.api.server.domain.roles.entity.QRole> roles = this.<com.lineinc.erp.api.server.domain.roles.entity.Role, com.lineinc.erp.api.server.domain.roles.entity.QRole>createSet("roles", com.lineinc.erp.api.server.domain.roles.entity.Role.class, com.lineinc.erp.api.server.domain.roles.entity.QRole.class, PathInits.DIRECT2);
+    public final SetPath<com.lineinc.erp.api.server.domain.role.entity.Role, com.lineinc.erp.api.server.domain.role.entity.QRole> roles = this.<com.lineinc.erp.api.server.domain.role.entity.Role, com.lineinc.erp.api.server.domain.role.entity.QRole>createSet("roles", com.lineinc.erp.api.server.domain.role.entity.Role.class, com.lineinc.erp.api.server.domain.role.entity.QRole.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;

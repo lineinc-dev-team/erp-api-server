@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.seeder;
 
-import com.lineinc.erp.api.server.domain.roles.entity.Role;
-import com.lineinc.erp.api.server.domain.roles.repository.RoleRepository;
+import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
