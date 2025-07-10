@@ -28,7 +28,6 @@ public class MenuController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "메뉴 및 권한 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
     })
     @GetMapping("/permissions")
     public ResponseEntity<SuccessResponse<List<MenuWithPermissionsResponse>>> getMenusWithPermissions() {
