@@ -4,10 +4,15 @@ import lombok.Getter;
 
 @Getter
 public enum PermissionAction {
-    VIEW,
-    CREATE,
-    UPDATE,
-    DELETE,
-    APPROVE
-}
+    VIEW("조회"),
+    CREATE("등록"),
+    UPDATE("수정"),
+    DELETE("삭제"),
+    APPROVE("승인");
 
+    private final String label;
+
+    PermissionAction(String label) {
+        this.label = label;
+    }
+}

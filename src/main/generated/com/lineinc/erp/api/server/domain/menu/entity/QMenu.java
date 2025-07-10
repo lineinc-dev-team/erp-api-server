@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -36,6 +37,8 @@ public class QMenu extends EntityPathBase<Menu> {
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath name = createString("name");
+
+    public final ListPath<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission> permissions = this.<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission>createList("permissions", com.lineinc.erp.api.server.domain.permission.entity.Permission.class, com.lineinc.erp.api.server.domain.permission.entity.QPermission.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;

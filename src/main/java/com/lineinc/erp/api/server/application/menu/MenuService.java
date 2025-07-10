@@ -15,18 +15,17 @@ import java.util.stream.Collectors;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final PermissionRepository permissionRepository;
 
     /**
      * 모든 메뉴와 메뉴별 권한을 포함하여 반환
      */
     public List<MenuWithPermissionsResponse> getMenusWithPermissions() {
-        List<Menu> menus = menuRepository.findAll();
+        List<Menu> menus = menuRepository.findAllWithPermissions();
 
         return menus.stream()
                 .map(menu -> {
-                    List<MenuWithPermissionsResponse.PermissionResponse> permissions = permissionRepository.findByMenu(menu).stream()
-                            .map(permission -> new MenuWithPermissionsResponse.PermissionResponse(permission.getId(), permission.getAction().name()))
+                    List<MenuWithPermissionsResponse.PermissionResponse> permissions = menu.getPermissions().stream()
+                            .map(permission -> new MenuWithPermissionsResponse.PermissionResponse(permission.getId(), permission.getAction().getLabel()))
                             .collect(Collectors.toList());
 
                     return new MenuWithPermissionsResponse(menu.getId(), menu.getName(), permissions);

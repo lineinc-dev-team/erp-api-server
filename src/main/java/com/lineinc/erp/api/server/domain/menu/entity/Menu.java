@@ -1,9 +1,12 @@
 package com.lineinc.erp.api.server.domain.menu.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,4 +21,7 @@ public class Menu extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String name; // 예: "계약관리"
+
+    @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY)
+    private List<Permission> permissions;
 }
