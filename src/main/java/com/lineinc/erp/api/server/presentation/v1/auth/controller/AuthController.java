@@ -81,15 +81,6 @@ public class AuthController {
                 : defaultSeconds;
         session.setMaxInactiveInterval(maxInactiveInterval);
 
-        // 명시적 쿠키 설정
-        Cookie sessionCookie = new Cookie("SESSION", session.getId());
-        sessionCookie.setPath("/");
-        sessionCookie.setSecure(true);
-        sessionCookie.setHttpOnly(true);
-        sessionCookie.setMaxAge(maxInactiveInterval);
-        sessionCookie.setAttribute("SameSite", "None");
-        response.addCookie(sessionCookie);
-
         return ResponseEntity.ok().build();
     }
 
