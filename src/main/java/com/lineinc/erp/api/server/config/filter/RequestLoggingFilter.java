@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.HashMap;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -42,7 +43,7 @@ public class RequestLoggingFilter implements Filter {
 
         // 요청 정보 수집
         String clientIp = HttpUtils.getClientIp(httpRequest);
-        String userAgent = httpRequest.getHeader("Users-Agent");
+        String userAgent = httpRequest.getHeader("User-Agent");
         String method = httpRequest.getMethod();
         String uri = httpRequest.getRequestURI();
         String queryString = httpRequest.getQueryString();
@@ -60,14 +61,15 @@ public class RequestLoggingFilter implements Filter {
             int status = httpResponse.getStatus();
 
             // 구조화된 로그 출력
-            logger.info("{}", Map.of(
-                    "method", method,
-                    "uri", uri + (queryString != null ? "?" + queryString : ""),
-                    "ip", clientIp,
-                    "status", status,
-                    "duration", duration,
-                    "userAgent", userAgent
-            ));
+            Map<String, Object> logMap = new HashMap<>();
+            logMap.put("method", method);
+            logMap.put("uri", uri + (queryString != null ? "?" + queryString : ""));
+            logMap.put("ip", clientIp);
+            logMap.put("status", status);
+            logMap.put("duration", duration);
+            logMap.put("userAgent", userAgent != null ? userAgent : "unknown");
+
+            logger.info("{}", logMap);
         }
     }
 
