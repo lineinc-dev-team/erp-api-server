@@ -39,10 +39,4 @@ management:
 
 swagger:
   server-url: https://dev-erp-api.dooson.it
-
-server:
-  servlet:
-    session:
-      cookie:
-        same-site: none
-        secure: false  # HTTPS 아닌 환경에서도 쿠키 저장 가능
+  ㄴ
