@@ -12,9 +12,10 @@ public class SeederCommandLineRunner implements CommandLineRunner {
     private final CompanySeeder companySeeder;
     private final PermissionSeeder permissionSeeder;
     private final MenuSeeder menuSeeder;
-    private final RoleSeeder roleSeeder;
-    private final UserRoleSeeder userRoleSeeder;
-    private final UserSeeder userSeeder;
+    private final RolesSeeder rolesSeeder;
+    private final RolesPermissionsSeeder rolesPermissionsSeeder;
+    private final UsersRolesSeeder usersRolesSeeder;
+    private final UsersSeeder usersSeeder;
 
     @Value("${seeder.enabled:true}")
     private boolean seederEnabled;
@@ -25,9 +26,10 @@ public class SeederCommandLineRunner implements CommandLineRunner {
             companySeeder.seed();
             menuSeeder.seed();
             permissionSeeder.seed();
-            roleSeeder.seed();
-            userRoleSeeder.seed();
-            userSeeder.seed();
+            rolesSeeder.seed();
+            rolesPermissionsSeeder.seed();
+            usersRolesSeeder.seed();
+            usersSeeder.seed();
             System.out.println("Database seeding completed.");
         }
     }

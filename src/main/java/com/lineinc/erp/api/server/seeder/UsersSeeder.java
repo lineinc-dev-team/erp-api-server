@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UserSeeder {
+public class UsersSeeder {
 
     @Value("${ADMIN_PASSWORD}")
     private String adminPassword;

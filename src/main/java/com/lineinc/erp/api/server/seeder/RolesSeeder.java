@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class RoleSeeder {
+public class RolesSeeder {
 
     private final RoleRepository roleRepository;
 

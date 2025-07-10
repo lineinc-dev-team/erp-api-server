@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UserRoleSeeder {
+public class UsersRolesSeeder {
 
     private final UserRepository usersRepository;
     private final RoleRepository roleRepository;
