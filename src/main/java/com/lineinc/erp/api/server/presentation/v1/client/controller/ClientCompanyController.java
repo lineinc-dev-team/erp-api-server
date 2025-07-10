@@ -125,7 +125,7 @@ public class ClientCompanyController {
             @Valid ClientCompanyListRequest request,
             @Valid DownloadableRequest downloadableRequest
     ) throws IOException {
-        List<String> allowedFields = List.of("id", "name", "businessNumber", "ceoName", "address");
+        List<String> allowedFields = List.of("id", "businessNumber", "name", "ceoName", "address");
         List<String> validatedFields = downloadableRequest.validatedFields(allowedFields);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
 

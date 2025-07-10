@@ -113,8 +113,8 @@ public class ClientCompanyService {
     private String getExcelHeaderName(String field) {
         return switch (field) {
             case "id" -> "No.";
-            case "name" -> "이름";
             case "businessNumber" -> "사업자번호";
+            case "name" -> "이름";
             case "ceoName" -> "대표자명";
             case "address" -> "주소";
             default -> null;
@@ -124,8 +124,8 @@ public class ClientCompanyService {
     private String getExcelCellValue(ClientCompanyResponse company, String field) {
         return switch (field) {
             case "id" -> String.valueOf(company.id());
-            case "name" -> company.name();
             case "businessNumber" -> company.businessNumber();
+            case "name" -> company.name();
             case "ceoName" -> company.ceoName();
             case "address" -> company.address();
             default -> null;
