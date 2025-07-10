@@ -6,7 +6,7 @@ spring:
     cookie:
       name: SESSION
       path: /
-      same-site: lax    # none 대신 lax 사용
+      same-site: none
       secure: false
       http-only: true
 
