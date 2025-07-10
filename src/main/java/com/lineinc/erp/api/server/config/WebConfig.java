@@ -44,4 +44,14 @@ public class WebConfig implements WebMvcConfigurer {
 
         return registrationBean;
     }
+
+    @Bean
+    public CookieSerializer cookieSerializer() {
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+        serializer.setUseHttpOnlyCookie(true);  // HttpOnly 설정
+        serializer.setSameSite("None");         // 크로스 도메인 쿠키 허용
+        serializer.setUseSecureCookie(true);    // HTTPS 환경에서만 쿠키 전송
+
+        return serializer;
+    }
 }
