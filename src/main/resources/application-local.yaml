@@ -1,4 +1,15 @@
 spring:
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    cookie:
+      name: SESSION
+      path: /
+      same-site: none
+      secure: false
+      http-only: true
+
   data:
     web:
       pageable:
