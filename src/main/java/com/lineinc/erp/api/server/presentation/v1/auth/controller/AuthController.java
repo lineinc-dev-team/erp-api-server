@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
-import com.lineinc.erp.api.server.application.users.UsersService;
+import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final UsersService usersService;
+    private final UserService userService;
 
     @Operation(summary = "로그인", description = "사용자 로그인 후 세션 생성 및 쿠키 발급")
     @ApiResponses(value = {
@@ -58,7 +58,7 @@ public class AuthController {
         User user = (User) authentication.getPrincipal();
 
         // 4. 마지막 로그인 시간 갱신
-        usersService.updateLastLoginAt(user);
+        userService.updateLastLoginAt(user);
 
         // 5. SecurityContext에 인증 정보 저장
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -96,7 +96,7 @@ public class AuthController {
     })
     @GetMapping("/me")
     public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(@AuthenticationPrincipal User user) {
-        User findUser = usersService.getUserByLoginIdOrThrow(user.getLoginId());
+        User findUser = userService.getUserByLoginIdOrThrow(user.getLoginId());
         UserInfoResponse response = UserInfoResponse.from(findUser);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }

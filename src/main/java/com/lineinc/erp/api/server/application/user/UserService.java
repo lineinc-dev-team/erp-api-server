@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.application.users;
+package com.lineinc.erp.api.server.application.user;
 
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
@@ -18,7 +18,7 @@ import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class UsersService {
+public class UserService {
 
 
     private final UserRepository usersRepository;

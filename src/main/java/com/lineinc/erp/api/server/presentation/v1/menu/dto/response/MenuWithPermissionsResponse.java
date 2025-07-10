@@ -1,0 +1,29 @@
+package com.lineinc.erp.api.server.presentation.v1.menu.dto.response;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
+
+@Schema(description = "메뉴 및 해당 메뉴에 속한 권한 목록 응답")
+public record MenuWithPermissionsResponse(
+
+        @Schema(description = "메뉴 ID", example = "1")
+        Long id,
+
+        @Schema(description = "메뉴명", example = "계정관리")
+        String name,
+
+        @Schema(description = "해당 메뉴에 할당된 권한 리스트")
+        List<PermissionResponse> permissions
+) {
+    @Schema(description = "권한 정보")
+    public record PermissionResponse(
+
+            @Schema(description = "권한 ID", example = "10")
+            Long id,
+
+            @Schema(description = "권한 액션명", example = "VIEW")
+            String action
+    ) {
+    }
+}

@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.user.controller;
 
-import com.lineinc.erp.api.server.application.users.UsersService;
+import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
@@ -28,7 +28,7 @@ import org.springframework.data.domain.Page;
 @Tag(name = "users", description = "유저 관련 API")
 public class UserController {
 
-    private final UsersService usersService;
+    private final UserService userService;
 
     @Operation(summary = "비밀번호 초기화", description = "유저 로그인 비밀번호 초기화")
     @ApiResponses(value = {
@@ -38,7 +38,7 @@ public class UserController {
     })
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        usersService.resetPassword(request.loginId());
+        userService.resetPassword(request.loginId());
         return ResponseEntity.ok().build();
     }
 
@@ -52,7 +52,7 @@ public class UserController {
             @Valid PageRequest pageRequest,
             @Valid UserListRequest request
     ) {
-        Page<UserInfoResponse> page = usersService.getAllUsers(
+        Page<UserInfoResponse> page = userService.getAllUsers(
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
         return ResponseEntity.ok(SuccessResponse.of(

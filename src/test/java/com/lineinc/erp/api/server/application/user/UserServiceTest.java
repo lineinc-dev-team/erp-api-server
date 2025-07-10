@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.application.users;
+package com.lineinc.erp.api.server.application.user;
 
 import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 class UserServiceTest {
 
     @Autowired
-    private UsersService usersService;
+    private UserService userService;
 
     @Autowired
     private UserRepository usersRepository;
@@ -54,7 +54,7 @@ class UserServiceTest {
         usersRepository.save(user);
 
         // when
-        User found = usersService.getUserByLoginIdOrThrow("test123");
+        User found = userService.getUserByLoginIdOrThrow("test123");
 
         // then
         assertThat(found).isNotNull();
@@ -64,7 +64,7 @@ class UserServiceTest {
     @Test
     @DisplayName("존재하지 않는 로그인 ID로 조회 시 예외 발생")
     void getUserByLoginIdOrThrow_fail() {
-        assertThatThrownBy(() -> usersService.getUserByLoginIdOrThrow("not_exist"))
+        assertThatThrownBy(() -> userService.getUserByLoginIdOrThrow("not_exist"))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("NOT_FOUND");
     }
@@ -87,7 +87,7 @@ class UserServiceTest {
         usersRepository.save(user);
 
         // when
-        usersService.resetPassword("test123");
+        userService.resetPassword("test123");
 
         // then
         User updatedUser = usersRepository.findByLoginId("test123").orElseThrow();
@@ -113,7 +113,7 @@ class UserServiceTest {
         usersRepository.save(user);
 
         // when
-        usersService.updateLastLoginAt(user);
+        userService.updateLastLoginAt(user);
 
         // then
         User updatedUser = usersRepository.findByLoginId("test123").orElseThrow();
