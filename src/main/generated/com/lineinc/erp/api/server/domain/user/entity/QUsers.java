@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.users.entity;
+package com.lineinc.erp.api.server.domain.user.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QUsers extends EntityPathBase<Users> {
 
-    private static final long serialVersionUID = 2012760722L;
+    private static final long serialVersionUID = -656012495L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

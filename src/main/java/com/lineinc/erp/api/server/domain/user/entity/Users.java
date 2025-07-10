@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.users.entity;
+package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.entity.Company;
@@ -35,7 +35,7 @@ public class Users extends BaseEntity implements UserDetails {
     private Long id;
 
     /**
-     * 소속 회사 정보 (User - Company : 다대일 관계)
+     * 소속 회사 정보 (Users - Company : 다대일 관계)
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.users.dto.request;
+package com.lineinc.erp.api.server.presentation.v1.user.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springdoc.core.annotations.ParameterObject;

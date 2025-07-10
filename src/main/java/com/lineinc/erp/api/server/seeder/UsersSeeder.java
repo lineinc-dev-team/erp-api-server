@@ -2,8 +2,8 @@ package com.lineinc.erp.api.server.seeder;
 
 import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
-import com.lineinc.erp.api.server.domain.users.entity.Users;
-import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
+import com.lineinc.erp.api.server.domain.user.entity.Users;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +21,7 @@ public class UsersSeeder {
     @Value("${ADMIN_PASSWORD}")
     private String adminPassword;
 
-    private final UsersRepository usersRepository;
+    private final UserRepository usersRepository;
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
 

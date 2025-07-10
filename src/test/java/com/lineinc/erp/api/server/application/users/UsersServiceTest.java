@@ -2,8 +2,8 @@ package com.lineinc.erp.api.server.application.users;
 
 import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
-import com.lineinc.erp.api.server.domain.users.entity.Users;
-import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
+import com.lineinc.erp.api.server.domain.user.entity.Users;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ class UsersServiceTest {
     private UsersService usersService;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository usersRepository;
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -46,12 +46,12 @@ class UsersServiceTest {
 
         companyRepository.save(company);
 
-        Users user = Users.builder()
+        Users users = Users.builder()
                 .company(company)
                 .loginId("test123")
                 .username("홍길동")
                 .build();
-        usersRepository.save(user);
+        usersRepository.save(users);
 
         // when
         Users found = usersService.getUserByLoginIdOrThrow("test123");
@@ -79,20 +79,20 @@ class UsersServiceTest {
 
         companyRepository.save(company);
 
-        Users user = Users.builder()
+        Users users = Users.builder()
                 .company(company)
                 .loginId("test123")
                 .username("홍길동")
                 .build();
-        usersRepository.save(user);
+        usersRepository.save(users);
 
         // when
         usersService.resetPassword("test123");
 
         // then
-        Users updatedUser = usersRepository.findByLoginId("test123").orElseThrow();
-        assertThat(passwordEncoder.matches(defaultPassword, updatedUser.getPassword())).isTrue();
-        assertThat(updatedUser.getPasswordResetAt()).isNotNull();
+        Users updatedUsers = usersRepository.findByLoginId("test123").orElseThrow();
+        assertThat(passwordEncoder.matches(defaultPassword, updatedUsers.getPassword())).isTrue();
+        assertThat(updatedUsers.getPasswordResetAt()).isNotNull();
     }
 
     @Test
@@ -105,19 +105,19 @@ class UsersServiceTest {
 
         companyRepository.save(company);
 
-        Users user = Users.builder()
+        Users users = Users.builder()
                 .company(company)
                 .loginId("test123")
                 .username("홍길동")
                 .build();
-        usersRepository.save(user);
+        usersRepository.save(users);
 
         // when
-        usersService.updateLastLoginAt(user);
+        usersService.updateLastLoginAt(users);
 
         // then
-        Users updatedUser = usersRepository.findByLoginId("test123").orElseThrow();
-        assertThat(updatedUser.getLastLoginAt()).isNotNull();
-        assertThat(updatedUser.getLastLoginAt()).isEqualTo(user.getLastLoginAt());
+        Users updatedUsers = usersRepository.findByLoginId("test123").orElseThrow();
+        assertThat(updatedUsers.getLastLoginAt()).isNotNull();
+        assertThat(updatedUsers.getLastLoginAt()).isEqualTo(users.getLastLoginAt());
     }
 }

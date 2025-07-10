@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.auth.dto.response;
 
 import com.lineinc.erp.api.server.domain.roles.entity.Roles;
-import com.lineinc.erp.api.server.domain.users.entity.Users;
+import com.lineinc.erp.api.server.domain.user.entity.Users;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -20,12 +20,12 @@ public record UserInfoResponse(
         @Schema(description = "사용자 권한 목록", example = "[\"어드민\", \"매니저\"]")
         List<String> roles
 ) {
-    public static UserInfoResponse from(Users user) {
+    public static UserInfoResponse from(Users users) {
         return new UserInfoResponse(
-                user.getId(),
-                user.getLoginId(),
-                user.getUsername(),
-                user.getRoles().stream()
+                users.getId(),
+                users.getLoginId(),
+                users.getUsername(),
+                users.getRoles().stream()
                         .map(Roles::getName)
                         .toList()
         );

@@ -42,7 +42,7 @@ public class RequestLoggingFilter implements Filter {
 
         // 요청 정보 수집
         String clientIp = HttpUtils.getClientIp(httpRequest);
-        String userAgent = httpRequest.getHeader("User-Agent");
+        String userAgent = httpRequest.getHeader("Users-Agent");
         String method = httpRequest.getMethod();
         String uri = httpRequest.getRequestURI();
         String queryString = httpRequest.getQueryString();

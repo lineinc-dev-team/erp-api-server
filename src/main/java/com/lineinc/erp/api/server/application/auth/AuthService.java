@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.application.auth;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
-import com.lineinc.erp.api.server.domain.users.repository.UsersRepository;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
 
-    private final UsersRepository usersRepository;
+    private final UserRepository usersRepository;
 
     @Override
     public UserDetails loadUserByUsername(String loginId) {

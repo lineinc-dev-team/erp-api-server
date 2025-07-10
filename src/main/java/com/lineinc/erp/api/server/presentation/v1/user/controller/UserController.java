@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.users.controller;
+package com.lineinc.erp.api.server.presentation.v1.user.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.request.PageRequest;
@@ -8,8 +8,8 @@ import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
-import com.lineinc.erp.api.server.presentation.v1.users.dto.request.ResetPasswordRequest;
-import com.lineinc.erp.api.server.presentation.v1.users.dto.request.UserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.ResetPasswordRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +26,7 @@ import org.springframework.data.domain.Page;
 @RequestMapping(value = "/api/v1/users")
 @RequiredArgsConstructor
 @Tag(name = "users", description = "유저 관련 API")
-public class UsersController {
+public class UserController {
 
     private final UsersService usersService;
 
