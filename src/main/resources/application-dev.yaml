@@ -3,6 +3,9 @@ spring:
     store-type: jdbc
     jdbc:
       initialize-schema: always
+    cookie:
+      same-site: none
+      secure: true
 
   data:
     web:
