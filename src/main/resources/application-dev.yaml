@@ -45,3 +45,5 @@ management:
 swagger:
   server-url: https://dev-erp-api.dooson.it
 
+cors:
+  allowed-origins: https://dev-erp.dooson.it,https://dev-erp-api.dooson.it
