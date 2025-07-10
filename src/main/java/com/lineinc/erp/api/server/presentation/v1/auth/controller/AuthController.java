@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +44,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(
             @Valid @RequestBody LoginRequest request,
-            HttpServletRequest httpRequest
+            HttpServletRequest httpRequest,
+            HttpServletResponse response
     ) {
         int defaultSeconds = 1800;        // 예: 30분
         int autoLoginSeconds = 604800;    // 예: 7일
@@ -72,9 +75,20 @@ public class AuthController {
                 context
         );
 
-        session.setMaxInactiveInterval(Boolean.TRUE.equals(request.autoLogin())
-                ? autoLoginSeconds   // 자동 로그인
-                : defaultSeconds);   // 일반 로그인
+        // 세션 타임아웃 설정
+        int maxInactiveInterval = Boolean.TRUE.equals(request.autoLogin())
+                ? autoLoginSeconds
+                : defaultSeconds;
+        session.setMaxInactiveInterval(maxInactiveInterval);
+
+        // 명시적 쿠키 설정
+        Cookie sessionCookie = new Cookie("SESSION", session.getId());
+        sessionCookie.setPath("/");
+        sessionCookie.setSecure(true);
+        sessionCookie.setHttpOnly(true);
+        sessionCookie.setMaxAge(maxInactiveInterval);
+        sessionCookie.setAttribute("SameSite", "None");
+        response.addCookie(sessionCookie);
 
         return ResponseEntity.ok().build();
     }
