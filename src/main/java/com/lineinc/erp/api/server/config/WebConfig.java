@@ -28,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         // CORS 설정 등록
         registry.addMapping("/**")        // 모든 API 엔드포인트 허용
-                .allowedOriginPatterns("*")
+                .allowedOrigins("http://localhost:3000")
                 .allowedMethods("*")                 // GET, POST, PUT, DELETE 등 모든 HTTP 메서드 허용
                 .allowedHeaders("*")                 // 모든 요청 헤더 허용
                 .allowCredentials(true);             // 쿠키/세션 등의 인증 정보 포함 허용
