@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.seeder;
 
 import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
-import com.lineinc.erp.api.server.domain.user.entity.Users;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,13 +26,13 @@ public class UsersSeeder {
     private final PasswordEncoder passwordEncoder;
 
     public void seed() {
-        Optional<Users> existingAdmin = usersRepository.findByLoginId(adminLoginId);
+        Optional<User> existingAdmin = usersRepository.findByLoginId(adminLoginId);
         if (existingAdmin.isPresent()) return;
 
         Company company = companyRepository.findById(1L)
                 .orElseThrow(() -> new IllegalStateException("Company with id 1 not found"));
 
-        Users admin = Users.builder()
+        User admin = User.builder()
                 .company(company)
                 .loginId(adminLoginId)
                 .username("관리자")

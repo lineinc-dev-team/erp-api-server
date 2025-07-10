@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.application.auth;
 
 import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
-import com.lineinc.erp.api.server.domain.user.entity.Users;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,13 +39,13 @@ class AuthServiceTest {
 
         companyRepository.save(company);
 
-        Users users = Users.builder()
+        User user = User.builder()
                 .company(company)
                 .loginId("test123")
                 .username("test")
                 .build();
 
-        usersRepository.save(users);  // 사용자 저장
+        usersRepository.save(user);  // 사용자 저장
 
         // when: 로그인 ID로 UserDetails 조회
         UserDetails result = authService.loadUserByUsername("test123");

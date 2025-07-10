@@ -7,17 +7,18 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QRoles is a Querydsl query type for Roles
+ * QRole is a Querydsl query type for Role
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QRoles extends EntityPathBase<Roles> {
+public class QRole extends EntityPathBase<Role> {
 
-    private static final long serialVersionUID = -2109220686L;
+    private static final long serialVersionUID = 1733075937L;
 
-    public static final QRoles roles = new QRoles("roles");
+    public static final QRole role = new QRole("role");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
@@ -37,22 +38,24 @@ public class QRoles extends EntityPathBase<Roles> {
 
     public final StringPath name = createString("name");
 
+    public final SetPath<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission> permissions = this.<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission>createSet("permissions", com.lineinc.erp.api.server.domain.permission.entity.Permission.class, com.lineinc.erp.api.server.domain.permission.entity.QPermission.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
 
-    public QRoles(String variable) {
-        super(Roles.class, forVariable(variable));
+    public QRole(String variable) {
+        super(Role.class, forVariable(variable));
     }
 
-    public QRoles(Path<? extends Roles> path) {
+    public QRole(Path<? extends Role> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QRoles(PathMetadata metadata) {
-        super(Roles.class, metadata);
+    public QRole(PathMetadata metadata) {
+        super(Role.class, metadata);
     }
 
 }

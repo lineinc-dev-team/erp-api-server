@@ -19,9 +19,29 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public static final QMenu menu = new QMenu("menu");
 
+    public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
+
+    //inherited
+    public final StringPath createdBy = _super.createdBy;
+
+    //inherited
+    public final BooleanPath deleted = _super.deleted;
+
+    //inherited
+    public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath name = createString("name");
+
+    //inherited
+    public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
+
+    //inherited
+    public final StringPath updatedBy = _super.updatedBy;
 
     public QMenu(String variable) {
         super(Menu.class, forVariable(variable));

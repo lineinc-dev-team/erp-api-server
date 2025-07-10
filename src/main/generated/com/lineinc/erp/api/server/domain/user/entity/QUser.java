@@ -11,16 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QUsers is a Querydsl query type for Users
+ * QUser is a Querydsl query type for User
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QUsers extends EntityPathBase<Users> {
+public class QUser extends EntityPathBase<User> {
 
-    private static final long serialVersionUID = -656012495L;
+    private static final long serialVersionUID = -990993022L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QUsers users = new QUsers("users");
+    public static final QUser user = new QUser("user");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
@@ -50,7 +50,7 @@ public class QUsers extends EntityPathBase<Users> {
 
     public final StringPath phoneNumber = createString("phoneNumber");
 
-    public final SetPath<com.lineinc.erp.api.server.domain.roles.entity.Roles, com.lineinc.erp.api.server.domain.roles.entity.QRoles> roles = this.<com.lineinc.erp.api.server.domain.roles.entity.Roles, com.lineinc.erp.api.server.domain.roles.entity.QRoles>createSet("roles", com.lineinc.erp.api.server.domain.roles.entity.Roles.class, com.lineinc.erp.api.server.domain.roles.entity.QRoles.class, PathInits.DIRECT2);
+    public final SetPath<com.lineinc.erp.api.server.domain.roles.entity.Role, com.lineinc.erp.api.server.domain.roles.entity.QRole> roles = this.<com.lineinc.erp.api.server.domain.roles.entity.Role, com.lineinc.erp.api.server.domain.roles.entity.QRole>createSet("roles", com.lineinc.erp.api.server.domain.roles.entity.Role.class, com.lineinc.erp.api.server.domain.roles.entity.QRole.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
@@ -60,23 +60,23 @@ public class QUsers extends EntityPathBase<Users> {
 
     public final StringPath username = createString("username");
 
-    public QUsers(String variable) {
-        this(Users.class, forVariable(variable), INITS);
+    public QUser(String variable) {
+        this(User.class, forVariable(variable), INITS);
     }
 
-    public QUsers(Path<? extends Users> path) {
+    public QUser(Path<? extends User> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QUsers(PathMetadata metadata) {
+    public QUser(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QUsers(PathMetadata metadata, PathInits inits) {
-        this(Users.class, metadata, inits);
+    public QUser(PathMetadata metadata, PathInits inits) {
+        this(User.class, metadata, inits);
     }
 
-    public QUsers(Class<? extends Users> type, PathMetadata metadata, PathInits inits) {
+    public QUser(Class<? extends User> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.company = inits.isInitialized("company") ? new com.lineinc.erp.api.server.domain.company.entity.QCompany(forProperty("company")) : null;
     }

@@ -1,10 +1,10 @@
 package com.lineinc.erp.api.server.domain.roles.repository;
 
-import com.lineinc.erp.api.server.domain.roles.entity.Roles;
+import com.lineinc.erp.api.server.domain.roles.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<Roles, Long> {
-    Optional<Roles> findByName(String name);
+public interface RoleRepository extends JpaRepository<Role, Long> {
+    Optional<Role> findByName(String name);
 }

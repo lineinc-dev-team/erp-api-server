@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.application.users;
 
-import com.lineinc.erp.api.server.domain.user.entity.Users;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,22 +29,22 @@ public class UsersService {
 
 
     @Transactional(readOnly = true)
-    public Users getUserByLoginIdOrThrow(String loginId) {
+    public User getUserByLoginIdOrThrow(String loginId) {
         return usersRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Transactional
     public void resetPassword(String loginId) {
-        Users users = getUserByLoginIdOrThrow(loginId);
+        User user = getUserByLoginIdOrThrow(loginId);
         String encodedPassword = passwordEncoder.encode(defaultPassword);
-        users.updatePassword(encodedPassword);
+        user.updatePassword(encodedPassword);
     }
 
     @Transactional
-    public void updateLastLoginAt(Users users) {
-        users.updateLastLoginAt(OffsetDateTime.now());
-        usersRepository.save(users);
+    public void updateLastLoginAt(User user) {
+        user.updateLastLoginAt(OffsetDateTime.now());
+        usersRepository.save(user);
     }
 
     @Transactional(readOnly = true)

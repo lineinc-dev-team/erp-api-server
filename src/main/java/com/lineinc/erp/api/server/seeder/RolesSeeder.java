@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.seeder;
 
-import com.lineinc.erp.api.server.domain.roles.entity.Roles;
+import com.lineinc.erp.api.server.domain.roles.entity.Role;
 import com.lineinc.erp.api.server.domain.roles.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,11 +16,11 @@ public class RolesSeeder {
         boolean exists = roleRepository.findByName(roleName).isPresent();
 
         if (!exists) {
-            Roles roles = Roles.builder()
+            Role role = Role.builder()
                     .name(roleName)
                     .build();
 
-            roleRepository.save(roles);
+            roleRepository.save(role);
         }
     }
 }

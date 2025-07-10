@@ -26,18 +26,18 @@ src/main/java/com/lineinc/erp/api/server
 ├── domain/                   # 비즈니스 핵심 도메인 모델
 │   ├── common/               # 모든 Entity가 상속하는 BaseEntity
 │   ├── company/              # 회사 도메인 (Entity, Repository 등)
-│   └── users/                # 사용자 도메인 (Entity, Enum, Repository 등)
+│   └── user/                # 사용자 도메인 (Entity, Enum, Repository 등)
 │
 ├── application/              # 유스케이스 및 서비스 계층
 │   ├── auth/                 # 인증 관련 서비스
-│   └── users/                # 사용자 관련 서비스
+│   └── user/                # 사용자 관련 서비스
 │
 ├── presentation/             # API 계층 (Controller + DTO)
 │   └── v1/                   # API 버전 1
 │       ├── auth/             # 인증 도메인
 │       │   ├── controller/   # 인증 API 컨트롤러
 │       │   └── dto/          # 인증 요청/응답 DTO
-│       └── users/            # 사용자 도메인
+│       └── user/            # 사용자 도메인
 │           ├── controller/   # 사용자 API 컨트롤러
 │           └── dto/          # 사용자 요청/응답 DTO
 │

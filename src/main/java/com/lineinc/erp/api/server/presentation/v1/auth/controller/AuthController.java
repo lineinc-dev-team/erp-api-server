@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
 import com.lineinc.erp.api.server.application.users.UsersService;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
-import com.lineinc.erp.api.server.domain.user.entity.Users;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,10 +55,10 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(token);
 
         // 3. 로그인 성공한 사용자 정보
-        Users users = (Users) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
 
         // 4. 마지막 로그인 시간 갱신
-        usersService.updateLastLoginAt(users);
+        usersService.updateLastLoginAt(user);
 
         // 5. SecurityContext에 인증 정보 저장
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -95,9 +95,9 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(@AuthenticationPrincipal Users users) {
-        Users findUsers = usersService.getUserByLoginIdOrThrow(users.getLoginId());
-        UserInfoResponse response = UserInfoResponse.from(findUsers);
+    public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(@AuthenticationPrincipal User user) {
+        User findUser = usersService.getUserByLoginIdOrThrow(user.getLoginId());
+        UserInfoResponse response = UserInfoResponse.from(findUser);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

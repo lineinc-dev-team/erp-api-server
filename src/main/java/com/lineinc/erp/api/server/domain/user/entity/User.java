@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.company.entity.Company;
-import com.lineinc.erp.api.server.domain.roles.entity.Roles;
+import com.lineinc.erp.api.server.domain.roles.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -17,21 +17,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(indexes = {
+@Table(name = "users", indexes = {
         @Index(columnList = "username")  // username 컬럼에 인덱스 생성 (검색 성능 향상 목적)
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-public class Users extends BaseEntity implements UserDetails {
+public class User extends BaseEntity implements UserDetails {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
-    @SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
     /**
@@ -70,7 +70,7 @@ public class Users extends BaseEntity implements UserDetails {
      */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable()
-    private Set<Roles> roles;
+    private Set<Role> roles;
 
     /**
      * 권한 목록 반환

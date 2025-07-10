@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.menu.entity;
 
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Menu {
+public class Menu extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menu_seq")
     @SequenceGenerator(name = "menu_seq", sequenceName = "menu_seq", allocationSize = 1)
