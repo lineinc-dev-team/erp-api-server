@@ -46,4 +46,4 @@ swagger:
   server-url: https://dev-erp-api.dooson.it
 
 cors:
-  allowed-origins: https://dev-erp.dooson.it,https://dev-erp-api.dooson.it,http://localhost:3000
+  allowed-origins: https://dev-erp.dooson.it,https://dev-erp-api.dooson.it
