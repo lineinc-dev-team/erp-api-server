@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
 
-@Schema(description = "권한 그룹 요약 응답")
+@Schema(description = "권한 그룹 리스트 응답")
 public record RolesResponse(
         @Schema(description = "권한 그룹 ID", example = "1")
         Long id,

@@ -6,6 +6,10 @@ import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.domain.permission.entity.Permission;
+import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +20,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -26,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 public class RoleController {
 
     private final RoleService roleService;
+    private final RoleRepository roleRepository;
 
     @Operation(
             summary = "권한 그룹 전체 조회",
@@ -58,4 +67,20 @@ public class RoleController {
         RolesResponse response = roleService.getRoleById(roleId);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
+
+    @Operation(
+            summary = "권한 그룹 메뉴별 권한 조회",
+            description = "권한 그룹 ID로 해당 권한 그룹이 가지고 있는 메뉴별 권한 정보를 조회합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "메뉴별 권한 목록 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    // getMenuPermissionsByRoleId: 권한 그룹 ID 기준으로 메뉴별 권한을 가져오는 메소드
+    @GetMapping("/{roleId}/menu-permissions")
+    public ResponseEntity<SuccessResponse<List<MenusPermissionsResponse>>> getRoleMenusPermissionsById(@PathVariable Long roleId) {
+        List<MenusPermissionsResponse> responseList = roleService.getMenusPermissionsById(roleId);
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
 }

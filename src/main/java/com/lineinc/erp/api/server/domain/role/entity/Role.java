@@ -3,12 +3,8 @@ package com.lineinc.erp.api.server.domain.role.entity;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import lombok.Builder;
 
 import java.io.Serial;
 import java.io.Serializable;
