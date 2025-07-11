@@ -76,9 +76,8 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "메뉴별 권한 목록 조회 성공"),
             @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
     })
-    // getMenuPermissionsByRoleId: 권한 그룹 ID 기준으로 메뉴별 권한을 가져오는 메소드
     @GetMapping("/{roleId}/menu-permissions")
-    public ResponseEntity<SuccessResponse<List<MenusPermissionsResponse>>> getRoleMenusPermissionsById(@PathVariable Long roleId) {
+    public ResponseEntity<SuccessResponse<List<MenusPermissionsResponse>>> getMenusPermissionsById(@PathVariable Long roleId) {
         List<MenusPermissionsResponse> responseList = roleService.getMenusPermissionsById(roleId);
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }

@@ -14,23 +14,22 @@ public record MenusPermissionsResponse(
         String name,
 
         @Schema(description = "권한")
-        List<Permission> permissions
+        List<PermissionDto> permissions
 ) {
-    public static MenusPermissionsResponse from(Long menuId, String menuName, List<com.lineinc.erp.api.server.domain.permission.entity.Permission> permissions) {
-        List<Permission> permissionItems = permissions.stream()
-                .map(p -> new Permission(p.getId(), p.getAction().getLabel()))
-                .sorted(Comparator.comparing(Permission::id))
+    public static MenusPermissionsResponse from(Long menuId, String menuName, List<Permission> permissions) {
+        List<PermissionDto> permissionItems = permissions.stream()
+                .map(p -> new PermissionDto(p.getId(), p.getAction().getLabel()))
+                .sorted(Comparator.comparing(PermissionDto::id))
                 .toList();
 
         return new MenusPermissionsResponse(menuId, menuName, permissionItems);
     }
 
-    public record Permission(
+    public record PermissionDto(
             @Schema(description = "권한 ID", example = "1")
             Long id,
             @Schema(description = "권한 이름", example = "조회")
             String action
     ) {
-
     }
 }
