@@ -10,12 +10,4 @@ import java.util.Optional;
 public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositoryCustom {
 
     Optional<Role> findByName(String name);
-
-    @Query("""
-            SELECT r FROM Role r
-            LEFT JOIN FETCH r.permissions p
-            LEFT JOIN FETCH p.menu m
-            WHERE r.id = :roleId
-            """)
-    Optional<Role> findByIdWithMenusAndPermissions(Long roleId);
 }
