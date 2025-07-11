@@ -24,7 +24,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
     public Page<RolesResponse> findAll(Object request, Pageable pageable) {
         List<Role> content = queryFactory
                 .selectFrom(QRole.role)
-                .orderBy(QRole.role.id.desc())
+                .orderBy(QRole.role.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
