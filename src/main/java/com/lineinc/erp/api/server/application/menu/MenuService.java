@@ -20,16 +20,8 @@ public class MenuService {
      * 모든 메뉴와 메뉴별 권한을 포함하여 반환
      */
     public List<MenuWithPermissionsResponse> getMenusWithPermissions() {
-        List<Menu> menus = menuRepository.findAllWithPermissions();
-
-        return menus.stream()
-                .map(menu -> {
-                    List<MenuWithPermissionsResponse.PermissionResponse> permissions = menu.getPermissions().stream()
-                            .map(permission -> new MenuWithPermissionsResponse.PermissionResponse(permission.getId(), permission.getAction().getLabel()))
-                            .collect(Collectors.toList());
-
-                    return new MenuWithPermissionsResponse(menu.getId(), menu.getName(), permissions);
-                })
+        return menuRepository.findAllWithPermissions().stream()
+                .map(MenuWithPermissionsResponse::from)
                 .collect(Collectors.toList());
     }
 

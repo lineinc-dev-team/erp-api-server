@@ -85,7 +85,7 @@ public class ClientCompanyController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "발주처 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
     })
     @DeleteMapping
     public ResponseEntity<Void> deleteClientCompanies(@RequestBody List<Long> ids) {

@@ -1,0 +1,26 @@
+package com.lineinc.erp.api.server.application.role;
+
+import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleWithMenusResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+
+@Service
+@RequiredArgsConstructor
+public class RoleService {
+
+    private final RoleRepository roleRepository;
+
+    @Transactional(readOnly = true)
+    public RoleWithMenusResponse getRoleWithMenus(Long roleId) {
+        Role role = roleRepository.findByIdWithMenusAndPermissions(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한 그룹을 찾을 수 없습니다."));
+
+        return RoleWithMenusResponse.from(role);
+    }
+}

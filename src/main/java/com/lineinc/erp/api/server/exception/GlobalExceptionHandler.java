@@ -208,7 +208,7 @@ public class GlobalExceptionHandler {
         log.warn("잘못된 요청 인자: {}", ex.getMessage());
         ErrorResponse response = ErrorResponse.of(
                 HttpStatus.BAD_REQUEST.value(),
-                ValidationMessages.INVALID_FIELD + ex.getMessage(),
+                ex.getMessage(),
                 List.of()
         );
         return ResponseEntity.badRequest().body(response);

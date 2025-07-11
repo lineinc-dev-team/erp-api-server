@@ -28,8 +28,8 @@ public class SeederCommandLineRunner implements CommandLineRunner {
             permissionSeeder.seed();
             rolesSeeder.seed();
             rolesPermissionsSeeder.seed();
-            usersRolesSeeder.seed();
             usersSeeder.seed();
+            usersRolesSeeder.seed();
             System.out.println("Database seeding completed.");
         }
     }

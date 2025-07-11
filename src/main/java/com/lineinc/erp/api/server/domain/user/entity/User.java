@@ -69,7 +69,6 @@ public class User extends BaseEntity implements UserDetails {
      * 권환 목록 반환
      */
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable()
     private Set<Role> roles;
 
     /**
