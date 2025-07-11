@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Comparator;
 
+import static com.lineinc.erp.api.server.presentation.v1.menu.dto.response.MenuWithPermissionsResponse.*;
+
 @Schema(description = "권한 그룹과 연결된 메뉴 및 권한 정보 응답")
 public record RoleWithMenusResponse(
 
@@ -35,9 +37,9 @@ public record RoleWithMenusResponse(
         // 메뉴별 권한 리스트를 DTO로 변환하여 메뉴 DTO 리스트 생성
         for (Map.Entry<Menu, List<Permission>> entry : menuToPermissions.entrySet()) {
             Menu menu = entry.getKey();
-            List<MenuWithPermissionsResponse.PermissionResponse> permissions = entry.getValue().stream()
+            List<PermissionResponse> permissions = entry.getValue().stream()
                     .sorted(Comparator.comparing(Permission::getId))
-                    .map(p -> new MenuWithPermissionsResponse.PermissionResponse(p.getId(), p.getAction().getLabel()))
+                    .map(p -> new PermissionResponse(p.getId(), p.getAction().getLabel()))
                     .toList();
 
             menus.add(new MenuWithPermissionsResponse(menu.getId(), menu.getName(), permissions));

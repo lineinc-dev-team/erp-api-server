@@ -19,7 +19,7 @@ public class RoleService {
     @Transactional(readOnly = true)
     public RoleWithMenusResponse getRoleWithMenus(Long roleId) {
         Role role = roleRepository.findByIdWithMenusAndPermissions(roleId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한 그룹을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return RoleWithMenusResponse.from(role);
     }

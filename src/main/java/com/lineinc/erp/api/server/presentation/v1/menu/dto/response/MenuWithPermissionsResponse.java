@@ -24,7 +24,7 @@ public record MenuWithPermissionsResponse(
             @Schema(description = "권한 ID", example = "10")
             Long id,
 
-            @Schema(description = "권한 액션명", example = "VIEW")
+            @Schema(description = "권한 액션명", example = "조회")
             String action
     ) {
     }
