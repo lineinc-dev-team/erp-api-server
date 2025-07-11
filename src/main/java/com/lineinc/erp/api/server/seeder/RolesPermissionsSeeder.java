@@ -29,25 +29,22 @@ public class RolesPermissionsSeeder {
 
     @Transactional
     public void seed() {
-        // 계정관리 매니저 역할 → 계정관리 메뉴에 대한 VIEW, CREATE, UPDATE, APPROVE 권한 할당 (DELETE 제외)
-        Optional<Role> roleOpt = roleRepository.findByName(AppConstants.ROLE_ACCOUNT_MANAGER_NAME);
-        Optional<Menu> menuOpt = menuRepository.findByName(AppConstants.MENU_ACCOUNT);
+        // 전체권한(삭제 제외) 역할 생성 및 모든 메뉴에 대한 권한 매핑
+        Role subMasterRole = roleRepository.findByName(AppConstants.ROLE_SUB_MASTER_NAME)
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .name(AppConstants.ROLE_SUB_MASTER_NAME)
+                        .build()));
 
-        if (roleOpt.isEmpty() || menuOpt.isEmpty()) return;
+        EnumSet<PermissionAction> subMasterActions = EnumSet.complementOf(EnumSet.of(PermissionAction.DELETE));
 
-        Role role = roleOpt.get();
-        Menu menu = menuOpt.get();
-
-        // DELETE 권한을 제외한 모든 PermissionAction 값을 포함한 EnumSet 생성
-        // → VIEW, CREATE, UPDATE, APPROVE 만 포함됨
-        EnumSet<PermissionAction> allowedActions = EnumSet.complementOf(EnumSet.of(PermissionAction.DELETE));
-
-        for (PermissionAction action : allowedActions) {
-            permissionRepository.findByMenuAndAction(menu, action).ifPresent(permission -> {
-                role.getPermissions().add(permission);
-            });
+        for (Menu m : menuRepository.findAll()) {
+            for (PermissionAction action : subMasterActions) {
+                permissionRepository.findByMenuAndAction(m, action).ifPresent(permission -> {
+                    subMasterRole.getPermissions().add(permission);
+                });
+            }
         }
 
-        roleRepository.save(role);
+        roleRepository.save(subMasterRole);
     }
 }

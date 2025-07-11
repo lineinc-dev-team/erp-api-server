@@ -45,7 +45,8 @@ public class RoleService {
 
     @Transactional(readOnly = true)
     public List<MenusPermissionsResponse> getMenusPermissionsById(Long roleId) {
-        Role role = getRoleOrThrow(roleId);
+        Role role = roleRepository.findWithPermissionsAndMenusById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         Map<Long, List<Permission>> grouped = role.getPermissions().stream()
                 .collect(Collectors.groupingBy(p -> p.getMenu().getId()));

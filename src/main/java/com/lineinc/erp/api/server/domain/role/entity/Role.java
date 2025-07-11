@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.role.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -33,4 +34,7 @@ public class Role extends BaseEntity implements Serializable {
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Permission> permissions = new HashSet<>();
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
 }

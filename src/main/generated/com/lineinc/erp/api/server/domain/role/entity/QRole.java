@@ -46,6 +46,8 @@ public class QRole extends EntityPathBase<Role> {
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
 
+    public final SetPath<com.lineinc.erp.api.server.domain.user.entity.User, com.lineinc.erp.api.server.domain.user.entity.QUser> users = this.<com.lineinc.erp.api.server.domain.user.entity.User, com.lineinc.erp.api.server.domain.user.entity.QUser>createSet("users", com.lineinc.erp.api.server.domain.user.entity.User.class, com.lineinc.erp.api.server.domain.user.entity.QUser.class, PathInits.DIRECT2);
+
     public QRole(String variable) {
         super(Role.class, forVariable(variable));
     }

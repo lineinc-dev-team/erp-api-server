@@ -5,6 +5,7 @@ import java.util.List;
 public final class AppConstants {
     public static final String COMPANY_MAIN_NAME = "라인공영";
     public static final String ROLE_MASTER_NAME = "전체권한";
+    public static final String ROLE_SUB_MASTER_NAME = "전체권한(삭제 제외)";
     public static final String ROLE_ACCOUNT_MANAGER_NAME = "계정관리 매니저 권한";
     public static final String ADMIN_LOGIN_ID = "admin";
     public static final String SYSTEM_NAME = "system";

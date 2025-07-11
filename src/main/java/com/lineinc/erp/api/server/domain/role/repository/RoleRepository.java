@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositoryCustom {
 
     Optional<Role> findByName(String name);
+
+    @EntityGraph(attributePaths = {"permissions", "permissions.menu"})
+    Optional<Role> findWithPermissionsAndMenusById(Long roleId);
 }
