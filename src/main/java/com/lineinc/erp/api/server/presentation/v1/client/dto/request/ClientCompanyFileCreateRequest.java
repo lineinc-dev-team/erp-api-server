@@ -10,7 +10,7 @@ public record ClientCompanyFileCreateRequest(
 
         @NotBlank
         @Schema(description = "문서명", example = "계약서_2024")
-        String documentName,
+        String name,
 
         @NotBlank
         @MultiConstraint(type = ValidatorType.URL)

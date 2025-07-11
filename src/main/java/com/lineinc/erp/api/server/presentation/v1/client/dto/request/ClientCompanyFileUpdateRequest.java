@@ -10,7 +10,7 @@ public record ClientCompanyFileUpdateRequest(
         Long id,
 
         @Schema(description = "문서명", example = "계약서_2024")
-        String documentName,
+        String name,
 
         @MultiConstraint(type = ValidatorType.URL)
         @Schema(description = "파일 접근용 URL", example = "https://s3.amazonaws.com/bucket/contract_2024.pdf")

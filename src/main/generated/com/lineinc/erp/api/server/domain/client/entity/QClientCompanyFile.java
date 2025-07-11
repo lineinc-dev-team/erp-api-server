@@ -38,13 +38,13 @@ public class QClientCompanyFile extends EntityPathBase<ClientCompanyFile> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
-    public final StringPath documentName = createString("documentName");
-
     public final StringPath fileUrl = createString("fileUrl");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");
+
+    public final StringPath name = createString("name");
 
     public final StringPath originalFileName = createString("originalFileName");
 

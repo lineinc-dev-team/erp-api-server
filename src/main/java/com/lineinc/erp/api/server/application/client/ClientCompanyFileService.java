@@ -3,18 +3,13 @@ package com.lineinc.erp.api.server.application.client;
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientCompanyFileService {
@@ -22,7 +17,7 @@ public class ClientCompanyFileService {
         if (Objects.isNull(requests) || requests.isEmpty()) return;
         requests.stream()
                 .map(dto -> ClientCompanyFile.builder()
-                        .documentName(dto.documentName())
+                        .name(dto.name())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
@@ -45,7 +40,7 @@ public class ClientCompanyFileService {
                 clientCompany.getFiles(),
                 requests,
                 (ClientCompanyFileUpdateRequest dto) -> ClientCompanyFile.builder()
-                        .documentName(dto.documentName())
+                        .name(dto.name())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
