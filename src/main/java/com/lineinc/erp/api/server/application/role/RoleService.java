@@ -31,4 +31,12 @@ public class RoleService {
     public Page<RolesResponse> getAllRoles(Pageable pageable) {
         return roleRepository.findAll((Object) null, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public RolesResponse getRoleById(Long roleId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return RolesResponse.from(role);
+    }
 }

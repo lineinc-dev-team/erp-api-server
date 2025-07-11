@@ -60,4 +60,18 @@ public class RoleController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
     }
+
+    @Operation(
+            summary = "단일 권한 그룹 조회",
+            description = "권한 그룹 ID로 단일 권한 그룹 정보를 조회합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "단일 권한 그룹 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{roleId}")
+    public ResponseEntity<SuccessResponse<RolesResponse>> getRoleById(@PathVariable Long roleId) {
+        RolesResponse response = roleService.getRoleById(roleId);
+        return ResponseEntity.ok(SuccessResponse.of(response));
+    }
 }
