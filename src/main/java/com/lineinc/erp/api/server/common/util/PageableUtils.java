@@ -14,9 +14,19 @@ import java.util.Map;
 public class PageableUtils {
 
     /**
+     * 페이지 번호, 페이지 크기를 기반으로 Pageable 생성
+     */
+    public static Pageable createPageable(int page, int size) {
+        return PageRequest.of(page, size);
+    }
+
+    /**
      * 페이지 번호, 페이지 크기, 정렬 조건 문자열을 기반으로 Pageable 생성
      */
     public static Pageable createPageable(int page, int size, String sort) {
+        if (sort == null || sort.isBlank()) {
+            return PageRequest.of(page, size);
+        }
         return PageRequest.of(page, size, parseSort(sort));
     }
 

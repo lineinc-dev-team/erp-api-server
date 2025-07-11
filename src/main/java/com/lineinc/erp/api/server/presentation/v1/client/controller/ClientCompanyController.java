@@ -74,6 +74,7 @@ public class ClientCompanyController {
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
+
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
