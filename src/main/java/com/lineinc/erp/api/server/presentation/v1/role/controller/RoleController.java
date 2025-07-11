@@ -62,9 +62,9 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "단일 권한 그룹 조회 성공"),
             @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
     })
-    @GetMapping("/{roleId}")
-    public ResponseEntity<SuccessResponse<RolesResponse>> getRoleById(@PathVariable Long roleId) {
-        RolesResponse response = roleService.getRoleById(roleId);
+    @GetMapping("/{id}")
+    public ResponseEntity<SuccessResponse<RolesResponse>> getRoleById(@PathVariable Long id) {
+        RolesResponse response = roleService.getRoleById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -76,9 +76,9 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "메뉴별 권한 목록 조회 성공"),
             @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
     })
-    @GetMapping("/{roleId}/menu-permissions")
-    public ResponseEntity<SuccessResponse<List<MenusPermissionsResponse>>> getMenusPermissionsById(@PathVariable Long roleId) {
-        List<MenusPermissionsResponse> responseList = roleService.getMenusPermissionsById(roleId);
+    @GetMapping("/{id}/menu-permissions")
+    public ResponseEntity<SuccessResponse<List<MenusPermissionsResponse>>> getMenusPermissionsById(@PathVariable Long id) {
+        List<MenusPermissionsResponse> responseList = roleService.getMenusPermissionsById(id);
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
