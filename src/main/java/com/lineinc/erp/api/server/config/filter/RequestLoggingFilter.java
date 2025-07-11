@@ -65,6 +65,7 @@ public class RequestLoggingFilter implements Filter {
             logMap.put("method", method);
             logMap.put("uri", uri + (queryString != null ? "?" + queryString : ""));
             logMap.put("ip", clientIp);
+            logMap.put("host", httpRequest.getHeader("Host"));
             logMap.put("status", status);
             logMap.put("duration", duration);
             logMap.put("userAgent", userAgent != null ? userAgent : "unknown");
