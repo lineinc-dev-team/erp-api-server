@@ -6,6 +6,8 @@ import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.AddUsersToRoleRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RemoveUsersFromRoleRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
@@ -80,11 +82,11 @@ public class RoleService {
     }
 
     @Transactional
-    public void removeUsersFromRole(Long roleId, List<Long> userIds) {
+    public void removeUsersFromRole(Long roleId, RemoveUsersFromRoleRequest request) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
-        List<User> users = userRepository.findAllById(userIds);
+        List<User> users = userRepository.findAllById(request.userIds());
 
         // 해당 role이 실제로 user의 roles에 있을 때만 제거 후 저장
         for (User user : users) {
@@ -96,11 +98,11 @@ public class RoleService {
     }
 
     @Transactional
-    public void addUsersToRole(Long roleId, List<Long> userIds) {
+    public void addUsersToRole(Long roleId, AddUsersToRoleRequest request) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
-        List<User> users = userRepository.findAllById(userIds);
+        List<User> users = userRepository.findAllById(request.userIds());
 
         for (User user : users) {
 

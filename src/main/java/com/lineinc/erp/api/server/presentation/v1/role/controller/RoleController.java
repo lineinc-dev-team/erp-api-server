@@ -9,6 +9,8 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.AddUsersToRoleRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RemoveUsersFromRoleRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
@@ -124,9 +126,9 @@ public class RoleController {
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
     public ResponseEntity<Void> removeUsersFromRole(
             @PathVariable Long id,
-            @RequestBody List<Long> userIds
+            @RequestBody RemoveUsersFromRoleRequest request
     ) {
-        roleService.removeUsersFromRole(id, userIds);
+        roleService.removeUsersFromRole(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -142,9 +144,9 @@ public class RoleController {
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.CREATE)
     public ResponseEntity<Void> addUsersToRole(
             @PathVariable Long id,
-            @RequestBody List<Long> userIds
+            @RequestBody AddUsersToRoleRequest request
     ) {
-        roleService.addUsersToRole(id, userIds);
+        roleService.addUsersToRole(id, request);
         return ResponseEntity.ok().build();
     }
 
