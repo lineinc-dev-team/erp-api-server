@@ -1,12 +1,15 @@
 package com.lineinc.erp.api.server.presentation.v1.role.controller;
 
 import com.lineinc.erp.api.server.application.role.RoleService;
+import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
@@ -77,6 +80,7 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/{id}/menu-permissions")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<MenusPermissionsResponse>>> getMenusPermissionsById(@PathVariable Long id) {
         List<MenusPermissionsResponse> responseList = roleService.getMenusPermissionsById(id);
         return ResponseEntity.ok(SuccessResponse.of(responseList));

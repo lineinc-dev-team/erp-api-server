@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config;
+package com.lineinc.erp.api.server.config.security;
 
 import com.lineinc.erp.api.server.application.auth.AuthService;
 import lombok.RequiredArgsConstructor;

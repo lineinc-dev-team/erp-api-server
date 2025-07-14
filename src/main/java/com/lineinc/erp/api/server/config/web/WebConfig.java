@@ -1,6 +1,6 @@
-package com.lineinc.erp.api.server.config;
+package com.lineinc.erp.api.server.config.web;
 
-import com.lineinc.erp.api.server.config.filter.RequestLoggingFilter;
+import com.lineinc.erp.api.server.config.web.filter.RequestLoggingFilter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

@@ -17,8 +17,8 @@ public record UserInfoResponse(
         @Schema(description = "사용자 이름", example = "홍길동")
         String username,
 
-        @Schema(description = "사용자 권한 목록", example = "[\"어드민\", \"매니저\"]")
-        List<String> roles
+        @Schema(description = "사용자 권한 목록")
+        List<RoleSummaryResponse> roles
 ) {
     public static UserInfoResponse from(User user) {
         return new UserInfoResponse(
@@ -26,8 +26,18 @@ public record UserInfoResponse(
                 user.getLoginId(),
                 user.getUsername(),
                 user.getRoles().stream()
-                        .map(Role::getName)
+                        .map(role -> new RoleSummaryResponse(role.getId(), role.getName()))
                         .toList()
         );
+    }
+
+    @Schema(description = "권한 그룹 요약 응답")
+    public static record RoleSummaryResponse(
+            @Schema(description = "권한 그룹 ID", example = "1")
+            Long id,
+
+            @Schema(description = "권한 그룹 이름", example = "어드민")
+            String name
+    ) {
     }
 }
