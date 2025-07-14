@@ -13,6 +13,9 @@ public record RolesResponse(
         @Schema(description = "권한 그룹 이름", example = "전체권한")
         String name,
 
+        @Schema(description = "해당 권한 그룹에 속한 유저 수", example = "5")
+        int userCount,
+
         @Schema(description = "생성일시", example = "2024-06-01T10:00:00")
         OffsetDateTime createdAt,
 
@@ -20,6 +23,6 @@ public record RolesResponse(
         OffsetDateTime updatedAt
 ) {
     public static RolesResponse from(Role role) {
-        return new RolesResponse(role.getId(), role.getName(), role.getCreatedAt(), role.getUpdatedAt());
+        return new RolesResponse(role.getId(), role.getName(), role.getUsers().size(), role.getCreatedAt(), role.getUpdatedAt());
     }
 }
