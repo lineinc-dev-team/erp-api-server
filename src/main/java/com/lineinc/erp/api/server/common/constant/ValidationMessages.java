@@ -17,4 +17,6 @@ public final class ValidationMessages {
     public static final String INVALID_DATE_FORMAT = "날짜 형식이 올바르지 않습니다. (예: yyyy-MM-dd)";
     public static final String INVALID_USER_INFO = "사용자 정보가 올바르지 않습니다.";
     public static final String NO_MENU_PERMISSION = "해당 메뉴에 대한 권한이 없습니다.";
+    public static final String ROLE_NOT_FOUND = "권한 그룹을 찾을 수 없습니다.";
+    
 }

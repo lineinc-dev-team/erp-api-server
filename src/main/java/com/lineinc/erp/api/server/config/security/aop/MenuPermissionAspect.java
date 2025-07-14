@@ -36,6 +36,9 @@ public class MenuPermissionAspect {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ValidationMessages.INVALID_USER_INFO);
         }
 
+        // 권한 체크 로직 진입 로그
+        log.info("[권한 체크] 권한 검사 시작: user={}, menu={}, action={}", user.getUsername(), requireMenuPermission.menu(), requireMenuPermission.action());
+
         List<Role> roles = user.getRoles().stream().toList();
 
         // 각 역할에 대해 해당 메뉴와 권한 액션을 갖는지 검사
@@ -50,7 +53,7 @@ public class MenuPermissionAspect {
 
         if (!hasPermission) {
             // 권한이 없을 경우 로그 출력 후 403 예외 발생
-            log.info("권한 없음: user={}, menu={}, action={}", user.getUsername(), requireMenuPermission.menu(), requireMenuPermission.action());
+            log.info("[권한 체크] 권한 없음: user={}, menu={}, action={}", user.getUsername(), requireMenuPermission.menu(), requireMenuPermission.action());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ValidationMessages.NO_MENU_PERMISSION);
         }
     }

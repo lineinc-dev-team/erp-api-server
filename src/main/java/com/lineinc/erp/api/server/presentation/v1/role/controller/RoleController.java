@@ -90,7 +90,6 @@ public class RoleController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저 목록 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/{id}/users")
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
@@ -108,6 +107,24 @@ public class RoleController {
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
+    }
+
+    @Operation(
+            summary = "권한 그룹에서 유저 삭제",
+            description = "권한 그룹 ID와 유저 ID로 해당 권한 그룹에서 유저를 삭제합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    @DeleteMapping("/{id}/users")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> removeUsersFromRole(
+            @PathVariable Long id,
+            @RequestBody List<Long> userIds
+    ) {
+        roleService.removeUsersFromRole(id, userIds);
+        return ResponseEntity.ok().build();
     }
 
 }

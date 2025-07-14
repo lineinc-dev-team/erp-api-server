@@ -1,8 +1,11 @@
 package com.lineinc.erp.api.server.application.role;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public Page<RolesResponse> getAllRoles(Pageable pageable) {
@@ -72,6 +76,22 @@ public class RoleService {
     @Transactional(readOnly = true)
     public Page<RoleUserListResponse> getUsersByRoleId(Long roleId, RoleUserListRequest request, Pageable pageable) {
         return roleRepository.findUsersByRoleId(roleId, request, pageable);
+    }
+
+    @Transactional
+    public void removeUsersFromRole(Long roleId, List<Long> userIds) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+
+        List<User> users = userRepository.findAllById(userIds);
+
+        // 해당 role이 실제로 user의 roles에 있을 때만 제거 후 저장
+        for (User user : users) {
+            if (user.getRoles().contains(role)) {
+                user.getRoles().remove(role);
+                userRepository.save(user);
+            }
+        }
     }
 
 }
