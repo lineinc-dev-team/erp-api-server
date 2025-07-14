@@ -1,10 +1,10 @@
 package com.lineinc.erp.api.server.config.security.aop;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.application.role.RoleService;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -38,13 +37,18 @@ public class MenuPermissionAspect {
 
         List<Role> roles = user.getRoles().stream().toList();
 
+        boolean isMaster = roles.stream()
+                .anyMatch(role -> AppConstants.ROLE_MASTER_NAME.equals(role.getName()));
+        if (isMaster) {
+            return;
+        }
+
         boolean hasPermission = roles.stream()
                 .flatMap(role -> roleService.getMenusPermissionsById(role.getId()).stream())
                 .filter(menuPermission -> menuPermission.name().trim().equalsIgnoreCase(requireMenuPermission.menu().trim()))
                 .flatMap(menuPermission -> menuPermission.permissions().stream())
                 .anyMatch(permission ->
                         PermissionAction.fromLabel(permission.action()) == requireMenuPermission.action());
-        ;
 
         if (!hasPermission) {
             log.info("권한 없음: user={}, menu={}, action={}", user.getUsername(), requireMenuPermission.menu(), requireMenuPermission.action());
