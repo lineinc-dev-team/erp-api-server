@@ -150,4 +150,19 @@ public class RoleController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "권한 그룹 삭제",
+            description = "권한 그룹 ID로 권한 그룹을 삭제합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    @DeleteMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteRoleById(@PathVariable Long id) {
+        roleService.deleteRoleById(id);
+        return ResponseEntity.ok().build();
+    }
+
 }
