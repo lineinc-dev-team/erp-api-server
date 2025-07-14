@@ -44,18 +44,18 @@ public class UsersSeeder {
 
         User subAdmin = User.builder()
                 .company(company)
-                .loginId("sub_admin")
+                .loginId(AppConstants.SUB_ADMIN_LOGIN_ID)
                 .username(AppConstants.ROLE_SUB_MASTER_NAME)
-                .passwordHash(passwordEncoder.encode("admin1234"))
+                .passwordHash(passwordEncoder.encode(adminPassword))
                 .createdBy(AppConstants.SYSTEM_NAME)
                 .updatedBy(AppConstants.SYSTEM_NAME)
                 .build();
 
         User subAdminLite = User.builder()
                 .company(company)
-                .loginId("sub_admin_lite")
+                .loginId(AppConstants.SUB_ADMIN_LITE_LOGIN_ID)
                 .username(AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU)
-                .passwordHash(passwordEncoder.encode("admin1234"))
+                .passwordHash(passwordEncoder.encode(adminPassword))
                 .createdBy(AppConstants.SYSTEM_NAME)
                 .updatedBy(AppConstants.SYSTEM_NAME)
                 .build();
