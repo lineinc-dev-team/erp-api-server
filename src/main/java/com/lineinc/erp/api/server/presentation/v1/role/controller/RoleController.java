@@ -8,9 +8,7 @@ import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
-import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
@@ -23,11 +21,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -45,6 +41,7 @@ public class RoleController {
     )
     @ApiResponse(responseCode = "200", description = "권한 그룹 목록 조회 성공")
     @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<RolesResponse>>> getAllRoles(
             @Valid PageRequest pageRequest
     ) {
@@ -66,6 +63,7 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<RolesResponse>> getRoleById(@PathVariable Long id) {
         RolesResponse response = roleService.getRoleById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
