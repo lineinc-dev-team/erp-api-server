@@ -35,6 +35,7 @@ public class Role extends BaseEntity implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Permission> permissions = new HashSet<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 }

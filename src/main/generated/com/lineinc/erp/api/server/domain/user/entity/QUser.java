@@ -44,6 +44,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath loginId = createString("loginId");
 
+    public final StringPath memo = createString("memo");
+
     public final StringPath passwordHash = createString("passwordHash");
 
     public final DateTimePath<java.time.OffsetDateTime> passwordResetAt = createDateTime("passwordResetAt", java.time.OffsetDateTime.class);

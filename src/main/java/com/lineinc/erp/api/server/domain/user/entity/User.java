@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
@@ -15,7 +14,6 @@ import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -71,6 +69,9 @@ public class User extends BaseEntity implements UserDetails {
      */
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Role> roles;
+
+    @Column(columnDefinition = "TEXT")
+    private String memo;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -9,8 +9,9 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,7 +34,6 @@ import java.util.List;
 public class RoleController {
 
     private final RoleService roleService;
-    private final RoleRepository roleRepository;
 
     @Operation(
             summary = "권한 그룹 전체 조회",
@@ -84,25 +84,30 @@ public class RoleController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-//    @Operation(
-//            summary = "권한 그룹에 속한 유저 목록 조회",
-//            description = "지정된 권한 그룹 ID에 속한 유저 목록을 반환합니다"
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "유저 목록 조회 성공"),
-//            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
-//    })
-//    @GetMapping("/{id}/users")
-//    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
-//    public ResponseEntity<SuccessResponse<List<String>>> getUsersByRoleId(@PathVariable Long id, @Valid PageRequest pageRequest
-//    ) {
-//        Page<RolesResponse> page = roleService.getAllRoles(
-//                PageableUtils.createPageable(pageRequest.page(), pageRequest.size())
-//        );
-//
-//        return ResponseEntity.ok(SuccessResponse.of(
-//                new PagingResponse<>(PagingInfo.from(page), page.getContent())
-//        ));
-//    }
+    @Operation(
+            summary = "권한 그룹에 속한 유저 목록 조회",
+            description = "지정된 권한 그룹 ID에 속한 유저 목록을 반환합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저 목록 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}/users")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<RoleUserListResponse>>> getUsersByRoleId(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid RoleUserListRequest roleUserListRequest
+    ) {
+        Page<RoleUserListResponse> page = roleService.getUsersByRoleId(
+                id,
+                roleUserListRequest,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size())
+        );
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+        ));
+    }
 
 }

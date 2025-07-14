@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.role.repository;
 
 import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.lineinc.erp.api.server.domain.role.entity.QRole;
+import com.lineinc.erp.api.server.domain.user.entity.QUser;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,5 +45,52 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
+    }
+
+    @Override
+    public Page<RoleUserListResponse> findUsersByRoleId(Long roleId, RoleUserListRequest request, Pageable pageable) {
+        QUser user = QUser.user;
+        QRole role = QRole.role;
+
+        BooleanExpression searchPredicate = containsSearch(user, request.search());
+
+        // 사용자 리스트 조회 (distinct, 페이징 포함)
+        List<RoleUserListResponse> content = queryFactory
+                .selectDistinct(user)
+                .from(user)
+                .join(user.roles, role)
+                .where(role.id.eq(roleId)
+                        .and(searchPredicate))
+                .orderBy(user.id.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch()
+                .stream()
+                .map(RoleUserListResponse::from)
+                .toList();
+
+        // 전체 개수 조회 (countDistinct)
+        Long totalCount = queryFactory
+                .select(user.countDistinct())
+                .from(user)
+                .join(user.roles, role)
+                .where(role.id.eq(roleId)
+                        .and(searchPredicate))
+                .fetchOne();
+
+        long total = Objects.requireNonNullElse(totalCount, 0L);
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    private BooleanExpression containsSearch(QUser user, String search) {
+        if (search == null) {
+            return null;
+        }
+        String trimmed = search.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        return user.username.containsIgnoreCase(trimmed)
+                .or(user.loginId.containsIgnoreCase(trimmed));
     }
 }

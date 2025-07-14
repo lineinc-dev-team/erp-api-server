@@ -3,7 +3,9 @@ package com.lineinc.erp.api.server.application.role;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,4 +68,10 @@ public class RoleService {
                 })
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public Page<RoleUserListResponse> getUsersByRoleId(Long roleId, RoleUserListRequest request, Pageable pageable) {
+        return roleRepository.findUsersByRoleId(roleId, request, pageable);
+    }
+
 }
