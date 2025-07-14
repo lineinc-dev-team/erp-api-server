@@ -37,7 +37,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         // fetchJoin 사용: role.users 컬렉션을 한 번에 같이 조회
         List<Role> content = queryFactory
                 .selectFrom(role)
-                .join(role.users, user).fetchJoin()
+                .leftJoin(role.users, user).fetchJoin()
                 .where(userSearchPredicate)
                 .orderBy(role.id.asc())
                 .offset(pageable.getOffset())
@@ -45,9 +45,9 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .fetch();
 
         Long totalCount = queryFactory
-                .select(role.count())
+                .select(role.countDistinct())
                 .from(role)
-                .join(role.users, user)
+                .leftJoin(role.users, user)
                 .where(userSearchPredicate)
                 .fetchOne();
 
