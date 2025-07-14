@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
@@ -31,8 +32,8 @@ public class RoleService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public Page<RolesResponse> getAllRoles(Pageable pageable) {
-        return roleRepository.findAll((Object) null, pageable);
+    public Page<RolesResponse> getAllRoles(UserWithRolesListRequest request, Pageable pageable) {
+        return roleRepository.findAll(request, pageable);
     }
 
     @Transactional(readOnly = true)

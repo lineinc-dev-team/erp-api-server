@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
@@ -43,9 +44,11 @@ public class RoleController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<RolesResponse>>> getAllRoles(
-            @Valid PageRequest pageRequest
+            @Valid PageRequest pageRequest,
+            @Valid UserWithRolesListRequest userWithRolesListRequest
     ) {
         Page<RolesResponse> page = roleService.getAllRoles(
+                userWithRolesListRequest,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size())
         );
 

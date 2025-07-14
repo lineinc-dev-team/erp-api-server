@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.role.repository;
 
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -25,17 +26,29 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<RolesResponse> findAll(Object request, Pageable pageable) {
+    public Page<RolesResponse> findAll(UserWithRolesListRequest request, Pageable pageable) {
+        QRole role = QRole.role;
+        QUser user = QUser.user;
+
+        String search = (request != null) ? request.userSearch() : null;
+
+        BooleanExpression userSearchPredicate = containsSearch(user, search);
+
+        // fetchJoin 사용: role.users 컬렉션을 한 번에 같이 조회
         List<Role> content = queryFactory
-                .selectFrom(QRole.role)
-                .orderBy(QRole.role.id.asc())
+                .selectFrom(role)
+                .join(role.users, user).fetchJoin()
+                .where(userSearchPredicate)
+                .orderBy(role.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         Long totalCount = queryFactory
-                .select(QRole.role.count())
-                .from(QRole.role)
+                .select(role.count())
+                .from(role)
+                .join(role.users, user)
+                .where(userSearchPredicate)
                 .fetchOne();
 
         long total = Objects.requireNonNullElse(totalCount, 0L);
@@ -93,4 +106,5 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         return user.username.containsIgnoreCase(trimmed)
                 .or(user.loginId.containsIgnoreCase(trimmed));
     }
+
 }
