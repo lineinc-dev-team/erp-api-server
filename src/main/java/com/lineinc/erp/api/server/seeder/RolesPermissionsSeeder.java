@@ -29,22 +29,26 @@ public class RolesPermissionsSeeder {
 
     @Transactional
     public void seed() {
-        // 전체권한(삭제 제외) 역할 생성 및 모든 메뉴에 대한 권한 매핑
-        Role subMasterRole = roleRepository.findByName(AppConstants.ROLE_SUB_MASTER_NAME)
-                .orElseGet(() -> roleRepository.save(Role.builder()
-                        .name(AppConstants.ROLE_SUB_MASTER_NAME)
-                        .build()));
+        assignPermissionsToRole(AppConstants.ROLE_SUB_MASTER_NAME, false);
+        assignPermissionsToRole(AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU, true);
+    }
 
-        EnumSet<PermissionAction> subMasterActions = EnumSet.complementOf(EnumSet.of(PermissionAction.DELETE));
+    private void assignPermissionsToRole(String roleName, boolean excludeRoleMenu) {
+        Role role = roleRepository.findByName(roleName)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
+
+        EnumSet<PermissionAction> actions = EnumSet.complementOf(EnumSet.of(PermissionAction.DELETE));
 
         for (Menu m : menuRepository.findAll()) {
-            for (PermissionAction action : subMasterActions) {
+            if (excludeRoleMenu && AppConstants.MENU_PERMISSION.equals(m.getName())) continue;
+
+            for (PermissionAction action : actions) {
                 permissionRepository.findByMenuAndAction(m, action).ifPresent(permission -> {
-                    subMasterRole.getPermissions().add(permission);
+                    role.getPermissions().add(permission);
                 });
             }
         }
 
-        roleRepository.save(subMasterRole);
+        roleRepository.save(role);
     }
 }

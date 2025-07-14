@@ -18,7 +18,8 @@ public class RolesSeeder {
     public void seed() {
         List<String> roleNames = List.of(
                 AppConstants.ROLE_MASTER_NAME,
-                AppConstants.ROLE_SUB_MASTER_NAME
+                AppConstants.ROLE_SUB_MASTER_NAME,
+                AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU
         );
 
         for (String roleName : roleNames) {

@@ -42,6 +42,27 @@ public class UsersSeeder {
                 .updatedBy(AppConstants.SYSTEM_NAME)
                 .build();
 
+        User subAdmin = User.builder()
+                .company(company)
+                .loginId("sub_admin")
+                .username(AppConstants.ROLE_SUB_MASTER_NAME)
+                .passwordHash(passwordEncoder.encode("admin1234"))
+                .createdBy(AppConstants.SYSTEM_NAME)
+                .updatedBy(AppConstants.SYSTEM_NAME)
+                .build();
+
+        User subAdminLite = User.builder()
+                .company(company)
+                .loginId("sub_admin_lite")
+                .username(AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU)
+                .passwordHash(passwordEncoder.encode("admin1234"))
+                .createdBy(AppConstants.SYSTEM_NAME)
+                .updatedBy(AppConstants.SYSTEM_NAME)
+                .build();
+
+        usersRepository.save(subAdmin);
+        usersRepository.save(subAdminLite);
+
         usersRepository.save(admin);
     }
 }

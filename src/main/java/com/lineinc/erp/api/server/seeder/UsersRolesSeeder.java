@@ -33,5 +33,25 @@ public class UsersRolesSeeder {
                 usersRepository.save(adminUser);
             }
         }
+
+        // 전체권한(삭제 제외) 유저
+        usersRepository.findByLoginId("sub_admin").ifPresent(user ->
+                roleRepository.findByName(AppConstants.ROLE_SUB_MASTER_NAME).ifPresent(role -> {
+                    if (!user.getRoles().contains(role)) {
+                        user.getRoles().add(role);
+                        usersRepository.save(user);
+                    }
+                })
+        );
+
+        // 전체권한(삭제/권한관리 제외) 유저
+        usersRepository.findByLoginId("sub_admin_lite").ifPresent(user ->
+                roleRepository.findByName(AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU).ifPresent(role -> {
+                    if (!user.getRoles().contains(role)) {
+                        user.getRoles().add(role);
+                        usersRepository.save(user);
+                    }
+                })
+        );
     }
 }
