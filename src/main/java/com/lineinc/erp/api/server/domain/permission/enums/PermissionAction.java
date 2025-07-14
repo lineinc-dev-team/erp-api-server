@@ -15,4 +15,13 @@ public enum PermissionAction {
     PermissionAction(String label) {
         this.label = label;
     }
+
+    public static PermissionAction fromLabel(String label) {
+        for (PermissionAction action : values()) {
+            if (action.label.equals(label)) {
+                return action;
+            }
+        }
+        throw new IllegalArgumentException("Unknown permission label: " + label);
+    }
 }

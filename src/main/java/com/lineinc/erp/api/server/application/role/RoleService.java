@@ -44,6 +44,12 @@ public class RoleService {
     }
 
     @Transactional(readOnly = true)
+    public Role getRoleWithPermissionsAndMenus(Long roleId) {
+        return roleRepository.findWithPermissionsAndMenusById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
     public List<MenusPermissionsResponse> getMenusPermissionsById(Long roleId) {
         Role role = roleRepository.findWithPermissionsAndMenusById(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
