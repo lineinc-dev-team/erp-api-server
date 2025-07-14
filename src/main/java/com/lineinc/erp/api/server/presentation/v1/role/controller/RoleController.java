@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.AddUsersToRoleRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.CreateRolesRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RemoveUsersFromRoleRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
@@ -162,6 +163,23 @@ public class RoleController {
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteRoleById(@PathVariable Long id) {
         roleService.deleteRoleById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "권한 그룹 생성",
+            description = "새로운 권한 그룹을 생성합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "생성 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content())
+    })
+    @PostMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.CREATE)
+    public ResponseEntity<Void> createRole(
+            @RequestBody @Valid CreateRolesRequest request
+    ) {
+        roleService.createRole(request);
         return ResponseEntity.ok().build();
     }
 

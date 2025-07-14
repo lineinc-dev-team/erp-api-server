@@ -6,10 +6,7 @@ import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.AddUsersToRoleRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RemoveUsersFromRoleRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
@@ -119,4 +116,17 @@ public class RoleService {
         roleRepository.delete(role);
     }
 
+    @Transactional
+    public void createRole(CreateRolesRequest request) {
+        boolean exists = roleRepository.existsByName(request.name());
+        if (exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.ROLE_NAME_ALREADY_EXISTS);
+        }
+
+        Role newRole = Role.builder()
+                .name(request.name())
+                .build();
+
+        roleRepository.save(newRole);
+    }
 }
