@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
-import java.util.Optional;
 
 /**
  * 역할(Role)과 권한(Permission)을 매핑하는 시더
@@ -29,6 +28,7 @@ public class RolesPermissionsSeeder {
 
     @Transactional
     public void seed() {
+        assignAllPermissionsToRole(AppConstants.ROLE_MASTER_NAME);
         assignPermissionsToRole(AppConstants.ROLE_SUB_MASTER_NAME, false);
         assignPermissionsToRole(AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU, true);
     }
@@ -51,4 +51,19 @@ public class RolesPermissionsSeeder {
 
         roleRepository.save(role);
     }
+
+    private void assignAllPermissionsToRole(String roleName) {
+        Role role = roleRepository.findByName(roleName)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
+
+        menuRepository.findAll().forEach(menu ->
+                EnumSet.allOf(PermissionAction.class).forEach(action ->
+                        permissionRepository.findByMenuAndAction(menu, action)
+                                .ifPresent(permission -> role.getPermissions().add(permission))
+                )
+        );
+
+        roleRepository.save(role);
+    }
 }
+

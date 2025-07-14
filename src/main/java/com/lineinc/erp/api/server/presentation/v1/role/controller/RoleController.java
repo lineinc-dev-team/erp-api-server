@@ -84,4 +84,25 @@ public class RoleController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
+//    @Operation(
+//            summary = "권한 그룹에 속한 유저 목록 조회",
+//            description = "지정된 권한 그룹 ID에 속한 유저 목록을 반환합니다"
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "유저 목록 조회 성공"),
+//            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+//    })
+//    @GetMapping("/{id}/users")
+//    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
+//    public ResponseEntity<SuccessResponse<List<String>>> getUsersByRoleId(@PathVariable Long id, @Valid PageRequest pageRequest
+//    ) {
+//        Page<RolesResponse> page = roleService.getAllRoles(
+//                PageableUtils.createPageable(pageRequest.page(), pageRequest.size())
+//        );
+//
+//        return ResponseEntity.ok(SuccessResponse.of(
+//                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+//        ));
+//    }
+
 }

@@ -38,13 +38,6 @@ public class MenuPermissionAspect {
 
         List<Role> roles = user.getRoles().stream().toList();
 
-        // 전체 권한 역할이 있는 경우 권한 체크를 생략
-        boolean isMaster = roles.stream()
-                .anyMatch(role -> AppConstants.ROLE_MASTER_NAME.equals(role.getName()));
-        if (isMaster) {
-            return;
-        }
-
         // 각 역할에 대해 해당 메뉴와 권한 액션을 갖는지 검사
         boolean hasPermission = roles.stream()
                 .flatMap(role -> roleService.getMenusPermissionsById(role.getId()).stream())
