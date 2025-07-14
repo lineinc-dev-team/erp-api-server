@@ -94,4 +94,20 @@ public class RoleService {
         }
     }
 
+    @Transactional
+    public void addUsersToRole(Long roleId, List<Long> userIds) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+
+        List<User> users = userRepository.findAllById(userIds);
+
+        for (User user : users) {
+
+            if (!user.getRoles().contains(role) && user.getRoles().isEmpty()) {
+                user.getRoles().add(role);
+                userRepository.save(user);
+            }
+        }
+    }
+
 }

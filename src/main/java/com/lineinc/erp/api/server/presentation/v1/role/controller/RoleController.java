@@ -127,4 +127,22 @@ public class RoleController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "권한 그룹에 유저 추가",
+            description = "권한 그룹 ID와 유저 ID 리스트로 해당 권한 그룹에 유저를 추가합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추가 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    @PostMapping("/{id}/users")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.CREATE)
+    public ResponseEntity<Void> addUsersToRole(
+            @PathVariable Long id,
+            @RequestBody List<Long> userIds
+    ) {
+        roleService.addUsersToRole(id, userIds);
+        return ResponseEntity.ok().build();
+    }
+
 }
