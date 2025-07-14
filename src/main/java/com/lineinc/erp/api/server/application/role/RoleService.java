@@ -117,6 +117,13 @@ public class RoleService {
     }
 
     @Transactional
+    public void deleteRolesByIds(List<Long> roleIds) {
+        for (Long roleId : roleIds) {
+            deleteRoleById(roleId);
+        }
+    }
+
+    @Transactional
     public void createRole(CreateRolesRequest request) {
         boolean exists = roleRepository.existsByName(request.name());
         if (exists) {

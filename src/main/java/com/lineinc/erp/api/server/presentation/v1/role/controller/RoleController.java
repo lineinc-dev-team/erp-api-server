@@ -11,6 +11,7 @@ import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.AddUsersToRoleRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.CreateRolesRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.DeleteRolesRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RemoveUsersFromRoleRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
@@ -180,6 +181,21 @@ public class RoleController {
             @RequestBody @Valid CreateRolesRequest request
     ) {
         roleService.createRole(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "여러 권한 그룹 삭제",
+            description = "권한 그룹 ID 리스트로 여러 권한 그룹을 삭제합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteRoles(@RequestBody DeleteRolesRequest request) {
+        roleService.deleteRolesByIds(request.roleIds());
         return ResponseEntity.ok().build();
     }
 
