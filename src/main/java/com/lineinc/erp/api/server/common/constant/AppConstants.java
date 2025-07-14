@@ -20,6 +20,7 @@ public final class AppConstants {
     public static final String MENU_EQUIPMENT = "장비관리";
     public static final String MENU_TAX = "세금계산서";
     public static final String MENU_REPORT = "통계/리포트";
+    public static final String MENU_PERMISSION = "권한관리";
 
     // 시스템 기본 메뉴 이름 목록
     public static final List<String> MENU_NAMES = List.of(
@@ -31,7 +32,9 @@ public final class AppConstants {
             MENU_HR,
             MENU_EQUIPMENT,
             MENU_TAX,
-            MENU_REPORT
+            MENU_REPORT,
+            MENU_PERMISSION
+
     );
 
     private AppConstants() {
