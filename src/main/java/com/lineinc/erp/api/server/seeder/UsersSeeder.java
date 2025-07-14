@@ -60,9 +60,8 @@ public class UsersSeeder {
                 .updatedBy(AppConstants.SYSTEM_NAME)
                 .build();
 
+        usersRepository.save(admin);
         usersRepository.save(subAdmin);
         usersRepository.save(subAdminLite);
-
-        usersRepository.save(admin);
     }
 }
