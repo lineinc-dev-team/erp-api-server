@@ -9,6 +9,7 @@ import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -129,6 +130,20 @@ public class UserService {
             case "memo" -> user.memo();
             default -> null;
         };
+    }
+
+    @Transactional
+    public void deleteUsersByIds(DeleteUsersRequest request) {
+        List<User> users = usersRepository.findAllById(request.userIds());
+        if (users.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND);
+        }
+
+        for (User user : users) {
+            user.markAsDeleted();
+        }
+
+        usersRepository.saveAll(users);
     }
 
 }

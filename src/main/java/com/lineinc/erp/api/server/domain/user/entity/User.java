@@ -47,7 +47,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String phoneNumber;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     /**

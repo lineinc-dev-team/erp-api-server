@@ -14,6 +14,7 @@ import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +55,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "모든 사용자 조회", description = "모든 유저 정보를 반환합니다")
+    @Operation(summary = "모든 유저 조회", description = "모든 유저 정보를 반환합니다")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
@@ -74,9 +75,9 @@ public class UserController {
         ));
     }
 
-    @Operation(summary = "사용자 생성", description = "새로운 사용자를 생성합니다")
+    @Operation(summary = "유저 생성", description = "새로운 유저를 생성합니다")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 생성 성공", content = @Content()),
+            @ApiResponse(responseCode = "200", description = "유저 생성 성공", content = @Content()),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
     })
     @PostMapping
@@ -110,5 +111,18 @@ public class UserController {
         )) {
             workbook.write(response.getOutputStream());
         }
+    }
+
+    @Operation(summary = "유저 계정 삭제", description = "선택한 유저 계정들을 삭제합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "삭제 대상 유저를 찾을 수 없음", content = @Content())
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteUsers(@RequestBody DeleteUsersRequest userIds) {
+        userService.deleteUsersByIds(userIds);
+        return ResponseEntity.ok().build();
     }
 }
