@@ -33,9 +33,6 @@ spring:
           order_updates: true
     open-in-view: false
 
-user:
-  default-password: ${USER_DEFAULT_PASSWORD}
-
 management:
   endpoints:
     web:

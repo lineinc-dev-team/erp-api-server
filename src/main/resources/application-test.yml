@@ -15,6 +15,3 @@ spring:
   flyway:
     enabled: false
 
-user:
-  default-password: "testDefaultPassword"
-

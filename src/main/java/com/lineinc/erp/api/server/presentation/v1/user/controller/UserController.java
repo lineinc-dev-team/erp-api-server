@@ -12,7 +12,6 @@ import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.ResetPasswordRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,10 +39,10 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
             @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
-    @PostMapping("/reset-password")
+    @PostMapping("/{id}/reset-password")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        userService.resetPassword(request.loginId());
+    public ResponseEntity<Void> resetPassword(@PathVariable Long id) {
+        userService.resetPassword(id);
         return ResponseEntity.ok().build();
     }
 

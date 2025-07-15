@@ -29,9 +29,6 @@ spring:
         default_batch_fetch_size: 200
     open-in-view: false
 
-user:
-  default-password: ${USER_DEFAULT_PASSWORD}
-
 management:
   endpoints:
     web:

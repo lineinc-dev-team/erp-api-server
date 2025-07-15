@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.application.user;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.common.util.PasswordUtils;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
@@ -26,9 +27,6 @@ public class UserService {
     private final UserRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${user.default-password}")
-    private String defaultPassword;
-
 
     @Transactional(readOnly = true)
     public User getUserByLoginIdOrThrow(String loginId) {
@@ -37,10 +35,12 @@ public class UserService {
     }
 
     @Transactional
-    public void resetPassword(String loginId) {
-        User user = getUserByLoginIdOrThrow(loginId);
-        String encodedPassword = passwordEncoder.encode(defaultPassword);
+    public void resetPassword(long id) {
+        User user = usersRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        String encodedPassword = passwordEncoder.encode(PasswordUtils.generateDefaultPassword());
         user.updatePassword(encodedPassword);
+        usersRepository.save(user);
     }
 
     @Transactional

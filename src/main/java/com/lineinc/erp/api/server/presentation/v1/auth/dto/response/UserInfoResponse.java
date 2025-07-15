@@ -36,7 +36,7 @@ public record UserInfoResponse(
         OffsetDateTime lastLoginAt,
 
         @Schema(description = "연락처(유선 전화번호)", example = "02-123-4567")
-        String landlinePhoneNumber,
+        String landlineNumber,
 
         @Schema(description = "사용자 권한 목록")
         List<RoleSummaryResponse> roles

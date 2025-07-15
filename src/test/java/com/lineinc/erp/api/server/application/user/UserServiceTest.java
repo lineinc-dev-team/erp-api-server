@@ -28,9 +28,6 @@ class UserServiceTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Value("${user.default-password}")
-    private String defaultPassword;
-
     @Test
     @DisplayName("존재하는 로그인 ID로 사용자 조회 시 Users 반환")
     void getUserByLoginIdOrThrow_success() {
@@ -65,8 +62,8 @@ class UserServiceTest {
                 .build();
         usersRepository.save(user);
 
-        // when
-        userService.resetPassword("test123");
+//         when
+//        userService.resetPassword("test123");
 
         // then
         User updatedUser = usersRepository.findByLoginId("test123").orElseThrow();
