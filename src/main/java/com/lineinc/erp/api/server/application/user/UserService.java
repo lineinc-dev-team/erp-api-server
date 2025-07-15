@@ -42,13 +42,13 @@ public class UserService {
         // 임시 비밀번호 생성
         String tempPassword = PasswordUtils.generateDefaultPassword();
 
+        // 이메일로 임시 비밀번호 발송
+        mailUtils.sendPasswordResetEmail(user.getEmail(), user.getUsername(), tempPassword);
+
         // 암호화된 비밀번호로 업데이트
         String encodedPassword = passwordEncoder.encode(tempPassword);
         user.updatePassword(encodedPassword);
         usersRepository.save(user);
-
-        // 이메일로 임시 비밀번호 발송
-        mailUtils.sendPasswordResetEmail(user.getEmail(), user.getUsername(), tempPassword);
     }
 
     @Transactional
