@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class PageableUtils {
 
@@ -56,41 +57,22 @@ public class PageableUtils {
         return Sort.by(orders);
     }
 
-    /**
-     * Pageable의 Sort를 QueryDSL OrderSpecifier 배열로 변환
-     *
-     * @param pageable     페이징 정보
-     * @param fieldMapping 필드명과 QueryDSL Path의 매핑
-     * @param defaultOrder 정렬 조건이 없을 때 사용할 기본 정렬
-     * @return OrderSpecifier 배열
-     */
     public static OrderSpecifier<?>[] toOrderSpecifiers(
             Pageable pageable,
-            Map<String, ComparableExpressionBase<?>> fieldMapping,
-            OrderSpecifier<?> defaultOrder) {
-
+            Map<String, ComparableExpressionBase<?>> fieldMapping
+    ) {
         if (pageable.getSort().isEmpty()) {
-            return new OrderSpecifier[]{defaultOrder};
+            return new OrderSpecifier[0];  // 기본 정렬 없이 빈 배열 반환
         }
-
-        return toOrderSpecifiers(pageable.getSort(), fieldMapping, defaultOrder);
+        return toOrderSpecifiers(pageable.getSort(), fieldMapping);
     }
 
-    /**
-     * Spring Sort를 QueryDSL OrderSpecifier 배열로 변환
-     *
-     * @param sort         정렬 정보
-     * @param fieldMapping 필드명과 QueryDSL Path의 매핑
-     * @param defaultOrder 정렬 조건이 없을 때 사용할 기본 정렬
-     * @return OrderSpecifier 배열
-     */
     public static OrderSpecifier<?>[] toOrderSpecifiers(
             Sort sort,
-            Map<String, ComparableExpressionBase<?>> fieldMapping,
-            OrderSpecifier<?> defaultOrder) {
-
+            Map<String, ComparableExpressionBase<?>> fieldMapping
+    ) {
         if (sort == null || sort.isEmpty()) {
-            return new OrderSpecifier[]{defaultOrder};
+            return new OrderSpecifier[0];
         }
 
         return sort.stream()
@@ -98,13 +80,13 @@ public class PageableUtils {
                     Order direction = order.isAscending() ? Order.ASC : Order.DESC;
                     ComparableExpressionBase<?> path = fieldMapping.get(order.getProperty());
 
-                    // 매핑되지 않은 필드는 기본 정렬 사용
                     if (path == null) {
-                        return defaultOrder;
+                        return null;  // 매핑 안 된 필드는 무시
                     }
 
                     return new OrderSpecifier<>(direction, path);
                 })
+                .filter(Objects::nonNull)
                 .toArray(OrderSpecifier[]::new);
     }
 }

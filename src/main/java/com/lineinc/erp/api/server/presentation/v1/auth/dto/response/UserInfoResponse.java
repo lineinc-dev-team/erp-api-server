@@ -38,6 +38,12 @@ public record UserInfoResponse(
         @Schema(description = "연락처(유선 전화번호)", example = "02-123-4567")
         String landlineNumber,
 
+        @Schema(description = "수정자", example = "관리자")
+        String updatedBy,
+
+        @Schema(description = "비고", example = "특이사항 없음")
+        String memo,
+
         @Schema(description = "사용자 권한 목록")
         List<RoleSummaryResponse> roles
 ) {
@@ -53,6 +59,8 @@ public record UserInfoResponse(
                 user.getUpdatedAt(),
                 user.getLastLoginAt(),
                 user.getLandlineNumber(),
+                user.getUpdatedBy(),
+                user.getMemo(),
                 user.getRoles().stream()
                         .map(role -> new RoleSummaryResponse(role.getId(), role.getName()))
                         .toList()

@@ -58,6 +58,7 @@ public class UserController {
             @Valid UserListRequest request
     ) {
         Page<UserInfoResponse> page = userService.getAllUsers(
+                request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
         return ResponseEntity.ok(SuccessResponse.of(

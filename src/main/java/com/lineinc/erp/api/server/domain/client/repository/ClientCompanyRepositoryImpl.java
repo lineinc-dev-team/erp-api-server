@@ -56,8 +56,7 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
-                SORT_FIELDS,
-                clientCompany.id.desc()
+                SORT_FIELDS
         );
 
         List<ClientCompany> content = queryFactory
@@ -149,8 +148,7 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         // PageableUtils를 사용하여 Sort를 OrderSpecifier로 변환
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 sort,
-                SORT_FIELDS,
-                clientCompany.id.desc()
+                SORT_FIELDS
         );
 
         return queryFactory

@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,8 +59,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserInfoResponse> getAllUsers(Pageable pageable) {
-        return usersRepository.findAll(pageable).map(UserInfoResponse::from);
+    public Page<UserInfoResponse> getAllUsers(UserListRequest request, Pageable pageable) {
+        return usersRepository.findAll(request, pageable);
     }
 
     @Transactional
