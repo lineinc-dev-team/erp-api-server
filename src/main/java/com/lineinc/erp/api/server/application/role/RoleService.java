@@ -130,7 +130,11 @@ public class RoleService {
             user.getRoles().removeIf(role -> roleIds.contains(role.getId()));
         }
         userRepository.saveAll(affectedUsers);
-        roleRepository.deleteAll(roles);
+
+        for (Role role : roles) {
+            role.markAsDeleted();
+        }
+        roleRepository.saveAll(roles);
     }
 
     @Transactional

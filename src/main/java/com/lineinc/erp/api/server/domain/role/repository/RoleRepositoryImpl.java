@@ -32,13 +32,19 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
         String search = (request != null) ? request.userSearch() : null;
 
+        BooleanExpression notDeleted = role.deleted.isFalse();
         BooleanExpression userSearchPredicate = containsSearch(user, search);
+
+        BooleanExpression whereCondition = notDeleted;
+        if (userSearchPredicate != null) {
+            whereCondition = notDeleted.and(userSearchPredicate);
+        }
 
         // fetchJoin 사용: role.users 컬렉션을 한 번에 같이 조회
         List<Role> content = queryFactory
                 .selectFrom(role)
                 .leftJoin(role.users, user).fetchJoin()
-                .where(userSearchPredicate)
+                .where(whereCondition)
                 .orderBy(role.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -48,7 +54,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .select(role.countDistinct())
                 .from(role)
                 .leftJoin(role.users, user)
-                .where(userSearchPredicate)
+                .where(whereCondition)
                 .fetchOne();
 
         long total = Objects.requireNonNullElse(totalCount, 0L);
