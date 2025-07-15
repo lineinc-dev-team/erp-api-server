@@ -44,6 +44,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final BooleanPath isActive = createBoolean("isActive");
 
+    public final StringPath landlineNumber = createString("landlineNumber");
+
     public final DateTimePath<java.time.OffsetDateTime> lastLoginAt = createDateTime("lastLoginAt", java.time.OffsetDateTime.class);
 
     public final StringPath loginId = createString("loginId");

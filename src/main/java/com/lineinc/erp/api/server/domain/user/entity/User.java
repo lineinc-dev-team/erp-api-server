@@ -50,6 +50,9 @@ public class User extends BaseEntity implements UserDetails {
     private String passwordHash;
 
     @Column
+    private String landlineNumber;
+
+    @Column
     private String phoneNumber;
 
     @Column(nullable = false, unique = true)
@@ -61,15 +64,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column()
     private OffsetDateTime passwordResetAt;
 
-    /**
-     * 최종 로그인 시각
-     */
     @Column()
     private OffsetDateTime lastLoginAt;
 
-    /**
-     * 권환 목록 반환
-     */
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Role> roles;
 
