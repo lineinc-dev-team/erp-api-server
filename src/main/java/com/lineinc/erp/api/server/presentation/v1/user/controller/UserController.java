@@ -1,12 +1,15 @@
 package com.lineinc.erp.api.server.presentation.v1.user.controller;
 
 import com.lineinc.erp.api.server.application.user.UserService;
+import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.ResetPasswordRequest;
@@ -38,6 +41,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
     @PostMapping("/reset-password")
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request.loginId());
         return ResponseEntity.ok().build();
@@ -48,6 +52,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<UserInfoResponse>>> getAllUsers(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
@@ -67,6 +72,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
     })
     @PostMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createUser(@Valid @RequestBody CreateUserRequest request) {
         userService.createUser(request);
         return ResponseEntity.ok().build();
