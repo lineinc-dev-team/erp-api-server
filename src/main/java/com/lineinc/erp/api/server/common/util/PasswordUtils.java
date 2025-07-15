@@ -18,8 +18,8 @@ public class PasswordUtils {
         return sb.toString();
     }
 
-    // 기본 10자리 생성
+    // 기본 8자리 생성
     public static String generateDefaultPassword() {
-        return generateRandomPassword(10);
+        return generateRandomPassword(8);
     }
 }
