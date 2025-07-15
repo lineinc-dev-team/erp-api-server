@@ -62,7 +62,6 @@ public class AuthController {
 
         // 4. 마지막 로그인 시간 갱신
         userService.updateLastLoginAt(user);
-        System.out.println("user!!! = " + user);
 
         // 5. SecurityContext에 인증 정보 저장
         SecurityContext context = SecurityContextHolder.createEmptyContext();
