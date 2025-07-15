@@ -7,23 +7,31 @@ import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
+
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/users")
@@ -76,5 +84,31 @@ public class UserController {
     public ResponseEntity<Void> createUser(@Valid @RequestBody CreateUserRequest request) {
         userService.createUser(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "유저 목록 엑셀 다운로드", description = "검색 조건에 맞는 유저 목록을 엑셀 파일로 다운로드합니다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
+    public void downloadUserListExcel(
+            @Valid SortRequest sortRequest,
+            @Valid UserListRequest request,
+            @Valid UserDownloadRequest userDownloadRequest,
+            HttpServletResponse response
+    ) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(userDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, UserDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "유저 목록.xlsx");
+
+        try (Workbook workbook = userService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed
+        )) {
+            workbook.write(response.getOutputStream());
+        }
     }
 }

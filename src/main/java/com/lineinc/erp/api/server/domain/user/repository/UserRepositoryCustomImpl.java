@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -101,4 +102,21 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         return builder;
     }
+
+    @Override
+    public List<UserInfoResponse> findAllWithoutPaging(UserListRequest request, Sort sort) {
+        BooleanBuilder condition = buildCondition(request);
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        List<User> users = queryFactory
+                .selectFrom(user)
+                .where(condition)
+                .orderBy(orders)
+                .fetch();
+
+        return users.stream()
+                .map(UserInfoResponse::from)
+                .toList();
+    }
 }
+

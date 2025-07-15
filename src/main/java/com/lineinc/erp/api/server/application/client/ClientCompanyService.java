@@ -102,7 +102,6 @@ public class ClientCompanyService {
                 .toList();
 
         return ExcelExportUtils.generateWorkbook(
-                "발주처 목록",
                 clientCompanyResponses,
                 fields,
                 this::getExcelHeaderName,

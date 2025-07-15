@@ -31,14 +31,13 @@ public class ExcelExportUtils {
      * @return 생성된 Workbook
      */
     public static <T> Workbook generateWorkbook(
-            String sheetName,
             List<T> data,
             List<String> fields,
             ExcelHeaderResolver headerResolver,
             ExcelCellValueExtractor<T> cellValueExtractor
     ) {
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet(sheetName);
+        Sheet sheet = workbook.createSheet("Sheet1");
 
         // 1. 헤더 생성
         Row headerRow = sheet.createRow(0);
