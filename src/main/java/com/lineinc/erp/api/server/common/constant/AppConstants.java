@@ -3,16 +3,29 @@ package com.lineinc.erp.api.server.common.constant;
 import java.util.List;
 
 public final class AppConstants {
+
+    // 회사 관련 상수
     public static final String COMPANY_MAIN_NAME = "라인공영";
-    public static final String ROLE_MASTER_NAME = "전체권한";
-    public static final String ROLE_SUB_MASTER_NAME = "전체권한(삭제 제외)";
-    public static final String ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU = "전체권한(삭제/권한관리 제외)";
+
+    // 권한 그룹명 관련 상수
+    public static final String ROLE_ADMIN_NAME = "전체권한";
+    public static final String ROLE_SUB_ADMIN_NAME = "전체권한(삭제 제외)";
+    public static final String ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU = "전체권한(삭제/권한관리 제외)";
+
+    // 관리자 로그인 ID 관련 상수
     public static final String ADMIN_LOGIN_ID = "admin";
     public static final String SUB_ADMIN_LOGIN_ID = "sub_admin";
     public static final String SUB_ADMIN_LITE_LOGIN_ID = "sub_admin_lite";
+
+    // 관리자 이메일 주소 관련 상수
+    public static final String ADMIN_EMAIL = "admin@example.com";
+    public static final String SUB_ADMIN_EMAIL = "sub_admin@example.com";
+    public static final String SUB_ADMIN_LITE_EMAIL = "sub_admin_lite@example.com";
+
+    // 시스템 관련 상수
     public static final String SYSTEM_NAME = "system";
 
-    // 시스템 기본 메뉴 이름 상수
+    // 시스템 기본 메뉴 이름 관련 상수
     public static final String MENU_ACCOUNT = "계정관리";
     public static final String MENU_OUTSOURCING_SETTLEMENT = "외주정산";
     public static final String MENU_CONTRACT = "계약/증빙";
@@ -36,7 +49,6 @@ public final class AppConstants {
             MENU_TAX,
             MENU_REPORT,
             MENU_PERMISSION
-
     );
 
     private AppConstants() {

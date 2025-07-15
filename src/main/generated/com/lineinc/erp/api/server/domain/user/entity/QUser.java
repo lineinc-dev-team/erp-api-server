@@ -38,7 +38,11 @@ public class QUser extends EntityPathBase<User> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final StringPath email = createString("email");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final BooleanPath isActive = createBoolean("isActive");
 
     public final DateTimePath<java.time.OffsetDateTime> lastLoginAt = createDateTime("lastLoginAt", java.time.OffsetDateTime.class);
 

@@ -52,6 +52,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String phoneNumber;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     /**
      * 비밀번호 초기화 시각 (비밀번호 변경 혹은 초기화된 시간)
      */
@@ -72,6 +75,13 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    /**
+     * 사용 여부
+     */
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isActive = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

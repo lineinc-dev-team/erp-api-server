@@ -28,9 +28,9 @@ public class RolesPermissionsSeeder {
 
     @Transactional
     public void seed() {
-        assignAllPermissionsToRole(AppConstants.ROLE_MASTER_NAME);
-        assignPermissionsToRole(AppConstants.ROLE_SUB_MASTER_NAME, false);
-        assignPermissionsToRole(AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU, true);
+        assignAllPermissionsToRole(AppConstants.ROLE_ADMIN_NAME);
+        assignPermissionsToRole(AppConstants.ROLE_SUB_ADMIN_NAME, false);
+        assignPermissionsToRole(AppConstants.ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU, true);
     }
 
     private void assignPermissionsToRole(String roleName, boolean excludeRoleMenu) {

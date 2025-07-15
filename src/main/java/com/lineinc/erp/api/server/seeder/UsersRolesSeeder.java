@@ -21,7 +21,7 @@ public class UsersRolesSeeder {
 
     public void seed() {
         Optional<User> adminUserOpt = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
-        Optional<Role> adminRoleOpt = roleRepository.findByName(AppConstants.ROLE_MASTER_NAME);
+        Optional<Role> adminRoleOpt = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME);
 
         if (adminUserOpt.isPresent() && adminRoleOpt.isPresent()) {
             User adminUser = adminUserOpt.get();
@@ -36,7 +36,7 @@ public class UsersRolesSeeder {
 
         // 전체권한(삭제 제외) 유저
         usersRepository.findByLoginId(AppConstants.SUB_ADMIN_LOGIN_ID).ifPresent(user ->
-                roleRepository.findByName(AppConstants.ROLE_SUB_MASTER_NAME).ifPresent(role -> {
+                roleRepository.findByName(AppConstants.ROLE_SUB_ADMIN_NAME).ifPresent(role -> {
                     if (!user.getRoles().contains(role)) {
                         user.getRoles().add(role);
                         usersRepository.save(user);
@@ -46,7 +46,7 @@ public class UsersRolesSeeder {
 
         // 전체권한(삭제/권한관리 제외) 유저
         usersRepository.findByLoginId(AppConstants.SUB_ADMIN_LITE_LOGIN_ID).ifPresent(user ->
-                roleRepository.findByName(AppConstants.ROLE_SUB_MASTER_WITHOUT_PERMISSION_MENU).ifPresent(role -> {
+                roleRepository.findByName(AppConstants.ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU).ifPresent(role -> {
                     if (!user.getRoles().contains(role)) {
                         user.getRoles().add(role);
                         usersRepository.save(user);
