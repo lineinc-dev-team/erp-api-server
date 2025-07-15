@@ -12,9 +12,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Permission extends BaseEntity {
 
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_seq")
     @SequenceGenerator(name = "permission_seq", sequenceName = "permission_seq", allocationSize = 1)
     private Long id;
@@ -26,5 +28,6 @@ public class Permission extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PermissionAction action;
+
 }
 

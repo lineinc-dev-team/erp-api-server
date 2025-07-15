@@ -24,9 +24,13 @@ spring:
     show-sql: true       # 실행되는 SQL을 콘솔에 출력
     properties:
       hibernate:
-        jdbc.time_zone: UTC     # DB와 시간대 동기화를 위해 UTC 사용 권장
-        format_sql: true        # SQL 출력 포맷팅 적용 (가독성 향상)
-        default_batch_fetch_size: 200  # batch fetch 사이즈 설정으로 N+1 문제 완화
+        jdbc.time_zone: UTC
+        format_sql: true
+        default_batch_fetch_size: 200
+        jdbc:
+          batch_size: 50
+          order_inserts: true
+          order_updates: true
     open-in-view: false
 
 user:

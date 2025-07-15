@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
-@Schema(description = "권한 그룹에 권한 추가 요청")
+@Schema(description = "권한 그룹에 권한 수정 요청")
 public record AddPermissionsToRoleRequest(
         @Schema(description = "추가할 권한 ID 목록", example = "[1, 2, 3]")
         @NotEmpty

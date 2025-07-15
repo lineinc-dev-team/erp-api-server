@@ -148,7 +148,7 @@ public class RoleService {
     }
 
     @Transactional
-    public void addPermissionsToRole(Long roleId, AddPermissionsToRoleRequest request) {
+    public void setPermissionsToRole(Long roleId, AddPermissionsToRoleRequest request) {
         Role role = getRoleOrThrow(roleId);
 
         List<Permission> permissions = permissionRepository.findAllById(request.permissionIds());
@@ -156,6 +156,9 @@ public class RoleService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SOME_PERMISSIONS_NOT_FOUND);
         }
 
+        // 기존 권한 제거 후 새로 설정
+        permissionRepository.deleteAllByRoleIdNative(roleId);
+        role.getPermissions().clear();
         role.getPermissions().addAll(permissions);
         roleRepository.save(role);
     }
