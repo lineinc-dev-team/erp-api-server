@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.application.auth;
 
-import com.lineinc.erp.api.server.domain.company.entity.Company;
-import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -26,21 +24,11 @@ class AuthServiceTest {
     @Autowired
     private UserRepository usersRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
 
     @Test
     @DisplayName("정상적인 로그인 ID를 주면 UserDetails 반환")
     void loadUserByUsername_success() {
-        // given: 테스트용 회사와 권한, 사용자 데이터를 DB에 저장
-        Company company = Company.builder()
-                .name("testCompany")
-                .build();
-
-        companyRepository.save(company);
-
         User user = User.builder()
-                .company(company)
                 .loginId("test123")
                 .username("test")
                 .build();

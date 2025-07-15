@@ -46,6 +46,7 @@ public class UserService {
     @Transactional
     public void updateLastLoginAt(User user) {
         user.updateLastLoginAt(OffsetDateTime.now());
+        usersRepository.save(user);
     }
 
     @Transactional(readOnly = true)
@@ -64,6 +65,7 @@ public class UserService {
                 .loginId(request.loginId())
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .phoneNumber(request.phoneNumber())
+                .landlineNumber(request.landlineNumber())
                 .email(request.email())
                 .isActive(request.isActive())
                 .build();

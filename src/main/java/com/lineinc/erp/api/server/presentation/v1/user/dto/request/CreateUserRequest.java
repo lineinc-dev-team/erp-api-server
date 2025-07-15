@@ -26,7 +26,7 @@ public record CreateUserRequest(
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
         @Schema(description = "유선 전화번호", example = "02-123-4567")
-        String landlinePhoneNumber,
+        String landlineNumber,
 
         @NotBlank
         @Schema(description = "비밀번호", example = "password123!")
