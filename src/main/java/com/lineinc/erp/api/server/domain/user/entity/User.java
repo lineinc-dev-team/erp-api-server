@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.company.entity.Company;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,13 +31,6 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
-
-    /**
-     * 소속 회사 정보 (Users - Company : 다대일 관계)
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private Company company;
 
     @Column(unique = true, nullable = false)
     private String loginId;

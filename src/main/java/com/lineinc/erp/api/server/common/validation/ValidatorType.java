@@ -8,10 +8,8 @@ public enum ValidatorType {
 
     URL("유효한 URL 형식이 아닙니다."),
     PHONE("유효한 휴대폰 번호 형식이 아닙니다."),
-    EMAIL("유효한 이메일 형식이 아닙니다."),
     BUSINESS_NUMBER("유효한 사업자등록번호 형식이 아닙니다."),
-    LANDLINE_NUMBER("유효한 유선 전화번호 형식이 아닙니다."),
-    CUSTOM("입력값이 유효하지 않습니다.");
+    LANDLINE_NUMBER("유효한 유선 전화번호 형식이 아닙니다.");
 
     private final String message;
 

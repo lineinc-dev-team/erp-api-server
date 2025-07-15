@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.ResetPasswordRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,5 +59,16 @@ public class UserController {
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
+    }
+
+    @Operation(summary = "사용자 생성", description = "새로운 사용자를 생성합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 생성 성공", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+    })
+    @PostMapping
+    public ResponseEntity<Void> createUser(@Valid @RequestBody CreateUserRequest request) {
+        userService.createUser(request);
+        return ResponseEntity.ok().build();
     }
 }

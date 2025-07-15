@@ -20,5 +20,6 @@ public final class ValidationMessages {
     public static final String ROLE_NOT_FOUND = "권한 그룹을 찾을 수 없습니다.";
     public static final String ROLE_NAME_ALREADY_EXISTS = "이미 존재하는 권한 그룹 이름입니다.";
     public static final String SOME_PERMISSIONS_NOT_FOUND = "일부 권한이 존재하지 않습니다.";
+    public static final String LOGIN_ID_ALREADY_EXISTS = "이미 사용 중인 로그인 ID입니다.";
 
 }

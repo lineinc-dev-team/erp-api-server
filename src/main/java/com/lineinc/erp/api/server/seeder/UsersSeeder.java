@@ -1,8 +1,6 @@
 package com.lineinc.erp.api.server.seeder;
 
 import com.lineinc.erp.api.server.common.constant.AppConstants;
-import com.lineinc.erp.api.server.domain.company.entity.Company;
-import com.lineinc.erp.api.server.domain.company.repository.CompanyRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,21 +18,13 @@ public class UsersSeeder {
     private String adminPassword;
 
     private final UserRepository usersRepository;
-    private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
 
     public void seed() {
         Optional<User> existingAdmin = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
         if (existingAdmin.isPresent()) return;
 
-        Optional<Company> companyOpt = companyRepository.findByName(AppConstants.COMPANY_MAIN_NAME);
-        if (companyOpt.isEmpty()) {
-            return;
-        }
-        Company company = companyOpt.get();
-
         User admin = User.builder()
-                .company(company)
                 .loginId(AppConstants.ADMIN_LOGIN_ID)
                 .username(AppConstants.ROLE_ADMIN_NAME)
                 .email(AppConstants.ADMIN_EMAIL)
@@ -44,7 +34,6 @@ public class UsersSeeder {
                 .build();
 
         User subAdmin = User.builder()
-                .company(company)
                 .loginId(AppConstants.SUB_ADMIN_LOGIN_ID)
                 .username(AppConstants.ROLE_SUB_ADMIN_NAME)
                 .email(AppConstants.SUB_ADMIN_EMAIL)
@@ -54,7 +43,6 @@ public class UsersSeeder {
                 .build();
 
         User subAdminLite = User.builder()
-                .company(company)
                 .loginId(AppConstants.SUB_ADMIN_LITE_LOGIN_ID)
                 .username(AppConstants.ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU)
                 .email(AppConstants.SUB_ADMIN_LITE_EMAIL)

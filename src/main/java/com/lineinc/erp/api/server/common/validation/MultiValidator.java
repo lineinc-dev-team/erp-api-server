@@ -42,7 +42,6 @@ public class MultiValidator implements ConstraintValidator<MultiConstraint, Stri
             case PHONE -> isValidPhone(value);
             case LANDLINE_NUMBER -> isValidLandlineNumber(value);
             case BUSINESS_NUMBER -> isValidBusinessNumber(value);
-            default -> false;
         };
 
         if (!result) {
