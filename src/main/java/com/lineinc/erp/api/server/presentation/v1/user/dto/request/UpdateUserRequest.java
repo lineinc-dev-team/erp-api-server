@@ -3,20 +3,12 @@ package com.lineinc.erp.api.server.presentation.v1.user.dto.request;
 import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
-@Schema(description = "유저 생성 요청")
-public record CreateUserRequest(
-        @NotBlank
-        @Schema(description = "로그인 아이디", example = "newuser01")
-        String loginId,
-
-        @NotBlank
+@Schema(description = "유저 수정 요청")
+public record UpdateUserRequest(
         @Schema(description = "사용자 이름", example = "홍길동")
         String username,
 
-        @Email
         @Schema(description = "이메일 주소", example = "user@example.com")
         String email,
 
@@ -28,11 +20,10 @@ public record CreateUserRequest(
         @Schema(description = "유선 전화번호", example = "02-123-4567")
         String landlineNumber,
 
-        @NotBlank
         @Schema(description = "비밀번호", example = "password123!")
         String password,
 
         @Schema(description = "사용자 활성화 여부", example = "true")
-        boolean isActive
+        Boolean isActive
 ) {
 }

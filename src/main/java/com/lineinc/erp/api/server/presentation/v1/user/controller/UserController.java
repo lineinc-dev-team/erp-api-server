@@ -13,10 +13,7 @@ import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserDownloadRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -123,6 +120,22 @@ public class UserController {
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteUsers(@RequestBody DeleteUsersRequest userIds) {
         userService.deleteUsersByIds(userIds);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "유저 정보 수정", description = "기존 유저 정보를 수정합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "수정 대상 유저를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequest request
+    ) {
+        userService.updateUser(id, request);
         return ResponseEntity.ok().build();
     }
 }

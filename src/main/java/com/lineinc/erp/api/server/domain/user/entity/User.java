@@ -2,16 +2,19 @@ package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serial;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -102,5 +105,23 @@ public class User extends BaseEntity implements UserDetails {
      */
     public void updateLastLoginAt(OffsetDateTime now) {
         this.lastLoginAt = now;
+    }
+
+    /**
+     * UpdateUserRequest DTO로부터 사용자 정보를 업데이트합니다.
+     *
+     * @param request         사용자 수정 요청 정보
+     * @param passwordEncoder 비밀번호 암호화에 사용할 인코더
+     */
+    public void updateFrom(UpdateUserRequest request, PasswordEncoder passwordEncoder) {
+        Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
+        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
+        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
+        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
+        Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
+
+        if (request.password() != null && !request.password().isBlank()) {
+            this.updatePassword(passwordEncoder.encode(request.password()));
+        }
     }
 }

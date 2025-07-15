@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -146,4 +147,12 @@ public class UserService {
         usersRepository.saveAll(users);
     }
 
+    @Transactional
+    public void updateUser(Long id, UpdateUserRequest request) {
+        User user = usersRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+
+        user.updateFrom(request, passwordEncoder);
+        usersRepository.save(user);
+    }
 }
