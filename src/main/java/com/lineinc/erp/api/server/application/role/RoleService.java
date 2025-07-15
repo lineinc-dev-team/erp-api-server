@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.application.role;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
+import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -29,6 +30,7 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final PermissionRepository permissionRepository;
 
     @Transactional(readOnly = true)
     public Page<RolesResponse> getAllRoles(UserWithRolesListRequest request, Pageable pageable) {
@@ -143,5 +145,18 @@ public class RoleService {
                 .build();
 
         roleRepository.save(newRole);
+    }
+
+    @Transactional
+    public void addPermissionsToRole(Long roleId, AddPermissionsToRoleRequest request) {
+        Role role = getRoleOrThrow(roleId);
+
+        List<Permission> permissions = permissionRepository.findAllById(request.permissionIds());
+        if (permissions.size() != request.permissionIds().size()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SOME_PERMISSIONS_NOT_FOUND);
+        }
+
+        role.getPermissions().addAll(permissions);
+        roleRepository.save(role);
     }
 }

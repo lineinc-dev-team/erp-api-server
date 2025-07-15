@@ -9,12 +9,7 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.AddUsersToRoleRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.CreateRolesRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.DeleteRolesRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RemoveUsersFromRoleRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
+import com.lineinc.erp.api.server.presentation.v1.role.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
@@ -153,21 +148,6 @@ public class RoleController {
     }
 
     @Operation(
-            summary = "권한 그룹 삭제",
-            description = "권한 그룹 ID로 권한 그룹을 삭제합니다"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
-    })
-    @DeleteMapping("/{id}")
-    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
-    public ResponseEntity<Void> deleteRoleById(@PathVariable Long id) {
-        roleService.deleteRoleById(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(
             summary = "권한 그룹 생성",
             description = "새로운 권한 그룹을 생성합니다"
     )
@@ -199,4 +179,21 @@ public class RoleController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "권한 그룹에 권한 추가",
+            description = "권한 그룹 ID에 권한 ID 리스트를 추가합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "권한 추가 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹 또는 권한을 찾을 수 없음", content = @Content())
+    })
+    @PostMapping("/{id}/permissions")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.CREATE)
+    public ResponseEntity<Void> addPermissionsToRole(
+            @PathVariable Long id,
+            @RequestBody @Valid AddPermissionsToRoleRequest request
+    ) {
+        roleService.addPermissionsToRole(id, request);
+        return ResponseEntity.ok().build();
+    }
 }
