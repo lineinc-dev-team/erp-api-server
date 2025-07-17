@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.file.dto.request;
 
+import com.lineinc.erp.api.server.common.enums.FileUploadTarget;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,6 +11,10 @@ public record PresignedUrlRequest(
                 example = "image/jpeg"
         )
         @NotNull
-        String contentType
+        String contentType,
+
+        @Schema(description = "파일 업로드 요청이 발생한 비즈니스 도메인", example = "CLIENT_COMPANY")
+        @NotNull
+        FileUploadTarget uploadTarget
 ) {
 }

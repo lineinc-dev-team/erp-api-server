@@ -43,7 +43,7 @@ public class FileController {
         }
 
         return ResponseEntity.ok(SuccessResponse.of(
-                s3FileService.generatePresignedUrl(request.contentType())
+                s3FileService.generatePresignedUrl(request)
         ));
     }
 }
