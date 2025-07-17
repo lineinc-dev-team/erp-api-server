@@ -11,7 +11,9 @@ import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -75,21 +77,21 @@ public class ClientCompanyController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
     }
-//
-//    @Operation(
-//            summary = "발주처 삭제",
-//            description = "하나 이상의 발주처 ID를 받아 해당 발주처를 삭제합니다"
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "발주처 삭제 성공"),
-//            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
-//    })
-//    @DeleteMapping
-//    public ResponseEntity<Void> deleteClientCompanies(@RequestBody List<Long> ids) {
-//        clientCompanyService.deleteClientCompanies(ids);
-//        return ResponseEntity.ok().build();
-//    }
-//
+
+    @Operation(
+            summary = "발주처 삭제",
+            description = "하나 이상의 발주처 ID를 받아 해당 발주처를 삭제합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "발주처 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
+    })
+    @DeleteMapping
+    public ResponseEntity<Void> deleteClientCompanies(@RequestBody DeleteClientCompaniesRequest clientCompanyIds) {
+        clientCompanyService.deleteClientCompanies(clientCompanyIds);
+        return ResponseEntity.ok().build();
+    }
+
 //    @Operation(
 //            summary = "발주처 수정",
 //            description = "특정 발주처 정보를 수정합니다"

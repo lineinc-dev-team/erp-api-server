@@ -1,11 +1,13 @@
 package com.lineinc.erp.api.server.application.client;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
@@ -74,10 +76,17 @@ public class ClientCompanyService {
     }
 
     @Transactional
-    public void deleteClientCompanies(List<Long> ids) {
-        for (Long id : ids) {
-            deleteClientCompany(id);
+    public void deleteClientCompanies(DeleteClientCompaniesRequest request) {
+        List<ClientCompany> clientCompanies = clientCompanyRepository.findAllById(request.clientCompanyIds());
+        if (clientCompanies.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND);
         }
+
+        for (ClientCompany clientCompany : clientCompanies) {
+            clientCompany.markAsDeleted();
+        }
+
+        clientCompanyRepository.saveAll(clientCompanies);
     }
 
     @Transactional
