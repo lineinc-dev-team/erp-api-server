@@ -1,20 +1,21 @@
 package com.lineinc.erp.api.server.presentation.v1.file.controller;
 
 import com.lineinc.erp.api.server.application.file.S3FileService;
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.common.enums.FileMimeType;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.presentation.v1.file.dto.request.PresignedUrlRequest;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.response.PresignedUrlResponse;
-import com.lineinc.erp.api.server.presentation.v1.menu.dto.response.MenuWithPermissionsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -33,19 +34,16 @@ public class FileController {
             @ApiResponse(responseCode = "200", description = "Presigned URL 발급 성공"),
             @ApiResponse(responseCode = "400", description = "요청 파라미터 오류", content = @Content())
     })
-    @GetMapping("/upload-url")
+    @PostMapping("/upload-url")
     public ResponseEntity<SuccessResponse<PresignedUrlResponse>> getPresignedUrl(
-            @io.swagger.v3.oas.annotations.Parameter(
-                    name = "contentType",
-                    description = "업로드할 파일의 MIME 타입 (예: image/png, image/jpeg, application/pdf 등)",
-                    example = "image/png",
-                    required = true
-            )
-            @RequestParam @NotBlank String contentType
+            @Valid @RequestBody PresignedUrlRequest request
     ) {
-        Map<String, Object> stringObjectMap = s3FileService.generatePresignedUrl(contentType);
-        PresignedUrlResponse response = new PresignedUrlResponse(stringObjectMap);
-        return ResponseEntity.ok(SuccessResponse.of(response));
+        if (!FileMimeType.isSupported(request.contentType())) {
+            throw new IllegalArgumentException(ValidationMessages.UNSUPPORTED_CONTENT_TYPE);
+        }
 
+        return ResponseEntity.ok(SuccessResponse.of(
+                s3FileService.generatePresignedUrl(request.contentType())
+        ));
     }
 }
