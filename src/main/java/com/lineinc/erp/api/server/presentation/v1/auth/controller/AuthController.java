@@ -76,10 +76,7 @@ public class AuthController {
         );
 
         // 세션 타임아웃 설정
-        int maxInactiveInterval = Boolean.TRUE.equals(request.autoLogin())
-                ? autoLoginSeconds
-                : defaultSeconds;
-        session.setMaxInactiveInterval(maxInactiveInterval);
+        session.setMaxInactiveInterval(defaultSeconds);
 
         return ResponseEntity.ok().build();
     }

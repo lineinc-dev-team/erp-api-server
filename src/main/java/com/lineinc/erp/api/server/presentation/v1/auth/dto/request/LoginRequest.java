@@ -12,9 +12,6 @@ public record LoginRequest(
 
         @NotBlank
         @Schema(description = "비밀번호", example = "1234")
-        String password,
-
-        @Schema(description = "자동 로그인 여부", example = "true", defaultValue = "false")
-        Boolean autoLogin
+        String password
 ) {
 }
