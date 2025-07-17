@@ -4,7 +4,7 @@ import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.common.util.MailUtils;
-import com.lineinc.erp.api.server.common.util.PasswordUtils;
+import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
@@ -36,6 +36,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailUtils mailUtils;
 
+    @Value("${USER_DEFAULT_PASSWORD}")
+    private String defaultPassword;
+
     @Transactional(readOnly = true)
     public User getUserByLoginIdOrThrow(String loginId) {
         return usersRepository.findByLoginId(loginId)
@@ -47,14 +50,7 @@ public class UserService {
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        // 임시 비밀번호 생성
-        String tempPassword = PasswordUtils.generateDefaultPassword();
-
-        // 이메일로 임시 비밀번호 발송
-        mailUtils.sendPasswordResetEmail(user.getEmail(), user.getUsername(), tempPassword);
-
-        // 암호화된 비밀번호로 업데이트
-        String encodedPassword = passwordEncoder.encode(tempPassword);
+        String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.updatePassword(encodedPassword);
         usersRepository.save(user);
     }
