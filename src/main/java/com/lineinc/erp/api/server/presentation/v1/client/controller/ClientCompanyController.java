@@ -52,29 +52,29 @@ public class ClientCompanyController {
         return ResponseEntity.ok().build();
     }
 
-//    @Operation(
-//            summary = "발주처 전체 조회",
-//            description = "등록된 모든 발주처 정보를 반환합니다"
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "발주처 목록 조회 성공"),
-//            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-//    })
-//    @GetMapping
-//    public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
-//            @Valid PageRequest pageRequest,
-//            @Valid SortRequest sortRequest,
-//            @Valid ClientCompanyListRequest request
-//    ) {
-//        Page<ClientCompanyResponse> page = clientCompanyService.getAllClientCompanies(
-//                request,
-//                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
-//        );
-//
-//        return ResponseEntity.ok(SuccessResponse.of(
-//                new PagingResponse<>(PagingInfo.from(page), page.getContent())
-//        ));
-//    }
+    @Operation(
+            summary = "발주처 전체 조회",
+            description = "등록된 모든 발주처 정보를 반환합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "발주처 목록 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+    })
+    @GetMapping
+    public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid ClientCompanyListRequest request
+    ) {
+        Page<ClientCompanyResponse> page = clientCompanyService.getAllClientCompanies(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
+        );
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+        ));
+    }
 //
 //    @Operation(
 //            summary = "발주처 삭제",

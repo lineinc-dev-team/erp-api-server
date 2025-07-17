@@ -118,20 +118,20 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
             builder.and(clientCompany.isActive.eq(request.isActive()));
         }
 
-        if (request.startDate() != null) {
+        if (request.createdStartDate() != null) {
             // atOffset(ZoneOffset.UTC)는 LocalDateTime → OffsetDateTime 변환 (UTC 기준)
             // goe는 Greater or Equal의 약자로 '이상' 조건을 뜻함
             builder.and(clientCompany.createdAt.goe(
-                    request.startDate()
+                    request.createdStartDate()
                             .atStartOfDay()
                             .atOffset(ZoneOffset.UTC)
             ));
         }
 
-        if (request.endDate() != null) {
+        if (request.createdEndDate() != null) {
             // lt는 Less Than의 약자로 '미만' 조건을 뜻함
             builder.and(clientCompany.createdAt.lt(
-                    request.endDate()
+                    request.createdEndDate()
                             .plusDays(1)    // endDate에 하루 더해 다음 날 00시로 만듦 (범위 포함 위해)
                             .atStartOfDay()
                             .atOffset(ZoneOffset.UTC)
