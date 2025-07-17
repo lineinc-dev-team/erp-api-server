@@ -2,16 +2,16 @@ package com.lineinc.erp.api.server.presentation.v1.file.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "S3 Presigned URL 응답")
+@Schema(description = "파일 업로드용 Presigned URL 응답")
 public record PresignedUrlResponse(
 
-        @Schema(description = "S3 presigned URL (업로드용)", example = "https://lineinc-erp-dev-files.s3.ap-northeast-2.amazonaws.com/temp/uuid?...")
-        String s3UploadUrl,
+        @Schema(description = "파일 업로드용 Presigned URL", example = "https://lineinc-erp-dev-files.s3.ap-northeast-2.amazonaws.com/temp/uuid?...")
+        String uploadUrl,
 
-        @Schema(description = "CDN을 통한 접근용 URL", example = "https://dev-cdn.dooson.it/temp/uuid")
-        String cdnAccessUrl
+        @Schema(description = "클라이언트 접근용 공개 URL", example = "https://dev-cdn.dooson.it/temp/uuid")
+        String publicUrl
 ) {
-    public static PresignedUrlResponse of(String uploadUrl, String cdnUrl) {
-        return new PresignedUrlResponse(uploadUrl, cdnUrl);
+    public static PresignedUrlResponse of(String uploadUrl, String publicUrl) {
+        return new PresignedUrlResponse(uploadUrl, publicUrl);
     }
 }
