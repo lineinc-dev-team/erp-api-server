@@ -33,7 +33,7 @@ public class ClientCompanyService {
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
 
-//        // 1. ClientCompany 객체 먼저 빌드
+        // 1. ClientCompany 객체 먼저 빌드
         ClientCompany clientCompany = ClientCompany.builder()
                 .name(request.name())
                 .businessNumber(request.businessNumber())

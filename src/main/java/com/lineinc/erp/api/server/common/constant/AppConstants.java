@@ -25,6 +25,9 @@ public final class AppConstants {
     // 시스템 관련 상수
     public static final String SYSTEM_NAME = "system";
 
+    // Presigned URL 유효기간 (분)
+    public static final int PRESIGNED_URL_EXPIRATION_MINUTES = 5;
+
     // 시스템 기본 메뉴 이름 관련 상수
     public static final String MENU_ACCOUNT = "계정관리";
     public static final String MENU_OUTSOURCING_SETTLEMENT = "외주정산";

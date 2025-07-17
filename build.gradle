@@ -56,6 +56,9 @@ dependencies {
 
     // Spring Boot Mail Starter
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // AWS SDK v2 S3 dependency
+    implementation 'software.amazon.awssdk:s3:2.26.11'
 }
 
 tasks.named('test') {

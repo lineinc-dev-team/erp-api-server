@@ -60,3 +60,14 @@ swagger:
 
 cors:
   allowed-origins: http://localhost:8080
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+      cdn-url: ${AWS_CDN_URL}
