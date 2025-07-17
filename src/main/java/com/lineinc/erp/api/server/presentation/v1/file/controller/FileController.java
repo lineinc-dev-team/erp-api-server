@@ -35,6 +35,12 @@ public class FileController {
     })
     @GetMapping("/upload-url")
     public ResponseEntity<SuccessResponse<PresignedUrlResponse>> getPresignedUrl(
+            @io.swagger.v3.oas.annotations.Parameter(
+                    name = "contentType",
+                    description = "업로드할 파일의 MIME 타입 (예: image/png, image/jpeg, application/pdf 등)",
+                    example = "image/png",
+                    required = true
+            )
             @RequestParam @NotBlank String contentType
     ) {
         Map<String, Object> stringObjectMap = s3FileService.generatePresignedUrl(contentType);
