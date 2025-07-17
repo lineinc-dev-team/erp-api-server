@@ -40,6 +40,6 @@ public class S3FileService {
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
         String cdnAccessUrl = cdnUrl + uniqueFileName;
-        return new PresignedUrlResponse(presignedRequest.url().toString(), cdnAccessUrl);
+        return PresignedUrlResponse.of(presignedRequest.url().toString(), cdnAccessUrl);
     }
 }
