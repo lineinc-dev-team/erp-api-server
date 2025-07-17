@@ -41,9 +41,7 @@ public class S3FileService {
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
 
-        String cdnAccessUrl = cdnUrl.endsWith("/")
-                ? cdnUrl + uniqueFileName
-                : cdnUrl + "/" + uniqueFileName;
+        String cdnAccessUrl = cdnUrl + uniqueFileName;
 
         Map<String, Object> response = new HashMap<>();
         response.put("uploadUrl", presignedRequest.url().toString());
