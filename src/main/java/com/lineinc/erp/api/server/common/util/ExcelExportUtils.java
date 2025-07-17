@@ -22,7 +22,6 @@ public class ExcelExportUtils {
     /**
      * 동적 필드 기반 엑셀 생성
      *
-     * @param sheetName          시트명
      * @param data               데이터 리스트
      * @param fields             출력할 필드 리스트
      * @param headerResolver     필드명 -> 헤더명 매핑 함수
@@ -42,7 +41,8 @@ public class ExcelExportUtils {
         // 1. 헤더 생성
         Row headerRow = sheet.createRow(0);
         for (int i = 0; i < fields.size(); i++) {
-            headerRow.createCell(i).setCellValue(headerResolver.resolve(fields.get(i)));
+            String resolvedHeader = headerResolver.resolve(fields.get(i));
+            headerRow.createCell(i).setCellValue(resolvedHeader != null ? resolvedHeader : fields.get(i));
         }
 
         // 2. 데이터 생성
@@ -50,7 +50,8 @@ public class ExcelExportUtils {
         for (T item : data) {
             Row row = sheet.createRow(rowIdx++);
             for (int i = 0; i < fields.size(); i++) {
-                row.createCell(i).setCellValue(cellValueExtractor.extract(item, fields.get(i)));
+                String cellValue = cellValueExtractor.extract(item, fields.get(i));
+                row.createCell(i).setCellValue(cellValue != null ? cellValue : "");
             }
         }
 

@@ -11,13 +11,13 @@ import java.util.List;
 public record UserDownloadRequest(
         @NotBlank
         @Schema(
-                description = "허용 필드: id, loginId, username, roleName, isActive, lastLoginAt, createdAt, updatedAt, updatedBy, memo, email",
-                example = "id,username,email"
+                description = "허용 필드: id, loginId, username, roleName, isActive, lastLoginAt, createdAt, updatedAt, updatedBy, memo",
+                example = "id,username,isActive"
         )
         String fields
 ) {
     public static final List<String> ALLOWED_FIELDS = List.of(
             "id", "loginId", "username", "roleName", "isActive",
-            "lastLoginAt", "createdAt", "updatedAt", "updatedBy", "memo", "email"
+            "lastLoginAt", "createdAt", "updatedAt", "updatedBy", "memo"
     );
 }
