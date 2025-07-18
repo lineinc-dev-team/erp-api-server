@@ -3,6 +3,8 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.OffsetDateTime;
+
 @Schema(description = "발주처 파일 정보 응답")
 public record ClientCompanyFileResponse(
 
@@ -22,10 +24,10 @@ public record ClientCompanyFileResponse(
         String memo,
 
         @Schema(description = "등록일", example = "2024-01-01T12:34:56")
-        String createdAt,
+        OffsetDateTime createdAt,
 
         @Schema(description = "수정일", example = "2024-01-01T12:34:56")
-        String updatedAt
+        OffsetDateTime updatedAt
 ) {
     public static ClientCompanyFileResponse from(ClientCompanyFile file) {
         return new ClientCompanyFileResponse(
@@ -34,8 +36,8 @@ public record ClientCompanyFileResponse(
                 file.getFileUrl(),
                 file.getOriginalFileName(),
                 file.getMemo(),
-                file.getCreatedAt().toString(),
-                file.getUpdatedAt().toString()
+                file.getCreatedAt(),
+                file.getUpdatedAt()
         );
     }
 }

@@ -3,6 +3,8 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.OffsetDateTime;
+
 @Schema(description = "발주처 담당자 정보 응답")
 public record ClientCompanyContactResponse(
 
@@ -28,10 +30,10 @@ public record ClientCompanyContactResponse(
         String memo,
 
         @Schema(description = "등록일", example = "2024-01-01T12:34:56")
-        String createdAt,
+        OffsetDateTime createdAt,
 
         @Schema(description = "수정일", example = "2024-01-01T12:34:56")
-        String updatedAt
+        OffsetDateTime updatedAt
 ) {
     public static ClientCompanyContactResponse from(ClientCompanyContact contact) {
         return new ClientCompanyContactResponse(
@@ -42,8 +44,8 @@ public record ClientCompanyContactResponse(
                 contact.getEmail(),
                 contact.getPosition(),
                 contact.getMemo(),
-                contact.getCreatedAt().toString(),
-                contact.getUpdatedAt().toString()
+                contact.getCreatedAt(),
+                contact.getUpdatedAt()
         );
     }
 }
