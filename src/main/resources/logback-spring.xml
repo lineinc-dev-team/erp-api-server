@@ -50,7 +50,6 @@
     </appender>
 
     <!-- 공통 설정: 모든 환경에서 공통적으로 적용 -->
-    <logger name="org.flywaydb.core.internal.command.DbMigrate" level="DEBUG"/>
     <logger name="org.hibernate.SQL" level="INFO"/>
 
     <!-- 기본 환경 fallback -->
@@ -60,8 +59,8 @@
         <appender-ref ref="ErrorFile"/>
     </root>
 
-    <!-- test, local, dev 환경 공통 설정 -->
-    <springProfile name="test,local,dev">
+    <!-- local, dev 환경 공통 설정 -->
+    <springProfile name="local,dev">
         <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
 
         <root level="INFO">

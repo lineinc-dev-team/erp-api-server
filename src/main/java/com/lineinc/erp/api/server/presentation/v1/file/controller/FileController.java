@@ -1,8 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.file.controller;
 
 import com.lineinc.erp.api.server.application.file.S3FileService;
-import com.lineinc.erp.api.server.common.constant.ValidationMessages;
-import com.lineinc.erp.api.server.common.enums.FileMimeType;
+import com.lineinc.erp.api.server.common.annotation.RateLimit;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.request.PresignedUrlRequest;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.response.PresignedUrlResponse;
@@ -16,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
@@ -28,20 +25,17 @@ public class FileController {
 
     @Operation(
             summary = "S3 Presigned URL 발급",
-            description = "지정한 파일 이름과 Content-Type에 대해 AWS S3 업로드용 presigned URL을 발급합니다"
+            description = "지정한 Content-Type에 대해 AWS S3 업로드용 presigned URL을 발급합니다"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Presigned URL 발급 성공"),
             @ApiResponse(responseCode = "400", description = "요청 파라미터 오류", content = @Content())
     })
+    @RateLimit(limit = 20, durationSeconds = 60) // 사용자당 1분에 20번 허용
     @PostMapping("/upload-url")
     public ResponseEntity<SuccessResponse<PresignedUrlResponse>> getPresignedUrl(
             @Valid @RequestBody PresignedUrlRequest request
     ) {
-        if (!FileMimeType.isSupported(request.contentType())) {
-            throw new IllegalArgumentException(ValidationMessages.UNSUPPORTED_CONTENT_TYPE);
-        }
-
         return ResponseEntity.ok(SuccessResponse.of(
                 s3FileService.generatePresignedUrl(request)
         ));

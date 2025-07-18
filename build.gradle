@@ -59,6 +59,9 @@ dependencies {
 
     // AWS SDK v2 S3 dependency
     implementation 'software.amazon.awssdk:s3:2.26.11'
+
+    // 사용자별 또는 IP 기반 요청 제한을 위한 Bucket4j 라이브러리
+    implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.3.0'
 }
 
 tasks.named('test') {

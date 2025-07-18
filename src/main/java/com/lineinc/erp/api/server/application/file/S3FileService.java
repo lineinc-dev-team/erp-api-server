@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.file;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.enums.FileMimeType;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.request.PresignedUrlRequest;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.response.PresignedUrlResponse;
@@ -27,6 +28,10 @@ public class S3FileService {
     private String bucketName;
 
     public PresignedUrlResponse generatePresignedUrl(PresignedUrlRequest request) {
+        if (!FileMimeType.isSupported(request.contentType())) {
+            throw new IllegalArgumentException(ValidationMessages.UNSUPPORTED_CONTENT_TYPE);
+        }
+
         FileMimeType mimeType = FileMimeType.fromMime(request.contentType());
         String uniqueFileName = request.uploadTarget().getDirectory() + "/" + UUID.randomUUID() + mimeType.getExtension();
 
