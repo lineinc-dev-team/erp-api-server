@@ -25,7 +25,7 @@ public class FileController {
 
     @Operation(
             summary = "S3 Presigned URL 발급",
-            description = "지정한 Content-Type에 대해 AWS S3 업로드용 presigned URL을 발급합니다"
+            description = "AWS S3 업로드용 presigned URL을 발급합니다"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Presigned URL 발급 성공"),
