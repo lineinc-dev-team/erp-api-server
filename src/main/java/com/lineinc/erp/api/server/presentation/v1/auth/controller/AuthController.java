@@ -47,7 +47,6 @@ public class AuthController {
             HttpServletResponse response
     ) {
         int defaultSeconds = 1800;        // 예: 30분
-        int autoLoginSeconds = 604800;    // 예: 7일
 
         // 1. 로그인 인증 토큰 생성
         UsernamePasswordAuthenticationToken token =

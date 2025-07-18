@@ -9,6 +9,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -148,5 +149,11 @@ public class ClientCompanyService {
             case "memo" -> company.memo();
             default -> null;
         };
+    }
+
+    @Transactional(readOnly = true)
+    public ClientCompanyDetailResponse getClientCompanyById(Long id) {
+        ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
+        return ClientCompanyDetailResponse.from(clientCompany);
     }
 }

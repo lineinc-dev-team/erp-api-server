@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.*;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -137,5 +138,21 @@ public class ClientCompanyController {
         )) {
             workbook.write(response.getOutputStream());
         }
+    }
+
+    @Operation(
+            summary = "발주처 상세 조회",
+            description = "특정 발주처 ID에 해당하는 상세 정보를 반환합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "발주처 상세 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<SuccessResponse<ClientCompanyDetailResponse>> getClientCompanyById(
+            @PathVariable Long id
+    ) {
+        ClientCompanyDetailResponse response = clientCompanyService.getClientCompanyById(id);
+        return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

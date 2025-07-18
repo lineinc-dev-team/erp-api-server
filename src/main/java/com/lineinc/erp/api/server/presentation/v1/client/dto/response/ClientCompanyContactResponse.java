@@ -22,7 +22,16 @@ public record ClientCompanyContactResponse(
         String email,
 
         @Schema(description = "직급 / 부서", example = "팀장")
-        String position
+        String position,
+
+        @Schema(description = "비고 / 메모")
+        String memo,
+
+        @Schema(description = "등록일", example = "2024-01-01T12:34:56")
+        String createdAt,
+
+        @Schema(description = "수정일", example = "2024-01-01T12:34:56")
+        String updatedAt
 ) {
     public static ClientCompanyContactResponse from(ClientCompanyContact contact) {
         return new ClientCompanyContactResponse(
@@ -31,7 +40,10 @@ public record ClientCompanyContactResponse(
                 contact.getPhoneNumber(),
                 contact.getLandlineNumber(),
                 contact.getEmail(),
-                contact.getPosition()
+                contact.getPosition(),
+                contact.getMemo(),
+                contact.getCreatedAt().toString(),
+                contact.getUpdatedAt().toString()
         );
     }
 }
