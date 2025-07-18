@@ -1,0 +1,23 @@
+package com.lineinc.erp.api.server.presentation.v1.client.dto.request;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import org.springdoc.core.annotations.ParameterObject;
+
+import java.util.List;
+
+@ParameterObject
+@Schema(description = "발주처 엑셀 다운로드 요청")
+public record ClientCompanyDownloadRequest(
+        @NotBlank
+        @Schema(
+                description = "허용 필드: id, businessNumber, name, ceoName, address, phoneNumber, isActive, createdAt, updatedAt, hasFile, memo",
+                example = "id,businessNumber,isActive"
+        )
+        String fields
+) {
+    public static final List<String> ALLOWED_FIELDS = List.of(
+            "id", "businessNumber", "name", "ceoName", "address",
+            "phoneNumber", "isActive", "createdAt", "updatedAt", "hasFile", "memo"
+    );
+}

@@ -29,6 +29,9 @@ public record ClientCompanyResponse(
         @Schema(description = "유선 전화번호", example = "02-1234-5678")
         String landlineNumber,
 
+        @Schema(description = "담당자 연락처", example = "010-1234-5678")
+        String phoneNumber,
+
         @Schema(description = "사용 여부", example = "true")
         Boolean isActive,
 
@@ -54,6 +57,7 @@ public record ClientCompanyResponse(
                 clientCompany.getName(),
                 clientCompany.getCeoName(),
                 clientCompany.getAddress(),
+                clientCompany.getPhoneNumber(),
                 clientCompany.getLandlineNumber(),
                 clientCompany.isActive(),
                 clientCompany.getCreatedAt(),

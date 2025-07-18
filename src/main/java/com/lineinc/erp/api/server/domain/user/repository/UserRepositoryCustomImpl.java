@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.domain.user.repository;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
@@ -39,7 +39,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     );
 
     @Override
-    public Page<UserInfoResponse> findAll(UserListRequest request, Pageable pageable) {
+    public Page<UserResponse> findAll(UserListRequest request, Pageable pageable) {
 
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
@@ -62,8 +62,8 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                 .fetchOne();
         long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        List<UserInfoResponse> responses = content.stream()
-                .map(UserInfoResponse::from)
+        List<UserResponse> responses = content.stream()
+                .map(UserResponse::from)
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
@@ -104,7 +104,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public List<UserInfoResponse> findAllWithoutPaging(UserListRequest request, Sort sort) {
+    public List<UserResponse> findAllWithoutPaging(UserListRequest request, Sort sort) {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
@@ -115,7 +115,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                 .fetch();
 
         return users.stream()
-                .map(UserInfoResponse::from)
+                .map(UserResponse::from)
                 .toList();
     }
 }

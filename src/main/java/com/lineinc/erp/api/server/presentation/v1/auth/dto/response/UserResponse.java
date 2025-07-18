@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @Schema(description = "로그인된 사용자 정보 응답")
-public record UserInfoResponse(
+public record UserResponse(
         @Schema(description = "사용자 ID", example = "123")
         Long id,
 
@@ -47,8 +47,8 @@ public record UserInfoResponse(
         @Schema(description = "사용자 권한 목록")
         List<RoleSummaryResponse> roles
 ) {
-    public static UserInfoResponse from(User user) {
-        return new UserInfoResponse(
+    public static UserResponse from(User user) {
+        return new UserResponse(
                 user.getId(),
                 user.getLoginId(),
                 user.getUsername(),

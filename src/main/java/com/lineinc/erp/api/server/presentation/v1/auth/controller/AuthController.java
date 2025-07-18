@@ -4,13 +4,12 @@ import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
-import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -97,9 +96,9 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<UserInfoResponse>> getCurrentUser(@AuthenticationPrincipal User user) {
+    public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal User user) {
         User findUser = userService.getUserByLoginIdOrThrow(user.getLoginId());
-        UserInfoResponse response = UserInfoResponse.from(findUser);
+        UserResponse response = UserResponse.from(findUser);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

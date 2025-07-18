@@ -144,12 +144,7 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
     @Override
     public List<ClientCompany> findAllWithoutPaging(ClientCompanyListRequest request, Sort sort) {
         BooleanBuilder condition = buildCondition(request);
-
-        // PageableUtils를 사용하여 Sort를 OrderSpecifier로 변환
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
-                sort,
-                SORT_FIELDS
-        );
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         return queryFactory
                 .selectFrom(clientCompany)

@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
@@ -10,10 +11,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -124,7 +122,13 @@ public class ClientCompanyService {
             case "businessNumber" -> "사업자번호";
             case "name" -> "이름";
             case "ceoName" -> "대표자명";
-            case "address" -> "주소";
+            case "address" -> "본사 주소";
+            case "phoneNumber" -> "전화번호";
+            case "isActive" -> "사용여부";
+            case "createdAt" -> "등록일";
+            case "updatedAt" -> "수정일";
+            case "hasFile" -> "첨부파일 유무";
+            case "memo" -> "비고/메모";
             default -> null;
         };
     }
@@ -136,6 +140,12 @@ public class ClientCompanyService {
             case "name" -> company.name();
             case "ceoName" -> company.ceoName();
             case "address" -> company.address();
+            case "phoneNumber" -> company.phoneNumber();
+            case "isActive" -> String.valueOf(company.isActive());
+            case "createdAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(company.createdAt());
+            case "updatedAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(company.updatedAt());
+            case "hasFile" -> company.hasFile() ? "Y" : "N";
+            case "memo" -> company.memo();
             default -> null;
         };
     }

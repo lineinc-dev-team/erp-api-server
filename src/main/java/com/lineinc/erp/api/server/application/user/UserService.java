@@ -7,7 +7,7 @@ import com.lineinc.erp.api.server.common.util.MailUtils;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
-import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
@@ -62,7 +62,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserInfoResponse> getAllUsers(UserListRequest request, Pageable pageable) {
+    public Page<UserResponse> getAllUsers(UserListRequest request, Pageable pageable) {
         return usersRepository.findAll(request, pageable);
     }
 
@@ -87,9 +87,9 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(UserListRequest request, Sort sort, List<String> fields) {
-        List<UserInfoResponse> userInfoResponses = usersRepository.findAllWithoutPaging(request, sort);
+        List<UserResponse> userRespons = usersRepository.findAllWithoutPaging(request, sort);
         return ExcelExportUtils.generateWorkbook(
-                userInfoResponses,
+                userRespons,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue
@@ -112,7 +112,7 @@ public class UserService {
         };
     }
 
-    private String getExcelCellValue(UserInfoResponse user, String field) {
+    private String getExcelCellValue(UserResponse user, String field) {
         return switch (field) {
             case "id" -> String.valueOf(user.id());
             case "loginId" -> user.loginId();

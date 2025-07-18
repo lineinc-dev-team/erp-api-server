@@ -12,7 +12,7 @@ import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserInfoResponse;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -58,12 +58,12 @@ public class UserController {
     })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<UserInfoResponse>>> getAllUsers(
+    public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
             @Valid UserListRequest request
     ) {
-        Page<UserInfoResponse> page = userService.getAllUsers(
+        Page<UserResponse> page = userService.getAllUsers(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
@@ -84,7 +84,9 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유저 목록 엑셀 다운로드", description = "검색 조건에 맞는 유저 목록을 엑셀 파일로 다운로드합니다")
+    @Operation(
+            summary = "유저 목록 엑셀 다운로드", description = "검색 조건에 맞는 유저 목록을 엑셀 파일로 다운로드합니다"
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())

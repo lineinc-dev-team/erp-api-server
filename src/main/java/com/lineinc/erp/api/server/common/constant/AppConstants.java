@@ -4,9 +4,6 @@ import java.util.List;
 
 public final class AppConstants {
 
-    // 회사 관련 상수
-    public static final String COMPANY_MAIN_NAME = "라인공영";
-
     // 권한 그룹명 관련 상수
     public static final String ROLE_ADMIN_NAME = "전체권한";
     public static final String ROLE_SUB_ADMIN_NAME = "전체권한(삭제 제외)";
@@ -25,9 +22,6 @@ public final class AppConstants {
     // 시스템 관련 상수
     public static final String SYSTEM_NAME = "system";
 
-    // Presigned URL 유효기간 (분)
-    public static final int PRESIGNED_URL_EXPIRATION_MINUTES = 5;
-
     // 시스템 기본 메뉴 이름 관련 상수
     public static final String MENU_ACCOUNT = "계정관리";
     public static final String MENU_OUTSOURCING_SETTLEMENT = "외주정산";
@@ -39,6 +33,7 @@ public final class AppConstants {
     public static final String MENU_TAX = "세금계산서";
     public static final String MENU_REPORT = "통계/리포트";
     public static final String MENU_PERMISSION = "권한관리";
+    public static final String MENU_CLIENT_COMPANY = "발주처 관리";
 
     // 시스템 기본 메뉴 이름 목록
     public static final List<String> MENU_NAMES = List.of(
@@ -51,7 +46,8 @@ public final class AppConstants {
             MENU_EQUIPMENT,
             MENU_TAX,
             MENU_REPORT,
-            MENU_PERMISSION
+            MENU_PERMISSION,
+            MENU_CLIENT_COMPANY
     );
 
     private AppConstants() {

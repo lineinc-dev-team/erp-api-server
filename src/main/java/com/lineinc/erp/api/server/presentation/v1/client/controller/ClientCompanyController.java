@@ -1,19 +1,19 @@
 package com.lineinc.erp.api.server.presentation.v1.client.controller;
 
 import com.lineinc.erp.api.server.application.client.ClientCompanyService;
+import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
+import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -110,30 +110,32 @@ public class ClientCompanyController {
         return ResponseEntity.ok().build();
     }
 
-//    @Operation(
-//            summary = "발주처 엑셀 다운로드",
-//            description = "등록된 발주처 목록을 엑셀 파일로 다운로드합니다."
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-//    })
-//    @GetMapping("/download")
-//    public void downloadClientCompaniesExcel(
-//            HttpServletResponse response,
-//            @Valid SortRequest sortRequest,
-//            @Valid ClientCompanyListRequest request,
-//            @Valid DownloadableRequest downloadableRequest
-//    ) throws IOException {
-//        List<String> allowedFields = List.of("id", "businessNumber", "name", "ceoName", "address");
-//        List<String> validatedFields = downloadableRequest.validatedFields(allowedFields);
-//        ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
-//
-//        Workbook workbook = clientCompanyService.downloadExcel(
-//                request,
-//                PageableUtils.parseSort(sortRequest.sort()),
-//                validatedFields
-//        );
-//        workbook.write(response.getOutputStream());
-//        workbook.close();
-//    }
+    @Operation(
+            summary = "발주처 엑셀 다운로드",
+            description = "검색 조건에 맞는 발주처 목록을 엑셀 파일로 다운로드합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
+    public void downloadClientCompaniesExcel(
+            @Valid SortRequest sortRequest,
+            @Valid ClientCompanyListRequest request,
+            @Valid ClientCompanyDownloadRequest companyDownloadRequest,
+            HttpServletResponse response
+    ) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(companyDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, ClientCompanyDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
+
+        try (Workbook workbook = clientCompanyService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed
+        )) {
+            workbook.write(response.getOutputStream());
+        }
+    }
 }
