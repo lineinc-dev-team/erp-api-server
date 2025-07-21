@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -150,5 +151,11 @@ public class UserService {
 
         user.updateFrom(request, passwordEncoder);
         usersRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<UserResponse.Simple> searchUsersByName(String keyword, Pageable pageable) {
+        Slice<User> userSlice = usersRepository.findByUsernameContainingIgnoreCase(keyword, pageable);
+        return userSlice.map(UserResponse.Simple::from);
     }
 }

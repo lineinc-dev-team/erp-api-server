@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.user.repository;
 
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -19,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     List<User> findAllByRoles_IdIn(List<Long> roleIds);
 
     boolean existsByLoginId(String loginId);
+
+    Slice<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
 }

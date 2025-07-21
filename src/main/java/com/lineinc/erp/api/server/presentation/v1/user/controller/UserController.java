@@ -7,6 +7,8 @@ import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.response.SliceInfo;
+import com.lineinc.erp.api.server.common.response.SliceResponse;
 import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
@@ -23,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,6 +72,25 @@ public class UserController {
         );
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
+        ));
+    }
+
+    @Operation(summary = "유저 이름 키워드 검색", description = "유저 이름으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "검색 성공")
+    })
+    @GetMapping("/search")
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<UserResponse.Simple>>> searchUsersByName(
+            @Valid SortRequest sortRequest,
+            @Valid PageRequest pageRequest,
+            @RequestParam String keyword
+    ) {
+        Slice<UserResponse.Simple> slice = userService.searchUsersByName(keyword,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
         ));
     }
 
