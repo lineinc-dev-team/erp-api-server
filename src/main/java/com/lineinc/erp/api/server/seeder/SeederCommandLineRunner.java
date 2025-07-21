@@ -8,13 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class SeederCommandLineRunner implements CommandLineRunner {
-
     private final PermissionSeeder permissionSeeder;
     private final MenuSeeder menuSeeder;
     private final RolesSeeder rolesSeeder;
     private final RolesPermissionsSeeder rolesPermissionsSeeder;
-    private final UsersRolesSeeder usersRolesSeeder;
+    private final OrganizationSeeder organizationSeeder;
     private final UsersSeeder usersSeeder;
+    private final UsersRolesSeeder usersRolesSeeder;
+
 
     @Value("${seeder.enabled:true}")
     private boolean seederEnabled;
@@ -26,6 +27,7 @@ public class SeederCommandLineRunner implements CommandLineRunner {
             permissionSeeder.seed();
             rolesSeeder.seed();
             rolesPermissionsSeeder.seed();
+            organizationSeeder.seed();
             usersSeeder.seed();
             usersRolesSeeder.seed();
             System.out.println("Database seeding completed.");

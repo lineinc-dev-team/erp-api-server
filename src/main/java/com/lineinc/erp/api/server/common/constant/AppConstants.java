@@ -50,6 +50,43 @@ public final class AppConstants {
             MENU_CLIENT_COMPANY
     );
 
+    // 직급(Grade) 관련 상수
+    public static final String GRADE_EMPLOYEE = "사원";
+    public static final String GRADE_ASSISTANT_MANAGER = "대리";
+    public static final String GRADE_MANAGER = "과장";
+
+    // 직책(Position) 관련 상수
+    public static final String POSITION_TEAM_LEADER = "팀장";
+    public static final String POSITION_PART_LEADER = "파트장";
+    public static final String POSITION_HEAD = "실장";
+
+    // 부서(Department) 관련 상수
+    public static final String DEPT_SUPPORT = "경영지원팀";
+    public static final String DEPT_DEVELOPMENT = "개발팀";
+    public static final String DEPT_SALES = "영업팀";
+
+    // 직급 전체 목록
+    public static final List<String> GRADE_NAMES = List.of(
+            GRADE_EMPLOYEE,
+            GRADE_ASSISTANT_MANAGER,
+            GRADE_MANAGER
+    );
+
+    // 직책 전체 목록
+    public static final List<String> POSITION_NAMES = List.of(
+            POSITION_TEAM_LEADER,
+            POSITION_PART_LEADER,
+            POSITION_HEAD
+    );
+
+    // 부서 전체 목록
+    public static final List<String> DEPARTMENT_NAMES = List.of(
+            DEPT_SUPPORT,
+            DEPT_DEVELOPMENT,
+            DEPT_SALES
+    );
+
+
     private AppConstants() {
     } // 인스턴스화 방지
 }
