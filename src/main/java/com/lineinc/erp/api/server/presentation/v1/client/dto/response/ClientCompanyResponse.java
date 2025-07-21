@@ -24,6 +24,9 @@ public record ClientCompanyResponse(
         @Schema(description = "대표자명", example = "홍길동")
         String ceoName,
 
+        @Schema(description = "이메일", example = "contact@samsung.com")
+        String email,
+
         @Schema(description = "주소", example = "서울시 강남구")
         String address,
 
@@ -63,6 +66,7 @@ public record ClientCompanyResponse(
                 clientCompany.getBusinessNumber(),
                 clientCompany.getName(),
                 clientCompany.getCeoName(),
+                clientCompany.getEmail(),
                 clientCompany.getAddress(),
                 clientCompany.getDetailAddress(),
                 clientCompany.getLandlineNumber(),

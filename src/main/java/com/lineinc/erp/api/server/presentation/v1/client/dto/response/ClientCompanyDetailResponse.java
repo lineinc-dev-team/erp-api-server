@@ -37,6 +37,9 @@ public record ClientCompanyDetailResponse(
         @Schema(description = "담당자 연락처", example = "010-1234-5678")
         String phoneNumber,
 
+        @Schema(description = "이메일 주소", example = "client@example.com")
+        String email,
+
         @Schema(description = "결제 방식", example = "CASH")
         PaymentMethod paymentMethod,
 
@@ -74,6 +77,7 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getDetailAddress(),
                 clientCompany.getLandlineNumber(),
                 clientCompany.getPhoneNumber(),
+                clientCompany.getEmail(),
                 clientCompany.getPaymentMethod(),
                 clientCompany.getPaymentPeriod(),
                 clientCompany.isActive(),
