@@ -4,9 +4,7 @@ import com.lineinc.erp.api.server.application.client.ClientCompanyService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
-import com.lineinc.erp.api.server.common.response.PagingInfo;
-import com.lineinc.erp.api.server.common.response.PagingResponse;
-import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.response.*;
 import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
@@ -25,6 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +47,7 @@ public class ClientCompanyController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
     })
     @PostMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createClientCompany(
             @Valid @RequestBody ClientCompanyCreateRequest request
     ) {
@@ -64,6 +64,7 @@ public class ClientCompanyController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
     })
     @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
@@ -79,6 +80,25 @@ public class ClientCompanyController {
         ));
     }
 
+    @Operation(summary = "발주처 이름 키워드 검색", description = "발주처 이름으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "검색 성공")
+    })
+    @GetMapping("/search")
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyResponse.Simple>>> searchClientCompanyByName(
+            @Valid SortRequest sortRequest,
+            @Valid PageRequest pageRequest,
+            @RequestParam String keyword
+    ) {
+        Slice<ClientCompanyResponse.Simple> slice = clientCompanyService.searchClientCompanyByName(keyword,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
+        ));
+    }
+
     @Operation(
             summary = "발주처 삭제",
             description = "하나 이상의 발주처 ID를 받아 해당 발주처를 삭제합니다"
@@ -88,6 +108,7 @@ public class ClientCompanyController {
             @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
     })
     @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteClientCompanies(@RequestBody DeleteClientCompaniesRequest clientCompanyIds) {
         clientCompanyService.deleteClientCompanies(clientCompanyIds);
         return ResponseEntity.ok().build();
@@ -103,6 +124,7 @@ public class ClientCompanyController {
             @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
     })
     @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateClientCompany(
             @PathVariable Long id,
             @Valid @RequestBody ClientCompanyUpdateRequest request
@@ -149,6 +171,7 @@ public class ClientCompanyController {
             @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
     })
     @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<ClientCompanyDetailResponse>> getClientCompanyById(
             @PathVariable Long id
     ) {

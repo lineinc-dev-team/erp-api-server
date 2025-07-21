@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -166,5 +167,11 @@ public class ClientCompanyService {
     public ClientCompanyDetailResponse getClientCompanyById(Long id) {
         ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
         return ClientCompanyDetailResponse.from(clientCompany);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<ClientCompanyResponse.Simple> searchClientCompanyByName(String keyword, Pageable pageable) {
+        Slice<ClientCompany> companySlice = clientCompanyRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        return companySlice.map(ClientCompanyResponse.Simple::from);
     }
 }

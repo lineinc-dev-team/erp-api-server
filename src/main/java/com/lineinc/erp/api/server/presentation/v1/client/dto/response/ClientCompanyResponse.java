@@ -78,4 +78,17 @@ public record ClientCompanyResponse(
                 clientCompany.getUser() != null ? UserResponse.Simple.from(clientCompany.getUser()) : null
         );
     }
+
+    @Schema(description = "간단한 발주처 응답")
+    public static record Simple(
+            @Schema(description = "발주처 ID", example = "123")
+            Long id,
+
+            @Schema(description = "발주처 이름", example = "삼성건설")
+            String name
+    ) {
+        public static Simple from(ClientCompany clientCompany) {
+            return new Simple(clientCompany.getId(), clientCompany.getName());
+        }
+    }
 }

@@ -77,7 +77,7 @@ public record UserResponse(
     ) {
     }
 
-    @Schema(description = "간단한 유저 응답 (id, 이름만 포함)")
+    @Schema(description = "간단한 유저 응답")
     public static record Simple(
             @Schema(description = "사용자 ID", example = "123")
             Long id,
