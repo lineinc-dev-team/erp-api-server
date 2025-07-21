@@ -39,9 +39,6 @@ public class ClientCompany extends BaseEntity {
     @Column
     private String ceoName;
 
-    /**
-     * 본사 주소
-     */
     @Column
     private String address;
 
