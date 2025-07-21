@@ -6,7 +6,7 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -14,7 +14,7 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-@Where(clause = "deleted = false")
+@SQLRestriction("deleted = false")
 public class Permission extends BaseEntity {
 
     @Id

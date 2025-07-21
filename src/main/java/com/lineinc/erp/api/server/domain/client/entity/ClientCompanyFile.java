@@ -6,7 +6,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@Where(clause = "deleted = false")
+@SQLRestriction("deleted = false")
 public class ClientCompanyFile extends BaseEntity implements UpdatableFrom<ClientCompanyFileUpdateRequest> {
 
     @Id
