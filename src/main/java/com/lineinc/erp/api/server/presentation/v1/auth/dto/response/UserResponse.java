@@ -78,15 +78,15 @@ public record UserResponse(
     }
 
     @Schema(description = "간단한 유저 응답")
-    public static record Simple(
+    public static record UserSimpleResponse(
             @Schema(description = "사용자 ID", example = "123")
             Long id,
 
             @Schema(description = "사용자 이름", example = "홍길동")
             String username
     ) {
-        public static Simple from(User user) {
-            return new Simple(user.getId(), user.getUsername());
+        public static UserSimpleResponse from(User user) {
+            return new UserSimpleResponse(user.getId(), user.getUsername());
         }
     }
 }

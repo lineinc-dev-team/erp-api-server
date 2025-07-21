@@ -170,8 +170,8 @@ public class ClientCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanyResponse.Simple> searchClientCompanyByName(String keyword, Pageable pageable) {
+    public Slice<ClientCompanyResponse.ClientCompanySimpleResponse> searchClientCompanyByName(String keyword, Pageable pageable) {
         Slice<ClientCompany> companySlice = clientCompanyRepository.findByNameContainingIgnoreCase(keyword, pageable);
-        return companySlice.map(ClientCompanyResponse.Simple::from);
+        return companySlice.map(ClientCompanyResponse.ClientCompanySimpleResponse::from);
     }
 }

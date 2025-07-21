@@ -62,7 +62,7 @@ public record ClientCompanyDetailResponse(
         List<ClientCompanyFileResponse> files,
 
         @Schema(description = "본사 담당자")
-        UserResponse.Simple user
+        UserResponse.UserSimpleResponse user
 ) {
     public static ClientCompanyDetailResponse from(ClientCompany clientCompany) {
         return new ClientCompanyDetailResponse(
@@ -86,7 +86,7 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getFiles().stream()
                         .map(ClientCompanyFileResponse::from)
                         .collect(Collectors.toList()),
-                clientCompany.getUser() != null ? UserResponse.Simple.from(clientCompany.getUser()) : null
+                clientCompany.getUser() != null ? UserResponse.UserSimpleResponse.from(clientCompany.getUser()) : null
         );
     }
 }

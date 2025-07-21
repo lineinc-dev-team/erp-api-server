@@ -81,12 +81,12 @@ public class UserController {
     })
     @GetMapping("/search")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<UserResponse.Simple>>> searchUsersByName(
+    public ResponseEntity<SuccessResponse<SliceResponse<UserResponse.UserSimpleResponse>>> searchUsersByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
             @RequestParam String keyword
     ) {
-        Slice<UserResponse.Simple> slice = userService.searchUsersByName(keyword,
+        Slice<UserResponse.UserSimpleResponse> slice = userService.searchUsersByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(

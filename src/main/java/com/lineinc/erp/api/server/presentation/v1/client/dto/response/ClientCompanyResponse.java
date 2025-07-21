@@ -55,7 +55,7 @@ public record ClientCompanyResponse(
         List<ClientCompanyContactResponse> contacts,
 
         @Schema(description = "본사 담당자")
-        UserResponse.Simple user
+        UserResponse.UserSimpleResponse user
 ) {
     public static ClientCompanyResponse from(ClientCompany clientCompany) {
         return new ClientCompanyResponse(
@@ -75,20 +75,20 @@ public record ClientCompanyResponse(
                 clientCompany.getContacts().stream()
                         .map(ClientCompanyContactResponse::from)
                         .collect(Collectors.toList()),
-                clientCompany.getUser() != null ? UserResponse.Simple.from(clientCompany.getUser()) : null
+                clientCompany.getUser() != null ? UserResponse.UserSimpleResponse.from(clientCompany.getUser()) : null
         );
     }
 
     @Schema(description = "간단한 발주처 응답")
-    public static record Simple(
+    public static record ClientCompanySimpleResponse(
             @Schema(description = "발주처 ID", example = "123")
             Long id,
 
             @Schema(description = "발주처 이름", example = "삼성건설")
             String name
     ) {
-        public static Simple from(ClientCompany clientCompany) {
-            return new Simple(clientCompany.getId(), clientCompany.getName());
+        public static ClientCompanySimpleResponse from(ClientCompany clientCompany) {
+            return new ClientCompanySimpleResponse(clientCompany.getId(), clientCompany.getName());
         }
     }
 }

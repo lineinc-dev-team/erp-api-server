@@ -154,9 +154,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<UserResponse.Simple> searchUsersByName(String keyword, Pageable pageable) {
+    public Slice<UserResponse.UserSimpleResponse> searchUsersByName(String keyword, Pageable pageable) {
         Slice<User> userSlice = usersRepository.findByUsernameContainingIgnoreCase(keyword, pageable);
-        return userSlice.map(UserResponse.Simple::from);
+        return userSlice.map(UserResponse.UserSimpleResponse::from);
     }
 
     @Transactional(readOnly = true)

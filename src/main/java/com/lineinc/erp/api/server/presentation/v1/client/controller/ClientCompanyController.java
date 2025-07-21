@@ -86,12 +86,12 @@ public class ClientCompanyController {
     })
     @GetMapping("/search")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyResponse.Simple>>> searchClientCompanyByName(
+    public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyResponse.ClientCompanySimpleResponse>>> searchClientCompanyByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
             @RequestParam String keyword
     ) {
-        Slice<ClientCompanyResponse.Simple> slice = clientCompanyService.searchClientCompanyByName(keyword,
+        Slice<ClientCompanyResponse.ClientCompanySimpleResponse> slice = clientCompanyService.searchClientCompanyByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
