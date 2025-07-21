@@ -1,0 +1,35 @@
+package com.lineinc.erp.api.server.domain.site.entity;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@SuperBuilder
+public class SiteProcess extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_process_seq")
+    @SequenceGenerator(name = "site_process_seq", sequenceName = "site_process_seq", allocationSize = 1)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id", nullable = false)
+    private Site site;  // 현장
+
+    @Column(nullable = false)
+    private String name;  // 공정명
+
+    @Column
+    private String officePhone;  // 사무실 연락처
+
+    @Column
+    private String status;  // 진행 상태
+
+    @Column(columnDefinition = "TEXT")
+    private String memo;  // 비고
+}

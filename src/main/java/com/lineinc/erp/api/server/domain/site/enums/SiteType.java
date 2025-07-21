@@ -13,13 +13,4 @@ public enum SiteType {
     SiteType(String label) {
         this.label = label;
     }
-
-    public static SiteType fromLabel(String label) {
-        for (SiteType type : values()) {
-            if (type.label.equals(label)) {
-                return type;
-            }
-        }
-        throw new IllegalArgumentException("Unknown site type label: " + label);
-    }
 }
