@@ -106,7 +106,7 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
             builder.and(clientCompany.ceoName.containsIgnoreCase(request.ceoName().trim()));
         }
         if (StringUtils.hasText(request.contactName())) {
-            builder.and(clientCompanyContact.name.containsIgnoreCase(request.contactName().trim()));
+            builder.and(clientCompany.contacts.any().name.containsIgnoreCase(request.contactName().trim()));
         }
         if (StringUtils.hasText(request.email())) {
             builder.and(clientCompany.email.containsIgnoreCase(request.email().trim()));
