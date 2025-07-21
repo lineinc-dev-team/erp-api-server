@@ -29,6 +29,9 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "본사 주소", example = "서울시 강남구")
         String address,
 
+        @Schema(description = "상세 주소", example = "강남구 테헤란로 123")
+        String detailAddress,
+
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
         @Schema(description = "담당자 유선 전화번호", example = "02-123-5678")
         String landlineNumber,
@@ -52,6 +55,9 @@ public record ClientCompanyCreateRequest(
 
         @Schema(description = "사용 여부", example = "true")
         boolean isActive,
+
+        @Schema(description = "본사 담당자 ID", example = "123")
+        Long userId,
 
         @Valid
         @Schema(description = "담당자 목록")

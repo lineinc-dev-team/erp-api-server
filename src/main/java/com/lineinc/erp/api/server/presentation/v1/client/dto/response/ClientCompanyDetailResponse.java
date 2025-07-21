@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
@@ -26,6 +27,9 @@ public record ClientCompanyDetailResponse(
 
         @Schema(description = "주소", example = "서울시 강남구")
         String address,
+
+        @Schema(description = "상세 주소", example = "강남구 테헤란로 123")
+        String detailAddress,
 
         @Schema(description = "유선 전화번호", example = "02-1234-5678")
         String landlineNumber,
@@ -55,7 +59,10 @@ public record ClientCompanyDetailResponse(
         List<ClientCompanyContactResponse> contacts,
 
         @Schema(description = "발주처 파일 목록")
-        List<ClientCompanyFileResponse> files
+        List<ClientCompanyFileResponse> files,
+
+        @Schema(description = "본사 담당자")
+        UserResponse.Simple user
 ) {
     public static ClientCompanyDetailResponse from(ClientCompany clientCompany) {
         return new ClientCompanyDetailResponse(
@@ -64,6 +71,7 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getName(),
                 clientCompany.getCeoName(),
                 clientCompany.getAddress(),
+                clientCompany.getDetailAddress(),
                 clientCompany.getPhoneNumber(),
                 clientCompany.getLandlineNumber(),
                 clientCompany.getPaymentMethod(),
@@ -77,7 +85,8 @@ public record ClientCompanyDetailResponse(
                         .collect(Collectors.toList()),
                 clientCompany.getFiles().stream()
                         .map(ClientCompanyFileResponse::from)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                clientCompany.getUser() != null ? UserResponse.Simple.from(clientCompany.getUser()) : null
         );
     }
 }

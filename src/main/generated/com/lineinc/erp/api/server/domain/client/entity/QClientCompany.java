@@ -18,6 +18,8 @@ public class QClientCompany extends EntityPathBase<ClientCompany> {
 
     private static final long serialVersionUID = 735863323L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QClientCompany clientCompany = new QClientCompany("clientCompany");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
@@ -41,6 +43,8 @@ public class QClientCompany extends EntityPathBase<ClientCompany> {
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
+
+    public final StringPath detailAddress = createString("detailAddress");
 
     public final StringPath email = createString("email");
 
@@ -68,16 +72,27 @@ public class QClientCompany extends EntityPathBase<ClientCompany> {
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
 
+    public final com.lineinc.erp.api.server.domain.user.entity.QUser user;
+
     public QClientCompany(String variable) {
-        super(ClientCompany.class, forVariable(variable));
+        this(ClientCompany.class, forVariable(variable), INITS);
     }
 
     public QClientCompany(Path<? extends ClientCompany> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QClientCompany(PathMetadata metadata) {
-        super(ClientCompany.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QClientCompany(PathMetadata metadata, PathInits inits) {
+        this(ClientCompany.class, metadata, inits);
+    }
+
+    public QClientCompany(Class<? extends ClientCompany> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.user = inits.isInitialized("user") ? new com.lineinc.erp.api.server.domain.user.entity.QUser(forProperty("user")) : null;
     }
 
 }

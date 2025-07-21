@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.client;
 
+import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
@@ -30,6 +31,7 @@ public class ClientCompanyService {
     private final ClientCompanyRepository clientCompanyRepository;
     private final ClientCompanyContactService contactService;
     private final ClientCompanyFileService fileService;
+    private final UserService userService;
 
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
@@ -40,9 +42,11 @@ public class ClientCompanyService {
                 .businessNumber(request.businessNumber())
                 .ceoName(request.ceoName())
                 .address(request.address())
+                .detailAddress(request.detailAddress())
                 .landlineNumber(request.landlineNumber())
                 .phoneNumber(request.phoneNumber())
                 .email(request.email())
+                .user(request.userId() != null ? userService.getUserByIdOrThrow(request.userId()) : null)
                 .paymentMethod(request.paymentMethod())
                 .paymentPeriod(request.paymentPeriod())
                 .memo(request.memo())
@@ -94,6 +98,13 @@ public class ClientCompanyService {
 
         // 기본 필드 업데이트
         clientCompany.updateFrom(request);
+
+        // 본사 담당자 정보 업데이트
+        if (request.userId() != null) {
+            clientCompany.setUser(userService.getUserByIdOrThrow(request.userId()));
+        } else {
+            clientCompany.setUser(null);
+        }
 
         // 담당자 정보 갱신
         contactService.updateClientCompanyContacts(clientCompany, request.contacts());

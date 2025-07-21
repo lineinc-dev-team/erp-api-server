@@ -20,8 +20,11 @@ public record ClientCompanyUpdateRequest(
         @Schema(description = "대표자명", example = "홍길동")
         String ceoName,
 
-        @Schema(description = "본사 주소", example = "서울시 강남구")
+        @Schema(description = "주소", example = "서울시 강남구")
         String address,
+
+        @Schema(description = "상세 주소", example = "강남대로 123, 3층")
+        String detailAddress,
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
         @Schema(description = "담당자 유선 전화번호", example = "02-123-5678")
@@ -46,6 +49,9 @@ public record ClientCompanyUpdateRequest(
 
         @Schema(description = "사용 여부", example = "true")
         Boolean isActive,
+
+        @Schema(description = "본사 담당자 ID", example = "123")
+        Long userId,
 
         @Valid
         @Schema(description = "담당자 목록")

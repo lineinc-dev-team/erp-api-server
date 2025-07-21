@@ -80,7 +80,7 @@ public class QSite extends EntityPathBase<Site> {
 
     public QSite(Class<? extends Site> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.clientCompany = inits.isInitialized("clientCompany") ? new com.lineinc.erp.api.server.domain.client.entity.QClientCompany(forProperty("clientCompany")) : null;
+        this.clientCompany = inits.isInitialized("clientCompany") ? new com.lineinc.erp.api.server.domain.client.entity.QClientCompany(forProperty("clientCompany"), inits.get("clientCompany")) : null;
         this.user = inits.isInitialized("user") ? new com.lineinc.erp.api.server.domain.user.entity.QUser(forProperty("user")) : null;
     }
 

@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
@@ -26,6 +27,9 @@ public record ClientCompanyResponse(
         @Schema(description = "주소", example = "서울시 강남구")
         String address,
 
+        @Schema(description = "상세 주소", example = "강남구 테헤란로 123")
+        String detailAddress,
+
         @Schema(description = "유선 전화번호", example = "02-1234-5678")
         String landlineNumber,
 
@@ -48,7 +52,10 @@ public record ClientCompanyResponse(
         String memo,
 
         @Schema(description = "발주처 담당자 목록")
-        List<ClientCompanyContactResponse> contacts
+        List<ClientCompanyContactResponse> contacts,
+
+        @Schema(description = "본사 담당자")
+        UserResponse.Simple user
 ) {
     public static ClientCompanyResponse from(ClientCompany clientCompany) {
         return new ClientCompanyResponse(
@@ -57,6 +64,7 @@ public record ClientCompanyResponse(
                 clientCompany.getName(),
                 clientCompany.getCeoName(),
                 clientCompany.getAddress(),
+                clientCompany.getDetailAddress(),
                 clientCompany.getPhoneNumber(),
                 clientCompany.getLandlineNumber(),
                 clientCompany.isActive(),
@@ -66,7 +74,8 @@ public record ClientCompanyResponse(
                 clientCompany.getMemo(),
                 clientCompany.getContacts().stream()
                         .map(ClientCompanyContactResponse::from)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                clientCompany.getUser() != null ? UserResponse.Simple.from(clientCompany.getUser()) : null
         );
     }
 }

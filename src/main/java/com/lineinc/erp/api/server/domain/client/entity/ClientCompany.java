@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.client.entity;
 
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,6 +44,9 @@ public class ClientCompany extends BaseEntity {
     private String address;
 
     @Column
+    private String detailAddress;
+
+    @Column
     private String landlineNumber;
 
     @Column
@@ -63,6 +67,13 @@ public class ClientCompany extends BaseEntity {
      */
     @Column
     private String paymentPeriod;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Where(clause = "deleted = false")
+    @OrderBy("id ASC")
+    @JoinColumn(name = "user_id")
+    private User user; // 본사 담당자
 
     /**
      * 발주처 담당자 목록
@@ -100,6 +111,7 @@ public class ClientCompany extends BaseEntity {
         Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
         Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
         Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
+        Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);

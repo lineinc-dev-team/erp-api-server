@@ -158,4 +158,10 @@ public class UserService {
         Slice<User> userSlice = usersRepository.findByUsernameContainingIgnoreCase(keyword, pageable);
         return userSlice.map(UserResponse.Simple::from);
     }
+
+    @Transactional(readOnly = true)
+    public User getUserByIdOrThrow(Long id) {
+        return usersRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+    }
 }
