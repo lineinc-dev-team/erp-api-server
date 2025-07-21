@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserReq
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@Where(clause = "deleted = false")
 public class User extends BaseEntity implements UserDetails {
 
     @Serial

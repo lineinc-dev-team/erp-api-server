@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@Where(clause = "deleted = false")
 public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<ClientCompanyContactUpdateRequest> {
 
     @Id

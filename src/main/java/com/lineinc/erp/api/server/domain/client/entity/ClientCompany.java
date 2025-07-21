@@ -21,6 +21,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@Where(clause = "deleted = false")
 public class ClientCompany extends BaseEntity {
 
     @Id
@@ -70,8 +71,6 @@ public class ClientCompany extends BaseEntity {
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
     @JoinColumn(name = "user_id")
     private User user; // 본사 담당자
 
@@ -79,8 +78,6 @@ public class ClientCompany extends BaseEntity {
      * 발주처 담당자 목록
      */
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
     @Builder.Default
     private List<ClientCompanyContact> contacts = new ArrayList<>();
 
@@ -88,8 +85,6 @@ public class ClientCompany extends BaseEntity {
      * 발주처 관련 첨부파일 목록
      */
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
     @Builder.Default
     private List<ClientCompanyFile> files = new ArrayList<>();
 

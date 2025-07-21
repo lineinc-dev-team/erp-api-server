@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @SuperBuilder
 @Table(name = "roles")
+@Where(clause = "deleted = false")
 public class Role extends BaseEntity implements Serializable {
 
     @Id

@@ -4,12 +4,14 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@Where(clause = "deleted = false")
 public class Department extends BaseEntity {
 
     @Id

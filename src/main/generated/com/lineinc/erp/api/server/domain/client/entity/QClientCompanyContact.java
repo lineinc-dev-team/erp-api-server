@@ -76,7 +76,7 @@ public class QClientCompanyContact extends EntityPathBase<ClientCompanyContact> 
 
     public QClientCompanyContact(Class<? extends ClientCompanyContact> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.clientCompany = inits.isInitialized("clientCompany") ? new QClientCompany(forProperty("clientCompany")) : null;
+        this.clientCompany = inits.isInitialized("clientCompany") ? new QClientCompany(forProperty("clientCompany"), inits.get("clientCompany")) : null;
     }
 
 }

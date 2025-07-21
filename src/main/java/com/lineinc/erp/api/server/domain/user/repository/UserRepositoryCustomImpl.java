@@ -71,7 +71,6 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     private BooleanBuilder buildCondition(UserListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(user.deleted.isFalse());
 
         if (StringUtils.hasText(request.username())) {
             builder.and(user.username.containsIgnoreCase(request.username().trim()));

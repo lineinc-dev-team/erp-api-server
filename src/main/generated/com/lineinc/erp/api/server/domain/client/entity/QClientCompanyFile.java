@@ -72,7 +72,7 @@ public class QClientCompanyFile extends EntityPathBase<ClientCompanyFile> {
 
     public QClientCompanyFile(Class<? extends ClientCompanyFile> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.clientCompany = inits.isInitialized("clientCompany") ? new QClientCompany(forProperty("clientCompany")) : null;
+        this.clientCompany = inits.isInitialized("clientCompany") ? new QClientCompany(forProperty("clientCompany"), inits.get("clientCompany")) : null;
     }
 
 }

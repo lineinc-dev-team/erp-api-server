@@ -32,13 +32,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
         String search = (request != null) ? request.userSearch() : null;
 
-        BooleanExpression notDeleted = role.deleted.isFalse();
-        BooleanExpression userSearchPredicate = containsSearch(user, search);
-
-        BooleanExpression whereCondition = notDeleted;
-        if (userSearchPredicate != null) {
-            whereCondition = notDeleted.and(userSearchPredicate);
-        }
+        BooleanExpression whereCondition = containsSearch(user, search);
 
         // fetchJoin 사용: role.users 컬렉션을 한 번에 같이 조회
         List<Role> content = queryFactory
