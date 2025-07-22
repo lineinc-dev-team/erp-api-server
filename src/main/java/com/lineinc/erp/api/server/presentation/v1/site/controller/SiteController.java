@@ -11,9 +11,14 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
+
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -65,4 +70,18 @@ public class SiteController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
     }
+
+    @Operation(summary = "현장 삭제", description = "하나 이상의 현장 ID를 받아 해당 현장을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "현장 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "현장을 찾을 수 없음")
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteSites(@RequestBody DeleteSitesRequest siteIds) {
+        siteService.deleteSites(siteIds);
+        return ResponseEntity.ok().build();
+    }
 }
+
+

@@ -14,7 +14,9 @@ import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -82,5 +85,19 @@ public class SiteService {
     @Transactional(readOnly = true)
     public Page<SiteResponse> getAllSites(SiteListRequest request, Pageable pageable) {
         return siteRepository.findAll(request, pageable);
+    }
+
+    @Transactional
+    public void deleteSites(DeleteSitesRequest request) {
+        List<Site> sites = siteRepository.findAllById(request.siteIds());
+        if (sites.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND);
+        }
+
+        for (Site site : sites) {
+            site.markAsDeleted();
+        }
+
+        siteRepository.saveAll(sites);
     }
 }

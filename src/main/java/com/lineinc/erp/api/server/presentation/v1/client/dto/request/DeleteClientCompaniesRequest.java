@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
-@Schema(description = "유저 삭제 요청")
+@Schema(description = "발주처 삭제 요청")
 public record DeleteClientCompaniesRequest(
         @NotEmpty
-        @Schema(description = "삭제할 클라이언트 회사 ID 목록", example = "[1, 2, 3]")
+        @Schema(description = "삭제할 발주처 ID 목록", example = "[1, 2, 3]")
         List<Long> clientCompanyIds
 ) {
 }
