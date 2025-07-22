@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 
 import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 
@@ -44,6 +45,9 @@ public record SiteResponse(
         @Schema(description = "등록일")
         OffsetDateTime createdAt,
 
+        @Schema(description = "등록자", example = "홍길동")
+        String createdBy,
+
         @Schema(description = "수정일")
         OffsetDateTime updatedAt,
 
@@ -52,7 +56,10 @@ public record SiteResponse(
 
         @Valid
         @Schema(description = "공정 정보")
-        SiteProcessResponse process
+        SiteProcessResponse process,
+
+        @Schema(description = "발주처 정보")
+        ClientCompanyResponse.ClientCompanySimpleResponse clientCompany
 ) {
     public static SiteResponse from(Site site) {
         return new SiteResponse(
@@ -68,11 +75,13 @@ public record SiteResponse(
                 site.getContractAmount(),
                 site.getMemo(),
                 site.getCreatedAt(),
+                site.getCreatedBy(),
                 site.getUpdatedAt(),
                 site.getContracts() != null && site.getContracts().stream().flatMap(c -> c.getFiles().stream()).findAny().isPresent(),
                 site.getProcesses() != null && !site.getProcesses().isEmpty()
                         ? SiteProcessResponse.from(site.getProcesses().get(0))
-                        : null
+                        : null,
+                site.getClientCompany() != null ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany()) : null
         );
     }
 }

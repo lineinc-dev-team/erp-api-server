@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.client.repository;
 
+import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.QClientCompany;
@@ -119,12 +120,12 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         }
 
         if (request.createdStartDate() != null) {
-            // atOffset(ZoneOffset.UTC)는 LocalDateTime → OffsetDateTime 변환 (UTC 기준)
+            // atOffset(AppConstants.KOREA_ZONE_OFFSET)는 LocalDateTime → OffsetDateTime 변환 (KST 기준)
             // goe는 Greater or Equal의 약자로 '이상' 조건을 뜻함
             builder.and(clientCompany.createdAt.goe(
                     request.createdStartDate()
                             .atStartOfDay()
-                            .atOffset(ZoneOffset.UTC)
+                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
             ));
         }
 
@@ -134,7 +135,7 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
                     request.createdEndDate()
                             .plusDays(1)    // endDate에 하루 더해 다음 날 00시로 만듦 (범위 포함 위해)
                             .atStartOfDay()
-                            .atOffset(ZoneOffset.UTC)
+                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
             ));
         }
 

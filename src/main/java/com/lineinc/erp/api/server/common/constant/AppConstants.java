@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.common.constant;
 
 import java.util.List;
+import java.time.ZoneOffset;
 
 public final class AppConstants {
 
@@ -72,6 +73,8 @@ public final class AppConstants {
             DEPT_SALES
     );
 
+    // 시간 관련 상수
+    public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
 
     private AppConstants() {
     } // 인스턴스화 방지

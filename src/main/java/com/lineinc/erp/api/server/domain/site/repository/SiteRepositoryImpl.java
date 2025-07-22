@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import static com.lineinc.erp.api.server.common.constant.AppConstants.KOREA_ZONE_OFFSET;
+
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +35,6 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     private final QSite site = QSite.site;
     private final QSiteProcess siteProcess = QSiteProcess.siteProcess;
-    private final QSiteContract siteContract = QSiteContract.siteContract;
-    private final QSiteFile siteFile = QSiteFile.siteFile;
 
     // 정렬 필드를 미리 정의하여 정적 매핑.
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
@@ -63,7 +63,8 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         List<Site> content = queryFactory
                 .selectFrom(site)
                 .leftJoin(site.clientCompany).fetchJoin()
-                .leftJoin(site.processes, siteProcess).fetchJoin()
+                .leftJoin(site.processes, siteProcess)
+                .fetchJoin()
                 .distinct()
                 .where(condition)
                 .orderBy(orders)
@@ -98,22 +99,24 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         if (StringUtils.hasText(request.name())) {
             builder.and(site.name.containsIgnoreCase(request.name().trim()));
         }
+
         SiteType type = request.type();
         if (type != null) {
             builder.and(site.type.eq(type));
         }
         if (StringUtils.hasText(request.processName())) {
-            builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
+            builder.and(site.processes.any().name.containsIgnoreCase(request.processName().trim()));
         }
         if (StringUtils.hasText(request.city())) {
-            builder.and(site.city.containsIgnoreCase(request.city().trim()));
+            builder.and(site.city.eq(request.city().trim()));
         }
         if (StringUtils.hasText(request.district())) {
-            builder.and(site.district.containsIgnoreCase(request.district().trim()));
+            builder.and(site.district.eq(request.district().trim()));
         }
+
         SiteProcessStatus siteProcessStatus = request.processStatus();
         if (siteProcessStatus != null) {
-            builder.and(siteProcess.status.eq(siteProcessStatus));
+            builder.and(site.processes.any().status.eq(siteProcessStatus));
         }
         if (StringUtils.hasText(request.clientCompanyName())) {
             builder.and(site.clientCompany.name.containsIgnoreCase(request.clientCompanyName().trim()));
@@ -126,7 +129,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             builder.and(site.startedAt.goe(
                     request.startDate()
                             .atStartOfDay()
-                            .atOffset(ZoneOffset.UTC)
+                            .atOffset(KOREA_ZONE_OFFSET)
             ));
         }
 
@@ -135,7 +138,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
                     request.endDate()
                             .plusDays(1)
                             .atStartOfDay()
-                            .atOffset(ZoneOffset.UTC)
+                            .atOffset(KOREA_ZONE_OFFSET)
             ));
         }
 
@@ -143,7 +146,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             builder.and(site.createdAt.goe(
                     request.createdStartDate()
                             .atStartOfDay()
-                            .atOffset(ZoneOffset.UTC)
+                            .atOffset(KOREA_ZONE_OFFSET)
             ));
         }
 
@@ -152,7 +155,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
                     request.createdEndDate()
                             .plusDays(1)
                             .atStartOfDay()
-                            .atOffset(ZoneOffset.UTC)
+                            .atOffset(KOREA_ZONE_OFFSET)
             ));
         }
 

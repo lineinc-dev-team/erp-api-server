@@ -18,6 +18,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.ZoneOffset;
+
+import static com.lineinc.erp.api.server.common.constant.AppConstants.KOREA_ZONE_OFFSET;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,19 +87,19 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         }
 
         if (request.createdStartDate() != null) {
-            builder.and(user.createdAt.goe(request.createdStartDate().atStartOfDay().atOffset(ZoneOffset.UTC)));
+            builder.and(user.createdAt.goe(request.createdStartDate().atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
         }
 
         if (request.createdEndDate() != null) {
-            builder.and(user.createdAt.lt(request.createdEndDate().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC)));
+            builder.and(user.createdAt.lt(request.createdEndDate().plusDays(1).atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
         }
 
         if (request.lastLoginStartDate() != null) {
-            builder.and(user.lastLoginAt.goe(request.lastLoginStartDate().atStartOfDay().atOffset(ZoneOffset.UTC)));
+            builder.and(user.lastLoginAt.goe(request.lastLoginStartDate().atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
         }
 
         if (request.lastLoginEndDate() != null) {
-            builder.and(user.lastLoginAt.lt(request.lastLoginEndDate().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC)));
+            builder.and(user.lastLoginAt.lt(request.lastLoginEndDate().plusDays(1).atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
         }
 
         return builder;
