@@ -70,7 +70,7 @@ public class ClientCompanyService {
     @Transactional(readOnly = true)
     public ClientCompany getClientCompanyByIdOrThrow(Long id) {
         return clientCompanyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND));
     }
 
     @Transactional

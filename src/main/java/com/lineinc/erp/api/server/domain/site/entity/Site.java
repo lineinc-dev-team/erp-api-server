@@ -53,7 +53,7 @@ public class Site extends BaseEntity {
     @Column
     private OffsetDateTime endDate; // 사업 종료일
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user; // 본사 담당자
 

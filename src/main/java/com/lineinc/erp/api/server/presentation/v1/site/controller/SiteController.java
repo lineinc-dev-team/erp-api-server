@@ -25,6 +25,7 @@ public class SiteController {
     @Operation(summary = "현장 등록", description = "현장 정보를 등록합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "현장 등록 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저 또는 발주처를 등록하려는 경우"),
             @ApiResponse(responseCode = "400", description = "입력값 오류")
     })
     @PostMapping
