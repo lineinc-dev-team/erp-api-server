@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -85,6 +86,21 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
+    }
+
+    @Override
+    public List<Site> findAllWithoutPaging(SiteListRequest request, Sort sort) {
+        BooleanBuilder condition = buildCondition(request);
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        return queryFactory
+                .selectFrom(site)
+                .leftJoin(site.clientCompany).fetchJoin()
+                .leftJoin(site.processes, siteProcess).fetchJoin()
+                .distinct()
+                .where(condition)
+                .orderBy(orders)
+                .fetch();
     }
 
     /**

@@ -152,7 +152,7 @@ public class ClientCompanyService {
             case "businessNumber" -> company.businessNumber();
             case "name" -> company.name();
             case "ceoName" -> company.ceoName();
-            case "address" -> company.address();
+            case "address" -> company.address() + " " + company.detailAddress();
             case "phoneNumber" -> company.phoneNumber();
             case "isActive" -> String.valueOf(company.isActive());
             case "createdAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(company.createdAt());

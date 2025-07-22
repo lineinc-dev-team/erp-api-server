@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.application.client.ClientCompanyService;
 import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -21,8 +22,10 @@ import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateReq
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,5 +102,57 @@ public class SiteService {
         }
 
         siteRepository.saveAll(sites);
+    }
+
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(SiteListRequest request, Sort sort, List<String> fields) {
+        List<SiteResponse> siteResponses = siteRepository.findAllWithoutPaging(request, sort)
+                .stream()
+                .map(SiteResponse::from)
+                .toList();
+
+        return ExcelExportUtils.generateWorkbook(
+                siteResponses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue
+        );
+    }
+
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "name" -> "현장명";
+            case "processName" -> "공정명";
+            case "address" -> "위치";
+            case "type" -> "현장유형";
+            case "clientCompanyName" -> "발주처명";
+            case "period" -> "사업기간";
+            case "processStatuses" -> "진행상태";
+            case "createdBy" -> "등록자";
+            case "createdAt" -> "등록일자";
+            case "hasFile" -> "첨부파일";
+            case "memo" -> "비고";
+            default -> null;
+        };
+    }
+
+    private String getExcelCellValue(SiteResponse siteResponse, String field) {
+        return switch (field) {
+            case "id" -> String.valueOf(siteResponse.id());
+            case "name" -> siteResponse.name();
+            case "processName" -> siteResponse.process().name();
+            case "address" -> siteResponse.address() + " " + siteResponse.detailAddress();
+            case "type" -> siteResponse.type();
+            case "clientCompanyName" -> siteResponse.clientCompany().name();
+            case "period" ->
+                    DateTimeFormatUtils.DATE_FORMATTER_YMD.format(siteResponse.startedAt()) + "~" + DateTimeFormatUtils.DATE_FORMATTER_YMD.format(siteResponse.endedAt());
+            case "processStatuses" -> siteResponse.process().status();
+            case "createdBy" -> siteResponse.createdBy();
+            case "createdAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(siteResponse.createdAt());
+            case "hasFile" -> siteResponse.hasFile() ? "Y" : "N";
+            case "memo" -> siteResponse.memo();
+            default -> null;
+        };
     }
 }
