@@ -46,7 +46,7 @@ public class QSiteProcess extends EntityPathBase<SiteProcess> {
 
     public final QSite site;
 
-    public final StringPath status = createString("status");
+    public final EnumPath<com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus> status = createEnum("status", com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus.class);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;

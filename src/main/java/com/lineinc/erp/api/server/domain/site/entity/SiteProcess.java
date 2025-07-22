@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -30,7 +31,7 @@ public class SiteProcess extends BaseEntity {
     private String officePhone;  // 사무실 연락처
 
     @Column
-    private String status;  // 진행 상태
+    private SiteProcessStatus status;  // 진행 상태
 
     @Column(columnDefinition = "TEXT")
     private String memo;  // 비고

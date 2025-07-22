@@ -30,6 +30,15 @@ public class Site extends BaseEntity {
     @Column
     private String address; // 주소
 
+    @Column
+    private String detailAddress; // 상세 주소
+
+    @Column
+    private String city; // 시
+
+    @Column
+    private String district; // 구
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SiteType type; // 현장 유형

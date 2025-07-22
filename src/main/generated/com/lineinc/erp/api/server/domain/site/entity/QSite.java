@@ -26,6 +26,8 @@ public class QSite extends EntityPathBase<Site> {
 
     public final StringPath address = createString("address");
 
+    public final StringPath city = createString("city");
+
     public final com.lineinc.erp.api.server.domain.client.entity.QClientCompany clientCompany;
 
     public final NumberPath<Long> contractAmount = createNumber("contractAmount", Long.class);
@@ -41,6 +43,10 @@ public class QSite extends EntityPathBase<Site> {
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
+
+    public final StringPath detailAddress = createString("detailAddress");
+
+    public final StringPath district = createString("district");
 
     public final DateTimePath<java.time.OffsetDateTime> endDate = createDateTime("endDate", java.time.OffsetDateTime.class);
 

@@ -1,5 +1,8 @@
 package com.lineinc.erp.api.server.common.util;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public final class DateTimeFormatUtils {
@@ -11,4 +14,11 @@ public final class DateTimeFormatUtils {
     public static final DateTimeFormatter DATE_FORMATTER_YMD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DATE_TIME_FORMATTER_YMD_HM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     public static final DateTimeFormatter DATE_TIME_FORMATTER_YMD_HMS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public static OffsetDateTime toOffsetDateTime(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+        return localDate.atStartOfDay().atOffset(ZoneOffset.ofHours(9));
+    }
 }

@@ -24,30 +24,16 @@ public final class AppConstants {
 
     // 시스템 기본 메뉴 이름 관련 상수
     public static final String MENU_ACCOUNT = "계정관리";
-    public static final String MENU_OUTSOURCING_SETTLEMENT = "외주정산";
-    public static final String MENU_CONTRACT = "계약/증빙";
-    public static final String MENU_MATERIAL = "자재관리";
-    public static final String MENU_OUTSOURCING = "외주관리";
-    public static final String MENU_HR = "노무관리";
-    public static final String MENU_EQUIPMENT = "장비관리";
-    public static final String MENU_TAX = "세금계산서";
-    public static final String MENU_REPORT = "통계/리포트";
     public static final String MENU_PERMISSION = "권한관리";
     public static final String MENU_CLIENT_COMPANY = "발주처 관리";
+    public static final String MENU_SITE = "현장관리";
 
     // 시스템 기본 메뉴 이름 목록
     public static final List<String> MENU_NAMES = List.of(
             MENU_ACCOUNT,
-            MENU_OUTSOURCING_SETTLEMENT,
-            MENU_CONTRACT,
-            MENU_MATERIAL,
-            MENU_OUTSOURCING,
-            MENU_HR,
-            MENU_EQUIPMENT,
-            MENU_TAX,
-            MENU_REPORT,
             MENU_PERMISSION,
-            MENU_CLIENT_COMPANY
+            MENU_CLIENT_COMPANY,
+            MENU_SITE
     );
 
     // 직급(Grade) 관련 상수
