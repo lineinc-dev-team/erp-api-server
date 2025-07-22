@@ -29,7 +29,9 @@ public class SiteContractService {
                     .build()
             );
 
-            siteFileService.createFiles(contract, contractReq.files());
+            if (contractReq.files() != null && !contractReq.files().isEmpty()) {
+                siteFileService.createFiles(contract, contractReq.files());
+            }
         }
     }
 }

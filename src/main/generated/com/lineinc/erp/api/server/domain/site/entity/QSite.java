@@ -32,6 +32,8 @@ public class QSite extends EntityPathBase<Site> {
 
     public final NumberPath<Long> contractAmount = createNumber("contractAmount", Long.class);
 
+    public final ListPath<SiteContract, QSiteContract> contracts = this.<SiteContract, QSiteContract>createList("contracts", SiteContract.class, QSiteContract.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
 
@@ -48,7 +50,7 @@ public class QSite extends EntityPathBase<Site> {
 
     public final StringPath district = createString("district");
 
-    public final DateTimePath<java.time.OffsetDateTime> endDate = createDateTime("endDate", java.time.OffsetDateTime.class);
+    public final DateTimePath<java.time.OffsetDateTime> endedAt = createDateTime("endedAt", java.time.OffsetDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -56,7 +58,9 @@ public class QSite extends EntityPathBase<Site> {
 
     public final StringPath name = createString("name");
 
-    public final DateTimePath<java.time.OffsetDateTime> startDate = createDateTime("startDate", java.time.OffsetDateTime.class);
+    public final ListPath<SiteProcess, QSiteProcess> processes = this.<SiteProcess, QSiteProcess>createList("processes", SiteProcess.class, QSiteProcess.class, PathInits.DIRECT2);
+
+    public final DateTimePath<java.time.OffsetDateTime> startedAt = createDateTime("startedAt", java.time.OffsetDateTime.class);
 
     public final EnumPath<com.lineinc.erp.api.server.domain.site.enums.SiteType> type = createEnum("type", com.lineinc.erp.api.server.domain.site.enums.SiteType.class);
 

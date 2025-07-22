@@ -38,6 +38,8 @@ public class QSiteContract extends EntityPathBase<SiteContract> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final ListPath<SiteFile, QSiteFile> files = this.<SiteFile, QSiteFile>createList("files", SiteFile.class, QSiteFile.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");

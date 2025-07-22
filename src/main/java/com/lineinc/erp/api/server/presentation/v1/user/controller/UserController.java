@@ -55,7 +55,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "모든 유저 조회", description = "모든 유저 정보를 반환합니다")
+    @Operation(summary = "유저 목록 조회", description = "모든 유저 정보를 반환합니다")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })

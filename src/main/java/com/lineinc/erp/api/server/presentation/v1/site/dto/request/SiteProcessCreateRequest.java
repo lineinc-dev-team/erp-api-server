@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.request;
 
+import com.lineinc.erp.api.server.common.validation.MultiConstraint;
+import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +13,8 @@ public record SiteProcessCreateRequest(
         @Schema(description = "공정명", example = "기초 공사")
         String name,
 
-        @Schema(description = "사무실 연락처")
+        @MultiConstraint(type = ValidatorType.PHONE_OR_LANDLINE)
+        @Schema(description = "사무실 연락처", example = "02-123-4567")
         String officePhone,
 
         @NotNull

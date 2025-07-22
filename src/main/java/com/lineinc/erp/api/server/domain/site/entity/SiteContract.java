@@ -6,6 +6,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.List;
+import java.util.ArrayList;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,4 +34,8 @@ public class SiteContract extends BaseEntity {
 
     @Column
     private String memo;  // 비고
+
+    @Builder.Default
+    @OneToMany(mappedBy = "siteContract", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SiteFile> files = new ArrayList<>();
 }

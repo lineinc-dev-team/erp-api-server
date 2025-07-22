@@ -45,6 +45,7 @@ public class ClientCompanyController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "발주처 등록 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저를 등록하려는 경우")
     })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
@@ -56,7 +57,7 @@ public class ClientCompanyController {
     }
 
     @Operation(
-            summary = "발주처 전체 조회",
+            summary = "발주처 목록 조회",
             description = "등록된 모든 발주처 정보를 반환합니다"
     )
     @ApiResponses(value = {

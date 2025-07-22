@@ -38,11 +38,11 @@ public record SiteCreateRequest(
 
         @Schema(description = "사업 시작일", example = "2024-01-01")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate startDate,
+        LocalDate startedAt,
 
         @Schema(description = "사업 종료일", example = "2025-12-31")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate endDate,
+        LocalDate endedAt,
 
         @Schema(description = "본사 담당자 ID", example = "5")
         Long userId,

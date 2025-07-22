@@ -10,7 +10,13 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Table(indexes = {
+        @Index(columnList = "city"),
+        @Index(columnList = "district")
+})
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,10 +54,10 @@ public class Site extends BaseEntity {
     private ClientCompany clientCompany; // 발주처
 
     @Column
-    private OffsetDateTime startDate; // 사업 시작일
+    private OffsetDateTime startedAt; // 사업 시작일
 
     @Column
-    private OffsetDateTime endDate; // 사업 종료일
+    private OffsetDateTime endedAt; // 사업 종료일
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -59,6 +65,14 @@ public class Site extends BaseEntity {
 
     @Column
     private Long contractAmount; // 도급금액
+
+    @Builder.Default
+    @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SiteContract> contracts = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SiteProcess> processes = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
