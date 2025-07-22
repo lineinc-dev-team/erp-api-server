@@ -31,7 +31,7 @@ public class FileController {
             @ApiResponse(responseCode = "200", description = "Presigned URL 발급 성공"),
             @ApiResponse(responseCode = "400", description = "요청 파라미터 오류", content = @Content())
     })
-    @RateLimit(limit = 20, durationSeconds = 60) // 사용자당 1분에 20번 허용
+    @RateLimit(limit = 20) // 사용자당 1분에 20번 허용
     @PostMapping("/upload-url")
     public ResponseEntity<SuccessResponse<PresignedUrlResponse>> getPresignedUrl(
             @Valid @RequestBody PresignedUrlRequest request
