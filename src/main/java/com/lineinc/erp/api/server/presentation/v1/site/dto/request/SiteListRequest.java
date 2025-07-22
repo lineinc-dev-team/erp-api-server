@@ -2,6 +2,9 @@ package com.lineinc.erp.api.server.presentation.v1.site.dto.request;
 
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
+
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,8 +29,8 @@ public record SiteListRequest(
         @Schema(description = "도/구 (District)", example = "강남구")
         String district,
 
-        @Schema(description = "공정 진행 상태", example = "IN_PROGRESS")
-        SiteProcessStatus processStatus,
+        @Schema(description = "공정 진행 상태 목록", example = "[\"IN_PROGRESS\", \"NOT_STARTED\"]")
+        List<SiteProcessStatus> processStatuses,
 
         @Schema(description = "발주처명", example = "삼성건설")
         String clientCompanyName,

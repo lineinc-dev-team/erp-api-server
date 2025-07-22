@@ -114,9 +114,9 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             builder.and(site.district.eq(request.district().trim()));
         }
 
-        SiteProcessStatus siteProcessStatus = request.processStatus();
-        if (siteProcessStatus != null) {
-            builder.and(site.processes.any().status.eq(siteProcessStatus));
+        List<SiteProcessStatus> siteProcessStatuses = request.processStatuses();
+        if (siteProcessStatuses != null && !siteProcessStatuses.isEmpty()) {
+            builder.and(site.processes.any().status.in(siteProcessStatuses));
         }
         if (StringUtils.hasText(request.clientCompanyName())) {
             builder.and(site.clientCompany.name.containsIgnoreCase(request.clientCompanyName().trim()));
