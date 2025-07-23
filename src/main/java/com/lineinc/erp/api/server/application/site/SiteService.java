@@ -12,6 +12,7 @@ import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 import lombok.RequiredArgsConstructor;
@@ -155,5 +156,36 @@ public class SiteService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
         return SiteDetailResponse.from(site);
     }
-}
 
+    @Transactional
+    public void updateSite(Long siteId, SiteUpdateRequest request) {
+        Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+
+        if (!site.getName().equals(request.name())) {
+            validateDuplicateName(request.name());
+        }
+
+        site.updateFrom(request);
+
+        if (request.userId() != null) {
+            User user = userService.getUserByIdOrThrow(request.userId());
+            site.changeUser(user);
+        }
+
+        if (request.clientCompanyId() != null) {
+            ClientCompany clientCompany = clientCompanyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
+            site.changeClientCompany(clientCompany);
+        }
+
+        if (request.process() != null) {
+            siteProcessService.updateProcess(site, request.process());
+        }
+
+        if (request.contracts() != null) {
+            siteContractService.updateContracts(site, request.contracts());
+        }
+
+        siteRepository.save(site);
+    }
+}

@@ -2,10 +2,13 @@ package com.lineinc.erp.api.server.domain.site.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -35,4 +38,11 @@ public class SiteProcess extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo;  // 비고
+
+    public void updateFrom(SiteProcessUpdateRequest request) {
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.officePhone()).ifPresent(val -> this.officePhone = val);
+        Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }

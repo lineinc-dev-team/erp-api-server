@@ -13,10 +13,7 @@ import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteDownloadRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 
@@ -132,6 +129,24 @@ public class SiteController {
         SiteDetailResponse siteResponse = siteService.getSiteById(id);
         return ResponseEntity.ok(SuccessResponse.of(siteResponse));
     }
+
+    @Operation(summary = "현장 정보 수정", description = "기존 현장 정보를 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "현장 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "해당 현장을 찾을 수 없음")
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateSite(
+            @PathVariable Long id,
+            @Valid @RequestBody SiteUpdateRequest request
+    ) {
+        siteService.updateSite(id, request);
+        return ResponseEntity.ok().build();
+    }
 }
+
+
 
 
