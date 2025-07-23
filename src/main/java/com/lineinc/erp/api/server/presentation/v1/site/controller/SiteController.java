@@ -13,11 +13,11 @@ import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 
 import java.io.IOException;
@@ -117,6 +117,20 @@ public class SiteController {
     public ResponseEntity<Void> deleteSites(@RequestBody DeleteSitesRequest siteIds) {
         siteService.deleteSites(siteIds);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "현장 상세 조회", description = "현장 상세 정보를 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "현장 상세 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "현장을 찾을 수 없음")
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SiteDetailResponse>> getSiteDetail(
+            @PathVariable Long id
+    ) {
+        SiteDetailResponse siteResponse = siteService.getSiteById(id);
+        return ResponseEntity.ok(SuccessResponse.of(siteResponse));
     }
 }
 

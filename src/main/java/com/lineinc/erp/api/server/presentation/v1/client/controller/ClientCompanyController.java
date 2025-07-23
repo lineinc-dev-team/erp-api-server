@@ -165,7 +165,7 @@ public class ClientCompanyController {
 
     @Operation(
             summary = "발주처 상세 조회",
-            description = "특정 발주처 ID에 해당하는 상세 정보를 반환합니다"
+            description = "발주처 상세 정보를 반환합니다"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "발주처 상세 조회 성공"),

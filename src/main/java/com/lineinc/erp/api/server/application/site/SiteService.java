@@ -6,20 +6,13 @@ import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.repository.SiteContractRepository;
-import com.lineinc.erp.api.server.domain.site.repository.SiteFileRepository;
-import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -155,4 +148,12 @@ public class SiteService {
             default -> null;
         };
     }
+
+    @Transactional(readOnly = true)
+    public SiteDetailResponse getSiteById(Long siteId) {
+        Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+        return SiteDetailResponse.from(site);
+    }
 }
+
