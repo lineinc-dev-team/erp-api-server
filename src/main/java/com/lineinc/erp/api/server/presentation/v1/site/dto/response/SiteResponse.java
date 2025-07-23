@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -83,5 +84,18 @@ public record SiteResponse(
                         : null,
                 site.getClientCompany() != null ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany()) : null
         );
+    }
+
+    @Schema(description = "간단한 현장 응답")
+    public static record SiteSimpleResponse(
+            @Schema(description = "현장 ID", example = "123")
+            Long id,
+
+            @Schema(description = "현장명", example = "서울 APT 신축공사")
+            String name
+    ) {
+        public static SiteResponse.SiteSimpleResponse from(Site site) {
+            return new SiteResponse.SiteSimpleResponse(site.getId(), site.getName());
+        }
     }
 }

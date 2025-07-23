@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -188,4 +189,11 @@ public class SiteService {
 
         siteRepository.save(site);
     }
+
+    @Transactional(readOnly = true)
+    public Slice<SiteResponse.SiteSimpleResponse> searchSiteByName(String keyword, Pageable pageable) {
+        Slice<Site> siteSlice = siteRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        return siteSlice.map(SiteResponse.SiteSimpleResponse::from);
+    }
+
 }

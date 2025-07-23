@@ -5,14 +5,13 @@ import com.lineinc.erp.api.server.application.site.SiteService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
-import com.lineinc.erp.api.server.common.response.PagingInfo;
-import com.lineinc.erp.api.server.common.response.PagingResponse;
-import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.response.*;
 import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
@@ -31,6 +30,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -144,6 +144,25 @@ public class SiteController {
     ) {
         siteService.updateSite(id, request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "현장 이름 키워드 검색", description = "현장명으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "검색 성공")
+    })
+    @GetMapping("/search")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<SiteResponse.SiteSimpleResponse>>> searchClientCompanyByName(
+            @Valid SortRequest sortRequest,
+            @Valid PageRequest pageRequest,
+            @RequestParam String keyword
+    ) {
+        Slice<SiteResponse.SiteSimpleResponse> slice = siteService.searchSiteByName(keyword,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
+        ));
     }
 }
 
