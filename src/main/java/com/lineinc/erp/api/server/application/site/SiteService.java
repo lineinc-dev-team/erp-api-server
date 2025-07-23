@@ -152,6 +152,12 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
+    public Site getSiteByIdOrThrow(Long siteId) {
+        return siteRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
     public SiteDetailResponse getSiteById(Long siteId) {
         Site site = siteRepository.findById(siteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));

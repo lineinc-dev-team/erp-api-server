@@ -17,7 +17,7 @@ public class SeederCommandLineRunner implements CommandLineRunner {
     private final UsersRolesSeeder usersRolesSeeder;
 
 
-    @Value("${seeder.enabled:false}")
+    @Value("${seeder.enabled:true}")
     private boolean seederEnabled;
 
     @Override

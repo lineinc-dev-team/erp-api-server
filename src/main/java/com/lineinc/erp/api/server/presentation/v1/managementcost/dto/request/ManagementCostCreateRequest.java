@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Schema(description = "관리비 등록 요청")
 public record ManagementCostCreateRequest(
@@ -37,6 +38,12 @@ public record ManagementCostCreateRequest(
         String accountHolder,
 
         @Schema(description = "비고", example = "기성 1회차 비용")
-        String memo
+        String memo,
+        
+        @Schema(description = "관리비 상세 품목 목록")
+        List<ManagementCostDetailCreateRequest> details,
+
+        @Schema(description = "관리비 파일 목록")
+        List<ManagementCostFileCreateRequest> files
 ) {
 }

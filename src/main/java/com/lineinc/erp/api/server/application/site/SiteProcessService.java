@@ -1,12 +1,15 @@
 package com.lineinc.erp.api.server.application.site;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessUpdateRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +32,10 @@ public class SiteProcessService {
         SiteProcess siteProcess = site.getProcesses().get(0);
         siteProcess.updateFrom(request);
         siteProcessRepository.save(siteProcess);
+    }
+
+    public SiteProcess getSiteProcessByIdOrThrow(Long id) {
+        return siteProcessRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_PROCESS_NOT_FOUND));
     }
 }
