@@ -58,10 +58,10 @@ public class User extends BaseEntity implements UserDetails {
     /**
      * 비밀번호 초기화 시각 (비밀번호 변경 혹은 초기화된 시간)
      */
-    @Column()
+    @Column
     private OffsetDateTime passwordResetAt;
 
-    @Column()
+    @Column
     private OffsetDateTime lastLoginAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
