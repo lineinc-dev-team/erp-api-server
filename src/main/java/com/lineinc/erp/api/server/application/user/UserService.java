@@ -88,9 +88,9 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(UserListRequest request, Sort sort, List<String> fields) {
-        List<UserResponse> userRespons = usersRepository.findAllWithoutPaging(request, sort);
+        List<UserResponse> userResponses = usersRepository.findAllWithoutPaging(request, sort);
         return ExcelExportUtils.generateWorkbook(
-                userRespons,
+                userResponses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue
@@ -120,10 +120,9 @@ public class UserService {
             case "username" -> user.username();
             case "roleName" -> user.roles().isEmpty() ? "" : user.roles().get(0).name();
             case "isActive" -> user.isActive() ? "Y" : "N";
-            case "lastLoginAt" ->
-                    user.lastLoginAt() != null ? DateTimeFormatUtils.DATE_FORMATTER_YMD.format(user.lastLoginAt()) : "";
-            case "createdAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(user.createdAt());
-            case "updatedAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(user.updatedAt());
+            case "lastLoginAt" -> DateTimeFormatUtils.formatKoreaLocalDate(user.lastLoginAt());
+            case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(user.createdAt());
+            case "updatedAt" -> DateTimeFormatUtils.formatKoreaLocalDate(user.updatedAt());
             case "updatedBy" -> user.updatedBy();
             case "memo" -> user.memo();
             default -> null;

@@ -155,8 +155,8 @@ public class ClientCompanyService {
             case "address" -> company.address() + " " + company.detailAddress();
             case "phoneNumber" -> company.phoneNumber();
             case "isActive" -> String.valueOf(company.isActive());
-            case "createdAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(company.createdAt());
-            case "updatedAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(company.updatedAt());
+            case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt());
+            case "updatedAt" -> DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
             case "hasFile" -> company.hasFile() ? "Y" : "N";
             case "memo" -> company.memo();
             default -> null;

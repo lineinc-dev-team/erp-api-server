@@ -141,10 +141,10 @@ public class SiteService {
             case "type" -> siteResponse.type();
             case "clientCompanyName" -> siteResponse.clientCompany().name();
             case "period" ->
-                    DateTimeFormatUtils.DATE_FORMATTER_YMD.format(siteResponse.startedAt()) + "~" + DateTimeFormatUtils.DATE_FORMATTER_YMD.format(siteResponse.endedAt());
+                    DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.startedAt()) + "~" + DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.endedAt());
             case "processStatuses" -> siteResponse.process().status();
             case "createdBy" -> siteResponse.createdBy();
-            case "createdAt" -> DateTimeFormatUtils.DATE_FORMATTER_YMD.format(siteResponse.createdAt());
+            case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.createdAt());
             case "hasFile" -> siteResponse.hasFile() ? "Y" : "N";
             case "memo" -> siteResponse.memo();
             default -> null;
