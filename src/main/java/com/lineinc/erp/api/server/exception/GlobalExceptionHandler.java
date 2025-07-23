@@ -14,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -87,6 +88,12 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                 ValidationMessages.UNSUPPORTED_CONTENT_TYPE + ": " + ex.getContentType()
         );
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex) {
+        log.warn("HttpMediaTypeNotAcceptableException: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_ACCEPTABLE, ValidationMessages.NOT_ACCEPTABLE);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
