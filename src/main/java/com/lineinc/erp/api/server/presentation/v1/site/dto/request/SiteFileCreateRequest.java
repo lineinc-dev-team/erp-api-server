@@ -7,10 +7,6 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "현장 파일 등록 요청")
 public record SiteFileCreateRequest(
-        @NotNull
-        @Schema(description = "계약 ID", example = "10")
-        Long siteContractId,
-
         @NotBlank
         @Schema(description = "문서명", example = "현장도면 v1")
         String name,
