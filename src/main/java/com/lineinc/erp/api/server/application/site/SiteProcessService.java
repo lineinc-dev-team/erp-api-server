@@ -6,9 +6,13 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteProcessResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -37,5 +41,11 @@ public class SiteProcessService {
     public SiteProcess getSiteProcessByIdOrThrow(Long id) {
         return siteProcessRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_PROCESS_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(String keyword, Pageable pageable) {
+        Slice<SiteProcess> siteProcessesSlice = siteProcessRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        return siteProcessesSlice.map(SiteProcessResponse.SiteProcessSimpleResponse::from);
     }
 }

@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.OffsetDateTime;
 
 @Schema(description = "현장 공정 정보 응답")
 public record SiteProcessResponse(
@@ -32,5 +31,18 @@ public record SiteProcessResponse(
                 process.getStatus() != null ? process.getStatus().getLabel() : null,
                 process.getMemo()
         );
+    }
+
+    @Schema(description = "간단한 현장 공정 응답")
+    public static record SiteProcessSimpleResponse(
+            @Schema(description = "공정 ID", example = "1")
+            Long id,
+
+            @Schema(description = "공정명", example = "기초 공사")
+            String name
+    ) {
+        public static SiteProcessResponse.SiteProcessSimpleResponse from(SiteProcess siteProcess) {
+            return new SiteProcessResponse.SiteProcessSimpleResponse(siteProcess.getId(), siteProcess.getName());
+        }
     }
 }
