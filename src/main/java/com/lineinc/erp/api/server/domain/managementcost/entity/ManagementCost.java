@@ -63,6 +63,9 @@ public class ManagementCost extends BaseEntity {
     @Column
     private String accountHolder;
 
+    @Column
+    private String bankName;
+
     @Column(columnDefinition = "TEXT")
     private String memo;
 }

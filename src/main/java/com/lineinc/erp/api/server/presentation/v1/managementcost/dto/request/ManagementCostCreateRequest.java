@@ -4,7 +4,7 @@ import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Schema(description = "관리비 등록 요청")
@@ -26,8 +26,8 @@ public record ManagementCostCreateRequest(
         String itemDescription,
 
         @NotNull
-        @Schema(description = "결제일자", example = "2024-07-15T00:00:00+09:00")
-        OffsetDateTime paymentDate,
+        @Schema(description = "결제일자", example = "2024-07-15")
+        LocalDate paymentDate,
 
         @Schema(description = "사업자등록번호", example = "123-45-67890")
         String businessNumber,
@@ -40,6 +40,9 @@ public record ManagementCostCreateRequest(
 
         @Schema(description = "예금주", example = "홍길동")
         String accountHolder,
+
+        @Schema(description = "은행명", example = "기업은행")
+        String bankName,
 
         @Schema(description = "비고", example = "기성 1회차 비용")
         String memo,

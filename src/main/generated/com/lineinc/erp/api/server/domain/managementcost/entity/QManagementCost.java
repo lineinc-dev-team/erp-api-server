@@ -28,6 +28,8 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
 
     public final StringPath accountNumber = createString("accountNumber");
 
+    public final StringPath bankName = createString("bankName");
+
     public final StringPath businessNumber = createString("businessNumber");
 
     public final StringPath ceoName = createString("ceoName");

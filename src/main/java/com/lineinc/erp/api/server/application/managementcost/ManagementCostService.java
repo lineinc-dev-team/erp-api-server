@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.application.managementcost;
 import com.lineinc.erp.api.server.application.site.SiteProcessService;
 import com.lineinc.erp.api.server.application.site.SiteService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -51,8 +53,9 @@ public class ManagementCostService {
                 .siteProcess(siteProcess)
                 .itemType(request.itemType())
                 .itemDescription(request.itemDescription())
-                .paymentDate(request.paymentDate())
+                .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
                 .businessNumber(request.businessNumber())
+                .bankName(request.bankName())
                 .ceoName(request.ceoName())
                 .accountNumber(request.accountNumber())
                 .accountHolder(request.accountHolder())
