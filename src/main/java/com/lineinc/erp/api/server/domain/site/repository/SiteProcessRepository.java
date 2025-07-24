@@ -9,4 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SiteProcessRepository extends JpaRepository<SiteProcess, Long> {
     Slice<SiteProcess> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    Slice<SiteProcess> findBySiteIdAndNameContainingIgnoreCase(Long siteId, String name, Pageable pageable);
+
+    Slice<SiteProcess> findBySiteId(Long siteId, Pageable pageable);
+
+    Slice<SiteProcess> findAllBy(Pageable pageable);
 }

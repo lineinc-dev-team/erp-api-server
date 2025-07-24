@@ -44,8 +44,21 @@ public class SiteProcessService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(String keyword, Pageable pageable) {
-        Slice<SiteProcess> siteProcessesSlice = siteProcessRepository.findByNameContainingIgnoreCase(keyword, pageable);
+    public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(Long siteId, String keyword, Pageable pageable) {
+        Slice<SiteProcess> siteProcessesSlice;
+
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+        if (siteId != null) {
+            siteProcessesSlice = hasKeyword
+                    ? siteProcessRepository.findBySiteIdAndNameContainingIgnoreCase(siteId, keyword, pageable)
+                    : siteProcessRepository.findBySiteId(siteId, pageable);
+        } else {
+            siteProcessesSlice = hasKeyword
+                    ? siteProcessRepository.findByNameContainingIgnoreCase(keyword, pageable)
+                    : siteProcessRepository.findAllBy(pageable);
+        }
+
         return siteProcessesSlice.map(SiteProcessResponse.SiteProcessSimpleResponse::from);
     }
 }

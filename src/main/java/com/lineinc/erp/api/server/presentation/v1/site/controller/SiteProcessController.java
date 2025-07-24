@@ -36,9 +36,11 @@ public class SiteProcessController {
     public ResponseEntity<SuccessResponse<SliceResponse<SiteProcessResponse.SiteProcessSimpleResponse>>> searchSiteProcessByKeyword(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
-            @RequestParam String keyword
+            @RequestParam(required = false) Long siteId,
+            @RequestParam(required = false) String keyword
     ) {
         Slice<SiteProcessResponse.SiteProcessSimpleResponse> slice = siteProcessService.searchSiteProcessByName(
+                siteId,
                 keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
