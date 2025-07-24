@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.Del
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostDetailResponse;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -157,5 +158,12 @@ public class ManagementCostService {
             case "memo" -> managementCost.memo();
             default -> null;
         };
+    }
+
+    @Transactional(readOnly = true)
+    public ManagementCostDetailViewResponse getManagementCostById(Long siteId) {
+        ManagementCost managementCost = managementCostRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
+        return ManagementCostDetailViewResponse.from(managementCost);
     }
 }
