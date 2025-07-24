@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.application.site.SiteProcessService;
 import com.lineinc.erp.api.server.application.site.SiteService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -11,11 +12,13 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,4 +89,73 @@ public class ManagementCostService {
         managementCostRepository.saveAll(managementCosts);
     }
 
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(ManagementCostListRequest request, Sort sort, List<String> fields) {
+        List<ManagementCostResponse> managementCostResponses = managementCostRepository.findAllWithoutPaging(request, sort)
+                .stream()
+                .map(ManagementCostResponse::from)
+                .toList();
+
+        return ExcelExportUtils.generateWorkbook(
+                managementCostResponses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue
+        );
+    }
+
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "siteName" -> "현장명";
+            case "processName" -> "공정명";
+            case "itemType" -> "품목";
+            case "paymentDate" -> "일자";
+            case "businessNumber" -> "사업자번호";
+            case "ceoName" -> "대표자";
+            case "accountNumber" -> "청구계좌";
+            case "accountHolder" -> "계좌명";
+            case "supplyPrice" -> "공급가";
+            case "vat" -> "부가세";
+            case "total" -> "합계";
+            case "hasFile" -> "첨부파일";
+            case "memo" -> "비고";
+            default -> null;
+        };
+    }
+
+    private String getExcelCellValue(ManagementCostResponse managementCost, String field) {
+        return switch (field) {
+            case "id" -> String.valueOf(managementCost.id());
+            case "siteName" -> managementCost.site().name();
+            case "processName" -> managementCost.process().name();
+            case "itemType" -> managementCost.itemType();
+            case "paymentDate" -> DateTimeFormatUtils.formatKoreaLocalDate(managementCost.paymentDate());
+            case "businessNumber" -> managementCost.businessNumber();
+            case "ceoName" -> managementCost.ceoName();
+            case "accountNumber" -> managementCost.bankName() + " / " + managementCost.accountNumber();
+            case "accountHolder" -> managementCost.accountHolder();
+            case "supplyPrice" -> String.valueOf(
+                    managementCost.details().stream()
+                            .filter(detail -> detail.supplyPrice() != null)
+                            .mapToLong(ManagementCostDetailResponse::supplyPrice)
+                            .sum()
+            );
+            case "vat" -> String.valueOf(
+                    managementCost.details().stream()
+                            .filter(detail -> detail.vat() != null)
+                            .mapToLong(ManagementCostDetailResponse::vat)
+                            .sum()
+            );
+            case "total" -> String.valueOf(
+                    managementCost.details().stream()
+                            .filter(detail -> detail.total() != null)
+                            .mapToLong(ManagementCostDetailResponse::total)
+                            .sum()
+            );
+            case "hasFile" -> managementCost.hasFile() ? "Y" : "N";
+            case "memo" -> managementCost.memo();
+            default -> null;
+        };
+    }
 }

@@ -7,25 +7,32 @@ import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteDownloadRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -96,5 +103,34 @@ public class ManagementCostController {
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
+    }
+
+    @Operation(
+            summary = "관리비 목록 엑셀 다운로드",
+            description = "검색 조건에 맞는 관리비 목록을 엑셀 파일로 다운로드합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public void downloadSitesExcel(
+            @Valid SortRequest sortRequest,
+            @Valid ManagementCostListRequest request,
+            @Valid ManagementCostDownloadRequest managementCostDownloadRequest,
+            HttpServletResponse response
+    ) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(managementCostDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, ManagementCostDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "관리비 목록.xlsx");
+
+        try (Workbook workbook = managementCostService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed
+        )) {
+            workbook.write(response.getOutputStream());
+        }
     }
 }

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -109,4 +110,20 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
 
         return builder;
     }
+
+    @Override
+    public List<ManagementCost> findAllWithoutPaging(ManagementCostListRequest request, Sort sort) {
+        BooleanBuilder condition = buildCondition(request);
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        return queryFactory
+                .selectFrom(managementCost)
+                .distinct()
+                .leftJoin(managementCost.site, site).fetchJoin()
+                .leftJoin(managementCost.siteProcess, siteProcess).fetchJoin()
+                .where(condition)
+                .orderBy(orders)
+                .fetch();
+    }
 }
+
