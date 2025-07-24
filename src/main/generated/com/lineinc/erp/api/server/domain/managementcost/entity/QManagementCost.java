@@ -46,6 +46,10 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final ListPath<ManagementCostDetail, QManagementCostDetail> details = this.<ManagementCostDetail, QManagementCostDetail>createList("details", ManagementCostDetail.class, QManagementCostDetail.class, PathInits.DIRECT2);
+
+    public final ListPath<ManagementCostFile, QManagementCostFile> files = this.<ManagementCostFile, QManagementCostFile>createList("files", ManagementCostFile.class, QManagementCostFile.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath itemDescription = createString("itemDescription");

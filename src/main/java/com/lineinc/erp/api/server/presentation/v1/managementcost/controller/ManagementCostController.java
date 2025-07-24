@@ -2,10 +2,17 @@ package com.lineinc.erp.api.server.presentation.v1.managementcost.controller;
 
 import com.lineinc.erp.api.server.application.managementcost.ManagementCostService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
+import com.lineinc.erp.api.server.common.request.PageRequest;
+import com.lineinc.erp.api.server.common.request.SortRequest;
+import com.lineinc.erp.api.server.common.response.PagingInfo;
+import com.lineinc.erp.api.server.common.response.PagingResponse;
+import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,20 +52,29 @@ public class ManagementCostController {
         return ResponseEntity.ok().build();
     }
 
-//    @Operation(
-//            summary = "관리비 목록 조회",
-//            description = "필터 조건에 맞는 관리비 목록을 조회합니다"
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "관리비 목록 조회 성공"),
-//            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-//    })
-//    @GetMapping
-//    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
-//    public ResponseEntity<List<ManagementCostResponse>> getManagementCosts(
-//            @Valid ManagementCostListRequest request
-//    ) {
-//        List<ManagementCostListRequest> response = managementCostService.getManagementCosts(request);
-//        return ResponseEntity.ok(response);
-//    }
+    @Operation(
+            summary = "관리비 목록 조회",
+            description = "필터 조건에 맞는 관리비 목록을 조회합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "관리비 목록 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<ManagementCostResponse>>> getManagementCosts(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid ManagementCostListRequest request
+    ) {
+
+        Page<ManagementCostResponse> page = managementCostService.getAllManagementCosts(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
+        );
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+        ));
+    }
 }

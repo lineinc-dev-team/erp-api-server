@@ -1,0 +1,112 @@
+package com.lineinc.erp.api.server.domain.managementcost.repository;
+
+import com.lineinc.erp.api.server.common.constant.AppConstants;
+import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.QManagementCost;
+import com.lineinc.erp.api.server.domain.site.entity.QSite;
+import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * ManagementCostRepositoryCustom의 구현체.
+ * ManagementCost 목록 조회 시, QueryDSL을 사용하여 조건 검색 및 페이징 처리.
+ */
+@Repository
+@RequiredArgsConstructor
+public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCustom {
+
+    private final JPAQueryFactory queryFactory;
+    private final QManagementCost managementCost = QManagementCost.managementCost;
+    private final QSite site = QSite.site;
+    private final QSiteProcess siteProcess = QSiteProcess.siteProcess;
+
+    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
+            "id", QManagementCost.managementCost.id,
+            "paymentDate", QManagementCost.managementCost.paymentDate,
+            "createdAt", QManagementCost.managementCost.createdAt,
+            "updatedAt", QManagementCost.managementCost.updatedAt
+    );
+
+    @Override
+    public Page<ManagementCostResponse> findAll(ManagementCostListRequest request, Pageable pageable) {
+        BooleanBuilder condition = buildCondition(request);
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+
+        List<ManagementCost> content = queryFactory
+                .selectFrom(managementCost)
+                .distinct()
+                .leftJoin(managementCost.site, site).fetchJoin()
+                .leftJoin(managementCost.siteProcess, siteProcess).fetchJoin()
+                .where(condition)
+                .orderBy(orders)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalCount = queryFactory
+                .select(managementCost.count())
+                .from(managementCost)
+                .leftJoin(managementCost.site, site)
+                .leftJoin(managementCost.siteProcess, siteProcess)
+                .where(condition)
+                .fetchOne();
+
+        long total = Objects.requireNonNullElse(totalCount, 0L);
+
+        List<ManagementCostResponse> responses = content.stream()
+                .map(ManagementCostResponse::from)
+                .toList();
+
+        return new PageImpl<>(responses, pageable, total);
+    }
+
+    private BooleanBuilder buildCondition(ManagementCostListRequest request) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (StringUtils.hasText(request.name())) {
+            builder.and(site.name.containsIgnoreCase(request.name().trim()));
+        }
+        if (StringUtils.hasText(request.processName())) {
+            builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
+        }
+        if (request.itemType() != null) {
+            builder.and(managementCost.itemType.eq(request.itemType()));
+        }
+        if (StringUtils.hasText(request.itemDescription())) {
+            builder.and(managementCost.itemDescription.containsIgnoreCase(request.itemDescription().trim()));
+        }
+        if (request.paymentStartDate() != null) {
+            builder.and(managementCost.paymentDate.goe(
+                    request.paymentStartDate()
+                            .atStartOfDay()
+                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
+            ));
+        }
+        if (request.paymentEndDate() != null) {
+            builder.and(managementCost.paymentDate.lt(
+                    request.paymentEndDate()
+                            .plusDays(1)
+                            .atStartOfDay()
+                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
+            ));
+        }
+
+        return builder;
+    }
+}

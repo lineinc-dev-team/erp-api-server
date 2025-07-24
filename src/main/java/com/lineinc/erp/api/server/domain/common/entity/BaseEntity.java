@@ -39,7 +39,7 @@ public abstract class BaseEntity implements MarkDeletable {
      * - 엔티티가 수정될 때 현재 시간으로 자동 업데이트
      */
     @UpdateTimestamp
-    @Column()
+    @Column
     private OffsetDateTime updatedAt;
 
     /**
@@ -74,7 +74,7 @@ public abstract class BaseEntity implements MarkDeletable {
      * - 삭제 시점 기록
      * - 삭제되지 않은 경우 null
      */
-    @Column()
+    @Column
     private OffsetDateTime deletedAt;
 
     /**

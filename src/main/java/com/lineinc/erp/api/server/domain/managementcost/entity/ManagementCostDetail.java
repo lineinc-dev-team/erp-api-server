@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +12,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class ManagementCostDetail {
+public class ManagementCostDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_detail_seq")

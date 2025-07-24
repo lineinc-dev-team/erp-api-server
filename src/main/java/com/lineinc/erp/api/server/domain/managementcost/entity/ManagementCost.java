@@ -10,6 +10,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -65,6 +67,14 @@ public class ManagementCost extends BaseEntity {
 
     @Column
     private String bankName;
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "managementCost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManagementCostFile> files = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "managementCost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManagementCostDetail> details = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String memo;

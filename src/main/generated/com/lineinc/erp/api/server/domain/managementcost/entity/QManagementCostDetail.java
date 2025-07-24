@@ -22,6 +22,20 @@ public class QManagementCostDetail extends EntityPathBase<ManagementCostDetail> 
 
     public static final QManagementCostDetail managementCostDetail = new QManagementCostDetail("managementCostDetail");
 
+    public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
+
+    //inherited
+    public final StringPath createdBy = _super.createdBy;
+
+    //inherited
+    public final BooleanPath deleted = _super.deleted;
+
+    //inherited
+    public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QManagementCost managementCost;
@@ -35,6 +49,12 @@ public class QManagementCostDetail extends EntityPathBase<ManagementCostDetail> 
     public final NumberPath<Long> total = createNumber("total", Long.class);
 
     public final NumberPath<Long> unitPrice = createNumber("unitPrice", Long.class);
+
+    //inherited
+    public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
+
+    //inherited
+    public final StringPath updatedBy = _super.updatedBy;
 
     public final NumberPath<Long> vat = createNumber("vat", Long.class);
 

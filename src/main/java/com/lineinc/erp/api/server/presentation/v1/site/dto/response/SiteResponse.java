@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -78,7 +77,7 @@ public record SiteResponse(
                 site.getCreatedAt(),
                 site.getCreatedBy(),
                 site.getUpdatedAt(),
-                site.getContracts() != null && site.getContracts().stream().flatMap(c -> c.getFiles().stream()).findAny().isPresent(),
+                site.getContracts().stream().anyMatch(c -> c.getFiles() != null && !c.getFiles().isEmpty()),
                 site.getProcesses() != null && !site.getProcesses().isEmpty()
                         ? SiteProcessResponse.from(site.getProcesses().get(0))
                         : null,

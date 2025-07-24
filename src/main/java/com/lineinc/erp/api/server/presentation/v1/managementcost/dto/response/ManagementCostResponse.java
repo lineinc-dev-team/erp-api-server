@@ -1,0 +1,75 @@
+package com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response;
+
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteProcessResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+
+@Schema(description = "관리비 정보 응답")
+public record ManagementCostResponse(
+        @Schema(description = "관리비 ID", example = "1")
+        Long id,
+
+        @Schema(description = "품목 타입", example = "월세")
+        String itemType,
+
+        @Schema(description = "품목 설명", example = "6월 전기요금")
+        String itemDescription,
+
+        @Schema(description = "결제일", example = "2024-01-01T00:00:00Z")
+        OffsetDateTime paymentDate,
+
+        @Schema(description = "사업자등록번호", example = "123-45-67890")
+        String businessNumber,
+
+        @Schema(description = "대표자명", example = "홍길동")
+        String ceoName,
+
+        @Schema(description = "계좌번호", example = "110-123-456789")
+        String accountNumber,
+
+        @Schema(description = "예금주", example = "홍길동")
+        String accountHolder,
+
+        @Schema(description = "은행명", example = "기업은행")
+        String bankName,
+
+        @Schema(description = "첨부파일 존재 여부", example = "true")
+        Boolean hasFile,
+
+        @Schema(description = "비고", example = "기타 메모")
+        String memo,
+
+        @Schema(description = "관리비 상세 항목 목록")
+        List<ManagementCostDetailResponse> details,
+
+        @Schema(description = "현장 요약 정보")
+        SiteResponse.SiteSimpleResponse site,
+
+        @Schema(description = "공정 요약 정보")
+        SiteProcessResponse.SiteProcessSimpleResponse process
+) {
+
+    public static ManagementCostResponse from(ManagementCost cost) {
+        return new ManagementCostResponse(
+                cost.getId(),
+                cost.getItemType().getLabel(),
+                cost.getItemDescription(),
+                cost.getPaymentDate(),
+                cost.getBusinessNumber(),
+                cost.getCeoName(),
+                cost.getAccountNumber(),
+                cost.getAccountHolder(),
+                cost.getBankName(),
+                cost.getFiles() != null && !cost.getFiles().isEmpty(),
+                cost.getMemo(),
+                cost.getDetails().stream().map(ManagementCostDetailResponse::from).toList(),
+                SiteResponse.SiteSimpleResponse.from(cost.getSite()),
+                SiteProcessResponse.SiteProcessSimpleResponse.from(cost.getSiteProcess())
+        );
+    }
+}
