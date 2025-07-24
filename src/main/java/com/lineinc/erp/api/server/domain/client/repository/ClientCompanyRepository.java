@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClientCompanyRepository extends JpaRepository<ClientCompany, Long>, ClientCompanyRepositoryCustom {
     Slice<ClientCompany> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    Slice<ClientCompany> findAllBy(Pageable pageable);
 }

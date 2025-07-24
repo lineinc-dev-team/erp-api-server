@@ -84,7 +84,7 @@ public class UserController {
     public ResponseEntity<SuccessResponse<SliceResponse<UserResponse.UserSimpleResponse>>> searchUsersByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
-            @RequestParam String keyword
+            @RequestParam(required = false) String keyword
     ) {
         Slice<UserResponse.UserSimpleResponse> slice = userService.searchUsersByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));

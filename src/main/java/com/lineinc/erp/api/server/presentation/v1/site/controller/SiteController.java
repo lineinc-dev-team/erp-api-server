@@ -156,7 +156,7 @@ public class SiteController {
     public ResponseEntity<SuccessResponse<SliceResponse<SiteResponse.SiteSimpleResponse>>> searchClientCompanyByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
-            @RequestParam String keyword
+            @RequestParam(required = false) String keyword
     ) {
         Slice<SiteResponse.SiteSimpleResponse> slice = siteService.searchSiteByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));

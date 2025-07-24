@@ -171,7 +171,14 @@ public class ClientCompanyService {
 
     @Transactional(readOnly = true)
     public Slice<ClientCompanyResponse.ClientCompanySimpleResponse> searchClientCompanyByName(String keyword, Pageable pageable) {
-        Slice<ClientCompany> companySlice = clientCompanyRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        Slice<ClientCompany> companySlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            companySlice = clientCompanyRepository.findAllBy(pageable);
+        } else {
+            companySlice = clientCompanyRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        }
+
         return companySlice.map(ClientCompanyResponse.ClientCompanySimpleResponse::from);
     }
 }

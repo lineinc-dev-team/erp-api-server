@@ -154,7 +154,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Slice<UserResponse.UserSimpleResponse> searchUsersByName(String keyword, Pageable pageable) {
-        Slice<User> userSlice = usersRepository.findByUsernameContainingIgnoreCase(keyword, pageable);
+        Slice<User> userSlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            userSlice = usersRepository.findAllBy(pageable);
+        } else {
+            userSlice = usersRepository.findByUsernameContainingIgnoreCase(keyword, pageable);
+        }
+
         return userSlice.map(UserResponse.UserSimpleResponse::from);
     }
 

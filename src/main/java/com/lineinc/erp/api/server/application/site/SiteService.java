@@ -198,7 +198,14 @@ public class SiteService {
 
     @Transactional(readOnly = true)
     public Slice<SiteResponse.SiteSimpleResponse> searchSiteByName(String keyword, Pageable pageable) {
-        Slice<Site> siteSlice = siteRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        Slice<Site> siteSlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            siteSlice = siteRepository.findAllBy(pageable);
+        } else {
+            siteSlice = siteRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        }
+
         return siteSlice.map(SiteResponse.SiteSimpleResponse::from);
     }
 

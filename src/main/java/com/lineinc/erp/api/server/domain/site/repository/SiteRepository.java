@@ -12,4 +12,6 @@ public interface SiteRepository extends JpaRepository<Site, Long>, SiteRepositor
     boolean existsByName(String name);
 
     Slice<Site> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    Slice<Site> findAllBy(Pageable pageable);
 }

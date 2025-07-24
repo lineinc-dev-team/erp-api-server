@@ -90,7 +90,7 @@ public class ClientCompanyController {
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyResponse.ClientCompanySimpleResponse>>> searchClientCompanyByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
-            @RequestParam String keyword
+            @RequestParam(required = false) String keyword
     ) {
         Slice<ClientCompanyResponse.ClientCompanySimpleResponse> slice = clientCompanyService.searchClientCompanyByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
