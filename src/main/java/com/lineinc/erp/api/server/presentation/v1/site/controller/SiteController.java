@@ -105,12 +105,14 @@ public class SiteController {
 
     @Operation(summary = "현장 삭제", description = "하나 이상의 현장 ID를 받아 해당 현장을 삭제합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "현장 삭제 성공"),
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
             @ApiResponse(responseCode = "404", description = "현장을 찾을 수 없음")
     })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.DELETE)
-    public ResponseEntity<Void> deleteSites(@RequestBody DeleteSitesRequest siteIds) {
+    public ResponseEntity<Void> deleteSites(
+            @RequestBody DeleteSitesRequest siteIds
+    ) {
         siteService.deleteSites(siteIds);
         return ResponseEntity.ok().build();
     }

@@ -30,4 +30,5 @@ public final class ValidationMessages {
     public static final String NOT_ACCEPTABLE = "요청한 Accept 타입에 대해 응답할 수 없습니다.";
     public static final String SITE_PROCESS_NOT_FOUND = "존재하지 않는 공정입니다.";
     public static final String SITE_PROCESS_NOT_MATCH_SITE = "해당 공정은 요청한 현장에 포함되어 있지 않습니다.";
+    public static final String MANAGEMENT_COST_NOT_FOUND = "존재하지 않는 관리비입니다.";
 }

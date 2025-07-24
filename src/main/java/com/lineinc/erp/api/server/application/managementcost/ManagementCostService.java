@@ -8,9 +8,11 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +70,20 @@ public class ManagementCostService {
     @Transactional(readOnly = true)
     public Page<ManagementCostResponse> getAllManagementCosts(ManagementCostListRequest request, Pageable pageable) {
         return managementCostRepository.findAll(request, pageable);
+    }
+
+    @Transactional
+    public void deleteManagementCosts(DeleteManagementCostsRequest request) {
+        List<ManagementCost> managementCosts = managementCostRepository.findAllById(request.managementCostIds());
+        if (managementCosts.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND);
+        }
+
+        for (ManagementCost managementCost : managementCosts) {
+            managementCost.markAsDeleted();
+        }
+
+        managementCostRepository.saveAll(managementCosts);
     }
 
 }

@@ -10,9 +10,11 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,6 +51,24 @@ public class ManagementCostController {
             @Valid @RequestBody ManagementCostCreateRequest request
     ) {
         managementCostService.createManagementCost(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "관리비 삭제",
+            description = "하나 이상의 관리비 ID를 받아 해당 관리비를 삭제합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "관리비를 찾을 수 없음")
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteManagementCosts(
+            @RequestBody DeleteManagementCostsRequest managementCostIds
+    ) {
+        managementCostService.deleteManagementCosts(managementCostIds);
         return ResponseEntity.ok().build();
     }
 
