@@ -12,10 +12,7 @@ import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.DeleteManagementCostsRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostDownloadRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -154,5 +151,24 @@ public class ManagementCostController {
         }
     }
 
-
+    @Operation(
+            summary = "관리비 정보 수정",
+            description = "기존 관리비 정보를 수정합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "해당 관리비를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateManagementCost(
+            @PathVariable Long id,
+            @Valid @RequestBody ManagementCostUpdateRequest request
+    ) {
+        managementCostService.updateManagementCost(id, request);
+        return ResponseEntity.ok().build();
+    }
 }
+
+

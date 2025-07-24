@@ -1,9 +1,11 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
+import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -78,4 +81,26 @@ public class ManagementCost extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    public void updateFrom(ManagementCostUpdateRequest request) {
+        Optional.ofNullable(request.itemType()).ifPresent(val -> this.itemType = val);
+        Optional.ofNullable(request.itemDescription()).ifPresent(val -> this.itemDescription = val);
+        Optional.ofNullable(request.paymentDate())
+                .map(DateTimeFormatUtils::toOffsetDateTime)
+                .ifPresent(val -> this.paymentDate = val);
+        Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
+        Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
+        Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
+        Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
+        Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
+
+    public void changeSite(Site site) {
+        this.site = site;
+    }
+
+    public void changeSiteProcess(SiteProcess siteProcess) {
+        this.siteProcess = siteProcess;
+    }
 }

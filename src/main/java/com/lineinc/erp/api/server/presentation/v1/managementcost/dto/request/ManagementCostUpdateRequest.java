@@ -2,29 +2,24 @@ package com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request;
 
 import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Schema(description = "관리비 등록 요청")
-public record ManagementCostCreateRequest(
-        @NotNull
+@Schema(description = "관리비 수정 요청")
+public record ManagementCostUpdateRequest(
         @Schema(description = "현장 ID", example = "1")
         Long siteId,
 
-        @NotNull
         @Schema(description = "공정 ID", example = "10")
         Long siteProcessId,
 
-        @NotNull
         @Schema(description = "관리비 품목 구분", example = "DEPOSIT")
         ItemType itemType,
 
         @Schema(description = "관리비 품목 설명", example = "6월 전기요금")
         String itemDescription,
 
-        @NotNull
         @Schema(description = "결제일자", example = "2024-07-15")
         LocalDate paymentDate,
 
@@ -47,9 +42,9 @@ public record ManagementCostCreateRequest(
         String memo,
 
         @Schema(description = "관리비 상세 품목 목록")
-        List<ManagementCostDetailCreateRequest> details,
+        List<ManagementCostDetailUpdateRequest> details,
 
         @Schema(description = "관리비 파일 목록")
-        List<ManagementCostFileCreateRequest> files
+        List<ManagementCostFileUpdateRequest> files
 ) {
 }

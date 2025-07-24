@@ -40,11 +40,11 @@ public record ManagementCostDetailViewResponse(
         @Schema(description = "비고", example = "기타 메모")
         String memo,
 
-        @Schema(description = "첨부파일 목록")
-        List<ManagementCostFileResponse> files,
-
         @Schema(description = "관리비 상세 항목 목록")
         List<ManagementCostDetailResponse> details,
+
+        @Schema(description = "첨부파일 목록")
+        List<ManagementCostFileResponse> files,
 
         @Schema(description = "현장 요약 정보")
         SiteResponse.SiteSimpleResponse site,
@@ -65,8 +65,8 @@ public record ManagementCostDetailViewResponse(
                 cost.getAccountHolder(),
                 cost.getBankName(),
                 cost.getMemo(),
-                cost.getFiles().stream().map(ManagementCostFileResponse::from).toList(),
                 cost.getDetails().stream().map(ManagementCostDetailResponse::from).toList(),
+                cost.getFiles().stream().map(ManagementCostFileResponse::from).toList(),
                 SiteResponse.SiteSimpleResponse.from(cost.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(cost.getSiteProcess())
         );

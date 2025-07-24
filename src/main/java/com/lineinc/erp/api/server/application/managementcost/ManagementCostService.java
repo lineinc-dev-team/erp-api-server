@@ -12,6 +12,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
@@ -165,5 +166,27 @@ public class ManagementCostService {
         ManagementCost managementCost = managementCostRepository.findById(siteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
         return ManagementCostDetailViewResponse.from(managementCost);
+    }
+
+    @Transactional(readOnly = true)
+    public ManagementCost getManagementCostByIdOrThrow(Long id) {
+        return managementCostRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
+    }
+
+    @Transactional
+    public void updateManagementCost(Long managementCostId, ManagementCostUpdateRequest request) {
+        ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        if (!siteProcess.getSite().getId().equals(site.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+        }
+        managementCost.changeSite(site);
+        managementCost.changeSiteProcess(siteProcess);
+        managementCost.updateFrom(request);
+
+        managementCostDetailService.updateManagementCostDetails(managementCost, request.details());
+        managementCostFileService.updateManagementCostFiles(managementCost, request.files());
     }
 }

@@ -133,7 +133,7 @@ public class SiteController {
 
     @Operation(summary = "현장 정보 수정", description = "기존 현장 정보를 수정합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "현장 수정 성공"),
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류"),
             @ApiResponse(responseCode = "404", description = "해당 현장을 찾을 수 없음")
     })

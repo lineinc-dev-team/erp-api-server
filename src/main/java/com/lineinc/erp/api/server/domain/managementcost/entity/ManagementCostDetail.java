@@ -1,10 +1,14 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostDetailUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -12,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class ManagementCostDetail extends BaseEntity {
+public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<ManagementCostDetailUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_detail_seq")
@@ -55,4 +59,14 @@ public class ManagementCostDetail extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    @Override
+    public void updateFrom(ManagementCostDetailUpdateRequest request) {
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
+        Optional.ofNullable(request.supplyPrice()).ifPresent(val -> this.supplyPrice = val);
+        Optional.ofNullable(request.vat()).ifPresent(val -> this.vat = val);
+        Optional.ofNullable(request.total()).ifPresent(val -> this.total = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }

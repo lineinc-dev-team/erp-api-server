@@ -1,11 +1,14 @@
 package com.lineinc.erp.api.server.application.managementcost;
 
+import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostFileRepository;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostFileCreateRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,5 +31,21 @@ public class ManagementCostFileService {
                 managementCostFileRepository.save(file);
             }
         }
+    }
+
+    @Transactional
+    public void updateManagementCostFiles(ManagementCost managementCost, List<ManagementCostFileUpdateRequest> requests) {
+        EntitySyncUtils.syncList(
+                managementCost.getFiles(),
+                requests,
+                (ManagementCostFileUpdateRequest dto) ->
+                        ManagementCostFile.builder()
+                                .managementCost(managementCost)
+                                .name(dto.name())
+                                .fileUrl(dto.fileUrl())
+                                .originalFileName(dto.originalFileName())
+                                .memo(dto.memo())
+                                .build()
+        );
     }
 }

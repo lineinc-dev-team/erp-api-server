@@ -1,10 +1,14 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -12,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class ManagementCostFile extends BaseEntity {
+public class ManagementCostFile extends BaseEntity implements UpdatableFrom<ManagementCostFileUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_file_seq")
@@ -49,4 +53,11 @@ public class ManagementCostFile extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    public void updateFrom(ManagementCostFileUpdateRequest request) {
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
+        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }
