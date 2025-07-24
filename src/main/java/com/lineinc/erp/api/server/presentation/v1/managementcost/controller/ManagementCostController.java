@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/management-costs")
@@ -40,4 +43,21 @@ public class ManagementCostController {
         managementCostService.createManagementCost(request);
         return ResponseEntity.ok().build();
     }
+
+//    @Operation(
+//            summary = "관리비 목록 조회",
+//            description = "필터 조건에 맞는 관리비 목록을 조회합니다"
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "관리비 목록 조회 성공"),
+//            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+//    })
+//    @GetMapping
+//    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+//    public ResponseEntity<List<ManagementCostResponse>> getManagementCosts(
+//            @Valid ManagementCostListRequest request
+//    ) {
+//        List<ManagementCostListRequest> response = managementCostService.getManagementCosts(request);
+//        return ResponseEntity.ok(response);
+//    }
 }

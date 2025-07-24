@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request;
 
+import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,8 +19,11 @@ public record ManagementCostCreateRequest(
         Long siteProcessId,
 
         @NotNull
-        @Schema(description = "관리비 품목 구분", example = "자재비")
-        String type,
+        @Schema(description = "관리비 품목 구분", example = "DEPOSIT")
+        ItemType itemType,
+
+        @Schema(description = "관리비 품목 설명", example = "6월 전기요금")
+        String itemDescription,
 
         @NotNull
         @Schema(description = "결제일자", example = "2024-07-15T00:00:00+09:00")
@@ -39,7 +43,7 @@ public record ManagementCostCreateRequest(
 
         @Schema(description = "비고", example = "기성 1회차 비용")
         String memo,
-        
+
         @Schema(description = "관리비 상세 품목 목록")
         List<ManagementCostDetailCreateRequest> details,
 

@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import jakarta.persistence.*;
@@ -31,8 +32,18 @@ public class ManagementCost extends BaseEntity {
     @JoinColumn(name = "site_process_id", nullable = false)
     private SiteProcess siteProcess;
 
+    /**
+     * 품목 타입 (예: 전기, 수도 등)
+     */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
+    private ItemType itemType;
+
+    /**
+     * 품목 설명 (예: 6월 전기요금 등)
+     */
+    @Column(nullable = false)
+    private String itemDescription;
 
     /**
      * 관리비가 발생(결제)된 날짜

@@ -46,6 +46,10 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath itemDescription = createString("itemDescription");
+
+    public final EnumPath<com.lineinc.erp.api.server.domain.managementcost.enums.ItemType> itemType = createEnum("itemType", com.lineinc.erp.api.server.domain.managementcost.enums.ItemType.class);
+
     public final StringPath memo = createString("memo");
 
     public final DateTimePath<java.time.OffsetDateTime> paymentDate = createDateTime("paymentDate", java.time.OffsetDateTime.class);
@@ -53,8 +57,6 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSiteProcess siteProcess;
-
-    public final StringPath type = createString("type");
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
