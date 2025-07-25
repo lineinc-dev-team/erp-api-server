@@ -5,19 +5,16 @@ import com.lineinc.erp.api.server.application.site.SiteService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -188,5 +185,12 @@ public class SteelManagementService {
             case "memo" -> steelManagement.memo();
             default -> null;
         };
+    }
+
+    @Transactional(readOnly = true)
+    public SteelManagementDetailViewResponse getSteelManagementById(Long siteId) {
+        SteelManagement steelManagement = steelManagementRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+        return SteelManagementDetailViewResponse.from(steelManagement);
     }
 }

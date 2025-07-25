@@ -10,17 +10,16 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostDownloadRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementDownloadRequest;
 import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
+import io.swagger.v3.oas.annotations.media.Content;
 import org.apache.poi.ss.usermodel.Workbook;
 import jakarta.servlet.http.HttpServletResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -152,5 +151,21 @@ public class SteelManagementController {
         )) {
             workbook.write(response.getOutputStream());
         }
+    }
+
+    @Operation(
+            summary = "강재 관리 상세 조회",
+            description = "강재 관리 상세 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SteelManagementDetailViewResponse>> getSteelManagementDetail(
+            @PathVariable Long id
+    ) {
+        SteelManagementDetailViewResponse steelManagementDetailViewResponse = steelManagementService.getSteelManagementById(id);
+        return ResponseEntity.ok(SuccessResponse.of(steelManagementDetailViewResponse));
     }
 }

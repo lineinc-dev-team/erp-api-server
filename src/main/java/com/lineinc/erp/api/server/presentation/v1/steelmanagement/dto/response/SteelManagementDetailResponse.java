@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "강재 관리 상세 목록 응답")
+@Schema(description = "강재 관리 상세 정보 응답")
 public record SteelManagementDetailResponse(
         @Schema(description = "규격", example = "D10")
         String standard,
