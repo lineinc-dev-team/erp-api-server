@@ -48,6 +48,8 @@ public class QSteelManagement extends EntityPathBase<SteelManagement> {
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSiteProcess siteProcess;
 
+    public final EnumPath<com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType> type = createEnum("type", com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType.class);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 

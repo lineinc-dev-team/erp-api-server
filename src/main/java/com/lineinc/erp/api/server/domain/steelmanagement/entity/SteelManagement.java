@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -36,6 +37,10 @@ public class SteelManagement extends BaseEntity {
     @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SteelManagementFile> files = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private SteelManagementType type;
 
     @Column
     private OffsetDateTime paymentDate;

@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request;
 
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,6 +20,10 @@ public record SteelManagementCreateRequest(
 
         @Schema(description = "용도", example = "철근 콘크리트 타설용")
         String usage,
+
+        @NotNull
+        @Schema(description = "강재 수불 구분", example = "ORDER")
+        SteelManagementType type,
 
         @Schema(description = "구매일자", example = "2024-07-25")
         LocalDate paymentDate,

@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
@@ -40,6 +41,7 @@ public class SteelManagementService {
                 .usage(request.usage())
                 .memo(request.memo())
                 .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
+                .type(request.type())
                 .build();
 
         steelManagement = steelManagementRepository.save(steelManagement);
