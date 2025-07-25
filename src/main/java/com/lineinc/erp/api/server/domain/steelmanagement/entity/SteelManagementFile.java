@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.steelManagement.entity;
+package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -21,7 +21,7 @@ public class SteelManagementFile extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "steel_management_file_seq")
     @SequenceGenerator(name = "steel_management_file_seq", sequenceName = "steel_management_file_seq", allocationSize = 1)
     private Long id;
-    
+
     /**
      * 강재수불부 참조
      */

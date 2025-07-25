@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.steelManagement.entity;
+package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -11,16 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QSteelManagement is a Querydsl query type for SteelManagement
+ * QSteelManagementFile is a Querydsl query type for SteelManagementFile
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QSteelManagement extends EntityPathBase<SteelManagement> {
+public class QSteelManagementFile extends EntityPathBase<SteelManagementFile> {
 
-    private static final long serialVersionUID = 1500146834L;
+    private static final long serialVersionUID = 58305870L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QSteelManagement steelManagement = new QSteelManagement("steelManagement");
+    public static final QSteelManagementFile steelManagementFile = new QSteelManagementFile("steelManagementFile");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
@@ -36,13 +36,17 @@ public class QSteelManagement extends EntityPathBase<SteelManagement> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final StringPath fileUrl = createString("fileUrl");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");
 
-    public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
+    public final StringPath name = createString("name");
 
-    public final com.lineinc.erp.api.server.domain.site.entity.QSiteProcess siteProcess;
+    public final StringPath originalFileName = createString("originalFileName");
+
+    public final QSteelManagement steelManagement;
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
@@ -50,28 +54,25 @@ public class QSteelManagement extends EntityPathBase<SteelManagement> {
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
 
-    public final StringPath usage = createString("usage");
-
-    public QSteelManagement(String variable) {
-        this(SteelManagement.class, forVariable(variable), INITS);
+    public QSteelManagementFile(String variable) {
+        this(SteelManagementFile.class, forVariable(variable), INITS);
     }
 
-    public QSteelManagement(Path<? extends SteelManagement> path) {
+    public QSteelManagementFile(Path<? extends SteelManagementFile> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QSteelManagement(PathMetadata metadata) {
+    public QSteelManagementFile(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QSteelManagement(PathMetadata metadata, PathInits inits) {
-        this(SteelManagement.class, metadata, inits);
+    public QSteelManagementFile(PathMetadata metadata, PathInits inits) {
+        this(SteelManagementFile.class, metadata, inits);
     }
 
-    public QSteelManagement(Class<? extends SteelManagement> type, PathMetadata metadata, PathInits inits) {
+    public QSteelManagementFile(Class<? extends SteelManagementFile> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.site = inits.isInitialized("site") ? new com.lineinc.erp.api.server.domain.site.entity.QSite(forProperty("site"), inits.get("site")) : null;
-        this.siteProcess = inits.isInitialized("siteProcess") ? new com.lineinc.erp.api.server.domain.site.entity.QSiteProcess(forProperty("siteProcess"), inits.get("siteProcess")) : null;
+        this.steelManagement = inits.isInitialized("steelManagement") ? new QSteelManagement(forProperty("steelManagement"), inits.get("steelManagement")) : null;
     }
 
 }

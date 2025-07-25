@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.steelManagement.entity;
+package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;

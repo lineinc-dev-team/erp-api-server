@@ -29,6 +29,7 @@ public final class AppConstants {
     public static final String MENU_CLIENT_COMPANY = "발주처 관리";
     public static final String MENU_SITE = "현장관리";
     public static final String MENU_MANAGEMENT_COST = "관리비 관리";
+    public static final String MENU_STEEL_MANAGEMENT = "강재 관리";
 
     // 시스템 기본 메뉴 이름 목록
     public static final List<String> MENU_NAMES = List.of(
@@ -36,7 +37,8 @@ public final class AppConstants {
             MENU_PERMISSION,
             MENU_CLIENT_COMPANY,
             MENU_SITE,
-            MENU_MANAGEMENT_COST
+            MENU_MANAGEMENT_COST,
+            MENU_STEEL_MANAGEMENT
     );
 
     // 직급(Grade) 관련 상수

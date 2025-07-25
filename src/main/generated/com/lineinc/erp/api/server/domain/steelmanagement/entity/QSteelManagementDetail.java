@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.steelManagement.entity;
+package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QSteelManagementDetail extends EntityPathBase<SteelManagementDetail> {
 
-    private static final long serialVersionUID = -402244733L;
+    private static final long serialVersionUID = 136651683L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
