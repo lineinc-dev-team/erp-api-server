@@ -44,6 +44,7 @@ public class SteelManagementService {
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
+        validateCreatableSteelType(request.type());
         SteelManagement steelManagement = SteelManagement.builder()
                 .site(site)
                 .siteProcess(siteProcess)
@@ -76,4 +77,13 @@ public class SteelManagementService {
 
         steelManagementRepository.saveAll(steelManagements);
     }
+
+    private void validateCreatableSteelType(SteelManagementType type) {
+        if (!(type == SteelManagementType.ORDER
+                || type == SteelManagementType.PURCHASE
+                || type == SteelManagementType.LEASE)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.INVALID_INITIAL_STEEL_TYPE);
+        }
+    }
 }
+

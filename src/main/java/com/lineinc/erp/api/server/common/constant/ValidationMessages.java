@@ -32,4 +32,5 @@ public final class ValidationMessages {
     public static final String SITE_PROCESS_NOT_MATCH_SITE = "해당 공정은 요청한 현장에 포함되어 있지 않습니다.";
     public static final String MANAGEMENT_COST_NOT_FOUND = "존재하지 않는 관리비입니다.";
     public static final String STEEL_MANAGEMENT_NOT_FOUND = "강재 관리를 찾을 수 없습니다.";
+    public static final String INVALID_INITIAL_STEEL_TYPE = "초기 타입은 발주, 매입, 임대만 가능합니다.";
 }

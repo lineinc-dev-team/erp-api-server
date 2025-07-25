@@ -13,8 +13,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
