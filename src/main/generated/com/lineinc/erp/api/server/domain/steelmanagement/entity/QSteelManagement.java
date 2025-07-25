@@ -36,9 +36,13 @@ public class QSteelManagement extends EntityPathBase<SteelManagement> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final ListPath<SteelManagementFile, QSteelManagementFile> files = this.<SteelManagementFile, QSteelManagementFile>createList("files", SteelManagementFile.class, QSteelManagementFile.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");
+
+    public final DateTimePath<java.time.OffsetDateTime> paymentDate = createDateTime("paymentDate", java.time.OffsetDateTime.class);
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
 

@@ -8,6 +8,10 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,6 +32,13 @@ public class SteelManagement extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_process_id", nullable = false)
     private SiteProcess siteProcess;
+
+    @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SteelManagementFile> files = new ArrayList<>();
+
+    @Column
+    private OffsetDateTime paymentDate;
 
     /**
      * 용도

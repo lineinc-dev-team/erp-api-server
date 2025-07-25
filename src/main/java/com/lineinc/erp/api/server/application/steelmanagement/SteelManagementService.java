@@ -39,6 +39,7 @@ public class SteelManagementService {
                 .siteProcess(siteProcess)
                 .usage(request.usage())
                 .memo(request.memo())
+                .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
                 .build();
 
         steelManagement = steelManagementRepository.save(steelManagement);
