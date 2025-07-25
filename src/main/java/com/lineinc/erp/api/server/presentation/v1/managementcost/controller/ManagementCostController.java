@@ -59,7 +59,7 @@ public class ManagementCostController {
 
     @Operation(
             summary = "관리비 삭제",
-            description = "하나 이상의 관리비 ID를 받아 해당 관리비를 삭제합니다."
+            description = "하나 이상의 관리비 ID를 받아 해당 데이터를 삭제합니다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제 성공"),

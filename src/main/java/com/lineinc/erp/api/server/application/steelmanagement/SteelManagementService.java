@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagem
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
@@ -23,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +63,17 @@ public class SteelManagementService {
         return steelManagementRepository.findAll(request, pageable);
     }
 
+    @Transactional
+    public void deleteSteelManagements(DeleteSteelManagementRequest request) {
+        List<SteelManagement> steelManagements = steelManagementRepository.findAllById(request.steelManagementIds());
+        if (steelManagements.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);
+        }
 
+        for (SteelManagement steelManagement : steelManagements) {
+            steelManagement.markAsDeleted();
+        }
+
+        steelManagementRepository.saveAll(steelManagements);
+    }
 }
