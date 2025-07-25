@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
@@ -17,6 +18,11 @@ import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.De
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementDownloadRequest;
+import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
+import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import jakarta.servlet.http.HttpServletResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -116,5 +122,35 @@ public class SteelManagementController {
     ) {
         steelManagementService.releaseSteelManagements(request);
         return ResponseEntity.ok().build();
+    }
+
+
+    @Operation(
+            summary = "강재 관리 목록 엑셀 다운로드",
+            description = "검색 조건에 맞는 강재 관리 목록을 엑셀 파일로 다운로드합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류")
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public void downloadSteelManagementsExcel(
+            @Valid SortRequest sortRequest,
+            @Valid SteelManagementListRequest request,
+            @Valid SteelManagementDownloadRequest steelManagementDownloadRequest,
+            HttpServletResponse response
+    ) throws java.io.IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(steelManagementDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, SteelManagementDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "강재 관리 목록.xlsx");
+
+        try (Workbook workbook = steelManagementService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed
+        )) {
+            workbook.write(response.getOutputStream());
+        }
     }
 }

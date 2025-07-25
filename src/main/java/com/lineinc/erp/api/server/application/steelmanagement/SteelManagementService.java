@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.application.site.SiteProcessService;
 import com.lineinc.erp.api.server.application.site.SiteService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -19,8 +20,10 @@ import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.St
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,5 +122,71 @@ public class SteelManagementService {
         }
 
         steelManagementRepository.saveAll(steelManagements);
+    }
+
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(SteelManagementListRequest request, Sort sort, List<String> fields) {
+        List<SteelManagementResponse> steelManagementResponses = steelManagementRepository.findAllWithoutPaging(request, sort)
+                .stream()
+                .map(SteelManagementResponse::from)
+                .toList();
+
+        return ExcelExportUtils.generateWorkbook(
+                steelManagementResponses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue
+        );
+    }
+
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "siteName" -> "현장명";
+            case "processName" -> "공정명";
+            case "paymentDate" -> "일자";
+            case "standard" -> "규격";
+            case "name" -> "품명";
+            case "unit" -> "단위";
+            case "count" -> "본";
+            case "length" -> "길이";
+            case "totalLength" -> "총 길이";
+            case "unitWeight" -> "단위중량";
+            case "quantity" -> "수량";
+            case "unitPrice" -> "단가";
+            case "supplyPrice" -> "공급가";
+            case "usage" -> "용도";
+            case "hasFile" -> "첨부";
+            case "type" -> "구분";
+            case "memo" -> "비고";
+            default -> null;
+        };
+    }
+
+    private String getExcelCellValue(SteelManagementResponse steelManagement, String field) {
+        boolean hasNoDetails = steelManagement.details().isEmpty();
+        var firstDetail = hasNoDetails ? null : steelManagement.details().get(0);
+
+        return switch (field) {
+            case "id" -> String.valueOf(steelManagement.id());
+            case "siteName" -> steelManagement.site().name();
+            case "processName" -> steelManagement.process().name();
+            case "paymentDate" -> DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.paymentDate());
+            case "standard" -> hasNoDetails ? "" : firstDetail.standard();
+            case "name" -> hasNoDetails ? "" : firstDetail.name();
+            case "unit" -> hasNoDetails ? "" : firstDetail.unit();
+            case "count" -> hasNoDetails ? "" : firstDetail.count().toString();
+            case "length" -> hasNoDetails ? "" : firstDetail.length().toString();
+            case "totalLength" -> hasNoDetails ? "" : firstDetail.totalLength().toString();
+            case "unitWeight" -> hasNoDetails ? "" : firstDetail.unitWeight().toString();
+            case "quantity" -> hasNoDetails ? "" : firstDetail.quantity().toString();
+            case "unitPrice" -> hasNoDetails ? "" : firstDetail.unitPrice().toString();
+            case "supplyPrice" -> hasNoDetails ? "" : firstDetail.supplyPrice().toString();
+            case "usage" -> steelManagement.usage();
+            case "hasFile" -> steelManagement.hasFile() ? "Y" : "N";
+            case "type" -> steelManagement.type();
+            case "memo" -> steelManagement.memo();
+            default -> null;
+        };
     }
 }

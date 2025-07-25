@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -34,6 +35,11 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
 
     private final JPAQueryFactory queryFactory;
 
+    private final QSteelManagement steelManagement = QSteelManagement.steelManagement;
+    private final QSite site = QSite.site;
+    private final QSiteProcess siteProcess = QSiteProcess.siteProcess;
+    private final QSteelManagementDetail detail = QSteelManagementDetail.steelManagementDetail;
+
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
             "id", QSteelManagement.steelManagement.id,
             "paymentDate", QSteelManagement.steelManagement.paymentDate,
@@ -43,10 +49,56 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
 
     @Override
     public Page<SteelManagementResponse> findAll(SteelManagementListRequest request, Pageable pageable) {
-        QSteelManagement steelManagement = QSteelManagement.steelManagement;
-        QSite site = QSite.site;
-        QSiteProcess siteProcess = QSiteProcess.siteProcess;
-        QSteelManagementDetail detail = QSteelManagementDetail.steelManagementDetail;
+
+        BooleanBuilder builder = buildCondition(request);
+
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+
+        List<SteelManagement> content = queryFactory
+                .selectFrom(steelManagement)
+                .distinct()
+                .leftJoin(steelManagement.site, site).fetchJoin()
+                .leftJoin(steelManagement.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(steelManagement.details, detail)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(orders)
+                .fetch();
+
+        Long totalCount = queryFactory
+                .select(steelManagement.count())
+                .from(steelManagement)
+                .where(builder)
+                .fetchOne();
+        long total = java.util.Objects.requireNonNullElse(totalCount, 0L);
+
+        List<SteelManagementResponse> responses = content.stream()
+                .map(SteelManagementResponse::from)
+                .toList();
+
+        return new PageImpl<>(responses, pageable, total);
+    }
+
+    @Override
+    public List<SteelManagement> findAllWithoutPaging(SteelManagementListRequest request, Sort sort) {
+
+        BooleanBuilder builder = buildCondition(request);
+
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        return queryFactory
+                .selectFrom(steelManagement)
+                .distinct()
+                .leftJoin(steelManagement.site, site).fetchJoin()
+                .leftJoin(steelManagement.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(steelManagement.details, detail)
+                .where(builder)
+                .orderBy(orders)
+                .fetch();
+    }
+
+    private BooleanBuilder buildCondition(SteelManagementListRequest request) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -84,31 +136,6 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
             );
         }
 
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
-
-        List<SteelManagement> content = queryFactory
-                .selectFrom(steelManagement)
-                .distinct()
-                .leftJoin(steelManagement.site, site).fetchJoin()
-                .leftJoin(steelManagement.siteProcess, siteProcess).fetchJoin()
-                .leftJoin(steelManagement.details, detail)
-                .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(orders)
-                .fetch();
-
-        Long totalCount = queryFactory
-                .select(steelManagement.count())
-                .from(steelManagement)
-                .where(builder)
-                .fetchOne();
-        long total = java.util.Objects.requireNonNullElse(totalCount, 0L);
-
-        List<SteelManagementResponse> responses = content.stream()
-                .map(SteelManagementResponse::from)
-                .toList();
-
-        return new PageImpl<>(responses, pageable, total);
+        return builder;
     }
 }
