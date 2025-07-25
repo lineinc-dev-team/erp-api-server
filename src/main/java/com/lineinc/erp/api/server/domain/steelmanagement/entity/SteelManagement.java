@@ -43,6 +43,7 @@ public class SteelManagement extends BaseEntity {
     private List<SteelManagementDetail> details = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @Setter
     @Column
     private SteelManagementType type;
 

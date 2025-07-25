@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagem
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
@@ -85,5 +86,21 @@ public class SteelManagementService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.INVALID_INITIAL_STEEL_TYPE);
         }
     }
-}
 
+    @Transactional
+    public void approveSteelManagements(ApproveSteelManagementRequest request) {
+        List<SteelManagement> steelManagements = steelManagementRepository.findAllById(request.steelManagementIds());
+        if (steelManagements.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);
+        }
+
+        for (SteelManagement steelManagement : steelManagements) {
+            if (steelManagement.getType() == SteelManagementType.RELEASE) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.CANNOT_APPROVE_RELEASED_STEEL);
+            }
+            steelManagement.setType(SteelManagementType.APPROVAL);
+        }
+
+        steelManagementRepository.saveAll(steelManagements);
+    }
+}
