@@ -102,4 +102,19 @@ public class SteelManagementController {
         steelManagementService.approveSteelManagements(request);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "강재 관리 반출 처리", description = "하나 이상의 강재 관리 ID를 받아 구분값을 반출로 변경합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "반출 처리 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
+    })
+    @PatchMapping("/release")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<Void> releaseSteelManagements(
+            @Valid @RequestBody ApproveSteelManagementRequest request
+    ) {
+        steelManagementService.releaseSteelManagements(request);
+        return ResponseEntity.ok().build();
+    }
 }

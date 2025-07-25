@@ -103,4 +103,21 @@ public class SteelManagementService {
 
         steelManagementRepository.saveAll(steelManagements);
     }
+
+    @Transactional
+    public void releaseSteelManagements(ApproveSteelManagementRequest request) {
+        List<SteelManagement> steelManagements = steelManagementRepository.findAllById(request.steelManagementIds());
+        if (steelManagements.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);
+        }
+
+        for (SteelManagement steelManagement : steelManagements) {
+            if (steelManagement.getType() != SteelManagementType.APPROVAL) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.CANNOT_RELEASE_NON_APPROVED_STEEL);
+            }
+            steelManagement.setType(SteelManagementType.RELEASE);
+        }
+
+        steelManagementRepository.saveAll(steelManagements);
+    }
 }
