@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum FileUploadTarget {
     CLIENT_COMPANY("client-company"),
     SITE("site"),
-    MANAGEMENT_COST("management-cost");
+    MANAGEMENT_COST("management-cost"),
+    STEEL_MANAGEMENT("steel-management");
 
     private final String directory;
 
