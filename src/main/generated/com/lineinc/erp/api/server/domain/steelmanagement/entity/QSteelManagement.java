@@ -36,6 +36,8 @@ public class QSteelManagement extends EntityPathBase<SteelManagement> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final ListPath<SteelManagementDetail, QSteelManagementDetail> details = this.<SteelManagementDetail, QSteelManagementDetail>createList("details", SteelManagementDetail.class, QSteelManagementDetail.class, PathInits.DIRECT2);
+
     public final ListPath<SteelManagementFile, QSteelManagementFile> files = this.<SteelManagementFile, QSteelManagementFile>createList("files", SteelManagementFile.class, QSteelManagementFile.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);

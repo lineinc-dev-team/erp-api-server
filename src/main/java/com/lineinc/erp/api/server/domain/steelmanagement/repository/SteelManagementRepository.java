@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SteelManagementRepository extends JpaRepository<SteelManagement, Long> {
+public interface SteelManagementRepository extends JpaRepository<SteelManagement, Long>, SteelManagementRepositoryCustom {
 }

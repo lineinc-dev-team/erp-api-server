@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response;
 
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "강재 관리 상세 목록 응답")
@@ -37,4 +38,19 @@ public record SteelManagementDetailResponse(
         @Schema(description = "비고", example = "특별 관리 대상")
         String memo
 ) {
+    public static SteelManagementDetailResponse from(SteelManagementDetail detail) {
+        return new SteelManagementDetailResponse(
+                detail.getStandard(),
+                detail.getName(),
+                detail.getUnit(),
+                detail.getCount(),
+                detail.getLength(),
+                detail.getTotalLength(),
+                detail.getUnitWeight(),
+                detail.getQuantity(),
+                detail.getUnitPrice(),
+                detail.getSupplyPrice(),
+                detail.getMemo()
+        );
+    }
 }

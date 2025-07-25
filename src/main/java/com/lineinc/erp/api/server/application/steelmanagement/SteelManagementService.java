@@ -11,8 +11,14 @@ import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,4 +54,11 @@ public class SteelManagementService {
         steelManagementDetailService.createSteelManagementDetail(steelManagement, request.details());
         steelManagementFileService.createSteelManagementFiles(steelManagement, request.files());
     }
+
+    @Transactional(readOnly = true)
+    public Page<SteelManagementResponse> getSteelManagementList(SteelManagementListRequest request, Pageable pageable) {
+        return steelManagementRepository.findAll(request, pageable);
+    }
+
+
 }

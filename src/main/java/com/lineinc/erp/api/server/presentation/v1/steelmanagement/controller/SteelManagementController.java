@@ -4,10 +4,14 @@ import com.lineinc.erp.api.server.application.steelmanagement.SteelManagementSer
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
+import com.lineinc.erp.api.server.common.response.PagingInfo;
+import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
@@ -17,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,19 +47,25 @@ public class SteelManagementController {
         return ResponseEntity.ok().build();
     }
 
-//    @Operation(summary = "강재 관리 목록 조회", description = "등록된 강재 관리 목록을 조회합니다.")
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "200", description = "조회 성공"),
-//            @ApiResponse(responseCode = "400", description = "입력값 오류")
-//    })
-//    @GetMapping
-//    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
-//    public ResponseEntity<SuccessResponse<SteelManagementResponse>> getSteelManagementList(
-//            @Valid PageRequest pageRequest,
-//            @Valid SortRequest sortRequest,
-//            @Valid SteelManagementListRequest request
-//    ) {
-//        List<SteelManagementResponse> list = steelManagementService.getSteelManagementList();
-//        return ResponseEntity.ok(SuccessResponse.of(list));
-//    }
+    @Operation(summary = "강재 관리 목록 조회", description = "등록된 강재 관리 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류")
+    })
+    @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementResponse>>> getSteelManagementList(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid SteelManagementListRequest request
+    ) {
+        Page<SteelManagementResponse> page = steelManagementService.getSteelManagementList(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
+        );
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+        ));
+    }
 }

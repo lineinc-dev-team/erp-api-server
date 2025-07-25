@@ -13,6 +13,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,6 +39,10 @@ public class SteelManagement extends BaseEntity {
     @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SteelManagementFile> files = new ArrayList<>();
+
+    @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SteelManagementDetail> details = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column
