@@ -2,6 +2,10 @@ package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import jakarta.persistence.*;
@@ -52,4 +56,12 @@ public class MaterialManagement extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MaterialManagementDetail> details = new ArrayList<>();
+
+    @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MaterialManagementFile> files = new ArrayList<>();
 }

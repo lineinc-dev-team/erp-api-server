@@ -1,0 +1,37 @@
+package com.lineinc.erp.api.server.application.materialmanagement;
+
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementFileCreateRequest;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class MaterialManagementFileService {
+
+
+    @Transactional
+    public void createMaterialFileManagement(
+            MaterialManagement materialManagement,
+            List<MaterialManagementFileCreateRequest> requests) {
+
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        requests.stream()
+                .filter(file -> file.name() != null && !file.name().isBlank())
+                .map(file -> MaterialManagementFile.builder()
+                        .materialManagement(materialManagement)
+                        .name(file.name())
+                        .fileUrl(file.fileUrl())
+                        .originalFileName(file.originalFileName())
+                        .memo(file.memo())
+                        .build())
+                .forEach(materialManagement.getFiles()::add);
+    }
+}

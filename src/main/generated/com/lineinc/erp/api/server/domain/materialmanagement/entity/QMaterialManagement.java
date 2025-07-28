@@ -38,6 +38,10 @@ public class QMaterialManagement extends EntityPathBase<MaterialManagement> {
 
     public final DateTimePath<java.time.OffsetDateTime> deliveryDate = createDateTime("deliveryDate", java.time.OffsetDateTime.class);
 
+    public final ListPath<MaterialManagementDetail, QMaterialManagementDetail> details = this.<MaterialManagementDetail, QMaterialManagementDetail>createList("details", MaterialManagementDetail.class, QMaterialManagementDetail.class, PathInits.DIRECT2);
+
+    public final ListPath<MaterialManagementFile, QMaterialManagementFile> files = this.<MaterialManagementFile, QMaterialManagementFile>createList("files", MaterialManagementFile.class, QMaterialManagementFile.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final EnumPath<com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType> inputType = createEnum("inputType", com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType.class);
