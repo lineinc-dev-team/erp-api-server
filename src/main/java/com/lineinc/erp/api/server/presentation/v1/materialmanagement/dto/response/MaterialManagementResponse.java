@@ -23,6 +23,9 @@ public record MaterialManagementResponse(
         @Schema(description = "납품일자", example = "2025-07-28")
         OffsetDateTime deliveryDate,
 
+        @Schema(description = "첨부파일 존재 여부", example = "true")
+        Boolean hasFile,
+
         @Schema(description = "비고", example = "1차 납품 완료")
         String memo,
 
@@ -33,10 +36,7 @@ public record MaterialManagementResponse(
         SiteProcessResponse.SiteProcessSimpleResponse process,
 
         @Schema(description = "상세 목록")
-        List<MaterialManagementDetailResponse> details,
-
-        @Schema(description = "파일 목록")
-        List<MaterialManagementFileResponse> files
+        List<MaterialManagementDetailResponse> details
 ) {
     public static MaterialManagementResponse from(MaterialManagement entity) {
         return new MaterialManagementResponse(
@@ -44,14 +44,12 @@ public record MaterialManagementResponse(
                 entity.getInputType() != null ? entity.getInputType().getLabel() : null,
                 entity.getInputTypeDescription(),
                 entity.getDeliveryDate() != null ? entity.getDeliveryDate() : null,
+                entity.getFiles() != null && !entity.getFiles().isEmpty(),
                 entity.getMemo(),
                 SiteResponse.SiteSimpleResponse.from(entity.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(entity.getSiteProcess()),
                 entity.getDetails().stream()
                         .map(MaterialManagementDetailResponse::from)
-                        .collect(Collectors.toList()),
-                entity.getFiles().stream()
-                        .map(MaterialManagementFileResponse::from)
                         .collect(Collectors.toList())
         );
     }

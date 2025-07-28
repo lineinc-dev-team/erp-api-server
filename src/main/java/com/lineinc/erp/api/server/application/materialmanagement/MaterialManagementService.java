@@ -131,7 +131,7 @@ public class MaterialManagementService {
             case "supplyPrice" -> materialManagement.details().get(0).supplyPrice().toString();
             case "vat" -> materialManagement.details().get(0).vat().toString();
             case "total" -> materialManagement.details().get(0).total().toString();
-            case "hasFile" -> !materialManagement.files().isEmpty() ? "Y" : "N";
+            case "hasFile" -> !materialManagement.hasFile() ? "Y" : "N";
             case "memo" -> materialManagement.memo();
             default -> "";
         };
@@ -157,7 +157,7 @@ public class MaterialManagementService {
         materialManagement.changeSite(site);
         materialManagement.changeSiteProcess(siteProcess);
         materialManagement.updateFrom(request);
-        
+
         materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details());
         materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files());
     }
