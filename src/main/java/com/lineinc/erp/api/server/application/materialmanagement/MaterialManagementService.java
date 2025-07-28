@@ -7,11 +7,17 @@ import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManag
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
-import jakarta.transaction.Transactional;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
@@ -47,5 +53,10 @@ public class MaterialManagementService {
         materialManagementDetailService.createMaterialDetailManagement(materialManagement, request.details());
         materialManagementFileService.createMaterialFileManagement(materialManagement, request.files());
         materialManagementRepository.save(materialManagement);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MaterialManagementResponse> getAllMaterialManagements(MaterialManagementListRequest request, Pageable pageable) {
+        return materialManagementRepository.findAll(request, pageable);
     }
 }

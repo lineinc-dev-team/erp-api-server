@@ -2,9 +2,17 @@ package com.lineinc.erp.api.server.presentation.v1.materialmanagement.controller
 
 import com.lineinc.erp.api.server.application.materialmanagement.MaterialManagementService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
+import com.lineinc.erp.api.server.common.request.PageRequest;
+import com.lineinc.erp.api.server.common.request.SortRequest;
+import com.lineinc.erp.api.server.common.response.PagingInfo;
+import com.lineinc.erp.api.server.common.response.PagingResponse;
+import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,5 +48,31 @@ public class MaterialManagementController {
     ) {
         materialManagementService.createMaterialManagement(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "자재관리 목록 조회",
+            description = "필터 조건에 맞는 자재관리 목록을 조회합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "자재관리 목록 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<MaterialManagementResponse>>> getMaterialManagements(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid MaterialManagementListRequest request
+    ) {
+
+        Page<MaterialManagementResponse> page = materialManagementService.getAllMaterialManagements(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
+        );
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+        ));
     }
 }
