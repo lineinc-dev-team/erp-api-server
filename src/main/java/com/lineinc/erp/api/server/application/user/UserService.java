@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.application.user;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.common.util.MailUtils;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
@@ -35,7 +34,6 @@ public class UserService {
 
     private final UserRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MailUtils mailUtils;
 
     @Value("${USER_DEFAULT_PASSWORD}")
     private String defaultPassword;
