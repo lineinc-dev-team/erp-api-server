@@ -32,9 +32,6 @@ public class ClientCompany extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    /**
-     * 사업자등록번호
-     */
     @Column
     private String businessNumber;
 
