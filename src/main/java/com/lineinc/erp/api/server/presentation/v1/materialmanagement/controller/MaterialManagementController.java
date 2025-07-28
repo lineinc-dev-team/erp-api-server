@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
@@ -75,4 +76,24 @@ public class MaterialManagementController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())
         ));
     }
+
+    @Operation(
+            summary = "자재관리 삭제",
+            description = "하나 이상의 자재관리 ID를 받아 해당 데이터를 삭제합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음")
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteMaterialManagements(
+            @RequestBody DeleteMaterialManagementsRequest materialManagementIds
+    ) {
+        materialManagementService.deleteMaterialManagements(materialManagementIds);
+        return ResponseEntity.ok().build();
+    }
 }
+
+

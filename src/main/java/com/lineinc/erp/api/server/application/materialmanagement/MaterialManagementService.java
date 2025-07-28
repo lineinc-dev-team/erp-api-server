@@ -7,8 +7,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManag
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
@@ -21,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,4 +59,20 @@ public class MaterialManagementService {
     public Page<MaterialManagementResponse> getAllMaterialManagements(MaterialManagementListRequest request, Pageable pageable) {
         return materialManagementRepository.findAll(request, pageable);
     }
+
+    @Transactional
+    public void deleteMaterialManagements(DeleteMaterialManagementsRequest request) {
+        List<MaterialManagement> materialManagements = materialManagementRepository.findAllById(request.materialManagementIds());
+        if (materialManagements.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND);
+        }
+
+        for (MaterialManagement materialManagement : materialManagements) {
+            materialManagement.markAsDeleted();
+        }
+
+        materialManagementRepository.saveAll(materialManagements);
+    }
 }
+
+
