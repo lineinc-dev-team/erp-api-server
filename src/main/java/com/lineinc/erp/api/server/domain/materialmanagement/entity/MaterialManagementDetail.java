@@ -1,6 +1,9 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementDetailUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,7 +18,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class MaterialManagementDetail extends BaseEntity {
+public class MaterialManagementDetail extends BaseEntity implements UpdatableFrom<MaterialManagementDetailUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_management_detail_seq")
@@ -80,4 +83,17 @@ public class MaterialManagementDetail extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    @Override
+    public void updateFrom(MaterialManagementDetailUpdateRequest request) {
+        java.util.Optional.ofNullable(request.name()).ifPresent(v -> this.name = v);
+        java.util.Optional.ofNullable(request.standard()).ifPresent(v -> this.standard = v);
+        java.util.Optional.ofNullable(request.usage()).ifPresent(v -> this.usage = v);
+        java.util.Optional.ofNullable(request.quantity()).ifPresent(v -> this.quantity = v);
+        java.util.Optional.ofNullable(request.unitPrice()).ifPresent(v -> this.unitPrice = v);
+        java.util.Optional.ofNullable(request.supplyPrice()).ifPresent(v -> this.supplyPrice = v);
+        java.util.Optional.ofNullable(request.vat()).ifPresent(v -> this.vat = v);
+        java.util.Optional.ofNullable(request.total()).ifPresent(v -> this.total = v);
+        java.util.Optional.ofNullable(request.memo()).ifPresent(v -> this.memo = v);
+    }
 }

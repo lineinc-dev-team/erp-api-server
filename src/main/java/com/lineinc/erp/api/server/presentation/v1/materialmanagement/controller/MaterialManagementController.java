@@ -14,10 +14,7 @@ import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
-import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
-import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementDownloadRequest;
-import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -152,6 +149,25 @@ public class MaterialManagementController {
         return ResponseEntity.ok(
                 SuccessResponse.of(response)
         );
+    }
+
+    @Operation(
+            summary = "자재관리 정보 수정",
+            description = "자재관리 정보를 수정합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "해당 자재관리를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateMaterialManagement(
+            @PathVariable Long id,
+            @Valid @RequestBody MaterialManagementUpdateRequest request
+    ) {
+        materialManagementService.updateMaterialManagement(id, request);
+        return ResponseEntity.ok().build();
     }
 }
 

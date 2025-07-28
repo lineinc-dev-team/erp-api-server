@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.Ma
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import lombok.RequiredArgsConstructor;
@@ -142,5 +143,24 @@ public class MaterialManagementService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
         return MaterialManagementDetailViewResponse.from(materialManagement);
     }
+
+    @Transactional
+    public void updateMaterialManagement(Long id, MaterialManagementUpdateRequest request) {
+        MaterialManagement materialManagement = materialManagementRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        if (!siteProcess.getSite().getId().equals(site.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+        }
+
+        materialManagement.changeSite(site);
+        materialManagement.changeSiteProcess(siteProcess);
+        materialManagement.updateFrom(request);
+        
+        materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details());
+        materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files());
+    }
 }
+
 

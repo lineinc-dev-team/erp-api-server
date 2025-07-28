@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.materialmanagement;
 
+import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
@@ -7,6 +8,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementDetailCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementDetailUpdateRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,4 +49,27 @@ public class MaterialManagementDetailService {
                         .build())
                 .forEach(materialManagement.getDetails()::add);
     }
+
+
+    @Transactional
+    public void updateMaterialManagementDetails(MaterialManagement materialManagement, List<MaterialManagementDetailUpdateRequest> requests) {
+        EntitySyncUtils.syncList(
+                materialManagement.getDetails(),
+                requests,
+                (MaterialManagementDetailUpdateRequest dto) -> MaterialManagementDetail.builder()
+                        .materialManagement(materialManagement)
+                        .name(dto.name())
+                        .standard(dto.standard())
+                        .usage(dto.usage())
+                        .quantity(dto.quantity())
+                        .unitPrice(dto.unitPrice())
+                        .supplyPrice(dto.supplyPrice())
+                        .vat(dto.vat())
+                        .total(dto.total())
+                        .memo(dto.memo())
+                        .build()
+        );
+    }
 }
+
+

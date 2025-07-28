@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.application.materialmanagement;
 
+import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementFileCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementFileUpdateRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,4 +36,22 @@ public class MaterialManagementFileService {
                         .build())
                 .forEach(materialManagement.getFiles()::add);
     }
+
+    @Transactional
+    public void updateMaterialManagementFiles(
+            MaterialManagement materialManagement,
+            List<MaterialManagementFileUpdateRequest> requests) {
+        EntitySyncUtils.syncList(
+                materialManagement.getFiles(),
+                requests,
+                (MaterialManagementFileUpdateRequest dto) -> MaterialManagementFile.builder()
+                        .materialManagement(materialManagement)
+                        .name(dto.name())
+                        .fileUrl(dto.fileUrl())
+                        .originalFileName(dto.originalFileName())
+                        .memo(dto.memo())
+                        .build()
+        );
+    }
 }
+

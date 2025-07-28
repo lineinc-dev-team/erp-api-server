@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 
+import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 
@@ -8,12 +9,14 @@ import java.util.List;
 
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -64,4 +67,24 @@ public class MaterialManagement extends BaseEntity {
     @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MaterialManagementFile> files = new ArrayList<>();
+
+
+    public void updateFrom(MaterialManagementUpdateRequest request) {
+        Optional.ofNullable(request.inputType())
+                .ifPresent(value -> this.inputType = value);
+        Optional.ofNullable(request.inputTypeDescription())
+                .ifPresent(value -> this.inputTypeDescription = value);
+        Optional.ofNullable(request.deliveryDate())
+                .ifPresent(value -> this.deliveryDate = DateTimeFormatUtils.toOffsetDateTime(value));
+        Optional.ofNullable(request.memo())
+                .ifPresent(value -> this.memo = value);
+    }
+
+    public void changeSite(Site site) {
+        this.site = site;
+    }
+
+    public void changeSiteProcess(SiteProcess siteProcess) {
+        this.siteProcess = siteProcess;
+    }
 }

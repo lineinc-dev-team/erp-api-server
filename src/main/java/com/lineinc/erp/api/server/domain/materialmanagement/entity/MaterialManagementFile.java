@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementFileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,13 +11,15 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.Optional;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class MaterialManagementFile extends BaseEntity {
+public class MaterialManagementFile extends BaseEntity implements UpdatableFrom<MaterialManagementFileUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_management_file_seq")
@@ -49,4 +53,11 @@ public class MaterialManagementFile extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    public void updateFrom(MaterialManagementFileUpdateRequest request) {
+        Optional.ofNullable(request.name()).ifPresent(value -> this.name = value);
+        Optional.ofNullable(request.fileUrl()).ifPresent(value -> this.fileUrl = value);
+        Optional.ofNullable(request.originalFileName()).ifPresent(value -> this.originalFileName = value);
+        Optional.ofNullable(request.memo()).ifPresent(value -> this.memo = value);
+    }
 }
