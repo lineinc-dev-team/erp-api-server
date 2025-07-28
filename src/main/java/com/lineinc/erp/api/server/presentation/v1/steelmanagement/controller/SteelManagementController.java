@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/steel-management")
+@RequestMapping("/api/v1/steel-managements")
 @RequiredArgsConstructor
 @Tag(name = "Steel Management", description = "강재 관리 API")
 public class SteelManagementController {
