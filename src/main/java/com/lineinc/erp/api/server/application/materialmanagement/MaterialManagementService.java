@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.Ma
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -94,7 +95,6 @@ public class MaterialManagementService {
         );
     }
 
-    // Maps field names to Korean column headers for Excel export.
     private String getExcelHeaderName(String field) {
         return switch (field) {
             case "siteName" -> "현장명";
@@ -135,4 +135,12 @@ public class MaterialManagementService {
             default -> "";
         };
     }
+
+    @Transactional(readOnly = true)
+    public MaterialManagementDetailViewResponse getMaterialManagementById(Long id) {
+        MaterialManagement materialManagement = materialManagementRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
+        return MaterialManagementDetailViewResponse.from(materialManagement);
+    }
 }
+

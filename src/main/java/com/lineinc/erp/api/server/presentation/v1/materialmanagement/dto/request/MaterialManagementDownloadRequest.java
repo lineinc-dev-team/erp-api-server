@@ -13,7 +13,7 @@ public record MaterialManagementDownloadRequest(
         @Schema(
                 description = "허용 필드: id, siteName, processName, inputType, deliveryDate, name, " +
                         "standard, usage, quantity, unitPrice, supplyPrice, vat, total, hasFile, memo",
-                example = "siteName,processName,inputType"
+                example = "id,siteName,processName,inputType"
         )
         String fields
 ) {

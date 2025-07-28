@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementDownloadRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -132,6 +133,25 @@ public class MaterialManagementController {
         )) {
             workbook.write(response.getOutputStream());
         }
+    }
+
+    @Operation(
+            summary = "자재관리 상세 조회",
+            description = "자재관리 상세 정보를 조회합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<MaterialManagementDetailViewResponse>> getMaterialManagementDetail(
+            @PathVariable Long id
+    ) {
+        MaterialManagementDetailViewResponse response = materialManagementService.getMaterialManagementById(id);
+        return ResponseEntity.ok(
+                SuccessResponse.of(response)
+        );
     }
 }
 
