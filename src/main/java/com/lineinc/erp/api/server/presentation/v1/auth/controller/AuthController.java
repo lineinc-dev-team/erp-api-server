@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
 import com.lineinc.erp.api.server.application.user.UserService;
+import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,8 +48,6 @@ public class AuthController {
             HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
-        int defaultSeconds = 1800;        // 예: 30분
-
         // 1. 로그인 인증 토큰 생성
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(request.loginId(), request.password());
@@ -56,10 +56,11 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(token);
 
         // 3. 로그인 성공한 사용자 정보
-        User user = (User) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+        User user = (User) principal;
 
         // 4. 마지막 로그인 시간 갱신
-        userService.updateLastLoginAt(user);
+        user.updateLastLoginAt();
 
         // 5. SecurityContext에 인증 정보 저장
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -74,8 +75,7 @@ public class AuthController {
         );
 
         // 세션 타임아웃 설정
-        session.setMaxInactiveInterval(defaultSeconds);
-
+        session.setMaxInactiveInterval(AppConstants.DEFAULT_SESSION_TIMEOUT_SECONDS);
         return ResponseEntity.ok().build();
     }
 

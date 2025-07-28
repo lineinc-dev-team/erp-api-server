@@ -54,12 +54,6 @@ public class UserService {
         usersRepository.save(user);
     }
 
-    @Transactional
-    public void updateLastLoginAt(User user) {
-        user.updateLastLoginAt(OffsetDateTime.now());
-        usersRepository.save(user);
-    }
-
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(UserListRequest request, Pageable pageable) {
         return usersRepository.findAll(request, pageable);

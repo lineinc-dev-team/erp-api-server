@@ -82,6 +82,9 @@ public final class AppConstants {
     // 시간 관련 상수
     public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
 
+    // 세션 타임아웃 기본값 (초 단위, 예: 1800초 = 30분)
+    public static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 1800;
+
     private AppConstants() {
     } // 인스턴스화 방지
 }

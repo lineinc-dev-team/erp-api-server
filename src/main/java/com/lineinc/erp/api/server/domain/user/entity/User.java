@@ -102,11 +102,9 @@ public class User extends BaseEntity implements UserDetails {
 
     /**
      * 최종 로그인 시각 수정
-     *
-     * @param now 현재 시각
      */
-    public void updateLastLoginAt(OffsetDateTime now) {
-        this.lastLoginAt = now;
+    public void updateLastLoginAt() {
+        this.lastLoginAt = OffsetDateTime.now();
     }
 
     /**
