@@ -152,7 +152,7 @@ public class ManagementCostController {
 
     @Operation(
             summary = "관리비 정보 수정",
-            description = "기존 관리비 정보를 수정합니다"
+            description = "관리비 정보를 수정합니다"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "수정 성공"),

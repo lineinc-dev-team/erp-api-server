@@ -1,6 +1,11 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
+
+import java.util.Optional;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementFileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,7 +20,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class SteelManagementFile extends BaseEntity {
+public class SteelManagementFile extends BaseEntity implements UpdatableFrom<SteelManagementFileUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "steel_management_file_seq")
@@ -53,4 +58,12 @@ public class SteelManagementFile extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고 / 메모
+
+    @Override
+    public void updateFrom(SteelManagementFileUpdateRequest request) {
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
+        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }

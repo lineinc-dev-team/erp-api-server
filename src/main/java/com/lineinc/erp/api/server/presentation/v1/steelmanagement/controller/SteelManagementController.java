@@ -10,13 +10,9 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementDownloadRequest;
 import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,14 +39,32 @@ public class SteelManagementController {
 
     @Operation(summary = "강재 관리 등록", description = "강재 관리 정보를 등록합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "등록 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류")
+            @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.CREATE)
     public ResponseEntity<SuccessResponse<Long>> createSteelManagement(
             @Valid @RequestBody SteelManagementCreateRequest request) {
         steelManagementService.createSteelManagement(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "강재 관리 수정",
+            description = "강재 관리 정보를 수정합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateSteelManagement(
+            @PathVariable Long id,
+            @Valid @RequestBody SteelManagementUpdateRequest request) {
+        steelManagementService.updateSteelManagement(id, request);
         return ResponseEntity.ok().build();
     }
 

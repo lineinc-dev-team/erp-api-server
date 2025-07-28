@@ -1,9 +1,11 @@
 package com.lineinc.erp.api.server.application.steelmanagement;
 
+import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementFileRepository;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementFileCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementFileUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,5 +36,20 @@ public class SteelManagementFileService {
                 .collect(Collectors.toList());
 
         steelManagementFileRepository.saveAll(files);
+    }
+
+    @Transactional
+    public void updateSteelManagementFiles(SteelManagement steelManagement, List<SteelManagementFileUpdateRequest> requests) {
+        EntitySyncUtils.syncList(
+                steelManagement.getFiles(),
+                requests,
+                (SteelManagementFileUpdateRequest dto) -> SteelManagementFile.builder()
+                        .steelManagement(steelManagement)
+                        .name(dto.name())
+                        .fileUrl(dto.fileUrl())
+                        .originalFileName(dto.originalFileName())
+                        .memo(dto.memo())
+                        .build()
+        );
     }
 }

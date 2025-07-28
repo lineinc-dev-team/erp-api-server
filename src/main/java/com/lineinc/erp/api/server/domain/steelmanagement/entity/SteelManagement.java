@@ -1,9 +1,11 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
+import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -61,4 +64,20 @@ public class SteelManagement extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    public void updateFrom(SteelManagementUpdateRequest request) {
+        Optional.ofNullable(request.usage()).ifPresent(val -> this.usage = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        Optional.ofNullable(request.paymentDate())
+                .map(DateTimeFormatUtils::toOffsetDateTime)
+                .ifPresent(val -> this.paymentDate = val);
+    }
+
+    public void changeSite(Site site) {
+        this.site = site;
+    }
+
+    public void changeSiteProcess(SiteProcess siteProcess) {
+        this.siteProcess = siteProcess;
+    }
 }

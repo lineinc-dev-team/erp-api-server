@@ -10,10 +10,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.response.SteelManagementResponse;
 import lombok.RequiredArgsConstructor;
@@ -192,5 +189,24 @@ public class SteelManagementService {
         SteelManagement steelManagement = steelManagementRepository.findById(siteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
         return SteelManagementDetailViewResponse.from(steelManagement);
+    }
+
+    @Transactional
+    public void updateSteelManagement(Long id, SteelManagementUpdateRequest request) {
+        SteelManagement steelManagement = steelManagementRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        if (!siteProcess.getSite().getId().equals(site.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+        }
+
+        steelManagement.changeSite(site);
+        steelManagement.changeSiteProcess(siteProcess);
+        steelManagement.updateFrom(request);
+
+        steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details());
+        steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files());
     }
 }

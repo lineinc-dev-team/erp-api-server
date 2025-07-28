@@ -1,10 +1,14 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementDetailUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -12,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class SteelManagementDetail extends BaseEntity {
+public class SteelManagementDetail extends BaseEntity implements UpdatableFrom<SteelManagementDetailUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "steel_management_detail_seq")
@@ -85,4 +89,19 @@ public class SteelManagementDetail extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    @Override
+    public void updateFrom(SteelManagementDetailUpdateRequest request) {
+        Optional.ofNullable(request.standard()).ifPresent(val -> this.standard = val);
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.unit()).ifPresent(val -> this.unit = val);
+        Optional.ofNullable(request.count()).ifPresent(val -> this.count = val);
+        Optional.ofNullable(request.length()).ifPresent(val -> this.length = val);
+        Optional.ofNullable(request.totalLength()).ifPresent(val -> this.totalLength = val);
+        Optional.ofNullable(request.unitWeight()).ifPresent(val -> this.unitWeight = val);
+        Optional.ofNullable(request.quantity()).ifPresent(val -> this.quantity = val);
+        Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
+        Optional.ofNullable(request.supplyPrice()).ifPresent(val -> this.supplyPrice = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }

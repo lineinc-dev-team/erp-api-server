@@ -1,9 +1,11 @@
 package com.lineinc.erp.api.server.application.steelmanagement;
 
+import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementDetailRepository;
 import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementDetailCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementDetailUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,5 +42,27 @@ public class SteelManagementDetailService {
                 .collect(Collectors.toList());
 
         steelManagementDetailRepository.saveAll(details);
+    }
+
+    @Transactional
+    public void updateSteelManagementDetails(SteelManagement steelManagement, List<SteelManagementDetailUpdateRequest> requests) {
+        EntitySyncUtils.syncList(
+                steelManagement.getDetails(),
+                requests,
+                (SteelManagementDetailUpdateRequest dto) -> SteelManagementDetail.builder()
+                        .steelManagement(steelManagement)
+                        .standard(dto.standard())
+                        .name(dto.name())
+                        .unit(dto.unit())
+                        .count(dto.count())
+                        .length(dto.length())
+                        .totalLength(dto.totalLength())
+                        .unitWeight(dto.unitWeight())
+                        .quantity(dto.quantity())
+                        .unitPrice(dto.unitPrice())
+                        .supplyPrice(dto.supplyPrice())
+                        .memo(dto.memo())
+                        .build()
+        );
     }
 }
