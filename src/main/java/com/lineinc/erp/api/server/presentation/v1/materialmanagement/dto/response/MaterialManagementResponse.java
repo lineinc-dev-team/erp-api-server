@@ -41,7 +41,7 @@ public record MaterialManagementResponse(
     public static MaterialManagementResponse from(MaterialManagement entity) {
         return new MaterialManagementResponse(
                 entity.getId(),
-                entity.getInputType() != null ? entity.getInputType().name() : null,
+                entity.getInputType() != null ? entity.getInputType().getLabel() : null,
                 entity.getInputTypeDescription(),
                 entity.getDeliveryDate() != null ? entity.getDeliveryDate() : null,
                 entity.getMemo(),

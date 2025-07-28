@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialMana
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementListRequest;
 import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.querydsl.core.BooleanBuilder;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -106,4 +108,23 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
 
         return builder;
     }
+
+    @Override
+    public List<MaterialManagement> findAllWithoutPaging(MaterialManagementListRequest request, Sort sort) {
+        BooleanBuilder condition = buildCondition(request);
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        List<MaterialManagement> content = queryFactory
+                .selectFrom(materialManagement)
+                .distinct()
+                .leftJoin(materialManagement.site, site).fetchJoin()
+                .leftJoin(materialManagement.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(materialManagement.details, materialManagementDetail)
+                .where(condition)
+                .orderBy(orders)
+                .fetch();
+
+        return content;
+    }
+
 }
