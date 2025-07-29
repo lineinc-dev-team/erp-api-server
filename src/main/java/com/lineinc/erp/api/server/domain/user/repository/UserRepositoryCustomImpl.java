@@ -102,6 +102,16 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             builder.and(user.lastLoginAt.lt(request.lastLoginEndDate().plusDays(1).atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
         }
 
+        if (request.departmentId() != null) {
+            builder.and(user.department.id.eq(request.departmentId()));
+        }
+        if (request.gradeId() != null) {
+            builder.and(user.grade.id.eq(request.gradeId()));
+        }
+        if (request.positionId() != null) {
+            builder.and(user.position.id.eq(request.positionId()));
+        }
+
         return builder;
     }
 

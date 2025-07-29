@@ -34,7 +34,16 @@ public record UserListRequest(
 
         @Schema(description = "최종 로그인일(종료일)", example = "2024-12-31")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate lastLoginEndDate
+        LocalDate lastLoginEndDate,
+
+        @Schema(description = "부서 ID", example = "1")
+        Long departmentId,
+
+        @Schema(description = "직급 ID", example = "2")
+        Long gradeId,
+
+        @Schema(description = "직책 ID", example = "3")
+        Long positionId
 
 ) {
 }

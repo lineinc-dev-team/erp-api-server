@@ -44,6 +44,15 @@ public record UserResponse(
         @Schema(description = "비고", example = "특이사항 없음")
         String memo,
 
+        @Schema(description = "부서 이름", example = "개발팀")
+        String department,
+
+        @Schema(description = "직급 이름", example = "대리")
+        String grade,
+
+        @Schema(description = "직책 이름", example = "팀장")
+        String position,
+
         @Schema(description = "사용자 권한 목록")
         List<RoleSummaryResponse> roles
 ) {
@@ -61,6 +70,9 @@ public record UserResponse(
                 user.getLandlineNumber(),
                 user.getUpdatedBy(),
                 user.getMemo(),
+                user.getDepartment() != null ? user.getDepartment().getName() : null,
+                user.getGrade() != null ? user.getGrade().getName() : null,
+                user.getPosition() != null ? user.getPosition().getName() : null,
                 user.getRoles().stream()
                         .map(role -> new RoleSummaryResponse(role.getId(), role.getName()))
                         .toList()

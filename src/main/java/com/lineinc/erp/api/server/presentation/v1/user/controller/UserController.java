@@ -63,8 +63,8 @@ public class UserController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
-            @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
             @Valid UserListRequest request
     ) {
         Page<UserResponse> page = userService.getAllUsers(
