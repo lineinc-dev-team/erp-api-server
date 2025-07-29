@@ -17,14 +17,17 @@ public record CreateUserRequest(
         String username,
 
         @Email
+        @NotBlank
         @Schema(description = "이메일 주소", example = "user@example.com")
         String email,
 
         @MultiConstraint(type = ValidatorType.PHONE)
+        @NotBlank
         @Schema(description = "전화번호", example = "010-1234-5678")
         String phoneNumber,
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
+        @NotBlank
         @Schema(description = "유선 전화번호", example = "02-123-4567")
         String landlineNumber,
 
@@ -32,15 +35,19 @@ public record CreateUserRequest(
         @Schema(description = "비밀번호", example = "password123!")
         String password,
 
+        @NotBlank
         @Schema(description = "사용자 활성화 여부", example = "true")
         boolean isActive,
 
+        @NotBlank
         @Schema(description = "부서 ID", example = "1")
         Long departmentId,
 
+        @NotBlank
         @Schema(description = "직급 ID", example = "2")
         Long gradeId,
 
+        @NotBlank
         @Schema(description = "직책 ID", example = "3")
         Long positionId
 ) {
