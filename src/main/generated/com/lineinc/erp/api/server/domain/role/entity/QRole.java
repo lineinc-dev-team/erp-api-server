@@ -34,6 +34,8 @@ public class QRole extends EntityPathBase<Role> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final BooleanPath hasGlobalSiteProcessAccess = createBoolean("hasGlobalSiteProcessAccess");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");

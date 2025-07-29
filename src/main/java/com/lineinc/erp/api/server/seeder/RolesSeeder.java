@@ -28,6 +28,7 @@ public class RolesSeeder {
             if (!exists) {
                 Role role = Role.builder()
                         .name(roleName)
+                        .hasGlobalSiteProcessAccess(AppConstants.ROLE_ADMIN_NAME.equals(roleName))
                         .createdBy(AppConstants.SYSTEM_NAME)
                         .updatedBy(AppConstants.SYSTEM_NAME)
                         .build();

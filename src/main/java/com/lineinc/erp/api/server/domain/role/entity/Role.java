@@ -41,6 +41,10 @@ public class Role extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> userRoles = new HashSet<>();
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean hasGlobalSiteProcessAccess = false;
+
     @Column(columnDefinition = "TEXT")
     private String memo;
 }
