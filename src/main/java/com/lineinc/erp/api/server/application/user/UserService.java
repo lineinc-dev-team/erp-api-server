@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.application.user;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
@@ -170,4 +171,12 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         persistentUser.updateLastLoginAt();
     }
+
+    @Transactional(readOnly = true)
+    public UserDetailResponse getUserDetail(Long id) {
+        User user = usersRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+        return UserDetailResponse.from(user);
+    }
 }
+

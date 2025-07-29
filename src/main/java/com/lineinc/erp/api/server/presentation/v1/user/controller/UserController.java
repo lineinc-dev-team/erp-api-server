@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.*;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -162,4 +163,17 @@ public class UserController {
         userService.updateUser(id, request);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "유저 상세 조회", description = "유저 ID로 상세 정보를 조회합니다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<UserDetailResponse>> getUserDetail(@PathVariable Long id) {
+        UserDetailResponse response = userService.getUserDetail(id);
+        return ResponseEntity.ok(SuccessResponse.of(response));
+    }
 }
+
