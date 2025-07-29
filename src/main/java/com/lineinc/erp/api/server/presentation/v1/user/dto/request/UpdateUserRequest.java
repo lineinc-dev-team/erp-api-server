@@ -24,6 +24,15 @@ public record UpdateUserRequest(
         String password,
 
         @Schema(description = "사용자 활성화 여부", example = "true")
-        Boolean isActive
+        Boolean isActive,
+
+        @Schema(description = "부서 ID", example = "1")
+        Long departmentId,
+
+        @Schema(description = "직급 ID", example = "2")
+        Long gradeId,
+
+        @Schema(description = "직책 ID", example = "3")
+        Long positionId
 ) {
 }

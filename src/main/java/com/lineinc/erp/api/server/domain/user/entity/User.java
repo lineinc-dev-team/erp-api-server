@@ -131,6 +131,17 @@ public class User extends BaseEntity implements UserDetails {
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
+
+        if (request.departmentId() != null) {
+            this.department = Department.builder().id(request.departmentId()).build();
+        }
+        if (request.gradeId() != null) {
+            this.grade = Grade.builder().id(request.gradeId()).build();
+        }
+        if (request.positionId() != null) {
+            this.position = Position.builder().id(request.positionId()).build();
+        }
+
         if (request.password() != null && !request.password().isBlank()) {
             this.updatePassword(passwordEncoder.encode(request.password()));
         }
