@@ -56,8 +56,6 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath passwordHash = createString("passwordHash");
 
-    public final DateTimePath<java.time.OffsetDateTime> passwordResetAt = createDateTime("passwordResetAt", java.time.OffsetDateTime.class);
-
     public final StringPath phoneNumber = createString("phoneNumber");
 
     public final com.lineinc.erp.api.server.domain.organization.entity.QPosition position;

@@ -40,4 +40,7 @@ public class Role extends BaseEntity implements Serializable {
     @Builder.Default
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
+
+    @Column(columnDefinition = "TEXT")
+    private String memo;
 }

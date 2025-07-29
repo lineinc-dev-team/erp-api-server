@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.presentation.v1.role.controller;
 import com.lineinc.erp.api.server.application.role.RoleService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
+import com.lineinc.erp.api.server.common.request.SortRequest;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
@@ -44,11 +45,12 @@ public class RoleController {
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<RolesResponse>>> getAllRoles(
             @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
             @Valid UserWithRolesListRequest userWithRolesListRequest
     ) {
         Page<RolesResponse> page = roleService.getAllRoles(
                 userWithRolesListRequest,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size())
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
 
         return ResponseEntity.ok(SuccessResponse.of(

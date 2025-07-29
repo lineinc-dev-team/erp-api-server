@@ -55,12 +55,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String email;
 
-    /**
-     * 비밀번호 초기화 시각 (비밀번호 변경 혹은 초기화된 시간)
-     */
-    @Column
-    private OffsetDateTime passwordResetAt;
-
     @Column
     private OffsetDateTime lastLoginAt;
 
@@ -109,7 +103,6 @@ public class User extends BaseEntity implements UserDetails {
      */
     public void updatePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
-        this.passwordResetAt = OffsetDateTime.now(); // 비밀번호 변경 시각도 기록
     }
 
     /**

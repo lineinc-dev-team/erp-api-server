@@ -36,6 +36,8 @@ public class QRole extends EntityPathBase<Role> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath memo = createString("memo");
+
     public final StringPath name = createString("name");
 
     public final SetPath<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission> permissions = this.<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission>createSet("permissions", com.lineinc.erp.api.server.domain.permission.entity.Permission.class, com.lineinc.erp.api.server.domain.permission.entity.QPermission.class, PathInits.DIRECT2);

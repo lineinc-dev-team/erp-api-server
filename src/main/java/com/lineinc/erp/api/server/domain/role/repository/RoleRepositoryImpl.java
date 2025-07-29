@@ -18,12 +18,24 @@ import java.util.Objects;
 import com.lineinc.erp.api.server.domain.role.entity.QRole;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
 public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
+            "id", QRole.role.id,
+            "name", QRole.role.name,
+            "createdAt", QRole.role.createdAt,
+            "updatedAt", QRole.role.updatedAt
+    );
 
     @Override
     public Page<RolesResponse> findAll(UserWithRolesListRequest request, Pageable pageable) {
@@ -34,12 +46,14 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
         BooleanExpression whereCondition = containsSearch(user, search);
 
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+
         // fetchJoin 사용: role.users 컬렉션을 한 번에 같이 조회
         List<Role> content = queryFactory
                 .selectFrom(role)
                 .leftJoin(role.users, user).fetchJoin()
                 .where(whereCondition)
-                .orderBy(role.id.asc())
+                .orderBy(orders)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

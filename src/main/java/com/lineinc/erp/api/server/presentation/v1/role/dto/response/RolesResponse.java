@@ -20,9 +20,19 @@ public record RolesResponse(
         OffsetDateTime createdAt,
 
         @Schema(description = "수정일시", example = "2024-07-01T12:00:00")
-        OffsetDateTime updatedAt
+        OffsetDateTime updatedAt,
+
+        @Schema(description = "메모", example = "특별 권한 그룹입니다.")
+        String memo
 ) {
     public static RolesResponse from(Role role) {
-        return new RolesResponse(role.getId(), role.getName(), role.getUsers().size(), role.getCreatedAt(), role.getUpdatedAt());
+        return new RolesResponse(
+                role.getId(),
+                role.getName(),
+                role.getUsers().size(),
+                role.getCreatedAt(),
+                role.getUpdatedAt(),
+                role.getMemo()
+        );
     }
 }
