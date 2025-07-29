@@ -14,6 +14,7 @@ public final class ValidationMessages {
     public static final String FILE_PROCESS_ERROR = "파일 처리 중 오류가 발생했습니다.";
     public static final String INTERNAL_SERVER_ERROR = "서버 내부 오류가 발생했습니다.";
     public static final String USER_NOT_FOUND = "존재하지 않는 사용자입니다.";
+    public static final String USER_NOT_ACTIVE = "비활성화된 계정입니다.";
     public static final String CLIENT_COMPANY_NOT_FOUND = "존재하지 않는 발주처입니다.";
     public static final String SITE_NAME_ALREADY_EXISTS = "이미 존재하는 현장명입니다.";
     public static final String SITE_NOT_FOUND = "존재하지 않는 현장입니다.";
@@ -24,7 +25,6 @@ public final class ValidationMessages {
     public static final String ROLE_NAME_ALREADY_EXISTS = "이미 존재하는 권한 그룹 이름입니다.";
     public static final String SOME_PERMISSIONS_NOT_FOUND = "일부 권한이 존재하지 않습니다.";
     public static final String LOGIN_ID_ALREADY_EXISTS = "이미 사용 중인 로그인 ID입니다.";
-    public static final String EMAIL_SEND_FAILURE = "메일 전송에 실패했습니다.";
     public static final String INVALID_DOWNLOAD_FIELD = "허용되지 않은 필드입니다: ";
     public static final String RATE_LIMIT_EXCEEDED = "요청 횟수 제한을 초과했습니다.";
     public static final String NOT_ACCEPTABLE = "요청한 Accept 타입에 대해 응답할 수 없습니다.";

@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
 import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
@@ -16,7 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,6 +58,9 @@ public class AuthController {
         // 3. 로그인 성공한 사용자 정보
         Object principal = authentication.getPrincipal();
         User user = (User) principal;
+        if (!user.isActive()) {
+            throw new IllegalStateException(ValidationMessages.USER_NOT_ACTIVE);
+        }
 
         // 4. 마지막 로그인 시간 갱신
         user.updateLastLoginAt();

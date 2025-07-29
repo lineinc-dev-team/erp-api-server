@@ -18,6 +18,8 @@ public class QUser extends EntityPathBase<User> {
 
     private static final long serialVersionUID = -990993022L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QUser user = new QUser("user");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
@@ -34,7 +36,11 @@ public class QUser extends EntityPathBase<User> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final com.lineinc.erp.api.server.domain.organization.entity.QDepartment department;
+
     public final StringPath email = createString("email");
+
+    public final com.lineinc.erp.api.server.domain.organization.entity.QGrade grade;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -54,6 +60,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath phoneNumber = createString("phoneNumber");
 
+    public final com.lineinc.erp.api.server.domain.organization.entity.QPosition position;
+
     public final SetPath<com.lineinc.erp.api.server.domain.role.entity.Role, com.lineinc.erp.api.server.domain.role.entity.QRole> roles = this.<com.lineinc.erp.api.server.domain.role.entity.Role, com.lineinc.erp.api.server.domain.role.entity.QRole>createSet("roles", com.lineinc.erp.api.server.domain.role.entity.Role.class, com.lineinc.erp.api.server.domain.role.entity.QRole.class, PathInits.DIRECT2);
 
     //inherited
@@ -65,15 +73,26 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath username = createString("username");
 
     public QUser(String variable) {
-        super(User.class, forVariable(variable));
+        this(User.class, forVariable(variable), INITS);
     }
 
     public QUser(Path<? extends User> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QUser(PathMetadata metadata) {
-        super(User.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QUser(PathMetadata metadata, PathInits inits) {
+        this(User.class, metadata, inits);
+    }
+
+    public QUser(Class<? extends User> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.department = inits.isInitialized("department") ? new com.lineinc.erp.api.server.domain.organization.entity.QDepartment(forProperty("department")) : null;
+        this.grade = inits.isInitialized("grade") ? new com.lineinc.erp.api.server.domain.organization.entity.QGrade(forProperty("grade")) : null;
+        this.position = inits.isInitialized("position") ? new com.lineinc.erp.api.server.domain.organization.entity.QPosition(forProperty("position")) : null;
     }
 
 }

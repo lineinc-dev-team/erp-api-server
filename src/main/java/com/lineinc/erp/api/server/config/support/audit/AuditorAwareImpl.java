@@ -4,6 +4,7 @@ import lombok.NonNull;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
@@ -37,8 +38,8 @@ public class AuditorAwareImpl implements AuditorAware<String> {
         Object principal = authentication.getPrincipal();
 
         // principal이 UserDetails 타입이면 username을 Optional에 담아 반환
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            return Optional.of(((org.springframework.security.core.userdetails.UserDetails) principal).getUsername());
+        if (principal instanceof UserDetails) {
+            return Optional.of(((UserDetails) principal).getUsername());
 
             // principal이 String 타입일 경우 그대로 Optional에 담아 반환
         } else if (principal instanceof String) {

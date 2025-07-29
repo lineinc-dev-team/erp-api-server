@@ -3,6 +3,9 @@ package com.lineinc.erp.api.server.domain.user.entity;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
+import com.lineinc.erp.api.server.domain.organization.entity.Department;
+import com.lineinc.erp.api.server.domain.organization.entity.Grade;
+import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -19,19 +22,13 @@ import java.util.Optional;
 import java.util.Set;
 
 @Entity
-@Table(name = "users", indexes = {
-        @Index(columnList = "username")  // username 컬럼에 인덱스 생성 (검색 성능 향상 목적)
-})
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class User extends BaseEntity implements UserDetails {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
@@ -66,6 +63,18 @@ public class User extends BaseEntity implements UserDetails {
 
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Role> roles;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grade_id")
+    private Grade grade;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position_id")
+    private Position position;
 
     @Column(columnDefinition = "TEXT")
     private String memo;
@@ -119,7 +128,6 @@ public class User extends BaseEntity implements UserDetails {
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-
         if (request.password() != null && !request.password().isBlank()) {
             this.updatePassword(passwordEncoder.encode(request.password()));
         }
