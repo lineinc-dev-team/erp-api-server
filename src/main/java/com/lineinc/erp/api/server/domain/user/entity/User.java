@@ -29,6 +29,9 @@ import java.util.Set;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class User extends BaseEntity implements UserDetails {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
