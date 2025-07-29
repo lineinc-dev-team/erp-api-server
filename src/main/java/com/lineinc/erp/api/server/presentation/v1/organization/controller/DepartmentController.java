@@ -1,0 +1,34 @@
+package com.lineinc.erp.api.server.presentation.v1.organization.controller;
+
+import com.lineinc.erp.api.server.application.organization.DepartmentService;
+import com.lineinc.erp.api.server.presentation.v1.organization.dto.response.DepartmentResponse;
+import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/departments")
+@RequiredArgsConstructor
+@Tag(name = "Departments", description = "부서 관련 API")
+public class DepartmentController {
+
+    private final DepartmentService departmentService;
+
+    @Operation(summary = "부서 목록 조회", description = "모든 부서 목록을 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+    })
+    @GetMapping
+    public ResponseEntity<SuccessResponse<List<DepartmentResponse>>> getAllDepartments() {
+        List<DepartmentResponse> departments = departmentService.getAllDepartments();
+        return ResponseEntity.ok(SuccessResponse.of(departments));
+    }
+
+}
