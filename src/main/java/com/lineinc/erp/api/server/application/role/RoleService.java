@@ -5,7 +5,10 @@ import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.entity.RolePermission;
+import com.lineinc.erp.api.server.domain.role.entity.RoleSiteProcess;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
@@ -170,20 +173,28 @@ public class RoleService {
         Role newRole = Role.builder()
                 .name(request.name())
                 .memo(request.memo())
+                .hasGlobalSiteProcessAccess(Boolean.TRUE.equals(request.hasGlobalSiteProcessAccess()))
                 .build();
 
         roleRepository.save(newRole);
 
         // 유저 연결
-        if (request.userIds() != null && !request.userIds().isEmpty()) {
-            List<User> users = userRepository.findAllById(request.userIds());
+        if (request.users() != null && !request.users().isEmpty()) {
+            List<Long> userIds = request.users().stream().map(CreateRolesRequest.UserWithMemo::userId).toList();
+            Map<Long, String> memoMap = request.users().stream()
+                    .collect(Collectors.toMap(CreateRolesRequest.UserWithMemo::userId, CreateRolesRequest.UserWithMemo::memo));
+
+            List<User> users = userRepository.findAllById(userIds);
             for (User user : users) {
-                UserRole userRole = UserRole.builder()
-                        .user(user)
-                        .role(newRole)
-                        .build();
-                user.getUserRoles().add(userRole);
-                userRepository.save(user);
+                if (user.getUserRoles().isEmpty()) {
+                    UserRole userRole = UserRole.builder()
+                            .user(user)
+                            .role(newRole)
+                            .memo(memoMap.get(user.getId()))
+                            .build();
+                    user.getUserRoles().add(userRole);
+                    userRepository.save(user);
+                }
             }
         }
 
@@ -198,6 +209,20 @@ public class RoleService {
                             .build())
                     .collect(Collectors.toList());
             newRole.getPermissions().addAll(rolePermissions);
+            roleRepository.save(newRole);
+        }
+
+        // 현장/공정 연결
+        if (!Boolean.TRUE.equals(request.hasGlobalSiteProcessAccess())
+                && request.siteProcesses() != null && !request.siteProcesses().isEmpty()) {
+            List<RoleSiteProcess> siteProcesses = request.siteProcesses().stream()
+                    .map(dto -> RoleSiteProcess.builder()
+                            .role(newRole)
+                            .site(dto.siteId() != null ? Site.builder().id(dto.siteId()).build() : null)
+                            .process(dto.processId() != null ? SiteProcess.builder().id(dto.processId()).build() : null)
+                            .build())
+                    .collect(Collectors.toList());
+            newRole.getSiteProcesses().addAll(siteProcesses);
             roleRepository.save(newRole);
         }
     }

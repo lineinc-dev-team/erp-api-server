@@ -44,6 +44,8 @@ public class QRole extends EntityPathBase<Role> {
 
     public final SetPath<RolePermission, QRolePermission> permissions = this.<RolePermission, QRolePermission>createSet("permissions", RolePermission.class, QRolePermission.class, PathInits.DIRECT2);
 
+    public final SetPath<RoleSiteProcess, QRoleSiteProcess> siteProcesses = this.<RoleSiteProcess, QRoleSiteProcess>createSet("siteProcesses", RoleSiteProcess.class, QRoleSiteProcess.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 
