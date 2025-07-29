@@ -40,7 +40,7 @@ public class QRole extends EntityPathBase<Role> {
 
     public final StringPath name = createString("name");
 
-    public final SetPath<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission> permissions = this.<com.lineinc.erp.api.server.domain.permission.entity.Permission, com.lineinc.erp.api.server.domain.permission.entity.QPermission>createSet("permissions", com.lineinc.erp.api.server.domain.permission.entity.Permission.class, com.lineinc.erp.api.server.domain.permission.entity.QPermission.class, PathInits.DIRECT2);
+    public final SetPath<RolePermission, QRolePermission> permissions = this.<RolePermission, QRolePermission>createSet("permissions", RolePermission.class, QRolePermission.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
@@ -48,7 +48,7 @@ public class QRole extends EntityPathBase<Role> {
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
 
-    public final SetPath<com.lineinc.erp.api.server.domain.user.entity.User, com.lineinc.erp.api.server.domain.user.entity.QUser> users = this.<com.lineinc.erp.api.server.domain.user.entity.User, com.lineinc.erp.api.server.domain.user.entity.QUser>createSet("users", com.lineinc.erp.api.server.domain.user.entity.User.class, com.lineinc.erp.api.server.domain.user.entity.QUser.class, PathInits.DIRECT2);
+    public final SetPath<com.lineinc.erp.api.server.domain.user.entity.UserRole, com.lineinc.erp.api.server.domain.user.entity.QUserRole> userRoles = this.<com.lineinc.erp.api.server.domain.user.entity.UserRole, com.lineinc.erp.api.server.domain.user.entity.QUserRole>createSet("userRoles", com.lineinc.erp.api.server.domain.user.entity.UserRole.class, com.lineinc.erp.api.server.domain.user.entity.QUserRole.class, PathInits.DIRECT2);
 
     public QRole(String variable) {
         super(Role.class, forVariable(variable));

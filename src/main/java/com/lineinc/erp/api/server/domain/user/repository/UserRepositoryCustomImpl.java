@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.user.repository;
 
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
+import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
@@ -82,8 +83,13 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         if (request.isActive() != null) {
             builder.and(user.isActive.eq(request.isActive()));
         }
+        QUserRole userRole = QUserRole.userRole;
         if (request.roleId() != null) {
-            builder.and(user.roles.any().id.eq(request.roleId()));
+            builder.and(user.id.in(
+                    queryFactory.select(userRole.user.id)
+                            .from(userRole)
+                            .where(userRole.role.id.eq(request.roleId()))
+            ));
         }
 
         if (request.createdStartDate() != null) {

@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
@@ -16,10 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serial;
 import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -58,8 +54,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private OffsetDateTime lastLoginAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Set<Role> roles;
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRole> userRoles = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")

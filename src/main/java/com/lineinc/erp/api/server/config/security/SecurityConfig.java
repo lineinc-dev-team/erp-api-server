@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.config.security;
 
-import com.lineinc.erp.api.server.application.auth.AuthService;
+import com.lineinc.erp.api.server.application.auth.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthService authService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -52,7 +52,7 @@ public class SecurityConfig {
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
                         })
                 )
-                .userDetailsService(authService)
+                .userDetailsService(customUserDetailsService)
                 .build();
     }
 

@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.role.entity;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,25 +22,24 @@ import java.util.Set;
 @Table(name = "roles")
 @SQLRestriction("deleted = false")
 public class Role extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")
     @SequenceGenerator(name = "role_seq", sequenceName = "role_seq", allocationSize = 1)
     private Long id;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     @Column(unique = true, nullable = false)
     private String name;
 
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Set<Permission> permissions = new HashSet<>();
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RolePermission> permissions = new HashSet<>();
 
     @Builder.Default
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRole> userRoles = new HashSet<>();
 
     @Column(columnDefinition = "TEXT")
     private String memo;

@@ -17,6 +17,7 @@ import java.util.Objects;
 
 import com.lineinc.erp.api.server.domain.role.entity.QRole;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
+import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.querydsl.core.types.OrderSpecifier;
@@ -48,10 +49,11 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        // fetchJoin 사용: role.users 컬렉션을 한 번에 같이 조회
+        // fetchJoin 사용: role.userRoles 컬렉션을 한 번에 같이 조회 (userRoles -> user)
         List<Role> content = queryFactory
                 .selectFrom(role)
-                .leftJoin(role.users, user).fetchJoin()
+                .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
+                .leftJoin(QUserRole.userRole.user, user).fetchJoin()
                 .where(whereCondition)
                 .orderBy(orders)
                 .offset(pageable.getOffset())
@@ -61,7 +63,8 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         Long totalCount = queryFactory
                 .select(role.countDistinct())
                 .from(role)
-                .leftJoin(role.users, user)
+                .leftJoin(role.userRoles, QUserRole.userRole)
+                .join(QUserRole.userRole.user, user)
                 .where(whereCondition)
                 .fetchOne();
 
@@ -82,10 +85,12 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         BooleanExpression searchPredicate = containsSearch(user, request.search());
 
         // 사용자 리스트 조회 (distinct, 페이징 포함)
+        QUserRole userRole = QUserRole.userRole;
         List<RoleUserListResponse> content = queryFactory
                 .selectDistinct(user)
                 .from(user)
-                .join(user.roles, role)
+                .join(user.userRoles, userRole)
+                .join(userRole.role, role)
                 .where(role.id.eq(roleId)
                         .and(searchPredicate))
                 .orderBy(user.id.asc())
@@ -100,7 +105,8 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         Long totalCount = queryFactory
                 .select(user.countDistinct())
                 .from(user)
-                .join(user.roles, role)
+                .join(user.userRoles, userRole)
+                .join(userRole.role, role)
                 .where(role.id.eq(roleId)
                         .and(searchPredicate))
                 .fetchOne();

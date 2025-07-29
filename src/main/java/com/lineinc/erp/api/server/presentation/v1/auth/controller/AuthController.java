@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
@@ -56,8 +57,8 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(token);
 
         // 3. 로그인 성공한 사용자 정보
-        Object principal = authentication.getPrincipal();
-        User user = (User) principal;
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
         if (!user.isActive()) {
             throw new IllegalStateException(ValidationMessages.USER_NOT_ACTIVE);
         }
@@ -98,9 +99,9 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal User user) {
-        User findUser = userService.getUserByLoginIdOrThrow(user.getLoginId());
-        UserResponse response = UserResponse.from(findUser);
+    public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
+        UserResponse response = userService.getUser(user.getId());
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

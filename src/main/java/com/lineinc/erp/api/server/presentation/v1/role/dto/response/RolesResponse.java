@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.role.dto.response;
 
 import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
@@ -26,10 +27,16 @@ public record RolesResponse(
         String memo
 ) {
     public static RolesResponse from(Role role) {
+        int userCount = role.getUserRoles() == null ? 0 :
+                (int) role.getUserRoles().stream()
+                        .map(UserRole::getUser)
+                        .distinct()
+                        .count();
+
         return new RolesResponse(
                 role.getId(),
                 role.getName(),
-                role.getUsers().size(),
+                userCount,
                 role.getCreatedAt(),
                 role.getUpdatedAt(),
                 role.getMemo()

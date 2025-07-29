@@ -180,9 +180,16 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDetailResponse getUserDetail(Long id) {
-        User user = usersRepository.findById(id)
+        User user = usersRepository.findByIdWithRoles(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         return UserDetailResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse getUser(Long id) {
+        User user = usersRepository.findByIdWithRoles(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+        return UserResponse.from(user);
     }
 }
 

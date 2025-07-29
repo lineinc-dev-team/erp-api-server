@@ -18,7 +18,7 @@ public enum PermissionAction {
 
     public static PermissionAction fromLabel(String label) {
         for (PermissionAction action : values()) {
-            if (action.label.equals(label)) {
+            if (action.label.equals(label) || action.name().equals(label)) {
                 return action;
             }
         }

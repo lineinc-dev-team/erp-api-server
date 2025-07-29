@@ -5,9 +5,11 @@ import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,7 +20,7 @@ public class UsersRolesSeeder {
     private final UserRepository usersRepository;
     private final RoleRepository roleRepository;
 
-
+    @Transactional
     public void seed() {
         Optional<User> adminUserOpt = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
         Optional<Role> adminRoleOpt = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME);
@@ -27,28 +29,37 @@ public class UsersRolesSeeder {
             User adminUser = adminUserOpt.get();
             Role adminRole = adminRoleOpt.get();
 
-            // 중복 삽입 방지를 위해 먼저 유저 권한 존재 여부 확인 필요 (생략 가능)
-            if (!adminUser.getRoles().contains(adminRole)) {
-                adminUser.getRoles().add(adminRole);
+            if (adminUser.getUserRoles().stream().noneMatch(ur -> ur.getRole().equals(adminRole))) {
+                UserRole userRole = UserRole.builder()
+                        .user(adminUser)
+                        .role(adminRole)
+                        .build();
+                adminUser.getUserRoles().add(userRole);
                 usersRepository.save(adminUser);
             }
         }
 
-        // 전체권한(삭제 제외) 유저
         usersRepository.findByLoginId(AppConstants.SUB_ADMIN_LOGIN_ID).ifPresent(user ->
                 roleRepository.findByName(AppConstants.ROLE_SUB_ADMIN_NAME).ifPresent(role -> {
-                    if (!user.getRoles().contains(role)) {
-                        user.getRoles().add(role);
+                    if (user.getUserRoles().stream().noneMatch(ur -> ur.getRole().equals(role))) {
+                        UserRole userRole = UserRole.builder()
+                                .user(user)
+                                .role(role)
+                                .build();
+                        user.getUserRoles().add(userRole);
                         usersRepository.save(user);
                     }
                 })
         );
 
-        // 전체권한(삭제/권한관리 제외) 유저
         usersRepository.findByLoginId(AppConstants.SUB_ADMIN_LITE_LOGIN_ID).ifPresent(user ->
                 roleRepository.findByName(AppConstants.ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU).ifPresent(role -> {
-                    if (!user.getRoles().contains(role)) {
-                        user.getRoles().add(role);
+                    if (user.getUserRoles().stream().noneMatch(ur -> ur.getRole().equals(role))) {
+                        UserRole userRole = UserRole.builder()
+                                .user(user)
+                                .role(role)
+                                .build();
+                        user.getUserRoles().add(userRole);
                         usersRepository.save(user);
                     }
                 })

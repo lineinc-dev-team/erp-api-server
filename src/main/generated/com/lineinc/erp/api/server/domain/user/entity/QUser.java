@@ -60,8 +60,6 @@ public class QUser extends EntityPathBase<User> {
 
     public final com.lineinc.erp.api.server.domain.organization.entity.QPosition position;
 
-    public final SetPath<com.lineinc.erp.api.server.domain.role.entity.Role, com.lineinc.erp.api.server.domain.role.entity.QRole> roles = this.<com.lineinc.erp.api.server.domain.role.entity.Role, com.lineinc.erp.api.server.domain.role.entity.QRole>createSet("roles", com.lineinc.erp.api.server.domain.role.entity.Role.class, com.lineinc.erp.api.server.domain.role.entity.QRole.class, PathInits.DIRECT2);
-
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 
@@ -69,6 +67,8 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath updatedBy = _super.updatedBy;
 
     public final StringPath username = createString("username");
+
+    public final SetPath<UserRole, QUserRole> userRoles = this.<UserRole, QUserRole>createSet("userRoles", UserRole.class, QUserRole.class, PathInits.DIRECT2);
 
     public QUser(String variable) {
         this(User.class, forVariable(variable), INITS);

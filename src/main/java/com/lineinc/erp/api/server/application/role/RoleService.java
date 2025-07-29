@@ -4,9 +4,12 @@ import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.role.entity.RolePermission;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
+import com.lineinc.erp.api.server.domain.user.repository.UserRoleRepository;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
@@ -31,6 +34,7 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Transactional(readOnly = true)
     public Page<RolesResponse> getAllRoles(UserWithRolesListRequest request, Pageable pageable) {
@@ -57,14 +61,20 @@ public class RoleService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         Map<Long, List<Permission>> grouped = role.getPermissions().stream()
-                .collect(Collectors.groupingBy(p -> p.getMenu().getId()));
+                .map(RolePermission::getPermission)
+                .collect(Collectors.groupingBy(permission -> permission.getMenu().getId()));
 
         return grouped.entrySet().stream()
                 .map(entry -> {
                     Long menuId = entry.getKey();
                     List<Permission> permissionList = entry.getValue();
                     String menuName = permissionList.get(0).getMenu().getName();
-                    return MenusPermissionsResponse.from(menuId, menuName, permissionList);
+
+                    List<MenusPermissionsResponse.PermissionDto> permissionDtos = permissionList.stream()
+                            .map(permission -> MenusPermissionsResponse.PermissionDto.from(permission))
+                            .toList();
+
+                    return MenusPermissionsResponse.from(menuId, menuName, permissionDtos);
                 })
                 .toList();
     }
@@ -81,10 +91,10 @@ public class RoleService {
 
         List<User> users = userRepository.findAllById(request.userIds());
 
-        // 해당 role이 실제로 user의 roles에 있을 때만 제거 후 저장
+        // 해당 role이 실제로 user의 userRoles에 있을 때만 제거 후 저장
         for (User user : users) {
-            if (user.getRoles().contains(role)) {
-                user.getRoles().remove(role);
+            if (user.getUserRoles().stream().anyMatch(ur -> ur.getRole().equals(role))) {
+                user.getUserRoles().removeIf(ur -> ur.getRole().equals(role));
                 userRepository.save(user);
             }
         }
@@ -98,9 +108,13 @@ public class RoleService {
         List<User> users = userRepository.findAllById(request.userIds());
 
         for (User user : users) {
-
-            if (!user.getRoles().contains(role) && user.getRoles().isEmpty()) {
-                user.getRoles().add(role);
+            boolean hasRole = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().equals(role));
+            if (!hasRole) {
+                UserRole userRole = UserRole.builder()
+                        .user(user)
+                        .role(role)
+                        .build();
+                user.getUserRoles().add(userRole);
                 userRepository.save(user);
             }
         }
@@ -110,11 +124,16 @@ public class RoleService {
     public void deleteRoleById(Long roleId) {
         Role role = getRoleOrThrow(roleId);
 
-        List<User> users = userRepository.findAllByRoles_Id(roleId);
-        for (User user : users) {
-            user.getRoles().remove(role);
+        List<UserRole> userRoles = userRoleRepository.findByRole_Id(roleId);
+        for (UserRole userRole : userRoles) {
+            User user = userRole.getUser();
+            user.getUserRoles().remove(userRole);
         }
-        userRepository.saveAll(users);
+        userRepository.saveAll(userRoles.stream()
+                .map(UserRole::getUser)
+                .distinct()
+                .toList());
+
         roleRepository.delete(role);
     }
 
@@ -125,11 +144,15 @@ public class RoleService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND);
         }
 
-        List<User> affectedUsers = userRepository.findAllByRoles_IdIn(roleIds);
-        for (User user : affectedUsers) {
-            user.getRoles().removeIf(role -> roleIds.contains(role.getId()));
+        List<UserRole> userRoles = userRoleRepository.findByRole_IdIn(roleIds);
+        for (UserRole userRole : userRoles) {
+            User user = userRole.getUser();
+            user.getUserRoles().remove(userRole);
         }
-        userRepository.saveAll(affectedUsers);
+        userRepository.saveAll(userRoles.stream()
+                .map(UserRole::getUser)
+                .distinct()
+                .toList());
 
         for (Role role : roles) {
             role.markAsDeleted();
@@ -163,7 +186,53 @@ public class RoleService {
         // 기존 권한 제거 후 새로 설정
         permissionRepository.deleteAllByRoleIdNative(roleId);
         role.getPermissions().clear();
-        role.getPermissions().addAll(permissions);
+
+        List<RolePermission> rolePermissions = permissions.stream()
+                .map(permission -> RolePermission.builder()
+                        .role(role)
+                        .permission(permission)
+                        .build())
+                .collect(Collectors.toList());
+
+        role.getPermissions().addAll(rolePermissions);
         roleRepository.save(role);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MenusPermissionsResponse> getPermissionsById(Long id) {
+        User user = userRepository.findByIdWithRoles(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        List<Long> roleIds = user.getUserRoles().stream()
+                .map(ur -> ur.getRole().getId())
+                .distinct()
+                .toList();
+
+        if (roleIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<MenusPermissionsResponse> allPermissions = roleIds.stream()
+                .flatMap(roleId -> getMenusPermissionsById(roleId).stream())
+                .toList();
+
+        Map<Long, List<MenusPermissionsResponse>> groupedByMenuId = allPermissions.stream()
+                .collect(Collectors.groupingBy(MenusPermissionsResponse::id));
+
+        return groupedByMenuId.entrySet().stream()
+                .map(entry -> {
+                    Long menuId = entry.getKey();
+                    List<MenusPermissionsResponse> permList = entry.getValue();
+
+                    String menuName = permList.get(0).name();
+
+                    List<MenusPermissionsResponse.PermissionDto> combinedPermissions = permList.stream()
+                            .flatMap(mp -> mp.permissions().stream())
+                            .distinct()
+                            .toList();
+
+                    return MenusPermissionsResponse.from(menuId, menuName, combinedPermissions);
+                })
+                .toList();
     }
 }

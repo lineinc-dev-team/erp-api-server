@@ -16,13 +16,9 @@ public record MenusPermissionsResponse(
         @Schema(description = "권한")
         List<PermissionDto> permissions
 ) {
-    public static MenusPermissionsResponse from(Long menuId, String menuName, List<Permission> permissions) {
-        List<PermissionDto> permissionItems = permissions.stream()
-                .map(p -> new PermissionDto(p.getId(), p.getAction().getLabel()))
-                .sorted(Comparator.comparing(PermissionDto::id))
-                .toList();
 
-        return new MenusPermissionsResponse(menuId, menuName, permissionItems);
+    public static MenusPermissionsResponse from(Long menuId, String menuName, List<PermissionDto> permissions) {
+        return new MenusPermissionsResponse(menuId, menuName, permissions);
     }
 
     public record PermissionDto(
@@ -31,5 +27,11 @@ public record MenusPermissionsResponse(
             @Schema(description = "권한 이름", example = "조회")
             String action
     ) {
+        public static PermissionDto from(Permission permission) {
+            return new PermissionDto(
+                    permission.getId(),
+                    permission.getAction() != null ? permission.getAction().name() : null
+            );
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.menu.entity.Menu;
 import com.lineinc.erp.api.server.domain.menu.repository.MenuRepository;
 import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.role.entity.RolePermission;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class RolesPermissionsSeeder {
 
     @Transactional
     public void seed() {
-        assignAllPermissionsToRole(AppConstants.ROLE_ADMIN_NAME);
+        assignAllPermissionsToRole();
         assignPermissionsToRole(AppConstants.ROLE_SUB_ADMIN_NAME, false);
         assignPermissionsToRole(AppConstants.ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU, true);
     }
@@ -44,7 +45,12 @@ public class RolesPermissionsSeeder {
 
             for (PermissionAction action : actions) {
                 permissionRepository.findByMenuAndAction(m, action).ifPresent(permission -> {
-                    role.getPermissions().add(permission);
+                    RolePermission rolePermission = RolePermission.builder()
+                            .role(role)
+                            .permission(permission)
+                            .menu(m)
+                            .build();
+                    role.getPermissions().add(rolePermission);
                 });
             }
         }
@@ -52,18 +58,23 @@ public class RolesPermissionsSeeder {
         roleRepository.save(role);
     }
 
-    private void assignAllPermissionsToRole(String roleName) {
-        Role role = roleRepository.findByName(roleName)
-                .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
+    private void assignAllPermissionsToRole() {
+        Role role = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(AppConstants.ROLE_ADMIN_NAME).build()));
 
         menuRepository.findAll().forEach(menu ->
                 EnumSet.allOf(PermissionAction.class).forEach(action ->
-                        permissionRepository.findByMenuAndAction(menu, action)
-                                .ifPresent(permission -> role.getPermissions().add(permission))
+                        permissionRepository.findByMenuAndAction(menu, action).ifPresent(permission -> {
+                            RolePermission rolePermission = RolePermission.builder()
+                                    .role(role)
+                                    .permission(permission)
+                                    .menu(menu)
+                                    .build();
+                            role.getPermissions().add(rolePermission);
+                        })
                 )
         );
 
         roleRepository.save(role);
     }
 }
-
