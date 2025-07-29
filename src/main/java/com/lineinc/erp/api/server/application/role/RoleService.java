@@ -201,7 +201,7 @@ public class RoleService {
     @Transactional(readOnly = true)
     public List<MenusPermissionsResponse> getPermissionsById(Long id) {
         User user = userRepository.findByIdWithRoles(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
         List<Long> roleIds = user.getUserRoles().stream()
                 .map(ur -> ur.getRole().getId())

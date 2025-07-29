@@ -7,7 +7,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import java.util.List;
 
 @ParameterObject
-@Schema(description = "사용자 엑셀 다운로드 요청")
+@Schema(description = "유저 엑셀 다운로드 요청")
 public record UserDownloadRequest(
         @NotBlank
         @Schema(

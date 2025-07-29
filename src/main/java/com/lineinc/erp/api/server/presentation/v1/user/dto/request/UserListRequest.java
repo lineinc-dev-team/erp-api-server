@@ -5,13 +5,12 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 @ParameterObject
-@Schema(description = "사용자 검색 및 페이징 요청")
+@Schema(description = "유저 검색 및 페이징 요청")
 public record UserListRequest(
 
-        @Schema(description = "사용자 이름", example = "홍길동")
+        @Schema(description = "유저명", example = "홍길동")
         String username,
 
         @Schema(description = "권한 그룹 ID", example = "1")
@@ -43,7 +42,10 @@ public record UserListRequest(
         Long gradeId,
 
         @Schema(description = "직책 ID", example = "3")
-        Long positionId
+        Long positionId,
+
+        @Schema(description = "역할(권한) 보유 여부 필터", example = "true")
+        Boolean hasRole
 
 ) {
 }
