@@ -6,6 +6,9 @@ import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.organization.entity.Department;
+import com.lineinc.erp.api.server.domain.organization.entity.Grade;
+import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
@@ -69,6 +72,9 @@ public class UserService {
         User user = User.builder()
                 .username(request.username())
                 .loginId(request.loginId())
+                .department(request.departmentId() != null ? Department.builder().id(request.departmentId()).build() : null)
+                .grade(request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null)
+                .position(request.positionId() != null ? Position.builder().id(request.positionId()).build() : null)
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .phoneNumber(request.phoneNumber())
                 .landlineNumber(request.landlineNumber())
