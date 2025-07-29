@@ -162,4 +162,12 @@ public class UserService {
         return usersRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
     }
+
+    @Transactional
+    public void updateLastLoginAt(User user) {
+        // 여기서 다시 영속 상태로 조회
+        User persistentUser = usersRepository.findById(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        persistentUser.updateLastLoginAt();
+    }
 }
