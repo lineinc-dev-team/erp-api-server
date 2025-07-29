@@ -15,6 +15,9 @@ public record CreateRolesRequest(
         String memo,
 
         @Schema(description = "계정 ID 리스트", example = "[1, 2, 3]")
-        List<Long> userIds
+        List<Long> userIds,
+
+        @Schema(description = "권한 ID 리스트", example = "[1, 2, 3]")
+        List<Long> permissionIds
 ) {
 }

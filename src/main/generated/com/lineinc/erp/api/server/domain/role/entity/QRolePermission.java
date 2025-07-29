@@ -40,8 +40,6 @@ public class QRolePermission extends EntityPathBase<RolePermission> {
 
     public final StringPath memo = createString("memo");
 
-    public final com.lineinc.erp.api.server.domain.menu.entity.QMenu menu;
-
     public final com.lineinc.erp.api.server.domain.permission.entity.QPermission permission;
 
     public final QRole role;
@@ -70,7 +68,6 @@ public class QRolePermission extends EntityPathBase<RolePermission> {
 
     public QRolePermission(Class<? extends RolePermission> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.menu = inits.isInitialized("menu") ? new com.lineinc.erp.api.server.domain.menu.entity.QMenu(forProperty("menu")) : null;
         this.permission = inits.isInitialized("permission") ? new com.lineinc.erp.api.server.domain.permission.entity.QPermission(forProperty("permission"), inits.get("permission")) : null;
         this.role = inits.isInitialized("role") ? new QRole(forProperty("role")) : null;
     }

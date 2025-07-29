@@ -39,11 +39,6 @@ public class RolePermission extends BaseEntity implements Serializable {
     @JoinColumn(name = "permission_id", nullable = false)
     private Permission permission;
 
-    // Menu과 연관관계 (다대일)
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
-
     @Column(columnDefinition = "TEXT")
     private String memo;
 }

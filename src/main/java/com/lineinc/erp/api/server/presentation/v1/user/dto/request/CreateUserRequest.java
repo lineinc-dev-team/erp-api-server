@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "유저 생성 요청")
 public record CreateUserRequest(
@@ -35,19 +36,19 @@ public record CreateUserRequest(
         @Schema(description = "비밀번호", example = "password123!")
         String password,
 
-        @NotBlank
+        @NotNull
         @Schema(description = "사용자 활성화 여부", example = "true")
         boolean isActive,
 
-        @NotBlank
+        @NotNull
         @Schema(description = "부서 ID", example = "1")
         Long departmentId,
 
-        @NotBlank
+        @NotNull
         @Schema(description = "직급 ID", example = "2")
         Long gradeId,
 
-        @NotBlank
+        @NotNull
         @Schema(description = "직책 ID", example = "3")
         Long positionId
 ) {

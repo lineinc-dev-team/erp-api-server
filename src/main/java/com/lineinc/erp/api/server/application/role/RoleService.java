@@ -71,7 +71,7 @@ public class RoleService {
                     String menuName = permissionList.get(0).getMenu().getName();
 
                     List<MenusPermissionsResponse.PermissionDto> permissionDtos = permissionList.stream()
-                            .map(permission -> MenusPermissionsResponse.PermissionDto.from(permission))
+                            .map(MenusPermissionsResponse.PermissionDto::from)
                             .toList();
 
                     return MenusPermissionsResponse.from(menuId, menuName, permissionDtos);
@@ -169,9 +169,37 @@ public class RoleService {
 
         Role newRole = Role.builder()
                 .name(request.name())
+                .memo(request.memo())
                 .build();
 
         roleRepository.save(newRole);
+
+        // 유저 연결
+        if (request.userIds() != null && !request.userIds().isEmpty()) {
+            List<User> users = userRepository.findAllById(request.userIds());
+            for (User user : users) {
+                UserRole userRole = UserRole.builder()
+                        .user(user)
+                        .role(newRole)
+                        .build();
+                user.getUserRoles().add(userRole);
+                userRepository.save(user);
+            }
+        }
+
+        // 권한 연결
+        if (request.permissionIds() != null && !request.permissionIds().isEmpty()) {
+            List<Permission> permissions = permissionRepository.findAllById(request.permissionIds());
+            List<RolePermission> rolePermissions = permissions.stream()
+                    .filter(permission -> permission.getMenu() != null)
+                    .map(permission -> RolePermission.builder()
+                            .role(newRole)
+                            .permission(permission)
+                            .build())
+                    .collect(Collectors.toList());
+            newRole.getPermissions().addAll(rolePermissions);
+            roleRepository.save(newRole);
+        }
     }
 
     @Transactional

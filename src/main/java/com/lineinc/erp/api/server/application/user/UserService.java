@@ -69,6 +69,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.LOGIN_ID_ALREADY_EXISTS);
         }
 
+        System.out.println("request = " + request);
         User user = User.builder()
                 .username(request.username())
                 .loginId(request.loginId())

@@ -48,7 +48,6 @@ public class RolesPermissionsSeeder {
                     RolePermission rolePermission = RolePermission.builder()
                             .role(role)
                             .permission(permission)
-                            .menu(m)
                             .build();
                     role.getPermissions().add(rolePermission);
                 });
@@ -68,7 +67,6 @@ public class RolesPermissionsSeeder {
                             RolePermission rolePermission = RolePermission.builder()
                                     .role(role)
                                     .permission(permission)
-                                    .menu(menu)
                                     .build();
                             role.getPermissions().add(rolePermission);
                         })
