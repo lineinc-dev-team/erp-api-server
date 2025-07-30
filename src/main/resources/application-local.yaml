@@ -1,4 +1,7 @@
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
   # 세션 관리 설정
   session:
     store-type: jdbc              # JDBC 기반 세션 저장소 사용
@@ -72,3 +75,8 @@ cloud:
 # 사용자 관련 기본 설정
 user:
   default-password: ${USER_DEFAULT_PASSWORD}  # 신규 사용자 기본 비밀번호, 환경 변수에서 가져옴
+
+
+# Spring Boot graceful shutdown 설정
+server:
+  shutdown: graceful
