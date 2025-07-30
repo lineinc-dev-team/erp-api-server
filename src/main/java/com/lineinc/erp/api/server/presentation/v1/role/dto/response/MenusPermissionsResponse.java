@@ -30,7 +30,7 @@ public record MenusPermissionsResponse(
         public static PermissionDto from(Permission permission) {
             return new PermissionDto(
                     permission.getId(),
-                    permission.getAction() != null ? permission.getAction().name() : null
+                    permission.getAction() != null ? permission.getAction().getLabel() : null
             );
         }
     }
