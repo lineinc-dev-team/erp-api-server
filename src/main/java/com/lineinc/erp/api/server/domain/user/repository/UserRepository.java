@@ -36,4 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
             "left join fetch p.menu m " +
             "where u.id = :id")
     Optional<User> findByIdWithPermissions(@Param("id") Long id);
+
+    long countByIdIn(Iterable<Long> ids);
 }
+

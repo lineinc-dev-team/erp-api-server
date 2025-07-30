@@ -138,14 +138,10 @@ public class UserService {
     @Transactional
     public void deleteUsersByIds(DeleteUsersRequest request) {
         List<User> users = usersRepository.findAllById(request.userIds());
-        if (users.isEmpty()) {
+        if (request.userIds().size() != users.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND);
         }
-
-        for (User user : users) {
-            user.markAsDeleted();
-        }
-
+        users.forEach(User::markAsDeleted);
         usersRepository.saveAll(users);
     }
 
