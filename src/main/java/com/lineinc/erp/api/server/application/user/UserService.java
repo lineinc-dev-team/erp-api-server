@@ -50,6 +50,7 @@ public class UserService {
 
     @Transactional
     public void resetPassword(long id) {
+        if (id == 1L) return; // 1번 계정은 비밀번호 초기화 금지
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -75,7 +76,7 @@ public class UserService {
                 .department(request.departmentId() != null ? Department.builder().id(request.departmentId()).build() : null)
                 .grade(request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null)
                 .position(request.positionId() != null ? Position.builder().id(request.positionId()).build() : null)
-                .passwordHash(passwordEncoder.encode(request.password()))
+                .passwordHash(passwordEncoder.encode(defaultPassword))
                 .phoneNumber(request.phoneNumber())
                 .landlineNumber(request.landlineNumber())
                 .email(request.email())

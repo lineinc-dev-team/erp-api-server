@@ -32,10 +32,6 @@ public record CreateUserRequest(
         @Schema(description = "유선 전화번호", example = "02-123-4567")
         String landlineNumber,
 
-        @NotBlank
-        @Schema(description = "비밀번호", example = "password123!")
-        String password,
-
         @NotNull
         @Schema(description = "사용자 활성화 여부", example = "true")
         boolean isActive,
