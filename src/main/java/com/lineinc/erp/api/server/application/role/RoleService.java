@@ -10,6 +10,8 @@ import com.lineinc.erp.api.server.domain.role.entity.RoleSiteProcess;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
+import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
@@ -39,6 +41,8 @@ public class RoleService {
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final UserRoleRepository userRoleRepository;
+    private final SiteRepository siteRepository;
+    private final SiteProcessRepository siteProcessRepository;
 
     @Transactional(readOnly = true)
     public Page<RolesResponse> getAllRoles(UserWithRolesListRequest request, Pageable pageable) {
@@ -220,12 +224,28 @@ public class RoleService {
         // 현장/공정 연결
         if (!Boolean.TRUE.equals(request.hasGlobalSiteProcessAccess())
                 && request.siteProcesses() != null && !request.siteProcesses().isEmpty()) {
+
             List<RoleSiteProcess> siteProcesses = request.siteProcesses().stream()
-                    .map(dto -> RoleSiteProcess.builder()
-                            .role(newRole)
-                            .site(dto.siteId() != null ? Site.builder().id(dto.siteId()).build() : null)
-                            .process(dto.processId() != null ? SiteProcess.builder().id(dto.processId()).build() : null)
-                            .build())
+                    .map(dto -> {
+                        Site site = null;
+                        if (dto.siteId() != null) {
+                            site = siteRepository.findById(dto.siteId())
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+                        }
+                        SiteProcess process = null;
+                        if (dto.processId() != null) {
+                            process = siteProcessRepository.findById(dto.processId())
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_PROCESS_NOT_FOUND));
+                        }
+                        if (site != null && process != null && !process.getSite().getId().equals(site.getId())) {
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+                        }
+                        return RoleSiteProcess.builder()
+                                .role(newRole)
+                                .site(site)
+                                .process(process)
+                                .build();
+                    })
                     .collect(Collectors.toList());
             newRole.getSiteProcesses().addAll(siteProcesses);
             roleRepository.save(newRole);

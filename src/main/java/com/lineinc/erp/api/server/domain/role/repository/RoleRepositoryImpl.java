@@ -25,6 +25,10 @@ import com.querydsl.core.types.dsl.ComparableExpressionBase;
 
 import java.util.Map;
 
+import com.lineinc.erp.api.server.domain.role.entity.QRoleSiteProcess;
+import com.lineinc.erp.api.server.domain.site.entity.QSite;
+import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+
 @Repository
 @RequiredArgsConstructor
 public class RoleRepositoryImpl implements RoleRepositoryCustom {
@@ -42,6 +46,9 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
     public Page<RolesResponse> findAll(UserWithRolesListRequest request, Pageable pageable) {
         QRole role = QRole.role;
         QUser user = QUser.user;
+        QRoleSiteProcess roleSiteProcess = QRoleSiteProcess.roleSiteProcess;
+        QSite site = QSite.site;
+        QSiteProcess process = QSiteProcess.siteProcess;
 
         String search = (request != null) ? request.userSearch() : null;
 
@@ -49,11 +56,14 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        // fetchJoin 사용: role.userRoles 컬렉션을 한 번에 같이 조회 (userRoles -> user)
+        // fetchJoin 사용: role.userRoles 컬렉션, siteProcesses, site, process를 한 번에 같이 조회
         List<Role> content = queryFactory
                 .selectFrom(role)
                 .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
                 .leftJoin(QUserRole.userRole.user, user).fetchJoin()
+                .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
+                .leftJoin(roleSiteProcess.site, site).fetchJoin()
+                .leftJoin(roleSiteProcess.process, process).fetchJoin()
                 .where(whereCondition)
                 .orderBy(orders)
                 .offset(pageable.getOffset())
@@ -81,11 +91,10 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
     public Page<RoleUserListResponse> findUsersByRoleId(Long roleId, RoleUserListRequest request, Pageable pageable) {
         QUser user = QUser.user;
         QRole role = QRole.role;
+        QUserRole userRole = QUserRole.userRole;
 
         BooleanExpression searchPredicate = containsSearch(user, request.search());
 
-        // 사용자 리스트 조회 (distinct, 페이징 포함)
-        QUserRole userRole = QUserRole.userRole;
         List<RoleUserListResponse> content = queryFactory
                 .selectDistinct(user)
                 .from(user)
@@ -101,7 +110,6 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .map(RoleUserListResponse::from)
                 .toList();
 
-        // 전체 개수 조회 (countDistinct)
         Long totalCount = queryFactory
                 .select(user.countDistinct())
                 .from(user)

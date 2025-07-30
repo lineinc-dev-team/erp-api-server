@@ -1,10 +1,14 @@
 package com.lineinc.erp.api.server.presentation.v1.role.dto.response;
 
 import com.lineinc.erp.api.server.domain.role.entity.Role;
+import com.lineinc.erp.api.server.domain.role.entity.RoleSiteProcess;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteProcessResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Schema(description = "권한 그룹 리스트 응답")
 public record RolesResponse(
@@ -24,7 +28,16 @@ public record RolesResponse(
         OffsetDateTime updatedAt,
 
         @Schema(description = "메모", example = "특별 권한 그룹입니다.")
-        String memo
+        String memo,
+
+        @Schema(description = "전체 현장-공정 접근 권한 여부", example = "false")
+        boolean hasGlobalSiteProcessAccess,
+
+        @Schema(description = "현장 정보 목록")
+        List<SiteResponse.SiteSimpleResponse> sites,
+
+        @Schema(description = "공정 정보 목록")
+        List<SiteProcessResponse.SiteProcessSimpleResponse> processes
 ) {
     public static RolesResponse from(Role role) {
         int userCount = role.getUserRoles() == null ? 0 :
@@ -33,13 +46,33 @@ public record RolesResponse(
                         .distinct()
                         .count();
 
+        List<SiteResponse.SiteSimpleResponse> sites = role.getSiteProcesses() == null ? List.of() :
+                role.getSiteProcesses().stream()
+                        .map(RoleSiteProcess::getSite)
+                        .filter(java.util.Objects::nonNull)
+                        .distinct()
+                        .map(SiteResponse.SiteSimpleResponse::from)
+                        .toList();
+
+        List<SiteProcessResponse.SiteProcessSimpleResponse> processes = role.getSiteProcesses() == null ? List.of() :
+                role.getSiteProcesses().stream()
+                        .map(RoleSiteProcess::getProcess)
+                        .filter(java.util.Objects::nonNull)
+                        .distinct()
+                        .map(SiteProcessResponse.SiteProcessSimpleResponse::from)
+                        .toList();
+
         return new RolesResponse(
                 role.getId(),
                 role.getName(),
                 userCount,
                 role.getCreatedAt(),
                 role.getUpdatedAt(),
-                role.getMemo()
+                role.getMemo(),
+                role.isHasGlobalSiteProcessAccess(),
+                sites,
+                processes
         );
     }
+
 }
