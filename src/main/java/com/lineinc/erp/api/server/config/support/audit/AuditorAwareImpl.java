@@ -26,26 +26,23 @@ public class AuditorAwareImpl implements AuditorAware<String> {
     @Override
     @NonNull
     public Optional<String> getCurrentAuditor() {
-        // 현재 SecurityContext에서 인증 객체를 얻음
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // 인증 정보가 없거나 인증되지 않은 경우 빈값 반환
         if (authentication == null || !authentication.isAuthenticated()) {
             return Optional.empty();
         }
 
-        // 인증된 사용자 정보(principal) 조회
         Object principal = authentication.getPrincipal();
 
-        // principal이 UserDetails 타입이면 username을 Optional에 담아 반환
+        // anonymousUser 문자열 체크 추가
+        if (principal instanceof String && principal.equals("anonymousUser")) {
+            return Optional.empty();
+        }
+
         if (principal instanceof UserDetails) {
             return Optional.of(((UserDetails) principal).getUsername());
-
-            // principal이 String 타입일 경우 그대로 Optional에 담아 반환
         } else if (principal instanceof String) {
             return Optional.of((String) principal);
-
-            // 그 외 타입은 빈 Optional 반환
         } else {
             return Optional.empty();
         }

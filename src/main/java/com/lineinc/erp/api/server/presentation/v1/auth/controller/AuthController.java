@@ -58,13 +58,12 @@ public class AuthController {
 
         // 3. 로그인 성공한 사용자 정보
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = userService.getUserEntity(userDetails.getUserId());
-        if (!user.isActive()) {
+        if (!userDetails.isActive()) {
             throw new IllegalStateException(ValidationMessages.USER_NOT_ACTIVE);
         }
 
         // 4. 마지막 로그인 시간 갱신
-        userService.updateLastLoginAt(user.getId());
+        userService.updateLastLoginAt(userDetails.getUserId());
 
         // 5. SecurityContext에 인증 정보 저장
         SecurityContext context = SecurityContextHolder.createEmptyContext();

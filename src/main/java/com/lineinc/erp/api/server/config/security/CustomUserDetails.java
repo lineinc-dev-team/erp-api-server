@@ -15,11 +15,14 @@ public class CustomUserDetails implements UserDetails, java.io.Serializable {
     private final Long userId;
     private final String username;
     private final String password;
+    @Getter
+    private final boolean active;
 
-    public CustomUserDetails(Long userId, String username, String password) {
+    public CustomUserDetails(Long userId, String username, String password, boolean active) {
         this.userId = userId;
         this.username = username;
         this.password = password;
+        this.active = active;
     }
 
     @Override
