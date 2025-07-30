@@ -81,6 +81,7 @@ public class UserService {
                 .landlineNumber(request.landlineNumber())
                 .email(request.email())
                 .isActive(request.isActive())
+                .memo(request.memo())
                 .build();
 
         usersRepository.save(user);
