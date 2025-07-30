@@ -23,12 +23,18 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 📦 JAR 파일 EC2로 전송
-        run: scp build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app.jar
+      - name: 📦 JAR 파일 EC2로 전송 및 덮어쓰기
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          scp build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-$TIMESTAMP.jar
+          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << EOF
+            cp /home/ubuntu/app-$TIMESTAMP.jar /home/ubuntu/app.jar
+            rm -f /home/ubuntu/app-$TIMESTAMP.jar
+          EOF
 
       - name: 🚀 EC2에서 JAR 실행
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << EOF
-            sudo systemctl daemon-reload
+            sudo systemctl daemon-reexec
             sudo systemctl restart myapp.service
           EOF
