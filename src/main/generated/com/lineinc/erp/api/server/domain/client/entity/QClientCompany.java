@@ -92,7 +92,7 @@ public class QClientCompany extends EntityPathBase<ClientCompany> {
 
     public QClientCompany(Class<? extends ClientCompany> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new com.lineinc.erp.api.server.domain.user.entity.QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new com.lineinc.erp.api.server.domain.user.entity.QUser(forProperty("user"), inits.get("user")) : null;
     }
 
 }

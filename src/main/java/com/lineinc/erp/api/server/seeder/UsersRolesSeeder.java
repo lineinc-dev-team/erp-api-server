@@ -38,31 +38,5 @@ public class UsersRolesSeeder {
                 usersRepository.save(adminUser);
             }
         }
-
-        usersRepository.findByLoginId(AppConstants.SUB_ADMIN_LOGIN_ID).ifPresent(user ->
-                roleRepository.findByName(AppConstants.ROLE_SUB_ADMIN_NAME).ifPresent(role -> {
-                    if (user.getUserRoles().stream().noneMatch(ur -> ur.getRole().equals(role))) {
-                        UserRole userRole = UserRole.builder()
-                                .user(user)
-                                .role(role)
-                                .build();
-                        user.getUserRoles().add(userRole);
-                        usersRepository.save(user);
-                    }
-                })
-        );
-
-        usersRepository.findByLoginId(AppConstants.SUB_ADMIN_LITE_LOGIN_ID).ifPresent(user ->
-                roleRepository.findByName(AppConstants.ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU).ifPresent(role -> {
-                    if (user.getUserRoles().stream().noneMatch(ur -> ur.getRole().equals(role))) {
-                        UserRole userRole = UserRole.builder()
-                                .user(user)
-                                .role(role)
-                                .build();
-                        user.getUserRoles().add(userRole);
-                        usersRepository.save(user);
-                    }
-                })
-        );
     }
 }

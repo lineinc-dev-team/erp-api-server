@@ -74,11 +74,11 @@ public class RoleService {
                     List<Permission> permissionList = entry.getValue();
                     String menuName = permissionList.get(0).getMenu().getName();
 
-                    List<MenusPermissionsResponse.PermissionDto> permissionDtos = permissionList.stream()
+                    List<MenusPermissionsResponse.PermissionDto> permissions = permissionList.stream()
                             .map(MenusPermissionsResponse.PermissionDto::from)
                             .toList();
 
-                    return MenusPermissionsResponse.from(menuId, menuName, permissionDtos);
+                    return MenusPermissionsResponse.from(menuId, menuName, permissions);
                 })
                 .toList();
     }
@@ -90,36 +90,40 @@ public class RoleService {
 
     @Transactional
     public void removeUsersFromRole(Long roleId, RemoveUsersFromRoleRequest request) {
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+        if (roleId != 1L) {
+            Role role = roleRepository.findById(roleId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
-        List<User> users = userRepository.findAllById(request.userIds());
+            List<User> users = userRepository.findAllById(request.userIds());
 
-        // 해당 role이 실제로 user의 userRoles에 있을 때만 제거 후 저장
-        for (User user : users) {
-            if (user.getUserRoles().stream().anyMatch(ur -> ur.getRole().equals(role))) {
-                user.getUserRoles().removeIf(ur -> ur.getRole().equals(role));
-                userRepository.save(user);
+            // 해당 role이 실제로 user의 userRoles에 있을 때만 제거 후 저장
+            for (User user : users) {
+                if (user.getUserRoles().stream().anyMatch(ur -> ur.getRole().equals(role))) {
+                    user.getUserRoles().removeIf(ur -> ur.getRole().equals(role));
+                    userRepository.save(user);
+                }
             }
         }
     }
 
     @Transactional
     public void addUsersToRole(Long roleId, AddUsersToRoleRequest request) {
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+        if (roleId != 1L) {
+            Role role = roleRepository.findById(roleId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
-        List<User> users = userRepository.findAllById(request.userIds());
+            List<User> users = userRepository.findAllById(request.userIds());
 
-        for (User user : users) {
-            boolean hasRole = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().equals(role));
-            if (!hasRole) {
-                UserRole userRole = UserRole.builder()
-                        .user(user)
-                        .role(role)
-                        .build();
-                user.getUserRoles().add(userRole);
-                userRepository.save(user);
+            for (User user : users) {
+                boolean hasRole = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().equals(role));
+                if (!hasRole) {
+                    UserRole userRole = UserRole.builder()
+                            .user(user)
+                            .role(role)
+                            .build();
+                    user.getUserRoles().add(userRole);
+                    userRepository.save(user);
+                }
             }
         }
     }

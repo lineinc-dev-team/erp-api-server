@@ -30,31 +30,6 @@ public class RolesPermissionsSeeder {
     @Transactional
     public void seed() {
         assignAllPermissionsToRole();
-        assignPermissionsToRole(AppConstants.ROLE_SUB_ADMIN_NAME, false);
-        assignPermissionsToRole(AppConstants.ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU, true);
-    }
-
-    private void assignPermissionsToRole(String roleName, boolean excludeRoleMenu) {
-        Role role = roleRepository.findByName(roleName)
-                .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
-
-        EnumSet<PermissionAction> actions = EnumSet.complementOf(EnumSet.of(PermissionAction.DELETE));
-
-        for (Menu m : menuRepository.findAll()) {
-            if (excludeRoleMenu && AppConstants.MENU_PERMISSION.equals(m.getName())) continue;
-
-            for (PermissionAction action : actions) {
-                permissionRepository.findByMenuAndAction(m, action).ifPresent(permission -> {
-                    RolePermission rolePermission = RolePermission.builder()
-                            .role(role)
-                            .permission(permission)
-                            .build();
-                    role.getPermissions().add(rolePermission);
-                });
-            }
-        }
-
-        roleRepository.save(role);
     }
 
     private void assignAllPermissionsToRole() {

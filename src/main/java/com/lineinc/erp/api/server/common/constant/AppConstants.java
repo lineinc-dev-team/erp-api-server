@@ -7,18 +7,11 @@ public final class AppConstants {
 
     // 권한 그룹명 관련 상수
     public static final String ROLE_ADMIN_NAME = "전체권한";
-    public static final String ROLE_SUB_ADMIN_NAME = "전체권한(삭제 제외)";
-    public static final String ROLE_SUB_ADMIN_WITHOUT_PERMISSION_MENU = "전체권한(삭제/권한관리 제외)";
 
-    // 관리자 로그인 ID 관련 상수
+    // 관리자 계정 관련 상수
     public static final String ADMIN_LOGIN_ID = "admin";
-    public static final String SUB_ADMIN_LOGIN_ID = "sub_admin";
-    public static final String SUB_ADMIN_LITE_LOGIN_ID = "sub_admin_lite";
-
-    // 관리자 이메일 주소 관련 상수
     public static final String ADMIN_EMAIL = "admin@example.com";
-    public static final String SUB_ADMIN_EMAIL = "sub_admin@example.com";
-    public static final String SUB_ADMIN_LITE_EMAIL = "sub_admin_lite@example.com";
+    public static final String ADMIN_USERNAME = "관리자";
 
     // 시스템 관련 상수
     public static final String SYSTEM_NAME = "system";

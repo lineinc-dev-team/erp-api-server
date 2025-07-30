@@ -45,7 +45,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
         String search = (request != null) ? request.userSearch() : null;
 
-        BooleanExpression whereCondition = containsSearch(user, search);
+        BooleanExpression whereCondition = role.id.ne(1L).and(containsSearch(user, search));
 
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
