@@ -39,11 +39,15 @@ public class RolesPermissionsSeeder {
         menuRepository.findAll().forEach(menu ->
                 EnumSet.allOf(PermissionAction.class).forEach(action ->
                         permissionRepository.findByMenuAndAction(menu, action).ifPresent(permission -> {
-                            RolePermission rolePermission = RolePermission.builder()
-                                    .role(role)
-                                    .permission(permission)
-                                    .build();
-                            role.getPermissions().add(rolePermission);
+                            boolean alreadyExists = role.getPermissions().stream()
+                                    .anyMatch(rp -> rp.getPermission().equals(permission));
+                            if (!alreadyExists) {
+                                RolePermission rolePermission = RolePermission.builder()
+                                        .role(role)
+                                        .permission(permission)
+                                        .build();
+                                role.getPermissions().add(rolePermission);
+                            }
                         })
                 )
         );

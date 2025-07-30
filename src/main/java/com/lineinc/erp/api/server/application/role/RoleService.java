@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 
 @Service
@@ -79,6 +80,7 @@ public class RoleService {
                     String menuName = permissionList.get(0).getMenu().getName();
 
                     List<MenusPermissionsResponse.PermissionDto> permissions = permissionList.stream()
+                            .sorted(Comparator.comparing(Permission::getId))
                             .map(MenusPermissionsResponse.PermissionDto::from)
                             .toList();
 
