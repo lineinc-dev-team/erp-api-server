@@ -69,22 +69,27 @@ public class RoleService {
         Role role = roleRepository.findWithPermissionsAndMenusById(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Map<Long, List<Permission>> grouped = role.getPermissions().stream()
+        // Permission ID 기준으로 중복 제거
+        Map<Long, Permission> uniquePermissions = role.getPermissions().stream()
                 .map(RolePermission::getPermission)
-                .collect(Collectors.groupingBy(permission -> permission.getMenu().getId()));
+                .collect(Collectors.toMap(
+                        Permission::getId,
+                        p -> p,
+                        (existing, replacement) -> existing // 중복 시 기존 값 유지
+                ));
 
-        return grouped.entrySet().stream()
+        // Menu ID로 그룹핑
+        return uniquePermissions.values().stream()
+                .collect(Collectors.groupingBy(p -> p.getMenu().getId()))
+                .entrySet().stream()
                 .map(entry -> {
-                    Long menuId = entry.getKey();
-                    List<Permission> permissionList = entry.getValue();
-                    String menuName = permissionList.get(0).getMenu().getName();
-
-                    List<MenusPermissionsResponse.PermissionDto> permissions = permissionList.stream()
+                    var permissions = entry.getValue().stream()
                             .sorted(Comparator.comparing(Permission::getId))
                             .map(MenusPermissionsResponse.PermissionDto::from)
                             .toList();
 
-                    return MenusPermissionsResponse.from(menuId, menuName, permissions);
+                    String menuName = entry.getValue().get(0).getMenu().getName();
+                    return MenusPermissionsResponse.from(entry.getKey(), menuName, permissions);
                 })
                 .toList();
     }
