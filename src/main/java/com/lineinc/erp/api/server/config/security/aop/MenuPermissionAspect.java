@@ -54,7 +54,7 @@ public class MenuPermissionAspect {
 
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomUserDetails) {
-            return ((CustomUserDetails) principal).getUser().getId();
+            return ((CustomUserDetails) principal).getUserId();
         } else if (principal instanceof User) {
             return ((User) principal).getId();
         } else {

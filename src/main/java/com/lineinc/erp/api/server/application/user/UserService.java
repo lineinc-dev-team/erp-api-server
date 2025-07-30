@@ -172,11 +172,10 @@ public class UserService {
     }
 
     @Transactional
-    public void updateLastLoginAt(User user) {
-        // 여기서 다시 영속 상태로 조회
-        User persistentUser = usersRepository.findById(user.getId())
+    public void updateLastLoginAt(Long userId) {
+        User user = usersRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        persistentUser.updateLastLoginAt();
+        user.updateLastLoginAt(); // 이건 쿼리 나감
     }
 
     @Transactional(readOnly = true)
@@ -191,6 +190,12 @@ public class UserService {
         User user = usersRepository.findByIdWithRoles(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         return UserResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserEntity(Long userId) {
+        return usersRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
     }
 }
 

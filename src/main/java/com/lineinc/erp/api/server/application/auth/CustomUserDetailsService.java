@@ -24,6 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByLoginId(username)
                 .orElseThrow(() -> new BadCredentialsException(ValidationMessages.USER_NOT_FOUND));
-        return new CustomUserDetails(user);
+        return new CustomUserDetails(user.getId(), user.getLoginId(), user.getPasswordHash());
     }
 }
