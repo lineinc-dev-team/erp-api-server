@@ -151,12 +151,17 @@ public class RoleService {
 
     @Transactional
     public void deleteRolesByIds(List<Long> roleIds) {
-        List<Role> roles = roleRepository.findAllById(roleIds);
-        if (roles.isEmpty()) {
+        List<Long> filteredRoleIds = roleIds.stream()
+                .filter(id -> !id.equals(1L))
+                .toList();
+
+        List<Role> roles = roleRepository.findAllById(filteredRoleIds);
+
+        if (roleIds.size() != roles.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND);
         }
 
-        List<UserRole> userRoles = userRoleRepository.findByRole_IdIn(roleIds);
+        List<UserRole> userRoles = userRoleRepository.findByRole_IdIn(filteredRoleIds);
         for (UserRole userRole : userRoles) {
             User user = userRole.getUser();
             user.getUserRoles().remove(userRole);
