@@ -113,41 +113,41 @@ public class RoleController {
         ));
     }
 
-    @Operation(
-            summary = "권한 그룹에서 유저 삭제",
-            description = "권한 그룹 ID와 유저 ID로 해당 권한 그룹에서 유저를 삭제합니다"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
-    })
-    @DeleteMapping("/{id}/users")
-    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
-    public ResponseEntity<Void> removeUsersFromRole(
-            @PathVariable Long id,
-            @RequestBody RemoveUsersFromRoleRequest request
-    ) {
-        roleService.removeUsersFromRole(id, request);
-        return ResponseEntity.ok().build();
-    }
+//    @Operation(
+//            summary = "권한 그룹에서 유저 삭제",
+//            description = "권한 그룹 ID와 유저 ID로 해당 권한 그룹에서 유저를 삭제합니다"
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+//            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+//    })
+//    @DeleteMapping("/{id}/users")
+//    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
+//    public ResponseEntity<Void> removeUsersFromRole(
+//            @PathVariable Long id,
+//            @RequestBody RemoveUsersFromRoleRequest request
+//    ) {
+//        roleService.removeUsersFromRole(id, request);
+//        return ResponseEntity.ok().build();
+//    }
 
-    @Operation(
-            summary = "권한 그룹에 유저 추가",
-            description = "권한 그룹 ID와 유저 ID 리스트로 해당 권한 그룹에 유저를 추가합니다"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "추가 성공"),
-            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
-    })
-    @PostMapping("/{id}/users")
-    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.CREATE)
-    public ResponseEntity<Void> addUsersToRole(
-            @PathVariable Long id,
-            @RequestBody AddUsersToRoleRequest request
-    ) {
-        roleService.addUsersToRole(id, request);
-        return ResponseEntity.ok().build();
-    }
+//    @Operation(
+//            summary = "권한 그룹에 유저 추가",
+//            description = "권한 그룹 ID와 유저 ID 리스트로 해당 권한 그룹에 유저를 추가합니다"
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "추가 성공"),
+//            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+//    })
+//    @PostMapping("/{id}/users")
+//    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.CREATE)
+//    public ResponseEntity<Void> addUsersToRole(
+//            @PathVariable Long id,
+//            @RequestBody AddUsersToRoleRequest request
+//    ) {
+//        roleService.addUsersToRole(id, request);
+//        return ResponseEntity.ok().build();
+//    }
 
     @Operation(
             summary = "권한 그룹 생성",
@@ -181,21 +181,21 @@ public class RoleController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "권한 그룹의 권한 수정",
-            description = "권한 그룹 ID에 권한 ID 리스트로 권한 목록을 수정합니다"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "권한 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "권한 그룹 또는 권한을 찾을 수 없음", content = @Content())
-    })
-    @PostMapping("/{id}/permissions")
-    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.UPDATE)  // 수정 권한으로 변경하는 것도 고려
-    public ResponseEntity<Void> updatePermissionsOfRole(
-            @PathVariable Long id,
-            @RequestBody @Valid AddPermissionsToRoleRequest request
-    ) {
-        roleService.setPermissionsToRole(id, request);
-        return ResponseEntity.ok().build();
-    }
+//    @Operation(
+//            summary = "권한 그룹의 권한 수정",
+//            description = "권한 그룹 ID에 권한 ID 리스트로 권한 목록을 수정합니다"
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "권한 수정 성공"),
+//            @ApiResponse(responseCode = "404", description = "권한 그룹 또는 권한을 찾을 수 없음", content = @Content())
+//    })
+//    @PostMapping("/{id}/permissions")
+//    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.UPDATE)  // 수정 권한으로 변경하는 것도 고려
+//    public ResponseEntity<Void> updatePermissionsOfRole(
+//            @PathVariable Long id,
+//            @RequestBody @Valid AddPermissionsToRoleRequest request
+//    ) {
+//        roleService.setPermissionsToRole(id, request);
+//        return ResponseEntity.ok().build();
+//    }
 }
