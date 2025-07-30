@@ -56,6 +56,7 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.updatePassword(encodedPassword);
+        user.setRequirePasswordReset(true);
         usersRepository.save(user);
     }
 
