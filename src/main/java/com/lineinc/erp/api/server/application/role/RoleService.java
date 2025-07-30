@@ -116,18 +116,27 @@ public class RoleService {
             Role role = roleRepository.findById(roleId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
-            List<User> users = userRepository.findAllById(request.userIds());
+            Map<Long, String> memoMap = request.users().stream()
+                    .collect(Collectors.toMap(AddUsersToRoleRequest.UserWithMemo::userId, AddUsersToRoleRequest.UserWithMemo::memo));
+
+            List<Long> userIds = request.users().stream()
+                    .map(AddUsersToRoleRequest.UserWithMemo::userId)
+                    .toList();
+
+            List<User> users = userRepository.findAllById(userIds);
 
             for (User user : users) {
-                boolean hasRole = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().equals(role));
-                if (!hasRole) {
-                    UserRole userRole = UserRole.builder()
-                            .user(user)
-                            .role(role)
-                            .build();
-                    user.getUserRoles().add(userRole);
-                    userRepository.save(user);
+                if (!user.getUserRoles().isEmpty()) {
+                    continue;
                 }
+
+                UserRole userRole = UserRole.builder()
+                        .user(user)
+                        .role(role)
+                        .memo(memoMap.get(user.getId()))
+                        .build();
+                user.getUserRoles().add(userRole);
+                userRepository.save(user);
             }
         }
     }
