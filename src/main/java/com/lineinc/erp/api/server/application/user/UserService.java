@@ -101,8 +101,11 @@ public class UserService {
         return switch (field) {
             case "id" -> "No.";
             case "loginId" -> "사용자 ID";
-            case "username" -> "사용자 이름";
-            case "roleName" -> "권한그룹";
+            case "username" -> "이름";
+            case "department" -> "부서";
+            case "grade" -> "직급";
+            case "position" -> "직책";
+            case "phoneNumber" -> "휴대폰";
             case "isActive" -> "계정상태";
             case "lastLoginAt" -> "최종접속일";
             case "createdAt" -> "생성일자";
@@ -118,7 +121,10 @@ public class UserService {
             case "id" -> String.valueOf(user.id());
             case "loginId" -> user.loginId();
             case "username" -> user.username();
-            case "roleName" -> user.roles().isEmpty() ? "" : user.roles().get(0).name();
+            case "department" -> user.department();
+            case "grade" -> user.grade();
+            case "position" -> user.position();
+            case "phoneNumber" -> user.phoneNumber() != null ? user.phoneNumber() : "";
             case "isActive" -> user.isActive() ? "Y" : "N";
             case "lastLoginAt" -> DateTimeFormatUtils.formatKoreaLocalDate(user.lastLoginAt());
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(user.createdAt());

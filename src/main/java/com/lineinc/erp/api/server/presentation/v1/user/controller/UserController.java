@@ -81,7 +81,6 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "검색 성공")
     })
     @GetMapping("/search")
-    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<UserResponse.UserSimpleResponse>>> searchUsersByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
