@@ -107,7 +107,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch()
                 .stream()
-                .map(RoleUserListResponse::from)
+                .map(userObj -> RoleUserListResponse.from(userObj, roleId))
                 .toList();
 
         Long totalCount = queryFactory
