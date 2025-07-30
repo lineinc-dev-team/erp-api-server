@@ -60,6 +60,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final com.lineinc.erp.api.server.domain.organization.entity.QPosition position;
 
+    public final BooleanPath requirePasswordReset = createBoolean("requirePasswordReset");
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 

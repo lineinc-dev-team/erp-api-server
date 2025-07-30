@@ -29,6 +29,7 @@ public class UsersSeeder {
                 .username(AppConstants.ADMIN_USERNAME)
                 .email(AppConstants.ADMIN_EMAIL)
                 .passwordHash(passwordEncoder.encode(adminPassword))
+                .requirePasswordReset(false)
                 .createdBy(AppConstants.SYSTEM_NAME)
                 .updatedBy(AppConstants.SYSTEM_NAME)
                 .build();

@@ -24,6 +24,7 @@ public class MenuPermissionAspect {
     public void checkMenuPermission(RequireMenuPermission requireMenuPermission) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = ((CustomUserDetails) principal).getUserId();
+        System.out.println("userId = " + userId);
         log.info("[권한 체크] 권한 검사 시작: userId={}, menu={}, action={}", userId, requireMenuPermission.menu(), requireMenuPermission.action());
         boolean hasPermission = roleService.hasPermission(
                 userId,

@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.application.user;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -28,7 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -52,7 +52,7 @@ public class UserService {
     public void resetPassword(long id) {
         if (id == 1L) return; // 1번 계정은 비밀번호 초기화 금지
         User user = usersRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
         String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.updatePassword(encodedPassword);
@@ -199,5 +199,15 @@ public class UserService {
         return usersRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
     }
+
+    @Transactional
+    public void changePassword(Long userId, PasswordChangeRequest request) {
+        User user = usersRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+        user.updatePassword(passwordEncoder.encode(request.newPassword()));
+        user.setRequirePasswordReset(false);
+        usersRepository.save(user);
+    }
 }
+
 

@@ -54,6 +54,9 @@ public record UserResponse(
         @Schema(description = "직책 이름", example = "팀장")
         String position,
 
+        @Schema(description = "최초 로그인 시 비밀번호 재설정 여부", example = "true")
+        Boolean requirePasswordReset,
+
         @Schema(description = "사용자 권한 목록")
         List<RoleSummaryResponse> roles
 ) {
@@ -74,6 +77,7 @@ public record UserResponse(
                 user.getDepartment() != null ? user.getDepartment().getName() : null,
                 user.getGrade() != null ? user.getGrade().getName() : null,
                 user.getPosition() != null ? user.getPosition().getName() : null,
+                user.isRequirePasswordReset(),
                 user.getUserRoles().stream()
                         .map(UserRole::getRole)
                         .map(role -> new RoleSummaryResponse(role.getId(), role.getName()))

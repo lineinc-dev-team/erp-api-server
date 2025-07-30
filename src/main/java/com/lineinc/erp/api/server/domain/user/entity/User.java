@@ -58,6 +58,11 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> userRoles = new HashSet<>();
 
+    @Setter
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean requirePasswordReset = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;

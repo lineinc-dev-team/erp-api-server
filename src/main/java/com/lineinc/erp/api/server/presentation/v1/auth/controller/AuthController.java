@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,6 +80,20 @@ public class AuthController {
 
         // 세션 타임아웃 설정
         session.setMaxInactiveInterval(AppConstants.DEFAULT_SESSION_TIMEOUT_SECONDS);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "새 비밀번호로 변경합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+    })
+    @PatchMapping("/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody PasswordChangeRequest request
+    ) {
+        userService.changePassword(userDetails.getUserId(), request);
         return ResponseEntity.ok().build();
     }
 
