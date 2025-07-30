@@ -4,6 +4,9 @@ import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +22,9 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
     // 특정 User와 Role 관계 존재 여부 확인
     boolean existsByUserAndRole(User user, Role role);
+
+    // 특정 Role ID의 모든 UserRole 삭제 (bulk delete)
+    @Modifying
+    @Query("DELETE FROM UserRole ur WHERE ur.role.id = :roleId")
+    void deleteAllByRoleId(@Param("roleId") Long roleId);
 }

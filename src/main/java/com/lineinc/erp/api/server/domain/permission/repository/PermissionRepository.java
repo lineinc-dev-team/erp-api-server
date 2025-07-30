@@ -20,6 +20,6 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     List<Permission> findByMenu(Menu menu);
 
     @Modifying
-    @Query(value = "DELETE FROM roles_permissions WHERE role_id = :roleId", nativeQuery = true)
+    @Query(value = "DELETE FROM role_permissions WHERE role_id = :roleId", nativeQuery = true)
     void deleteAllByRoleIdNative(@Param("roleId") Long roleId);
 }

@@ -216,15 +216,17 @@ public class RoleService {
 
             List<User> users = userRepository.findAllById(userIds);
             for (User user : users) {
-                if (user.getUserRoles().isEmpty()) {
-                    UserRole userRole = UserRole.builder()
-                            .user(user)
-                            .role(newRole)
-                            .memo(memoMap.get(user.getId()))
-                            .build();
-                    user.getUserRoles().add(userRole);
-                    userRepository.save(user);
+                if (!user.getUserRoles().isEmpty()) {
+                    continue;
                 }
+
+                UserRole userRole = UserRole.builder()
+                        .user(user)
+                        .role(newRole)
+                        .memo(memoMap.get(user.getId()))
+                        .build();
+                user.getUserRoles().add(userRole);
+                userRepository.save(user);
             }
         }
 
@@ -311,5 +313,107 @@ public class RoleService {
                                 permission.getMenu().getName().equalsIgnoreCase(menuName.trim()) &&
                                 PermissionAction.fromLabel(permission.getAction().getLabel()) == action
                 );
+    }
+
+    @Transactional
+    public void updateRole(Long roleId, UpdateRolesRequest request) {
+        if (roleId == 1L) return;
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+
+        role.updateFrom(request);
+
+        // 사용자 연결 처리
+        if (request.users() != null) {
+            // 기존 연결 제거 (bulk delete)
+            userRoleRepository.deleteAllByRoleId(roleId);
+            role.getUserRoles().clear();
+
+            // 새로운 사용자 연결
+            if (!request.users().isEmpty()) {
+                List<Long> userIds = request.users().stream()
+                        .map(UpdateRolesRequest.UserWithMemo::userId)
+                        .toList();
+
+                Map<Long, String> memoMap = request.users().stream()
+                        .collect(Collectors.toMap(
+                                UpdateRolesRequest.UserWithMemo::userId,
+                                UpdateRolesRequest.UserWithMemo::memo
+                        ));
+
+                List<User> users = userRepository.findAllById(userIds);
+                List<UserRole> newUserRoles = users.stream()
+                        .filter(user -> user.getUserRoles().isEmpty())
+                        .map(user -> UserRole.builder()
+                                .user(user)
+                                .role(role)
+                                .memo(memoMap.get(user.getId()))
+                                .build())
+                        .toList();
+
+                if (!newUserRoles.isEmpty()) {
+                    userRoleRepository.saveAll(newUserRoles);
+                    role.getUserRoles().addAll(newUserRoles);
+                }
+            }
+        }
+
+        // 권한 연결 처리
+        if (request.permissionIds() != null) {
+            role.getPermissions().clear();
+
+            if (!request.permissionIds().isEmpty()) {
+                List<Permission> permissions = permissionRepository.findAllById(request.permissionIds());
+                if (permissions.size() != request.permissionIds().size()) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SOME_PERMISSIONS_NOT_FOUND);
+                }
+
+                List<RolePermission> rolePermissions = permissions.stream()
+                        .filter(p -> p.getMenu() != null)
+                        .map(p -> RolePermission.builder()
+                                .role(role)
+                                .permission(p)
+                                .build())
+                        .collect(Collectors.toList());
+
+                role.getPermissions().addAll(rolePermissions);
+            }
+        }
+
+        // 현장/공정 연결 처리
+        if (request.hasGlobalSiteProcessAccess() != null && !request.hasGlobalSiteProcessAccess()) {
+            role.getSiteProcesses().clear();
+
+            if (request.siteProcesses() != null && !request.siteProcesses().isEmpty()) {
+                List<RoleSiteProcess> siteProcesses = request.siteProcesses().stream()
+                        .map(dto -> {
+                            Site site = dto.siteId() != null ?
+                                    siteRepository.findById(dto.siteId())
+                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND))
+                                    : null;
+
+                            SiteProcess process = dto.processId() != null ?
+                                    siteProcessRepository.findById(dto.processId())
+                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_PROCESS_NOT_FOUND))
+                                    : null;
+
+                            if (site != null && process != null && !process.getSite().getId().equals(site.getId())) {
+                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+                            }
+
+                            return RoleSiteProcess.builder()
+                                    .role(role)
+                                    .site(site)
+                                    .process(process)
+                                    .build();
+                        })
+                        .collect(Collectors.toList());
+
+                role.getSiteProcesses().addAll(siteProcesses);
+            }
+        }
+
+        roleRepository.save(role);
     }
 }

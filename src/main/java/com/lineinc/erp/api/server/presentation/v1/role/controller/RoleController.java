@@ -167,6 +167,24 @@ public class RoleController {
     }
 
     @Operation(
+            summary = "권한 그룹 수정",
+            description = "권한 그룹 정보를 수정합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "404", description = "권한 그룹을 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateRole(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateRolesRequest request
+    ) {
+        roleService.updateRole(id, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
             summary = "여러 권한 그룹 삭제",
             description = "권한 그룹 ID 리스트로 여러 권한 그룹을 삭제합니다"
     )
