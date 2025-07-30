@@ -27,4 +27,13 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
             "left join fetch ur.role " +
             "where u.id = :id")
     Optional<User> findByIdWithRoles(@Param("id") Long id);
+
+    @Query("select u from User u " +
+            "left join fetch u.userRoles ur " +
+            "left join fetch ur.role r " +
+            "left join fetch r.permissions rp " +
+            "left join fetch rp.permission p " +
+            "left join fetch p.menu m " +
+            "where u.id = :id")
+    Optional<User> findByIdWithPermissions(@Param("id") Long id);
 }

@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.application.role;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.entity.RolePermission;
@@ -252,40 +253,18 @@ public class RoleService {
     }
 
     @Transactional(readOnly = true)
-    public List<MenusPermissionsResponse> getPermissionsById(Long id) {
-        User user = userRepository.findByIdWithRoles(id)
+    public boolean hasPermission(Long userId, String menuName, PermissionAction action) {
+        User user = userRepository.findByIdWithPermissions(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
-        List<Long> roleIds = user.getUserRoles().stream()
-                .map(ur -> ur.getRole().getId())
-                .distinct()
-                .toList();
-
-        if (roleIds.isEmpty()) {
-            return List.of();
-        }
-
-        List<MenusPermissionsResponse> allPermissions = roleIds.stream()
-                .flatMap(roleId -> getMenusPermissionsById(roleId).stream())
-                .toList();
-
-        Map<Long, List<MenusPermissionsResponse>> groupedByMenuId = allPermissions.stream()
-                .collect(Collectors.groupingBy(MenusPermissionsResponse::id));
-
-        return groupedByMenuId.entrySet().stream()
-                .map(entry -> {
-                    Long menuId = entry.getKey();
-                    List<MenusPermissionsResponse> permList = entry.getValue();
-
-                    String menuName = permList.get(0).name();
-
-                    List<MenusPermissionsResponse.PermissionDto> combinedPermissions = permList.stream()
-                            .flatMap(mp -> mp.permissions().stream())
-                            .distinct()
-                            .toList();
-
-                    return MenusPermissionsResponse.from(menuId, menuName, combinedPermissions);
-                })
-                .toList();
+        return user.getUserRoles().stream()
+                .map(UserRole::getRole)
+                .flatMap(role -> role.getPermissions().stream())
+                .map(RolePermission::getPermission)
+                .anyMatch(permission ->
+                        permission.getMenu() != null &&
+                                permission.getMenu().getName().equalsIgnoreCase(menuName.trim()) &&
+                                PermissionAction.fromLabel(permission.getAction().getLabel()) == action
+                );
     }
 }
