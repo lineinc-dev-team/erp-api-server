@@ -9,6 +9,7 @@ public final class ValidationMessages {
     public static final String INVALID_PROPERTY_REFERENCE = "요청에 잘못된 정렬 조건 또는 필드명이 포함되어 있습니다.";
     public static final String RESOURCE_NOT_FOUND = "요청한 리소스를 찾을 수 없습니다.";
     public static final String PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다.";
+    public static final String VALUE_NOT_PRESENT = "없음";
     public static final String UNSUPPORTED_CONTENT_TYPE = "지원하지 않는 콘텐츠 타입입니다.";
     public static final String ACCESS_DENIED = "접근 권한이 없습니다.";
     public static final String FILE_PROCESS_ERROR = "파일 처리 중 오류가 발생했습니다.";

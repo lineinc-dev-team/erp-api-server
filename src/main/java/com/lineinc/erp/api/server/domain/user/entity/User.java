@@ -120,22 +120,17 @@ public class User extends BaseEntity implements UserDetails {
      * @param request         사용자 수정 요청 정보
      * @param passwordEncoder 비밀번호 암호화에 사용할 인코더
      */
-    public void updateFrom(UpdateUserRequest request, PasswordEncoder passwordEncoder) {
+    public void updateFrom(UpdateUserRequest request, PasswordEncoder passwordEncoder,
+                           Department department, Grade grade, Position position) {
         Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
 
-        if (request.departmentId() != null) {
-            this.department = Department.builder().id(request.departmentId()).build();
-        }
-        if (request.gradeId() != null) {
-            this.grade = Grade.builder().id(request.gradeId()).build();
-        }
-        if (request.positionId() != null) {
-            this.position = Position.builder().id(request.positionId()).build();
-        }
+        this.department = department;
+        this.grade = grade;
+        this.position = position;
 
         if (request.password() != null && !request.password().isBlank()) {
             this.updatePassword(passwordEncoder.encode(request.password()));
