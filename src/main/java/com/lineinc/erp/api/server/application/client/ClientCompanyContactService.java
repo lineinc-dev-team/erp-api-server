@@ -1,18 +1,25 @@
 package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
+import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class ClientCompanyContactService {
+
+    private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
 
     /**
      * 신규 연락처들을 생성하여 ClientCompany에 추가합니다.
@@ -47,6 +54,9 @@ public class ClientCompanyContactService {
      */
     @Transactional
     public void updateClientCompanyContacts(ClientCompany clientCompany, List<ClientCompanyContactUpdateRequest> requests) {
+        // 원본 연락처 목록 복사
+        List<ClientCompanyContact> originalContacts = new ArrayList<>(clientCompany.getContacts());
+
         EntitySyncUtils.syncList(
                 clientCompany.getContacts(),                    // 기존 연락처 리스트
                 requests,                                       // 수정 요청 리스트
@@ -61,5 +71,32 @@ public class ClientCompanyContactService {
                                 .clientCompany(clientCompany)
                                 .build()
         );
+
+        List<ClientCompanyContact> updatedContacts = clientCompany.getContacts();
+        List<String> changes = new ArrayList<>();
+
+        // 감지된 삭제
+        for (ClientCompanyContact original : originalContacts) {
+            if (original.isDeleted()) {
+                changes.add("담당자 삭제: " + original.getName());
+            }
+        }
+
+        // 감지된 추가
+        for (ClientCompanyContact updated : updatedContacts) {
+            if (updated.getId() == null) {
+                changes.add("담당자 추가: " + updated.getName());
+            }
+        }
+
+        // 변경 이력 저장 (실제로는 change history repository가 필요함 - 여기선 로그 출력 예시)
+        // 변경 이력 저장 - 하나의 row에 통합 기록
+        if (!changes.isEmpty()) {
+            String combinedChange = String.join("\n", changes);
+            clientCompanyChangeHistoryRepository.save(ClientCompanyChangeHistory.builder()
+                    .clientCompany(clientCompany)
+                    .changeDetail(combinedChange)
+                    .build());
+        }
     }
 }
