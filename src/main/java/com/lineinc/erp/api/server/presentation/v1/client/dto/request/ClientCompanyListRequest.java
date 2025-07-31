@@ -18,14 +18,20 @@ public record ClientCompanyListRequest(
         @Schema(description = "대표자명", example = "홍길동")
         String ceoName,
 
-        @Schema(description = "담당자 연락처", example = "010-1234-5678")
+        @Schema(description = "전화번호", example = "010-1234-5678")
         String phoneNumber,
+
+        @Schema(description = "유선 전화번호", example = "02-124-5678")
+        String landlineNumber,
 
         @Schema(description = "발주처 담당자명", example = "홍길동")
         String contactName,
 
         @Schema(description = "이메일", example = "example@samsung.com")
         String email,
+
+        @Schema(description = "본사 담당자명", example = "김영희")
+        String userName,
 
         @Schema(description = "생성일(시작일)", example = "2024-01-01")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

@@ -108,13 +108,18 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         if (StringUtils.hasText(request.contactName())) {
             builder.and(clientCompany.contacts.any().name.containsIgnoreCase(request.contactName().trim()));
         }
+        if (StringUtils.hasText(request.userName())) {
+            builder.and(clientCompany.user.username.containsIgnoreCase(request.userName().trim()));
+        }
         if (StringUtils.hasText(request.email())) {
             builder.and(clientCompany.email.containsIgnoreCase(request.email().trim()));
         }
         if (StringUtils.hasText(request.phoneNumber())) {
             builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
         }
-
+        if (StringUtils.hasText(request.landlineNumber())) {
+            builder.and(clientCompany.landlineNumber.contains(request.landlineNumber().trim()));
+        }
         if (request.isActive() != null) {
             builder.and(clientCompany.isActive.eq(request.isActive()));
         }
