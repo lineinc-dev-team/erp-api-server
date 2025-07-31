@@ -19,12 +19,13 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            build/
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle-wrapper.properties', '**/settings.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: 🧱 Gradle로 JAR 빌드
-        run: ./gradlew bootJar --no-daemon --parallel
+        run: ./gradlew bootJar --no-daemon --parallel -x test
 
       - name: 🔐 SSH 키 설정
         run: |
@@ -34,13 +35,13 @@ jobs:
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: 📦 JAR 파일 EC2로 전송
-        run: scp build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-latest.jar
+        run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-latest.jar
 
-      - name: 🚀 EC2에서 서비스 재시작
+      - name: 🚀 EC2에서 PM2로 서비스 재시작
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
-            sudo systemctl daemon-reload
-            sudo systemctl stop myapp.service
             ln -sf /home/ubuntu/app-latest.jar /home/ubuntu/app.jar
-            sudo systemctl start myapp.service
+            pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+            pm2 save
+            curl --retry 5 --retry-delay 5 http://localhost:8080/health
           EOF
