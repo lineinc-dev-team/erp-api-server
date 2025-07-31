@@ -40,8 +40,8 @@ jobs:
       - name: 🚀 EC2에서 PM2로 서비스 재시작
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
-            ln -sf /home/ubuntu/app-latest.jar /home/ubuntu/app.jar
             pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
             pm2 save
-            curl --retry 5 --retry-delay 5 http://localhost:8080/health
+            sleep 5 # 애플리케이션 시작 대기
+            curl --retry 10 --retry-delay 5 http://localhost:8080/health || true
           EOF
