@@ -35,6 +35,7 @@ public class ClientCompanyContactService {
                 .map(dto -> ClientCompanyContact.builder()
                         .name(dto.name())
                         .position(dto.position())
+                        .department(dto.department())
                         .landlineNumber(dto.landlineNumber())
                         .phoneNumber(dto.phoneNumber())
                         .email(dto.email())

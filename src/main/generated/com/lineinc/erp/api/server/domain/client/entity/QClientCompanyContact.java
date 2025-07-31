@@ -38,6 +38,8 @@ public class QClientCompanyContact extends EntityPathBase<ClientCompanyContact> 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final StringPath department = createString("department");
+
     public final StringPath email = createString("email");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);

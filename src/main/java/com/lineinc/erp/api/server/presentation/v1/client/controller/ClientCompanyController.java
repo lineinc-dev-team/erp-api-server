@@ -169,7 +169,7 @@ public class ClientCompanyController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "발주처 상세 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
+            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음", content = @Content()),
     })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)

@@ -41,7 +41,7 @@ public record ClientCompanyDetailResponse(
         String email,
 
         @Schema(description = "결제 방식", example = "CASH")
-        PaymentMethod paymentMethod,
+        String paymentMethod,
 
         @Schema(description = "결제 유예 기간", example = "2")
         String paymentPeriod,
@@ -78,7 +78,7 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getLandlineNumber(),
                 clientCompany.getPhoneNumber(),
                 clientCompany.getEmail(),
-                clientCompany.getPaymentMethod(),
+                clientCompany.getPaymentMethod().getDisplayName(),
                 clientCompany.getPaymentPeriod(),
                 clientCompany.isActive(),
                 clientCompany.getCreatedAt(),

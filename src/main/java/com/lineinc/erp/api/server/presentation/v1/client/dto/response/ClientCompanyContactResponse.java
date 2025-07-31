@@ -23,8 +23,11 @@ public record ClientCompanyContactResponse(
         @Schema(description = "이메일", example = "kim@example.com")
         String email,
 
-        @Schema(description = "직급 / 부서", example = "팀장")
+        @Schema(description = "직급", example = "팀장")
         String position,
+
+        @Schema(description = "부서", example = "영업팀")
+        String department,
 
         @Schema(description = "비고 / 메모")
         String memo,
@@ -43,6 +46,7 @@ public record ClientCompanyContactResponse(
                 contact.getLandlineNumber(),
                 contact.getEmail(),
                 contact.getPosition(),
+                contact.getDepartment(),
                 contact.getMemo(),
                 contact.getCreatedAt(),
                 contact.getUpdatedAt()

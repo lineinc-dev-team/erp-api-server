@@ -13,8 +13,12 @@ public record ClientCompanyContactCreateRequest(
         String name,
 
         @NotBlank
-        @Schema(description = "직급 / 부서", example = "팀장")
+        @Schema(description = "직급", example = "팀장")
         String position,
+
+        @NotBlank
+        @Schema(description = "부서", example = "영업팀")
+        String department,
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
         @Schema(description = "담당자 유선 전화번호", example = "02-123-5678")

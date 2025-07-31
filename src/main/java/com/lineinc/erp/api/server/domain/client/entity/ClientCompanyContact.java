@@ -37,7 +37,13 @@ public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<Cl
     private String name;
 
     /**
-     * 담당자의 직급 또는 부서
+     * 담당자의 부서
+     */
+    @Column
+    private String department;
+
+    /**
+     * 담당자의 직급
      */
     @Column
     private String position;
