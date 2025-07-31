@@ -2,7 +2,7 @@ name: Deploy Dev to EC2
 
 on:
   push:
-    branches: [ dev ]  # ✅ dev 브랜치에만 반응
+    branches: [ dev ]
 
 jobs:
   deploy:
@@ -11,10 +11,20 @@ jobs:
 
     steps:
       - name: ✅ 코드 체크아웃
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: 🔁 Gradle 캐시 복원
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle-wrapper.properties', '**/settings.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: 🧱 Gradle로 JAR 빌드
-        run: ./gradlew bootJar
+        run: ./gradlew bootJar --no-daemon --parallel
 
       - name: 🔐 SSH 키 설정
         run: |
@@ -24,11 +34,12 @@ jobs:
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: 📦 JAR 파일 EC2로 전송
-        run: scp build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app.jar
+        run: scp build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-latest.jar
 
-      - name: 🚀 EC2에서 JAR 실행
+      - name: 🚀 EC2에서 서비스 재시작
         run: |
-          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << EOF
-            sudo systemctl daemon-reload
-            sudo systemctl restart myapp.service
+          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
+            sudo systemctl stop myapp.service
+            ln -sf /home/ubuntu/app-latest.jar /home/ubuntu/app.jar
+            sudo systemctl start myapp.service
           EOF
