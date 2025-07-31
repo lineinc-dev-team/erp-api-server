@@ -9,11 +9,14 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistor
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
@@ -242,4 +245,12 @@ public class ClientCompanyService {
 
         return companySlice.map(ClientCompanyResponse.ClientCompanySimpleResponse::from);
     }
+
+    @Transactional(readOnly = true)
+    public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(Long clientCompanyId, Pageable pageable) {
+        ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
+        Slice<ClientCompanyChangeHistory> historySlice = clientCompanyChangeHistoryRepository.findByClientCompany(clientCompany, pageable);
+        return historySlice.map(ClientCompanyChangeHistoryResponse::from);
+    }
 }
+

@@ -175,7 +175,7 @@ public class UserController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "유저 변경 이력 조회", description = "특정 유저의 변경 히스토리를 슬라이스 형식으로 조회합니다")
+    @Operation(summary = "유저 변경 이력 조회", description = "특정 유저의 변경 히스토리를 조회합니다")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })

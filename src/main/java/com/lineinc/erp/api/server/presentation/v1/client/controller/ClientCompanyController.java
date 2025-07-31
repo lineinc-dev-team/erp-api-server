@@ -11,6 +11,7 @@ import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.*;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -179,19 +180,19 @@ public class ClientCompanyController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-//    @Operation(summary = "발주처 수정 이력 조회", description = "특정 발주처의 수정 이력 리스트를 조회합니다.")
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "200", description = "수정 이력 조회 성공")
-//    })
-//    @GetMapping("/{id}/change-histories")
-//    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
-//    public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
-//            @PathVariable Long id,
-//            @Valid PageRequest pageRequest,
-//            @Valid SortRequest sortRequest
-//    ) {
-//        Slice<ClientCompanyChangeHistoryResponse> slice = clientCompanyService.getClientCompanyChangeHistories(id,
-//                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
-//        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
-//    }
+    @Operation(summary = "발주처 변경 이력 조회", description = "특정 발주처의 변경 히스토리를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/{id}/change-histories")
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest
+    ) {
+        Slice<ClientCompanyChangeHistoryResponse> slice = clientCompanyService.getClientCompanyChangeHistories(id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
 }
