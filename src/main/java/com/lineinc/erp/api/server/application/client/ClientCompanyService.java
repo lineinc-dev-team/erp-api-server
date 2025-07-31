@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClien
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
@@ -112,8 +113,17 @@ public class ClientCompanyService {
 
         // 변경 이력 추적 및 반영
         ClientCompany.ClientCompanyUpdateResult result = clientCompany.updateFromWithHistory(request, userRepository);
-
         Diff diff = javers.compare(result.before(), result.after());
+
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (ClientCompanyUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                clientCompanyChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getClientCompany().getId().equals(clientCompany.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
 
         // 변경된 필드가 있을 경우 변경 이력 저장
         String changeDetail = buildClientCompanyChangeDetail(diff);
@@ -175,7 +185,7 @@ public class ClientCompanyService {
                 }
             }
         });
-        return changeDetailBuilder.toString();
+        return changeDetailBuilder.toString().trim();
     }
 
     @Transactional(readOnly = true)

@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto.request;
 import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -59,6 +60,17 @@ public record ClientCompanyUpdateRequest(
 
         @Valid
         @Schema(description = "파일 목록")
-        List<ClientCompanyFileUpdateRequest> files
+        List<ClientCompanyFileUpdateRequest> files,
+
+        @Schema(description = "수정 이력 리스트")
+        List<ClientCompanyUpdateRequest.ChangeHistoryRequest> changeHistories
 ) {
+    public record ChangeHistoryRequest(
+            @Schema(description = "수정 이력 번호", example = "1")
+            Long id,
+
+            @Schema(description = "변경 사유 또는 비고", example = "변경에 따른 업데이트")
+            String memo
+    ) {
+    }
 }
