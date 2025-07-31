@@ -179,7 +179,7 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    @GetMapping("/{id}/change-history")
+    @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<UserChangeHistoryResponse>>> getUserChangeHistories(
             @PathVariable Long id,

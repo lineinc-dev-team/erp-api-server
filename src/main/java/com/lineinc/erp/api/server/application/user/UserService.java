@@ -229,7 +229,7 @@ public class UserService {
                 }
             }
         });
-        return changeDetailBuilder.toString();
+        return changeDetailBuilder.toString().trim();
     }
 
     @Transactional(readOnly = true)
