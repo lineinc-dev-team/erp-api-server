@@ -61,7 +61,6 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping
-    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
