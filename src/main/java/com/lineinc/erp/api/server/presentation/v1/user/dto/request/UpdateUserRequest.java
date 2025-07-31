@@ -4,6 +4,8 @@ import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.List;
+
 @Schema(description = "유저 수정 요청")
 public record UpdateUserRequest(
         @Schema(description = "사용자 이름", example = "홍길동")
@@ -33,6 +35,18 @@ public record UpdateUserRequest(
         Long gradeId,
 
         @Schema(description = "직책 ID", example = "3")
-        Long positionId
+        Long positionId,
+
+        @Schema(description = "수정 이력 리스트")
+        List<ChangeHistoryRequest> changeHistories
 ) {
+    public record ChangeHistoryRequest(
+            @Schema(description = "수정 이력 번호", example = "1")
+            Long id,
+
+            @Schema(description = "변경 사유 또는 비고", example = "직급 변경에 따른 업데이트")
+            String memo
+    ) {
+    }
 }
+

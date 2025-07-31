@@ -167,6 +167,16 @@ public class UserService {
         User.UserUpdateResult result = user.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
         Diff diff = javers.compare(result.before(), result.after());
 
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (UpdateUserRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                userChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getUser().getId().equals(user.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
+
         // 변경된 필드를 추적하여 사용자 친화적 메시지 생성
         String changeDetail = buildUserChangeDetail(diff);
         // 변경 사항이 있으면 이력 저장

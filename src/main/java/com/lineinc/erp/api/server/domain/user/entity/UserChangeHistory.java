@@ -24,6 +24,7 @@ public class UserChangeHistory extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String changeDetail; // 모든 변경 내역을 이 한 필드에 저장
 
+    @Setter
     @Column(columnDefinition = "TEXT")
     private String memo; // 선택적 변경 사유, 비고 등
 }
