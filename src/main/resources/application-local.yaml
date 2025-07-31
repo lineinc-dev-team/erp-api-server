@@ -1,8 +1,6 @@
 spring:
   javers:
     sql-schema-management-enabled: false
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
 
   # 세션 관리 설정
   session:
@@ -81,6 +79,3 @@ user:
   default-password: ${USER_DEFAULT_PASSWORD}  # 신규 사용자 기본 비밀번호, 환경 변수에서 가져옴
 
 
-# Spring Boot graceful shutdown 설정
-server:
-  shutdown: graceful
