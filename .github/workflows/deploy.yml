@@ -39,6 +39,7 @@ jobs:
       - name: 🚀 EC2에서 서비스 재시작
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
+            sudo systemctl daemon-reload
             sudo systemctl stop myapp.service
             ln -sf /home/ubuntu/app-latest.jar /home/ubuntu/app.jar
             sudo systemctl start myapp.service
