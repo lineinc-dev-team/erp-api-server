@@ -17,10 +17,10 @@ public final class AppConstants {
     public static final String SYSTEM_NAME = "system";
 
     // 시스템 기본 메뉴 이름 관련 상수
-    public static final String MENU_ACCOUNT = "계정관리";
-    public static final String MENU_PERMISSION = "권한관리";
+    public static final String MENU_ACCOUNT = "계정 관리";
+    public static final String MENU_PERMISSION = "권한 관리";
     public static final String MENU_CLIENT_COMPANY = "발주처 관리";
-    public static final String MENU_SITE = "현장관리";
+    public static final String MENU_SITE = "현장 관리";
     public static final String MENU_MANAGEMENT_COST = "관리비 관리";
     public static final String MENU_STEEL_MANAGEMENT = "강재 관리";
     public static final String MENU_MATERIAL_MANAGEMENT = "자재 관리";
