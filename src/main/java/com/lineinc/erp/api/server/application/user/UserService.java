@@ -6,7 +6,6 @@ import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
-import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
@@ -35,8 +34,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +42,6 @@ public class UserService {
 
     private final UserRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserChangeHistoryRepository userChangeHistoryRepository;
     private final DepartmentRepository departmentRepository;
     private final GradeRepository gradeRepository;
     private final PositionRepository positionRepository;
@@ -163,47 +159,7 @@ public class UserService {
     public void updateUser(Long id, UpdateUserRequest request) {
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
-
-        Department department = null;
-        String reqDepartmentName = null;
-        if (request.departmentId() != null) {
-            department = departmentRepository.findById(request.departmentId()).orElse(null);
-            reqDepartmentName = department != null ? department.getName() : null;
-        } else {
-            department = user.getDepartment();
-            reqDepartmentName = department != null ? department.getName() : null;
-        }
-
-        Grade grade = null;
-        String reqGradeName = null;
-        if (request.gradeId() != null) {
-            grade = gradeRepository.findById(request.gradeId()).orElse(null);
-            reqGradeName = grade != null ? grade.getName() : null;
-        } else {
-            grade = user.getGrade();
-            reqGradeName = grade != null ? grade.getName() : null;
-        }
-
-        Position position = null;
-        String reqPositionName = null;
-        if (request.positionId() != null) {
-            position = positionRepository.findById(request.positionId()).orElse(null);
-            reqPositionName = position != null ? position.getName() : null;
-        } else {
-            position = user.getPosition();
-            reqPositionName = position != null ? position.getName() : null;
-        }
-
-        String changeDetail = buildChangeDetail(user, request, reqDepartmentName, reqGradeName, reqPositionName);
-
-        if (!changeDetail.isBlank()) {
-            userChangeHistoryRepository.save(UserChangeHistory.builder()
-                    .user(user)
-                    .changeDetail(changeDetail)
-                    .build());
-        }
-
-        user.updateFrom(request, passwordEncoder, department, grade, position);
+        user.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
         usersRepository.save(user);
     }
 
@@ -262,41 +218,4 @@ public class UserService {
         usersRepository.save(user);
     }
 
-    private String buildChangeDetail(User user, UpdateUserRequest request, String reqDepartmentName, String reqGradeName, String reqPositionName) {
-        Map<String, Object> currentValues = Map.of(
-                "이름", user.getUsername(),
-                "부서", user.getDepartment() != null ? user.getDepartment().getName() : ValidationMessages.VALUE_NOT_PRESENT,
-                "직급", user.getGrade() != null ? user.getGrade().getName() : ValidationMessages.VALUE_NOT_PRESENT,
-                "직책", user.getPosition() != null ? user.getPosition().getName() : ValidationMessages.VALUE_NOT_PRESENT,
-                "휴대폰", user.getPhoneNumber(),
-                "연락처", user.getLandlineNumber(),
-                "이메일", user.getEmail(),
-                "계정 상태", user.isActive() ? "활성" : "비활성"
-        );
-
-        Map<String, Object> requestValues = Map.of(
-                "이름", request.username(),
-                "부서", reqDepartmentName,
-                "직급", reqGradeName,
-                "직책", reqPositionName,
-                "휴대폰", request.phoneNumber(),
-                "연락처", request.landlineNumber(),
-                "이메일", request.email(),
-                "계정 상태", request.isActive() != null ? (request.isActive() ? "활성" : "비활성") : ValidationMessages.VALUE_NOT_PRESENT
-        );
-
-        StringBuilder changeDetail = new StringBuilder();
-
-        for (String key : currentValues.keySet()) {
-            Object currentValue = currentValues.get(key);
-            Object requestValue = requestValues.get(key);
-
-            if (!Objects.equals(currentValue, requestValue)) {
-                String before = currentValue != null ? currentValue.toString() : ValidationMessages.VALUE_NOT_PRESENT;
-                String after = requestValue != null ? requestValue.toString() : ValidationMessages.VALUE_NOT_PRESENT;
-                changeDetail.append(key).append(": ").append(before).append(" → ").append(after).append("\n");
-            }
-        }
-        return changeDetail.toString();
-    }
 }

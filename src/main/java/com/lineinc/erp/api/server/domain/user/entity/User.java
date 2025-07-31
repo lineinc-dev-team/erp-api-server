@@ -1,6 +1,9 @@
 package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
+import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
+import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
@@ -120,17 +123,28 @@ public class User extends BaseEntity implements UserDetails {
      * @param request         사용자 수정 요청 정보
      * @param passwordEncoder 비밀번호 암호화에 사용할 인코더
      */
-    public void updateFrom(UpdateUserRequest request, PasswordEncoder passwordEncoder,
-                           Department department, Grade grade, Position position) {
+    public void updateFrom(UpdateUserRequest request,
+                           PasswordEncoder passwordEncoder,
+                           DepartmentRepository departmentRepository,
+                           GradeRepository gradeRepository,
+                           PositionRepository positionRepository) {
         Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
 
-        this.department = department;
-        this.grade = grade;
-        this.position = position;
+        Optional.ofNullable(request.departmentId())
+                .flatMap(departmentRepository::findById)
+                .ifPresent(entity -> this.department = entity);
+
+        Optional.ofNullable(request.gradeId())
+                .flatMap(gradeRepository::findById)
+                .ifPresent(entity -> this.grade = entity);
+
+        Optional.ofNullable(request.positionId())
+                .flatMap(positionRepository::findById)
+                .ifPresent(entity -> this.position = entity);
 
         if (request.password() != null && !request.password().isBlank()) {
             this.updatePassword(passwordEncoder.encode(request.password()));
