@@ -44,6 +44,8 @@ public class QClientCompanyContact extends EntityPathBase<ClientCompanyContact> 
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final BooleanPath isMain = createBoolean("isMain");
+
     public final StringPath landlineNumber = createString("landlineNumber");
 
     public final StringPath memo = createString("memo");

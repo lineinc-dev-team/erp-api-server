@@ -36,7 +36,10 @@ public record ClientCompanyContactResponse(
         OffsetDateTime createdAt,
 
         @Schema(description = "수정일", example = "2024-01-01T12:34:56")
-        OffsetDateTime updatedAt
+        OffsetDateTime updatedAt,
+
+        @Schema(description = "대표 담당자 여부", example = "true")
+        Boolean isMain
 ) {
     public static ClientCompanyContactResponse from(ClientCompanyContact contact) {
         return new ClientCompanyContactResponse(
@@ -49,7 +52,8 @@ public record ClientCompanyContactResponse(
                 contact.getDepartment(),
                 contact.getMemo(),
                 contact.getCreatedAt(),
-                contact.getUpdatedAt()
+                contact.getUpdatedAt(),
+                contact.getIsMain()
         );
     }
 }

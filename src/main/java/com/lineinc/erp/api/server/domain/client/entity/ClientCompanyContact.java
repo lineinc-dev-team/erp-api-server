@@ -63,6 +63,13 @@ public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<Cl
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    /**
+     * 대표 담당자인지 여부
+     */
+    @Column
+    @Builder.Default
+    private Boolean isMain = false;
+
     @Override
     public void updateFrom(ClientCompanyContactUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
