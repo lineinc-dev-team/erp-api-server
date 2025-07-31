@@ -20,6 +20,9 @@ public record ClientCompanyContactCreateRequest(
         @Schema(description = "부서", example = "영업팀")
         String department,
 
+        @Schema(description = "대표 담당자 여부", example = "true")
+        Boolean isMain,
+
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
         @Schema(description = "담당자 유선 전화번호", example = "02-123-5678")
         String landlineNumber,

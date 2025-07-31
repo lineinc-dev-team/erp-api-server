@@ -78,6 +78,7 @@ public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<Cl
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        Optional.ofNullable(request.isMain()).ifPresent(val -> this.isMain = val);
     }
 
 }

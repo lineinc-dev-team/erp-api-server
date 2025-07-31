@@ -40,6 +40,7 @@ public class ClientCompanyContactService {
                         .phoneNumber(dto.phoneNumber())
                         .email(dto.email())
                         .memo(dto.memo())
+                        .isMain(dto.isMain())
                         .clientCompany(clientCompany)
                         .build())
                 .forEach(clientCompany.getContacts()::add);
@@ -64,6 +65,8 @@ public class ClientCompanyContactService {
                 (ClientCompanyContactUpdateRequest dto) ->      // 신규 엔티티 생성 함수
                         ClientCompanyContact.builder()
                                 .name(dto.name())
+                                .department(dto.department())
+                                .isMain(dto.isMain())
                                 .position(dto.position())
                                 .landlineNumber(dto.landlineNumber())
                                 .phoneNumber(dto.phoneNumber())

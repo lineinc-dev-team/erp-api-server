@@ -2,17 +2,23 @@ package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
+import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class ClientCompanyFileService {
+    private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+
     public void createClientCompanyFile(ClientCompany clientCompany, List<ClientCompanyFileCreateRequest> requests) {
         if (Objects.isNull(requests) || requests.isEmpty()) return;
         requests.stream()
@@ -36,6 +42,9 @@ public class ClientCompanyFileService {
      */
     @Transactional
     public void updateClientCompanyFiles(ClientCompany clientCompany, List<ClientCompanyFileUpdateRequest> requests) {
+        // 원본 파일 목록 복사
+        List<ClientCompanyFile> originalFiles = new java.util.ArrayList<>(clientCompany.getFiles());
+
         EntitySyncUtils.syncList(
                 clientCompany.getFiles(),
                 requests,
@@ -47,5 +56,31 @@ public class ClientCompanyFileService {
                         .clientCompany(clientCompany)
                         .build()
         );
+
+        List<ClientCompanyFile> updatedFiles = clientCompany.getFiles();
+        List<String> changes = new java.util.ArrayList<>();
+
+        // 감지된 삭제
+        for (ClientCompanyFile original : originalFiles) {
+            if (original.isDeleted()) {
+                changes.add("첨부파일 삭제: " + original.getName());
+            }
+        }
+
+        // 감지된 추가
+        for (ClientCompanyFile updated : updatedFiles) {
+            if (updated.getId() == null) {
+                changes.add("첨부파일 추가: " + updated.getName());
+            }
+        }
+
+        // 변경 이력 저장 - 하나의 row에 통합 기록
+        if (!changes.isEmpty()) {
+            String combinedChange = String.join("\n", changes);
+            clientCompanyChangeHistoryRepository.save(ClientCompanyChangeHistory.builder()
+                    .clientCompany(clientCompany)
+                    .changeDetail(combinedChange)
+                    .build());
+        }
     }
 }
