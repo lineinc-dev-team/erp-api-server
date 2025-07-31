@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -43,7 +44,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-
     private final UserRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final DepartmentRepository departmentRepository;
@@ -51,7 +51,6 @@ public class UserService {
     private final PositionRepository positionRepository;
     private final Javers javers;
     private final UserChangeHistoryRepository userChangeHistoryRepository;
-
 
     @Value("${USER_DEFAULT_PASSWORD}")
     private String defaultPassword;
@@ -278,4 +277,16 @@ public class UserService {
         usersRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
+    public Slice<UserChangeHistoryResponse> getUserChangeHistoriesSlice(Long userId, Pageable pageable) {
+        // 유저 존재 확인 (필요 시)
+        User user = usersRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+
+        // UserChangeHistory를 user 기준으로 슬라이스 조회
+        Slice<UserChangeHistory> historySlice = userChangeHistoryRepository.findByUser(user, pageable);
+
+        // 엔티티를 DTO로 변환하여 슬라이스 반환
+        return historySlice.map(UserChangeHistoryResponse::from);
+    }
 }

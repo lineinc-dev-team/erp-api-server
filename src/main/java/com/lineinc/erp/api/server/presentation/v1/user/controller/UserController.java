@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserChangeHistoryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -173,5 +174,24 @@ public class UserController {
         UserDetailResponse response = userService.getUserDetail(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
-}
 
+    @Operation(summary = "유저 변경 이력 조회", description = "특정 유저의 변경 히스토리를 슬라이스 형식으로 조회합니다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/{id}/change-history")
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<UserChangeHistoryResponse>>> getUserChangeHistories(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest
+    ) {
+        Slice<UserChangeHistoryResponse> slice = userService.getUserChangeHistoriesSlice(
+                id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
+        );
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
+        ));
+    }
+}
