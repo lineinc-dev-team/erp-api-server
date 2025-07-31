@@ -1,13 +1,17 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffInclude;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,33 +33,42 @@ public class ClientCompany extends BaseEntity {
     @SequenceGenerator(name = "client_company_seq", sequenceName = "client_company_seq", allocationSize = 1)
     private Long id;
 
+    @DiffInclude
     @Column(nullable = false)
     private String name;
 
+    @DiffInclude
     @Column
     private String businessNumber;
 
+    @DiffInclude
     @Column
     private String ceoName;
 
+    @DiffInclude
     @Column
     private String address;
 
+    @DiffInclude
     @Column
     private String detailAddress;
 
+    @DiffInclude
     @Column
     private String landlineNumber;
 
+    @DiffInclude
     @Column
     private String phoneNumber;
 
+    @DiffInclude
     @Column
     private String email;
 
     /**
      * 결제 방식 (현금/어음)
      */
+    @DiffInclude
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
@@ -63,6 +76,7 @@ public class ClientCompany extends BaseEntity {
     /**
      * 결제 유예 기간
      */
+    @DiffInclude
     @Column
     private String paymentPeriod;
 
@@ -74,6 +88,7 @@ public class ClientCompany extends BaseEntity {
     /**
      * 발주처 담당자 목록
      */
+    @DiffInclude
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ClientCompanyContact> contacts = new ArrayList<>();
@@ -81,6 +96,7 @@ public class ClientCompany extends BaseEntity {
     /**
      * 발주처 관련 첨부파일 목록
      */
+    @DiffInclude
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ClientCompanyFile> files = new ArrayList<>();
@@ -88,6 +104,7 @@ public class ClientCompany extends BaseEntity {
     /**
      * 사용 여부
      */
+    @DiffInclude
     @Builder.Default
     @Column(nullable = false)
     private boolean isActive = true;
@@ -95,8 +112,13 @@ public class ClientCompany extends BaseEntity {
     /**
      * 비고 / 메모
      */
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    @Transient
+    @DiffInclude
+    private String userName;
 
     public void updateFrom(ClientCompanyUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
@@ -112,4 +134,39 @@ public class ClientCompany extends BaseEntity {
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
     }
+
+    public record ClientCompanyUpdateResult(ClientCompany before, ClientCompany after) {
+    }
+
+    public ClientCompanyUpdateResult updateFromWithHistory(ClientCompanyUpdateRequest request, UserRepository userRepository) {
+        ClientCompany before = ClientCompany.builder()
+                .id(this.id)
+                .name(this.name)
+                .businessNumber(this.businessNumber)
+                .ceoName(this.ceoName)
+                .address(this.address)
+                .detailAddress(this.detailAddress)
+                .landlineNumber(this.landlineNumber)
+                .phoneNumber(this.phoneNumber)
+                .email(this.email)
+                .paymentMethod(this.paymentMethod)
+                .paymentPeriod(this.paymentPeriod)
+                .memo(this.memo)
+                .isActive(this.isActive)
+                .contacts(this.contacts)
+                .files(this.files)
+                .userName(this.user != null ? this.user.getUsername() : null)
+                .build();
+
+        if (request.userId() != null) {
+            User user = userRepository.findById(request.userId())
+                    .orElseThrow(() -> new ResponseStatusException(
+                            org.springframework.http.HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+            this.setUser(user);
+            this.userName = user.getUsername();
+        }
+        this.updateFrom(request);
+        return new ClientCompanyUpdateResult(before, this);
+    }
+
 }

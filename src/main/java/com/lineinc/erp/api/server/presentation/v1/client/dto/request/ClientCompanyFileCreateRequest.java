@@ -7,7 +7,6 @@ import com.lineinc.erp.api.server.common.validation.ValidatorType;
 
 @Schema(description = "발주처 파일 등록 요청")
 public record ClientCompanyFileCreateRequest(
-
         @NotBlank
         @Schema(description = "문서명", example = "계약서_2024")
         String name,

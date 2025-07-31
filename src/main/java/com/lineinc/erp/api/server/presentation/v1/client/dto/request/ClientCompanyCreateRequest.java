@@ -29,6 +29,7 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "본사 주소", example = "서울시 강남구")
         String address,
 
+        @NotBlank
         @Schema(description = "상세 주소", example = "강남구 테헤란로 123")
         String detailAddress,
 
@@ -56,7 +57,7 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "사용 여부", example = "true")
         boolean isActive,
 
-        @Schema(description = "본사 담당자 ID", example = "123")
+        @Schema(description = "본사 담당자 ID", example = "2")
         Long userId,
 
         @Valid

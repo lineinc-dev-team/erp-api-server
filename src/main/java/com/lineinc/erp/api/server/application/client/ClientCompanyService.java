@@ -5,7 +5,11 @@ import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
+import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
@@ -14,6 +18,9 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientComp
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -33,6 +40,9 @@ public class ClientCompanyService {
     private final ClientCompanyContactService contactService;
     private final ClientCompanyFileService fileService;
     private final UserService userService;
+    private final Javers javers;
+    private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
@@ -97,14 +107,19 @@ public class ClientCompanyService {
     public void updateClientCompany(Long id, ClientCompanyUpdateRequest request) {
         ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
 
-        // 기본 필드 업데이트
-        clientCompany.updateFrom(request);
+        // 변경 이력 추적 및 반영
+        ClientCompany.ClientCompanyUpdateResult result = clientCompany.updateFromWithHistory(request, userRepository);
 
-        // 본사 담당자 정보 업데이트
-        if (request.userId() != null) {
-            clientCompany.setUser(userService.getUserByIdOrThrow(request.userId()));
-        } else {
-            clientCompany.setUser(null);
+        Diff diff = javers.compare(result.before(), result.after());
+
+        // 변경된 필드가 있을 경우 변경 이력 저장
+        String changeDetail = buildClientCompanyChangeDetail(diff);
+        if (!changeDetail.isBlank()) {
+            ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
+                    .clientCompany(clientCompany)
+                    .changeDetail(changeDetail)
+                    .build();
+            clientCompanyChangeHistoryRepository.save(changeHistory);
         }
 
         // 담당자 정보 갱신
@@ -112,6 +127,52 @@ public class ClientCompanyService {
 
         // 첨부파일 정보 갱신
         fileService.updateClientCompanyFiles(clientCompany, request.files());
+    }
+
+    private String buildClientCompanyChangeDetail(Diff diff) {
+        StringBuilder changeDetailBuilder = new StringBuilder();
+        diff.getChanges().forEach(change -> {
+            if (change instanceof ValueChange valueChange) {
+                String propertyName = valueChange.getPropertyName();
+                String label = switch (propertyName) {
+                    case "name" -> "발주처명";
+                    case "businessNumber" -> "사업자등록번호";
+                    case "ceoName" -> "대표자명";
+                    case "address" -> "본사 주소";
+                    case "detailAddress" -> "상세 주소";
+                    case "landlineNumber" -> "전화번호";
+                    case "phoneNumber" -> "휴대폰번호";
+                    case "email" -> "이메일";
+                    case "paymentMethod" -> "결제 방식";
+                    case "paymentPeriod" -> "결제 주기";
+                    case "memo" -> "비고";
+                    case "isActive" -> "사용 여부";
+                    case "userName" -> "본사담당자명";
+                    default -> null;
+                };
+                if (label != null) {
+                    Object left = valueChange.getLeft();
+                    Object right = valueChange.getRight();
+                    String leftStr = left == null ? "" : left.toString();
+                    String rightStr = right == null ? "" : right.toString();
+                    if ("isActive".equals(propertyName)) {
+                        leftStr = "true".equals(leftStr) ? "활성" : "비활성";
+                        rightStr = "true".equals(rightStr) ? "활성" : "비활성";
+                    } else if ("paymentMethod".equals(propertyName)) {
+                        leftStr = left instanceof PaymentMethod pm ? pm.getDisplayName() : leftStr;
+                        rightStr = right instanceof PaymentMethod pm ? pm.getDisplayName() : rightStr;
+                    }
+                    if (rightStr.isBlank()) return;
+                    changeDetailBuilder.append(label)
+                            .append(" : ")
+                            .append(leftStr)
+                            .append(" → ")
+                            .append(rightStr)
+                            .append("\n");
+                }
+            }
+        });
+        return changeDetailBuilder.toString();
     }
 
     @Transactional(readOnly = true)
