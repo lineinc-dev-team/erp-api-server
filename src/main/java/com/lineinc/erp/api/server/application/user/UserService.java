@@ -6,15 +6,19 @@ import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
-import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
+import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
@@ -45,6 +49,8 @@ public class UserService {
     private final DepartmentRepository departmentRepository;
     private final GradeRepository gradeRepository;
     private final PositionRepository positionRepository;
+    private final Javers javers;
+    private final UserChangeHistoryRepository userChangeHistoryRepository;
 
 
     @Value("${USER_DEFAULT_PASSWORD}")
@@ -159,8 +165,62 @@ public class UserService {
     public void updateUser(Long id, UpdateUserRequest request) {
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
-        user.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
+        User.UserUpdateResult result = user.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
+        Diff diff = javers.compare(result.before(), result.after());
+
+        // 변경된 필드를 추적하여 사용자 친화적 메시지 생성
+        String changeDetail = buildUserChangeDetail(diff);
+        // 변경 사항이 있으면 이력 저장
+        if (!changeDetail.isBlank()) {
+            UserChangeHistory changeHistory = UserChangeHistory.builder()
+                    .user(user)
+                    .changeDetail(changeDetail)
+                    .build();
+            userChangeHistoryRepository.save(changeHistory);
+        }
+
         usersRepository.save(user);
+    }
+
+    private String buildUserChangeDetail(Diff diff) {
+        StringBuilder changeDetailBuilder = new StringBuilder();
+        diff.getChanges().forEach(change -> {
+            if (change instanceof ValueChange valueChange) {
+                String propertyName = valueChange.getPropertyName();
+                String label = switch (propertyName) {
+                    case "username" -> "이름";
+                    case "phoneNumber" -> "휴대폰";
+                    case "landlineNumber" -> "연락처";
+                    case "email" -> "이메일";
+                    case "isActive" -> "계정상태";
+                    case "memo" -> "비고";
+                    case "departmentName" -> "부서";
+                    case "gradeName" -> "직급";
+                    case "positionName" -> "직책";
+                    default -> null;
+                };
+                if (label != null) {
+                    Object left = valueChange.getLeft();
+                    Object right = valueChange.getRight();
+                    String leftStr = left == null ? "" : left.toString();
+                    String rightStr = right == null ? "" : right.toString();
+                    if ("isActive".equals(propertyName)) {
+                        leftStr = "true".equals(leftStr) ? "활성" : "비활성";
+                        rightStr = "true".equals(rightStr) ? "활성" : "비활성";
+                    }
+                    if (rightStr.isBlank()) {
+                        return;
+                    }
+                    changeDetailBuilder.append(label)
+                            .append(" : ")
+                            .append(leftStr)
+                            .append(" → ")
+                            .append(rightStr)
+                            .append("\n");
+                }
+            }
+        });
+        return changeDetailBuilder.toString();
     }
 
     @Transactional(readOnly = true)
