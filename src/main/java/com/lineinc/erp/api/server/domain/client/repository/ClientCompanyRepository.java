@@ -11,4 +11,6 @@ public interface ClientCompanyRepository extends JpaRepository<ClientCompany, Lo
     Slice<ClientCompany> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     Slice<ClientCompany> findAllBy(Pageable pageable);
+
+    boolean existsByBusinessNumber(String businessNumber);
 }

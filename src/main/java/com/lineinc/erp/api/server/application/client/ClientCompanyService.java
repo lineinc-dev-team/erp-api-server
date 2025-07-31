@@ -51,6 +51,10 @@ public class ClientCompanyService {
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
 
+        if (clientCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
+        }
+
         // 1. ClientCompany 객체 먼저 빌드
         ClientCompany clientCompany = ClientCompany.builder()
                 .name(request.name())
@@ -263,4 +267,3 @@ public class ClientCompanyService {
         return historySlice.map(ClientCompanyChangeHistoryResponse::from);
     }
 }
-
