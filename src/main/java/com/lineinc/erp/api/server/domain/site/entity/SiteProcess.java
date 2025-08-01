@@ -39,6 +39,7 @@ public class SiteProcess extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
+    @Setter
     private User manager;
 
     @Column(columnDefinition = "TEXT")

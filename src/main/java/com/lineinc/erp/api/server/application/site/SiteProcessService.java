@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.site;
 
+import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class SiteProcessService {
 
     private final SiteProcessRepository siteProcessRepository;
+    private final UserService userService;
 
     public void createProcess(Site site, SiteProcessCreateRequest request) {
         siteProcessRepository.save(SiteProcess.builder()
@@ -28,6 +30,7 @@ public class SiteProcessService {
                 .officePhone(request.officePhone())
                 .status(request.status())
                 .memo(request.memo())
+                .manager(userService.getUserByIdOrThrow(request.managerId()))
                 .build()
         );
     }
@@ -35,6 +38,7 @@ public class SiteProcessService {
     public void updateProcess(Site site, SiteProcessUpdateRequest request) {
         SiteProcess siteProcess = site.getProcesses().get(0);
         siteProcess.updateFrom(request);
+        siteProcess.setManager(userService.getUserByIdOrThrow(request.managerId()));
         siteProcessRepository.save(siteProcess);
     }
 

@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.presentation.v1.site.dto.request;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -11,7 +10,6 @@ import java.util.List;
 
 @Schema(description = "현장 수정 요청")
 public record SiteUpdateRequest(
-        @NotBlank
         @Schema(description = "현장명", example = "서울 APT 신축공사")
         String name,
 

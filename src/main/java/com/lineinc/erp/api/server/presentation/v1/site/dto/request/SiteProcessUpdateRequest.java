@@ -4,12 +4,9 @@ import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "현장 공정 등록 요청")
 public record SiteProcessUpdateRequest(
-        @NotBlank
         @Schema(description = "공정명", example = "기초 공사")
         String name,
 
@@ -17,9 +14,11 @@ public record SiteProcessUpdateRequest(
         @Schema(description = "사무실 연락처", example = "02-123-4567")
         String officePhone,
 
-        @NotNull
         @Schema(description = "진행 상태", example = "NOT_STARTED")
         SiteProcessStatus status,
+
+        @Schema(description = "공정소장 ID", example = "2")
+        Long managerId,
 
         @Schema(description = "비고")
         String memo

@@ -10,11 +10,9 @@ public record SiteFileUpdateRequest(
         @Schema(description = "현장 파일 ID", example = "1")
         Long id,
 
-        @NotBlank
         @Schema(description = "문서명", example = "현장도면 v1")
         String name,
 
-        @NotBlank
         @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/bucket/folder/file.pdf")
         String fileUrl,
 
@@ -24,7 +22,6 @@ public record SiteFileUpdateRequest(
         @Schema(description = "비고 또는 설명", example = "1차 계약서 스캔본")
         String memo,
 
-        @NotNull
         @Schema(description = "파일 유형", example = "CONTRACT")
         SiteFileType type
 ) {
