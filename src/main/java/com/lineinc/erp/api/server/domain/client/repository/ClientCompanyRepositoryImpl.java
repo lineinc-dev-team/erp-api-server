@@ -118,7 +118,11 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
             builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
         }
         if (StringUtils.hasText(request.landlineNumber())) {
-            builder.and(clientCompany.landlineNumber.contains(request.landlineNumber().trim()));
+            String number = request.landlineNumber().trim();
+            builder.and(
+                    clientCompany.landlineNumber.contains(number)
+                            .or(clientCompany.phoneNumber.contains(number))
+            );
         }
         if (request.isActive() != null) {
             builder.and(clientCompany.isActive.eq(request.isActive()));
