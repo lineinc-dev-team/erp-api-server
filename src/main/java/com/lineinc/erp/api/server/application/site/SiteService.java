@@ -6,7 +6,11 @@ import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
+import com.lineinc.erp.api.server.domain.site.enums.SiteType;
+import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
@@ -17,6 +21,9 @@ import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailRe
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -39,6 +46,8 @@ public class SiteService {
     private final SiteProcessService siteProcessService;
     private final SiteContractService siteContractService;
     private final UserService userService;
+    private final SiteChangeHistoryRepository siteChangeHistoryRepository;
+    private final Javers javers;
 
     @Transactional
     public void createSite(SiteCreateRequest request) {
@@ -173,16 +182,16 @@ public class SiteService {
             validateDuplicateName(request.name());
         }
 
-        site.updateFrom(request);
+        Site.SiteUpdateResult siteUpdateResult = site.updateFrom(request, userService, clientCompanyService);
 
-        if (request.userId() != null) {
-            User user = userService.getUserByIdOrThrow(request.userId());
-            site.changeUser(user);
-        }
-
-        if (request.clientCompanyId() != null) {
-            ClientCompany clientCompany = clientCompanyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
-            site.changeClientCompany(clientCompany);
+        Diff diff = javers.compare(siteUpdateResult.before(), siteUpdateResult.after());
+        String changeDetail = buildSiteChangeDetail(diff);
+        if (!changeDetail.isBlank()) {
+            SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+                    .site(site)
+                    .changeDetail(changeDetail)
+                    .build();
+            siteChangeHistoryRepository.save(changeHistory);
         }
 
         if (request.process() != null) {
@@ -207,6 +216,56 @@ public class SiteService {
         }
 
         return siteSlice.map(SiteResponse.SiteSimpleResponse::from);
+    }
+
+    private String buildSiteChangeDetail(Diff diff) {
+        StringBuilder changeDetailBuilder = new StringBuilder();
+        diff.getChanges().forEach(change -> {
+            if (change instanceof ValueChange valueChange) {
+                String propertyName = valueChange.getPropertyName();
+                String label = switch (propertyName) {
+                    case "name" -> "현장명";
+                    case "address" -> "주소";
+                    case "detailAddress" -> "상세주소";
+                    case "type" -> "현장유형";
+                    case "startedAt" -> "시작일";
+                    case "endedAt" -> "종료일";
+                    case "contractAmount" -> "도급금액";
+                    case "memo" -> "비고";
+                    case "userName" -> "현장소장";
+                    case "clientCompanyName" -> "발주처";
+                    default -> null;
+                };
+                if (label != null) {
+                    Object left = valueChange.getLeft();
+                    Object right = valueChange.getRight();
+                    String leftStr;
+                    String rightStr;
+                    switch (propertyName) {
+                        case "type" -> {
+                            leftStr = left != null ? SiteType.valueOf(left.toString()).getLabel() : "";
+                            rightStr = right != null ? SiteType.valueOf(right.toString()).getLabel() : "";
+                        }
+                        case "startedAt", "endedAt" -> {
+                            leftStr = left instanceof OffsetDateTime ? DateTimeFormatUtils.formatKoreaLocalDate((OffsetDateTime) left) : "";
+                            rightStr = right instanceof OffsetDateTime ? DateTimeFormatUtils.formatKoreaLocalDate((OffsetDateTime) right) : "";
+                        }
+                        default -> {
+                            leftStr = left == null ? "" : left.toString();
+                            rightStr = right == null ? "" : right.toString();
+                        }
+                    }
+                    if (rightStr == null || rightStr.isBlank()) return;
+                    changeDetailBuilder.append(label)
+                            .append(" : ")
+                            .append(leftStr)
+                            .append(" → ")
+                            .append(rightStr)
+                            .append("\n");
+                }
+            }
+        });
+        return changeDetailBuilder.toString().trim();
     }
 
 }

@@ -1,8 +1,11 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
+import com.lineinc.erp.api.server.application.client.ClientCompanyService;
+import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteUpdateRequest;
 
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
@@ -13,6 +16,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -35,12 +39,15 @@ public class Site extends BaseEntity {
     @SequenceGenerator(name = "site_seq", sequenceName = "site_seq", allocationSize = 1)
     private Long id;
 
+    @DiffInclude
     @Column(nullable = false)
     private String name; // 현장명
 
+    @DiffInclude
     @Column
     private String address; // 주소
 
+    @DiffInclude
     @Column
     private String detailAddress; // 상세 주소
 
@@ -50,6 +57,7 @@ public class Site extends BaseEntity {
     @Column
     private String district; // 구
 
+    @DiffInclude
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SiteType type; // 현장 유형
@@ -58,9 +66,11 @@ public class Site extends BaseEntity {
     @JoinColumn(name = "client_company_id")
     private ClientCompany clientCompany; // 발주처
 
+    @DiffInclude
     @Column
     private OffsetDateTime startedAt; // 사업 시작일
 
+    @DiffInclude
     @Column
     private OffsetDateTime endedAt; // 사업 종료일
 
@@ -68,6 +78,7 @@ public class Site extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user; // 본사 담당자
 
+    @DiffInclude
     @Column
     private Long contractAmount; // 도급금액
 
@@ -79,10 +90,34 @@ public class Site extends BaseEntity {
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SiteProcess> processes = new ArrayList<>();
 
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
-    public void updateFrom(SiteUpdateRequest request) {
+    @Transient
+    @DiffInclude
+    private String userName;
+
+    @Transient
+    @DiffInclude
+    private String clientCompanyName;
+
+    public SiteUpdateResult updateFrom(SiteUpdateRequest request, UserService userService, ClientCompanyService clientCompanyService) {
+
+        Site before = Site.builder()
+                .id(this.id)
+                .name(this.name)
+                .address(this.address)
+                .detailAddress(this.detailAddress)
+                .type(this.type)
+                .startedAt(this.startedAt != null ? this.startedAt.withOffsetSameInstant(ZoneOffset.ofHours(9)) : null)
+                .endedAt(this.endedAt != null ? this.endedAt.withOffsetSameInstant(ZoneOffset.ofHours(9)) : null)
+                .clientCompanyName(this.clientCompany != null ? this.clientCompany.getName() : null)
+                .userName(this.user != null ? this.user.getUsername() : null)
+                .contractAmount(this.contractAmount)
+                .memo(this.memo)
+                .build();
+
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
         Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
@@ -97,13 +132,28 @@ public class Site extends BaseEntity {
                 .ifPresent(val -> this.endedAt = val);
         Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+
+        Optional.ofNullable(request.userId())
+                .map(userService::getUserByIdOrThrow)
+                .ifPresent(this::changeUser);
+
+        Optional.ofNullable(request.clientCompanyId())
+                .map(clientCompanyService::getClientCompanyByIdOrThrow)
+                .ifPresent(this::changeClientCompany);
+
+        return new SiteUpdateResult(before, this);
     }
 
     public void changeUser(User user) {
         this.user = user;
+        this.userName = user.getUsername();
     }
 
     public void changeClientCompany(ClientCompany clientCompany) {
         this.clientCompany = clientCompany;
+        this.clientCompanyName = clientCompany.getName();
+    }
+
+    public record SiteUpdateResult(Site before, Site after) {
     }
 }
