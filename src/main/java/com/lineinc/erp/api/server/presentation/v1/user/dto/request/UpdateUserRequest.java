@@ -37,6 +37,9 @@ public record UpdateUserRequest(
         @Schema(description = "직책 ID", example = "3")
         Long positionId,
 
+        @Schema(description = "사용자 메모", example = "외주팀에서 이관됨")
+        String memo,
+
         @Schema(description = "수정 이력 리스트")
         List<ChangeHistoryRequest> changeHistories
 ) {
@@ -49,4 +52,3 @@ public record UpdateUserRequest(
     ) {
     }
 }
-

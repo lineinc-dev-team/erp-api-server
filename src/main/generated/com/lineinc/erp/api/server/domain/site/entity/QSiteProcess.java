@@ -38,6 +38,8 @@ public class QSiteProcess extends EntityPathBase<SiteProcess> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final com.lineinc.erp.api.server.domain.user.entity.QUser manager;
+
     public final StringPath memo = createString("memo");
 
     public final StringPath name = createString("name");
@@ -72,6 +74,7 @@ public class QSiteProcess extends EntityPathBase<SiteProcess> {
 
     public QSiteProcess(Class<? extends SiteProcess> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.manager = inits.isInitialized("manager") ? new com.lineinc.erp.api.server.domain.user.entity.QUser(forProperty("manager"), inits.get("manager")) : null;
         this.site = inits.isInitialized("site") ? new QSite(forProperty("site"), inits.get("site")) : null;
     }
 

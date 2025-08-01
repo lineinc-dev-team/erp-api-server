@@ -21,6 +21,10 @@ public record SiteProcessCreateRequest(
         @Schema(description = "진행 상태", example = "NOT_STARTED")
         SiteProcessStatus status,
 
+        @NotNull
+        @Schema(description = "공정소장 ID", example = "2")
+        Long managerId,
+
         @Schema(description = "비고")
         String memo
 ) {

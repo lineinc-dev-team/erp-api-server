@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.site.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,6 +36,10 @@ public class SiteProcess extends BaseEntity {
 
     @Column
     private SiteProcessStatus status;  // 진행 상태
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
+    private User manager;
 
     @Column(columnDefinition = "TEXT")
     private String memo;  // 비고

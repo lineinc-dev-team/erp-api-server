@@ -165,6 +165,7 @@ public class User extends BaseEntity implements UserDetails {
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
 
         // 조직 관련 필드 업데이트
         Optional.ofNullable(request.departmentId())
