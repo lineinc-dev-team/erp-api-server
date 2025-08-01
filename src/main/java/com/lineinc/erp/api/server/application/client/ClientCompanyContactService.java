@@ -62,6 +62,13 @@ public class ClientCompanyContactService {
      */
     @Transactional
     public void updateClientCompanyContacts(ClientCompany clientCompany, List<ClientCompanyContactUpdateRequest> requests) {
+        if (Objects.nonNull(requests) && !requests.isEmpty()) {
+            long mainCount = requests.stream().filter(ClientCompanyContactUpdateRequest::isMain).count();
+            if (mainCount != 1) {
+                throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
+            }
+        }
+
         // 원본 연락처 목록 복사
         List<ClientCompanyContact> originalContacts = new ArrayList<>(clientCompany.getContacts());
 
