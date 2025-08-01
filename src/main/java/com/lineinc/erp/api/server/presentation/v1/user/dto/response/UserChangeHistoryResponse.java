@@ -10,7 +10,7 @@ public record UserChangeHistoryResponse(
         @Schema(description = "변경 이력 ID", example = "1")
         Long id,
 
-        @Schema(description = "변경 상세 내역", example = "부서: 총무팀 → 재무팀, 직급: 사원 → 대리")
+        @Schema(description = "변경 상세 내역")
         String changeDetail,
 
         @Schema(description = "메모", example = "조직 개편에 따른 이동")
