@@ -164,6 +164,7 @@ public class UserService {
 
     @Transactional
     public void updateUser(Long id, UpdateUserRequest request) {
+        if (id == 1L) return;
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         User.UserUpdateResult result = user.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
