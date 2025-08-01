@@ -9,17 +9,15 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistor
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
-import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyContactResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
@@ -158,7 +156,7 @@ public class ClientCompanyService {
                     case "address" -> "본사 주소";
                     case "detailAddress" -> "상세 주소";
                     case "landlineNumber" -> "전화번호";
-                    case "phoneNumber" -> "휴대폰번호";
+                    case "phoneNumber" -> "개인 휴대폰";
                     case "email" -> "이메일";
                     case "paymentMethod" -> "결제 방식";
                     case "paymentPeriod" -> "결제 주기";
@@ -210,14 +208,18 @@ public class ClientCompanyService {
     private String getExcelHeaderName(String field) {
         return switch (field) {
             case "id" -> "No.";
-            case "businessNumber" -> "사업자번호";
-            case "name" -> "이름";
+            case "businessNumber" -> "사업자등록번호";
+            case "name" -> "발주처명";
             case "ceoName" -> "대표자명";
             case "address" -> "본사 주소";
-            case "phoneNumber" -> "전화번호";
+            case "phoneNumber" -> "개인 휴대폰";
+            case "landlineNumber" -> "전화번호";
+            case "contactName" -> "담당자명";
+            case "contactPositionAndDepartment" -> "직급/부서";
+            case "contactLandlineNumberAndEmail" -> "담당자 전화번호/이메일";
+            case "userName" -> "본사담당자";
             case "isActive" -> "사용여부";
-            case "createdAt" -> "등록일";
-            case "updatedAt" -> "수정일";
+            case "createdAtAndUpdatedAt" -> "등록일/수정일";
             case "hasFile" -> "첨부파일 유무";
             case "memo" -> "비고/메모";
             default -> null;
@@ -225,6 +227,11 @@ public class ClientCompanyService {
     }
 
     private String getExcelCellValue(ClientCompanyResponse company, String field) {
+        ClientCompanyContactResponse mainContact = company.contacts().stream()
+                .filter(ClientCompanyContactResponse::isMain)
+                .findFirst()
+                .orElse(null);
+
         return switch (field) {
             case "id" -> String.valueOf(company.id());
             case "businessNumber" -> company.businessNumber();
@@ -232,9 +239,16 @@ public class ClientCompanyService {
             case "ceoName" -> company.ceoName();
             case "address" -> company.address() + " " + company.detailAddress();
             case "phoneNumber" -> company.phoneNumber();
-            case "isActive" -> String.valueOf(company.isActive());
-            case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt());
-            case "updatedAt" -> DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
+            case "landlineNumber" -> company.landlineNumber();
+            case "contactName" -> mainContact != null ? mainContact.name() : "";
+            case "contactPositionAndDepartment" ->
+                    mainContact != null ? mainContact.position() + " / " + mainContact.department() : "";
+            case "contactLandlineNumberAndEmail" ->
+                    mainContact != null ? mainContact.landlineNumber() + " / " + mainContact.email() : "";
+            case "userName" -> company.user().username();
+            case "isActive" -> company.isActive() ? "Y" : "N";
+            case "createdAtAndUpdatedAt" ->
+                    DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/" + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
             case "hasFile" -> company.hasFile() ? "Y" : "N";
             case "memo" -> company.memo();
             default -> null;

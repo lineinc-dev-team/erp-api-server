@@ -33,10 +33,10 @@ public record ClientCompanyResponse(
         @Schema(description = "상세 주소", example = "강남구 테헤란로 123")
         String detailAddress,
 
-        @Schema(description = "유선 전화번호", example = "02-1234-5678")
+        @Schema(description = "전화번호", example = "02-1234-5678")
         String landlineNumber,
 
-        @Schema(description = "담당자 연락처", example = "010-1234-5678")
+        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
         String phoneNumber,
 
         @Schema(description = "사용 여부", example = "true")

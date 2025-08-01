@@ -14,10 +14,10 @@ public record ClientCompanyContactResponse(
         @Schema(description = "담당자명", example = "김철수")
         String name,
 
-        @Schema(description = "연락처", example = "010-1234-5678")
+        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
         String phoneNumber,
 
-        @Schema(description = "유선전화", example = "02-9876-5432")
+        @Schema(description = "전화번호", example = "02-9876-5432")
         String landlineNumber,
 
         @Schema(description = "이메일", example = "kim@example.com")

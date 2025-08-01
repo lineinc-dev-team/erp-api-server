@@ -24,12 +24,12 @@ public record ClientCompanyContactCreateRequest(
         Boolean isMain,
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
-        @Schema(description = "담당자 유선 전화번호", example = "02-123-5678")
+        @Schema(description = "전화번호", example = "02-123-5678")
         String landlineNumber,
 
         @NotBlank
         @MultiConstraint(type = ValidatorType.PHONE)
-        @Schema(description = "담당자 연락처", example = "010-1234-5678")
+        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
         String phoneNumber,
 
         @NotBlank

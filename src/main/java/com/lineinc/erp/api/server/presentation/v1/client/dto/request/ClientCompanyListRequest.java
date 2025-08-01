@@ -18,10 +18,10 @@ public record ClientCompanyListRequest(
         @Schema(description = "대표자명", example = "홍길동")
         String ceoName,
 
-        @Schema(description = "전화번호", example = "010-1234-5678")
+        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
         String phoneNumber,
 
-        @Schema(description = "유선 전화번호", example = "02-124-5678")
+        @Schema(description = "전화번호", example = "02-124-5678")
         String landlineNumber,
 
         @Schema(description = "발주처 담당자명", example = "홍길동")

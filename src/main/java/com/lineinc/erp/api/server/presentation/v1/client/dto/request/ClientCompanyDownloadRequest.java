@@ -11,13 +11,15 @@ import java.util.List;
 public record ClientCompanyDownloadRequest(
         @NotBlank
         @Schema(
-                description = "허용 필드: id, businessNumber, name, ceoName, address, phoneNumber, isActive, createdAt, updatedAt, hasFile, memo",
+                description = "허용 필드: id, businessNumber, name, ceoName, address, phoneNumber, landlineNumber, contactName, contactPositionAndDepartment, contactLandlineNumberAndEmail, userName, isActive, createdAtAndUpdatedAt, hasFile, memo",
                 example = "id,businessNumber,isActive"
         )
         String fields
 ) {
     public static final List<String> ALLOWED_FIELDS = List.of(
             "id", "businessNumber", "name", "ceoName", "address",
-            "phoneNumber", "isActive", "createdAt", "updatedAt", "hasFile", "memo"
+            "phoneNumber", "landlineNumber", "contactName", "contactPositionAndDepartment",
+            "contactLandlineNumberAndEmail", "userName", "isActive", "createdAtAndUpdatedAt",
+            "hasFile", "memo"
     );
 }
