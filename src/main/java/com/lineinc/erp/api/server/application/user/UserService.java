@@ -13,7 +13,7 @@ import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserChangeHi
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ValueChange;
+import com.lineinc.erp.api.server.common.util.JaversUtils;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
@@ -41,10 +41,6 @@ import org.springframework.data.domain.Slice;
 
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-
-import static com.lineinc.erp.api.server.domain.user.entity.QUser.user;
 
 @Service
 @RequiredArgsConstructor
@@ -176,38 +172,22 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
         oldUser.syncTransientFields();
-        // Javers JSON 직렬화/역직렬화로 복제본 생성
-        User oldUserSnapshot = javers.getJsonConverter()
-                .fromJson(javers.getJsonConverter().toJson(oldUser), User.class);
+        User oldUserSnapshot = JaversUtils.createSnapshot(javers, oldUser, User.class);
 
         oldUser.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
         usersRepository.save(oldUser);
 
-        // Javers 변경점 비교
         Diff diff = javers.compare(oldUserSnapshot, oldUser);
 
-        // 필요한 필드만 추출 (property, left, right)
-        List<Map<String, Object>> simpleChanges = diff.getChanges().stream()
-                .filter(change -> change instanceof ValueChange)
-                .map(change -> {
-                    ValueChange vc = (ValueChange) change;
-                    Map<String, Object> map = new HashMap<>();
-                    map.put(vc.getPropertyName(), vc.getLeft() + " ⇒ " + vc.getRight());
-                    return map;
-                })
-                .collect(Collectors.toList());
-
+        List<Map<String, String>> simpleChanges = JaversUtils.extractSimpleChanges(diff);
         String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        UserChangeHistory changeHistory = UserChangeHistory.builder()
+                .user(oldUser)
+                .type(UserChangeType.BASIC)
+                .changes(changesJson)
+                .build();
 
-        // UserChangeHistory 엔티티 생성 및 저장
-        if (!simpleChanges.isEmpty()) {
-            UserChangeHistory changeHistory = UserChangeHistory.builder()
-                    .user(oldUser)
-                    .type(UserChangeType.BASIC)
-                    .changes(changesJson)
-                    .build();
-            userChangeHistoryRepository.save(changeHistory);
-        }
+        userChangeHistoryRepository.save(changeHistory);
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (UpdateUserRequest.ChangeHistoryRequest changeHistoryRequest : request.changeHistories()) {
