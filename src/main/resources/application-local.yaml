@@ -1,7 +1,4 @@
 spring:
-  javers:
-    sql-schema-management-enabled: false
-
   # 세션 관리 설정
   session:
     store-type: jdbc              # JDBC 기반 세션 저장소 사용

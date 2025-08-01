@@ -1,7 +1,4 @@
 spring:
-  javers:
-    sql-schema-management-enabled: false
-
   session:
     store-type: jdbc
     jdbc:
@@ -23,7 +20,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:

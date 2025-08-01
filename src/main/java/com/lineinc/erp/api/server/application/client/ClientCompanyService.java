@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
@@ -132,6 +133,7 @@ public class ClientCompanyService {
         if (!changeDetail.isBlank()) {
             ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
+                    .type(ClientCompanyChangeType.BASIC)
                     .changeDetail(changeDetail)
                     .build();
             clientCompanyChangeHistoryRepository.save(changeHistory);

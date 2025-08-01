@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepos
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
+import com.lineinc.erp.api.server.domain.user.enums.UserChangeType;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
@@ -39,6 +40,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import static com.lineinc.erp.api.server.domain.user.entity.QUser.user;
 
 @Service
 @RequiredArgsConstructor
@@ -165,74 +171,53 @@ public class UserService {
     @Transactional
     public void updateUser(Long id, UpdateUserRequest request) {
         if (id == 1L) return;
-        User user = usersRepository.findById(id)
+
+        User oldUser = usersRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
-        User.UserUpdateResult result = user.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
-        Diff diff = javers.compare(result.before(), result.after());
 
-        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (UpdateUserRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
-                userChangeHistoryRepository.findById(historyRequest.id())
-                        .filter(history -> history.getUser().getId().equals(user.getId()))
-                        .ifPresent(history -> {
-                            history.setMemo(historyRequest.memo());
-                        });
-            }
-        }
+        oldUser.syncTransientFields();
+        // Javers JSON 직렬화/역직렬화로 복제본 생성
+        User oldUserSnapshot = javers.getJsonConverter()
+                .fromJson(javers.getJsonConverter().toJson(oldUser), User.class);
 
-        // 변경된 필드를 추적하여 사용자 친화적 메시지 생성
-        String changeDetail = buildUserChangeDetail(diff);
-        // 변경 사항이 있으면 이력 저장
-        if (!changeDetail.isBlank()) {
+        oldUser.updateFrom(request, passwordEncoder, departmentRepository, gradeRepository, positionRepository);
+        usersRepository.save(oldUser);
+
+        // Javers 변경점 비교
+        Diff diff = javers.compare(oldUserSnapshot, oldUser);
+
+        // 필요한 필드만 추출 (property, left, right)
+        List<Map<String, Object>> simpleChanges = diff.getChanges().stream()
+                .filter(change -> change instanceof ValueChange)
+                .map(change -> {
+                    ValueChange vc = (ValueChange) change;
+                    Map<String, Object> map = new HashMap<>();
+                    map.put(vc.getPropertyName(), vc.getLeft() + " ⇒ " + vc.getRight());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        // UserChangeHistory 엔티티 생성 및 저장
+        if (!simpleChanges.isEmpty()) {
             UserChangeHistory changeHistory = UserChangeHistory.builder()
-                    .user(user)
-                    .changeDetail(changeDetail)
+                    .user(oldUser)
+                    .type(UserChangeType.BASIC)
+                    .changes(changesJson)
                     .build();
             userChangeHistoryRepository.save(changeHistory);
         }
 
-        usersRepository.save(user);
-    }
-
-    private String buildUserChangeDetail(Diff diff) {
-        StringBuilder changeDetailBuilder = new StringBuilder();
-        diff.getChanges().forEach(change -> {
-            if (change instanceof ValueChange valueChange) {
-                String propertyName = valueChange.getPropertyName();
-                String label = switch (propertyName) {
-                    case "username" -> "이름";
-                    case "phoneNumber" -> "개인 휴대폰";
-                    case "landlineNumber" -> "전화번호";
-                    case "email" -> "이메일";
-                    case "isActive" -> "계정상태";
-                    case "memo" -> "비고";
-                    case "departmentName" -> "부서";
-                    case "gradeName" -> "직급";
-                    case "positionName" -> "직책";
-                    default -> null;
-                };
-                if (label != null) {
-                    Object left = valueChange.getLeft();
-                    Object right = valueChange.getRight();
-                    String leftStr = left == null ? "" : left.toString();
-                    String rightStr = right == null ? "" : right.toString();
-                    if ("isActive".equals(propertyName)) {
-                        leftStr = "true".equals(leftStr) ? "활성" : "비활성";
-                        rightStr = "true".equals(rightStr) ? "활성" : "비활성";
-                    }
-                    if (rightStr.isBlank()) {
-                        return;
-                    }
-                    changeDetailBuilder.append(label)
-                            .append(" : ")
-                            .append(leftStr)
-                            .append(" → ")
-                            .append(rightStr)
-                            .append("\n");
-                }
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (UpdateUserRequest.ChangeHistoryRequest changeHistoryRequest : request.changeHistories()) {
+                userChangeHistoryRepository.findById(changeHistoryRequest.id())
+                        .filter(hist -> hist.getUser().getId().equals(oldUser.getId()))
+                        .ifPresent(hist -> {
+                            hist.setMemo(changeHistoryRequest.memo());
+                        });
             }
-        });
-        return changeDetailBuilder.toString().trim();
+        }
     }
 
     @Transactional(readOnly = true)

@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.user.enums.UserChangeType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,8 +22,12 @@ public class UserChangeHistory extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(columnDefinition = "TEXT")
-    private String changeDetail; // 모든 변경 내역을 이 한 필드에 저장
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserChangeType type;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String changes;
 
     @Setter
     @Column(columnDefinition = "TEXT")

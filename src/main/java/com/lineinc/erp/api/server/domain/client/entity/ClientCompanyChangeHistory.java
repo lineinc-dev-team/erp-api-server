@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,10 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @JoinColumn(name = "client_company_id", nullable = false)
     private ClientCompany clientCompany;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private ClientCompanyChangeType type;
+
     @Column(columnDefinition = "TEXT")
     private String changeDetail; // 모든 변경 내역을 이 한 필드에 저장
 
@@ -28,3 +33,4 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 선택적 변경 사유, 비고 등
 }
+

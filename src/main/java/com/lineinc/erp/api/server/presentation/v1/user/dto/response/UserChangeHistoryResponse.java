@@ -11,7 +11,7 @@ public record UserChangeHistoryResponse(
         Long id,
 
         @Schema(description = "변경 상세 내역")
-        String changeDetail,
+        String getChanges,
 
         @Schema(description = "메모", example = "조직 개편에 따른 이동")
         String memo,
@@ -23,16 +23,20 @@ public record UserChangeHistoryResponse(
         OffsetDateTime updatedAt,
 
         @Schema(description = "수정자", example = "관리자")
-        String updatedBy
+        String updatedBy,
+
+        @Schema(description = "변경 유형", example = "BASIC")
+        String type
 ) {
     public static UserChangeHistoryResponse from(UserChangeHistory history) {
         return new UserChangeHistoryResponse(
                 history.getId(),
-                history.getChangeDetail(),
+                history.getChanges(),
                 history.getMemo(),
                 history.getCreatedAt(),
                 history.getUpdatedAt(),
-                history.getUpdatedBy()
+                history.getUpdatedBy(),
+                history.getType().name()
         );
     }
 }

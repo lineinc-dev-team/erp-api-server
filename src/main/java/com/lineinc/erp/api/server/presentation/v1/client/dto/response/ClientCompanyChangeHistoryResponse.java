@@ -23,7 +23,10 @@ public record ClientCompanyChangeHistoryResponse(
         OffsetDateTime updatedAt,
 
         @Schema(description = "수정자", example = "관리자")
-        String updatedBy
+        String updatedBy,
+
+        @Schema(description = "변경 유형", example = "CONTACT")
+        String type
 ) {
     public static ClientCompanyChangeHistoryResponse from(ClientCompanyChangeHistory history) {
         return new ClientCompanyChangeHistoryResponse(
@@ -32,7 +35,8 @@ public record ClientCompanyChangeHistoryResponse(
                 history.getMemo(),
                 history.getCreatedAt(),
                 history.getUpdatedAt(),
-                history.getUpdatedBy()
+                history.getUpdatedBy(),
+                history.getType().getLabel()
         );
     }
 }

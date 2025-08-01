@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
 import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
@@ -11,6 +12,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.Objects;
 public class ClientCompanyContactService {
 
     private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+    private final Javers javers;
 
     /**
      * 신규 연락처들을 생성하여 ClientCompany에 추가합니다.
@@ -95,14 +100,53 @@ public class ClientCompanyContactService {
         // 감지된 삭제
         for (ClientCompanyContact original : originalContacts) {
             if (original.isDeleted()) {
-                changes.add("담당자 삭제: " + original.getName());
+                changes.add("담당자 삭제: " + buildContactSnapshot(original));
             }
         }
 
         // 감지된 추가
         for (ClientCompanyContact updated : updatedContacts) {
             if (updated.getId() == null) {
-                changes.add("담당자 추가: " + updated.getName());
+                changes.add("담당자 추가: " + buildContactSnapshot(updated));
+            }
+        }
+
+        // 감지된 수정 (Javers diff 사용)
+        for (ClientCompanyContact updated : updatedContacts) {
+            if (updated.getId() == null) continue;
+            ClientCompanyContact original = originalContacts.stream()
+                    .filter(o -> o.getId().equals(updated.getId()))
+                    .findFirst()
+                    .orElse(null);
+            if (original != null && !original.isDeleted()) {
+                Diff diff = javers.compare(original, updated);
+                for (var change : diff.getChanges()) {
+                    if (change instanceof ValueChange valueChange) {
+                        String propertyName = valueChange.getPropertyName();
+                        String label = switch (propertyName) {
+                            case "name" -> "이름";
+                            case "department" -> "부서";
+                            case "position" -> "직책";
+                            case "landlineNumber" -> "전화번호";
+                            case "phoneNumber" -> "개인 휴대폰";
+                            case "email" -> "이메일";
+                            case "memo" -> "메모";
+                            case "isMain" -> "대표여부";
+                            default -> null;
+                        };
+                        if (label != null) {
+                            String left = valueChange.getLeft() == null ? "" : valueChange.getLeft().toString();
+                            String right = valueChange.getRight() == null ? "" : valueChange.getRight().toString();
+                            if ("isMain".equals(propertyName)) {
+                                left = "true".equals(left) ? "Y" : "N";
+                                right = "true".equals(right) ? "Y" : "N";
+                            }
+                            if (!left.equals(right)) {
+                                changes.add(String.format("담당자 %s - %s: %s → %s", original.getName(), label, left, right));
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -113,7 +157,20 @@ public class ClientCompanyContactService {
             clientCompanyChangeHistoryRepository.save(ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
                     .changeDetail(combinedChange)
+                    .type(ClientCompanyChangeType.CONTACT)
                     .build());
         }
+    }
+
+    private String buildContactSnapshot(ClientCompanyContact contact) {
+        return String.format("%s (부서: %s, 직책: %s, 전화번호: %s, 개인 휴대폰: %s, 이메일: %s, 메모: %s, 대표여부: %s)",
+                contact.getName(),
+                contact.getDepartment(),
+                contact.getPosition(),
+                contact.getLandlineNumber(),
+                contact.getPhoneNumber(),
+                contact.getEmail(),
+                contact.getMemo(),
+                contact.getIsMain() ? "Y" : "N");
     }
 }

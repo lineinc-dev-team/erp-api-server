@@ -103,7 +103,6 @@ public class Site extends BaseEntity {
     private String clientCompanyName;
 
     public SiteUpdateResult updateFrom(SiteUpdateRequest request, UserService userService, ClientCompanyService clientCompanyService) {
-
         Site before = Site.builder()
                 .id(this.id)
                 .name(this.name)
@@ -132,11 +131,9 @@ public class Site extends BaseEntity {
                 .ifPresent(val -> this.endedAt = val);
         Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-
         Optional.ofNullable(request.userId())
                 .map(userService::getUserByIdOrThrow)
                 .ifPresent(this::changeUser);
-
         Optional.ofNullable(request.clientCompanyId())
                 .map(clientCompanyService::getClientCompanyByIdOrThrow)
                 .ifPresent(this::changeClientCompany);

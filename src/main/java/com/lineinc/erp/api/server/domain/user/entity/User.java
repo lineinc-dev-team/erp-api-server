@@ -13,6 +13,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffInclude;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,14 +74,17 @@ public class User extends BaseEntity implements UserDetails {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
+    @DiffIgnore
     private Department department;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_id")
+    @DiffIgnore
     private Grade grade;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id")
+    @DiffIgnore
     private Position position;
 
     @DiffInclude
@@ -137,66 +141,48 @@ public class User extends BaseEntity implements UserDetails {
     private String positionName;
 
     /**
+     * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
+     */
+    public void syncTransientFields() {
+        this.departmentName = this.department != null ? this.department.getName() : null;
+        this.gradeName = this.grade != null ? this.grade.getName() : null;
+        this.positionName = this.position != null ? this.position.getName() : null;
+    }
+
+    /**
      * UpdateUserRequest DTO로부터 사용자 정보를 업데이트합니다.
      */
-    public UserUpdateResult updateFrom(UpdateUserRequest request,
-                                       PasswordEncoder passwordEncoder,
-                                       DepartmentRepository departmentRepository,
-                                       GradeRepository gradeRepository,
-                                       PositionRepository positionRepository) {
-
-        User before = User.builder()
-                .id(this.id)
-                .username(this.username)
-                .landlineNumber(this.landlineNumber)
-                .phoneNumber(this.phoneNumber)
-                .email(this.email)
-                .memo(this.memo)
-                .isActive(this.isActive)
-                .build();
-
-        before.departmentName = this.department != null ? this.department.getName() : null;
-        before.gradeName = this.grade != null ? this.grade.getName() : null;
-        before.positionName = this.position != null ? this.position.getName() : null;
-
-        // 기본 필드 업데이트
+    public void updateFrom(UpdateUserRequest request,
+                           PasswordEncoder passwordEncoder,
+                           DepartmentRepository departmentRepository,
+                           GradeRepository gradeRepository,
+                           PositionRepository positionRepository) {
         Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-
-        // 조직 관련 필드 업데이트
         Optional.ofNullable(request.departmentId())
                 .flatMap(departmentRepository::findById)
                 .ifPresent(entity -> {
                     this.department = entity;
-                    this.departmentName = entity.getName();
                 });
-
         Optional.ofNullable(request.gradeId())
                 .flatMap(gradeRepository::findById)
                 .ifPresent(entity -> {
                     this.grade = entity;
-                    this.gradeName = entity.getName();
                 });
 
         Optional.ofNullable(request.positionId())
                 .flatMap(positionRepository::findById)
                 .ifPresent(entity -> {
                     this.position = entity;
-                    this.positionName = entity.getName();
                 });
-
-        // 비밀번호 업데이트
         if (request.password() != null && !request.password().isBlank()) {
             this.updatePassword(passwordEncoder.encode(request.password()));
         }
 
-        return new UserUpdateResult(before, this);
-    }
-
-    public record UserUpdateResult(User before, User after) {
+        syncTransientFields();
     }
 }

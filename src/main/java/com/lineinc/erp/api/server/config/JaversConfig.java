@@ -13,10 +13,9 @@ public class JaversConfig {
 
     @Bean
     public Javers javers() {
-        // DB에 저장하지 않고 메모리에서만 비교 기능 사용
         JaversRepository repository = new InMemoryRepository();
         return JaversBuilder.javers()
-                .withObjectAccessHook(new HibernateUnproxyObjectAccessHook<Object>())
+                .withObjectAccessHook(new HibernateUnproxyObjectAccessHook<>())
                 .registerJaversRepository(repository)
                 .build();
     }
