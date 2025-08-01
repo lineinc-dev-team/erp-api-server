@@ -15,11 +15,11 @@ public record UpdateUserRequest(
         String email,
 
         @MultiConstraint(type = ValidatorType.PHONE)
-        @Schema(description = "전화번호", example = "010-1234-5678")
+        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
         String phoneNumber,
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
-        @Schema(description = "유선 전화번호", example = "02-123-4567")
+        @Schema(description = "전화번호", example = "02-123-4567")
         String landlineNumber,
 
         @Schema(description = "비밀번호", example = "password123!")

@@ -120,7 +120,8 @@ public class UserService {
             case "department" -> "부서";
             case "grade" -> "직급";
             case "position" -> "직책";
-            case "phoneNumber" -> "휴대폰";
+            case "phoneNumber" -> "개인 휴대폰";
+            case "landlineNumber" -> "전화번호";
             case "isActive" -> "계정상태";
             case "lastLoginAt" -> "최종접속일";
             case "createdAt" -> "생성일자";
@@ -140,6 +141,7 @@ public class UserService {
             case "grade" -> user.grade();
             case "position" -> user.position();
             case "phoneNumber" -> user.phoneNumber() != null ? user.phoneNumber() : "";
+            case "landlineNumber" -> user.landlineNumber() != null ? user.landlineNumber() : "";
             case "isActive" -> user.isActive() ? "Y" : "N";
             case "lastLoginAt" -> DateTimeFormatUtils.formatKoreaLocalDate(user.lastLoginAt());
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(user.createdAt());
@@ -198,8 +200,8 @@ public class UserService {
                 String propertyName = valueChange.getPropertyName();
                 String label = switch (propertyName) {
                     case "username" -> "이름";
-                    case "phoneNumber" -> "휴대폰";
-                    case "landlineNumber" -> "연락처";
+                    case "phoneNumber" -> "개인 휴대폰";
+                    case "landlineNumber" -> "전화번호";
                     case "email" -> "이메일";
                     case "isActive" -> "계정상태";
                     case "memo" -> "비고";

@@ -18,7 +18,7 @@ public record UserResponse(
         @Schema(description = "사용자 이름", example = "홍길동")
         String username,
 
-        @Schema(description = "휴대폰 번호", example = "010-1234-5678")
+        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
         String phoneNumber,
 
         @Schema(description = "이메일 주소", example = "user@example.com")
@@ -36,7 +36,7 @@ public record UserResponse(
         @Schema(description = "최종 로그인 일시", example = "2025-07-15T12:30:00+09:00")
         OffsetDateTime lastLoginAt,
 
-        @Schema(description = "연락처(유선 전화번호)", example = "02-123-4567")
+        @Schema(description = "전화번호", example = "02-123-4567")
         String landlineNumber,
 
         @Schema(description = "수정자", example = "관리자")
