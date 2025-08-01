@@ -17,6 +17,7 @@ public final class ValidationMessages {
     public static final String USER_NOT_ACTIVE = "비활성화된 계정입니다.";
     public static final String CLIENT_COMPANY_NOT_FOUND = "존재하지 않는 발주처입니다.";
     public static final String BUSINESS_NUMBER_ALREADY_EXISTS = "이미 등록된 사업자등록번호입니다.";
+    public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 반드시 한 명이 지정되어야 합니다.";
     public static final String SITE_NAME_ALREADY_EXISTS = "이미 존재하는 현장명입니다.";
     public static final String SITE_NOT_FOUND = "존재하지 않는 현장입니다.";
     public static final String INVALID_DATE_FORMAT = "날짜 형식이 올바르지 않습니다. (예: yyyy-MM-dd)";

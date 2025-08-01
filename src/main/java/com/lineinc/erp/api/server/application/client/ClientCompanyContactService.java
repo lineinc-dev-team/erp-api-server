@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.application.client;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
@@ -29,6 +30,11 @@ public class ClientCompanyContactService {
      */
     public void createClientCompanyContacts(ClientCompany clientCompany, List<ClientCompanyContactCreateRequest> requests) {
         if (Objects.isNull(requests) || requests.isEmpty()) return;
+
+        long mainCount = requests.stream().filter(ClientCompanyContactCreateRequest::isMain).count();
+        if (mainCount != 1) {
+            throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
+        }
 
         // 요청 리스트를 순회하며 각각 ClientCompanyContact 엔티티 생성 후 연관관계 설정 및 추가
         requests.stream()
