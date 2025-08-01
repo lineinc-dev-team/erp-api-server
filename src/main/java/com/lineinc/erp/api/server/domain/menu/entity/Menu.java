@@ -21,7 +21,7 @@ public class Menu extends BaseEntity {
     @SequenceGenerator(name = "menu_seq", sequenceName = "menu_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name; // 예: "계약관리"
 
     @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY)

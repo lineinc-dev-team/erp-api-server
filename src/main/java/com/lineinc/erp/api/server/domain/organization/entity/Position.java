@@ -19,6 +19,6 @@ public class Position extends BaseEntity {
     @SequenceGenerator(name = "position_seq", sequenceName = "position_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name; // 예: "팀장", "파트장", "실장"
 }

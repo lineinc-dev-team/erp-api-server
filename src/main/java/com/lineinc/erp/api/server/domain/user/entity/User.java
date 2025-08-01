@@ -37,7 +37,7 @@ public class User extends BaseEntity implements UserDetails {
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String loginId;
 
     @Column

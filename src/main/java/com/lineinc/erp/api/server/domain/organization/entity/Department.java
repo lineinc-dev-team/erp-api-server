@@ -19,6 +19,6 @@ public class Department extends BaseEntity {
     @SequenceGenerator(name = "department_seq", sequenceName = "department_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name; // 예: "경영지원팀", "개발팀", "영업팀"
 }

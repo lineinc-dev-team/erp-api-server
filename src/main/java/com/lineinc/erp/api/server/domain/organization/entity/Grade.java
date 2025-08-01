@@ -19,6 +19,6 @@ public class Grade extends BaseEntity {
     @SequenceGenerator(name = "grade_seq", sequenceName = "grade_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name; // 예: "사원", "대리", "과장"
 }
