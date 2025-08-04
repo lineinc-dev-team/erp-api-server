@@ -45,13 +45,16 @@ jobs:
             sleep 2
           
             # 새 JAR로 임시 애플리케이션 시작 (다른 포트)
-            nohup java -jar /home/ubuntu/app-new.jar --server.port=8081 > /tmp/app-new.log 2>&1 &
-            NEW_PID=$!
+            cp /home/ubuntu/app-new.jar /tmp/app-test.jar
+            JAR_PATH="/tmp/app-test.jar" pm2 start ecosystem.config.js --name "app-test" -- --server.port=8081
+            sleep 10
           
-            # PID 확인
-            if ! kill -0 $NEW_PID 2>/dev/null; then
+            # PID 확인 → PM2 상태 확인으로 변경
+            sleep 5
+            if ! pm2 list | grep -q "app-test.*online"; then
               echo "애플리케이션 시작 실패"
-              cat /tmp/app-new.log
+              pm2 logs app-test --lines 20 --nostream
+              pm2 delete app-test 2>/dev/null || true
               exit 1
             fi
           
@@ -68,8 +71,8 @@ jobs:
             # 헬스체크 실패시 롤백
             if [ "$HEALTH_CHECK_SUCCESS" = false ]; then
               echo "헬스체크 실패 - 로그 확인:"
-              tail -20 /tmp/app-new.log
-              kill $NEW_PID 2>/dev/null || true
+              pm2 logs app-test --lines 20 --nostream
+              pm2 delete app-test 2>/dev/null || true
               exit 1
             fi
           
@@ -82,7 +85,7 @@ jobs:
             fi
           
             # 임시 프로세스 종료
-            kill $NEW_PID 2>/dev/null || true
+            pm2 delete app-test
           
             pm2 save
             sleep 5
