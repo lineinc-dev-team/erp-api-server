@@ -24,7 +24,7 @@ public class QSiteChangeHistory extends EntityPathBase<SiteChangeHistory> {
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
-    public final StringPath changeDetail = createString("changeDetail");
+    public final StringPath changes = createString("changes");
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
@@ -43,6 +43,8 @@ public class QSiteChangeHistory extends EntityPathBase<SiteChangeHistory> {
     public final StringPath memo = createString("memo");
 
     public final QSite site;
+
+    public final EnumPath<com.lineinc.erp.api.server.domain.site.enums.SiteChangeType> type = createEnum("type", com.lineinc.erp.api.server.domain.site.enums.SiteChangeType.class);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;

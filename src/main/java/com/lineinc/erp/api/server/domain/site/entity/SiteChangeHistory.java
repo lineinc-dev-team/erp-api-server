@@ -1,9 +1,12 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -21,8 +24,13 @@ public class SiteChangeHistory extends BaseEntity {
     @JoinColumn(name = "site_id", nullable = false)
     private Site site;
 
-    @Column(columnDefinition = "TEXT")
-    private String changeDetail; // 모든 변경 내역을 이 한 필드에 저장
+    @Enumerated(EnumType.STRING)
+    @Column
+    private SiteChangeType type;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
+    private String changes;
 
     @Setter
     @Column(columnDefinition = "TEXT")
