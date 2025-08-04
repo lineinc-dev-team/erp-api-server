@@ -5,6 +5,9 @@ import com.lineinc.erp.api.server.domain.user.enums.UserChangeType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 
 @Entity
 @Getter
@@ -26,7 +29,8 @@ public class UserChangeHistory extends BaseEntity {
     @Column(nullable = false)
     private UserChangeType type;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
     private String changes;
 
     @Setter

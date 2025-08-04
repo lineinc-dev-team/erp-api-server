@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.user.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -10,7 +11,8 @@ public record UserChangeHistoryResponse(
         @Schema(description = "변경 이력 ID", example = "1")
         Long id,
 
-        @Schema(description = "변경 상세 내역")
+        @Schema(description = "변경 상세 내역", example = "[{\"type\": \"수정\", \"after\": \"외주팀에서 이관됨\", \"before\": \"추가 메모\", \"property\": \"memo\"}]")
+        @JsonProperty("getChanges")
         String getChanges,
 
         @Schema(description = "메모", example = "조직 개편에 따른 이동")
