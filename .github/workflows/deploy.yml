@@ -37,6 +37,9 @@ jobs:
       - name: 📦 JAR 파일 EC2로 전송
         run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
+      - name: 🔧 JAR 파일 권한 및 소유자 설정
+        run: ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} "chmod 644 /home/ubuntu/app-new.jar"
+
       - name: 🚀 EC2에서 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
@@ -52,8 +55,9 @@ jobs:
             # 새 JAR를 임시 위치로 복사 (안전한 작업)
             cp /home/ubuntu/app-new.jar /tmp/app-new.jar
 
-            # 새 애플리케이션을 pm2로 포트 8081에서 시작
-            pm2 start java --name app-new -- -jar /tmp/app-new.jar --server.port=8081
+            # 새 애플리케이션을 pm2 포트 8081에서 시작
+            pm2 delete app-new 2>/dev/null || true
+            pm2 start ecosystem.config.js --only app-new
 
             # pm2가 app-new를 온라인 상태로 만들 때까지 최대 30초 대기 (6회, 5초 간격)
             for i in {1..6}; do
@@ -96,8 +100,8 @@ jobs:
               # 기존 app-new 종료 (안전하게)
               pm2 delete app-new 2>/dev/null || true
 
-              # 새 jar 파일로 app 재시작 (포트 8080)
-              pm2 start java --name app -- -jar /home/ubuntu/app-latest.jar --server.port=8080
+              # 새 jar 파일로 app ecosystem으로 재시작 (포트 8080)
+              pm2 start ecosystem.config.js --only app
             fi
 
             # 최종 헬스 체크 1회 성공 (포트 8080, 최대 60초)
