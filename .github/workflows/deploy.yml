@@ -79,7 +79,7 @@ jobs:
             # 기존 PM2 애플리케이션 교체
             mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
             if pm2 list | grep -q "app.*online"; then
-              pm2 reload ecosystem.config.js --update-env
+              pm2 reload ecosystem.config.js --update-env --wait-ready
             else
               pm2 start ecosystem.config.js
             fi
