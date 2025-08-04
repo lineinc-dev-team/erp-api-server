@@ -9,10 +9,12 @@ import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
+import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyPaymentMethodResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,7 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/client-companies")
@@ -195,4 +199,14 @@ public class ClientCompanyController {
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
+
+    @Operation(summary = "결제 수단 목록 조회", description = "결제 수단 목록을 반환합니다")
+    @GetMapping("/payment-methods")
+    public ResponseEntity<SuccessResponse<List<ClientCompanyPaymentMethodResponse>>> getPaymentMethods() {
+        List<ClientCompanyPaymentMethodResponse> responseList = Arrays.stream(PaymentMethod.values())
+                .map(pm -> new ClientCompanyPaymentMethodResponse((long) pm.ordinal() + 1, pm.name(), pm.getDisplayName()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
 }
