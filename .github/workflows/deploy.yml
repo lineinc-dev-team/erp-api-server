@@ -43,18 +43,9 @@ jobs:
       - name: 🚀 EC2에서 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
-            # 포트 8081 정리 및 완전 종료 대기
-            pkill -f "server.port=8081" 2>/dev/null || true
-            for i in {1..6}; do
-              if ! lsof -i:8081 >/dev/null; then
-                break
-              fi
-              sleep 2
-            done
-
             # 새 JAR를 임시 위치로 복사 (안전한 작업)
             cp /home/ubuntu/app-new.jar /tmp/app-new.jar
-
+          
             # 새 애플리케이션을 pm2 ecosystem으로 포트 8081에서 시작
             pm2 delete app-new 2>/dev/null || true
             pm2 start ecosystem.config.js --only app-new
@@ -91,8 +82,14 @@ jobs:
               pm2 delete app-new 2>/dev/null || true
               exit 1
             else
-              echo "✅ app-new 헬스체크 통과 → Nginx 프록시를 8081로 전환 시작"
-              sudo sed -i 's/proxy_pass http:\/\/localhost:8080;/proxy_pass http:\/\/localhost:8081;/' /etc/nginx/conf.d/erp.conf
+              echo "✅ app-new 헬스체크 통과 → Nginx 프록시 포트 동적 전환 시작"
+              CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://localhost:\K[0-9]+' /etc/nginx/conf.d/erp.conf)
+              if [ "$CURRENT_PORT" = "8080" ]; then
+                NEW_PORT=8081
+              else
+                NEW_PORT=8080
+              fi
+              sudo sed -i "s/proxy_pass http:\/\/localhost:[0-9]\+/proxy_pass http:\/\/localhost:${NEW_PORT}/" /etc/nginx/conf.d/erp.conf
               sudo nginx -s reload
 
               mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
