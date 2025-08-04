@@ -181,13 +181,14 @@ public class UserService {
 
         List<Map<String, String>> simpleChanges = JaversUtils.extractSimpleChanges(diff);
         String changesJson = javers.getJsonConverter().toJson(simpleChanges);
-        UserChangeHistory changeHistory = UserChangeHistory.builder()
-                .user(oldUser)
-                .type(UserChangeType.BASIC)
-                .changes(changesJson)
-                .build();
-
-        userChangeHistoryRepository.save(changeHistory);
+        if (!simpleChanges.isEmpty()) {
+            UserChangeHistory changeHistory = UserChangeHistory.builder()
+                    .user(oldUser)
+                    .type(UserChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            userChangeHistoryRepository.save(changeHistory);
+        }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (UpdateUserRequest.ChangeHistoryRequest changeHistoryRequest : request.changeHistories()) {
