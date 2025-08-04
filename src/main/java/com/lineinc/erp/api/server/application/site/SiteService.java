@@ -46,8 +46,6 @@ public class SiteService {
     private final SiteProcessService siteProcessService;
     private final SiteContractService siteContractService;
     private final UserService userService;
-    private final SiteChangeHistoryRepository siteChangeHistoryRepository;
-    private final Javers javers;
 
     @Transactional
     public void createSite(SiteCreateRequest request) {
@@ -182,18 +180,6 @@ public class SiteService {
             validateDuplicateName(request.name());
         }
 
-        Site.SiteUpdateResult siteUpdateResult = site.updateFrom(request, userService, clientCompanyService);
-
-        Diff diff = javers.compare(siteUpdateResult.before(), siteUpdateResult.after());
-        String changeDetail = buildSiteChangeDetail(diff);
-        if (!changeDetail.isBlank()) {
-            SiteChangeHistory changeHistory = SiteChangeHistory.builder()
-                    .site(site)
-                    .changeDetail(changeDetail)
-                    .build();
-            siteChangeHistoryRepository.save(changeHistory);
-        }
-
         if (request.process() != null) {
             siteProcessService.updateProcess(site, request.process());
         }
@@ -216,56 +202,6 @@ public class SiteService {
         }
 
         return siteSlice.map(SiteResponse.SiteSimpleResponse::from);
-    }
-
-    private String buildSiteChangeDetail(Diff diff) {
-        StringBuilder changeDetailBuilder = new StringBuilder();
-        diff.getChanges().forEach(change -> {
-            if (change instanceof ValueChange valueChange) {
-                String propertyName = valueChange.getPropertyName();
-                String label = switch (propertyName) {
-                    case "name" -> "현장명";
-                    case "address" -> "주소";
-                    case "detailAddress" -> "상세주소";
-                    case "type" -> "현장유형";
-                    case "startedAt" -> "시작일";
-                    case "endedAt" -> "종료일";
-                    case "contractAmount" -> "도급금액";
-                    case "memo" -> "비고";
-                    case "userName" -> "현장소장";
-                    case "clientCompanyName" -> "발주처";
-                    default -> null;
-                };
-                if (label != null) {
-                    Object left = valueChange.getLeft();
-                    Object right = valueChange.getRight();
-                    String leftStr;
-                    String rightStr;
-                    switch (propertyName) {
-                        case "type" -> {
-                            leftStr = left != null ? SiteType.valueOf(left.toString()).getLabel() : "";
-                            rightStr = right != null ? SiteType.valueOf(right.toString()).getLabel() : "";
-                        }
-                        case "startedAt", "endedAt" -> {
-                            leftStr = left instanceof OffsetDateTime ? DateTimeFormatUtils.formatKoreaLocalDate((OffsetDateTime) left) : "";
-                            rightStr = right instanceof OffsetDateTime ? DateTimeFormatUtils.formatKoreaLocalDate((OffsetDateTime) right) : "";
-                        }
-                        default -> {
-                            leftStr = left == null ? "" : left.toString();
-                            rightStr = right == null ? "" : right.toString();
-                        }
-                    }
-                    if (rightStr == null || rightStr.isBlank()) return;
-                    changeDetailBuilder.append(label)
-                            .append(" : ")
-                            .append(leftStr)
-                            .append(" → ")
-                            .append(rightStr)
-                            .append("\n");
-                }
-            }
-        });
-        return changeDetailBuilder.toString().trim();
     }
 
 }

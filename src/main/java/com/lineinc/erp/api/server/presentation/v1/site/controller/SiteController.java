@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.site.controller;
 
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteTypeResponse;
+import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.application.site.SiteService;
 
 import com.lineinc.erp.api.server.common.constant.AppConstants;
@@ -16,6 +18,7 @@ import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailRe
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -165,7 +168,19 @@ public class SiteController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
         ));
     }
+
+    @Operation(summary = "현장 구분 목록 조회", description = "현장 구분 목록을 반환합니다")
+    @GetMapping("/site-types")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<SiteTypeResponse>>> getSiteTypes() {
+        List<SiteTypeResponse> responseList = Arrays.stream(SiteType.values())
+                .map(type -> new SiteTypeResponse((long) type.ordinal() + 1, type.name(), type.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
 }
+
 
 
 
