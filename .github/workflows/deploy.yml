@@ -61,7 +61,7 @@ jobs:
             # 새 애플리케이션 헬스체크 (최대 60초 대기)
             HEALTH_CHECK_SUCCESS=false
             for i in {1..12}; do
-              if curl -f http://localhost:8081/health > /dev/null 2>&1; then
+              if curl -f http://localhost:8081/actuator/health > /dev/null 2>&1; then
                 HEALTH_CHECK_SUCCESS=true
                 break
               fi
@@ -89,5 +89,5 @@ jobs:
           
             pm2 save
             sleep 5
-            curl --retry 3 --retry-delay 3 http://localhost:8080/health > /dev/null 2>&1 || exit 1
+            curl --retry 3 --retry-delay 3 http://localhost:8080/actuator/health > /dev/null 2>&1 || exit 1
           EOF
