@@ -89,18 +89,19 @@ jobs:
               pm2 logs app-test --lines 50 --no-stream
               pm2 delete app-test 2>/dev/null || true
               exit 1
-            fi
-
-            # 기존 PM2 애플리케이션 교체
-            mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
-            if pm2 list | grep -q "app.*online"; then
-              pm2 reload ecosystem.config.js --update-env
             else
-              pm2 start ecosystem.config.js
-            fi
+              # 기존 PM2 애플리케이션 교체 (헬스체크 통과 후에만 실행)
+              echo "✅ app-test 헬스체크 통과 → app 서비스 reload 시작"
+              mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
+              if pm2 list | grep -q "app.*online"; then
+                pm2 reload ecosystem.config.js --update-env
+              else
+                pm2 start ecosystem.config.js
+              fi
 
-            # 임시 프로세스 종료
-            pm2 delete app-test
+              # 임시 프로세스 종료
+              pm2 delete app-test
+            fi
 
             # 최종 헬스 체크 3연속 성공 (최대 60초)
             success_count=0
