@@ -82,28 +82,6 @@ jobs:
             echo "▶ 새 JAR를 임시 위치로 복사"
             cp "$APP_NEW_JAR" /tmp/app-new.jar
 
-            echo "▶ 새 애플리케이션($PM2_APP_NAME_NEW)을 포트 $PORT_2에서 pm2로 시작"
-            pm2 delete "$PM2_APP_NAME_NEW" 2>/dev/null || true
-            pm2 start ecosystem.config.js --only "$PM2_APP_NAME_NEW"
-
-            echo "▶ pm2 온라인 상태 대기..."
-            if ! wait_for_pm2_online "$PM2_APP_NAME_NEW"; then
-              echo "❌ $PM2_APP_NAME_NEW pm2 온라인 상태 진입 실패"
-              pm2 logs "$PM2_APP_NAME_NEW" --lines 50
-              pm2 delete "$PM2_APP_NAME_NEW" 2>/dev/null || true
-              exit 1
-            fi
-
-            echo "▶ 헬스 체크 포트 $PORT_2 시작"
-            if ! health_check $PORT_2; then
-              echo "❌ 헬스체크 실패 (포트 $PORT_2)"
-              pm2 logs "$PM2_APP_NAME_NEW" --lines 50
-              pm2 delete "$PM2_APP_NAME_NEW" 2>/dev/null || true
-              exit 1
-            fi
-
-            echo "✅ $PM2_APP_NAME_NEW 헬스체크 통과, Nginx 프록시 포트 전환 시작"
-
             CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://localhost:\K[0-9]+' "$NGINX_CONF")
             if [ "$CURRENT_PORT" == "$PORT_1" ]; then
               NEW_PORT=$PORT_2
@@ -117,12 +95,33 @@ jobs:
 
             echo "▶ 현재 Nginx 프록시 포트: $CURRENT_PORT, 변경할 포트: $NEW_PORT"
 
+            echo "▶ 이전 앱($OLD_APP) 종료"
+            pm2 delete "$OLD_APP" 2>/dev/null || true
+
+            echo "▶ 새 애플리케이션($NEW_APP)을 포트 $NEW_PORT에서 pm2로 시작"
+            pm2 start ecosystem.config.js --only "$NEW_APP"
+
+            echo "▶ pm2 온라인 상태 대기..."
+            if ! wait_for_pm2_online "$NEW_APP"; then
+              echo "❌ $NEW_APP pm2 온라인 상태 진입 실패"
+              pm2 logs "$NEW_APP" --lines 50
+              pm2 delete "$NEW_APP" 2>/dev/null || true
+              exit 1
+            fi
+
+            echo "▶ 헬스 체크 포트 $NEW_PORT 시작"
+            if ! health_check $NEW_PORT; then
+              echo "❌ 헬스체크 실패 (포트 $NEW_PORT)"
+              pm2 logs "$NEW_APP" --lines 50
+              pm2 delete "$NEW_APP" 2>/dev/null || true
+              exit 1
+            fi
+
+            echo "✅ $NEW_APP 헬스체크 통과, Nginx 프록시 포트 전환 시작"
+
             sudo sed -i "s/proxy_pass http:\/\/localhost:[0-9]\+/proxy_pass http:\/\/localhost:${NEW_PORT}/" "$NGINX_CONF"
             sudo nginx -s reload
             echo "▶ Nginx 리로드 완료"
-
-            echo "▶ 이전 포트($CURRENT_PORT)에서 실행 중인 앱($OLD_APP) 종료"
-            pm2 delete "$OLD_APP" 2>/dev/null || true
 
             echo "▶ 최신 JAR로 교체"
             mv "$APP_NEW_JAR" "$APP_LATEST_JAR"
