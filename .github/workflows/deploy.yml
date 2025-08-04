@@ -49,7 +49,7 @@ jobs:
             APP_LATEST_JAR="/home/ubuntu/app-latest.jar"
             PM2_APP_NAME_NEW="app-new"
             PM2_APP_NAME_OLD="app"
-            NGINX_CONF="/etc/nginx/conf.d/erp.conf"
+            NGINX_CONF="/etc/nginx/sites-available/erp.conf"
             PORT_1=8080
             PORT_2=8081
 
