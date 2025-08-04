@@ -83,7 +83,8 @@ jobs:
             cp "$APP_NEW_JAR" /tmp/app-new.jar
 
             CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' "$NGINX_CONF" 2>/dev/null || echo "$PORT_1")
-            if [ "$CURRENT_PORT" == "$PORT_1" ]; then
+            echo "▶ DEBUG: CURRENT_PORT=$CURRENT_PORT, PORT_1=$PORT_1, PORT_2=$PORT_2"
+            if [ "$CURRENT_PORT" -eq "$PORT_1" ]; then
               NEW_PORT=$PORT_2
               OLD_APP=$PM2_APP_NAME_OLD
               NEW_APP=$PM2_APP_NAME_NEW
