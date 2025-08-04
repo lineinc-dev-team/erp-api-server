@@ -40,42 +40,57 @@ jobs:
       - name: 🚀 EC2에서 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
-            # 포트 8081 정리
+            # 포트 8081 정리 및 완전 종료 대기
             pkill -f "server.port=8081" 2>/dev/null || true
-            sleep 2
-          
+            for i in {1..6}; do
+              if ! lsof -i:8081 >/dev/null; then
+                break
+              fi
+              sleep 2
+            done
+
             # 새 JAR로 임시 애플리케이션 시작 (다른 포트)
             cp /home/ubuntu/app-new.jar /tmp/app-test.jar
             JAR_PATH="/tmp/app-test.jar" pm2 start ecosystem.config.js --name "app-test" -- --server.port=8081
-            sleep 10
-          
-            # PID 확인 → PM2 상태 확인으로 변경
-            sleep 5
-            if ! pm2 list | grep -q "app-test.*online"; then
-              echo "애플리케이션 시작 실패"
-              pm2 logs app-test --lines 20 --nostream
-              pm2 delete app-test 2>/dev/null || true
-              exit 1
-            fi
-          
-            # 새 애플리케이션 헬스체크 (최대 60초 대기)
-            HEALTH_CHECK_SUCCESS=false
-            for i in {1..12}; do
-              if curl -f http://localhost:8081/actuator/health > /dev/null 2>&1; then
-                HEALTH_CHECK_SUCCESS=true
+
+            # PM2 온라인 대기 (최대 30초)
+            for i in {1..6}; do
+              if pm2 list | grep -q "app-test.*online"; then
                 break
               fi
               sleep 5
             done
-          
-            # 헬스체크 실패시 롤백
-            if [ "$HEALTH_CHECK_SUCCESS" = false ]; then
-              echo "헬스체크 실패 - 로그 확인:"
-              pm2 logs app-test --lines 20 --nostream
+
+            if ! pm2 list | grep -q "app-test.*online"; then
+              echo "애플리케이션 시작 실패"
+              pm2 logs app-test --lines 50 --no-stream
               pm2 delete app-test 2>/dev/null || true
               exit 1
             fi
-          
+
+            # 헬스 체크 3연속 성공 조건 (최대 60초)
+            HEALTH_CHECK_SUCCESS=false
+            success_count=0
+            for i in {1..12}; do
+              if curl -f http://localhost:8081/actuator/health > /dev/null 2>&1; then
+                ((success_count++))
+                if [ "$success_count" -ge 3 ]; then
+                  HEALTH_CHECK_SUCCESS=true
+                  break
+                fi
+              else
+                success_count=0
+              fi
+              sleep 5
+            done
+
+            if [ "$HEALTH_CHECK_SUCCESS" = false ]; then
+              echo "헬스체크 실패 - 로그 확인:"
+              pm2 logs app-test --lines 50 --no-stream
+              pm2 delete app-test 2>/dev/null || true
+              exit 1
+            fi
+
             # 기존 PM2 애플리케이션 교체
             mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
             if pm2 list | grep -q "app.*online"; then
@@ -83,11 +98,25 @@ jobs:
             else
               pm2 start ecosystem.config.js
             fi
-          
+
             # 임시 프로세스 종료
             pm2 delete app-test
-          
-            pm2 save
-            sleep 5
-            curl --retry 3 --retry-delay 3 http://localhost:8080/actuator/health > /dev/null 2>&1 || exit 1
+
+            # 최종 헬스 체크 3연속 성공 (최대 60초)
+            success_count=0
+            for i in {1..12}; do
+              if curl -f http://localhost:8080/actuator/health > /dev/null 2>&1; then
+                ((success_count++))
+                if [ "$success_count" -ge 3 ]; then
+                  exit 0
+                fi
+              else
+                success_count=0
+              fi
+              sleep 5
+            done
+
+            echo "최종 헬스체크 실패"
+            pm2 logs app --lines 50 --no-stream
+            exit 1
           EOF

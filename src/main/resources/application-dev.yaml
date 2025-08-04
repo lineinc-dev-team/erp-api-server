@@ -1,4 +1,7 @@
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
   session:
     store-type: jdbc
     jdbc:
@@ -58,3 +61,8 @@ cloud:
 
 user:
   default-password: ${USER_DEFAULT_PASSWORD}
+
+server:
+  shutdown: graceful
+
+

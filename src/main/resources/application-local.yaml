@@ -1,4 +1,7 @@
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
   # 세션 관리 설정
   session:
     store-type: jdbc              # JDBC 기반 세션 저장소 사용
@@ -38,6 +41,8 @@ spring:
           order_updates: true         # 배치 최적화를 위해 수정문 정렬
     open-in-view: false        # 지연 로딩 문제 방지를 위해 Open Session in View 패턴 비활성화
 
+server:
+  shutdown: graceful
 # 관리 엔드포인트 설정
 management:
   endpoints:
