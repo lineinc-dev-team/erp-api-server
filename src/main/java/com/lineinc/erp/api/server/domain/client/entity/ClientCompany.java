@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -68,7 +69,7 @@ public class ClientCompany extends BaseEntity {
     /**
      * 결제 방식 (현금/어음)
      */
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
@@ -81,6 +82,7 @@ public class ClientCompany extends BaseEntity {
     private String paymentPeriod;
 
     @Setter
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user; // 본사 담당자
@@ -88,16 +90,16 @@ public class ClientCompany extends BaseEntity {
     /**
      * 발주처 담당자 목록
      */
-    @DiffInclude
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @DiffIgnore
     @Builder.Default
     private List<ClientCompanyContact> contacts = new ArrayList<>();
 
     /**
      * 발주처 관련 첨부파일 목록
      */
-    @DiffInclude
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @DiffIgnore
     @Builder.Default
     private List<ClientCompanyFile> files = new ArrayList<>();
 
@@ -120,7 +122,14 @@ public class ClientCompany extends BaseEntity {
     @DiffInclude
     private String userName;
 
-    public void updateFrom(ClientCompanyUpdateRequest request) {
+    /**
+     * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
+     */
+    public void syncTransientFields() {
+        this.userName = this.user != null ? this.user.getUsername() : null;
+    }
+
+    public void updateFrom(ClientCompanyUpdateRequest request, UserRepository userRepository) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
         Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
@@ -133,30 +142,6 @@ public class ClientCompany extends BaseEntity {
         Optional.ofNullable(request.paymentPeriod()).ifPresent(val -> this.paymentPeriod = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-    }
-
-    public record ClientCompanyUpdateResult(ClientCompany before, ClientCompany after) {
-    }
-
-    public ClientCompanyUpdateResult updateFromWithHistory(ClientCompanyUpdateRequest request, UserRepository userRepository) {
-        ClientCompany before = ClientCompany.builder()
-                .id(this.id)
-                .name(this.name)
-                .businessNumber(this.businessNumber)
-                .ceoName(this.ceoName)
-                .address(this.address)
-                .detailAddress(this.detailAddress)
-                .landlineNumber(this.landlineNumber)
-                .phoneNumber(this.phoneNumber)
-                .email(this.email)
-                .paymentMethod(this.paymentMethod)
-                .paymentPeriod(this.paymentPeriod)
-                .memo(this.memo)
-                .isActive(this.isActive)
-                .contacts(this.contacts)
-                .files(this.files)
-                .userName(this.user != null ? this.user.getUsername() : null)
-                .build();
 
         if (request.userId() != null) {
             User user = userRepository.findById(request.userId())
@@ -165,8 +150,7 @@ public class ClientCompany extends BaseEntity {
             this.setUser(user);
             this.userName = user.getUsername();
         }
-        this.updateFrom(request);
-        return new ClientCompanyUpdateResult(before, this);
+        syncTransientFields();
     }
 
 }
