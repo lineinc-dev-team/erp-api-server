@@ -91,14 +91,13 @@ jobs:
               pm2 delete app-new 2>/dev/null || true
               exit 1
             else
-              echo "✅ app-new 헬스체크 통과 → 기존 app 교체 시작"
+              echo "✅ app-new 헬스체크 통과 → Nginx 프록시를 8081로 전환 시작"
+              sudo sed -i 's/proxy_pass http:\/\/localhost:8080;/proxy_pass http:\/\/localhost:8081;/' /etc/nginx/conf.d/erp.conf
+              sudo nginx -s reload
+
               mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
-
-              # 기존 app을 무중단 재시작 (reload)
-              pm2 reload app
-
-              # 기존 app-new 종료
-              pm2 delete app-new 2>/dev/null || true
+              # 기존 app-new 종료는 하지 않고 유지 (필요시 수동 종료)
+              # 기존 app도 종료하지 않고 둠 (트래픽은 8081로 넘어감)
             fi
 
             # 최종 헬스 체크 1회 성공 (포트 8080, 최대 60초)
