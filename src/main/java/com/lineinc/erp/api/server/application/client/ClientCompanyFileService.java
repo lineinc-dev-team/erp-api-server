@@ -1,6 +1,11 @@
 package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.common.util.JaversUtils;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
@@ -11,13 +16,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ClientCompanyFileService {
     private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+    private final Javers javers;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void createClientCompanyFile(ClientCompany clientCompany, List<ClientCompanyFileCreateRequest> requests) {
         if (Objects.isNull(requests) || requests.isEmpty()) return;
@@ -42,8 +49,9 @@ public class ClientCompanyFileService {
      */
     @Transactional
     public void updateClientCompanyFiles(ClientCompany clientCompany, List<ClientCompanyFileUpdateRequest> requests) {
-        // 원본 파일 목록 복사
-        List<ClientCompanyFile> originalFiles = new java.util.ArrayList<>(clientCompany.getFiles());
+        List<ClientCompanyFile> beforeFiles = clientCompany.getFiles().stream()
+                .map(file -> JaversUtils.createSnapshot(javers, file, ClientCompanyFile.class))
+                .toList();
 
         EntitySyncUtils.syncList(
                 clientCompany.getFiles(),
@@ -57,30 +65,43 @@ public class ClientCompanyFileService {
                         .build()
         );
 
-        List<ClientCompanyFile> updatedFiles = clientCompany.getFiles();
-        List<String> changes = new java.util.ArrayList<>();
+        List<ClientCompanyFile> afterFiles = new ArrayList<>(clientCompany.getFiles());
+        List<Map<String, String>> allChanges = new ArrayList<>();
 
-        // 감지된 삭제
-        for (ClientCompanyFile original : originalFiles) {
-            if (original.isDeleted()) {
-                changes.add("첨부파일 삭제: " + original.getName());
+        // 추가된 파일
+        Set<Long> beforeIds = beforeFiles.stream()
+                .map(ClientCompanyFile::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (ClientCompanyFile after : afterFiles) {
+            if (after.getId() == null || !beforeIds.contains(after.getId())) {
+                allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
+        // 수정된 파일
+        Map<Long, ClientCompanyFile> afterMap = afterFiles.stream()
+                .filter(c -> c.getId() != null)
+                .collect(Collectors.toMap(ClientCompanyFile::getId, c -> c));
 
-        // 감지된 추가
-        for (ClientCompanyFile updated : updatedFiles) {
-            if (updated.getId() == null) {
-                changes.add("첨부파일 추가: " + updated.getName());
-            }
+        for (ClientCompanyFile before : beforeFiles) {
+            if (before.getId() == null || !afterMap.containsKey(before.getId())) continue;
+
+            ClientCompanyFile after = afterMap.get(before.getId());
+            Diff diff = javers.compare(before, after);
+            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            allChanges.addAll(modified);
         }
 
-        // 변경 이력 저장 - 하나의 row에 통합 기록
-        if (!changes.isEmpty()) {
-            String combinedChange = String.join("\n", changes);
-            clientCompanyChangeHistoryRepository.save(ClientCompanyChangeHistory.builder()
+        if (!allChanges.isEmpty()) {
+            String json = javers.getJsonConverter().toJson(allChanges);
+            ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .changeDetail(combinedChange)
-                    .build());
+                    .type(ClientCompanyChangeType.ATTACHMENT)
+                    .changes(json)
+                    .build();
+            clientCompanyChangeHistoryRepository.save(history);
         }
+
     }
 }

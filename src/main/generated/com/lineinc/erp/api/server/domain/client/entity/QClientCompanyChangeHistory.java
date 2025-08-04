@@ -24,7 +24,7 @@ public class QClientCompanyChangeHistory extends EntityPathBase<ClientCompanyCha
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
-    public final StringPath changeDetail = createString("changeDetail");
+    public final StringPath changes = createString("changes");
 
     public final QClientCompany clientCompany;
 

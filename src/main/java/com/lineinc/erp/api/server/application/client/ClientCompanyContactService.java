@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.application.client;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.common.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
@@ -14,11 +15,9 @@ import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ValueChange;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,103 +73,64 @@ public class ClientCompanyContactService {
             }
         }
 
-        // 원본 연락처 목록 복사
-        List<ClientCompanyContact> originalContacts = new ArrayList<>(clientCompany.getContacts());
+        List<ClientCompanyContact> beforeContacts = clientCompany.getContacts().stream()
+                .map(contact -> JaversUtils.createSnapshot(javers, contact, ClientCompanyContact.class))
+                .toList();
 
         EntitySyncUtils.syncList(
-                clientCompany.getContacts(),                    // 기존 연락처 리스트
-                requests,                                       // 수정 요청 리스트
-                (ClientCompanyContactUpdateRequest dto) ->      // 신규 엔티티 생성 함수
-                        ClientCompanyContact.builder()
-                                .name(dto.name())
-                                .department(dto.department())
-                                .isMain(dto.isMain())
-                                .position(dto.position())
-                                .landlineNumber(dto.landlineNumber())
-                                .phoneNumber(dto.phoneNumber())
-                                .email(dto.email())
-                                .memo(dto.memo())
-                                .clientCompany(clientCompany)
-                                .build()
+                clientCompany.getContacts(),
+                requests,
+                (ClientCompanyContactUpdateRequest dto) -> ClientCompanyContact.builder()
+                        .name(dto.name())
+                        .department(dto.department())
+                        .isMain(dto.isMain())
+                        .position(dto.position())
+                        .landlineNumber(dto.landlineNumber())
+                        .phoneNumber(dto.phoneNumber())
+                        .email(dto.email())
+                        .memo(dto.memo())
+                        .clientCompany(clientCompany)
+                        .build()
         );
 
-        List<ClientCompanyContact> updatedContacts = clientCompany.getContacts();
-        List<String> changes = new ArrayList<>();
+        List<ClientCompanyContact> afterContacts = new ArrayList<>(clientCompany.getContacts());
 
-        // 감지된 삭제
-        for (ClientCompanyContact original : originalContacts) {
-            if (original.isDeleted()) {
-                changes.add("담당자 삭제: " + buildContactSnapshot(original));
+        List<Map<String, String>> allChanges = new ArrayList<>();
+
+        // 추가된 연락처
+        Set<Long> beforeIds = beforeContacts.stream()
+                .map(ClientCompanyContact::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (ClientCompanyContact after : afterContacts) {
+            if (after.getId() == null || !beforeIds.contains(after.getId())) {
+                allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
-        // 감지된 추가
-        for (ClientCompanyContact updated : updatedContacts) {
-            if (updated.getId() == null) {
-                changes.add("담당자 추가: " + buildContactSnapshot(updated));
-            }
+        // 수정된 연락처
+        Map<Long, ClientCompanyContact> afterMap = afterContacts.stream()
+                .filter(c -> c.getId() != null)
+                .collect(Collectors.toMap(ClientCompanyContact::getId, c -> c));
+
+        for (ClientCompanyContact before : beforeContacts) {
+            if (before.getId() == null || !afterMap.containsKey(before.getId())) continue;
+
+            ClientCompanyContact after = afterMap.get(before.getId());
+            Diff diff = javers.compare(before, after);
+            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            allChanges.addAll(modified);
         }
 
-        // 감지된 수정 (Javers diff 사용)
-        for (ClientCompanyContact updated : updatedContacts) {
-            if (updated.getId() == null) continue;
-            ClientCompanyContact original = originalContacts.stream()
-                    .filter(o -> o.getId().equals(updated.getId()))
-                    .findFirst()
-                    .orElse(null);
-            if (original != null && !original.isDeleted()) {
-                Diff diff = javers.compare(original, updated);
-                for (var change : diff.getChanges()) {
-                    if (change instanceof ValueChange valueChange) {
-                        String propertyName = valueChange.getPropertyName();
-                        String label = switch (propertyName) {
-                            case "name" -> "이름";
-                            case "department" -> "부서";
-                            case "position" -> "직책";
-                            case "landlineNumber" -> "전화번호";
-                            case "phoneNumber" -> "개인 휴대폰";
-                            case "email" -> "이메일";
-                            case "memo" -> "메모";
-                            case "isMain" -> "대표여부";
-                            default -> null;
-                        };
-                        if (label != null) {
-                            String left = valueChange.getLeft() == null ? "" : valueChange.getLeft().toString();
-                            String right = valueChange.getRight() == null ? "" : valueChange.getRight().toString();
-                            if ("isMain".equals(propertyName)) {
-                                left = "true".equals(left) ? "Y" : "N";
-                                right = "true".equals(right) ? "Y" : "N";
-                            }
-                            if (!left.equals(right)) {
-                                changes.add(String.format("담당자 %s - %s: %s → %s", original.getName(), label, left, right));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 변경 이력 저장 (실제로는 change history repository가 필요함 - 여기선 로그 출력 예시)
-        // 변경 이력 저장 - 하나의 row에 통합 기록
-        if (!changes.isEmpty()) {
-            String combinedChange = String.join("\n", changes);
-            clientCompanyChangeHistoryRepository.save(ClientCompanyChangeHistory.builder()
+        if (!allChanges.isEmpty()) {
+            String json = javers.getJsonConverter().toJson(allChanges);
+            ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .changeDetail(combinedChange)
                     .type(ClientCompanyChangeType.CONTACT)
-                    .build());
+                    .changes(json)
+                    .build();
+            clientCompanyChangeHistoryRepository.save(history);
         }
-    }
-
-    private String buildContactSnapshot(ClientCompanyContact contact) {
-        return String.format("%s (부서: %s, 직책: %s, 전화번호: %s, 개인 휴대폰: %s, 이메일: %s, 메모: %s, 대표여부: %s)",
-                contact.getName(),
-                contact.getDepartment(),
-                contact.getPosition(),
-                contact.getLandlineNumber(),
-                contact.getPhoneNumber(),
-                contact.getEmail(),
-                contact.getMemo(),
-                contact.getIsMain() ? "Y" : "N");
     }
 }

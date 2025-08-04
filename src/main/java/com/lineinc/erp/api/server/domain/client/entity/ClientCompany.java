@@ -122,11 +122,16 @@ public class ClientCompany extends BaseEntity {
     @DiffInclude
     private String userName;
 
+    @Transient
+    @DiffInclude
+    private String paymentMethodName;
+
     /**
      * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
      */
     public void syncTransientFields() {
         this.userName = this.user != null ? this.user.getUsername() : null;
+        this.paymentMethodName = this.paymentMethod != null ? this.paymentMethod.getDisplayName() : null;
     }
 
     public void updateFrom(ClientCompanyUpdateRequest request, UserRepository userRepository) {

@@ -183,7 +183,7 @@ public class UserService {
 
         Diff diff = javers.compare(oldUserSnapshot, oldUser);
 
-        List<Map<String, String>> simpleChanges = JaversUtils.extractSimpleChanges(diff);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
         String changesJson = javers.getJsonConverter().toJson(simpleChanges);
         if (!simpleChanges.isEmpty()) {
             UserChangeHistory changeHistory = UserChangeHistory.builder()

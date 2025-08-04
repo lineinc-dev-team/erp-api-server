@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -122,14 +121,14 @@ public class ClientCompanyService {
         clientCompanyRepository.save(clientCompany);
 
         Diff diff = javers.compare(oldSnapshot, clientCompany);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractSimpleChanges(diff);
-        String changeDetail = javers.getJsonConverter().toJson(simpleChanges);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
             ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
                     .type(ClientCompanyChangeType.BASIC)
-                    .changeDetail(changeDetail)
+                    .changes(changesJson)
                     .build();
             clientCompanyChangeHistoryRepository.save(changeHistory);
         }

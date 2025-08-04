@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -11,7 +12,8 @@ public record ClientCompanyChangeHistoryResponse(
         Long id,
 
         @Schema(description = "변경 상세 내역")
-        String changeDetail,
+        @JsonProperty("getChanges")
+        String getChanges,
 
         @Schema(description = "메모", example = "조직 개편에 따른 이동")
         String memo,
@@ -31,7 +33,7 @@ public record ClientCompanyChangeHistoryResponse(
     public static ClientCompanyChangeHistoryResponse from(ClientCompanyChangeHistory history) {
         return new ClientCompanyChangeHistoryResponse(
                 history.getId(),
-                history.getChangeDetail(),
+                history.getChanges(),
                 history.getMemo(),
                 history.getCreatedAt(),
                 history.getUpdatedAt(),

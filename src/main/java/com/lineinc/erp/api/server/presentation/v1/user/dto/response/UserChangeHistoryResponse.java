@@ -11,7 +11,7 @@ public record UserChangeHistoryResponse(
         @Schema(description = "변경 이력 ID", example = "1")
         Long id,
 
-        @Schema(description = "변경 상세 내역", example = "[{\"type\": \"수정\", \"after\": \"외주팀에서 이관됨\", \"before\": \"추가 메모\", \"property\": \"memo\"}]")
+        @Schema(description = "변경 상세 내역")
         @JsonProperty("getChanges")
         String getChanges,
 

@@ -5,6 +5,8 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -26,9 +28,10 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @Column
     private ClientCompanyChangeType type;
 
-    @Column(columnDefinition = "TEXT")
-    private String changeDetail; // 모든 변경 내역을 이 한 필드에 저장
-
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
+    private String changes;
+    
     @Setter
     @Column(columnDefinition = "TEXT")
     private String memo; // 선택적 변경 사유, 비고 등
