@@ -35,13 +35,44 @@ jobs:
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: 📦 JAR 파일 EC2로 전송
-        run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-latest.jar
+        run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
-      - name: 🚀 EC2에서 PM2로 서비스 재시작
+      - name: 🚀 EC2에서 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} << 'EOF'
-            pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+            # 새 JAR로 임시 애플리케이션 시작 (다른 포트)
+            nohup java -jar /home/ubuntu/app-new.jar --server.port=8081 > /dev/null 2>&1 &
+            NEW_PID=$!
+          
+            # 새 애플리케이션 헬스체크 (최대 30초 대기)
+            HEALTH_CHECK_SUCCESS=false
+            for i in {1..6}; do
+              if curl -f http://localhost:8081/health > /dev/null 2>&1; then
+                HEALTH_CHECK_SUCCESS=true
+                break
+              fi
+              sleep 5
+            done
+          
+            # 헬스체크 실패시 롤백
+            if [ "$HEALTH_CHECK_SUCCESS" = false ]; then
+              kill $NEW_PID 2>/dev/null || true
+              rm -f /home/ubuntu/app-new.jar
+              exit 1
+            fi
+          
+            # 기존 PM2 애플리케이션 교체
+            mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
+            if pm2 list | grep -q "app.*online"; then
+              pm2 reload ecosystem.config.js --update-env
+            else
+              pm2 start ecosystem.config.js
+            fi
+          
+            # 임시 프로세스 종료
+            kill $NEW_PID 2>/dev/null || true
+          
             pm2 save
-            sleep 5 # 애플리케이션 시작 대기
-            curl --retry 10 --retry-delay 5 http://localhost:8080/health || true
+            sleep 3
+            curl --retry 5 --retry-delay 2 http://localhost:8080/health > /dev/null 2>&1 || exit 1
           EOF
