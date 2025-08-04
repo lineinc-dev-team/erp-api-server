@@ -174,7 +174,7 @@ public class SiteController {
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<SiteTypeResponse>>> getSiteTypes() {
         List<SiteTypeResponse> responseList = Arrays.stream(SiteType.values())
-                .map(type -> new SiteTypeResponse((long) type.ordinal() + 1, type.name(), type.getLabel()))
+                .map(type -> new SiteTypeResponse(type.name(), type.getLabel()))
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }

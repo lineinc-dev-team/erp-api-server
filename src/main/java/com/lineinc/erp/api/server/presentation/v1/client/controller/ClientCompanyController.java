@@ -204,7 +204,7 @@ public class ClientCompanyController {
     @GetMapping("/payment-methods")
     public ResponseEntity<SuccessResponse<List<ClientCompanyPaymentMethodResponse>>> getPaymentMethods() {
         List<ClientCompanyPaymentMethodResponse> responseList = Arrays.stream(PaymentMethod.values())
-                .map(pm -> new ClientCompanyPaymentMethodResponse((long) pm.ordinal() + 1, pm.name(), pm.getDisplayName()))
+                .map(pm -> new ClientCompanyPaymentMethodResponse(pm.name(), pm.getDisplayName()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
