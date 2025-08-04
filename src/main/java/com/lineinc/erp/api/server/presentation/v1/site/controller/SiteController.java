@@ -16,6 +16,8 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
+import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteFileTypeResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -171,7 +173,6 @@ public class SiteController {
 
     @Operation(summary = "현장 구분 목록 조회", description = "현장 구분 목록을 반환합니다")
     @GetMapping("/site-types")
-    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<SiteTypeResponse>>> getSiteTypes() {
         List<SiteTypeResponse> responseList = Arrays.stream(SiteType.values())
                 .map(type -> new SiteTypeResponse(type.name(), type.getLabel()))
@@ -179,9 +180,13 @@ public class SiteController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
+    @Operation(summary = "현장 파일 구분 목록 조회", description = "현장 파일 구분 목록을 반환합니다")
+    @GetMapping("/site-file-types")
+    public ResponseEntity<SuccessResponse<List<SiteFileTypeResponse>>> getSiteFileTypes() {
+        List<SiteFileTypeResponse> responseList = Arrays.stream(SiteFileType.values())
+                .map(type -> new SiteFileTypeResponse(type.name(), type.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
 }
-
-
-
-
-
