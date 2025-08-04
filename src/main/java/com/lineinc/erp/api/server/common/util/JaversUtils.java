@@ -19,7 +19,23 @@ public class JaversUtils {
         return diff.getChanges().stream()
                 .filter(change -> change instanceof ValueChange)
                 .map(change -> (ValueChange) change)
-                .map(vc -> Map.of(vc.getPropertyName(), vc.getLeft() + " ⇒ " + vc.getRight()))
+                .map(vc -> {
+                    String changeType;
+                    if (vc.getLeft() == null && vc.getRight() != null) {
+                        changeType = "추가";
+                    } else if (vc.getLeft() != null && vc.getRight() == null) {
+                        changeType = "삭제";
+                    } else {
+                        changeType = "수정";
+                    }
+
+                    return Map.of(
+                            "property", vc.getPropertyName(),
+                            "before", vc.getLeft() == null ? "" : vc.getLeft().toString(),
+                            "after", vc.getRight() == null ? "" : vc.getRight().toString(),
+                            "type", changeType
+                    );
+                })
                 .collect(Collectors.toList());
     }
 }
