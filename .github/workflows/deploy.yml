@@ -43,7 +43,7 @@ jobs:
       - name: 🚀 EC2 무중단 배포 및 Nginx 포트 스위칭
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
-            set -euo pipe fail
+            set -euo pipefail
 
             APP_NEW_JAR="/home/ubuntu/app-new.jar"
             APP_LATEST_JAR="/home/ubuntu/app-latest.jar"
