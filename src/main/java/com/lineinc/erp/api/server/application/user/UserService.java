@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepos
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
+import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.enums.UserChangeType;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserChangeHistoryResponse;
@@ -160,7 +161,10 @@ public class UserService {
         if (request.userIds().size() != users.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND);
         }
-        users.forEach(User::markAsDeleted);
+        users.forEach(user -> {
+            user.markAsDeleted();
+            user.getUserRoles().forEach(UserRole::markAsDeleted);
+        });
         usersRepository.saveAll(users);
     }
 
