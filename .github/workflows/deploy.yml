@@ -43,7 +43,7 @@ jobs:
       - name: 🚀 EC2 무중단 배포 및 Nginx 포트 스위칭
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
-            set -euo pipefail
+            set -euo pipe fail
 
             APP_NEW_JAR="/home/ubuntu/app-new.jar"
             APP_LATEST_JAR="/home/ubuntu/app-latest.jar"
@@ -113,6 +113,8 @@ jobs:
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
+            echo "▶ 헬스 체크 통과 후 앱 안정화 대기 10초"
+            sleep 10
 
             echo "✅ $NEW_APP 헬스체크 통과, Nginx 프록시 포트 전환 시작"
 
