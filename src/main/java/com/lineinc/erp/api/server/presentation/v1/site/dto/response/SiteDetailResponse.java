@@ -66,6 +66,9 @@ public record SiteDetailResponse(
         @Schema(description = "본사 담당자 정보")
         UserSimpleResponse user,
 
+        @Schema(description = "공정 소장 정보")
+        UserSimpleResponse manager,
+
         @Schema(description = "계약 정보 목록")
         List<SiteContractResponse> contracts
 ) {
@@ -94,6 +97,9 @@ public record SiteDetailResponse(
                         : null,
                 site.getClientCompany() != null ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany()) : null,
                 site.getUser() != null ? UserSimpleResponse.from(site.getUser()) : null,
+                (site.getProcesses() != null && !site.getProcesses().isEmpty() && site.getProcesses().get(0).getManager() != null)
+                        ? UserSimpleResponse.from(site.getProcesses().get(0).getManager())
+                        : null,
                 contractResponses
         );
     }
