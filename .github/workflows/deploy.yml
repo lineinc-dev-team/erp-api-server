@@ -55,8 +55,8 @@ jobs:
 
             function wait_for_pm2_online() {
               local app_name=$1
-              local retries=6
-              local wait_sec=5
+              local retries=4
+              local wait_sec=3
               for i in $(seq 1 $retries); do
                 if pm2 list | grep -q "${app_name}.*online"; then
                   return 0
@@ -68,8 +68,8 @@ jobs:
 
             function health_check() {
               local port=$1
-              local retries=12
-              local wait_sec=5
+              local retries=6
+              local wait_sec=3
               for i in $(seq 1 $retries); do
                 if curl -sf "http://localhost:${port}/actuator/health" > /dev/null; then
                   return 0
@@ -114,8 +114,6 @@ jobs:
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
-            echo "▶ 헬스 체크 통과 후 앱 안정화 대기 10초"
-            sleep 10
 
             echo "✅ $NEW_APP 헬스체크 통과, Nginx 프록시 포트 전환 시작"
 
