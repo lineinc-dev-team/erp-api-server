@@ -55,7 +55,7 @@ jobs:
             # 새 JAR를 임시 위치로 복사 (안전한 작업)
             cp /home/ubuntu/app-new.jar /tmp/app-new.jar
 
-            # 새 애플리케이션을 pm2 포트 8081에서 시작
+            # 새 애플리케이션을 pm2 ecosystem으로 포트 8081에서 시작
             pm2 delete app-new 2>/dev/null || true
             pm2 start ecosystem.config.js --only app-new
 
@@ -94,14 +94,11 @@ jobs:
               echo "✅ app-new 헬스체크 통과 → 기존 app 교체 시작"
               mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
 
-              # 기존 app 종료
-              pm2 delete app 2>/dev/null || true
+              # 기존 app을 무중단 재시작 (reload)
+              pm2 reload app
 
-              # 기존 app-new 종료 (안전하게)
+              # 기존 app-new 종료
               pm2 delete app-new 2>/dev/null || true
-
-              # 새 jar 파일로 app ecosystem으로 재시작 (포트 8080)
-              pm2 start ecosystem.config.js --only app
             fi
 
             # 최종 헬스 체크 1회 성공 (포트 8080, 최대 60초)
