@@ -120,7 +120,7 @@ jobs:
 
             echo "✅ $NEW_APP 헬스체크 통과, Nginx 프록시 포트 전환 시작"
 
-            sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/" "$NGINX_CONF"
+            sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" "$NGINX_CONF"
             sudo nginx -s reload
             echo "▶ Nginx 리로드 완료"
 
