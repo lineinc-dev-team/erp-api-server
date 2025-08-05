@@ -93,24 +93,8 @@ public class SiteService {
     @Transactional(readOnly = true)
     public Page<SiteResponse> getAllSites(Long userId, SiteListRequest request, Pageable pageable) {
         User user = userService.getUserByIdOrThrow(userId);
-
-        if (user.getUserRoles() != null && !user.getUserRoles().isEmpty()) {
-            boolean hasGlobalAccess = user.getUserRoles().stream()
-                    .anyMatch(role -> role.getRole().isHasGlobalSiteProcessAccess());
-
-            if (!hasGlobalAccess) {
-                List<Long> accessibleSiteIds = user.getUserRoles().stream()
-                        .flatMap(role -> role.getRole().getSiteProcesses().stream())
-                        .map(siteProcess -> siteProcess.getSite().getId())
-                        .distinct()
-                        .toList();
-
-                return siteRepository.findAll(request, pageable, accessibleSiteIds);
-            } else {
-                return siteRepository.findAll(request, pageable, null);
-            }
-        }
-        return siteRepository.findAll(request, pageable, null);
+        List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        return siteRepository.findAll(request, pageable, accessibleSiteIds);
     }
 
     @Transactional
@@ -128,8 +112,10 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(SiteListRequest request, Sort sort, List<String> fields) {
-        List<SiteResponse> siteResponses = siteRepository.findAllWithoutPaging(request, sort)
+    public Workbook downloadExcel(Long userId, SiteListRequest request, Sort sort, List<String> fields) {
+        User user = userService.getUserByIdOrThrow(userId);
+        List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        List<SiteResponse> siteResponses = siteRepository.findAllWithoutPaging(request, sort, accessibleSiteIds)
                 .stream()
                 .map(SiteResponse::from)
                 .toList();

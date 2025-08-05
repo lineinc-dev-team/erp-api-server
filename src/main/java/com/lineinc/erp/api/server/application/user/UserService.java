@@ -272,4 +272,26 @@ public class UserService {
         // 엔티티를 DTO로 변환하여 슬라이스 반환
         return historySlice.map(UserChangeHistoryResponse::from);
     }
+
+    public List<Long> getAccessibleSiteIds(User user) {
+        // 유저 권한 없음 → 접근 불가 (빈 리스트 반환)
+        if (user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
+            return List.of();  // 빈 리스트로 명시적 반환
+        }
+
+        // 글로벌 권한 보유 → 전체 접근 가능 → null 반환
+        boolean hasGlobalAccess = user.getUserRoles().stream()
+                .anyMatch(role -> role.getRole().isHasGlobalSiteProcessAccess());
+
+        if (hasGlobalAccess) {
+            return null;  // 특별히 null 처리로 전체 조회를 허용
+        }
+
+        // 제한된 접근 권한 → siteId 목록 추출
+        return user.getUserRoles().stream()
+                .flatMap(role -> role.getRole().getSiteProcesses().stream())
+                .map(siteProcess -> siteProcess.getSite().getId())
+                .distinct()
+                .toList();
+    }
 }

@@ -24,6 +24,7 @@ public interface SiteRepositoryCustom {
      */
     List<Site> findAllWithoutPaging(
             SiteListRequest request,
-            Sort sort
+            Sort sort,
+            List<Long> accessibleSiteIds
     );
 }

@@ -56,7 +56,10 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
     @Override
     public Page<SiteResponse> findAll(SiteListRequest request, Pageable pageable, List<Long> accessibleSiteIds) {
         BooleanBuilder condition = buildCondition(request);
-        if (accessibleSiteIds != null && !accessibleSiteIds.isEmpty()) {
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
             condition.and(site.id.in(accessibleSiteIds));
         }
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
@@ -92,8 +95,14 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
     }
 
     @Override
-    public List<Site> findAllWithoutPaging(SiteListRequest request, Sort sort) {
+    public List<Site> findAllWithoutPaging(SiteListRequest request, Sort sort, List<Long> accessibleSiteIds) {
         BooleanBuilder condition = buildCondition(request);
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return List.of();
+            }
+            condition.and(site.id.in(accessibleSiteIds));
+        }
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         return queryFactory

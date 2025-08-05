@@ -91,6 +91,7 @@ public class SiteController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
     public void downloadSitesExcel(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid SortRequest sortRequest,
             @Valid SiteListRequest request,
             @Valid SiteDownloadRequest siteDownloadRequest,
@@ -101,6 +102,7 @@ public class SiteController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "현장 목록.xlsx");
 
         try (Workbook workbook = siteService.downloadExcel(
+                userDetails.getUserId(),
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed
