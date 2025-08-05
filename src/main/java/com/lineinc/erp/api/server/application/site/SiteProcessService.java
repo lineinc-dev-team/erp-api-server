@@ -2,13 +2,20 @@ package com.lineinc.erp.api.server.application.site;
 
 import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.common.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
+import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteProcessResponse;
 import lombok.RequiredArgsConstructor;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -16,12 +23,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class SiteProcessService {
 
     private final SiteProcessRepository siteProcessRepository;
     private final UserService userService;
+    private final Javers javers;
+    private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
     public void createProcess(Site site, SiteProcessCreateRequest request) {
         siteProcessRepository.save(SiteProcess.builder()
@@ -37,9 +49,25 @@ public class SiteProcessService {
 
     public void updateProcess(Site site, SiteProcessUpdateRequest request) {
         SiteProcess siteProcess = site.getProcesses().get(0);
-        siteProcess.updateFrom(request);
-        siteProcess.setManager(userService.getUserByIdOrThrow(request.managerId()));
+        User user = userService.getUserByIdOrThrow(request.managerId());
+
+        siteProcess.syncTransientFields();
+        SiteProcess oldSnapshot = JaversUtils.createSnapshot(javers, siteProcess, SiteProcess.class);
+        siteProcess.updateFrom(request, user);
         siteProcessRepository.save(siteProcess);
+
+        Diff diff = javers.compare(oldSnapshot, siteProcess);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+                    .site(site)
+                    .type(SiteChangeType.PROCESS)
+                    .changes(changesJson)
+                    .build();
+            siteChangeHistoryRepository.save(changeHistory);
+        }
     }
 
     public SiteProcess getSiteProcessByIdOrThrow(Long id) {
