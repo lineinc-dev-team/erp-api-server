@@ -228,6 +228,16 @@ public class SiteService {
             siteChangeHistoryRepository.save(changeHistory);
         }
 
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (SiteUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                siteChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getSite().getId().equals(site.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
+
         if (request.process() != null) {
             siteProcessService.updateProcess(site, request.process());
         }

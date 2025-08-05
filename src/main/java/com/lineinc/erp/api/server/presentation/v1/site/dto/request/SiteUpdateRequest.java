@@ -54,6 +54,17 @@ public record SiteUpdateRequest(
 
         @Valid
         @Schema(description = "현장 계약 목록")
-        List<SiteContractUpdateRequest> contracts
+        List<SiteContractUpdateRequest> contracts,
+
+        @Schema(description = "수정 이력 리스트")
+        List<SiteUpdateRequest.ChangeHistoryRequest> changeHistories
 ) {
+    public record ChangeHistoryRequest(
+            @Schema(description = "수정 이력 번호", example = "1")
+            Long id,
+
+            @Schema(description = "변경 사유 또는 비고", example = "변경에 따른 업데이트")
+            String memo
+    ) {
+    }
 }

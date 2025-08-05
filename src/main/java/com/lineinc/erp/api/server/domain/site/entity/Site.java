@@ -65,7 +65,7 @@ public class Site extends BaseEntity {
     private SiteType type; // 현장 유형
 
     @DiffIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "client_company_id")
     private ClientCompany clientCompany; // 발주처
 
