@@ -5,11 +5,11 @@ import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.common.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
-import com.lineinc.erp.api.server.domain.site.enums.SiteType;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -35,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,8 @@ public class SiteService {
     private final SiteProcessService siteProcessService;
     private final SiteContractService siteContractService;
     private final UserService userService;
+    private final Javers javers;
+    private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
     @Transactional
     public void createSite(SiteCreateRequest request) {
@@ -180,6 +183,25 @@ public class SiteService {
             validateDuplicateName(request.name());
         }
 
+        site.syncTransientFields();
+        Site oldSnapshot = JaversUtils.createSnapshot(javers, site, Site.class);
+
+        site.updateFrom(request, userService, clientCompanyService);
+        siteRepository.save(site);
+
+        Diff diff = javers.compare(oldSnapshot, site);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+                    .site(site)
+                    .type(SiteChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            siteChangeHistoryRepository.save(changeHistory);
+        }
+
         if (request.process() != null) {
             siteProcessService.updateProcess(site, request.process());
         }
@@ -188,7 +210,6 @@ public class SiteService {
             siteContractService.updateContracts(site, request.contracts());
         }
 
-        siteRepository.save(site);
     }
 
     @Transactional(readOnly = true)
@@ -205,3 +226,4 @@ public class SiteService {
     }
 
 }
+

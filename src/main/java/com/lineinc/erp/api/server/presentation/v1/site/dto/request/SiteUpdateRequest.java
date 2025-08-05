@@ -39,7 +39,7 @@ public record SiteUpdateRequest(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate endedAt,
 
-        @Schema(description = "본사 담당자 ID", example = "5")
+        @Schema(description = "본사 담당자 ID", example = "1")
         Long userId,
 
         @Schema(description = "도급 금액", example = "100000000")

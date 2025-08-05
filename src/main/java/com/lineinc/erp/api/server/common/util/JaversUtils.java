@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.common.util;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
+import lombok.extern.slf4j.Slf4j;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.Javers;
@@ -11,11 +12,35 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class JaversUtils {
-
     public static <T> T createSnapshot(Javers javers, T entity, Class<T> clazz) {
-        return javers.getJsonConverter()
-                .fromJson(javers.getJsonConverter().toJson(entity), clazz);
+        try {
+            String json = javers.getJsonConverter().toJson(entity);
+            return javers.getJsonConverter().fromJson(json, clazz);
+        } catch (Exception e) {
+            log.error("❌ createSnapshot 직렬화 실패 클래스: {}", entity.getClass().getName());
+            try {
+                var fields = entity.getClass().getDeclaredFields();
+                for (var field : fields) {
+                    field.setAccessible(true);
+                    Object value = null;
+                    try {
+                        value = field.get(entity);
+                    } catch (Exception reflectionEx) {
+                        continue;
+                    }
+                    try {
+                        javers.getJsonConverter().toJson(value);
+                    } catch (Exception innerEx) {
+                        log.error("     ✖ 직렬화 실패 프로퍼티: {}", field.getName());
+                    }
+                }
+            } catch (Exception reflectionEx) {
+                // ignore reflection exceptions here
+            }
+            throw e;
+        }
     }
 
     public static List<Map<String, String>> extractModifiedChanges(Javers javers, Diff diff) {

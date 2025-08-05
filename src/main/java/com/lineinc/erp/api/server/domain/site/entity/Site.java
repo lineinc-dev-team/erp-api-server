@@ -16,6 +16,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import java.time.OffsetDateTime;
@@ -51,30 +52,34 @@ public class Site extends BaseEntity {
     @Column
     private String detailAddress; // 상세 주소
 
+    @DiffIgnore
     @Column
     private String city; // 시
 
+    @DiffIgnore
     @Column
     private String district; // 구
 
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SiteType type; // 현장 유형
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_company_id")
     private ClientCompany clientCompany; // 발주처
 
-    @DiffInclude
+    @DiffIgnore
     @Column
     private OffsetDateTime startedAt; // 사업 시작일
 
-    @DiffInclude
+    @DiffIgnore
     @Column
     private OffsetDateTime endedAt; // 사업 종료일
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @DiffIgnore
     @JoinColumn(name = "user_id")
     private User user; // 본사 담당자
 
@@ -83,10 +88,12 @@ public class Site extends BaseEntity {
     private Long contractAmount; // 도급금액
 
     @Builder.Default
+    @DiffIgnore
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SiteContract> contracts = new ArrayList<>();
 
     @Builder.Default
+    @DiffIgnore
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SiteProcess> processes = new ArrayList<>();
 
@@ -102,21 +109,30 @@ public class Site extends BaseEntity {
     @DiffInclude
     private String clientCompanyName;
 
-    public SiteUpdateResult updateFrom(SiteUpdateRequest request, UserService userService, ClientCompanyService clientCompanyService) {
-        Site before = Site.builder()
-                .id(this.id)
-                .name(this.name)
-                .address(this.address)
-                .detailAddress(this.detailAddress)
-                .type(this.type)
-                .startedAt(this.startedAt != null ? this.startedAt.withOffsetSameInstant(ZoneOffset.ofHours(9)) : null)
-                .endedAt(this.endedAt != null ? this.endedAt.withOffsetSameInstant(ZoneOffset.ofHours(9)) : null)
-                .clientCompanyName(this.clientCompany != null ? this.clientCompany.getName() : null)
-                .userName(this.user != null ? this.user.getUsername() : null)
-                .contractAmount(this.contractAmount)
-                .memo(this.memo)
-                .build();
+    @Transient
+    @DiffInclude
+    private String typeName;
 
+    @Transient
+    @DiffInclude
+    private String startedAtFormat;
+
+    @Transient
+    @DiffInclude
+    private String endedAtFormat;
+
+    /**
+     * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
+     */
+    public void syncTransientFields() {
+        this.userName = this.user != null ? this.user.getUsername() : null;
+        this.clientCompanyName = this.clientCompany != null ? this.clientCompany.getName() : null;
+        this.typeName = this.type != null ? this.type.getLabel() : null;
+        this.startedAtFormat = this.startedAt != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.startedAt) : null;
+        this.endedAtFormat = this.endedAt != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.endedAt) : null;
+    }
+
+    public void updateFrom(SiteUpdateRequest request, UserService userService, ClientCompanyService clientCompanyService) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
         Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
@@ -137,20 +153,14 @@ public class Site extends BaseEntity {
         Optional.ofNullable(request.clientCompanyId())
                 .map(clientCompanyService::getClientCompanyByIdOrThrow)
                 .ifPresent(this::changeClientCompany);
-
-        return new SiteUpdateResult(before, this);
+        syncTransientFields();
     }
 
     public void changeUser(User user) {
         this.user = user;
-        this.userName = user.getUsername();
     }
 
     public void changeClientCompany(ClientCompany clientCompany) {
         this.clientCompany = clientCompany;
-        this.clientCompanyName = clientCompany.getName();
-    }
-
-    public record SiteUpdateResult(Site before, Site after) {
     }
 }
