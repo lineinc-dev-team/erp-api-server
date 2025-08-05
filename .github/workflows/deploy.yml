@@ -82,6 +82,9 @@ jobs:
             echo "▶ 새 JAR를 임시 위치로 복사"
             cp "$APP_NEW_JAR" /tmp/app-new.jar
 
+            echo "▶ 최신 JAR로 교체"
+            mv "$APP_NEW_JAR" "$APP_LATEST_JAR"
+
             CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' "$NGINX_CONF" 2>/dev/null | head -n 1 | xargs || echo "$PORT_1")
             echo "▶ DEBUG: CURRENT_PORT='$CURRENT_PORT', PORT_1='$PORT_1', PORT_2='$PORT_2'"
             if [ "$CURRENT_PORT" = "$PORT_1" ]; then
