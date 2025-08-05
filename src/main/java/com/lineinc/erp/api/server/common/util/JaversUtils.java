@@ -2,6 +2,8 @@ package com.lineinc.erp.api.server.common.util;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
+import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
+import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import lombok.extern.slf4j.Slf4j;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
@@ -77,10 +79,14 @@ public class JaversUtils {
     // 단일 추가 엔티티 변경 내역 추출
     public static Map<String, String> extractAddedEntityChange(Javers javers, Object newEntity) {
         String afterValue;
-        if (newEntity instanceof ClientCompanyContact contact) {
-            afterValue = contact.getName();
-        } else if (newEntity instanceof ClientCompanyFile file) {
-            afterValue = file.getName();
+        if (newEntity instanceof ClientCompanyContact clientCompanyContact) {
+            afterValue = clientCompanyContact.getName();
+        } else if (newEntity instanceof ClientCompanyFile clientCompanyFile) {
+            afterValue = clientCompanyFile.getName();
+        } else if (newEntity instanceof SiteContract siteContract) {
+            afterValue = siteContract.getName();
+        } else if (newEntity instanceof SiteFile siteFile) {
+            afterValue = siteFile.getName();
         } else {
             afterValue = toJsonSafe(javers, newEntity);
         }
@@ -105,10 +111,14 @@ public class JaversUtils {
         if (affectedObject instanceof Optional<?> optional) {
             affectedObject = optional.orElse(null);
         }
-        if (affectedObject instanceof ClientCompanyContact contact) {
-            return contact.getName() + "(" + contact.getId() + ")";
-        } else if (affectedObject instanceof ClientCompanyFile file) {
-            return file.getName() + "(" + file.getId() + ")";
+        if (affectedObject instanceof ClientCompanyContact clientCompanyContact) {
+            return clientCompanyContact.getName() + "(" + clientCompanyContact.getId() + ")";
+        } else if (affectedObject instanceof ClientCompanyFile clientCompanyFile) {
+            return clientCompanyFile.getName() + "(" + clientCompanyFile.getId() + ")";
+        } else if (affectedObject instanceof SiteContract siteContract) {
+            return siteContract.getName() + "(" + siteContract.getId() + ")";
+        } else if (affectedObject instanceof SiteFile siteFile) {
+            return siteFile.getName() + "(" + siteFile.getId() + ")";
         } else if (affectedObject != null) {
             return affectedObject.toString();
         } else {

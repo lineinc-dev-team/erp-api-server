@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 
 @Entity
@@ -23,10 +25,12 @@ import org.hibernate.annotations.SQLRestriction;
 public class SiteFile extends BaseEntity implements UpdatableFrom<SiteFileUpdateRequest> {
 
     @Id
+    @DiffInclude
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_file_seq")
     @SequenceGenerator(name = "site_file_seq", sequenceName = "site_file_seq", allocationSize = 1)
     private Long id;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_contract_id")
     private SiteContract siteContract;
@@ -34,18 +38,21 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<SiteFileUpdate
     /**
      * 문서명 (사용자가 지정하는 파일 이름)
      */
+    @DiffInclude
     @Column(nullable = false)
     private String name;
 
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
+    @DiffInclude
     @Column(nullable = false)
     private String fileUrl; // S3 경로
 
     /**
      * 업로드된 파일의 원본 파일명
      */
+    @DiffInclude
     @Column
     private String originalFileName;
 
@@ -58,6 +65,7 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<SiteFileUpdate
     /**
      * 파일 유형 (계약서, 현장도면, 보증서류, 인허가 서류, 기타 등)
      */
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SiteFileType type;

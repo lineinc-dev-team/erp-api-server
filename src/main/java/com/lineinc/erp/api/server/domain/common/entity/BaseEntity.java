@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.*;
+import org.javers.core.metamodel.annotation.DiffInclude;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -65,6 +66,7 @@ public abstract class BaseEntity implements MarkDeletable {
      * - 기본값 false (삭제되지 않음)
      * - 논리 삭제 구현 시 사용
      */
+    @DiffInclude
     @Column(nullable = false)
     @Builder.Default
     private boolean deleted = false;
