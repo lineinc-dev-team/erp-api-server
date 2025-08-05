@@ -52,7 +52,9 @@ public record SiteListRequest(
 
         @Schema(description = "등록일 종료일", example = "2024-12-31")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate createdEndDate
+        LocalDate createdEndDate,
 
+        @Schema(description = "공정 소장명", example = "홍길동")
+        String managerName
 ) {
 }

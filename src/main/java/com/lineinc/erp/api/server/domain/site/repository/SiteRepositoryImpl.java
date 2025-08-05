@@ -123,6 +123,9 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         if (StringUtils.hasText(request.processName())) {
             builder.and(site.processes.any().name.containsIgnoreCase(request.processName().trim()));
         }
+        if (StringUtils.hasText(request.managerName())) {
+            builder.and(site.processes.any().manager.username.containsIgnoreCase(request.managerName().trim()));
+        }
         if (StringUtils.hasText(request.city())) {
             builder.and(site.city.eq(request.city().trim()));
         }

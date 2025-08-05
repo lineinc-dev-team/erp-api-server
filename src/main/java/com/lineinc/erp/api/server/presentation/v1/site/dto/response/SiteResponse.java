@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 
 import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -58,6 +59,9 @@ public record SiteResponse(
         @Schema(description = "공정 정보")
         SiteProcessResponse process,
 
+        @Schema(description = "공정 소장 정보")
+        UserResponse.UserSimpleResponse manager,
+
         @Schema(description = "발주처 정보")
         ClientCompanyResponse.ClientCompanySimpleResponse clientCompany
 ) {
@@ -80,6 +84,9 @@ public record SiteResponse(
                 site.getContracts().stream().anyMatch(c -> c.getFiles() != null && !c.getFiles().isEmpty()),
                 site.getProcesses() != null && !site.getProcesses().isEmpty()
                         ? SiteProcessResponse.from(site.getProcesses().get(0))
+                        : null,
+                site.getProcesses() != null && !site.getProcesses().isEmpty() && site.getProcesses().get(0).getManager() != null
+                        ? UserResponse.UserSimpleResponse.from(site.getProcesses().get(0).getManager())
                         : null,
                 site.getClientCompany() != null ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany()) : null
         );
