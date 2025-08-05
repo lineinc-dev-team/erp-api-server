@@ -20,7 +20,6 @@ import org.springframework.util.StringUtils;
 
 import static com.lineinc.erp.api.server.common.constant.AppConstants.KOREA_ZONE_OFFSET;
 
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,13 +48,17 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
     /**
      * Site 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
      *
-     * @param request  검색 조건
-     * @param pageable 페이징 및 정렬 정보
+     * @param request           검색 조건
+     * @param pageable          페이징 및 정렬 정보
+     * @param accessibleSiteIds 접근 가능한 사이트 ID 리스트
      * @return SiteResponse 리스트를 담은 Page 객체
      */
     @Override
-    public Page<SiteResponse> findAll(SiteListRequest request, Pageable pageable) {
+    public Page<SiteResponse> findAll(SiteListRequest request, Pageable pageable, List<Long> accessibleSiteIds) {
         BooleanBuilder condition = buildCondition(request);
+        if (accessibleSiteIds != null && !accessibleSiteIds.isEmpty()) {
+            condition.and(site.id.in(accessibleSiteIds));
+        }
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
                 SORT_FIELDS

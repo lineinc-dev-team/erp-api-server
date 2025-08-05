@@ -91,8 +91,26 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Page<SiteResponse> getAllSites(SiteListRequest request, Pageable pageable) {
-        return siteRepository.findAll(request, pageable);
+    public Page<SiteResponse> getAllSites(Long userId, SiteListRequest request, Pageable pageable) {
+        User user = userService.getUserByIdOrThrow(userId);
+
+        if (user.getUserRoles() != null && !user.getUserRoles().isEmpty()) {
+            boolean hasGlobalAccess = user.getUserRoles().stream()
+                    .anyMatch(role -> role.getRole().isHasGlobalSiteProcessAccess());
+
+            if (!hasGlobalAccess) {
+                List<Long> accessibleSiteIds = user.getUserRoles().stream()
+                        .flatMap(role -> role.getRole().getSiteProcesses().stream())
+                        .map(siteProcess -> siteProcess.getSite().getId())
+                        .distinct()
+                        .toList();
+
+                return siteRepository.findAll(request, pageable, accessibleSiteIds);
+            } else {
+                return siteRepository.findAll(request, pageable, null);
+            }
+        }
+        return siteRepository.findAll(request, pageable, null);
     }
 
     @Transactional
@@ -242,4 +260,3 @@ public class SiteService {
         return historySlice.map(SiteChangeHistoryResponse::from);
     }
 }
-

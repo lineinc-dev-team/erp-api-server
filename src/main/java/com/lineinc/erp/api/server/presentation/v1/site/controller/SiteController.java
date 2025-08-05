@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.site.controller;
 
+import com.lineinc.erp.api.server.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.*;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.application.site.SiteService;
@@ -33,6 +34,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -62,11 +64,13 @@ public class SiteController {
     })
     @GetMapping
     public ResponseEntity<SuccessResponse<PagingResponse<SiteResponse>>> getAllSites(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
             @Valid SiteListRequest request
     ) {
         Page<SiteResponse> page = siteService.getAllSites(
+                userDetails.getUserId(),
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );

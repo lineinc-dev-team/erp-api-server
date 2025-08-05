@@ -15,7 +15,8 @@ public interface SiteRepositoryCustom {
      */
     Page<SiteResponse> findAll(
             SiteListRequest request,
-            Pageable pageable
+            Pageable pageable,
+            List<Long> accessibleSiteIds
     );
 
     /**
