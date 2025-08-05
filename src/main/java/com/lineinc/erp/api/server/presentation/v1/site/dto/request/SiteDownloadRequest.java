@@ -11,7 +11,7 @@ import java.util.List;
 public record SiteDownloadRequest(
         @NotBlank
         @Schema(
-                description = "허용 필드: id, name, processName, address, type, clientCompanyName, period, processStatuses, createdBy, createdAt, hasFile ,memo",
+                description = "허용 필드: id, name, processName, address, type, clientCompanyName, period, processStatuses, createdBy, createdAt, hasFile ,memo, contractAmount, managerName",
                 example = "id, name, address"
         )
         String fields
@@ -28,6 +28,8 @@ public record SiteDownloadRequest(
             "createdBy",
             "createdAt",
             "hasFile",
-            "memo"
+            "memo",
+            "contractAmount",
+            "managerName"
     );
 }

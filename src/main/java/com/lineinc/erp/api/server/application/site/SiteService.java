@@ -138,6 +138,8 @@ public class SiteService {
             case "createdAt" -> "등록일자";
             case "hasFile" -> "첨부파일";
             case "memo" -> "비고";
+            case "contractAmount" -> "도급금액";
+            case "managerName" -> "공정소장";
             default -> null;
         };
     }
@@ -157,6 +159,8 @@ public class SiteService {
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.createdAt());
             case "hasFile" -> siteResponse.hasFile() ? "Y" : "N";
             case "memo" -> siteResponse.memo();
+            case "contractAmount" -> String.valueOf(siteResponse.contractAmount());
+            case "managerName" -> siteResponse.manager().username();
             default -> null;
         };
     }
