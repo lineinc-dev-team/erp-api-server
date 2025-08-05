@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.site.controller;
 
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteTypeResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.*;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.application.site.SiteService;
 
@@ -14,10 +14,7 @@ import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.*;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteFileTypeResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -189,4 +186,19 @@ public class SiteController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
+    @Operation(summary = "현장 변경 이력 조회", description = "특정 현장의 변경 이력을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "현장을 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}/change-histories")
+    public ResponseEntity<SuccessResponse<SliceResponse<SiteChangeHistoryResponse>>> getSiteChangeHistories(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest
+    ) {
+        Slice<SiteChangeHistoryResponse> slice = siteService.getSiteChangeHistories(id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
 }

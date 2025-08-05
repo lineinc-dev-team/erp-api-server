@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRe
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
 import lombok.RequiredArgsConstructor;
@@ -224,5 +225,17 @@ public class SiteService {
         return siteSlice.map(SiteResponse.SiteSimpleResponse::from);
     }
 
+    @Transactional(readOnly = true)
+    public Slice<SiteChangeHistoryResponse> getSiteChangeHistories(Long siteId, Pageable pageable) {
+        // 해당 현장 존재 여부 확인 (예외 처리)
+        siteRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+
+        // 현장 변경 이력 조회 (페이지 단위)
+        Slice<SiteChangeHistory> historySlice = siteChangeHistoryRepository.findBySiteId(siteId, pageable);
+
+        // 엔티티 -> DTO 변환 후 반환
+        return historySlice.map(SiteChangeHistoryResponse::from);
+    }
 }
 
