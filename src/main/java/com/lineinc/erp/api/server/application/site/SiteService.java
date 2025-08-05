@@ -176,10 +176,28 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public SiteDetailResponse getSiteById(Long siteId) {
+    public SiteDetailResponse getSiteById(Long siteId, Long userId) {
         Site site = siteRepository.findById(siteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
-        return SiteDetailResponse.from(site);
+        User user = userService.getUserByIdOrThrow(userId);
+        boolean hasAccess = hasSiteProcessAccess(user, siteId);
+        return SiteDetailResponse.from(site, hasAccess);
+    }
+
+    private boolean hasSiteProcessAccess(User user, Long siteId) {
+        if (user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
+            return false;
+        }
+
+        boolean hasGlobalAccess = user.getUserRoles().stream()
+                .anyMatch(r -> r.getRole().isHasGlobalSiteProcessAccess());
+        if (hasGlobalAccess) {
+            return true;
+        }
+
+        return user.getUserRoles().stream()
+                .flatMap(userRole -> userRole.getRole().getSiteProcesses().stream())
+                .anyMatch(siteProcess -> siteProcess.getSite().getId().equals(siteId));
     }
 
     @Transactional

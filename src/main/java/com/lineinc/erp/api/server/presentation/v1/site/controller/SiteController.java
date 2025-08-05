@@ -133,9 +133,10 @@ public class SiteController {
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SiteDetailResponse>> getSiteDetail(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id
     ) {
-        SiteDetailResponse siteResponse = siteService.getSiteById(id);
+        SiteDetailResponse siteResponse = siteService.getSiteById(id, userDetails.getUserId());
         return ResponseEntity.ok(SuccessResponse.of(siteResponse));
     }
 

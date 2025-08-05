@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse.UserSimpleResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 import java.time.OffsetDateTime;
@@ -72,10 +73,19 @@ public record SiteDetailResponse(
         @Schema(description = "계약 정보 목록")
         List<SiteContractResponse> contracts
 ) {
-    public static SiteDetailResponse from(Site site) {
+    public static SiteDetailResponse from(Site site, boolean hasAccess) {
         List<SiteContractResponse> contractResponses = site.getContracts().stream()
                 .map(SiteContractResponse::from)
                 .collect(Collectors.toList());
+
+        ClientCompanyResponse.ClientCompanySimpleResponse clientCompanyResponse = null;
+        try {
+            if (site.getClientCompany() != null) {
+                clientCompanyResponse = ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany());
+            }
+        } catch (EntityNotFoundException e) {
+            // Deleted clientCompany reference; safely ignore and set to null
+        }
 
         return new SiteDetailResponse(
                 site.getId(),
@@ -92,12 +102,12 @@ public record SiteDetailResponse(
                 site.getCreatedAt(),
                 site.getCreatedBy(),
                 site.getUpdatedAt(),
-                site.getProcesses() != null && !site.getProcesses().isEmpty()
+                hasAccess && site.getProcesses() != null && !site.getProcesses().isEmpty()
                         ? SiteProcessResponse.from(site.getProcesses().get(0))
                         : null,
-                site.getClientCompany() != null ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany()) : null,
+                clientCompanyResponse,
                 site.getUser() != null ? UserSimpleResponse.from(site.getUser()) : null,
-                (site.getProcesses() != null && !site.getProcesses().isEmpty() && site.getProcesses().get(0).getManager() != null)
+                hasAccess && site.getProcesses() != null && !site.getProcesses().isEmpty() && site.getProcesses().get(0).getManager() != null
                         ? UserSimpleResponse.from(site.getProcesses().get(0).getManager())
                         : null,
                 contractResponses
