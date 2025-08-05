@@ -96,6 +96,9 @@ jobs:
 
             echo "▶ 현재 Nginx 프록시 포트: $CURRENT_PORT, 변경할 포트: $NEW_PORT"
 
+            echo "▶ 최신 JAR로 교체"
+            mv "$APP_NEW_JAR" "$APP_LATEST_JAR"
+
             echo "▶ 새 애플리케이션($NEW_APP)을 포트 $NEW_PORT에서 pm2로 시작"
             pm2 start ecosystem.config.js --only "$NEW_APP"
 
