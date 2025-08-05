@@ -155,7 +155,7 @@ public class SiteService {
             case "processName" -> siteResponse.process().name();
             case "address" -> siteResponse.address() + " " + siteResponse.detailAddress();
             case "type" -> siteResponse.type();
-            case "clientCompanyName" -> siteResponse.clientCompany().name();
+            case "clientCompanyName" -> siteResponse.clientCompany() != null ? siteResponse.clientCompany().name() : "";
             case "period" ->
                     DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.startedAt()) + "~" + DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.endedAt());
             case "processStatuses" -> siteResponse.process().status();
