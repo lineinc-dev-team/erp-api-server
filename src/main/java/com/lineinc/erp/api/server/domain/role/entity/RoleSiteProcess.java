@@ -27,12 +27,12 @@ public class RoleSiteProcess extends BaseEntity implements Serializable {
     @SequenceGenerator(name = "role_site_process_seq", sequenceName = "role_site_process_seq", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "site_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id")
     private Site site;
 
     @ManyToOne(fetch = FetchType.LAZY)
