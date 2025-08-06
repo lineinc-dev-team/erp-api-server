@@ -2,7 +2,9 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
 
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDefaultDeductionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyTypeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,14 +33,15 @@ public class OutsourcingCompanyController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-//    @Operation(summary = "구분 목록 조회", description = "외주업체 구분 목록을 반환합니다.")
-//    @ApiResponse(responseCode = "200", description = "구분 목록 조회 성공")
-//    @GetMapping("/types")
-//    public ResponseEntity<SuccessResponse<List<SeparationResponse>>> getSeparations() {
-//        List<SeparationResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
-//                .map(type -> new SeparationResponse(type.name(), type.getLabel()))
-//                .toList();
-//        return ResponseEntity.ok(SuccessResponse.of(responseList));
-//    }
+    @Operation(summary = "구분 목록 조회", description = "외주업체 구분 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/types")
+    public ResponseEntity<SuccessResponse<List<OutsourcingCompanyTypeResponse>>> getSeparations() {
+        List<OutsourcingCompanyTypeResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
+                .map(type -> new OutsourcingCompanyTypeResponse(type.name(), type.getLabel()))
+                .toList();
+
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 
 }
