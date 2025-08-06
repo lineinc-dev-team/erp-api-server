@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -33,6 +34,8 @@ public class QOutsourcingCompany extends EntityPathBase<OutsourcingCompany> {
 
     public final StringPath ceoName = createString("ceoName");
 
+    public final ListPath<OutsourcingCompanyContact, QOutsourcingCompanyContact> contacts = this.<OutsourcingCompanyContact, QOutsourcingCompanyContact>createList("contacts", OutsourcingCompanyContact.class, QOutsourcingCompanyContact.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
 
@@ -52,6 +55,8 @@ public class QOutsourcingCompany extends EntityPathBase<OutsourcingCompany> {
     public final StringPath detailAddress = createString("detailAddress");
 
     public final StringPath email = createString("email");
+
+    public final ListPath<OutsourcingCompanyFile, QOutsourcingCompanyFile> files = this.<OutsourcingCompanyFile, QOutsourcingCompanyFile>createList("files", OutsourcingCompanyFile.class, QOutsourcingCompanyFile.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

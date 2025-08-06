@@ -1,8 +1,13 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -28,6 +33,7 @@ public class OutsourcingCompany extends BaseEntity {
     private String businessNumber;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private OutsourcingCompanyType type;
 
     @Column
@@ -51,6 +57,7 @@ public class OutsourcingCompany extends BaseEntity {
     @Column
     private String email;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean isActive = true;
 
@@ -58,6 +65,7 @@ public class OutsourcingCompany extends BaseEntity {
      * 기본공제 항목
      */
     @Column
+    @Enumerated(EnumType.STRING)
     private OutsourcingCompanyDefaultDeductionsType defaultDeductions;
 
     @Column
@@ -80,4 +88,12 @@ public class OutsourcingCompany extends BaseEntity {
      */
     @Column(nullable = false)
     private String accountHolder;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OutsourcingCompanyContact> contacts = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OutsourcingCompanyFile> files = new ArrayList<>();
 }
