@@ -179,13 +179,9 @@ public class RoleService {
 
         List<UserRole> userRoles = userRoleRepository.findByRole_IdIn(filteredRoleIds);
         for (UserRole userRole : userRoles) {
-            User user = userRole.getUser();
-            user.getUserRoles().remove(userRole);
+            userRole.markAsDeleted();
         }
-        userRepository.saveAll(userRoles.stream()
-                .map(UserRole::getUser)
-                .distinct()
-                .toList());
+        userRoleRepository.saveAll(userRoles);
 
         for (Role role : roles) {
             role.markAsDeleted();
