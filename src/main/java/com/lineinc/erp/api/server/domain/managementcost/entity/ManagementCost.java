@@ -30,11 +30,11 @@ public class ManagementCost extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id", nullable = false)
+    @JoinColumn(name = "site_id")
     private Site site;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id", nullable = false)
+    @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
 
     /**
