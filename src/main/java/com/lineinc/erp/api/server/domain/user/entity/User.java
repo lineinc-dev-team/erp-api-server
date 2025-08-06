@@ -64,6 +64,7 @@ public class User extends BaseEntity implements UserDetails {
     private OffsetDateTime lastLoginAt;
 
     @Builder.Default
+    @DiffIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> userRoles = new HashSet<>();
 
