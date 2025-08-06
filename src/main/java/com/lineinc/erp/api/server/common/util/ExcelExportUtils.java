@@ -38,21 +38,28 @@ public class ExcelExportUtils {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Sheet1");
 
-        // 1. 헤더 생성
+        // 1. 헤더 생성 (첫 번째 컬럼은 무조건 "No.")
         Row headerRow = sheet.createRow(0);
-        for (int i = 0; i < fields.size(); i++) {
-            String resolvedHeader = headerResolver.resolve(fields.get(i));
-            headerRow.createCell(i).setCellValue(resolvedHeader != null ? resolvedHeader : fields.get(i));
+        headerRow.createCell(0).setCellValue("No.");
+        for (int i = 0, col = 1; i < fields.size(); i++) {
+            String field = fields.get(i);
+            if ("id".equals(field)) continue;
+            String resolvedHeader = headerResolver.resolve(field);
+            headerRow.createCell(col++).setCellValue(resolvedHeader != null ? resolvedHeader : field);
         }
 
-        // 2. 데이터 생성
+        // 2. 데이터 생성 (첫 번째 컬럼에 행 번호 삽입)
         int rowIdx = 1;
         for (T item : data) {
-            Row row = sheet.createRow(rowIdx++);
-            for (int i = 0; i < fields.size(); i++) {
-                String cellValue = cellValueExtractor.extract(item, fields.get(i));
-                row.createCell(i).setCellValue(cellValue != null ? cellValue : "");
+            Row row = sheet.createRow(rowIdx);
+            row.createCell(0).setCellValue(String.valueOf(rowIdx));
+            int col = 1;
+            for (String field : fields) {
+                if ("id".equals(field)) continue;
+                String cellValue = cellValueExtractor.extract(item, field);
+                row.createCell(col++).setCellValue(cellValue != null ? cellValue : "");
             }
+            rowIdx++;
         }
 
         return workbook;
