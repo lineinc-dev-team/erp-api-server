@@ -15,8 +15,8 @@ import org.hibernate.annotations.SQLRestriction;
 public class OutsourcingCompanyContact extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_contact_seq")
-    @SequenceGenerator(name = "client_company_contact_seq", sequenceName = "client_company_contact_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contact_seq")
+    @SequenceGenerator(name = "outsourcing_company_contact_seq", sequenceName = "outsourcing_company_contact_seq", allocationSize = 1)
     private Long id;
 
     /**
