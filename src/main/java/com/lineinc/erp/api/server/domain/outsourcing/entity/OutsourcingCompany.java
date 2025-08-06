@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 @Entity
 @Getter
@@ -24,9 +27,11 @@ public class OutsourcingCompany extends BaseEntity {
     @SequenceGenerator(name = "outsourcing_company_seq", sequenceName = "outsourcing_company_seq", allocationSize = 1)
     private Long id;
 
+    @DiffInclude
     @Column(nullable = false)
     private String name;
 
+    @DiffInclude
     @Column
     private String businessNumber;
 
@@ -97,4 +102,23 @@ public class OutsourcingCompany extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyFile> files = new ArrayList<>();
+
+    public void updateFrom(OutsourcingCompanyUpdateRequest request) {
+        this.name = request.name();
+        this.type = request.type();
+        this.typeDescription = request.typeDescription();
+        this.ceoName = request.ceoName();
+        this.address = request.address();
+        this.detailAddress = request.detailAddress();
+        this.landlineNumber = request.landlineNumber();
+        this.phoneNumber = request.phoneNumber();
+        this.email = request.email();
+        this.isActive = Boolean.TRUE.equals(request.isActive());
+        this.defaultDeductions = request.defaultDeductions();
+        this.defaultDeductionsDescription = request.defaultDeductionsDescription();
+        this.bankName = request.bankName();
+        this.accountNumber = request.accountNumber();
+        this.accountHolder = request.accountHolder();
+        this.memo = request.memo();
+    }
 }

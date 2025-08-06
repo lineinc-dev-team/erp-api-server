@@ -87,23 +87,23 @@ public class OutsourcingCompanyController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-//    @Operation(
-//            summary = "외주업체 수정",
-//            description = "특정 외주업체 정보를 수정합니다"
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "성공"),
-//            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-//            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음"),
-//    })
-//    @PatchMapping("/{id}")
-//    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.UPDATE)
-//    public ResponseEntity<Void> updateOutsourcingCompany(
-//            @PathVariable Long id,
-//            @Valid @RequestBody OutsourcingCompanyUpdateRequest request
-//    ) {
-////        outsourcingCompanyService.updateOutsourcingCompany(id, request);
-//        return ResponseEntity.ok().build();
-//    }
+    @Operation(
+            summary = "외주업체 수정",
+            description = "특정 외주업체 정보를 수정합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음"),
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateOutsourcingCompany(
+            @PathVariable Long id,
+            @Valid @RequestBody OutsourcingCompanyUpdateRequest request
+    ) {
+        outsourcingCompanyService.updateOutsourcingCompany(id, request);
+        return ResponseEntity.ok().build();
+    }
 }
 

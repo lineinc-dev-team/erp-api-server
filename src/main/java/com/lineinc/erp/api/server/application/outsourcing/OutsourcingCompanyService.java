@@ -1,13 +1,12 @@
 package com.lineinc.erp.api.server.application.outsourcing;
 
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContactResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyFileResponse;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -60,5 +59,16 @@ public class OutsourcingCompanyService {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
         return OutsourcingCompanyDetailResponse.from(company);
+    }
+
+    @Transactional
+    public void updateOutsourcingCompany(Long id, OutsourcingCompanyUpdateRequest request) {
+        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+
+        company.updateFrom(request);
+
+//        outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts());
+//        outsourcingCompanyFileService.updateOutsourcingCompanyFiles(company, request.files());
     }
 }
