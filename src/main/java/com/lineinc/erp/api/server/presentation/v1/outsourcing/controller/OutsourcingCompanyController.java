@@ -1,0 +1,44 @@
+package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
+
+import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDefaultDeductionsResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/outsourcing-companies")
+@RequiredArgsConstructor
+@Tag(name = "Outsourcing Companies", description = "외주업체 관련 API")
+public class OutsourcingCompanyController {
+
+    @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/default-deductions")
+    public ResponseEntity<SuccessResponse<List<OutsourcingCompanyDefaultDeductionsResponse>>> getDeductionItems() {
+        List<OutsourcingCompanyDefaultDeductionsResponse> responseList = Arrays.stream(OutsourcingCompanyDefaultDeductionsType.values())
+                .map(dd -> new OutsourcingCompanyDefaultDeductionsResponse(dd.name(), dd.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
+//    @Operation(summary = "구분 목록 조회", description = "외주업체 구분 목록을 반환합니다.")
+//    @ApiResponse(responseCode = "200", description = "구분 목록 조회 성공")
+//    @GetMapping("/types")
+//    public ResponseEntity<SuccessResponse<List<SeparationResponse>>> getSeparations() {
+//        List<SeparationResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
+//                .map(type -> new SeparationResponse(type.name(), type.getLabel()))
+//                .toList();
+//        return ResponseEntity.ok(SuccessResponse.of(responseList));
+//    }
+
+}
