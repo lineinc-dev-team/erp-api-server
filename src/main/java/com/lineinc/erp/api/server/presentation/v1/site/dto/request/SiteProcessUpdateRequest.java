@@ -4,10 +4,12 @@ import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "현장 공정 등록 요청")
 public record SiteProcessUpdateRequest(
         @Schema(description = "공정명", example = "기초 공사")
+        @Size(min = 5, max = 100)
         String name,
 
         @MultiConstraint(type = ValidatorType.PHONE_OR_LANDLINE)

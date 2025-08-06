@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 @Schema(description = "현장 등록 요청")
 public record SiteCreateRequest(
         @NotBlank
+        @Size(min = 5, max = 100)
         @Schema(description = "현장명", example = "서울 APT 신축공사")
         String name,
 

@@ -6,10 +6,12 @@ import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "현장 공정 등록 요청")
 public record SiteProcessCreateRequest(
         @NotBlank
+        @Size(min = 5, max = 100)
         @Schema(description = "공정명", example = "기초 공사")
         String name,
 
