@@ -3,11 +3,13 @@ package com.lineinc.erp.api.server.presentation.v1.user.dto.request;
 import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 @Schema(description = "유저 수정 요청")
 public record UpdateUserRequest(
+        @Size(min = 2, max = 100)
         @Schema(description = "사용자 이름", example = "홍길동")
         String username,
 

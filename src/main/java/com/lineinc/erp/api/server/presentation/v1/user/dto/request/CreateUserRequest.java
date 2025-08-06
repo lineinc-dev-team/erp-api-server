@@ -6,14 +6,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "유저 생성 요청")
 public record CreateUserRequest(
         @NotBlank
+        @Size(min = 5, max = 100)
         @Schema(description = "로그인 아이디", example = "newuser01")
         String loginId,
 
         @NotBlank
+        @Size(min = 2, max = 100)
         @Schema(description = "사용자 이름", example = "홍길동")
         String username,
 
