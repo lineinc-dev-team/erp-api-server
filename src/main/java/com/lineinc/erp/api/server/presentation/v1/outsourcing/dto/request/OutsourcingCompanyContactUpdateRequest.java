@@ -3,9 +3,14 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Schema(description = "외주업체 담당자 등록 요청")
-public record OutsourcingCompanyContactCreateRequest(
+@Schema(description = "외주업체 담당자 수정 요청")
+public record OutsourcingCompanyContactUpdateRequest(
+        @Schema(description = "담당자 ID", example = "123")
+        @NotNull
+        Long id,
+
         @Schema(description = "담당자명", example = "홍길동")
         @NotBlank
         String name,

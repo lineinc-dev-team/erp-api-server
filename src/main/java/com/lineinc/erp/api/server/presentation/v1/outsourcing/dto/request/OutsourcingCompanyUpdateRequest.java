@@ -4,20 +4,17 @@ import java.util.List;
 
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "외주업체 등록 요청")
-public record OutsourcingCompanyCreateRequest(
-        @Schema(description = "외주업체명", example = "삼성 ENG")
+@Schema(description = "외주업체 수정 요청")
+public record OutsourcingCompanyUpdateRequest(
+        @Schema(description = "외주업체명", example = "삼성ENG")
         @NotBlank
         String name,
 
-        @Schema(description = "사업자등록번호", example = "123-45-67890")
-        String businessNumber,
-
-        @Schema(description = "외주업체 구분", example = "EQUIPMENT")
+        @Schema(description = "구분", example = "DIRECT")
         OutsourcingCompanyType type,
 
         @Schema(description = "구분 설명", example = "직접 시공 업체")
@@ -35,14 +32,17 @@ public record OutsourcingCompanyCreateRequest(
         @Schema(description = "전화번호", example = "02-123-4567")
         String landlineNumber,
 
-        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
+        @Schema(description = "휴대폰번호", example = "010-1234-5678")
         String phoneNumber,
 
         @Schema(description = "이메일", example = "ceo@outsourcing.com")
         @Email
         String email,
 
-        @Schema(description = "기본 공제 항목", example = "FOUR_INSURANCES")
+        @Schema(description = "활성 여부", example = "true")
+        Boolean isActive,
+
+        @Schema(description = "기본 공제 항목", example = "INCOME_TAX")
         OutsourcingCompanyDefaultDeductionsType defaultDeductions,
 
         @Schema(description = "기본 공제 항목 설명", example = "3.3% 원천징수")
@@ -54,13 +54,17 @@ public record OutsourcingCompanyCreateRequest(
         @Schema(description = "계좌번호", example = "123456-78-901234")
         String accountNumber,
 
-        @Schema(description = "예금주", example = "홍길동")
+        @Schema(description = "예금주", example = "홍길순")
         String accountHolder,
 
+        @Schema(description = "비고")
+        String memo,
+
         @Schema(description = "담당자 목록")
-        List<OutsourcingCompanyContactCreateRequest> contacts,
+        List<OutsourcingCompanyContactUpdateRequest> contacts,
 
         @Schema(description = "첨부파일 목록")
         List<OutsourcingCompanyFileCreateRequest> files
+
 ) {
 }

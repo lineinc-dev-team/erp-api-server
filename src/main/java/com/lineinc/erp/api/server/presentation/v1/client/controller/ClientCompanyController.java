@@ -124,7 +124,7 @@ public class ClientCompanyController {
             description = "특정 발주처 정보를 수정합니다"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "발주처 수정 성공"),
+            @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류"),
             @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"),
     })

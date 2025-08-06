@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.application.outsourcing;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyContactFileRequest;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyFileCreateRequest;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class OutsourcingCompanyFileService {
     @Transactional
     public void createOutsourcingCompanyFiles(
             OutsourcingCompany outsourcingCompany,
-            List<OutsourcingCompanyContactFileRequest> requests
+            List<OutsourcingCompanyFileCreateRequest> requests
     ) {
         if (requests == null || requests.isEmpty()) return;
 
