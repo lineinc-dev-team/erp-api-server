@@ -1,5 +1,9 @@
 package com.lineinc.erp.api.server.application.outsourcing;
 
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContactResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyFileResponse;
+
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
@@ -49,5 +53,12 @@ public class OutsourcingCompanyService {
 
         // 3. 저장
         outsourcingCompanyRepository.save(outsourcingCompany);
+    }
+
+    @Transactional(readOnly = true)
+    public OutsourcingCompanyDetailResponse getOutsourcingCompanyById(Long id) {
+        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+        return OutsourcingCompanyDetailResponse.from(company);
     }
 }

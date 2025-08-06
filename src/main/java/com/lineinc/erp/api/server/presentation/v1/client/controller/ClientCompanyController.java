@@ -172,7 +172,7 @@ public class ClientCompanyController {
             description = "발주처 상세 정보를 반환합니다"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "발주처 상세 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음", content = @Content()),
     })
     @GetMapping("/{id}")

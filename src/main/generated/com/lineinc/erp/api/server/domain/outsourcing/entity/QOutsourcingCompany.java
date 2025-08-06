@@ -64,6 +64,8 @@ public class QOutsourcingCompany extends EntityPathBase<OutsourcingCompany> {
 
     public final StringPath landlineNumber = createString("landlineNumber");
 
+    public final StringPath memo = createString("memo");
+
     public final StringPath name = createString("name");
 
     public final StringPath phoneNumber = createString("phoneNumber");

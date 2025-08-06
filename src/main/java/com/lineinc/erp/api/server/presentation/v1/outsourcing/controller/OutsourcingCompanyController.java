@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDefaultDeductionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyTypeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -60,6 +61,7 @@ public class OutsourcingCompanyController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content()),
     })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.CREATE)
@@ -70,4 +72,19 @@ public class OutsourcingCompanyController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "외주업체 상세 조회", description = "외주업체 상세 정보를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content()),
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<OutsourcingCompanyDetailResponse>> getOutsourcingCompanyById(
+            @PathVariable Long id
+    ) {
+        OutsourcingCompanyDetailResponse response = outsourcingCompanyService.getOutsourcingCompanyById(id);
+        return ResponseEntity.ok(SuccessResponse.of(response));
+    }
+
 }
+

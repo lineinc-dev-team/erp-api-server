@@ -6,8 +6,6 @@ import java.util.List;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -88,6 +86,9 @@ public class OutsourcingCompany extends BaseEntity {
      */
     @Column(nullable = false)
     private String accountHolder;
+
+    @Column(columnDefinition = "TEXT")
+    private String memo;
 
     @Builder.Default
     @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)

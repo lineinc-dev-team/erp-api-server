@@ -37,4 +37,5 @@ public final class ValidationMessages {
     public static final String INVALID_INITIAL_STEEL_TYPE = "초기 타입은 발주, 매입, 임대만 가능합니다.";
     public static final String CANNOT_APPROVE_RELEASED_STEEL = "이미 반출된 건은 승인으로 변경할 수 없습니다.";
     public static final String CANNOT_RELEASE_NON_APPROVED_STEEL = "반출 처리는 승인된 건만 가능합니다.";
+    public static final String OUTSOURCING_COMPANY_NOT_FOUND = "외주업체를 찾을 수 없습니다.";
 }
