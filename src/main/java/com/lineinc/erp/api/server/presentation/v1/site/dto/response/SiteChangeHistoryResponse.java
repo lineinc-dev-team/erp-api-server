@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
@@ -27,8 +28,11 @@ public record SiteChangeHistoryResponse(
         @Schema(description = "수정자", example = "관리자")
         String updatedBy,
 
-        @Schema(description = "변경 유형", example = "CONTACT")
-        String type
+        @Schema(description = "변경 유형", example = "현장정보")
+        String type,
+
+        @Schema(description = "변경 유형 코드", example = "CONTACT")
+        SiteChangeType typeCode
 ) {
     public static SiteChangeHistoryResponse from(SiteChangeHistory history) {
         return new SiteChangeHistoryResponse(
@@ -38,7 +42,8 @@ public record SiteChangeHistoryResponse(
                 history.getCreatedAt(),
                 history.getUpdatedAt(),
                 history.getUpdatedBy(),
-                history.getType().getLabel()
+                history.getType().getLabel(),
+                history.getType()
         );
     }
 }

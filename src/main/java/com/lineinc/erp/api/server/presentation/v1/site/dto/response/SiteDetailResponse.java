@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 
 import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse.UserSimpleResponse;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,8 +32,11 @@ public record SiteDetailResponse(
         @Schema(description = "구", example = "강남구")
         String district,
 
-        @Schema(description = "현장 유형", example = "CONSTRUCTION")
+        @Schema(description = "현장 유형", example = "건축")
         String type,
+
+        @Schema(description = "현장 유형 코드", example = "CONSTRUCTION")
+        SiteType typeCode,
 
         @Schema(description = "사업 시작일", example = "2024-01-01T00:00:00+09:00")
         OffsetDateTime startedAt,
@@ -86,6 +90,7 @@ public record SiteDetailResponse(
                 site.getCity(),
                 site.getDistrict(),
                 site.getType().getLabel(),
+                site.getType(),
                 site.getStartedAt(),
                 site.getEndedAt(),
                 site.getContractAmount(),
