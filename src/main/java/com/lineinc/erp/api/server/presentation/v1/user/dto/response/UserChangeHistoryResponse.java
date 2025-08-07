@@ -32,7 +32,7 @@ public record UserChangeHistoryResponse(
         String type,
 
         @Schema(description = "변경 유형 코드", example = "BASIC")
-        UserChangeType typeConde
+        UserChangeType typeCode
 ) {
     public static UserChangeHistoryResponse from(UserChangeHistory history) {
         return new UserChangeHistoryResponse(
