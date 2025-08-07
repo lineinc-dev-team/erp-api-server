@@ -41,30 +41,30 @@ public class OutsourcingCompanyController {
 
     private final OutsourcingCompanyService outsourcingCompanyService;
 
-    @Operation(
-            summary = "외주업체 목록 조회",
-            description = "등록된 모든 외주업체 정보를 반환합니다"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "외주업체 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-    })
-    @GetMapping
-    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<OutsourcingCompanyResponse>>> getAllOutsourcingCompanies(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid OutsourcingCompanyListRequest request
-    ) {
-        Page<OutsourcingCompanyResponse> page = outsourcingCompanyService.getAllOutsourcingCompanies(
-                request,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
-        );
-
-        return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())
-        ));
-    }
+//    @Operation(
+//            summary = "외주업체 목록 조회",
+//            description = "등록된 모든 외주업체 정보를 반환합니다"
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "외주업체 목록 조회 성공"),
+//            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+//    })
+//    @GetMapping
+//    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
+//    public ResponseEntity<SuccessResponse<PagingResponse<OutsourcingCompanyResponse>>> getAllOutsourcingCompanies(
+//            @Valid PageRequest pageRequest,
+//            @Valid SortRequest sortRequest,
+//            @Valid OutsourcingCompanyListRequest request
+//    ) {
+//        Page<OutsourcingCompanyResponse> page = outsourcingCompanyService.getAllOutsourcingCompanies(
+//                request,
+//                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
+//        );
+//
+//        return ResponseEntity.ok(SuccessResponse.of(
+//                new PagingResponse<>(PagingInfo.from(page), page.getContent())
+//        ));
+//    }
 
     @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")

@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
 
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
@@ -15,8 +16,11 @@ public record SiteProcessResponse(
         @Schema(description = "사무실 전화번호")
         String officePhone,
 
-        @Schema(description = "공정 상태", example = "IN_PROGRESS")
+        @Schema(description = "공정 상태", example = "준비중")
         String status,
+
+        @Schema(description = "공정 상태 코드", example = "IN_PROGRESS")
+        SiteProcessStatus statusCode,
 
         @Schema(description = "공정 비고", example = "공정 진행 중")
         String memo
@@ -29,6 +33,7 @@ public record SiteProcessResponse(
                 process.getName(),
                 process.getOfficePhone(),
                 process.getStatus() != null ? process.getStatus().getLabel() : null,
+                process.getStatus() != null ? process.getStatus() : null,
                 process.getMemo()
         );
     }

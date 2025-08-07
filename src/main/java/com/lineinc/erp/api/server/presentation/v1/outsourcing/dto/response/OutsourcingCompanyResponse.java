@@ -1,10 +1,14 @@
 package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Schema(description = "외주업체 상세 응답")
 public record OutsourcingCompanyResponse(
@@ -19,6 +23,9 @@ public record OutsourcingCompanyResponse(
 
         @Schema(description = "구분")
         String type,
+
+        @Schema(description = "구분 코드")
+        OutsourcingCompanyType typeCode,
 
         @Schema(description = "대표자명")
         String ceoName,
@@ -43,6 +50,9 @@ public record OutsourcingCompanyResponse(
 
         @Schema(description = "기본 공제 항목")
         String defaultDeductions,
+
+        @Schema(description = "기본 공제 항목 코드")
+        String defaultDeductionsCode,
 
         @Schema(description = "기본 공제 항목 설명")
         String defaultDeductionsDescription,
@@ -71,6 +81,7 @@ public record OutsourcingCompanyResponse(
                 company.getName(),
                 company.getBusinessNumber(),
                 company.getType().getLabel(),
+                company.getType(),
                 company.getCeoName(),
                 company.getAddress(),
                 company.getDetailAddress(),
@@ -78,6 +89,9 @@ public record OutsourcingCompanyResponse(
                 company.getPhoneNumber(),
                 company.getEmail(),
                 company.isActive(),
+                Arrays.stream(company.getDefaultDeductions().split(","))
+                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
+                        .collect(Collectors.joining(", ")),
                 company.getDefaultDeductions(),
                 company.getDefaultDeductionsDescription(),
                 company.getMemo(),

@@ -23,7 +23,10 @@ public record SiteFileResponse(
         String memo,
 
         @Schema(description = "파일 유형", example = "계약서")
-        String type
+        String type,
+
+        @Schema(description = "파일 유형 코드", example = "CONTRACT")
+        SiteFileType typeCode
 
 ) {
     public static SiteFileResponse from(SiteFile file) {
@@ -33,7 +36,8 @@ public record SiteFileResponse(
                 file.getFileUrl(),
                 file.getOriginalFileName(),
                 file.getMemo(),
-                file.getType().getLabel()
+                file.getType().getLabel(),
+                file.getType()
         );
     }
 }
