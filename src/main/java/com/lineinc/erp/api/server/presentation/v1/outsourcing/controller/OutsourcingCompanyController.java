@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
 import org.springframework.data.domain.Page;
@@ -137,20 +138,20 @@ public class OutsourcingCompanyController {
         return ResponseEntity.ok().build();
     }
 
-//    @Operation(
-//            summary = "외주업체 삭제",
-//            description = "하나 이상의 외주업체 ID를 받아 해당 외주업체를 삭제합니다"
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "외주업체 삭제 성공"),
-//            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음"),
-//    })
-//    @DeleteMapping
-//    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.DELETE)
-//    public ResponseEntity<Void> deleteOutsourcingCompanies(@RequestBody DeleteOutsourcingCompaniesRequest request) {
-//        outsourcingCompanyService.deleteOutsourcingCompanies(request);
-//        return ResponseEntity.ok().build();
-//    }
+    @Operation(
+            summary = "외주업체 삭제",
+            description = "하나 이상의 외주업체 ID를 받아 해당 외주업체를 삭제합니다"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "외주업체 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음"),
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteOutsourcingCompanies(@RequestBody DeleteOutsourcingCompaniesRequest request) {
+        outsourcingCompanyService.deleteOutsourcingCompanies(request);
+        return ResponseEntity.ok().build();
+    }
 }
 
 

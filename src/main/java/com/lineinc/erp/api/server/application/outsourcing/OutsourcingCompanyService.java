@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
 
@@ -112,4 +113,19 @@ public class OutsourcingCompanyService {
     public Page<OutsourcingCompanyResponse> getAllOutsourcingCompanies(OutsourcingCompanyListRequest request, Pageable pageable) {
         return outsourcingCompanyRepository.findAll(request, pageable);
     }
+
+    @Transactional
+    public void deleteOutsourcingCompanies(DeleteOutsourcingCompaniesRequest request) {
+        List<OutsourcingCompany> outsourcingCompanies = outsourcingCompanyRepository.findAllById(request.outsourcingCompanyIds());
+        if (outsourcingCompanies.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND);
+        }
+
+        for (OutsourcingCompany company : outsourcingCompanies) {
+            company.markAsDeleted();
+        }
+
+        outsourcingCompanyRepository.saveAll(outsourcingCompanies);
+    }
 }
+
