@@ -136,7 +136,7 @@ public class OutsourcingCompany extends BaseEntity {
                 Arrays.stream(this.defaultDeductions.split(","))
                         .map(String::trim)
                         .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(", "));
+                        .collect(Collectors.joining(","));
     }
 
     public void updateFrom(OutsourcingCompanyUpdateRequest request) {

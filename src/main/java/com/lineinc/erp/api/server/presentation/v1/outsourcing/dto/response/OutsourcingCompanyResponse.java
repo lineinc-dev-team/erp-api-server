@@ -91,7 +91,7 @@ public record OutsourcingCompanyResponse(
                 company.isActive(),
                 Arrays.stream(company.getDefaultDeductions().split(","))
                         .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(", ")),
+                        .collect(Collectors.joining(",")),
                 company.getDefaultDeductions(),
                 company.getDefaultDeductionsDescription(),
                 company.getMemo(),

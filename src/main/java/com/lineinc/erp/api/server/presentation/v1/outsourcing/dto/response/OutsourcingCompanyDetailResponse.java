@@ -50,6 +50,9 @@ public record OutsourcingCompanyDetailResponse(
         @Schema(description = "기본 공제 항목")
         String defaultDeductions,
 
+        @Schema(description = "기본 공제 항목 코드")
+        String defaultDeductionsCode,
+
         @Schema(description = "기본 공제 항목 설명")
         String defaultDeductionsDescription,
 
@@ -87,7 +90,8 @@ public record OutsourcingCompanyDetailResponse(
                 company.isActive(),
                 Arrays.stream(company.getDefaultDeductions().split(","))
                         .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(", ")),
+                        .collect(Collectors.joining(",")),
+                company.getDefaultDeductions(),
                 company.getDefaultDeductionsDescription(),
                 company.getBankName(),
                 company.getAccountNumber(),
