@@ -1,5 +1,10 @@
 package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
 
+import com.lineinc.erp.api.server.common.response.SliceResponse;
+import com.lineinc.erp.api.server.common.response.SliceInfo;
+import org.springframework.data.domain.Slice;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyChangeHistoryResponse;
+
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyDownloadRequest;
 import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
@@ -189,6 +194,25 @@ public class OutsourcingCompanyController {
             workbook.write(response.getOutputStream());
         }
     }
+
+    @Operation(summary = "외주업체 변경 이력 조회", description = "특정 외주업체의 변경 히스토리를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/{id}/change-histories")
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<OutsourcingCompanyChangeHistoryResponse>>> getOutsourcingCompanyChangeHistories(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest
+    ) {
+        Slice<OutsourcingCompanyChangeHistoryResponse> slice = outsourcingCompanyService.getOutsourcingCompanyChangeHistories(
+                id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
+        );
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
 }
+
 
 

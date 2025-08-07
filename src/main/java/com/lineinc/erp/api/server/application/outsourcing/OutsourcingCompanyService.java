@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContactResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
 
@@ -25,6 +26,7 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -200,9 +202,13 @@ public class OutsourcingCompanyService {
             default -> null;
         };
     }
+
+    @Transactional(readOnly = true)
+    public Slice<OutsourcingCompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistories(Long id, Pageable pageable) {
+        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+
+        Slice<OutsourcingChangeHistory> histories = outsourcingChangeRepository.findAllByOutsourcingCompany(company, pageable);
+        return histories.map(OutsourcingCompanyChangeHistoryResponse::from);
+    }
 }
-
-
-
-
-
