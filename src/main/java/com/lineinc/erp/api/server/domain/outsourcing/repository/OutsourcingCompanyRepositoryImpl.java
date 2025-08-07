@@ -6,8 +6,6 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyFile;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepositoryCustom;
-import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
 import com.querydsl.core.BooleanBuilder;
@@ -65,7 +63,6 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
                 .selectFrom(outsourcingCompany)
                 .distinct()
                 .leftJoin(outsourcingCompany.contacts, outsourcingCompanyContact).fetchJoin()
-                .leftJoin(outsourcingCompany.files, outsourcingCompanyFile).fetchJoin()
                 .where(condition)
                 .orderBy(orders)
                 .offset(pageable.getOffset())
@@ -112,6 +109,9 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
         }
         if (request.isActive() != null) {
             builder.and(outsourcingCompany.isActive.eq(request.isActive()));
+        }
+        if (request.type() != null) {
+            builder.and(outsourcingCompany.type.eq(request.type()));
         }
 
         if (request.createdStartDate() != null) {

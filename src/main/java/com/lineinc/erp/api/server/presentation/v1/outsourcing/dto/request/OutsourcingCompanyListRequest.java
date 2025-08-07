@@ -2,10 +2,12 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request;
 
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
+@ParameterObject
 @Schema(description = "외주업체 목록 조회 요청")
 public record OutsourcingCompanyListRequest(
 
