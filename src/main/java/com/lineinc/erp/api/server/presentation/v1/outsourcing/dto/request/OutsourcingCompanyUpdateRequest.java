@@ -61,7 +61,17 @@ public record OutsourcingCompanyUpdateRequest(
         List<OutsourcingCompanyContactUpdateRequest> contacts,
 
         @Schema(description = "첨부파일 목록")
-        List<OutsourcingCompanyFileUpdateRequest> files
+        List<OutsourcingCompanyFileUpdateRequest> files,
 
+        @Schema(description = "수정 이력 리스트")
+        List<OutsourcingCompanyUpdateRequest.ChangeHistoryRequest> changeHistories
 ) {
+    public record ChangeHistoryRequest(
+            @Schema(description = "수정 이력 번호", example = "1")
+            Long id,
+
+            @Schema(description = "변경 사유 또는 비고", example = "변경에 따른 업데이트")
+            String memo
+    ) {
+    }
 }
