@@ -4,6 +4,9 @@ import com.lineinc.erp.api.server.common.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
@@ -11,9 +14,12 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,5 +106,10 @@ public class OutsourcingCompanyService {
 
         outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts());
         outsourcingCompanyFileService.updateOutsourcingCompanyFiles(company, request.files());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OutsourcingCompanyResponse> getAllOutsourcingCompanies(OutsourcingCompanyListRequest request, Pageable pageable) {
+        return outsourcingCompanyRepository.findAll(request, pageable);
     }
 }

@@ -22,4 +22,5 @@ public enum OutsourcingCompanyDefaultDeductionsType {
             return name;
         }
     }
+
 }

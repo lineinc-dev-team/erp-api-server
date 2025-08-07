@@ -1,16 +1,13 @@
 package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.Arrays;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Schema(description = "외주업체 상세 응답")
-public record OutsourcingCompanyDetailResponse(
+public record OutsourcingCompanyResponse(
         @Schema(description = "ID")
         Long id,
 
@@ -22,9 +19,6 @@ public record OutsourcingCompanyDetailResponse(
 
         @Schema(description = "구분")
         String type,
-
-        @Schema(description = "구분 설명")
-        String typeDescription,
 
         @Schema(description = "대표자명")
         String ceoName,
@@ -53,17 +47,17 @@ public record OutsourcingCompanyDetailResponse(
         @Schema(description = "기본 공제 항목 설명")
         String defaultDeductionsDescription,
 
-        @Schema(description = "은행명")
-        String bankName,
-
-        @Schema(description = "계좌번호")
-        String accountNumber,
-
-        @Schema(description = "예금주")
-        String accountHolder,
-
         @Schema(description = "비고")
         String memo,
+
+        @Schema(description = "등록일")
+        OffsetDateTime createdAt,
+
+        @Schema(description = "수정일")
+        OffsetDateTime updatedAt,
+
+        @Schema(description = "첨부파일 여부")
+        boolean hasFile,
 
         @Schema(description = "담당자 목록")
         List<OutsourcingCompanyContactResponse> contacts,
@@ -71,13 +65,12 @@ public record OutsourcingCompanyDetailResponse(
         @Schema(description = "파일 목록")
         List<OutsourcingCompanyFileResponse> files
 ) {
-    public static OutsourcingCompanyDetailResponse from(OutsourcingCompany company) {
-        return new OutsourcingCompanyDetailResponse(
+    public static OutsourcingCompanyResponse from(OutsourcingCompany company) {
+        return new OutsourcingCompanyResponse(
                 company.getId(),
                 company.getName(),
                 company.getBusinessNumber(),
                 company.getType().getLabel(),
-                company.getTypeDescription(),
                 company.getCeoName(),
                 company.getAddress(),
                 company.getDetailAddress(),
@@ -85,14 +78,12 @@ public record OutsourcingCompanyDetailResponse(
                 company.getPhoneNumber(),
                 company.getEmail(),
                 company.isActive(),
-                Arrays.stream(company.getDefaultDeductions().split(","))
-                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(", ")),
+                company.getDefaultDeductions(),
                 company.getDefaultDeductionsDescription(),
-                company.getBankName(),
-                company.getAccountNumber(),
-                company.getAccountHolder(),
                 company.getMemo(),
+                company.getCreatedAt(),
+                company.getUpdatedAt(),
+                !company.getFiles().isEmpty(),
                 company.getContacts().stream()
                         .map(OutsourcingCompanyContactResponse::from)
                         .toList(),
