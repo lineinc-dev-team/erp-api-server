@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum OutsourcingCompanyDefaultDeductionsType {
     FOUR_INSURANCES("4대보험"),
     FUEL_COST("유류비"),
-    MEAL_COST("식대");
+    MEAL_COST("식대"),
+    ETC("기타");
 
     private final String label;
 

@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request;
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -42,8 +41,8 @@ public record OutsourcingCompanyCreateRequest(
         @Email
         String email,
 
-        @Schema(description = "기본 공제 항목", example = "FOUR_INSURANCES")
-        OutsourcingCompanyDefaultDeductionsType defaultDeductions,
+        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "INCOME_TAX,FOUR_INSURANCE")
+        String defaultDeductions,
 
         @Schema(description = "기본 공제 항목 설명", example = "3.3% 원천징수")
         String defaultDeductionsDescription,

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -68,8 +67,7 @@ public class OutsourcingCompany extends BaseEntity {
      * 기본공제 항목
      */
     @Column
-    @Enumerated(EnumType.STRING)
-    private OutsourcingCompanyDefaultDeductionsType defaultDeductions;
+    private String defaultDeductions; // "FOUR_INSURANCE,INCOME_TAX" 형식
 
     @Column
     private String defaultDeductionsDescription;

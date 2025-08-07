@@ -82,7 +82,7 @@ public record OutsourcingCompanyDetailResponse(
                 company.getPhoneNumber(),
                 company.getEmail(),
                 company.isActive(),
-                company.getDefaultDeductions().getLabel(),
+                company.getDefaultDeductions(),
                 company.getDefaultDeductionsDescription(),
                 company.getBankName(),
                 company.getAccountNumber(),

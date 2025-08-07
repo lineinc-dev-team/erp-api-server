@@ -42,7 +42,7 @@ public class QOutsourcingCompany extends EntityPathBase<OutsourcingCompany> {
     //inherited
     public final StringPath createdBy = _super.createdBy;
 
-    public final EnumPath<com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType> defaultDeductions = createEnum("defaultDeductions", com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType.class);
+    public final StringPath defaultDeductions = createString("defaultDeductions");
 
     public final StringPath defaultDeductionsDescription = createString("defaultDeductionsDescription");
 
