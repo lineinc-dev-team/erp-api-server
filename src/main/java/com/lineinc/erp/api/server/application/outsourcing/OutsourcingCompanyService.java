@@ -65,7 +65,6 @@ public class OutsourcingCompanyService {
     public void updateOutsourcingCompany(Long id, OutsourcingCompanyUpdateRequest request) {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
-
         company.updateFrom(request);
 
 //        outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts());

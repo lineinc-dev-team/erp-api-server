@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request;
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -14,7 +13,7 @@ public record OutsourcingCompanyUpdateRequest(
         @NotBlank
         String name,
 
-        @Schema(description = "구분", example = "DIRECT")
+        @Schema(description = "구분", example = "SERVICE")
         OutsourcingCompanyType type,
 
         @Schema(description = "구분 설명", example = "직접 시공 업체")
