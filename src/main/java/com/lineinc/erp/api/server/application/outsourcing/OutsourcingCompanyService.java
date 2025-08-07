@@ -179,6 +179,7 @@ public class OutsourcingCompanyService {
             case "createdAtAndUpdatedAt" -> "등록일/수정일";
             case "hasFile" -> "첨부파일 유무";
             case "memo" -> "비고/메모";
+            case "email" -> "이메일";
             default -> null;
         };
     }
@@ -207,6 +208,7 @@ public class OutsourcingCompanyService {
                     DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/" + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
             case "hasFile" -> company.hasFile() ? "Y" : "N";
             case "memo" -> company.memo();
+            case "email" -> company.email();
             default -> null;
         };
     }

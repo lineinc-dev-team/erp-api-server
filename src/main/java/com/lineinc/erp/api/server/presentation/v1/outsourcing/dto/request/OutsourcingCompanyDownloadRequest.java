@@ -11,7 +11,7 @@ import java.util.List;
 public record OutsourcingCompanyDownloadRequest(
         @NotBlank
         @Schema(
-                description = "허용 필드: id, name, businessNumber, type, ceoName, address, phoneNumber, landlineNumber, contactName, contactPositionAndDepartment, defaultDeductions, isActive, createdAtAndUpdatedAt, hasFile, memo",
+                description = "허용 필드: id, name, businessNumber, type, ceoName, address, phoneNumber, landlineNumber, contactName, contactPositionAndDepartment, defaultDeductions, isActive, createdAtAndUpdatedAt, hasFile, memo, email",
                 example = "id,businessNumber,isActive"
         )
         String fields
@@ -19,6 +19,6 @@ public record OutsourcingCompanyDownloadRequest(
     public static final List<String> ALLOWED_FIELDS = List.of(
             "id", "name", "businessNumber", "type", "ceoName", "address",
             "phoneNumber", "landlineNumber", "contactName", "contactPositionAndDepartment",
-            "defaultDeductions", "isActive", "createdAtAndUpdatedAt", "hasFile", "memo"
+            "defaultDeductions", "isActive", "createdAtAndUpdatedAt", "hasFile", "memo", "email"
     );
 }
