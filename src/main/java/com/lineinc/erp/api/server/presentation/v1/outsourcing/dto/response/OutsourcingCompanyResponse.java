@@ -70,10 +70,8 @@ public record OutsourcingCompanyResponse(
         boolean hasFile,
 
         @Schema(description = "담당자 목록")
-        List<OutsourcingCompanyContactResponse> contacts,
+        List<OutsourcingCompanyContactResponse> contacts
 
-        @Schema(description = "파일 목록")
-        List<OutsourcingCompanyFileResponse> files
 ) {
     public static OutsourcingCompanyResponse from(OutsourcingCompany company) {
         return new OutsourcingCompanyResponse(
@@ -100,9 +98,6 @@ public record OutsourcingCompanyResponse(
                 !company.getFiles().isEmpty(),
                 company.getContacts().stream()
                         .map(OutsourcingCompanyContactResponse::from)
-                        .toList(),
-                company.getFiles().stream()
-                        .map(OutsourcingCompanyFileResponse::from)
                         .toList()
         );
     }

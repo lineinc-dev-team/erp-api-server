@@ -136,4 +136,21 @@ public class OutsourcingCompanyController {
         outsourcingCompanyService.updateOutsourcingCompany(id, request);
         return ResponseEntity.ok().build();
     }
+
+//    @Operation(
+//            summary = "외주업체 삭제",
+//            description = "하나 이상의 외주업체 ID를 받아 해당 외주업체를 삭제합니다"
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "외주업체 삭제 성공"),
+//            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음"),
+//    })
+//    @DeleteMapping
+//    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.DELETE)
+//    public ResponseEntity<Void> deleteOutsourcingCompanies(@RequestBody DeleteOutsourcingCompaniesRequest request) {
+//        outsourcingCompanyService.deleteOutsourcingCompanies(request);
+//        return ResponseEntity.ok().build();
+//    }
 }
+
+
