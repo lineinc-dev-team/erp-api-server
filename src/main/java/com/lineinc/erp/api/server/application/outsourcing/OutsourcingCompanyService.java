@@ -44,6 +44,8 @@ public class OutsourcingCompanyService {
                 .bankName(request.bankName())
                 .accountNumber(request.accountNumber())
                 .accountHolder(request.accountHolder())
+                .isActive(request.isActive())
+                .memo(request.memo())
                 .build();
 
         // 2. 담당자 및 파일 생성, 연관관계 설정

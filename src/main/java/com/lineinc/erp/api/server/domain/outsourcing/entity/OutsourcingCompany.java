@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 @Entity
@@ -34,31 +35,40 @@ public class OutsourcingCompany extends BaseEntity {
     @Column
     private String businessNumber;
 
+    @DiffIgnore
     @Column
     @Enumerated(EnumType.STRING)
     private OutsourcingCompanyType type;
 
+    @DiffInclude
     @Column
     private String typeDescription;
 
+    @DiffInclude
     @Column
     private String ceoName;
 
+    @DiffInclude
     @Column
     private String address;
 
+    @DiffInclude
     @Column
     private String detailAddress;
 
+    @DiffInclude
     @Column
     private String landlineNumber;
 
+    @DiffInclude
     @Column
     private String phoneNumber;
 
+    @DiffInclude
     @Column
     private String email;
 
+    @DiffInclude
     @Builder.Default
     @Column(nullable = false)
     private boolean isActive = true;
@@ -66,40 +76,52 @@ public class OutsourcingCompany extends BaseEntity {
     /**
      * 기본공제 항목
      */
+    @DiffInclude
     @Column
     private String defaultDeductions; // "FOUR_INSURANCE,INCOME_TAX" 형식
 
+    @DiffInclude
     @Column
     private String defaultDeductionsDescription;
 
     /**
      * 계좌 정보 - 은행
      */
+    @DiffInclude
     @Column(nullable = false)
     private String bankName;
 
     /**
      * 계좌 정보 - 계좌번호
      */
+    @DiffInclude
     @Column(nullable = false)
     private String accountNumber;
 
     /**
      * 계좌 정보 - 예금주
      */
+    @DiffInclude
     @Column(nullable = false)
     private String accountHolder;
 
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    @DiffIgnore
     @Builder.Default
     @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyContact> contacts = new ArrayList<>();
 
+    @DiffIgnore
     @Builder.Default
     @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyFile> files = new ArrayList<>();
+
+    @Transient
+    @DiffInclude
+    private String typeName;
 
     public void updateFrom(OutsourcingCompanyUpdateRequest request) {
         this.name = request.name();

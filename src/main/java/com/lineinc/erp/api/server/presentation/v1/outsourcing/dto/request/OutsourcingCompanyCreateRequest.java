@@ -56,6 +56,12 @@ public record OutsourcingCompanyCreateRequest(
         @Schema(description = "예금주", example = "홍길동")
         String accountHolder,
 
+        @Schema(description = "사용 여부", example = "true")
+        Boolean isActive,
+
+        @Schema(description = "비고", example = "기타 참고 사항 입력")
+        String memo,
+
         @Schema(description = "담당자 목록")
         List<OutsourcingCompanyContactCreateRequest> contacts,
 
