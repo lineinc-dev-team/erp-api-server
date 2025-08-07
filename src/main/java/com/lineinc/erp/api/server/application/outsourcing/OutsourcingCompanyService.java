@@ -1,9 +1,6 @@
 package com.lineinc.erp.api.server.application.outsourcing;
 
 import com.lineinc.erp.api.server.common.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
@@ -101,7 +98,7 @@ public class OutsourcingCompanyService {
             outsourcingChangeRepository.save(changeHistory);
         }
 
-//        outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts());
+        outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts());
 //        outsourcingCompanyFileService.updateOutsourcingCompanyFiles(company, request.files());
     }
 }

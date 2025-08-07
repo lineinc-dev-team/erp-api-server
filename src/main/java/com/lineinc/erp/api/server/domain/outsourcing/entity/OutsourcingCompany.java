@@ -140,22 +140,22 @@ public class OutsourcingCompany extends BaseEntity {
     }
 
     public void updateFrom(OutsourcingCompanyUpdateRequest request) {
-        this.name = request.name();
-        this.type = request.type();
-        this.typeDescription = request.typeDescription();
-        this.ceoName = request.ceoName();
-        this.address = request.address();
-        this.detailAddress = request.detailAddress();
-        this.landlineNumber = request.landlineNumber();
-        this.phoneNumber = request.phoneNumber();
-        this.email = request.email();
-        this.isActive = Boolean.TRUE.equals(request.isActive());
-        this.defaultDeductions = request.defaultDeductions();
-        this.defaultDeductionsDescription = request.defaultDeductionsDescription();
-        this.bankName = request.bankName();
-        this.accountNumber = request.accountNumber();
-        this.accountHolder = request.accountHolder();
-        this.memo = request.memo();
+        java.util.Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        java.util.Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
+        java.util.Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
+        java.util.Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
+        java.util.Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
+        java.util.Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
+        java.util.Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
+        java.util.Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
+        java.util.Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
+        java.util.Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
+        java.util.Optional.ofNullable(request.defaultDeductions()).ifPresent(val -> this.defaultDeductions = val);
+        java.util.Optional.ofNullable(request.defaultDeductionsDescription()).ifPresent(val -> this.defaultDeductionsDescription = val);
+        java.util.Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
+        java.util.Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
+        java.util.Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
+        java.util.Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         syncTransientFields();
     }
 }

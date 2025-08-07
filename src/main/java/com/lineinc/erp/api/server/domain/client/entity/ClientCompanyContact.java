@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import java.util.Optional;
 
@@ -26,6 +28,7 @@ public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<Cl
     /**
      * 이 담당자가 속한 발주처 엔티티
      */
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_company_id", nullable = false)
     private ClientCompany clientCompany;
@@ -33,39 +36,47 @@ public class ClientCompanyContact extends BaseEntity implements UpdatableFrom<Cl
     /**
      * 담당자의 이름
      */
+    @DiffInclude
     @Column(nullable = false)
     private String name;
 
     /**
      * 담당자의 부서
      */
+    @DiffInclude
     @Column
     private String department;
 
     /**
      * 담당자의 직급
      */
+    @DiffInclude
     @Column
     private String position;
 
+    @DiffInclude
     @Column
     private String landlineNumber;
 
+    @DiffInclude
     @Column
     private String phoneNumber;
 
+    @DiffInclude
     @Column
     private String email;
 
     /**
      * 담당자에 대한 비고 또는 추가 메모
      */
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
 
     /**
      * 대표 담당자인지 여부
      */
+    @DiffInclude
     @Column
     @Builder.Default
     private Boolean isMain = false;

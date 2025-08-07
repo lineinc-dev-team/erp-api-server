@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.common.util;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import lombok.extern.slf4j.Slf4j;
@@ -87,6 +88,8 @@ public class JaversUtils {
             afterValue = siteContract.getName();
         } else if (newEntity instanceof SiteFile siteFile) {
             afterValue = siteFile.getName();
+        } else if (newEntity instanceof OutsourcingCompanyContact outsourcingCompanyContact) {
+            afterValue = outsourcingCompanyContact.getName();
         } else {
             afterValue = toJsonSafe(javers, newEntity);
         }
@@ -119,6 +122,8 @@ public class JaversUtils {
             return siteContract.getName() + "(" + siteContract.getId() + ")";
         } else if (affectedObject instanceof SiteFile siteFile) {
             return siteFile.getName() + "(" + siteFile.getId() + ")";
+        } else if (affectedObject instanceof OutsourcingCompanyContact outsourcingCompanyContact) {
+            return outsourcingCompanyContact.getName() + "(" + outsourcingCompanyContact.getId() + ")";
         } else if (affectedObject != null) {
             return affectedObject.toString();
         } else {

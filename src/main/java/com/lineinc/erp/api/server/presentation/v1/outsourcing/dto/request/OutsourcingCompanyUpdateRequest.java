@@ -5,12 +5,10 @@ import java.util.List;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "외주업체 수정 요청")
 public record OutsourcingCompanyUpdateRequest(
         @Schema(description = "외주업체명", example = "삼성ENG")
-        @NotBlank
         String name,
 
         @Schema(description = "구분", example = "SERVICE")
@@ -63,7 +61,7 @@ public record OutsourcingCompanyUpdateRequest(
         List<OutsourcingCompanyContactUpdateRequest> contacts,
 
         @Schema(description = "첨부파일 목록")
-        List<OutsourcingCompanyFileCreateRequest> files
+        List<OutsourcingCompanyFileUpdateRequest> files
 
 ) {
 }
