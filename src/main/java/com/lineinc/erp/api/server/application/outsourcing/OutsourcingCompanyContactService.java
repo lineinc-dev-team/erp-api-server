@@ -86,7 +86,6 @@ public class OutsourcingCompanyContactService {
         );
 
         List<OutsourcingCompanyContact> afterContacts = new ArrayList<>(company.getContacts());
-
         List<Map<String, String>> allChanges = new ArrayList<>();
 
         Set<Long> beforeIds = beforeContacts.stream()

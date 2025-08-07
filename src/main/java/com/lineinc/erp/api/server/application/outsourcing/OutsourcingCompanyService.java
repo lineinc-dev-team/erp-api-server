@@ -99,6 +99,6 @@ public class OutsourcingCompanyService {
         }
 
         outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts());
-//        outsourcingCompanyFileService.updateOutsourcingCompanyFiles(company, request.files());
+        outsourcingCompanyFileService.updateOutsourcingCompanyFiles(company, request.files());
     }
 }
