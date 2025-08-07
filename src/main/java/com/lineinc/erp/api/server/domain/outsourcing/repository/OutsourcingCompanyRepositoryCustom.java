@@ -1,9 +1,11 @@
 package com.lineinc.erp.api.server.domain.outsourcing.repository;
 
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -17,11 +19,11 @@ public interface OutsourcingCompanyRepositoryCustom {
             Pageable pageable
     );
 
-//    /**
-//     * 엑셀 다운로드용 - 페이지네이션 없이 발주처 목록 전체 조회
-//     */
-//    List<ClientCompany> findAllWithoutPaging(
-//            ClientCompanyListRequest request,
-//            Sort sort
-//    );
+    /**
+     * 엑셀 다운로드용 - 페이지네이션 없이 발주처 목록 전체 조회
+     */
+    List<OutsourcingCompany> findAllWithoutPaging(
+            OutsourcingCompanyListRequest request,
+            Sort sort
+    );
 }

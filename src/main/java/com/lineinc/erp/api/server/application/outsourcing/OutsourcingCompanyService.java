@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.application.outsourcing;
 
+import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.common.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
@@ -8,6 +10,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContactResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
@@ -17,10 +20,12 @@ import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.Outsou
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,5 +132,77 @@ public class OutsourcingCompanyService {
 
         outsourcingCompanyRepository.saveAll(outsourcingCompanies);
     }
+
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(
+            OutsourcingCompanyListRequest request,
+            Sort sort,
+            List<String> fields
+    ) {
+        List<OutsourcingCompanyResponse> outsourcingCompanyResponses = outsourcingCompanyRepository.findAllWithoutPaging(request, sort)
+                .stream()
+                .map(OutsourcingCompanyResponse::from)
+                .toList();
+
+        return ExcelExportUtils.generateWorkbook(
+                outsourcingCompanyResponses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue
+        );
+    }
+
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "name" -> "업체명";
+            case "businessNumber" -> "사업자등록번호";
+            case "type" -> "구분";
+            case "ceoName" -> "대표자명";
+            case "address" -> "주소";
+            case "phoneNumber" -> "휴대폰";
+            case "landlineNumber" -> "전화번호";
+            case "contactName" -> "담당자명";
+            case "contactPositionAndDepartment" -> "직급/부서";
+            case "defaultDeductions" -> "공제항목 기본값";
+            case "isActive" -> "사용여부";
+            case "createdAtAndUpdatedAt" -> "등록일/수정일";
+            case "hasFile" -> "첨부파일 유무";
+            case "memo" -> "비고/메모";
+            default -> null;
+        };
+    }
+
+    private String getExcelCellValue(OutsourcingCompanyResponse company, String field) {
+        var mainContact = company.contacts().stream()
+                .filter(OutsourcingCompanyContactResponse::isMain)
+                .findFirst()
+                .orElse(null);
+
+        return switch (field) {
+            case "id" -> String.valueOf(company.id());
+            case "name" -> company.name();
+            case "businessNumber" -> company.businessNumber();
+            case "type" -> company.type();
+            case "ceoName" -> company.ceoName();
+            case "address" -> company.address() + " " + company.detailAddress();
+            case "phoneNumber" -> company.phoneNumber();
+            case "landlineNumber" -> company.landlineNumber();
+            case "contactName" -> mainContact != null ? mainContact.name() : "";
+            case "contactPositionAndDepartment" ->
+                    mainContact != null ? mainContact.position() + "/" + mainContact.department() : "";
+            case "defaultDeductions" -> company.defaultDeductions();
+            case "isActive" -> company.isActive() ? "Y" : "N";
+            case "createdAtAndUpdatedAt" ->
+                    DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/" + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
+            case "hasFile" -> company.hasFile() ? "Y" : "N";
+            case "memo" -> company.memo();
+            default -> null;
+        };
+    }
 }
+
+
+
+
 
