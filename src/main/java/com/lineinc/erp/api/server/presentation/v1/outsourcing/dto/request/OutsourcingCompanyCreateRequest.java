@@ -41,7 +41,7 @@ public record OutsourcingCompanyCreateRequest(
         @Email
         String email,
 
-        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "INCOME_TAX,FOUR_INSURANCE")
+        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FUEL_COST,FOUR_INSURANCES")
         String defaultDeductions,
 
         @Schema(description = "기본 공제 항목 설명", example = "3.3% 원천징수")

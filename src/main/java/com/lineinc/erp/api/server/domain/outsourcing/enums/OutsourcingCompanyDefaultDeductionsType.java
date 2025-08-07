@@ -14,4 +14,12 @@ public enum OutsourcingCompanyDefaultDeductionsType {
     OutsourcingCompanyDefaultDeductionsType(String label) {
         this.label = label;
     }
+
+    public static String safeLabelOf(String name) {
+        try {
+            return OutsourcingCompanyDefaultDeductionsType.valueOf(name).getLabel();
+        } catch (Exception e) {
+            return name;
+        }
+    }
 }

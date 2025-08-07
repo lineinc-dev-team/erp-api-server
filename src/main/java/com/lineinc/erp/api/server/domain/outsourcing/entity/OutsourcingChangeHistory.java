@@ -23,7 +23,7 @@ public class OutsourcingChangeHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_id", nullable = false)
-    private Site site;
+    private OutsourcingCompany outsourcingCompany;
 
     @Enumerated(EnumType.STRING)
     @Column

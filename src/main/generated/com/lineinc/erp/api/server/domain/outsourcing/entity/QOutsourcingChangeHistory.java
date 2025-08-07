@@ -42,7 +42,7 @@ public class QOutsourcingChangeHistory extends EntityPathBase<OutsourcingChangeH
 
     public final StringPath memo = createString("memo");
 
-    public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
+    public final QOutsourcingCompany outsourcingCompany;
 
     public final EnumPath<com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType> type = createEnum("type", com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType.class);
 
@@ -70,7 +70,7 @@ public class QOutsourcingChangeHistory extends EntityPathBase<OutsourcingChangeH
 
     public QOutsourcingChangeHistory(Class<? extends OutsourcingChangeHistory> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.site = inits.isInitialized("site") ? new com.lineinc.erp.api.server.domain.site.entity.QSite(forProperty("site"), inits.get("site")) : null;
+        this.outsourcingCompany = inits.isInitialized("outsourcingCompany") ? new QOutsourcingCompany(forProperty("outsourcingCompany")) : null;
     }
 
 }

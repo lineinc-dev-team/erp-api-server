@@ -1,9 +1,12 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
@@ -76,7 +79,7 @@ public class OutsourcingCompany extends BaseEntity {
     /**
      * 기본공제 항목
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String defaultDeductions; // "FOUR_INSURANCE,INCOME_TAX" 형식
 
@@ -123,6 +126,19 @@ public class OutsourcingCompany extends BaseEntity {
     @DiffInclude
     private String typeName;
 
+    @Transient
+    @DiffInclude
+    private String defaultDeductionsName;
+
+    public void syncTransientFields() {
+        this.typeName = this.type != null ? this.type.getLabel() : null;
+        this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null :
+                Arrays.stream(this.defaultDeductions.split(","))
+                        .map(String::trim)
+                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
+                        .collect(Collectors.joining(", "));
+    }
+
     public void updateFrom(OutsourcingCompanyUpdateRequest request) {
         this.name = request.name();
         this.type = request.type();
@@ -140,5 +156,6 @@ public class OutsourcingCompany extends BaseEntity {
         this.accountNumber = request.accountNumber();
         this.accountHolder = request.accountHolder();
         this.memo = request.memo();
+        syncTransientFields();
     }
 }
