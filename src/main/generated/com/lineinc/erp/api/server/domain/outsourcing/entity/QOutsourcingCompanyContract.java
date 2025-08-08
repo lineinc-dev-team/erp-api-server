@@ -52,8 +52,6 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final BooleanPath isActive = createBoolean("isActive");
-
     public final StringPath memo = createString("memo");
 
     public final StringPath name = createString("name");
@@ -63,6 +61,8 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSiteProcess siteProcess;
+
+    public final EnumPath<com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus> status = createEnum("status", com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus.class);
 
     public final EnumPath<com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType> taxInvoiceCondition = createEnum("taxInvoiceCondition", com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType.class);
 

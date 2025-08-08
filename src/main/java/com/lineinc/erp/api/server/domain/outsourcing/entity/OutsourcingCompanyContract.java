@@ -4,6 +4,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractCategoryType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -77,9 +78,9 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OutsourcingCompanyContractCategoryType category;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean isActive = true;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private OutsourcingCompanyContractStatus status;
 
     @Column(columnDefinition = "TEXT")
     private String memo;
