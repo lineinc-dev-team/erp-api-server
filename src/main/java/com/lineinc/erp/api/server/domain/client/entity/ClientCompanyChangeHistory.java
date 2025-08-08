@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
+import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,12 +26,12 @@ public class ClientCompanyChangeHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private ClientCompanyChangeType type;
+    private ChangeType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
     private String changes;
-    
+
     @Setter
     @Column(columnDefinition = "TEXT")
     private String memo; // 선택적 변경 사유, 비고 등

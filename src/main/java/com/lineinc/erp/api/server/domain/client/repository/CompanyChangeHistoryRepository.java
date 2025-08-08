@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ClientCompanyChangeHistoryRepository extends JpaRepository<ClientCompanyChangeHistory, Long> {
+public interface CompanyChangeHistoryRepository extends JpaRepository<ClientCompanyChangeHistory, Long> {
 
     Slice<ClientCompanyChangeHistory> findByClientCompany(ClientCompany clientCompany, Pageable pageable);
 

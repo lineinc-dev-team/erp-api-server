@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.client.service;
 
+import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -7,9 +8,8 @@ import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
-import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
-import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyRepository;
+import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyListRequest;
@@ -37,20 +37,20 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class ClientCompanyService {
+public class CompanyService {
 
-    private final ClientCompanyRepository clientCompanyRepository;
-    private final ClientCompanyContactService contactService;
-    private final ClientCompanyFileService fileService;
+    private final CompanyRepository companyRepository;
+    private final CompanyContactService contactService;
+    private final CompanyFileService fileService;
     private final UserService userService;
     private final Javers javers;
-    private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+    private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
 
-        if (clientCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
+        if (companyRepository.existsByBusinessNumber(request.businessNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
         }
 
@@ -76,17 +76,17 @@ public class ClientCompanyService {
         fileService.createClientCompanyFile(clientCompany, request.files());
 
         // 3. 모든 연관관계 설정 후 save
-        clientCompanyRepository.save(clientCompany);
+        companyRepository.save(clientCompany);
     }
 
     @Transactional(readOnly = true)
     public Page<ClientCompanyResponse> getAllClientCompanies(ClientCompanyListRequest request, Pageable pageable) {
-        return clientCompanyRepository.findAll(request, pageable);
+        return companyRepository.findAll(request, pageable);
     }
 
     @Transactional(readOnly = true)
     public ClientCompany getClientCompanyByIdOrThrow(Long id) {
-        return clientCompanyRepository.findById(id)
+        return companyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND));
     }
 
@@ -98,7 +98,7 @@ public class ClientCompanyService {
 
     @Transactional
     public void deleteClientCompanies(DeleteClientCompaniesRequest request) {
-        List<ClientCompany> clientCompanies = clientCompanyRepository.findAllById(request.clientCompanyIds());
+        List<ClientCompany> clientCompanies = companyRepository.findAllById(request.clientCompanyIds());
         if (clientCompanies.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND);
         }
@@ -107,7 +107,7 @@ public class ClientCompanyService {
             clientCompany.markAsDeleted();
         }
 
-        clientCompanyRepository.saveAll(clientCompanies);
+        companyRepository.saveAll(clientCompanies);
     }
 
     @Transactional
@@ -118,7 +118,7 @@ public class ClientCompanyService {
         ClientCompany oldSnapshot = JaversUtils.createSnapshot(javers, clientCompany, ClientCompany.class);
 
         clientCompany.updateFrom(request, userRepository);
-        clientCompanyRepository.save(clientCompany);
+        companyRepository.save(clientCompany);
 
         Diff diff = javers.compare(oldSnapshot, clientCompany);
         List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
@@ -127,15 +127,15 @@ public class ClientCompanyService {
         if (!simpleChanges.isEmpty()) {
             ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .type(ClientCompanyChangeType.BASIC)
+                    .type(ChangeType.BASIC)
                     .changes(changesJson)
                     .build();
-            clientCompanyChangeHistoryRepository.save(changeHistory);
+            companyChangeHistoryRepository.save(changeHistory);
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (ClientCompanyUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
-                clientCompanyChangeHistoryRepository.findById(historyRequest.id())
+                companyChangeHistoryRepository.findById(historyRequest.id())
                         .filter(history -> history.getClientCompany().getId().equals(clientCompany.getId()))
                         .ifPresent(history -> {
                             history.setMemo(historyRequest.memo());
@@ -150,7 +150,7 @@ public class ClientCompanyService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(ClientCompanyListRequest request, Sort sort, List<String> fields) {
-        List<ClientCompanyResponse> clientCompanyResponses = clientCompanyRepository.findAllWithoutPaging(request, sort)
+        List<ClientCompanyResponse> clientCompanyResponses = companyRepository.findAllWithoutPaging(request, sort)
                 .stream()
                 .map(ClientCompanyResponse::from)
                 .toList();
@@ -224,9 +224,9 @@ public class ClientCompanyService {
         Slice<ClientCompany> companySlice;
 
         if (keyword == null || keyword.isBlank()) {
-            companySlice = clientCompanyRepository.findAllBy(pageable);
+            companySlice = companyRepository.findAllBy(pageable);
         } else {
-            companySlice = clientCompanyRepository.findByNameContainingIgnoreCase(keyword, pageable);
+            companySlice = companyRepository.findByNameContainingIgnoreCase(keyword, pageable);
         }
 
         return companySlice.map(ClientCompanyResponse.ClientCompanySimpleResponse::from);
@@ -235,7 +235,7 @@ public class ClientCompanyService {
     @Transactional(readOnly = true)
     public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(Long clientCompanyId, Pageable pageable) {
         ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
-        Slice<ClientCompanyChangeHistory> historySlice = clientCompanyChangeHistoryRepository.findByClientCompany(clientCompany, pageable);
+        Slice<ClientCompanyChangeHistory> historySlice = companyChangeHistoryRepository.findByClientCompany(clientCompany, pageable);
         return historySlice.map(ClientCompanyChangeHistoryResponse::from);
     }
 }

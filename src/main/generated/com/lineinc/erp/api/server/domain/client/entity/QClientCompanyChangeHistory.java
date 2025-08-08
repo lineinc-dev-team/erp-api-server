@@ -44,7 +44,7 @@ public class QClientCompanyChangeHistory extends EntityPathBase<ClientCompanyCha
 
     public final StringPath memo = createString("memo");
 
-    public final EnumPath<com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType> type = createEnum("type", com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType.class);
+    public final EnumPath<com.lineinc.erp.api.server.domain.client.enums.ChangeType> type = createEnum("type", com.lineinc.erp.api.server.domain.client.enums.ChangeType.class);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;

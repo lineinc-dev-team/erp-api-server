@@ -2,14 +2,14 @@ package com.lineinc.erp.api.server.domain.client.service;
 
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
+import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
-import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import jakarta.transaction.Transactional;
@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ClientCompanyFileService {
-    private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+public class CompanyFileService {
+    private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
     private final Javers javers;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -97,10 +97,10 @@ public class ClientCompanyFileService {
             String json = javers.getJsonConverter().toJson(allChanges);
             ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .type(ClientCompanyChangeType.ATTACHMENT)
+                    .type(ChangeType.ATTACHMENT)
                     .changes(json)
                     .build();
-            clientCompanyChangeHistoryRepository.save(history);
+            companyChangeHistoryRepository.save(history);
         }
 
     }

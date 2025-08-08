@@ -5,8 +5,8 @@ import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
-import com.lineinc.erp.api.server.domain.client.repository.ClientCompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
+import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import jakarta.transaction.Transactional;
@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ClientCompanyContactService {
+public class CompanyContactService {
 
-    private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+    private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
     private final Javers javers;
 
     /**
@@ -127,10 +127,10 @@ public class ClientCompanyContactService {
             String json = javers.getJsonConverter().toJson(allChanges);
             ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .type(ClientCompanyChangeType.CONTACT)
+                    .type(ChangeType.CONTACT)
                     .changes(json)
                     .build();
-            clientCompanyChangeHistoryRepository.save(history);
+            companyChangeHistoryRepository.save(history);
         }
     }
 }

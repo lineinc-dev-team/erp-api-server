@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 @Repository
 @RequiredArgsConstructor
-public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCustom {
+public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     private final QClientCompany clientCompany = QClientCompany.clientCompany;

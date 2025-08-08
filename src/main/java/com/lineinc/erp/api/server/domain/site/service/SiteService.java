@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.site.service;
 
-import com.lineinc.erp.api.server.domain.client.service.ClientCompanyService;
+import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -43,7 +43,7 @@ public class SiteService {
 
     private final SiteRepository siteRepository;
 
-    private final ClientCompanyService clientCompanyService;
+    private final CompanyService companyService;
     private final SiteProcessService siteProcessService;
     private final SiteContractService siteContractService;
     private final UserService userService;
@@ -53,7 +53,7 @@ public class SiteService {
     @Transactional
     public void createSite(CreateSiteRequest request) {
         validateDuplicateName(request.name());
-        ClientCompany clientCompany = clientCompanyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
+        ClientCompany clientCompany = companyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
         User user = userService.getUserByIdOrThrow(request.userId());
 
         OffsetDateTime startedAt = DateTimeFormatUtils.toOffsetDateTime(request.startedAt());
@@ -212,7 +212,7 @@ public class SiteService {
         site.syncTransientFields();
         Site oldSnapshot = JaversUtils.createSnapshot(javers, site, Site.class);
 
-        site.updateFrom(request, userService, clientCompanyService);
+        site.updateFrom(request, userService, companyService);
         siteRepository.save(site);
 
         Diff diff = javers.compare(oldSnapshot, site);

@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
+import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
@@ -32,7 +32,7 @@ public record ClientCompanyChangeHistoryResponse(
         String type,
 
         @Schema(description = "변경 유형 코드", example = "CONTACT")
-        ClientCompanyChangeType typeCode
+        ChangeType typeCode
 ) {
     public static ClientCompanyChangeHistoryResponse from(ClientCompanyChangeHistory history) {
         return new ClientCompanyChangeHistoryResponse(

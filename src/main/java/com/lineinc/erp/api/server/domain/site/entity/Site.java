@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
-import com.lineinc.erp.api.server.domain.client.service.ClientCompanyService;
+import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.UpdateSiteRequest;
@@ -131,7 +131,7 @@ public class Site extends BaseEntity {
         this.endedAtFormat = this.endedAt != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.endedAt) : null;
     }
 
-    public void updateFrom(UpdateSiteRequest request, UserService userService, ClientCompanyService clientCompanyService) {
+    public void updateFrom(UpdateSiteRequest request, UserService userService, CompanyService companyService) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
         Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
@@ -150,7 +150,7 @@ public class Site extends BaseEntity {
                 .map(userService::getUserByIdOrThrow)
                 .ifPresent(this::changeUser);
         Optional.ofNullable(request.clientCompanyId())
-                .map(clientCompanyService::getClientCompanyByIdOrThrow)
+                .map(companyService::getClientCompanyByIdOrThrow)
                 .ifPresent(this::changeClientCompany);
         syncTransientFields();
     }

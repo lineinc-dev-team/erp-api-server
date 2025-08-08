@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.client.controller;
 
-import com.lineinc.erp.api.server.domain.client.service.ClientCompanyService;
+import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Client Companies", description = "발주처 관련 API")
 public class ClientCompanyController {
 
-    private final ClientCompanyService clientCompanyService;
+    private final CompanyService companyService;
 
     @Operation(
             summary = "발주처 등록",
@@ -57,7 +57,7 @@ public class ClientCompanyController {
     public ResponseEntity<Void> createClientCompany(
             @Valid @RequestBody ClientCompanyCreateRequest request
     ) {
-        clientCompanyService.createClientCompany(request);
+        companyService.createClientCompany(request);
         return ResponseEntity.ok().build();
     }
 
@@ -76,7 +76,7 @@ public class ClientCompanyController {
             @Valid SortRequest sortRequest,
             @Valid ClientCompanyListRequest request
     ) {
-        Page<ClientCompanyResponse> page = clientCompanyService.getAllClientCompanies(
+        Page<ClientCompanyResponse> page = companyService.getAllClientCompanies(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
@@ -96,7 +96,7 @@ public class ClientCompanyController {
             @Valid PageRequest pageRequest,
             @RequestParam(required = false) String keyword
     ) {
-        Slice<ClientCompanyResponse.ClientCompanySimpleResponse> slice = clientCompanyService.searchClientCompanyByName(keyword,
+        Slice<ClientCompanyResponse.ClientCompanySimpleResponse> slice = companyService.searchClientCompanyByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
@@ -115,7 +115,7 @@ public class ClientCompanyController {
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteClientCompanies(@RequestBody DeleteClientCompaniesRequest clientCompanyIds) {
-        clientCompanyService.deleteClientCompanies(clientCompanyIds);
+        companyService.deleteClientCompanies(clientCompanyIds);
         return ResponseEntity.ok().build();
     }
 
@@ -134,7 +134,7 @@ public class ClientCompanyController {
             @PathVariable Long id,
             @Valid @RequestBody ClientCompanyUpdateRequest request
     ) {
-        clientCompanyService.updateClientCompany(id, request);
+        companyService.updateClientCompany(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -158,7 +158,7 @@ public class ClientCompanyController {
         DownloadFieldUtils.validateFields(parsed, ClientCompanyDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
 
-        try (Workbook workbook = clientCompanyService.downloadExcel(
+        try (Workbook workbook = companyService.downloadExcel(
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed
@@ -180,7 +180,7 @@ public class ClientCompanyController {
     public ResponseEntity<SuccessResponse<ClientCompanyDetailResponse>> getClientCompanyById(
             @PathVariable Long id
     ) {
-        ClientCompanyDetailResponse response = clientCompanyService.getClientCompanyById(id);
+        ClientCompanyDetailResponse response = companyService.getClientCompanyById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -195,7 +195,7 @@ public class ClientCompanyController {
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest
     ) {
-        Slice<ClientCompanyChangeHistoryResponse> slice = clientCompanyService.getClientCompanyChangeHistories(id,
+        Slice<ClientCompanyChangeHistoryResponse> slice = companyService.getClientCompanyChangeHistories(id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }

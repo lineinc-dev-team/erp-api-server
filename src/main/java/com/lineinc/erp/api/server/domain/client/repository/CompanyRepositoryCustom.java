@@ -9,7 +9,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
-public interface ClientCompanyRepositoryCustom {
+public interface CompanyRepositoryCustom {
 
     /**
      * 동적 조건으로 발주처 목록을 조회합니다.
