@@ -1,0 +1,35 @@
+package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
+
+import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContractDefaultDeductionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDefaultDeductionsResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/outsourcing-company-contracts")
+@RequiredArgsConstructor
+@Tag(name = "Outsourcing Company Contract", description = "외주업체 계약 관련 API")
+public class OutsourcingCompanyContractController {
+    @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/default-deductions")
+    public ResponseEntity<SuccessResponse<List<OutsourcingCompanyContractDefaultDeductionsResponse>>> getDeductionItems() {
+        List<OutsourcingCompanyContractDefaultDeductionsResponse> responseList = Arrays.stream(OutsourcingCompanyContractDefaultDeductionsType.values())
+                .map(dd -> new OutsourcingCompanyContractDefaultDeductionsResponse(dd.name(), dd.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
+}
