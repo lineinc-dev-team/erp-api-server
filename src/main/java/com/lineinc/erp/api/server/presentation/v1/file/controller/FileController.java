@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.file.controller;
 
-import com.lineinc.erp.api.server.application.file.S3FileService;
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.common.annotation.RateLimit;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.request.PresignedUrlRequest;

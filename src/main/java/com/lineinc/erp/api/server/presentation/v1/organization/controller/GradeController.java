@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.organization.controller;
 
-import com.lineinc.erp.api.server.application.organization.GradeService;
+import com.lineinc.erp.api.server.domain.organization.service.GradeService;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.presentation.v1.organization.dto.response.GradeResponse;
 import io.swagger.v3.oas.annotations.Operation;

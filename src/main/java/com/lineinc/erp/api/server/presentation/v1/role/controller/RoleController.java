@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.role.controller;
 
-import com.lineinc.erp.api.server.application.role.RoleService;
+import com.lineinc.erp.api.server.domain.role.service.RoleService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
@@ -8,7 +8,7 @@ import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.response.PagingResponse;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
-import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
+import com.lineinc.erp.api.server.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.request.*;
 import com.lineinc.erp.api.server.presentation.v1.role.dto.response.MenusPermissionsResponse;

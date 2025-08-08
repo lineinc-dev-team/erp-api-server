@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import com.lineinc.erp.api.server.application.outsourcing.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.request.PageRequest;
 import com.lineinc.erp.api.server.common.request.SortRequest;
@@ -25,7 +25,7 @@ import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.Delete
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyResponse;
 import org.springframework.data.domain.Page;
-import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
+import com.lineinc.erp.api.server.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;

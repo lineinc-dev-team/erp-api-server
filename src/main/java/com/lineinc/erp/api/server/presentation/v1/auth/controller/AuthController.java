@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.auth.controller;
 
-import com.lineinc.erp.api.server.application.user.UserService;
+import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.common.constant.AppConstants;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;

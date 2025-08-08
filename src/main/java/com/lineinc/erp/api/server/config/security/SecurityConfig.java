@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.config.security;
 
-import com.lineinc.erp.api.server.application.auth.CustomUserDetailsService;
+import com.lineinc.erp.api.server.domain.common.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

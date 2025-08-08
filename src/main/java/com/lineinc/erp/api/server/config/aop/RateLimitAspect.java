@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.config.aop;
 
-import com.lineinc.erp.api.server.application.ratelimit.RateLimitService;
+import com.lineinc.erp.api.server.domain.common.service.RateLimitService;
 import com.lineinc.erp.api.server.common.annotation.RateLimit;
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.common.util.SecurityUtils;

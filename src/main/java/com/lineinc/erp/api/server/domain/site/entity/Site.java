@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
-import com.lineinc.erp.api.server.application.client.ClientCompanyService;
-import com.lineinc.erp.api.server.application.user.UserService;
+import com.lineinc.erp.api.server.domain.client.service.ClientCompanyService;
+import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.UpdateSiteRequest;
 
