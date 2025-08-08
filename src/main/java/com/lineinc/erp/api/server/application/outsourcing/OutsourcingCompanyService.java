@@ -227,4 +227,21 @@ public class OutsourcingCompanyService {
         Slice<OutsourcingChangeHistory> histories = outsourcingChangeRepository.findAllByOutsourcingCompany(company, pageable);
         return histories.map(CompanyChangeHistoryResponse::from);
     }
+
+    @Transactional(readOnly = true)
+    public Slice<CompanyResponse.CompanySimpleResponse> searchByName(String name, Pageable pageable) {
+        Slice<OutsourcingCompany> companies;
+
+        if (name == null || name.trim().isEmpty()) {
+            companies = outsourcingCompanyRepository.findAllBy(pageable);
+        } else {
+            companies = outsourcingCompanyRepository.findByNameContainingIgnoreCase(name.trim(), pageable);
+        }
+
+        return companies.map(company -> new CompanyResponse.CompanySimpleResponse(
+                company.getId(),
+                company.getName(),
+                company.getBusinessNumber()
+        ));
+    }
 }

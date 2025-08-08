@@ -212,6 +212,24 @@ public class CompanyController {
         );
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
+
+    @Operation(summary = "외주업체 이름 키워드 검색", description = "외주업체 이름으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "검색 성공")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<SuccessResponse<SliceResponse<CompanyResponse.CompanySimpleResponse>>> searchClientCompanyByName(
+            @Valid SortRequest sortRequest,
+            @Valid PageRequest pageRequest,
+            @RequestParam(required = false) String keyword
+    ) {
+        Slice<CompanyResponse.CompanySimpleResponse> slice = outsourcingCompanyService.searchByName(keyword,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
+        ));
+    }
 }
 
 

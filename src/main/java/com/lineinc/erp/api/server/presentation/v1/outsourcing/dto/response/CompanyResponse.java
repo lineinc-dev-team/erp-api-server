@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response;
 
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
@@ -100,5 +102,24 @@ public record CompanyResponse(
                         .map(CompanyContactResponse::from)
                         .toList()
         );
+
+
     }
+
+    @Schema(description = "간단한 외주업체 응답")
+    public static record CompanySimpleResponse(
+            @Schema(description = "외주업체 ID", example = "123")
+            Long id,
+
+            @Schema(description = "외주업체 이름", example = "삼성건설")
+            String name,
+
+            @Schema(description = "외주업체 사업자등록번호", example = "123-45-67890")
+            String businessNumber
+    ) {
+        public static CompanyResponse.CompanySimpleResponse from(OutsourcingCompany company) {
+            return new CompanyResponse.CompanySimpleResponse(company.getId(), company.getName(), company.getBusinessNumber());
+        }
+    }
+
 }
