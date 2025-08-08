@@ -1,16 +1,39 @@
 package com.lineinc.erp.api.server.common.validation;
 
+import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import lombok.Getter;
+
 /**
- * 검증 타입을 정의하는 열거형(enum) 클래스입니다.
- * 여러 검증 로직에서 타입 구분용으로 사용됩니다.
+ * 유효성 검사 유형을 정의하는 열거형(enum) 클래스입니다.
+ * 각 타입에 해당하는 오류 메시지를 {@link ValidationMessages}에서 가져와 연결합니다.
  */
+@Getter
 public enum ValidatorType {
 
-    URL("유효한 URL 형식이 아닙니다."),
-    PHONE("유효한 휴대폰 번호 형식이 아닙니다."),
-    BUSINESS_NUMBER("유효한 사업자등록번호 형식이 아닙니다."),
-    LANDLINE_NUMBER("유효한 유선 전화번호 형식이 아닙니다."),
-    PHONE_OR_LANDLINE("유효한 전화번호 형식(휴대폰 또는 유선전화)이 아닙니다.");
+    /**
+     * URL 형식 검사
+     */
+    URL(ValidationMessages.INVALID_URL),
+
+    /**
+     * 휴대폰 번호 형식 검사 (예: 010-1234-5678)
+     */
+    PHONE(ValidationMessages.INVALID_PHONE),
+
+    /**
+     * 사업자등록번호 형식 검사 (예: 123-45-67890)
+     */
+    BUSINESS_NUMBER(ValidationMessages.INVALID_BUSINESS_NUMBER),
+
+    /**
+     * 유선 전화번호 형식 검사 (예: 02-123-4567)
+     */
+    LANDLINE_NUMBER(ValidationMessages.INVALID_LANDLINE),
+
+    /**
+     * 휴대폰 또는 유선 전화번호 형식 중 하나 허용
+     */
+    PHONE_OR_LANDLINE(ValidationMessages.INVALID_PHONE_OR_LANDLINE);
 
     private final String message;
 
@@ -18,7 +41,4 @@ public enum ValidatorType {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
 }
