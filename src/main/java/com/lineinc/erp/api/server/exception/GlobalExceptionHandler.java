@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -24,21 +23,20 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * 전역적으로 모든 {@code @RestController} 에서 발생한 예외를 처리해주는 클래스입니다.
+ * 단, 인증 실패(401)는 Spring Security의 AuthenticationEntryPoint에서 처리합니다.
+ */
 @Slf4j
-@RestControllerAdvice // 전역적으로 모든 @RestController 에서 발생한 예외를 처리해주는 클래스
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // 1. 인증/인가 관련
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
-        log.warn("BadCredentialsException: {}", ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ValidationMessages.PASSWORD_MISMATCH, List.of());
-    }
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ResponseEntity<ErrorResponse> handleInternalAuthentication(InternalAuthenticationServiceException ex) {
         log.warn("InternalAuthenticationServiceException: {}", ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), List.of());
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), List.of());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
