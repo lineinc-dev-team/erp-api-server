@@ -2,10 +2,10 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
 
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.ContractStatusResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContractDefaultDeductionsResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.TaxInvoiceConditionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,5 +44,16 @@ public class OutsourcingCompanyContractController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
+    @Operation(summary = "계약 상태 목록 조회", description = "외주업체 계약 상태 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/statuses")
+    public ResponseEntity<SuccessResponse<List<ContractStatusResponse>>> getContractStatuses() {
+        List<ContractStatusResponse> responseList = Arrays.stream(OutsourcingCompanyContractStatus.values())
+                .map(status -> new ContractStatusResponse(status.name(), status.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 
 }
+
+
