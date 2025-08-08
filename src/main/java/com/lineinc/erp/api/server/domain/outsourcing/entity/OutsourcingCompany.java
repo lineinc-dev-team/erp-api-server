@@ -141,6 +141,7 @@ public class OutsourcingCompany extends BaseEntity {
 
     public void updateFrom(OutsourcingCompanyUpdateRequest request) {
         java.util.Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        java.util.Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
         java.util.Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         java.util.Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
         java.util.Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);

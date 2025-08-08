@@ -11,6 +11,9 @@ public record OutsourcingCompanyUpdateRequest(
         @Schema(description = "외주업체명", example = "삼성ENG")
         String name,
 
+        @Schema(description = "사업자등록번호", example = "123-45-67890")
+        String businessNumber,
+
         @Schema(description = "구분", example = "SERVICE")
         OutsourcingCompanyType type,
 

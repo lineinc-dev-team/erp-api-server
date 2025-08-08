@@ -91,6 +91,12 @@ public class OutsourcingCompanyService {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
+        if (request.businessNumber() != null &&
+                !request.businessNumber().equals(company.getBusinessNumber()) &&
+                outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
+        }
+
         company.syncTransientFields();
         OutsourcingCompany oldSnapshot = JaversUtils.createSnapshot(javers, company, OutsourcingCompany.class);
 
