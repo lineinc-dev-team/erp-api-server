@@ -22,6 +22,11 @@ import java.time.OffsetDateTime;
 @SQLRestriction("deleted = false")
 public class OutsourcingCompanyContractWorker extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_worker_seq")
+    @SequenceGenerator(name = "outsourcing_company_contract_worker_seq", sequenceName = "outsourcing_company_contract_worker_seq", allocationSize = 1)
+    private Long id;
+
     @Column(nullable = false)
     private String name;
 

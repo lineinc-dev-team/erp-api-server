@@ -39,6 +39,8 @@ public class QOutsourcingCompanyContractWorker extends EntityPathBase<Outsourcin
 
     public final StringPath fileUrl = createString("fileUrl");
 
+    public final NumberPath<Long> id = createNumber("id", Long.class);
+
     public final StringPath name = createString("name");
 
     public final StringPath note = createString("note");
