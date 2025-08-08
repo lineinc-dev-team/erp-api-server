@@ -5,7 +5,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFi
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 파일 응답")
-public record OutsourcingCompanyFileResponse(
+public record CompanyFileResponse(
         @Schema(description = "ID")
         Long id,
 
@@ -21,8 +21,8 @@ public record OutsourcingCompanyFileResponse(
         @Schema(description = "비고")
         String memo
 ) {
-    public static OutsourcingCompanyFileResponse from(OutsourcingCompanyFile file) {
-        return new OutsourcingCompanyFileResponse(
+    public static CompanyFileResponse from(OutsourcingCompanyFile file) {
+        return new CompanyFileResponse(
                 file.getId(),
                 file.getName(),
                 file.getFileUrl(),

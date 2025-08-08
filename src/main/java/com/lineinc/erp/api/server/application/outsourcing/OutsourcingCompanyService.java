@@ -8,16 +8,16 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyChangeHistoryResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContactResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyContactResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyDetailResponse;
 
 import com.lineinc.erp.api.server.common.constant.ValidationMessages;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
@@ -80,10 +80,10 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public OutsourcingCompanyDetailResponse getOutsourcingCompanyById(Long id) {
+    public CompanyDetailResponse getOutsourcingCompanyById(Long id) {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
-        return OutsourcingCompanyDetailResponse.from(company);
+        return CompanyDetailResponse.from(company);
     }
 
     @Transactional
@@ -131,7 +131,7 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<OutsourcingCompanyResponse> getAllOutsourcingCompanies(OutsourcingCompanyListRequest request, Pageable pageable) {
+    public Page<CompanyResponse> getAllOutsourcingCompanies(OutsourcingCompanyListRequest request, Pageable pageable) {
         return outsourcingCompanyRepository.findAll(request, pageable);
     }
 
@@ -155,13 +155,13 @@ public class OutsourcingCompanyService {
             Sort sort,
             List<String> fields
     ) {
-        List<OutsourcingCompanyResponse> outsourcingCompanyResponses = outsourcingCompanyRepository.findAllWithoutPaging(request, sort)
+        List<CompanyResponse> companyRespons = outsourcingCompanyRepository.findAllWithoutPaging(request, sort)
                 .stream()
-                .map(OutsourcingCompanyResponse::from)
+                .map(CompanyResponse::from)
                 .toList();
 
         return ExcelExportUtils.generateWorkbook(
-                outsourcingCompanyResponses,
+                companyRespons,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue
@@ -190,9 +190,9 @@ public class OutsourcingCompanyService {
         };
     }
 
-    private String getExcelCellValue(OutsourcingCompanyResponse company, String field) {
+    private String getExcelCellValue(CompanyResponse company, String field) {
         var mainContact = company.contacts().stream()
-                .filter(OutsourcingCompanyContactResponse::isMain)
+                .filter(CompanyContactResponse::isMain)
                 .findFirst()
                 .orElse(null);
 
@@ -220,11 +220,11 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<OutsourcingCompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistories(Long id, Pageable pageable) {
+    public Slice<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistories(Long id, Pageable pageable) {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
         Slice<OutsourcingChangeHistory> histories = outsourcingChangeRepository.findAllByOutsourcingCompany(company, pageable);
-        return histories.map(OutsourcingCompanyChangeHistoryResponse::from);
+        return histories.map(CompanyChangeHistoryResponse::from);
     }
 }

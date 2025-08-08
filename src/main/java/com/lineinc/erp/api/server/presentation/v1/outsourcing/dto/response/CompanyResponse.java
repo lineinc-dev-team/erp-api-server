@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Schema(description = "외주업체 상세 응답")
-public record OutsourcingCompanyResponse(
+public record CompanyResponse(
         @Schema(description = "ID", example = "1")
         Long id,
 
@@ -70,11 +70,11 @@ public record OutsourcingCompanyResponse(
         boolean hasFile,
 
         @Schema(description = "담당자 목록")
-        List<OutsourcingCompanyContactResponse> contacts
+        List<CompanyContactResponse> contacts
 
 ) {
-    public static OutsourcingCompanyResponse from(OutsourcingCompany company) {
-        return new OutsourcingCompanyResponse(
+    public static CompanyResponse from(OutsourcingCompany company) {
+        return new CompanyResponse(
                 company.getId(),
                 company.getName(),
                 company.getBusinessNumber(),
@@ -97,7 +97,7 @@ public record OutsourcingCompanyResponse(
                 company.getUpdatedAt(),
                 !company.getFiles().isEmpty(),
                 company.getContacts().stream()
-                        .map(OutsourcingCompanyContactResponse::from)
+                        .map(CompanyContactResponse::from)
                         .toList()
         );
     }

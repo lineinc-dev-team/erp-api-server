@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.domain.outsourcing.repository;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,7 +14,7 @@ public interface OutsourcingCompanyRepositoryCustom {
     /**
      * 동적 조건으로 발주처 목록을 조회합니다.
      */
-    Page<OutsourcingCompanyResponse> findAll(
+    Page<CompanyResponse> findAll(
             OutsourcingCompanyListRequest request,
             Pageable pageable
     );

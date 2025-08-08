@@ -5,7 +5,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyCon
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.ContractStatusResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyContractDefaultDeductionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyContractDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.TaxInvoiceConditionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,13 +23,13 @@ import java.util.List;
 @RequestMapping("/api/v1/outsourcing-company-contracts")
 @RequiredArgsConstructor
 @Tag(name = "Outsourcing Company Contract", description = "외주업체 계약 관련 API")
-public class OutsourcingCompanyContractController {
+public class CompanyContractController {
     @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/default-deductions")
-    public ResponseEntity<SuccessResponse<List<OutsourcingCompanyContractDefaultDeductionsResponse>>> getDeductionItems() {
-        List<OutsourcingCompanyContractDefaultDeductionsResponse> responseList = Arrays.stream(OutsourcingCompanyContractDefaultDeductionsType.values())
-                .map(dd -> new OutsourcingCompanyContractDefaultDeductionsResponse(dd.name(), dd.getLabel()))
+    public ResponseEntity<SuccessResponse<List<CompanyContractDefaultDeductionsResponse>>> getDeductionItems() {
+        List<CompanyContractDefaultDeductionsResponse> responseList = Arrays.stream(OutsourcingCompanyContractDefaultDeductionsType.values())
+                .map(dd -> new CompanyContractDefaultDeductionsResponse(dd.name(), dd.getLabel()))
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }

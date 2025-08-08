@@ -3,13 +3,12 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
 
 @Schema(description = "외주업체 변경 이력 응답")
-public record OutsourcingCompanyChangeHistoryResponse(
+public record CompanyChangeHistoryResponse(
         @Schema(description = "변경 이력 ID", example = "1")
         Long id,
 
@@ -35,8 +34,8 @@ public record OutsourcingCompanyChangeHistoryResponse(
         @Schema(description = "변경 유형 코드", example = "CONTACT")
         OutsourcingChangeType typeCode
 ) {
-    public static OutsourcingCompanyChangeHistoryResponse from(OutsourcingChangeHistory history) {
-        return new OutsourcingCompanyChangeHistoryResponse(
+    public static CompanyChangeHistoryResponse from(OutsourcingChangeHistory history) {
+        return new CompanyChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),
                 history.getMemo(),

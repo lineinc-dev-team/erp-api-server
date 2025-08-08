@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
 import com.lineinc.erp.api.server.common.response.SliceResponse;
 import com.lineinc.erp.api.server.common.response.SliceInfo;
 import org.springframework.data.domain.Slice;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
 
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyDownloadRequest;
 import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
@@ -23,7 +23,7 @@ import com.lineinc.erp.api.server.common.response.PagingInfo;
 import com.lineinc.erp.api.server.common.util.PageableUtils;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyResponse;
 import org.springframework.data.domain.Page;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
@@ -31,9 +31,9 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTyp
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDefaultDeductionsResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyDetailResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyTypeResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyDefaultDeductionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyDetailResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyTypeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,7 +51,7 @@ import java.util.List;
 @RequestMapping("/api/v1/outsourcing-companies")
 @RequiredArgsConstructor
 @Tag(name = "Outsourcing Companies", description = "외주업체 관련 API")
-public class OutsourcingCompanyController {
+public class CompanyController {
 
     private final OutsourcingCompanyService outsourcingCompanyService;
 
@@ -65,12 +65,12 @@ public class OutsourcingCompanyController {
     })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<OutsourcingCompanyResponse>>> getAllOutsourcingCompanies(
+    public ResponseEntity<SuccessResponse<PagingResponse<CompanyResponse>>> getAllOutsourcingCompanies(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
             @Valid OutsourcingCompanyListRequest request
     ) {
-        Page<OutsourcingCompanyResponse> page = outsourcingCompanyService.getAllOutsourcingCompanies(
+        Page<CompanyResponse> page = outsourcingCompanyService.getAllOutsourcingCompanies(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );
@@ -83,9 +83,9 @@ public class OutsourcingCompanyController {
     @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/default-deductions")
-    public ResponseEntity<SuccessResponse<List<OutsourcingCompanyDefaultDeductionsResponse>>> getDeductionItems() {
-        List<OutsourcingCompanyDefaultDeductionsResponse> responseList = Arrays.stream(OutsourcingCompanyDefaultDeductionsType.values())
-                .map(dd -> new OutsourcingCompanyDefaultDeductionsResponse(dd.name(), dd.getLabel()))
+    public ResponseEntity<SuccessResponse<List<CompanyDefaultDeductionsResponse>>> getDeductionItems() {
+        List<CompanyDefaultDeductionsResponse> responseList = Arrays.stream(OutsourcingCompanyDefaultDeductionsType.values())
+                .map(dd -> new CompanyDefaultDeductionsResponse(dd.name(), dd.getLabel()))
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
@@ -93,9 +93,9 @@ public class OutsourcingCompanyController {
     @Operation(summary = "구분 목록 조회", description = "외주업체 구분 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/types")
-    public ResponseEntity<SuccessResponse<List<OutsourcingCompanyTypeResponse>>> getSeparations() {
-        List<OutsourcingCompanyTypeResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
-                .map(type -> new OutsourcingCompanyTypeResponse(type.name(), type.getLabel()))
+    public ResponseEntity<SuccessResponse<List<CompanyTypeResponse>>> getSeparations() {
+        List<CompanyTypeResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
+                .map(type -> new CompanyTypeResponse(type.name(), type.getLabel()))
                 .toList();
 
         return ResponseEntity.ok(SuccessResponse.of(responseList));
@@ -125,10 +125,10 @@ public class OutsourcingCompanyController {
     })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<OutsourcingCompanyDetailResponse>> getOutsourcingCompanyById(
+    public ResponseEntity<SuccessResponse<CompanyDetailResponse>> getOutsourcingCompanyById(
             @PathVariable Long id
     ) {
-        OutsourcingCompanyDetailResponse response = outsourcingCompanyService.getOutsourcingCompanyById(id);
+        CompanyDetailResponse response = outsourcingCompanyService.getOutsourcingCompanyById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -201,12 +201,12 @@ public class OutsourcingCompanyController {
     })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<OutsourcingCompanyChangeHistoryResponse>>> getOutsourcingCompanyChangeHistories(
+    public ResponseEntity<SuccessResponse<SliceResponse<CompanyChangeHistoryResponse>>> getOutsourcingCompanyChangeHistories(
             @PathVariable Long id,
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest
     ) {
-        Slice<OutsourcingCompanyChangeHistoryResponse> slice = outsourcingCompanyService.getOutsourcingCompanyChangeHistories(
+        Slice<CompanyChangeHistoryResponse> slice = outsourcingCompanyService.getOutsourcingCompanyChangeHistories(
                 id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
         );

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Schema(description = "외주업체 상세 응답")
-public record OutsourcingCompanyDetailResponse(
+public record CompanyDetailResponse(
         @Schema(description = "ID", example = "1")
         Long id,
 
@@ -73,13 +73,13 @@ public record OutsourcingCompanyDetailResponse(
         String memo,
 
         @Schema(description = "담당자 목록")
-        List<OutsourcingCompanyContactResponse> contacts,
+        List<CompanyContactResponse> contacts,
 
         @Schema(description = "파일 목록")
-        List<OutsourcingCompanyFileResponse> files
+        List<CompanyFileResponse> files
 ) {
-    public static OutsourcingCompanyDetailResponse from(OutsourcingCompany company) {
-        return new OutsourcingCompanyDetailResponse(
+    public static CompanyDetailResponse from(OutsourcingCompany company) {
+        return new CompanyDetailResponse(
                 company.getId(),
                 company.getName(),
                 company.getBusinessNumber(),
@@ -103,10 +103,10 @@ public record OutsourcingCompanyDetailResponse(
                 company.getAccountHolder(),
                 company.getMemo(),
                 company.getContacts().stream()
-                        .map(OutsourcingCompanyContactResponse::from)
+                        .map(CompanyContactResponse::from)
                         .toList(),
                 company.getFiles().stream()
-                        .map(OutsourcingCompanyFileResponse::from)
+                        .map(CompanyFileResponse::from)
                         .toList()
         );
     }

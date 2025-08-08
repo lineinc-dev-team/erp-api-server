@@ -7,7 +7,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyFile;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.OutsourcingCompanyResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyResponse;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
@@ -53,7 +53,7 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
      * @return OutsourcingCompanyResponse 리스트를 담은 Page 객체
      */
     @Override
-    public Page<OutsourcingCompanyResponse> findAll(OutsourcingCompanyListRequest request, Pageable pageable) {
+    public Page<CompanyResponse> findAll(OutsourcingCompanyListRequest request, Pageable pageable) {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
@@ -78,8 +78,8 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
                 .fetchOne();
         long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        List<OutsourcingCompanyResponse> responses = content.stream()
-                .map(OutsourcingCompanyResponse::from)
+        List<CompanyResponse> responses = content.stream()
+                .map(CompanyResponse::from)
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);

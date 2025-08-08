@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 
 @Schema(description = "외주업체 담당자 응답")
-public record OutsourcingCompanyContactResponse(
+public record CompanyContactResponse(
 
         @Schema(description = "ID", example = "101")
         Long id,
@@ -34,8 +34,8 @@ public record OutsourcingCompanyContactResponse(
         Boolean isMain
 
 ) {
-    public static OutsourcingCompanyContactResponse from(OutsourcingCompanyContact contact) {
-        return new OutsourcingCompanyContactResponse(
+    public static CompanyContactResponse from(OutsourcingCompanyContact contact) {
+        return new CompanyContactResponse(
                 contact.getId(),
                 contact.getName(),
                 contact.getDepartment(),
