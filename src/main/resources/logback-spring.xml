@@ -5,7 +5,8 @@
 
     <!-- 로그 패턴 및 디렉토리 설정 -->
     <property name="LOG_PATTERN"
-              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} [%thread] %highlight(%-5level) %clr(%logger{36}){cyan} - %msg%n"/>
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} [%thread] %highlight(%-5level) %clr(%logger{36}){cyan} - %msg%n%xEx"/>
+    <!-- LOG_DIR는 application.yml에서 logging.file.path로 외부 설정할 수 있습니다 -->
     <property name="LOG_DIR" value="logs"/>
 
     <!-- 콘솔 출력: 색상 적용 -->
@@ -51,6 +52,7 @@
 
     <!-- 공통 설정: 모든 환경에서 공통적으로 적용 -->
     <logger name="org.hibernate.SQL" level="INFO"/>
+    <logger name="com.lineinc" level="DEBUG"/>
 
     <!-- 기본 환경 fallback -->
     <root level="INFO">
