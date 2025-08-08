@@ -3,9 +3,11 @@ package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
 import com.lineinc.erp.api.server.common.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.ContractStatusResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyContractDefaultDeductionsResponse;
+import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.ContractTypeResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.TaxInvoiceConditionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,6 +56,14 @@ public class CompanyContractController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
+    @Operation(summary = "계약 구분 목록 조회", description = "외주업체 계약 구분 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/types")
+    public ResponseEntity<SuccessResponse<List<ContractTypeResponse>>> getContractTypes() {
+        List<ContractTypeResponse> responseList = Arrays.stream(OutsourcingCompanyContractType.values())
+                .map(type -> new ContractTypeResponse(type.name(), type.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
 }
-
-
