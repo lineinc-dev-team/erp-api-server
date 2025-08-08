@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 @Schema(description = "현장 계약 등록 요청")
-public record SiteContractCreateRequest(
+public record CreateSiteContractRequest(
         @NotBlank
         @Schema(description = "계약명", example = "전기공사 계약")
         String name,
@@ -20,6 +20,6 @@ public record SiteContractCreateRequest(
 
         @Valid
         @Schema(description = "계약 관련 파일 목록")
-        List<SiteFileCreateRequest> files
+        List<CreateSiteFileRequest> files
 ) {
 }

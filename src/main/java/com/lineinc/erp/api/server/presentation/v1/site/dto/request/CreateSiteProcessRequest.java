@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "현장 공정 등록 요청")
-public record SiteProcessCreateRequest(
+public record CreateSiteProcessRequest(
         @NotBlank
         @Size(min = 5, max = 100)
         @Schema(description = "공정명", example = "기초 공사")

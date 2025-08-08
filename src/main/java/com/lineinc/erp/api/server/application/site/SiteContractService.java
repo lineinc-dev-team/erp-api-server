@@ -5,7 +5,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.site.repository.SiteContractRepository;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteContractCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.CreateSiteContractRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteContractUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,8 +32,8 @@ public class SiteContractService {
     private final Javers javers;
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
-    public void createContracts(Site site, List<SiteContractCreateRequest> requests) {
-        for (SiteContractCreateRequest contractReq : requests) {
+    public void createContracts(Site site, List<CreateSiteContractRequest> requests) {
+        for (CreateSiteContractRequest contractReq : requests) {
             SiteContract contract = siteContractRepository.save(SiteContract.builder()
                     .site(site)
                     .name(contractReq.name())

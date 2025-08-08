@@ -23,6 +23,6 @@ public record SiteContractUpdateRequest(
 
         @Valid
         @Schema(description = "계약 관련 파일 목록")
-        List<SiteFileUpdateRequest> files
+        List<UpdateSiteFileRequest> files
 ) {
 }

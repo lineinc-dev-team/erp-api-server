@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractCategoryType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
@@ -36,15 +35,9 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
 
-    @Column(nullable = false)
-    private String name;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_id")
     private OutsourcingCompany outsourcingCompany;
-
-    @Column
-    private String businessNumber;
 
     @Column
     @Enumerated(EnumType.STRING)

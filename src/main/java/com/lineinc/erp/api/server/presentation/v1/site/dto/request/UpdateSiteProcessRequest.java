@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "현장 공정 등록 요청")
-public record SiteProcessUpdateRequest(
+public record UpdateSiteProcessRequest(
         @Schema(description = "공정명", example = "기초 공사")
         @Size(min = 5, max = 100)
         String name,

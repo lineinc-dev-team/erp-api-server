@@ -13,7 +13,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 @Schema(description = "현장 등록 요청")
-public record SiteCreateRequest(
+public record CreateSiteRequest(
         @NotBlank
         @Size(min = 5, max = 100)
         @Schema(description = "현장명", example = "서울 APT 신축공사")
@@ -57,10 +57,10 @@ public record SiteCreateRequest(
 
         @Valid
         @Schema(description = "현장 공정 정보")
-        SiteProcessCreateRequest process,
+        CreateSiteProcessRequest process,
 
         @Valid
         @Schema(description = "현장 계약 목록")
-        List<SiteContractCreateRequest> contracts
+        List<CreateSiteContractRequest> contracts
 ) {
 }

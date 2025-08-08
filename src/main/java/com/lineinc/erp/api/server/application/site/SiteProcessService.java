@@ -10,8 +10,8 @@ import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.CreateSiteProcessRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.UpdateSiteProcessRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteProcessResponse;
 import lombok.RequiredArgsConstructor;
 import org.javers.core.Javers;
@@ -35,7 +35,7 @@ public class SiteProcessService {
     private final Javers javers;
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
-    public void createProcess(Site site, SiteProcessCreateRequest request) {
+    public void createProcess(Site site, CreateSiteProcessRequest request) {
         siteProcessRepository.save(SiteProcess.builder()
                 .site(site)
                 .name(request.name())
@@ -47,7 +47,7 @@ public class SiteProcessService {
         );
     }
 
-    public void updateProcess(Site site, SiteProcessUpdateRequest request) {
+    public void updateProcess(Site site, UpdateSiteProcessRequest request) {
         SiteProcess siteProcess = site.getProcesses().get(0);
         User user = userService.getUserByIdOrThrow(request.managerId());
 

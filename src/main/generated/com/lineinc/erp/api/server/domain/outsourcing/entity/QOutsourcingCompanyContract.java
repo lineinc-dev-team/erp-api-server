@@ -24,8 +24,6 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
-    public final StringPath businessNumber = createString("businessNumber");
-
     public final EnumPath<com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractCategoryType> category = createEnum("category", com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractCategoryType.class);
 
     public final NumberPath<Long> contractAmount = createNumber("contractAmount", Long.class);
@@ -53,8 +51,6 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");
-
-    public final StringPath name = createString("name");
 
     public final QOutsourcingCompany outsourcingCompany;
 

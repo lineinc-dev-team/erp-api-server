@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.domain.site.entity;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteProcessUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.UpdateSiteProcessRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -66,7 +66,7 @@ public class SiteProcess extends BaseEntity {
         this.statusName = this.status != null ? this.status.getLabel() : null;
     }
 
-    public void updateFrom(SiteProcessUpdateRequest request, User user) {
+    public void updateFrom(UpdateSiteProcessRequest request, User user) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.officePhone()).ifPresent(val -> this.officePhone = val);
         Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);

@@ -52,7 +52,7 @@ public class SiteController {
     })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.CREATE)
-    public ResponseEntity<Void> createSite(@Valid @RequestBody SiteCreateRequest request) {
+    public ResponseEntity<Void> createSite(@Valid @RequestBody CreateSiteRequest request) {
         siteService.createSite(request);
         return ResponseEntity.ok().build();
     }
@@ -150,7 +150,7 @@ public class SiteController {
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateSite(
             @PathVariable Long id,
-            @Valid @RequestBody SiteUpdateRequest request
+            @Valid @RequestBody UpdateSiteRequest request
     ) {
         siteService.updateSite(id, request);
         return ResponseEntity.ok().build();

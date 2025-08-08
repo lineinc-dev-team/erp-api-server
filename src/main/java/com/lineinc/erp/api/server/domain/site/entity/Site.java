@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.domain.site.entity;
 import com.lineinc.erp.api.server.application.client.ClientCompanyService;
 import com.lineinc.erp.api.server.application.user.UserService;
 import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.UpdateSiteRequest;
 
 import java.util.Optional;
 
@@ -131,7 +131,7 @@ public class Site extends BaseEntity {
         this.endedAtFormat = this.endedAt != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.endedAt) : null;
     }
 
-    public void updateFrom(SiteUpdateRequest request, UserService userService, ClientCompanyService clientCompanyService) {
+    public void updateFrom(UpdateSiteRequest request, UserService userService, ClientCompanyService clientCompanyService) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
         Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);

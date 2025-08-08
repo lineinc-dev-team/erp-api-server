@@ -14,9 +14,9 @@ import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryReposi
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.DeleteSitesRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.CreateSiteRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.UpdateSiteRequest;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteChangeHistoryResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteDetailResponse;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
@@ -51,7 +51,7 @@ public class SiteService {
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
     @Transactional
-    public void createSite(SiteCreateRequest request) {
+    public void createSite(CreateSiteRequest request) {
         validateDuplicateName(request.name());
         ClientCompany clientCompany = clientCompanyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
         User user = userService.getUserByIdOrThrow(request.userId());
@@ -201,7 +201,7 @@ public class SiteService {
     }
 
     @Transactional
-    public void updateSite(Long siteId, SiteUpdateRequest request) {
+    public void updateSite(Long siteId, UpdateSiteRequest request) {
         Site site = siteRepository.findById(siteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
 
@@ -229,7 +229,7 @@ public class SiteService {
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (SiteUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+            for (UpdateSiteRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
                 siteChangeHistoryRepository.findById(historyRequest.id())
                         .filter(history -> history.getSite().getId().equals(site.getId()))
                         .ifPresent(history -> {

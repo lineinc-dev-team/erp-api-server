@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.application.site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.site.repository.SiteFileRepository;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteFileCreateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.CreateSiteFileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +15,8 @@ public class SiteFileService {
 
     private final SiteFileRepository siteFileRepository;
 
-    public void createFiles(SiteContract contract, List<SiteFileCreateRequest> fileRequests) {
-        for (SiteFileCreateRequest fileReq : fileRequests) {
+    public void createFiles(SiteContract contract, List<CreateSiteFileRequest> fileRequests) {
+        for (CreateSiteFileRequest fileReq : fileRequests) {
             siteFileRepository.save(SiteFile.builder()
                     .siteContract(contract)
                     .name(fileReq.name())

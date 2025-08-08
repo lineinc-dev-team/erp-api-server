@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Schema(description = "현장 수정 요청")
-public record SiteUpdateRequest(
+public record UpdateSiteRequest(
         @Schema(description = "현장명", example = "서울 APT 신축공사")
         @Size(min = 5, max = 100)
         String name,
@@ -52,14 +52,14 @@ public record SiteUpdateRequest(
 
         @Valid
         @Schema(description = "현장 공정 정보")
-        SiteProcessUpdateRequest process,
+        UpdateSiteProcessRequest process,
 
         @Valid
         @Schema(description = "현장 계약 목록")
         List<SiteContractUpdateRequest> contracts,
 
         @Schema(description = "수정 이력 리스트")
-        List<SiteUpdateRequest.ChangeHistoryRequest> changeHistories
+        List<UpdateSiteRequest.ChangeHistoryRequest> changeHistories
 ) {
     public record ChangeHistoryRequest(
             @Schema(description = "수정 이력 번호", example = "1")
