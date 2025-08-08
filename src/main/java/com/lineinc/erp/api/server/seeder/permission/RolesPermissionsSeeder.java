@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.seeder;
+package com.lineinc.erp.api.server.seeder.permission;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.seeder;
+package com.lineinc.erp.api.server.seeder.menu;
 
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.domain.menu.entity.Menu;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.seeder;
+package com.lineinc.erp.api.server.seeder.user;
 
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
