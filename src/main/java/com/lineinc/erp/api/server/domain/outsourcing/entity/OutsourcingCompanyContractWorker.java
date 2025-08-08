@@ -46,5 +46,5 @@ public class OutsourcingCompanyContractWorker extends BaseEntity {
     private String originalFileName;
 
     @Column(columnDefinition = "TEXT")
-    private String note; // 비고
+    private String memo; // 비고
 }

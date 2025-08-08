@@ -38,7 +38,7 @@ public class QOutsourcingCompanyContractEquipment extends EntityPathBase<Outsour
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath note = createString("note");
+    public final StringPath memo = createString("memo");
 
     public final StringPath specification = createString("specification");
 

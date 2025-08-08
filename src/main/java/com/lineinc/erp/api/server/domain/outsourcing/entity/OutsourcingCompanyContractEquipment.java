@@ -45,7 +45,5 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
     private String taskDescription; // 작업내용
 
     @Column(columnDefinition = "TEXT")
-    private String note; // 비고
-
-
+    private String memo; // 비고
 }

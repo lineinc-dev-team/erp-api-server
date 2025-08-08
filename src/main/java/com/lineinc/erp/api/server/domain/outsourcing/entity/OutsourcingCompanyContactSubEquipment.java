@@ -27,5 +27,5 @@ public class OutsourcingCompanyContactSubEquipment {
     private OutsourcingCompanyContractEquipment equipment;
 
     @Column(columnDefinition = "TEXT")
-    private String note; // 비고
+    private String memo; // 비고
 }
