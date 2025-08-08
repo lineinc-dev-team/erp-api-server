@@ -27,6 +27,10 @@ public class OutsourcingCompanyContractDriver extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    private OutsourcingCompanyContract outsourcingCompanyContract;
+
     // 1. 기사자격증 파일
     @DiffInclude
     @Column(nullable = false)

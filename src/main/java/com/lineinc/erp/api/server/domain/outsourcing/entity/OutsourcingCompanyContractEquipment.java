@@ -31,6 +31,10 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
     @Column
     private String category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    private OutsourcingCompanyContract outsourcingCompanyContract;
+    
     @Builder.Default
     @OneToMany(mappedBy = "equipment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyContactSubEquipment> subEquipments = new ArrayList<>();

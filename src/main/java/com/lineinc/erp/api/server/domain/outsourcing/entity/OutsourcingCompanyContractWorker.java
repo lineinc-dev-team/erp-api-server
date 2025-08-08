@@ -27,6 +27,10 @@ public class OutsourcingCompanyContractWorker extends BaseEntity {
     @SequenceGenerator(name = "outsourcing_company_contract_worker_seq", sequenceName = "outsourcing_company_contract_worker_seq", allocationSize = 1)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    private OutsourcingCompanyContract outsourcingCompanyContract;
+    
     @Column(nullable = false)
     private String name;
 

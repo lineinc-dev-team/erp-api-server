@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -16,6 +17,8 @@ import com.querydsl.core.types.Path;
 public class QOutsourcingCompanyContractDriver extends EntityPathBase<OutsourcingCompanyContractDriver> {
 
     private static final long serialVersionUID = -1704874555L;
+
+    private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QOutsourcingCompanyContractDriver outsourcingCompanyContractDriver = new QOutsourcingCompanyContractDriver("outsourcingCompanyContractDriver");
 
@@ -51,6 +54,8 @@ public class QOutsourcingCompanyContractDriver extends EntityPathBase<Outsourcin
 
     public final StringPath name = createString("name");
 
+    public final QOutsourcingCompanyContract outsourcingCompanyContract;
+
     public final StringPath safetyEducationFileUrl = createString("safetyEducationFileUrl");
 
     public final StringPath safetyEducationName = createString("safetyEducationName");
@@ -64,15 +69,24 @@ public class QOutsourcingCompanyContractDriver extends EntityPathBase<Outsourcin
     public final StringPath updatedBy = _super.updatedBy;
 
     public QOutsourcingCompanyContractDriver(String variable) {
-        super(OutsourcingCompanyContractDriver.class, forVariable(variable));
+        this(OutsourcingCompanyContractDriver.class, forVariable(variable), INITS);
     }
 
     public QOutsourcingCompanyContractDriver(Path<? extends OutsourcingCompanyContractDriver> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QOutsourcingCompanyContractDriver(PathMetadata metadata) {
-        super(OutsourcingCompanyContractDriver.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QOutsourcingCompanyContractDriver(PathMetadata metadata, PathInits inits) {
+        this(OutsourcingCompanyContractDriver.class, metadata, inits);
+    }
+
+    public QOutsourcingCompanyContractDriver(Class<? extends OutsourcingCompanyContractDriver> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.outsourcingCompanyContract = inits.isInitialized("outsourcingCompanyContract") ? new QOutsourcingCompanyContract(forProperty("outsourcingCompanyContract"), inits.get("outsourcingCompanyContract")) : null;
     }
 
 }

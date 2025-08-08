@@ -18,6 +18,8 @@ public class QOutsourcingCompanyContractEquipment extends EntityPathBase<Outsour
 
     private static final long serialVersionUID = 513150673L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QOutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment = new QOutsourcingCompanyContractEquipment("outsourcingCompanyContractEquipment");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
@@ -40,6 +42,8 @@ public class QOutsourcingCompanyContractEquipment extends EntityPathBase<Outsour
 
     public final StringPath memo = createString("memo");
 
+    public final QOutsourcingCompanyContract outsourcingCompanyContract;
+
     public final StringPath specification = createString("specification");
 
     public final ListPath<OutsourcingCompanyContactSubEquipment, QOutsourcingCompanyContactSubEquipment> subEquipments = this.<OutsourcingCompanyContactSubEquipment, QOutsourcingCompanyContactSubEquipment>createList("subEquipments", OutsourcingCompanyContactSubEquipment.class, QOutsourcingCompanyContactSubEquipment.class, PathInits.DIRECT2);
@@ -59,15 +63,24 @@ public class QOutsourcingCompanyContractEquipment extends EntityPathBase<Outsour
     public final StringPath vehicleNumber = createString("vehicleNumber");
 
     public QOutsourcingCompanyContractEquipment(String variable) {
-        super(OutsourcingCompanyContractEquipment.class, forVariable(variable));
+        this(OutsourcingCompanyContractEquipment.class, forVariable(variable), INITS);
     }
 
     public QOutsourcingCompanyContractEquipment(Path<? extends OutsourcingCompanyContractEquipment> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QOutsourcingCompanyContractEquipment(PathMetadata metadata) {
-        super(OutsourcingCompanyContractEquipment.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QOutsourcingCompanyContractEquipment(PathMetadata metadata, PathInits inits) {
+        this(OutsourcingCompanyContractEquipment.class, metadata, inits);
+    }
+
+    public QOutsourcingCompanyContractEquipment(Class<? extends OutsourcingCompanyContractEquipment> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.outsourcingCompanyContract = inits.isInitialized("outsourcingCompanyContract") ? new QOutsourcingCompanyContract(forProperty("outsourcingCompanyContract"), inits.get("outsourcingCompanyContract")) : null;
     }
 
 }
