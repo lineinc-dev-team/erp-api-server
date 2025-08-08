@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.client.repository;
 
-import com.lineinc.erp.api.server.common.constant.AppConstants;
-import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.QClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.QClientCompanyContact;

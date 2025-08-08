@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.seeder;
 
 
-import com.lineinc.erp.api.server.common.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;

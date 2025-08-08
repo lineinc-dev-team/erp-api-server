@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.outsourcing.repository;
 
-import com.lineinc.erp.api.server.common.constant.AppConstants;
-import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyContact;

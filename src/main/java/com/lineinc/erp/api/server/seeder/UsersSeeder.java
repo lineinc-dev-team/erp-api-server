@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.seeder;
 
-import com.lineinc.erp.api.server.common.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

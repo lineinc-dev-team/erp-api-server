@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.user.repository;
 
-import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -18,7 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import static com.lineinc.erp.api.server.common.constant.AppConstants.KOREA_ZONE_OFFSET;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.KOREA_ZONE_OFFSET;
 
 import java.util.List;
 import java.util.Map;

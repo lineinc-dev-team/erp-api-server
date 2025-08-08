@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.client.service;
 
-import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
-import com.lineinc.erp.api.server.common.util.JaversUtils;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeType;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;

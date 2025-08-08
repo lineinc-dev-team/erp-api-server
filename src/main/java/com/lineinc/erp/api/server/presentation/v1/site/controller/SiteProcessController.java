@@ -1,11 +1,11 @@
 package com.lineinc.erp.api.server.presentation.v1.site.controller;
 
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
-import com.lineinc.erp.api.server.common.constant.AppConstants;
-import com.lineinc.erp.api.server.common.request.PageRequest;
-import com.lineinc.erp.api.server.common.request.SortRequest;
-import com.lineinc.erp.api.server.common.response.*;
-import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.dto.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.*;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.response.siteprocess.SiteProcessResponse;

@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.client.dto.request;
 
-import com.lineinc.erp.api.server.common.validation.MultiConstraint;
-import com.lineinc.erp.api.server.common.validation.ValidatorType;
+import com.lineinc.erp.api.server.shared.validation.MultiConstraint;
+import com.lineinc.erp.api.server.shared.validation.ValidatorType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "발주처 파일 등록 요청")

@@ -1,9 +1,9 @@
 package com.lineinc.erp.api.server.config.aop;
 
 import com.lineinc.erp.api.server.domain.common.service.RateLimitService;
-import com.lineinc.erp.api.server.common.annotation.RateLimit;
-import com.lineinc.erp.api.server.common.constant.ValidationMessages;
-import com.lineinc.erp.api.server.common.util.SecurityUtils;
+import com.lineinc.erp.api.server.shared.annotation.RateLimit;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.SecurityUtils;
 import io.github.bucket4j.Bucket;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;

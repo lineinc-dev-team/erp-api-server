@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.site.service;
 
-import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 
-import com.lineinc.erp.api.server.common.util.JaversUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;

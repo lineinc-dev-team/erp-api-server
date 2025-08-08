@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 
-import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 

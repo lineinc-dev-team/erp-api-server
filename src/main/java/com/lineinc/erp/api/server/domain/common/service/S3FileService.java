@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.common.service;
 
-import com.lineinc.erp.api.server.common.constant.ValidationMessages;
-import com.lineinc.erp.api.server.common.enums.FileMimeType;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.enums.FileMimeType;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.request.PresignedUrlRequest;
 import com.lineinc.erp.api.server.presentation.v1.file.dto.response.PresignedUrlResponse;
 import lombok.RequiredArgsConstructor;

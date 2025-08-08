@@ -1,26 +1,26 @@
 package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
 
-import com.lineinc.erp.api.server.common.response.SliceResponse;
-import com.lineinc.erp.api.server.common.response.SliceInfo;
+import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
 
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyDownloadRequest;
-import com.lineinc.erp.api.server.common.util.DownloadFieldUtils;
-import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
-import com.lineinc.erp.api.server.common.constant.AppConstants;
-import com.lineinc.erp.api.server.common.request.PageRequest;
-import com.lineinc.erp.api.server.common.request.SortRequest;
-import com.lineinc.erp.api.server.common.response.SuccessResponse;
-import com.lineinc.erp.api.server.common.response.PagingResponse;
-import com.lineinc.erp.api.server.common.response.PagingInfo;
-import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.dto.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyResponse;

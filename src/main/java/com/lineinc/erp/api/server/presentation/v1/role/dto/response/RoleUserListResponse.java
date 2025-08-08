@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.role.dto.response;
 
-import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;

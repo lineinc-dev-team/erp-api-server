@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.domain.outsourcing.service;
 
-import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.common.util.JaversUtils;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
@@ -12,7 +12,7 @@ import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.Compa
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyContactResponse;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyDetailResponse;
 
-import com.lineinc.erp.api.server.common.constant.ValidationMessages;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;

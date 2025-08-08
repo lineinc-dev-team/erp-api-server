@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.domain.user.service;
 
-import com.lineinc.erp.api.server.common.constant.ValidationMessages;
-import com.lineinc.erp.api.server.common.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.common.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
@@ -14,7 +14,7 @@ import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserCha
 import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserInfoResponse;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
-import com.lineinc.erp.api.server.common.util.JaversUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;

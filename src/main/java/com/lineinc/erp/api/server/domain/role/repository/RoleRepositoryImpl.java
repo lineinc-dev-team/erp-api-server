@@ -19,7 +19,7 @@ import com.lineinc.erp.api.server.domain.role.entity.QRole;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.lineinc.erp.api.server.common.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 

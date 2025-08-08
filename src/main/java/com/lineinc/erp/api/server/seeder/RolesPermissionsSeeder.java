@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.seeder;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 
-import com.lineinc.erp.api.server.common.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.domain.menu.repository.MenuRepository;
 import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
 import com.lineinc.erp.api.server.domain.role.entity.Role;

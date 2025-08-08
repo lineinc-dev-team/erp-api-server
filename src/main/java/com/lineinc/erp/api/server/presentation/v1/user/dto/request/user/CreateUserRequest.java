@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.user.dto.request.user;
 
-import com.lineinc.erp.api.server.common.validation.MultiConstraint;
-import com.lineinc.erp.api.server.common.validation.ValidatorType;
+import com.lineinc.erp.api.server.shared.validation.MultiConstraint;
+import com.lineinc.erp.api.server.shared.validation.ValidatorType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

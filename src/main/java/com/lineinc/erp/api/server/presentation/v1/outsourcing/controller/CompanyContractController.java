@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.outsourcing.controller;
 
-import com.lineinc.erp.api.server.common.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.*;
 import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;

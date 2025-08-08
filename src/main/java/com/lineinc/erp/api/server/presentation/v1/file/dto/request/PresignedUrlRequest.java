@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.presentation.v1.file.dto.request;
 
-import com.lineinc.erp.api.server.common.enums.FileUploadTarget;
+import com.lineinc.erp.api.server.shared.enums.FileUploadTarget;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 

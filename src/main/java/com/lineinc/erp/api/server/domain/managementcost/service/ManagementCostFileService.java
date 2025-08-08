@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.managementcost.service;
 
-import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

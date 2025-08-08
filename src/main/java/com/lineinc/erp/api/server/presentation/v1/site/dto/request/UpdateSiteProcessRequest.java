@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.presentation.v1.site.dto.request;
 
-import com.lineinc.erp.api.server.common.validation.MultiConstraint;
-import com.lineinc.erp.api.server.common.validation.ValidatorType;
+import com.lineinc.erp.api.server.shared.validation.MultiConstraint;
+import com.lineinc.erp.api.server.shared.validation.ValidatorType;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;

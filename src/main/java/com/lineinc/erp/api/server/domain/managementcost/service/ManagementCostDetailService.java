@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.managementcost.service;
 
-import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostDetailRepository;

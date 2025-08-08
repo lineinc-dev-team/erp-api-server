@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.client.service;
 
-import com.lineinc.erp.api.server.common.constant.ValidationMessages;
-import com.lineinc.erp.api.server.common.util.JaversUtils;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
@@ -12,7 +12,7 @@ import com.lineinc.erp.api.server.presentation.v1.client.dto.request.ClientCompa
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 
