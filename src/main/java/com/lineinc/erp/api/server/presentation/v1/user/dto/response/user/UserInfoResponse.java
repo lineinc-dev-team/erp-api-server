@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.user.dto.response;
+package com.lineinc.erp.api.server.presentation.v1.user.dto.response.user;
 
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @Schema(description = "유저 상세 정보 응답")
-public record UserDetailResponse(
+public record UserInfoResponse(
         @Schema(description = "사용자 ID", example = "123")
         Long id,
 
@@ -58,8 +58,8 @@ public record UserDetailResponse(
         @Schema(description = "사용자 권한 목록")
         List<UserResponse.RoleSummaryResponse> roles
 ) {
-    public static UserDetailResponse from(User user) {
-        return new UserDetailResponse(
+    public static UserInfoResponse from(User user) {
+        return new UserInfoResponse(
                 user.getId(),
                 user.getLoginId(),
                 user.getUsername(),

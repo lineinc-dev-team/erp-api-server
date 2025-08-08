@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.domain.site.entity;
 import com.lineinc.erp.api.server.common.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteContractUpdateRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.sitecontract.SiteContractUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

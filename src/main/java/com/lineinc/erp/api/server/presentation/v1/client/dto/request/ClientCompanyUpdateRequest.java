@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.presentation.v1.client.dto.request;
 import com.lineinc.erp.api.server.common.validation.MultiConstraint;
 import com.lineinc.erp.api.server.common.validation.ValidatorType;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

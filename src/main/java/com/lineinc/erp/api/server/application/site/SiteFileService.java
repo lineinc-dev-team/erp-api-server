@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.application.site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.site.repository.SiteFileRepository;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.CreateSiteFileRequest;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.request.sitefile.CreateSiteFileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -48,7 +48,7 @@ public class QOutsourcingCompanyContactSubEquipment extends EntityPathBase<Outso
 
     public QOutsourcingCompanyContactSubEquipment(Class<? extends OutsourcingCompanyContactSubEquipment> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.equipment = inits.isInitialized("equipment") ? new QOutsourcingCompanyContractEquipment(forProperty("equipment")) : null;
+        this.equipment = inits.isInitialized("equipment") ? new QOutsourcingCompanyContractEquipment(forProperty("equipment"), inits.get("equipment")) : null;
     }
 
 }

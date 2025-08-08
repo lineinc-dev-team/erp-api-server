@@ -1,6 +1,7 @@
-package com.lineinc.erp.api.server.presentation.v1.site.dto.response;
+package com.lineinc.erp.api.server.presentation.v1.site.dto.response.sitecontract;
 
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.sitefile.SiteFileResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;

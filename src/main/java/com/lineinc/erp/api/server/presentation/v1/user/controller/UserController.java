@@ -15,9 +15,9 @@ import com.lineinc.erp.api.server.common.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.config.security.aop.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.*;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserChangeHistoryResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.user.*;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserInfoResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserChangeHistoryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
-            @Valid UserListRequest request
+            @Valid SearchUserRequest request
     ) {
         Page<UserResponse> page = userService.getAllUsers(
                 request,
@@ -117,12 +117,12 @@ public class UserController {
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public void downloadUserListExcel(
             @Valid SortRequest sortRequest,
-            @Valid UserListRequest request,
-            @Valid UserDownloadRequest userDownloadRequest,
+            @Valid SearchUserRequest request,
+            @Valid DownloadUserListRequest downloadUserListRequest,
             HttpServletResponse response
     ) throws IOException {
-        List<String> parsed = DownloadFieldUtils.parseFields(userDownloadRequest.fields());
-        DownloadFieldUtils.validateFields(parsed, UserDownloadRequest.ALLOWED_FIELDS);
+        List<String> parsed = DownloadFieldUtils.parseFields(downloadUserListRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, DownloadUserListRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "유저 목록.xlsx");
 
         try (Workbook workbook = userService.downloadExcel(
@@ -142,7 +142,7 @@ public class UserController {
     })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.DELETE)
-    public ResponseEntity<Void> deleteUsers(@RequestBody DeleteUsersRequest userIds) {
+    public ResponseEntity<Void> deleteUsers(@RequestBody BulkDeleteUsersRequest userIds) {
         userService.deleteUsersByIds(userIds);
         return ResponseEntity.ok().build();
     }
@@ -170,8 +170,8 @@ public class UserController {
     })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<UserDetailResponse>> getUserDetail(@PathVariable Long id) {
-        UserDetailResponse response = userService.getUserDetail(id);
+    public ResponseEntity<SuccessResponse<UserInfoResponse>> getUserDetail(@PathVariable Long id) {
+        UserInfoResponse response = userService.getUserDetail(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 

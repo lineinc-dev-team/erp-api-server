@@ -5,7 +5,7 @@ import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.user.SearchUserRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
@@ -17,8 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
-
-import java.time.ZoneOffset;
 
 import static com.lineinc.erp.api.server.common.constant.AppConstants.KOREA_ZONE_OFFSET;
 
@@ -43,7 +41,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     );
 
     @Override
-    public Page<UserResponse> findAll(UserListRequest request, Pageable pageable) {
+    public Page<UserResponse> findAll(SearchUserRequest request, Pageable pageable) {
 
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
@@ -73,7 +71,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         return new PageImpl<>(responses, pageable, total);
     }
 
-    private BooleanBuilder buildCondition(UserListRequest request) {
+    private BooleanBuilder buildCondition(SearchUserRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(user.id.ne(1L));
 
@@ -141,7 +139,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public List<UserResponse> findAllWithoutPaging(UserListRequest request, Sort sort) {
+    public List<UserResponse> findAllWithoutPaging(SearchUserRequest request, Sort sort) {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 

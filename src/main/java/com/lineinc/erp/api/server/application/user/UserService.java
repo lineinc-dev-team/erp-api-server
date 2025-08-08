@@ -10,8 +10,8 @@ import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.enums.UserChangeType;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserChangeHistoryResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.response.UserDetailResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserChangeHistoryResponse;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserInfoResponse;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import com.lineinc.erp.api.server.common.util.JaversUtils;
@@ -23,10 +23,10 @@ import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
 import com.lineinc.erp.api.server.presentation.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.CreateUserRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.DeleteUsersRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UpdateUserRequest;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.UserListRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.user.CreateUserRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.user.BulkDeleteUsersRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.user.UpdateUserRequest;
+import com.lineinc.erp.api.server.presentation.v1.user.dto.request.user.SearchUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Sort;
@@ -77,7 +77,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(UserListRequest request, Pageable pageable) {
+    public Page<UserResponse> getAllUsers(SearchUserRequest request, Pageable pageable) {
         return usersRepository.findAll(request, pageable);
     }
 
@@ -105,7 +105,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(UserListRequest request, Sort sort, List<String> fields) {
+    public Workbook downloadExcel(SearchUserRequest request, Sort sort, List<String> fields) {
         List<UserResponse> userResponses = usersRepository.findAllWithoutPaging(request, sort);
         return ExcelExportUtils.generateWorkbook(
                 userResponses,
@@ -156,7 +156,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUsersByIds(DeleteUsersRequest request) {
+    public void deleteUsersByIds(BulkDeleteUsersRequest request) {
         List<User> users = usersRepository.findAllById(request.userIds());
         if (request.userIds().size() != users.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND);
@@ -232,10 +232,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDetailResponse getUserDetail(Long id) {
+    public UserInfoResponse getUserDetail(Long id) {
         User user = usersRepository.findByIdWithRoles(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
-        return UserDetailResponse.from(user);
+        return UserInfoResponse.from(user);
     }
 
     @Transactional(readOnly = true)

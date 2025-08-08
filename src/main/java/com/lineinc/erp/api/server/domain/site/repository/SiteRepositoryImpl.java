@@ -5,7 +5,7 @@ import com.lineinc.erp.api.server.domain.site.entity.*;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.site.SiteResponse;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;

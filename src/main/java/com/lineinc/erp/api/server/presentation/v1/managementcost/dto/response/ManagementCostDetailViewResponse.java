@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteProcessResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.SiteResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.siteprocess.SiteProcessResponse;
+import com.lineinc.erp.api.server.presentation.v1.site.dto.response.site.SiteResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;

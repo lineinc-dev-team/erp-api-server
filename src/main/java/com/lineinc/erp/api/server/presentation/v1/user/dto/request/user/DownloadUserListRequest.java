@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.user.dto.request;
+package com.lineinc.erp.api.server.presentation.v1.user.dto.request.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @ParameterObject
 @Schema(description = "유저 엑셀 다운로드 요청")
-public record UserDownloadRequest(
+public record DownloadUserListRequest(
         @NotBlank
         @Schema(
                 description = "허용 필드: id, loginId, username, department, grade, position, landlineNumber, phoneNumber, isActive, lastLoginAt, createdAt, updatedAt, updatedBy, memo",
