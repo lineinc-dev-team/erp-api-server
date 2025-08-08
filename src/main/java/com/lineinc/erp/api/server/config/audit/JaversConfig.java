@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config;
+package com.lineinc.erp.api.server.config.audit;
 
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config;
+package com.lineinc.erp.api.server.config.persistence;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
