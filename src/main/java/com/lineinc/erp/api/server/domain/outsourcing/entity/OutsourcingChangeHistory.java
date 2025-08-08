@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
-import com.lineinc.erp.api.server.domain.site.entity.Site;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
