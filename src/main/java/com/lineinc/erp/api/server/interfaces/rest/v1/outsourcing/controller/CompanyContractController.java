@@ -2,19 +2,25 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.controller;
 
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.*;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContractDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractCategoryTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.TaxInvoiceConditionResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,7 +84,7 @@ public class CompanyContractController {
 //    @Operation(summary = "외주업체 계약 등록", description = "외주업체 계약 정보를 등록합니다")
 //    @ApiResponses(value = {
 //            @ApiResponse(responseCode = "200", description = "성공"),
-//            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+//            @ApiResponse(responseCode = "400", description = "입력값 오류")
 //    })
 //    @PostMapping
 //    public ResponseEntity<Void> createOutsourcingCompanyContract(

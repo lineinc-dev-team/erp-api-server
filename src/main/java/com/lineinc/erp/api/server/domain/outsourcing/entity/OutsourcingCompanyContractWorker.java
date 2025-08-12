@@ -1,18 +1,11 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractCategoryType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
-import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffInclude;
-
-import java.time.OffsetDateTime;
 
 @Entity
 @Getter

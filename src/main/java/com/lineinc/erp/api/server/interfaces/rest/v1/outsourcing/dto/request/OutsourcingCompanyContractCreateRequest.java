@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTax
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -58,6 +59,27 @@ public record OutsourcingCompanyContractCreateRequest(
         OutsourcingCompanyContractStatus status,
 
         @Schema(description = "메모", example = "특이사항 없음")
-        String memo
+        String memo,
+
+        @Schema(description = "계약 담당자 목록")
+        List<OutsourcingCompanyContractContactCreateRequest> contacts,
+
+        @Schema(description = "계약 첨부파일 목록")
+        List<OutsourcingCompanyContractFileCreateRequest> files,
+
+        @Schema(description = "계약 인력 목록")
+        List<OutsourcingCompanyContractWorkerCreateRequest> workers,
+
+        @Schema(description = "계약 장비 목록")
+        List<OutsourcingCompanyContractEquipmentCreateRequest> equipments,
+
+        @Schema(description = "계약 보조장비 목록")
+        List<OutsourcingCompanyContractSubEquipmentCreateRequest> subEquipments,
+
+        @Schema(description = "계약 운전자 목록")
+        List<OutsourcingCompanyContractDriverCreateRequest> drivers,
+
+        @Schema(description = "계약 공사항목 목록")
+        List<OutsourcingCompanyContractContstructionCreateRequest> constructions
 ) {
 }

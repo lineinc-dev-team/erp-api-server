@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
-import org.javers.core.metamodel.annotation.DiffInclude;
 
 import java.util.ArrayList;
 import java.util.List;
