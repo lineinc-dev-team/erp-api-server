@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 
@@ -12,6 +14,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTax
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,9 +25,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -92,4 +97,14 @@ public class OutsourcingCompanyContract extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    // 계약 담당자 목록
+    @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<OutsourcingCompanyContractContact> contacts = new ArrayList<>();
+
+    // 계약 첨부파일 목록
+    @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<OutsourcingCompanyContractFile> files = new ArrayList<>();
 }

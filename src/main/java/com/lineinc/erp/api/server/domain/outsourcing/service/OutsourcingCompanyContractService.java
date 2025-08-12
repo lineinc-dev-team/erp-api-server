@@ -3,6 +3,8 @@ package com.lineinc.erp.api.server.domain.outsourcing.service;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
 import lombok.RequiredArgsConstructor;
@@ -282,5 +285,20 @@ public class OutsourcingCompanyContractService {
                 .build();
 
         contractHistoryRepository.save(history);
+    }
+
+    /**
+     * 외주업체별 계약 이력을 페이징하여 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Page<ContractHistoryResponse> getContractHistoryByCompany(
+            Long companyId,
+            Pageable pageable) {
+
+        Page<OutsourcingCompanyContractHistory> historyPage = contractHistoryRepository
+                .findByOutsourcingCompanyIdWithPaging(companyId, pageable);
+
+        // ContractHistoryResponse로 변환
+        return historyPage.map(ContractHistoryResponse::from);
     }
 }
