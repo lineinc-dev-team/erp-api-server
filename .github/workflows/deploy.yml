@@ -157,9 +157,17 @@ jobs:
             echo "▶ 포트 $NEW_PORT 리스닝 확인 (15초 대기)"
             sleep 15
             
-            # 간단한 포트 확인
+            # 포트 확인 (더 정확한 매칭)
+            echo "▶ 포트 $NEW_PORT 리스닝 상태 상세 확인:"
+            ss -tlnp | grep ":$NEW_PORT " || echo "포트 $NEW_PORT에서 리스닝하는 프로세스 없음"
+            
             if ! ss -tlnp | grep -q ":$NEW_PORT "; then
               echo "❌ 포트 $NEW_PORT에서 리스닝하지 않음"
+              echo "▶ 현재 포트 상태:"
+              ss -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
+              echo "▶ PM2 앱 상태:"
+              pm2 list
+              echo "▶ 애플리케이션 로그:"
               pm2 logs "$NEW_APP" --lines 50
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
