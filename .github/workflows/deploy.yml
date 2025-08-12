@@ -123,8 +123,8 @@ jobs:
             # NEW_PORT에 이미 실행 중인 앱이 있다면 삭제
             echo "▶ 포트 $NEW_PORT 사용 중인 기존 앱 확인 및 삭제"
             
-            # 기존 app-new 프로세스 완전 정리
-            echo "▶ 기존 app-new 프로세스 완전 정리"
+            # 기존 app-new 프로세스만 정리 (app은 유지)
+            echo "▶ 기존 app-new 프로세스만 정리 (app은 유지)"
             pm2 delete "app-new" 2>/dev/null || true
             pm2 save --force
             sleep 3
@@ -133,12 +133,24 @@ jobs:
             echo "▶ PM2 프로세스 정리 후 상태:"
             pm2 list
             
-            # ecosystem.config.js에서 app-new의 JAR 경로를 app-latest.jar로 수정
-            echo "▶ ecosystem.config.js에서 app-new JAR 경로 수정"
-            sed -i 's|/home/ubuntu/app-new.jar|/home/ubuntu/app-latest.jar|g' ecosystem.config.js
+            # PM2 프로세스 목록 확인
+            echo "▶ PM2 프로세스 정리 후 상태:"
+            pm2 list
+            
+            # 디버깅: ecosystem.config.js 내용 확인
+            echo "▶ ecosystem.config.js 내용 확인:"
+            cat ecosystem.config.js
+            
+            # 디버깅: app-new 설정에서 JAR 경로 확인
+            echo "▶ app-new 설정에서 JAR 경로 확인:"
+            grep -A 5 -B 5 "app-new" ecosystem.config.js
             
             # 새 앱 시작
             echo "▶ $NEW_APP 시작 중..."
+            echo "▶ PM2 시작 전 환경변수 확인:"
+            echo "  - SERVER_PORT: $NEW_PORT"
+            echo "  - JAR 경로: /home/ubuntu/app-latest.jar"
+            
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
             echo "▶ $NEW_APP 시작 후 즉시 로그 확인"
