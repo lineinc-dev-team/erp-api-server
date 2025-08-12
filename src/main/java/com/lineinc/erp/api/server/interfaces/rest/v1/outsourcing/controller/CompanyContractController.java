@@ -18,10 +18,12 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyCon
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyContractService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContractDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractCategoryTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.TaxInvoiceConditionResponse;
@@ -136,28 +138,24 @@ public class CompanyContractController {
                                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
         }
 
-        // @Operation(summary = "외주계약 리스트 조회", description = "검색 조건에 따라 외주계약 리스트를 페이징하여
-        // 조회합니다")
-        // @ApiResponses(value = {
-        // @ApiResponse(responseCode = "200", description = "조회 성공"),
-        // @ApiResponse(responseCode = "400", description = "입력값 오류", content =
-        // @Content())
-        // })
-        // @GetMapping
-        // public ResponseEntity<SuccessResponse<PagingResponse<ContractListResponse>>>
-        // getContractList(
-        // @Valid ContractListSearchRequest searchRequest,
-        // @Valid PageRequest pageRequest,
-        // @Valid SortRequest sortRequest) {
+        @Operation(summary = "외주계약 리스트 조회", description = "검색 조건에 따라 외주계약 리스트를 페이징하여조회합니다")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "조회 성공"),
+                        @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+        })
+        @GetMapping
+        public ResponseEntity<SuccessResponse<PagingResponse<ContractListResponse>>> getContractList(
+                        @Valid ContractListSearchRequest searchRequest,
+                        @Valid PageRequest pageRequest,
+                        @Valid SortRequest sortRequest) {
 
-        // Page<ContractListResponse> page =
-        // outsourcingCompanyContractService.getContractList(
-        // searchRequest,
-        // PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-        // sortRequest.sort()));
+                Page<ContractListResponse> page = outsourcingCompanyContractService.getContractList(
+                                searchRequest,
+                                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                                                sortRequest.sort()));
 
-        // return ResponseEntity.ok(SuccessResponse.of(
-        // new PagingResponse<>(PagingInfo.from(page), page.getContent())));
-        // }
+                return ResponseEntity.ok(SuccessResponse.of(
+                                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+        }
 
 }

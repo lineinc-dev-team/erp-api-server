@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 계약 이력 응답")
 public record ContractHistoryResponse(
+                @Schema(description = "계약 ID") Long contractId,
+
                 @Schema(description = "현장명") String siteName,
 
                 @Schema(description = "공정명") String processName,
@@ -60,6 +62,7 @@ public record ContractHistoryResponse(
                 }
 
                 return new ContractHistoryResponse(
+                                history.getId(),
                                 contract.getSite() != null ? contract.getSite().getName() : null,
                                 contract.getSiteProcess() != null ? contract.getSiteProcess().getName() : null,
                                 contract.getContractAmount(),

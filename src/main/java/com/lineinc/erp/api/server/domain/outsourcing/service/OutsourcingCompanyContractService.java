@@ -37,6 +37,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractContstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
@@ -48,6 +49,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
 import lombok.RequiredArgsConstructor;
@@ -365,6 +367,19 @@ public class OutsourcingCompanyContractService {
 
         // ContractHistoryResponse로 변환
         return historyPage.map(ContractHistoryResponse::from);
+    }
+
+    /**
+     * 검색 조건에 따라 외주계약 리스트를 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Page<ContractListResponse> getContractList(ContractListSearchRequest searchRequest, Pageable pageable) {
+        log.info("외주계약 리스트 조회 시작: searchRequest={}, pageable={}", searchRequest, pageable);
+
+        Page<OutsourcingCompanyContract> contractPage = contractRepository.findBySearchConditions(searchRequest,
+                pageable);
+
+        return contractPage.map(ContractListResponse::from);
     }
 
 }

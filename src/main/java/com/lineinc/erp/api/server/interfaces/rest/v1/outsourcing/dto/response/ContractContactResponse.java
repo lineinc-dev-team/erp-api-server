@@ -1,12 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "외주업체 담당자 응답")
-public record CompanyContactResponse(
+@Schema(description = "외주업체 계약 담당자 응답")
+public record ContractContactResponse(
 
         @Schema(description = "ID", example = "101") Long id,
 
@@ -27,21 +26,8 @@ public record CompanyContactResponse(
         @Schema(description = "대표 담당자 여부", example = "true") Boolean isMain
 
 ) {
-    public static CompanyContactResponse from(OutsourcingCompanyContact contact) {
-        return new CompanyContactResponse(
-                contact.getId(),
-                contact.getName(),
-                contact.getDepartment(),
-                contact.getPosition(),
-                contact.getLandlineNumber(),
-                contact.getPhoneNumber(),
-                contact.getEmail(),
-                contact.getMemo(),
-                contact.getIsMain());
-    }
-
-    public static CompanyContactResponse from(OutsourcingCompanyContractContact contact) {
-        return new CompanyContactResponse(
+    public static ContractContactResponse from(OutsourcingCompanyContractContact contact) {
+        return new ContractContactResponse(
                 contact.getId(),
                 contact.getName(),
                 contact.getDepartment(),
