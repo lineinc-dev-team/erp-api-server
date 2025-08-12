@@ -63,6 +63,7 @@ user:
   default-password: ${USER_DEFAULT_PASSWORD}
 
 server:
+  port: ${SERVER_PORT:8080}
   shutdown: graceful
 
 

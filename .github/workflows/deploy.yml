@@ -106,7 +106,12 @@ jobs:
 
 
             echo "▶ 새 애플리케이션($NEW_APP)을 포트 $NEW_PORT에서 pm2로 시작"
+            echo "▶ 환경변수 SERVER_PORT=$NEW_PORT 설정"
+            export SERVER_PORT=$NEW_PORT
             pm2 start ecosystem.config.js --only "$NEW_APP"
+
+            echo "▶ 애플리케이션 시작 대기 (10초)"
+            sleep 10
 
             echo "▶ pm2 온라인 상태 대기..."
             if ! wait_for_pm2_online "$NEW_APP"; then
@@ -118,9 +123,21 @@ jobs:
 
             echo "▶ 포트 $NEW_PORT 리스닝 상태 확인"
             sleep 3
+            
+            # 포트 리스닝 상태 상세 확인
+            echo "▶ 현재 시스템 포트 상태:"
+            netstat -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
+            
+            echo "▶ PM2 프로세스 상태:"
+            pm2 list
+            
+            echo "▶ Java 프로세스 상태:"
+            ps aux | grep java | grep -v grep || echo "Java 프로세스 없음"
+            
             if ! netstat -tlnp | grep -q ":$NEW_PORT "; then
               echo "❌ 포트 $NEW_PORT에서 리스닝하지 않음"
-              pm2 logs "$NEW_APP" --lines 50
+              echo "▶ 애플리케이션 로그 확인:"
+              pm2 logs "$NEW_APP" --lines 100
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
