@@ -37,217 +37,63 @@ jobs:
       - name: 📦 JAR 파일 EC2로 전송
         run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
-      - name: 🔧 JAR 파일 권한 설정
-        run: ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} "chmod 644 /home/ubuntu/app-new.jar"
-
-      - name: 🚀 EC2 무중단 배포 및 Nginx 포트 스위칭
+      - name: 🚀 EC2 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
 
             echo "🚀 무중단 배포 시작"
-            echo "=================================="
-            echo "📖 무중단 배포 원리:"
-            echo "  1. 새 앱을 다른 포트에서 시작"
-            echo "  2. 새 앱이 정상 동작하는지 확인"
-            echo "  3. Nginx 프록시를 새 포트로 전환"
-            echo "  4. 기존 앱 종료 (서비스 중단 없음)"
-            echo "=================================="
             
+            # 변수 설정
             APP_NEW_JAR="/home/ubuntu/app-new.jar"
             APP_LATEST_JAR="/home/ubuntu/app-latest.jar"
-            PM2_APP_NAME_NEW="app-new"
-            PM2_APP_NAME_OLD="app"
-            NGINX_CONF="/etc/nginx/sites-available/erp.conf"
             PORT_1=8080
             PORT_2=8081
             
-            echo "📋 배포 설정:"
-            echo "  - 새 JAR: $APP_NEW_JAR"
-            echo "  - 최신 JAR: $APP_LATEST_JAR"
-            echo "  - 포트 1: $PORT_1"
-            echo "  - 포트 2: $PORT_2"
-            echo "  - Nginx 설정: $NGINX_CONF"
-            echo "=================================="
-
-            # 간단한 헬스체크 함수
-            health_check() {
-              local port=$1
-              for i in {1..10}; do
-                if curl -s "http://localhost:${port}/actuator/health" | grep -q '"status":"UP"'; then
-                  echo "✅ 포트 $port 헬스체크 성공"
-                  return 0
-                fi
-                sleep 3
-              done
-              echo "❌ 포트 $port 헬스체크 실패"
-              return 1
-            }
-
-            echo "▶ 새 JAR를 최신 JAR로 교체"
+            # 새 JAR를 최신 JAR로 교체
             mv "$APP_NEW_JAR" "$APP_LATEST_JAR"
             
-            echo "▶ JAR 파일 권한 및 소유자 확인"
-            ls -la "$APP_LATEST_JAR"
+            # 현재 실행 중인 포트 확인
+            CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "$PORT_1")
             
-            echo "▶ 현재 JAR 파일 상태 확인"
-            ls -la /home/ubuntu/app-*.jar || echo "JAR 파일 없음"
-            
-            # PM2 설정 확인
-            echo "▶ PM2 설정 파일 확인"
-            if [ ! -f "ecosystem.config.js" ]; then
-              echo "❌ ecosystem.config.js 파일이 없습니다. 실서버에 파일이 있는지 확인하세요."
-              exit 1
-            fi
-            echo "✅ ecosystem.config.js 파일 확인됨"
-            
-            # 현재 실행 중인 앱 확인
-            echo "▶ 현재 실행 중인 PM2 앱 확인"
-            pm2 list
-
-            CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' "$NGINX_CONF" 2>/dev/null | head -n 1 | xargs || echo "$PORT_1")
-            echo "▶ DEBUG: CURRENT_PORT='$CURRENT_PORT', PORT_1='$PORT_1', PORT_2='$PORT_2'"
+            # 새 포트 결정
             if [ "$CURRENT_PORT" = "$PORT_1" ]; then
               NEW_PORT=$PORT_2
-              OLD_APP=$PM2_APP_NAME_OLD
-              NEW_APP=$PM2_APP_NAME_NEW
+              OLD_APP="app"
+              NEW_APP="app-new"
             else
               NEW_PORT=$PORT_1
-              OLD_APP=$PM2_APP_NAME_NEW
-              NEW_APP=$PM2_APP_NAME_OLD
+              OLD_APP="app-new"
+              NEW_APP="app"
             fi
-
-            echo "▶ 현재 Nginx 프록시 포트: $CURRENT_PORT, 변경할 포트: $NEW_PORT"
-
-
-            echo "▶ 새 애플리케이션($NEW_APP)을 포트 $NEW_PORT에서 pm2로 시작"
-            echo "▶ 환경변수 SERVER_PORT=$NEW_PORT 설정"
             
-            # NEW_PORT에 이미 실행 중인 앱이 있다면 삭제
-            echo "▶ 포트 $NEW_PORT 사용 중인 기존 앱 확인 및 삭제"
+            echo "▶ 현재 포트: $CURRENT_PORT, 새 포트: $NEW_PORT"
             
-            # 기존 app-new 프로세스만 정리 (app은 유지)
-            echo "▶ 기존 app-new 프로세스만 정리 (app은 유지)"
+            # 기존 app-new 프로세스 정리
             pm2 delete "app-new" 2>/dev/null || true
-            pm2 save --force
-            
-            # PM2 설정 리로드
-            echo "▶ PM2 설정 리로드"
-            pm2 reload ecosystem.config.js
-            sleep 3
-            
-            # PM2 프로세스 목록 확인
-            echo "▶ PM2 프로세스 정리 후 상태:"
-            pm2 list
-            
-            # PM2 프로세스 목록 확인
-            echo "▶ PM2 프로세스 정리 후 상태:"
-            pm2 list
-            
-            # 디버깅: ecosystem.config.js 내용 확인
-            echo "▶ ecosystem.config.js 내용 확인:"
-            cat ecosystem.config.js
-            
-            # 디버깅: app-new 설정에서 JAR 경로 확인
-            echo "▶ app-new 설정에서 JAR 경로 확인:"
-            grep -A 5 -B 5 "app-new" ecosystem.config.js
             
             # 새 앱 시작
-            echo "▶ $NEW_APP 시작 중..."
-            echo "▶ PM2 시작 전 환경변수 확인:"
-            echo "  - SERVER_PORT: $NEW_PORT"
-            echo "  - JAR 경로: /home/ubuntu/app-latest.jar"
-            
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
-            echo "▶ $NEW_APP 시작 후 즉시 로그 확인"
-            pm2 logs "$NEW_APP" --lines 20
-
-            echo "▶ 애플리케이션 시작 대기 (15초)"
-            sleep 15
-
-            echo "▶ PM2 앱 상태 확인"
-            pm2 list
+            # 앱 시작 대기
+            sleep 20
             
-            if ! pm2 list | grep -q "${NEW_APP}.*online"; then
-              echo "❌ $NEW_APP 온라인 상태 진입 실패"
-              echo "▶ 상세 로그 확인:"
-              pm2 logs "$NEW_APP" --lines 100
-              pm2 delete "$NEW_APP" 2>/dev/null || true
-              exit 1
-            fi
-
-            echo "▶ 포트 $NEW_PORT 리스닝 확인 (15초 대기)"
-            sleep 15
+            # 헬스체크
+            for i in {1..10}; do
+              if curl -s "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 헬스체크 성공"
+                break
+              fi
+              sleep 3
+            done
             
-            # 포트 확인 (더 정확한 매칭)
-            echo "▶ 디버깅 정보:"
-            echo "  - NEW_PORT: '$NEW_PORT'"
-            echo "  - NEW_APP: '$NEW_APP'"
-            echo "  - OLD_APP: '$OLD_APP'"
-            
-            echo "▶ $NEW_APP 프로세스 상세 정보:"
-            pm2 show "$NEW_APP"
-            
-            echo "▶ 포트 $NEW_PORT 리스닝 상태 상세 확인:"
-            ss -tlnp | grep ":$NEW_PORT " || echo "포트 $NEW_PORT에서 리스닝하는 프로세스 없음"
-            
-            echo "▶ 전체 포트 상태:"
-            ss -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
-            
-            echo "▶ Java 프로세스 확인:"
-            ps aux | grep java | grep -v grep || echo "Java 프로세스 없음"
-            
-            # 포트 확인 (더 안전한 방식)
-            PORT_CHECK_RESULT=$(ss -tlnp | grep -c ":$NEW_PORT")
-            echo "▶ 포트 $NEW_PORT 확인 결과: $PORT_CHECK_RESULT개 프로세스"
-            
-            if [ "$PORT_CHECK_RESULT" -eq 0 ]; then
-              echo "❌ 포트 $NEW_PORT에서 리스닝하지 않음"
-              echo "▶ 변수 값 확인:"
-              echo "  - NEW_PORT: '$NEW_PORT'"
-              echo "  - NEW_APP: '$NEW_APP'"
-              echo "▶ 현재 포트 상태:"
-              ss -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
-              echo "▶ PM2 앱 상태:"
-              pm2 list
-              echo "▶ $NEW_APP 상세 정보:"
-              pm2 show "$NEW_APP"
-              echo "▶ 애플리케이션 로그:"
-              pm2 logs "$NEW_APP" --lines 100
-              pm2 delete "$NEW_APP" 2>/dev/null || true
-              exit 1
-            fi
-            echo "✅ 포트 $NEW_PORT 리스닝 확인됨"
-
-            echo "▶ 헬스체크 시작"
-            if ! health_check $NEW_PORT; then
-              echo "❌ 헬스체크 실패"
-              pm2 delete "$NEW_APP" 2>/dev/null || true
-              exit 1
-            fi
-
-            echo "✅ $NEW_APP 헬스체크 통과, Nginx 프록시 포트 전환 시작"
-
-            sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" "$NGINX_CONF"
+            # Nginx 프록시 전환
+            sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
             sudo nginx -s reload
-            echo "▶ Nginx 리로드 완료"
-          
-          
-          
-            echo "▶ 이전 앱($OLD_APP) 종료"
-            pm2 delete "$OLD_APP" 2>/dev/null || true
             
-            # PM2 설정 저장
-            echo "▶ PM2 설정 저장"
+            # 이전 앱 종료
+            pm2 delete "$OLD_APP" 2>/dev/null || true
             pm2 save --force
-
-            echo "▶ 최종 헬스체크"
-            if ! health_check $NEW_PORT; then
-              echo "❌ 최종 헬스체크 실패"
-              exit 1
-            fi
-
+            
             echo "✅ 무중단 배포 완료"
-            exit 0
           EOF
