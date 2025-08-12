@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyCo
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriverFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractHistory;
@@ -22,6 +23,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyCo
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractConstructionRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractContactRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractDriverFileRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractDriverRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractEquipmentRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractFileRepository;
@@ -39,6 +41,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractContstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractDriverCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractDriverFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractSubEquipmentCreateRequest;
@@ -61,6 +64,7 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractFileRepository fileRepository;
     private final OutsourcingCompanyContractWorkerRepository workerRepository;
     private final OutsourcingCompanyContractWorkerFileRepository workerFileRepository;
+    private final OutsourcingCompanyContractDriverFileRepository driverFileRepository;
     private final OutsourcingCompanyContractEquipmentRepository equipmentRepository;
     private final OutsourcingCompanyContractDriverRepository driverRepository;
     private final OutsourcingCompanyContractConstructionRepository constructionRepository;
@@ -251,19 +255,15 @@ public class OutsourcingCompanyContractService {
             OutsourcingCompanyContractDriver driver = OutsourcingCompanyContractDriver.builder()
                     .outsourcingCompanyContract(contract)
                     .name(driverRequest.name())
-                    .driverLicenseName(driverRequest.driverLicenseName())
-                    .driverLicenseFileUrl(driverRequest.driverLicenseFileUrl())
-                    .driverLicenseOriginalFileName(driverRequest.driverLicenseOriginalFileName())
-                    .safetyEducationName(driverRequest.safetyEducationName())
-                    .safetyEducationFileUrl(driverRequest.safetyEducationFileUrl())
-                    .safetyEducationOriginalFileName(driverRequest.safetyEducationOriginalFileName())
-                    .etcDocumentName(driverRequest.etcDocumentName())
-                    .etcDocumentFileUrl(driverRequest.etcDocumentFileUrl())
-                    .etcDocumentOriginalFileName(driverRequest.etcDocumentOriginalFileName())
                     .memo(driverRequest.memo())
                     .build();
 
             driverRepository.save(driver);
+
+            // 드라이버 서류가 있으면 생성
+            if (driverRequest.files() != null && !driverRequest.files().isEmpty()) {
+                createContractDriverFiles(driver, driverRequest.files());
+            }
         }
     }
 
@@ -280,6 +280,24 @@ public class OutsourcingCompanyContractService {
                     .build();
 
             workerFileRepository.save(file);
+        }
+    }
+
+    /**
+     * 계약 운전자 서류를 생성합니다.
+     */
+    private void createContractDriverFiles(OutsourcingCompanyContractDriver driver,
+            List<OutsourcingCompanyContractDriverFileCreateRequest> files) {
+        for (OutsourcingCompanyContractDriverFileCreateRequest fileRequest : files) {
+            OutsourcingCompanyContractDriverFile file = OutsourcingCompanyContractDriverFile.builder()
+                    .driver(driver)
+                    .documentType(fileRequest.documentType())
+                    .fileUrl(fileRequest.fileUrl())
+                    .originalFileName(fileRequest.originalFileName())
+                    .build();
+
+            // 파일을 드라이버의 files 리스트에 추가
+            driver.getFiles().add(file);
         }
     }
 

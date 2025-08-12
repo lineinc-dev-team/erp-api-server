@@ -45,6 +45,15 @@ jobs:
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
 
+            echo "🚀 무중단 배포 시작"
+            echo "=================================="
+            echo "📖 무중단 배포 원리:"
+            echo "  1. 새 앱을 다른 포트에서 시작"
+            echo "  2. 새 앱이 정상 동작하는지 확인"
+            echo "  3. Nginx 프록시를 새 포트로 전환"
+            echo "  4. 기존 앱 종료 (서비스 중단 없음)"
+            echo "=================================="
+            
             APP_NEW_JAR="/home/ubuntu/app-new.jar"
             APP_LATEST_JAR="/home/ubuntu/app-latest.jar"
             PM2_APP_NAME_NEW="app-new"
@@ -52,35 +61,26 @@ jobs:
             NGINX_CONF="/etc/nginx/sites-available/erp.conf"
             PORT_1=8080
             PORT_2=8081
+            
+            echo "📋 배포 설정:"
+            echo "  - 새 JAR: $APP_NEW_JAR"
+            echo "  - 최신 JAR: $APP_LATEST_JAR"
+            echo "  - 포트 1: $PORT_1"
+            echo "  - 포트 2: $PORT_2"
+            echo "  - Nginx 설정: $NGINX_CONF"
+            echo "=================================="
 
-            function wait_for_pm2_online() {
-              local app_name=$1
-              local retries=4
-              local wait_sec=3
-              for i in $(seq 1 $retries); do
-                if pm2 list | grep -q "${app_name}.*online"; then
-                  return 0
-                fi
-                sleep $wait_sec
-              done
-              return 1
-            }
-
-            function health_check() {
+            # 간단한 헬스체크 함수
+            health_check() {
               local port=$1
-              local retries=15
-              local wait_sec=5
-              echo "▶ 포트 $port 헬스체크 시작 (총 ${retries}회, ${wait_sec}초 간격)"
-              for i in $(seq 1 $retries); do
-                echo "▶ 헬스체크 시도 $i/$retries (포트 $port)"
+              for i in {1..10}; do
                 if curl -s "http://localhost:${port}/actuator/health" | grep -q '"status":"UP"'; then
-                  echo "✅ 헬스체크 성공 (포트 $port)"
+                  echo "✅ 포트 $port 헬스체크 성공"
                   return 0
                 fi
-                echo "⏳ 헬스체크 실패, ${wait_sec}초 후 재시도..."
-                sleep $wait_sec
+                sleep 3
               done
-              echo "❌ 헬스체크 최종 실패 (포트 $port)"
+              echo "❌ 포트 $port 헬스체크 실패"
               return 1
             }
 
@@ -89,6 +89,18 @@ jobs:
 
             echo "▶ 최신 JAR로 교체"
             mv "$APP_NEW_JAR" "$APP_LATEST_JAR"
+            
+            # PM2 설정 확인
+            echo "▶ PM2 설정 파일 확인"
+            if [ ! -f "ecosystem.config.js" ]; then
+              echo "❌ ecosystem.config.js 파일이 없습니다. 실서버에 파일이 있는지 확인하세요."
+              exit 1
+            fi
+            echo "✅ ecosystem.config.js 파일 확인됨"
+            
+            # 현재 실행 중인 앱 확인
+            echo "▶ 현재 실행 중인 PM2 앱 확인"
+            pm2 list
 
             CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' "$NGINX_CONF" 2>/dev/null | head -n 1 | xargs || echo "$PORT_1")
             echo "▶ DEBUG: CURRENT_PORT='$CURRENT_PORT', PORT_1='$PORT_1', PORT_2='$PORT_2'"
@@ -107,61 +119,39 @@ jobs:
 
             echo "▶ 새 애플리케이션($NEW_APP)을 포트 $NEW_PORT에서 pm2로 시작"
             echo "▶ 환경변수 SERVER_PORT=$NEW_PORT 설정"
-            export SERVER_PORT=$NEW_PORT
+            
+            # 새 앱 시작 (기존 앱은 그대로 두고)
             pm2 start ecosystem.config.js --only "$NEW_APP"
 
             echo "▶ 애플리케이션 시작 대기 (10초)"
             sleep 10
 
-            echo "▶ pm2 온라인 상태 대기..."
-            if ! wait_for_pm2_online "$NEW_APP"; then
-              echo "❌ $NEW_APP pm2 온라인 상태 진입 실패"
+            echo "▶ PM2 앱 상태 확인"
+            if ! pm2 list | grep -q "${NEW_APP}.*online"; then
+              echo "❌ $NEW_APP 온라인 상태 진입 실패"
               pm2 logs "$NEW_APP" --lines 50
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
 
-            echo "▶ 포트 $NEW_PORT 리스닝 상태 확인"
-            sleep 3
+            echo "▶ 포트 $NEW_PORT 리스닝 확인 (15초 대기)"
+            sleep 15
             
-            # 포트 리스닝 상태 상세 확인
-            echo "▶ 현재 시스템 포트 상태:"
-            netstat -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
-            
-            echo "▶ PM2 프로세스 상태:"
-            pm2 list
-            
-            echo "▶ Java 프로세스 상태:"
-            ps aux | grep java | grep -v grep || echo "Java 프로세스 없음"
-            
-            if ! netstat -tlnp | grep -q ":$NEW_PORT "; then
+            # 간단한 포트 확인
+            if ! ss -tlnp | grep -q ":$NEW_PORT "; then
               echo "❌ 포트 $NEW_PORT에서 리스닝하지 않음"
-              echo "▶ 애플리케이션 로그 확인:"
-              pm2 logs "$NEW_APP" --lines 100
+              pm2 logs "$NEW_APP" --lines 50
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
             echo "✅ 포트 $NEW_PORT 리스닝 확인됨"
 
-            echo "▶ 헬스 체크 포트 $NEW_PORT 시작"
-            echo "▶ 헬스 체크 전 10초 대기 (애플리케이션 시작 시간 확보)"
-            sleep 10
+            echo "▶ 헬스체크 시작"
             if ! health_check $NEW_PORT; then
-              echo "❌ 헬스체크 실패 (포트 $NEW_PORT)"
-              echo "▶ 애플리케이션 상태 확인:"
-              pm2 list
-              echo "▶ 애플리케이션 로그 (최근 100줄):"
-              pm2 logs "$NEW_APP" --lines 100
-              echo "▶ 포트 상태 확인:"
-              netstat -tlnp | grep -E ":(8080|8081) "
-              echo "▶ 프로세스 상태 확인:"
-              ps aux | grep java | grep -v grep
+              echo "❌ 헬스체크 실패"
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
-
-            echo "▶ 헬스 체크 통과 후 앱 안정화 대기 5초"
-            sleep 5
 
             echo "✅ $NEW_APP 헬스체크 통과, Nginx 프록시 포트 전환 시작"
 
@@ -173,16 +163,14 @@ jobs:
           
             echo "▶ 이전 앱($OLD_APP) 종료"
             pm2 delete "$OLD_APP" 2>/dev/null || true
+            
+            # PM2 설정 저장
+            echo "▶ PM2 설정 저장"
+            pm2 save --force
 
-            echo "▶ 최종 헬스 체크 포트 $NEW_PORT"
+            echo "▶ 최종 헬스체크"
             if ! health_check $NEW_PORT; then
-              echo "❌ 최종 헬스체크 실패 (포트 $NEW_PORT)"
-              echo "▶ 애플리케이션 상태 확인:"
-              pm2 list
-              echo "▶ 애플리케이션 로그 (최근 100줄):"
-              pm2 logs "$NEW_APP" --lines 100
-              echo "▶ 포트 상태 확인:"
-              netstat -tlnp | grep -E ":(8080|8081) "
+              echo "❌ 최종 헬스체크 실패"
               exit 1
             fi
 
