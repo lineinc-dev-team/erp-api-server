@@ -158,11 +158,26 @@ jobs:
             sleep 15
             
             # 포트 확인 (더 정확한 매칭)
+            echo "▶ 디버깅 정보:"
+            echo "  - NEW_PORT: '$NEW_PORT'"
+            echo "  - NEW_APP: '$NEW_APP'"
+            echo "  - OLD_APP: '$OLD_APP'"
+            
             echo "▶ 포트 $NEW_PORT 리스닝 상태 상세 확인:"
             ss -tlnp | grep ":$NEW_PORT " || echo "포트 $NEW_PORT에서 리스닝하는 프로세스 없음"
             
-            if ! ss -tlnp | grep -q ":$NEW_PORT "; then
+            echo "▶ 전체 포트 상태:"
+            ss -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
+            
+            # 포트 확인 (더 안전한 방식)
+            PORT_CHECK_RESULT=$(ss -tlnp | grep -c ":$NEW_PORT")
+            echo "▶ 포트 $NEW_PORT 확인 결과: $PORT_CHECK_RESULT개 프로세스"
+            
+            if [ "$PORT_CHECK_RESULT" -eq 0 ]; then
               echo "❌ 포트 $NEW_PORT에서 리스닝하지 않음"
+              echo "▶ 변수 값 확인:"
+              echo "  - NEW_PORT: '$NEW_PORT'"
+              echo "  - NEW_APP: '$NEW_APP'"
               echo "▶ 현재 포트 상태:"
               ss -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
               echo "▶ PM2 앱 상태:"
