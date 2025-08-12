@@ -1,29 +1,13 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.compile.nullAnalysis.mode": "automatic",
-    // 자동 포맷팅 설정
+    // 기본 자동 포맷팅
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
-    "editor.formatOnType": true,
     // Java 전용 설정
     "java.format.enabled": true,
-    "java.format.onType.enabled": true,
     "java.saveActions.organizeImports": true,
-    "java.completion.importOrder": [
-        "java",
-        "javax",
-        "com",
-        "org"
-    ],
-    // 파일 저장 시 자동 동작
+    // 파일 자동 저장
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 1000,
-    // 코드 액션 자동 실행
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit",
-        "source.fixAll": "explicit"
-    },
-    // Java 포맷터 설정
-    "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
-    "java.format.settings.profile": "GoogleStyle"
+    "files.autoSaveDelay": 1000
 }
