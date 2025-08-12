@@ -84,11 +84,11 @@ jobs:
               return 1
             }
 
-            echo "▶ 새 JAR를 임시 위치로 복사"
-            cp "$APP_NEW_JAR" /tmp/app-new.jar
-
-            echo "▶ 최신 JAR로 교체"
+            echo "▶ 새 JAR를 최신 JAR로 교체"
             mv "$APP_NEW_JAR" "$APP_LATEST_JAR"
+            
+            echo "▶ JAR 파일 권한 및 소유자 확인"
+            ls -la "$APP_LATEST_JAR"
             
             # PM2 설정 확인
             echo "▶ PM2 설정 파일 확인"
@@ -123,22 +123,15 @@ jobs:
             # NEW_PORT에 이미 실행 중인 앱이 있다면 삭제
             echo "▶ 포트 $NEW_PORT 사용 중인 기존 앱 확인 및 삭제"
             
-            # 포트별로 실행 중인 앱 확인
-            if [ "$NEW_PORT" = "8080" ]; then
-              # 포트 8080을 사용하는 app이 있다면 삭제
-              if pm2 list | grep -q "app.*online"; then
-                echo "▶ 포트 8080 사용 중인 app 삭제 중..."
-                pm2 delete "app" 2>/dev/null || true
-                sleep 3
-              fi
-            elif [ "$NEW_PORT" = "8081" ]; then
-              # 포트 8081을 사용하는 app-new가 있다면 삭제
-              if pm2 list | grep -q "app-new.*online"; then
-                echo "▶ 포트 8081 사용 중인 app-new 삭제 중..."
-                pm2 delete "app-new" 2>/dev/null || true
-                sleep 3
-              fi
-            fi
+            # 기존 app-new 프로세스 완전 정리
+            echo "▶ 기존 app-new 프로세스 완전 정리"
+            pm2 delete "app-new" 2>/dev/null || true
+            pm2 save --force
+            sleep 3
+            
+            # PM2 프로세스 목록 확인
+            echo "▶ PM2 프로세스 정리 후 상태:"
+            pm2 list
             
             # 새 앱 시작
             echo "▶ $NEW_APP 시작 중..."
