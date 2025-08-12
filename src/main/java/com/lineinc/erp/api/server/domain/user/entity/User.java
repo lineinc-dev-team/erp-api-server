@@ -4,7 +4,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.request.user.UpdateUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.UpdateUserRequest;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
