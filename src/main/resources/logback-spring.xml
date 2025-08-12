@@ -67,11 +67,24 @@
     <!-- 예외 처리 관련 로그 레벨 조정 -->
     <logger name="com.lineinc.erp.api.server.shared.exception" level="WARN"/>
 
+    <!-- 비동기 로깅으로 성능 향상 -->
+    <appender name="AsyncFile" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="File"/>
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="AsyncErrorFile" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ErrorFile"/>
+        <queueSize>256</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
     <!-- 기본 환경 fallback -->
     <root level="INFO">
         <appender-ref ref="Console"/>
-        <appender-ref ref="File"/>
-        <appender-ref ref="ErrorFile"/>
+        <appender-ref ref="AsyncFile"/>
+        <appender-ref ref="AsyncErrorFile"/>
     </root>
 
     <!-- local, dev 환경 공통 설정 -->
@@ -80,8 +93,8 @@
 
         <root level="INFO">
             <appender-ref ref="Console"/>
-            <appender-ref ref="File"/>
-            <appender-ref ref="ErrorFile"/>
+            <appender-ref ref="AsyncFile"/>
+            <appender-ref ref="AsyncErrorFile"/>
         </root>
     </springProfile>
 
@@ -90,8 +103,8 @@
         <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
 
         <root level="INFO">
-            <appender-ref ref="File"/>
-            <appender-ref ref="ErrorFile"/>
+            <appender-ref ref="AsyncFile"/>
+            <appender-ref ref="AsyncErrorFile"/>
         </root>
     </springProfile>
 
