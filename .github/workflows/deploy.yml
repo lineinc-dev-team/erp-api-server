@@ -68,14 +68,19 @@ jobs:
 
             function health_check() {
               local port=$1
-              local retries=10
-              local wait_sec=3
+              local retries=15
+              local wait_sec=5
+              echo "▶ 포트 $port 헬스체크 시작 (총 ${retries}회, ${wait_sec}초 간격)"
               for i in $(seq 1 $retries); do
+                echo "▶ 헬스체크 시도 $i/$retries (포트 $port)"
                 if curl -s "http://localhost:${port}/actuator/health" | grep -q '"status":"UP"'; then
+                  echo "✅ 헬스체크 성공 (포트 $port)"
                   return 0
                 fi
+                echo "⏳ 헬스체크 실패, ${wait_sec}초 후 재시도..."
                 sleep $wait_sec
               done
+              echo "❌ 헬스체크 최종 실패 (포트 $port)"
               return 1
             }
 
@@ -111,12 +116,29 @@ jobs:
               exit 1
             fi
 
+            echo "▶ 포트 $NEW_PORT 리스닝 상태 확인"
+            sleep 3
+            if ! netstat -tlnp | grep -q ":$NEW_PORT "; then
+              echo "❌ 포트 $NEW_PORT에서 리스닝하지 않음"
+              pm2 logs "$NEW_APP" --lines 50
+              pm2 delete "$NEW_APP" 2>/dev/null || true
+              exit 1
+            fi
+            echo "✅ 포트 $NEW_PORT 리스닝 확인됨"
+
             echo "▶ 헬스 체크 포트 $NEW_PORT 시작"
-            echo "▶ 헬스 체크 전 5초 대기"
-            sleep 5
+            echo "▶ 헬스 체크 전 10초 대기 (애플리케이션 시작 시간 확보)"
+            sleep 10
             if ! health_check $NEW_PORT; then
               echo "❌ 헬스체크 실패 (포트 $NEW_PORT)"
-              pm2 logs "$NEW_APP" --lines 50
+              echo "▶ 애플리케이션 상태 확인:"
+              pm2 list
+              echo "▶ 애플리케이션 로그 (최근 100줄):"
+              pm2 logs "$NEW_APP" --lines 100
+              echo "▶ 포트 상태 확인:"
+              netstat -tlnp | grep -E ":(8080|8081) "
+              echo "▶ 프로세스 상태 확인:"
+              ps aux | grep java | grep -v grep
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
@@ -138,7 +160,12 @@ jobs:
             echo "▶ 최종 헬스 체크 포트 $NEW_PORT"
             if ! health_check $NEW_PORT; then
               echo "❌ 최종 헬스체크 실패 (포트 $NEW_PORT)"
-              pm2 logs "$NEW_APP" --lines 50
+              echo "▶ 애플리케이션 상태 확인:"
+              pm2 list
+              echo "▶ 애플리케이션 로그 (최근 100줄):"
+              pm2 logs "$NEW_APP" --lines 100
+              echo "▶ 포트 상태 확인:"
+              netstat -tlnp | grep -E ":(8080|8081) "
               exit 1
             fi
 

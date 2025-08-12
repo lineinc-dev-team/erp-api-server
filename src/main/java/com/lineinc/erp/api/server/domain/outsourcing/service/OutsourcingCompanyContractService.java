@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyCo
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorker;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorkerFile;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractConstructionRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractContactRepository;
@@ -27,6 +28,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompa
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractSubEquipmentRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractWorkerFileRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractWorkerRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -41,6 +43,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractSubEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
@@ -57,6 +60,7 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractContactRepository contactRepository;
     private final OutsourcingCompanyContractFileRepository fileRepository;
     private final OutsourcingCompanyContractWorkerRepository workerRepository;
+    private final OutsourcingCompanyContractWorkerFileRepository workerFileRepository;
     private final OutsourcingCompanyContractEquipmentRepository equipmentRepository;
     private final OutsourcingCompanyContractDriverRepository driverRepository;
     private final OutsourcingCompanyContractConstructionRepository constructionRepository;
@@ -200,13 +204,15 @@ public class OutsourcingCompanyContractService {
                     .name(workerRequest.name())
                     .category(workerRequest.category())
                     .taskDescription(workerRequest.taskDescription())
-                    .fileName(workerRequest.fileName())
-                    .fileUrl(workerRequest.fileUrl())
-                    .originalFileName(workerRequest.originalFileName())
                     .memo(workerRequest.memo())
                     .build();
 
             workerRepository.save(worker);
+
+            // 인력 서류가 있으면 생성
+            if (workerRequest.files() != null && !workerRequest.files().isEmpty()) {
+                createContractWorkerFiles(worker, workerRequest.files());
+            }
         }
     }
 
@@ -258,6 +264,22 @@ public class OutsourcingCompanyContractService {
                     .build();
 
             driverRepository.save(driver);
+        }
+    }
+
+    /**
+     * 계약 인력 서류를 생성합니다.
+     */
+    private void createContractWorkerFiles(OutsourcingCompanyContractWorker worker,
+            List<OutsourcingCompanyContractWorkerFileCreateRequest> files) {
+        for (OutsourcingCompanyContractWorkerFileCreateRequest fileRequest : files) {
+            OutsourcingCompanyContractWorkerFile file = OutsourcingCompanyContractWorkerFile.builder()
+                    .worker(worker)
+                    .fileUrl(fileRequest.fileUrl())
+                    .originalFileName(fileRequest.originalFileName())
+                    .build();
+
+            workerFileRepository.save(file);
         }
     }
 
