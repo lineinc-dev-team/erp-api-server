@@ -133,6 +133,10 @@ jobs:
             echo "▶ PM2 프로세스 정리 후 상태:"
             pm2 list
             
+            # ecosystem.config.js에서 app-new의 JAR 경로를 app-latest.jar로 수정
+            echo "▶ ecosystem.config.js에서 app-new JAR 경로 수정"
+            sed -i 's|/home/ubuntu/app-new.jar|/home/ubuntu/app-latest.jar|g' ecosystem.config.js
+            
             # 새 앱 시작
             echo "▶ $NEW_APP 시작 중..."
             pm2 start ecosystem.config.js --only "$NEW_APP"
