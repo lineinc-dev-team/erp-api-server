@@ -120,7 +120,27 @@ jobs:
             echo "▶ 새 애플리케이션($NEW_APP)을 포트 $NEW_PORT에서 pm2로 시작"
             echo "▶ 환경변수 SERVER_PORT=$NEW_PORT 설정"
             
-            # 새 앱 시작 (기존 앱은 그대로 두고)
+            # NEW_PORT에 이미 실행 중인 앱이 있다면 삭제
+            echo "▶ 포트 $NEW_PORT 사용 중인 기존 앱 확인 및 삭제"
+            
+            # 포트별로 실행 중인 앱 확인
+            if [ "$NEW_PORT" = "8080" ]; then
+              # 포트 8080을 사용하는 app이 있다면 삭제
+              if pm2 list | grep -q "app.*online"; then
+                echo "▶ 포트 8080 사용 중인 app 삭제 중..."
+                pm2 delete "app" 2>/dev/null || true
+                sleep 3
+              fi
+            elif [ "$NEW_PORT" = "8081" ]; then
+              # 포트 8081을 사용하는 app-new가 있다면 삭제
+              if pm2 list | grep -q "app-new.*online"; then
+                echo "▶ 포트 8081 사용 중인 app-new 삭제 중..."
+                pm2 delete "app-new" 2>/dev/null || true
+                sleep 3
+              fi
+            fi
+            
+            # 새 앱 시작
             pm2 start ecosystem.config.js --only "$NEW_APP"
 
             echo "▶ 애플리케이션 시작 대기 (10초)"
