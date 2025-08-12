@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.controller;
 
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.*;
+import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContractDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractCategoryTypeResponse;
@@ -9,7 +10,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.TaxInvoiceConditionResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -19,17 +20,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/outsourcing-company-contracts")
 @RequiredArgsConstructor
 @Tag(name = "Outsourcing Company Contract", description = "외주업체 계약 관련 API")
 public class CompanyContractController {
+
+    private final OutsourcingCompanyContractService outsourcingCompanyContractService;
 
     @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
@@ -81,18 +86,19 @@ public class CompanyContractController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-//    @Operation(summary = "외주업체 계약 등록", description = "외주업체 계약 정보를 등록합니다")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "성공"),
-//            @ApiResponse(responseCode = "400", description = "입력값 오류")
-//    })
-//    @PostMapping
-//    public ResponseEntity<Void> createOutsourcingCompanyContract(
-//            @Valid @RequestBody OutsourcingCompanyContractCreateRequest request
-//    ) {
-//        outsourcingCompanyContractService.createContract(request);
-//        return ResponseEntity.ok().build();
-//    }
+   @Operation(summary = "외주업체 계약 등록", description = "외주업체 계약 정보를 등록합니다")
+   @ApiResponses(value = {
+           @ApiResponse(responseCode = "200", description = "성공"),
+           @ApiResponse(responseCode = "400", description = "입력값 오류")
+   })
+   @PostMapping
+   public ResponseEntity<Void> createOutsourcingCompanyContract(
+          @Valid @RequestBody OutsourcingCompanyContractCreateRequest request
+   ) {
+       log.info("컨트롤러에서 받은 요청: {}", request);
+       outsourcingCompanyContractService.createContract(request);
+       return ResponseEntity.ok().build();
+   }
 }
 
 

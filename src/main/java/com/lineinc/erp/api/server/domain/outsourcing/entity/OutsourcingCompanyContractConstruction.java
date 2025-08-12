@@ -1,12 +1,7 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,4 +45,8 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo; // 메모
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    private OutsourcingCompanyContract outsourcingCompanyContract;
 }
