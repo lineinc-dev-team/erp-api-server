@@ -75,21 +75,44 @@ jobs:
             # 새 앱 시작
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
-            # 앱 시작 대기
-            sleep 20
+            # 앱 시작 대기 (더 긴 시간)
+            echo "▶ 앱 시작 대기 (30초)"
+            sleep 30
             
-            # 헬스체크
-            for i in {1..10}; do
-              if curl -s "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 헬스체크 성공"
+            # 포트 리스닝 확인
+            echo "▶ 포트 $NEW_PORT 리스닝 확인"
+            for i in {1..20}; do
+              if ss -tlnp | grep -q ":$NEW_PORT "; then
+                echo "✅ 포트 $NEW_PORT 리스닝 확인됨"
                 break
               fi
-              sleep 3
+              sleep 2
             done
             
+            # 헬스체크 (더 엄격하게)
+            echo "▶ 헬스체크 시작"
+            for i in {1..15}; do
+              if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 헬스체크 성공 (시도 $i)"
+                break
+              fi
+              if [ $i -eq 15 ]; then
+                echo "❌ 헬스체크 실패"
+                pm2 delete "$NEW_APP" 2>/dev/null || true
+                exit 1
+              fi
+              sleep 2
+            done
+            
+            # 추가 안정화 대기
+            echo "▶ 추가 안정화 대기 (10초)"
+            sleep 10
+            
             # Nginx 프록시 전환
+            echo "▶ Nginx 프록시 전환 시작"
             sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
             sudo nginx -s reload
+            echo "✅ Nginx 프록시 전환 완료"
             
             # 이전 앱 종료
             pm2 delete "$OLD_APP" 2>/dev/null || true
