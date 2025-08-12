@@ -1,7 +1,8 @@
 package com.lineinc.erp.api.server.domain.menu.service;
 
 import com.lineinc.erp.api.server.domain.menu.repository.MenuRepository;
-import com.lineinc.erp.api.server.presentation.v1.menu.dto.response.MenuWithPermissionsResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.menu.dto.response.MenuWithPermissionsResponse;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

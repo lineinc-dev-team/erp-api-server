@@ -1,13 +1,13 @@
-package com.lineinc.erp.api.server.presentation.v1.auth.controller;
+package com.lineinc.erp.api.server.interfaces.rest.v1.auth.controller;
 
 import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
-import com.lineinc.erp.api.server.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.PasswordChangeRequest;
-import com.lineinc.erp.api.server.presentation.v1.auth.dto.request.LoginRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.request.LoginRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

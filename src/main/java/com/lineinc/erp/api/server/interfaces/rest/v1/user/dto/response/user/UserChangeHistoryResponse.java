@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.user.dto.response.user;
+package com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;

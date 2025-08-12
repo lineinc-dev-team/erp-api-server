@@ -5,8 +5,6 @@ import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyFileCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -24,6 +22,8 @@ import org.javers.core.diff.Diff;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
 
 @Service
 @RequiredArgsConstructor

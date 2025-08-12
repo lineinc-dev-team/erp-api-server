@@ -1,8 +1,9 @@
-package com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response;
+package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.siteprocess.SiteProcessResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.site.SiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;

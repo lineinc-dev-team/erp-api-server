@@ -1,8 +1,9 @@
 package com.lineinc.erp.api.server.domain.managementcost.repository;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostListRequest;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

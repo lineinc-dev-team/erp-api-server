@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.managementcost.dto.response;
+package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 

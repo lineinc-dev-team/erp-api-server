@@ -1,10 +1,6 @@
 package com.lineinc.erp.api.server.domain.role.repository;
 
 import com.lineinc.erp.api.server.domain.role.entity.Role;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.RoleUserListRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.request.UserWithRolesListRequest;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RoleUserListResponse;
-import com.lineinc.erp.api.server.presentation.v1.role.dto.response.RolesResponse;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +14,10 @@ import java.util.Objects;
 import com.lineinc.erp.api.server.domain.role.entity.QRole;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
+import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.RoleUserListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.UserWithRolesListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.response.RoleUserListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.response.RolesResponse;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.types.OrderSpecifier;

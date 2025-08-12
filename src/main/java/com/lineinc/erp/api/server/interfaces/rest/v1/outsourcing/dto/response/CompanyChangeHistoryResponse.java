@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response;
+package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;

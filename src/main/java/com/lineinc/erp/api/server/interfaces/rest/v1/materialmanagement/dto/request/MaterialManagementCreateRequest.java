@@ -1,9 +1,7 @@
-package com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request;
+package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request;
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementDetailCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.request.MaterialManagementFileCreateRequest;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.menu.dto.response;
+package com.lineinc.erp.api.server.interfaces.rest.v1.menu.dto.response;
 
 import com.lineinc.erp.api.server.domain.menu.entity.Menu;
 import io.swagger.v3.oas.annotations.media.Schema;

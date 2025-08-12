@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.site.dto.response.site;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

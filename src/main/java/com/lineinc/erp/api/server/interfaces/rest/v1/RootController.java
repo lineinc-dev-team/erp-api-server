@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1;
+package com.lineinc.erp.api.server.interfaces.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

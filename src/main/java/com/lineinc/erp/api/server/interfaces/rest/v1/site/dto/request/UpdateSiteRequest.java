@@ -1,11 +1,12 @@
-package com.lineinc.erp.api.server.presentation.v1.site.dto.request;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request;
 
-import com.lineinc.erp.api.server.domain.site.enums.SiteType;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.sitecontract.SiteContractUpdateRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.lineinc.erp.api.server.domain.site.enums.SiteType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.sitecontract.SiteContractUpdateRequest;
 
 import java.time.LocalDate;
 import java.util.List;

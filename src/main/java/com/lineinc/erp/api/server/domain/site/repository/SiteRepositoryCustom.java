@@ -1,8 +1,9 @@
 package com.lineinc.erp.api.server.domain.site.repository;
 
 import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.SiteListRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.site.SiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

@@ -2,7 +2,8 @@ package com.lineinc.erp.api.server.domain.organization.service;
 
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
-import com.lineinc.erp.api.server.presentation.v1.organization.dto.response.GradeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.organization.dto.response.GradeResponse;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

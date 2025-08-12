@@ -1,9 +1,19 @@
-package com.lineinc.erp.api.server.presentation.v1.site.controller;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.controller;
 
-import com.lineinc.erp.api.server.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
-
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
+import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteDownloadRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.site.CreateSiteRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.site.DeleteSitesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.changehistory.SiteChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.sitefile.SiteFileTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
@@ -11,22 +21,13 @@ import com.lineinc.erp.api.server.shared.dto.response.*;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-import com.lineinc.erp.api.server.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.*;
 import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.site.CreateSiteRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.site.DeleteSitesRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.changehistory.SiteChangeHistoryResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.site.SiteDetailResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.site.SiteResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.site.SiteTypeResponse;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.response.sitefile.SiteFileTypeResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
 import io.swagger.v3.oas.annotations.Operation;

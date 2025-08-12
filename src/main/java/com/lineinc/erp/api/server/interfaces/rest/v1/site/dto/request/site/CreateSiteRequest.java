@@ -1,8 +1,9 @@
-package com.lineinc.erp.api.server.presentation.v1.site.dto.request.site;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.site;
 
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.sitecontract.CreateSiteContractRequest;
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.siteprocess.CreateSiteProcessRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.sitecontract.CreateSiteContractRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.siteprocess.CreateSiteProcessRequest;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

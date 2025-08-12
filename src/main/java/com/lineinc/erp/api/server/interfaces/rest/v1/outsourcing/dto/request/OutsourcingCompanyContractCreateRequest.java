@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request;
+package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractCategoryType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;

@@ -8,12 +8,12 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyContactCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactUpdateRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyContactUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;

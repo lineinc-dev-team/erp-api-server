@@ -1,9 +1,9 @@
 package com.lineinc.erp.api.server.domain.common.service;
 
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.interfaces.rest.v1.file.dto.request.PresignedUrlRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.file.dto.response.PresignedUrlResponse;
 import com.lineinc.erp.api.server.shared.enums.FileMimeType;
-import com.lineinc.erp.api.server.presentation.v1.file.dto.request.PresignedUrlRequest;
-import com.lineinc.erp.api.server.presentation.v1.file.dto.response.PresignedUrlResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

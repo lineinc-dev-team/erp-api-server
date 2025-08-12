@@ -1,13 +1,14 @@
 package com.lineinc.erp.api.server.domain.managementcost.service;
 
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostFileRepository;
-import com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request.ManagementCostFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

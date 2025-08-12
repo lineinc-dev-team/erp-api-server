@@ -1,8 +1,8 @@
-package com.lineinc.erp.api.server.config.security;
-
-import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+package com.lineinc.erp.api.server.infrastructure.config.security;
 
 import java.lang.annotation.*;
+
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

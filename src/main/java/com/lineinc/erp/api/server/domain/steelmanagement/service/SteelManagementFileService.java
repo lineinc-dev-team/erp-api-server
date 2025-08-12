@@ -4,8 +4,9 @@ import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementFileRepository;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementFileCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request.SteelManagementFileUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementFileUpdateRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-//package com.lineinc.erp.api.server.presentation.v1.materialmanagement.controller;
+//package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.controller;
 //
 //import com.lineinc.erp.api.server.domain.materialmanagement.service.MaterialManagementService;
 //import com.lineinc.erp.api.server.common.constant.AppConstants;

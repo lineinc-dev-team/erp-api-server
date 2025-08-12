@@ -1,11 +1,12 @@
-package com.lineinc.erp.api.server.presentation.v1.site.dto.request.sitecontract;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.sitecontract;
 
-import com.lineinc.erp.api.server.presentation.v1.site.dto.request.UpdateSiteFileRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
+
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteFileRequest;
 
 @Schema(description = "현장 계약 수정 요청")
 public record SiteContractUpdateRequest(

@@ -1,8 +1,8 @@
-package com.lineinc.erp.api.server.presentation.v1.menu.controller;
+package com.lineinc.erp.api.server.interfaces.rest.v1.menu.controller;
 
 import com.lineinc.erp.api.server.domain.menu.service.MenuService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.menu.dto.response.MenuWithPermissionsResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
-import com.lineinc.erp.api.server.presentation.v1.menu.dto.response.MenuWithPermissionsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

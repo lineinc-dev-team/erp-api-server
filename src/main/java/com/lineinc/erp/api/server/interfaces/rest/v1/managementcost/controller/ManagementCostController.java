@@ -1,4 +1,4 @@
-//package com.lineinc.erp.api.server.presentation.v1.managementcost.controller;
+//package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.controller;
 //
 //import com.lineinc.erp.api.server.domain.managementcost.service.ManagementCostService;
 //import com.lineinc.erp.api.server.common.constant.AppConstants;

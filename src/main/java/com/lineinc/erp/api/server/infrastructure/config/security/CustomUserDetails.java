@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config.security;
+package com.lineinc.erp.api.server.infrastructure.config.security;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

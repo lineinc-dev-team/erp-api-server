@@ -1,6 +1,7 @@
-package com.lineinc.erp.api.server.presentation.v1.user.controller;
+package com.lineinc.erp.api.server.interfaces.rest.v1.user.controller;
 
 import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
@@ -12,12 +13,12 @@ import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-import com.lineinc.erp.api.server.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.*;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserInfoResponse;
-import com.lineinc.erp.api.server.presentation.v1.user.dto.response.user.UserChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserInfoResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

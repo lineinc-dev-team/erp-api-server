@@ -1,16 +1,17 @@
-package com.lineinc.erp.api.server.seeder.runner;
+package com.lineinc.erp.api.server.infrastructure.seeder.runner;
 
-import com.lineinc.erp.api.server.seeder.menu.MenuSeeder;
-import com.lineinc.erp.api.server.seeder.organization.OrganizationSeeder;
-import com.lineinc.erp.api.server.seeder.permission.PermissionSeeder;
-import com.lineinc.erp.api.server.seeder.permission.RolesPermissionsSeeder;
-import com.lineinc.erp.api.server.seeder.role.RolesSeeder;
-import com.lineinc.erp.api.server.seeder.user.UsersRolesSeeder;
-import com.lineinc.erp.api.server.seeder.user.UsersSeeder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import com.lineinc.erp.api.server.infrastructure.seeder.menu.MenuSeeder;
+import com.lineinc.erp.api.server.infrastructure.seeder.organization.OrganizationSeeder;
+import com.lineinc.erp.api.server.infrastructure.seeder.permission.PermissionSeeder;
+import com.lineinc.erp.api.server.infrastructure.seeder.permission.RolesPermissionsSeeder;
+import com.lineinc.erp.api.server.infrastructure.seeder.role.RolesSeeder;
+import com.lineinc.erp.api.server.infrastructure.seeder.user.UsersRolesSeeder;
+import com.lineinc.erp.api.server.infrastructure.seeder.user.UsersSeeder;
 
 @Component
 @RequiredArgsConstructor

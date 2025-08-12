@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.client.controller;
+package com.lineinc.erp.api.server.interfaces.rest.v1.client.controller;
 
 import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -8,14 +8,19 @@ import com.lineinc.erp.api.server.shared.dto.response.*;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-import com.lineinc.erp.api.server.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.request.*;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyDetailResponse;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyPaymentMethodResponse;
-import com.lineinc.erp.api.server.presentation.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyDownloadRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.DeleteClientCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyPaymentMethodResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

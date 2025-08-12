@@ -1,4 +1,4 @@
-//package com.lineinc.erp.api.server.presentation.v1.steelmanagement.controller;
+//package com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.controller;
 //
 //import com.lineinc.erp.api.server.domain.steelmanagement.service.SteelManagementService;
 //import com.lineinc.erp.api.server.common.constant.AppConstants;

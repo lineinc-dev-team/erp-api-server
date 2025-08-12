@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config.security;
+package com.lineinc.erp.api.server.infrastructure.config.security;
 
 import com.lineinc.erp.api.server.domain.common.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;

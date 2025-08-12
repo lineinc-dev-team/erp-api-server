@@ -1,11 +1,12 @@
-package com.lineinc.erp.api.server.presentation.v1.managementcost.dto.request;
+package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request;
 
-import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import com.lineinc.erp.api.server.domain.managementcost.entity.ItemType;
 
 @Schema(description = "관리비 등록 요청")
 public record ManagementCostCreateRequest(

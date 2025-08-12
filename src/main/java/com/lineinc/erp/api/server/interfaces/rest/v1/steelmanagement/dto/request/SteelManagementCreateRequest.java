@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.steelmanagement.dto.request;
+package com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request;
 
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 

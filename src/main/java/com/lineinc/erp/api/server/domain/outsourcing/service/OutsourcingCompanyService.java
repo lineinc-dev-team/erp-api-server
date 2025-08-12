@@ -6,18 +6,19 @@ import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyContactResponse;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyDetailResponse;
 
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
-import com.lineinc.erp.api.server.presentation.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContactResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;

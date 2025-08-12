@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.presentation.v1.materialmanagement.dto.response;
+package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import io.swagger.v3.oas.annotations.media.Schema;
