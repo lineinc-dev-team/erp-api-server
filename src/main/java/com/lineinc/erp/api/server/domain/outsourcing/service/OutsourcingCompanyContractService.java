@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyCo
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractHistory;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractConstructionRepository;
@@ -25,6 +26,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompa
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractFileRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractSubEquipmentRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractWorkerRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -37,6 +39,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractDriverCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractSubEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -61,6 +64,7 @@ public class OutsourcingCompanyContractService {
     private final SiteRepository siteRepository;
     private final SiteProcessRepository siteProcessRepository;
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
+    private final OutsourcingCompanyContractSubEquipmentRepository subEquipmentRepository;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -224,6 +228,11 @@ public class OutsourcingCompanyContractService {
                     .build();
 
             equipmentRepository.save(equipment);
+
+            // 보조장비가 있으면 생성
+            if (equipmentRequest.subEquipments() != null && !equipmentRequest.subEquipments().isEmpty()) {
+                createContractSubEquipments(equipment, equipmentRequest.subEquipments());
+            }
         }
     }
 
@@ -276,6 +285,22 @@ public class OutsourcingCompanyContractService {
     }
 
     /**
+     * 계약 보조장비를 생성합니다.
+     */
+    private void createContractSubEquipments(OutsourcingCompanyContractEquipment equipment,
+            List<OutsourcingCompanyContractSubEquipmentCreateRequest> subEquipments) {
+        for (OutsourcingCompanyContractSubEquipmentCreateRequest subEquipmentRequest : subEquipments) {
+            OutsourcingCompanyContractSubEquipment subEquipment = OutsourcingCompanyContractSubEquipment.builder()
+                    .equipment(equipment)
+                    .type(subEquipmentRequest.type())
+                    .memo(subEquipmentRequest.memo())
+                    .build();
+
+            subEquipmentRepository.save(subEquipment);
+        }
+    }
+
+    /**
      * 계약 이력을 생성합니다.
      */
     private void createContractHistory(OutsourcingCompanyContract contract) {
@@ -301,4 +326,5 @@ public class OutsourcingCompanyContractService {
         // ContractHistoryResponse로 변환
         return historyPage.map(ContractHistoryResponse::from);
     }
+
 }
