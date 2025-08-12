@@ -75,38 +75,24 @@ jobs:
             # 새 앱 시작
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
-            # 앱 시작 대기 (더 긴 시간)
-            echo "▶ 앱 시작 대기 (30초)"
-            sleep 30
+            # 앱 시작 대기
+            echo "▶ 앱 시작 대기 (15초)"
+            sleep 15
             
-            # 포트 리스닝 확인
-            echo "▶ 포트 $NEW_PORT 리스닝 확인"
-            for i in {1..20}; do
-              if ss -tlnp | grep -q ":$NEW_PORT "; then
-                echo "✅ 포트 $NEW_PORT 리스닝 확인됨"
+            # 포트 확인 + 헬스체크 (동시에)
+            echo "▶ 포트 및 헬스체크 확인"
+            for i in {1..10}; do
+              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 3 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 포트 및 헬스체크 성공"
                 break
               fi
-              sleep 2
-            done
-            
-            # 헬스체크 (더 엄격하게)
-            echo "▶ 헬스체크 시작"
-            for i in {1..15}; do
-              if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 헬스체크 성공 (시도 $i)"
-                break
-              fi
-              if [ $i -eq 15 ]; then
-                echo "❌ 헬스체크 실패"
+              if [ $i -eq 10 ]; then
+                echo "❌ 포트 또는 헬스체크 실패"
                 pm2 delete "$NEW_APP" 2>/dev/null || true
                 exit 1
               fi
-              sleep 2
+              sleep 3
             done
-            
-            # 추가 안정화 대기
-            echo "▶ 추가 안정화 대기 (10초)"
-            sleep 10
             
             # Nginx 프록시 전환
             echo "▶ Nginx 프록시 전환 시작"
