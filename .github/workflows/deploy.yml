@@ -141,15 +141,22 @@ jobs:
             fi
             
             # 새 앱 시작
+            echo "▶ $NEW_APP 시작 중..."
             pm2 start ecosystem.config.js --only "$NEW_APP"
+            
+            echo "▶ $NEW_APP 시작 후 즉시 로그 확인"
+            pm2 logs "$NEW_APP" --lines 20
 
-            echo "▶ 애플리케이션 시작 대기 (10초)"
-            sleep 10
+            echo "▶ 애플리케이션 시작 대기 (15초)"
+            sleep 15
 
             echo "▶ PM2 앱 상태 확인"
+            pm2 list
+            
             if ! pm2 list | grep -q "${NEW_APP}.*online"; then
               echo "❌ $NEW_APP 온라인 상태 진입 실패"
-              pm2 logs "$NEW_APP" --lines 50
+              echo "▶ 상세 로그 확인:"
+              pm2 logs "$NEW_APP" --lines 100
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
@@ -163,11 +170,17 @@ jobs:
             echo "  - NEW_APP: '$NEW_APP'"
             echo "  - OLD_APP: '$OLD_APP'"
             
+            echo "▶ $NEW_APP 프로세스 상세 정보:"
+            pm2 show "$NEW_APP"
+            
             echo "▶ 포트 $NEW_PORT 리스닝 상태 상세 확인:"
             ss -tlnp | grep ":$NEW_PORT " || echo "포트 $NEW_PORT에서 리스닝하는 프로세스 없음"
             
             echo "▶ 전체 포트 상태:"
             ss -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
+            
+            echo "▶ Java 프로세스 확인:"
+            ps aux | grep java | grep -v grep || echo "Java 프로세스 없음"
             
             # 포트 확인 (더 안전한 방식)
             PORT_CHECK_RESULT=$(ss -tlnp | grep -c ":$NEW_PORT")
@@ -182,8 +195,10 @@ jobs:
               ss -tlnp | grep -E ":(8080|8081) " || echo "포트 8080, 8081에서 리스닝하는 프로세스 없음"
               echo "▶ PM2 앱 상태:"
               pm2 list
+              echo "▶ $NEW_APP 상세 정보:"
+              pm2 show "$NEW_APP"
               echo "▶ 애플리케이션 로그:"
-              pm2 logs "$NEW_APP" --lines 50
+              pm2 logs "$NEW_APP" --lines 100
               pm2 delete "$NEW_APP" 2>/dev/null || true
               exit 1
             fi
