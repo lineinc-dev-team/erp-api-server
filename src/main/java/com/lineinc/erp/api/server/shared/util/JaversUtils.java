@@ -12,6 +12,7 @@ import org.javers.core.diff.changetype.ValueChange;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
@@ -80,20 +81,8 @@ public class JaversUtils {
 
     // 단일 추가 엔티티 변경 내역 추출
     public static Map<String, String> extractAddedEntityChange(Javers javers, Object newEntity) {
-        String afterValue;
-        if (newEntity instanceof ClientCompanyContact clientCompanyContact) {
-            afterValue = clientCompanyContact.getName();
-        } else if (newEntity instanceof ClientCompanyFile clientCompanyFile) {
-            afterValue = clientCompanyFile.getName();
-        } else if (newEntity instanceof SiteContract siteContract) {
-            afterValue = siteContract.getName();
-        } else if (newEntity instanceof SiteFile siteFile) {
-            afterValue = siteFile.getName();
-        } else if (newEntity instanceof OutsourcingCompanyContact outsourcingCompanyContact) {
-            afterValue = outsourcingCompanyContact.getName();
-        } else if (newEntity instanceof OutsourcingCompanyFile outsourcingCompanyFile) {
-            afterValue = outsourcingCompanyFile.getName();
-        } else {
+        String afterValue = extractEntityName(newEntity);
+        if (afterValue == null) {
             afterValue = toJsonSafe(javers, newEntity);
         }
 
@@ -102,6 +91,25 @@ public class JaversUtils {
                 "before", "null",
                 "after", afterValue,
                 "type", "추가");
+    }
+
+    private static String extractEntityName(Object entity) {
+        if (entity instanceof ClientCompanyContact contact) {
+            return contact.getName();
+        } else if (entity instanceof ClientCompanyFile file) {
+            return file.getName();
+        } else if (entity instanceof SiteContract contract) {
+            return contract.getName();
+        } else if (entity instanceof SiteFile file) {
+            return file.getName();
+        } else if (entity instanceof OutsourcingCompanyContact contact) {
+            return contact.getName();
+        } else if (entity instanceof OutsourcingCompanyFile file) {
+            return file.getName();
+        } else if (entity instanceof OutsourcingCompanyContractContact contact) {
+            return contact.getName();
+        }
+        return null;
     }
 
     private static String toJsonSafe(Javers javers, Object obj) {
@@ -117,22 +125,31 @@ public class JaversUtils {
         if (affectedObject instanceof Optional<?> optional) {
             affectedObject = optional.orElse(null);
         }
-        if (affectedObject instanceof ClientCompanyContact clientCompanyContact) {
-            return clientCompanyContact.getName() + "(" + clientCompanyContact.getId() + ")";
-        } else if (affectedObject instanceof ClientCompanyFile clientCompanyFile) {
-            return clientCompanyFile.getName() + "(" + clientCompanyFile.getId() + ")";
-        } else if (affectedObject instanceof SiteContract siteContract) {
-            return siteContract.getName() + "(" + siteContract.getId() + ")";
-        } else if (affectedObject instanceof SiteFile siteFile) {
-            return siteFile.getName() + "(" + siteFile.getId() + ")";
-        } else if (affectedObject instanceof OutsourcingCompanyContact outsourcingCompanyContact) {
-            return outsourcingCompanyContact.getName() + "(" + outsourcingCompanyContact.getId() + ")";
-        } else if (affectedObject instanceof OutsourcingCompanyFile outsourcingCompanyFile) {
-            return outsourcingCompanyFile.getName() + "(" + outsourcingCompanyFile.getId() + ")";
-        } else if (affectedObject != null) {
-            return affectedObject.toString();
-        } else {
-            return "";
+
+        String entityName = extractEntityNameWithId(affectedObject);
+        if (entityName != null) {
+            return entityName;
         }
+
+        return affectedObject != null ? affectedObject.toString() : "";
+    }
+
+    private static String extractEntityNameWithId(Object entity) {
+        if (entity instanceof ClientCompanyContact contact) {
+            return contact.getName() + "(" + contact.getId() + ")";
+        } else if (entity instanceof ClientCompanyFile file) {
+            return file.getName() + "(" + file.getId() + ")";
+        } else if (entity instanceof SiteContract contract) {
+            return contract.getName() + "(" + contract.getId() + ")";
+        } else if (entity instanceof SiteFile file) {
+            return file.getName() + "(" + file.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContact contact) {
+            return contact.getName() + "(" + contact.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyFile file) {
+            return file.getName() + "(" + file.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContractContact contact) {
+            return contact.getName() + "(" + contact.getId() + ")";
+        }
+        return null;
     }
 }

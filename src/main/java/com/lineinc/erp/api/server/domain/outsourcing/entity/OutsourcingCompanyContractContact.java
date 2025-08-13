@@ -1,11 +1,27 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractContactUpdateRequest;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -20,6 +36,7 @@ public class OutsourcingCompanyContractContact extends BaseEntity {
     @SequenceGenerator(name = "outsourcing_company_contract_contact_seq", sequenceName = "outsourcing_company_contract_contact_seq", allocationSize = 1)
     private Long id;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
@@ -72,5 +89,34 @@ public class OutsourcingCompanyContractContact extends BaseEntity {
     @Builder.Default
     private Boolean isMain = false;
 
+    /**
+     * DTO의 정보로 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(OutsourcingCompanyContractContactUpdateRequest request) {
+        if (request.name() != null) {
+            this.name = request.name();
+        }
+        if (request.department() != null) {
+            this.department = request.department();
+        }
+        if (request.position() != null) {
+            this.position = request.position();
+        }
+        if (request.landlineNumber() != null) {
+            this.landlineNumber = request.landlineNumber();
+        }
+        if (request.phoneNumber() != null) {
+            this.phoneNumber = request.phoneNumber();
+        }
+        if (request.email() != null) {
+            this.email = request.email();
+        }
+        if (request.memo() != null) {
+            this.memo = request.memo();
+        }
+        if (request.isMain() != null) {
+            this.isMain = request.isMain();
+        }
+    }
 
 }

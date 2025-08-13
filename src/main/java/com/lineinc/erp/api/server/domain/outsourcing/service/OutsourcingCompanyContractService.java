@@ -94,6 +94,7 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
     private final OutsourcingCompanyContractSubEquipmentRepository subEquipmentRepository;
     private final Javers javers;
+    private final OutsourcingCompanyContractContactService contractContactService;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -584,7 +585,10 @@ public class OutsourcingCompanyContractService {
             contractChangeHistoryRepository.save(changeHistory);
         }
 
-        // 5. 사용자 정의 변경 이력 저장
+        // 5. 담당자 정보 수정
+        contractContactService.updateContractContacts(contract.getId(), request.contacts());
+
+        // 6. 사용자 정의 변경 이력 저장
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {
