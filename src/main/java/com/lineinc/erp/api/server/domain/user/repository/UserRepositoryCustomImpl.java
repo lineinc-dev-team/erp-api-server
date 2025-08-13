@@ -1,16 +1,10 @@
 package com.lineinc.erp.api.server.domain.user.repository;
 
-import com.lineinc.erp.api.server.shared.util.PageableUtils;
-import com.lineinc.erp.api.server.domain.user.entity.QUser;
-import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
-import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.SearchUserRequest;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +12,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.KOREA_ZONE_OFFSET;
+import com.lineinc.erp.api.server.domain.user.entity.QUser;
+import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.SearchUserRequest;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,8 +39,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             "username", user.username,
             "createdAt", user.createdAt,
             "updatedAt", user.updatedAt,
-            "lastLoginAt", user.lastLoginAt
-    );
+            "lastLoginAt", user.lastLoginAt);
 
     @Override
     public Page<UserResponse> findAll(SearchUserRequest request, Pageable pageable) {
@@ -46,8 +47,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
-                SORT_FIELDS
-        );
+                SORT_FIELDS);
 
         List<User> content = queryFactory
                 .selectFrom(user)
@@ -87,24 +87,37 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             builder.and(user.id.in(
                     queryFactory.select(userRole.user.id)
                             .from(userRole)
-                            .where(userRole.role.id.eq(request.roleId()))
-            ));
+                            .where(userRole.role.id.eq(request.roleId()))));
         }
 
         if (request.createdStartDate() != null) {
-            builder.and(user.createdAt.goe(request.createdStartDate().atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
+            builder.and(user.createdAt.goe(dateRange[0]));
+
+            // 종료일이 없으면 시작일의 끝까지로 설정
+            if (request.createdEndDate() == null) {
+                builder.and(user.createdAt.lt(dateRange[1]));
+            }
         }
 
         if (request.createdEndDate() != null) {
-            builder.and(user.createdAt.lt(request.createdEndDate().plusDays(1).atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
+            builder.and(user.createdAt.lt(dateRange[1]));
         }
 
         if (request.lastLoginStartDate() != null) {
-            builder.and(user.lastLoginAt.goe(request.lastLoginStartDate().atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.lastLoginStartDate());
+            builder.and(user.lastLoginAt.goe(dateRange[0]));
+
+            // 종료일이 없으면 시작일의 끝까지로 설정
+            if (request.lastLoginEndDate() == null) {
+                builder.and(user.lastLoginAt.lt(dateRange[1]));
+            }
         }
 
         if (request.lastLoginEndDate() != null) {
-            builder.and(user.lastLoginAt.lt(request.lastLoginEndDate().plusDays(1).atStartOfDay().atOffset(KOREA_ZONE_OFFSET)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.lastLoginEndDate());
+            builder.and(user.lastLoginAt.lt(dateRange[1]));
         }
 
         if (request.departmentId() != null) {
@@ -123,15 +136,13 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                 builder.and(user.id.in(
                         queryFactory.select(userRole.user.id)
                                 .from(userRole)
-                                .distinct()
-                ));
+                                .distinct()));
             } else {
                 // 어떤 역할도 하나도 가지고 있지 않은 유저만 조회
                 builder.and(user.id.notIn(
                         queryFactory.select(userRole.user.id)
                                 .from(userRole)
-                                .distinct()
-                ));
+                                .distinct()));
             }
         }
 
@@ -154,4 +165,3 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                 .toList();
     }
 }
-

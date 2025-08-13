@@ -1,16 +1,10 @@
 package com.lineinc.erp.api.server.domain.site.repository;
 
-import com.lineinc.erp.api.server.shared.util.PageableUtils;
-import com.lineinc.erp.api.server.domain.site.entity.*;
-import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
-import com.lineinc.erp.api.server.domain.site.enums.SiteType;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +12,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.KOREA_ZONE_OFFSET;
+import com.lineinc.erp.api.server.domain.site.entity.QSite;
+import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
+import com.lineinc.erp.api.server.domain.site.enums.SiteType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 /**
  * SiteRepositoryCustom의 구현체.
@@ -42,8 +46,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             "name", QSite.site.name,
             "startedAt", QSite.site.startedAt,
             "createdAt", QSite.site.createdAt,
-            "updatedAt", QSite.site.updatedAt
-    );
+            "updatedAt", QSite.site.updatedAt);
 
     /**
      * Site 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
@@ -64,8 +67,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         }
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
-                SORT_FIELDS
-        );
+                SORT_FIELDS);
 
         List<Site> content = queryFactory
                 .selectFrom(site)
@@ -157,37 +159,33 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         }
 
         if (request.startDate() != null) {
-            builder.and(site.startedAt.goe(
-                    request.startDate()
-                            .atStartOfDay()
-                            .atOffset(KOREA_ZONE_OFFSET)
-            ));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.startDate());
+            builder.and(site.startedAt.goe(dateRange[0]));
+
+            // 종료일이 없으면 시작일의 끝까지로 설정
+            if (request.endDate() == null) {
+                builder.and(site.startedAt.lt(dateRange[1]));
+            }
         }
 
         if (request.endDate() != null) {
-            builder.and(site.endedAt.lt(
-                    request.endDate()
-                            .plusDays(1)
-                            .atStartOfDay()
-                            .atOffset(KOREA_ZONE_OFFSET)
-            ));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.endDate());
+            builder.and(site.endedAt.lt(dateRange[1]));
         }
 
         if (request.createdStartDate() != null) {
-            builder.and(site.createdAt.goe(
-                    request.createdStartDate()
-                            .atStartOfDay()
-                            .atOffset(KOREA_ZONE_OFFSET)
-            ));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
+            builder.and(site.createdAt.goe(dateRange[0]));
+
+            // 종료일이 없으면 시작일의 끝까지로 설정
+            if (request.createdEndDate() == null) {
+                builder.and(site.createdAt.lt(dateRange[1]));
+            }
         }
 
         if (request.createdEndDate() != null) {
-            builder.and(site.createdAt.lt(
-                    request.createdEndDate()
-                            .plusDays(1)
-                            .atStartOfDay()
-                            .atOffset(KOREA_ZONE_OFFSET)
-            ));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
+            builder.and(site.createdAt.lt(dateRange[1]));
         }
 
         return builder;

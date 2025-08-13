@@ -1,19 +1,9 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.repository;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.util.PageableUtils;
-import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
-import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagement;
-import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
-import com.lineinc.erp.api.server.domain.site.entity.QSite;
-import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +11,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagement;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
+import com.lineinc.erp.api.server.domain.site.entity.QSite;
+import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -39,8 +41,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
             "id", materialManagement.id,
             "deliveryDate", materialManagement.deliveryDate,
             "createdAt", materialManagement.createdAt,
-            "updatedAt", materialManagement.updatedAt
-    );
+            "updatedAt", materialManagement.updatedAt);
 
     @Override
     public Page<MaterialManagementResponse> findAll(MaterialManagementListRequest request, Pageable pageable) {
@@ -91,18 +92,11 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
         }
         if (request.deliveryStartDate() != null) {
             builder.and(materialManagement.deliveryDate.goe(
-                    request.deliveryStartDate()
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                    DateTimeFormatUtils.getUtcDateRange(request.deliveryStartDate())[0]));
         }
         if (request.deliveryEndDate() != null) {
             builder.and(materialManagement.deliveryDate.lt(
-                    request.deliveryEndDate()
-                            .plusDays(1)
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                    DateTimeFormatUtils.getUtcDateRange(request.deliveryEndDate())[1]));
         }
 
         return builder;

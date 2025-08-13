@@ -1,18 +1,10 @@
 package com.lineinc.erp.api.server.domain.client.repository;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.util.PageableUtils;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.QClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.QClientCompanyContact;
-import com.lineinc.erp.api.server.domain.user.entity.QUser;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +12,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.QClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.QClientCompanyContact;
+import com.lineinc.erp.api.server.domain.user.entity.QUser;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * ClientCompanyRepositoryCustom의 구현체.
@@ -42,8 +45,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             "id", QClientCompany.clientCompany.id,
             "name", QClientCompany.clientCompany.name,
             "createdAt", QClientCompany.clientCompany.createdAt,
-            "updatedAt", QClientCompany.clientCompany.updatedAt
-    );
+            "updatedAt", QClientCompany.clientCompany.updatedAt);
 
     /**
      * ClientCompany 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
@@ -57,8 +59,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
-                SORT_FIELDS
-        );
+                SORT_FIELDS);
 
         List<ClientCompany> content = queryFactory
                 .selectFrom(clientCompany)
@@ -112,10 +113,8 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         }
         if (StringUtils.hasText(request.email())) {
             builder.and(
-                    clientCompany.contacts.any()
-                            .email.containsIgnoreCase(request.email().trim())
-                            .and(clientCompany.contacts.any().isMain.isTrue())
-            );
+                    clientCompany.contacts.any().email.containsIgnoreCase(request.email().trim())
+                            .and(clientCompany.contacts.any().isMain.isTrue()));
         }
         if (StringUtils.hasText(request.phoneNumber())) {
             builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
@@ -124,31 +123,25 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             String number = request.landlineNumber().trim();
             builder.and(
                     clientCompany.landlineNumber.contains(number)
-                            .or(clientCompany.phoneNumber.contains(number))
-            );
+                            .or(clientCompany.phoneNumber.contains(number)));
         }
         if (request.isActive() != null) {
             builder.and(clientCompany.isActive.eq(request.isActive()));
         }
 
         if (request.createdStartDate() != null) {
-            // atOffset(AppConstants.KOREA_ZONE_OFFSET)는 LocalDateTime → OffsetDateTime 변환 (KST 기준)
-            // goe는 Greater or Equal의 약자로 '이상' 조건을 뜻함
-            builder.and(clientCompany.createdAt.goe(
-                    request.createdStartDate()
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
+            builder.and(clientCompany.createdAt.goe(dateRange[0]));
+
+            // 종료일이 없으면 시작일의 끝까지로 설정
+            if (request.createdEndDate() == null) {
+                builder.and(clientCompany.createdAt.lt(dateRange[1]));
+            }
         }
 
         if (request.createdEndDate() != null) {
-            // lt는 Less Than의 약자로 '미만' 조건을 뜻함
-            builder.and(clientCompany.createdAt.lt(
-                    request.createdEndDate()
-                            .plusDays(1)    // endDate에 하루 더해 다음 날 00시로 만듦 (범위 포함 위해)
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
+            builder.and(clientCompany.createdAt.lt(dateRange[1]));
         }
 
         return builder;

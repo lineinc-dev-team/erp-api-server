@@ -1,18 +1,9 @@
 package com.lineinc.erp.api.server.domain.managementcost.repository;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.util.PageableUtils;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.domain.managementcost.entity.QManagementCost;
-import com.lineinc.erp.api.server.domain.site.entity.QSite;
-import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +11,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.QManagementCost;
+import com.lineinc.erp.api.server.domain.site.entity.QSite;
+import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * ManagementCostRepositoryCustom의 구현체.
@@ -41,8 +43,7 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
             "id", QManagementCost.managementCost.id,
             "paymentDate", QManagementCost.managementCost.paymentDate,
             "createdAt", QManagementCost.managementCost.createdAt,
-            "updatedAt", QManagementCost.managementCost.updatedAt
-    );
+            "updatedAt", QManagementCost.managementCost.updatedAt);
 
     @Override
     public Page<ManagementCostResponse> findAll(ManagementCostListRequest request, Pageable pageable) {
@@ -94,18 +95,11 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
         }
         if (request.paymentStartDate() != null) {
             builder.and(managementCost.paymentDate.goe(
-                    request.paymentStartDate()
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                    DateTimeFormatUtils.getUtcDateRange(request.paymentStartDate())[0]));
         }
         if (request.paymentEndDate() != null) {
             builder.and(managementCost.paymentDate.lt(
-                    request.paymentEndDate()
-                            .plusDays(1)
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                    DateTimeFormatUtils.getUtcDateRange(request.paymentEndDate())[1]));
         }
 
         return builder;
@@ -126,4 +120,3 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
                 .fetch();
     }
 }
-

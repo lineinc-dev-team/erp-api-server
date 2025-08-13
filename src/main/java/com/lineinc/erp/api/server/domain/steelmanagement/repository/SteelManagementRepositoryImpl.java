@@ -1,20 +1,8 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.repository;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.domain.site.entity.QSite;
-import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
-import com.lineinc.erp.api.server.domain.steelmanagement.entity.QSteelManagement;
-import com.lineinc.erp.api.server.domain.steelmanagement.entity.QSteelManagementDetail;
-import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
-import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
-import com.lineinc.erp.api.server.shared.util.PageableUtils;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +10,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
+import com.lineinc.erp.api.server.domain.site.entity.QSite;
+import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.QSteelManagement;
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.QSteelManagementDetail;
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * SteelManagementRepositoryCustom의 구현체.
@@ -44,8 +46,7 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
             "id", QSteelManagement.steelManagement.id,
             "paymentDate", QSteelManagement.steelManagement.paymentDate,
             "createdAt", QSteelManagement.steelManagement.createdAt,
-            "updatedAt", QSteelManagement.steelManagement.updatedAt
-    );
+            "updatedAt", QSteelManagement.steelManagement.updatedAt);
 
     @Override
     public Page<SteelManagementResponse> findAll(SteelManagementListRequest request, Pageable pageable) {
@@ -110,18 +111,11 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
         }
         if (request.paymentStartDate() != null) {
             builder.and(steelManagement.paymentDate.goe(
-                    request.paymentStartDate()
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                    DateTimeFormatUtils.getUtcDateRange(request.paymentStartDate())[0]));
         }
         if (request.paymentEndDate() != null) {
             builder.and(steelManagement.paymentDate.lt(
-                    request.paymentEndDate()
-                            .plusDays(1)
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                    DateTimeFormatUtils.getUtcDateRange(request.paymentEndDate())[1]));
         }
         if (request.type() != null) {
             builder.and(steelManagement.type.eq(request.type()));
@@ -132,8 +126,7 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
                             .from(detail)
                             .where(detail.steelManagement.eq(steelManagement)
                                     .and(detail.name.containsIgnoreCase(request.itemName().trim())))
-                            .exists()
-            );
+                            .exists());
         }
 
         return builder;
