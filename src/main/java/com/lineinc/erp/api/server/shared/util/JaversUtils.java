@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
@@ -108,6 +109,8 @@ public class JaversUtils {
             return file.getName();
         } else if (entity instanceof OutsourcingCompanyContractContact contact) {
             return contact.getName();
+        } else if (entity instanceof OutsourcingCompanyContractFile file) {
+            return file.getName();
         }
         return null;
     }
@@ -149,6 +152,8 @@ public class JaversUtils {
             return file.getName() + "(" + file.getId() + ")";
         } else if (entity instanceof OutsourcingCompanyContractContact contact) {
             return contact.getName() + "(" + contact.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContractFile file) {
+            return file.getName() + "(" + file.getId() + ")";
         }
         return null;
     }

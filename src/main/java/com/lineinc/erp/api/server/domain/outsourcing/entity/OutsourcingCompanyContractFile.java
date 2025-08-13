@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -65,4 +66,22 @@ public class OutsourcingCompanyContractFile extends BaseEntity {
     @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고 / 메모
+
+    /**
+     * DTO의 정보로 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(OutsourcingCompanyContractFileUpdateRequest request) {
+        if (request.name() != null) {
+            this.name = request.name();
+        }
+        if (request.fileUrl() != null) {
+            this.fileUrl = request.fileUrl();
+        }
+        if (request.originalFileName() != null) {
+            this.originalFileName = request.originalFileName();
+        }
+        if (request.memo() != null) {
+            this.memo = request.memo();
+        }
+    }
 }
