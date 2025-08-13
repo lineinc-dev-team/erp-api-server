@@ -418,7 +418,7 @@ public class OutsourcingCompanyContractService {
             case "contractAmount" -> "계약금액(총액)";
             case "defaultDeductions" -> "공제항목";
             case "taxInvoiceCondition" -> "세금계산서 발행조건";
-            case "contacts" -> "담당자";
+            case "contactName" -> "담당자";
             case "createdAt" -> "작성일자";
             case "contractStatus" -> "상태";
             case "memo" -> "비고";
@@ -445,7 +445,7 @@ public class OutsourcingCompanyContractService {
             case "contractAmount" -> contract.contractAmount() != null ? String.valueOf(contract.contractAmount()) : "";
             case "defaultDeductions" -> contract.defaultDeductions();
             case "taxInvoiceCondition" -> contract.taxInvoiceCondition();
-            case "contacts" -> {
+            case "contactName" -> {
                 if (contract.contacts() != null && !contract.contacts().isEmpty()) {
                     yield contract.contacts().stream()
                             .map(contact -> contact.name())
