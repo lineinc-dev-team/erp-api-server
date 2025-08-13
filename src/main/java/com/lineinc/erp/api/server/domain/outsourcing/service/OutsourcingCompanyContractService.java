@@ -53,6 +53,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDriverResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
@@ -507,6 +508,22 @@ public class OutsourcingCompanyContractService {
                 contractId,
                 pageable);
         return page.map(ContractEquipmentResponse::from);
+    }
+
+    /**
+     * 외주업체 계약 기사(운전자) 정보를 Slice로 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractDriverResponse> getContractDrivers(Long contractId, Pageable pageable) {
+        // 계약이 존재하는지 확인
+        if (!contractRepository.existsById(contractId)) {
+            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+        }
+
+        Page<OutsourcingCompanyContractDriver> page = driverRepository.findByOutsourcingCompanyContractId(
+                contractId,
+                pageable);
+        return page.map(ContractDriverResponse::from);
     }
 
     /**
