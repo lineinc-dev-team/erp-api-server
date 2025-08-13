@@ -51,6 +51,12 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
             whereClause.and(outsourcingCompany.name.containsIgnoreCase(searchRequest.companyName().trim()));
         }
 
+        // 사업자등록번호 검색 (부분 일치)
+        if (searchRequest.businessNumber() != null && !searchRequest.businessNumber().trim().isEmpty()) {
+            whereClause
+                    .and(outsourcingCompany.businessNumber.containsIgnoreCase(searchRequest.businessNumber().trim()));
+        }
+
         // 계약 구분 검색
         if (searchRequest.contractType() != null) {
             whereClause.and(outsourcingCompanyContract.type.eq(searchRequest.contractType()));

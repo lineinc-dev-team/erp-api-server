@@ -26,5 +26,7 @@ public record ContractListSearchRequest(
 
         @Schema(description = "계약 종료일 (시작)", example = "2024-12-31") LocalDate contractEndDate,
 
+        @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
+
         @Schema(description = "담당자명 (검색어)", example = "홍길동") String contactName) {
 }
