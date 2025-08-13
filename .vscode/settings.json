@@ -9,5 +9,13 @@
     "java.saveActions.organizeImports": true,
     // 파일 자동 저장
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 1000
+    "files.autoSaveDelay": 1000,
+    // 탭 및 들여쓰기 설정
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.useTabStops": false,
+    // Java 전용 들여쓰기 설정
+    "java.format.settings.url": "",
+    "java.format.settings.profile": "GoogleStyle"
 }

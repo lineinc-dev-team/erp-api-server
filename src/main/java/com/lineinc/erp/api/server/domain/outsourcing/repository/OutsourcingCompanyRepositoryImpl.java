@@ -1,18 +1,9 @@
 package com.lineinc.erp.api.server.domain.outsourcing.repository;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.util.PageableUtils;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyContact;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyFile;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +11,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyContact;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyFile;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * OutsourcingCompanyRepositoryCustom의 구현체.
@@ -42,8 +44,7 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
             "id", QOutsourcingCompany.outsourcingCompany.id,
             "name", QOutsourcingCompany.outsourcingCompany.name,
             "createdAt", QOutsourcingCompany.outsourcingCompany.createdAt,
-            "updatedAt", QOutsourcingCompany.outsourcingCompany.updatedAt
-    );
+            "updatedAt", QOutsourcingCompany.outsourcingCompany.updatedAt);
 
     /**
      * OutsourcingCompany 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
@@ -57,8 +58,7 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
-                SORT_FIELDS
-        );
+                SORT_FIELDS);
 
         List<OutsourcingCompany> content = queryFactory
                 .selectFrom(outsourcingCompany)
@@ -130,27 +130,25 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
         }
 
         if (request.createdStartDate() != null) {
-            // atOffset(AppConstants.KOREA_ZONE_OFFSET)는 LocalDateTime → OffsetDateTime 변환 (KST 기준)
+            // atOffset(AppConstants.KOREA_ZONE_OFFSET)는 LocalDateTime → OffsetDateTime 변환
+            // (KST 기준)
             // goe는 Greater or Equal의 약자로 '이상' 조건을 뜻함
             builder.and(outsourcingCompany.createdAt.goe(
                     request.createdStartDate()
                             .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)));
         }
 
         if (request.createdEndDate() != null) {
             // lt는 Less Than의 약자로 '미만' 조건을 뜻함
             builder.and(outsourcingCompany.createdAt.lt(
                     request.createdEndDate()
-                            .plusDays(1)    // endDate에 하루 더해 다음 날 00시로 만듦 (범위 포함 위해)
+                            .plusDays(1) // endDate에 하루 더해 다음 날 00시로 만듦 (범위 포함 위해)
                             .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)
-            ));
+                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)));
         }
 
         return builder;
     }
-
 
 }

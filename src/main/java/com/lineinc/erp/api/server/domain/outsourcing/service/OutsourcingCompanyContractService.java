@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.outsourcing.service;
 
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -51,6 +51,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -134,18 +135,17 @@ public class OutsourcingCompanyContractService {
         OutsourcingCompany outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
                 .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
+        OffsetDateTime contractStartDate = DateTimeFormatUtils.toOffsetDateTime(request.contractStartDate());
+        OffsetDateTime contractEndDate = DateTimeFormatUtils.toOffsetDateTime(request.contractEndDate());
+
         OutsourcingCompanyContract contract = OutsourcingCompanyContract.builder()
                 .site(site)
                 .siteProcess(siteProcess)
                 .outsourcingCompany(outsourcingCompany)
                 .type(request.type())
                 .typeDescription(request.typeDescription())
-                .contractStartDate(request.contractStartDate() != null
-                        ? request.contractStartDate().atStartOfDay().atOffset(ZoneOffset.UTC)
-                        : null)
-                .contractEndDate(request.contractEndDate() != null
-                        ? request.contractEndDate().atStartOfDay().atOffset(ZoneOffset.UTC)
-                        : null)
+                .contractStartDate(contractStartDate)
+                .contractEndDate(contractEndDate)
                 .contractAmount(request.contractAmount())
                 .defaultDeductions(request.defaultDeductionsType())
                 .defaultDeductionsDescription(request.defaultDeductionsDescription())

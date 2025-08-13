@@ -6,6 +6,7 @@ import static com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingC
 import static com.lineinc.erp.api.server.domain.site.entity.QSite.site;
 import static com.lineinc.erp.api.server.domain.site.entity.QSiteProcess.siteProcess;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -60,16 +61,21 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
             whereClause.and(outsourcingCompanyContract.status.eq(searchRequest.contractStatus()));
         }
 
-        // 계약 시작일 검색 (시작일 이후) - LocalDate를 OffsetDateTime으로 변환
+        // 계약 시작일 검색 (시작일 이후) - LocalDate를 UTC 범위로 변환
         if (searchRequest.contractStartDate() != null) {
-            whereClause.and(outsourcingCompanyContract.contractStartDate.goe(
-                    DateTimeFormatUtils.toOffsetDateTime(searchRequest.contractStartDate())));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(searchRequest.contractStartDate());
+            whereClause.and(outsourcingCompanyContract.contractStartDate.goe(dateRange[0]));
+
+            // 종료일이 없으면 시작일의 끝까지로 설정
+            if (searchRequest.contractEndDate() == null) {
+                whereClause.and(outsourcingCompanyContract.contractStartDate.lt(dateRange[1]));
+            }
         }
 
-        // 계약 종료일 검색 (종료일 이전) - LocalDate를 OffsetDateTime으로 변환
+        // 계약 종료일 검색 (종료일 이전) - LocalDate를 UTC 범위로 변환
         if (searchRequest.contractEndDate() != null) {
-            whereClause.and(outsourcingCompanyContract.contractEndDate.loe(
-                    DateTimeFormatUtils.toOffsetDateTime(searchRequest.contractEndDate()).plusDays(1).minusNanos(1)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(searchRequest.contractEndDate());
+            whereClause.and(outsourcingCompanyContract.contractEndDate.lt(dateRange[1]));
         }
 
         // 담당자명 검색 (부분 일치)
