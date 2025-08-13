@@ -22,11 +22,17 @@ public record ContractListResponse(
 
         @Schema(description = "계약 구분") String contractType,
 
+        @Schema(description = "계약 구분 코드") String contractTypeCode,
+
         @Schema(description = "계약 구분 설명") String typeDescription,
 
         @Schema(description = "계약 상태") String contractStatus,
 
+        @Schema(description = "계약 상태 코드") String contractStatusCode,
+
         @Schema(description = "계약 유형 카테고리") String categoryType,
+
+        @Schema(description = "계약 유형 카테고리 코드") String categoryTypeCode,
 
         @Schema(description = "외주금액") Long contractAmount,
 
@@ -34,7 +40,11 @@ public record ContractListResponse(
 
         @Schema(description = "공제항목") String defaultDeductions,
 
+        @Schema(description = "공제항목 코드") String defaultDeductionsCode,
+
         @Schema(description = "세금계산서 발행조건") String taxInvoiceCondition,
+
+        @Schema(description = "세금계산서 발행조건 코드") String taxInvoiceConditionCode,
 
         @Schema(description = "세금계산서 발행일") Integer taxInvoiceIssueDayOfMonth,
 
@@ -79,14 +89,19 @@ public record ContractListResponse(
                         : null,
                 contract.getOutsourcingCompany().getBusinessNumber(),
                 contract.getType() != null ? contract.getType().getLabel() : null,
+                contract.getType() != null ? contract.getType().name() : null,
                 contract.getTypeDescription(),
                 contract.getStatus() != null ? contract.getStatus().getLabel() : null,
+                contract.getStatus() != null ? contract.getStatus().name() : null,
                 contract.getCategory() != null ? contract.getCategory().getLabel() : null,
+                contract.getCategory() != null ? contract.getCategory().name() : null,
                 contract.getContractAmount(),
                 contacts,
                 defaultDeductionsLabel,
+                contract.getDefaultDeductions() != null ? contract.getDefaultDeductions() : null,
                 contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().getLabel()
                         : null,
+                contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().name() : null,
                 contract.getTaxInvoiceIssueDayOfMonth(),
                 contract.getMemo(),
                 contract.getContractStartDate(),
