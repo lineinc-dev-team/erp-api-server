@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/v1/outsourcing-company-contracts")
 @RequiredArgsConstructor
-@Tag(name = "Outsourcing Company Contract", description = "외주업체 계약 관련 API")
+@Tag(name = "외주업체 계약 관리", description = "외주업체 계약 관련 API")
 public class CompanyContractController {
 
         private final OutsourcingCompanyContractService outsourcingCompanyContractService;

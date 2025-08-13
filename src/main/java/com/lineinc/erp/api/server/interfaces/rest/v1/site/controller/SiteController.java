@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/sites")
 @RequiredArgsConstructor
-@Tag(name = "Sites", description = "현장 관련 API")
+@Tag(name = "현장 관리", description = "현장 관련 API")
 public class SiteController {
     private final SiteService siteService;
 

@@ -35,7 +35,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/roles")
 @RequiredArgsConstructor
-@Tag(name = "Roles", description = "권한 그룹 관련 API")
+@Tag(name = "권한 그룹 관리", description = "권한 그룹 관련 API")
 public class RoleController {
 
     private final RoleService roleService;

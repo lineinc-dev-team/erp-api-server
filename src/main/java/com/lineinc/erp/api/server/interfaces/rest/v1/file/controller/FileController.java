@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
-@Tag(name = "Files", description = "파일 업로드 관련 API")
+@Tag(name = "파일 관리", description = "파일 업로드 관련 API")
 public class FileController {
 
     private final S3FileService s3FileService;

@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/positions")
 @RequiredArgsConstructor
-@Tag(name = "Positions", description = "직책 관련 API")
+@Tag(name = "직책 관리", description = "직책 관련 API")
 public class PositionController {
 
     private final PositionService positionService;

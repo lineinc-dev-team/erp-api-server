@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/site-process")
 @RequiredArgsConstructor
-@Tag(name = "Site Processes", description = "현장 공정 관련 API")
+@Tag(name = "현장 공정 관리", description = "현장 공정 관련 API")
 public class SiteProcessController {
 
     private final SiteProcessService siteProcessService;

@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/grades")
 @RequiredArgsConstructor
-@Tag(name = "Grades", description = "직급 관련 API")
+@Tag(name = "직급 관리", description = "직급 관련 API")
 public class GradeController {
 
     private final GradeService gradeService;

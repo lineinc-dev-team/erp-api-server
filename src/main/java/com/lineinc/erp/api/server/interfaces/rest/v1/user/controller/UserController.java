@@ -1,23 +1,44 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.user.controller;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.BulkDeleteUsersRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.CreateUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.DownloadUserListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.SearchUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.UpdateUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserInfoResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
-import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.*;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserInfoResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,20 +48,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.data.domain.Slice;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import org.springframework.data.domain.Page;
-
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/users")
 @RequiredArgsConstructor
-@Tag(name = "Users", description = "유저 관련 API")
+@Tag(name = "유저 관리", description = "유저 관련 API")
 public class UserController {
 
     private final UserService userService;
@@ -66,15 +78,12 @@ public class UserController {
     public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
-            @Valid SearchUserRequest request
-    ) {
+            @Valid SearchUserRequest request) {
         Page<UserResponse> page = userService.getAllUsers(
                 request,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
-        );
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())
-        ));
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
     @Operation(summary = "유저 이름 키워드 검색", description = "유저 이름으로 간단한 검색을 수행합니다.")
@@ -85,14 +94,12 @@ public class UserController {
     public ResponseEntity<SuccessResponse<SliceResponse<UserResponse.UserSimpleResponse>>> searchUsersByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
-            @RequestParam(required = false) String keyword
-    ) {
+            @RequestParam(required = false) String keyword) {
         Slice<UserResponse.UserSimpleResponse> slice = userService.searchUsersByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
-        ));
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "유저 생성", description = "새로운 유저를 생성합니다")
@@ -107,9 +114,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "유저 목록 엑셀 다운로드", description = "검색 조건에 맞는 유저 목록을 엑셀 파일로 다운로드합니다"
-    )
+    @Operation(summary = "유저 목록 엑셀 다운로드", description = "검색 조건에 맞는 유저 목록을 엑셀 파일로 다운로드합니다")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
@@ -120,8 +125,7 @@ public class UserController {
             @Valid SortRequest sortRequest,
             @Valid SearchUserRequest request,
             @Valid DownloadUserListRequest downloadUserListRequest,
-            HttpServletResponse response
-    ) throws IOException {
+            HttpServletResponse response) throws IOException {
         List<String> parsed = DownloadFieldUtils.parseFields(downloadUserListRequest.fields());
         DownloadFieldUtils.validateFields(parsed, DownloadUserListRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "유저 목록.xlsx");
@@ -129,8 +133,7 @@ public class UserController {
         try (Workbook workbook = userService.downloadExcel(
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
-                parsed
-        )) {
+                parsed)) {
             workbook.write(response.getOutputStream());
         }
     }
@@ -158,8 +161,7 @@ public class UserController {
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateUser(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateUserRequest request
-    ) {
+            @Valid @RequestBody UpdateUserRequest request) {
         userService.updateUser(id, request);
         return ResponseEntity.ok().build();
     }
@@ -185,14 +187,11 @@ public class UserController {
     public ResponseEntity<SuccessResponse<SliceResponse<UserChangeHistoryResponse>>> getUserChangeHistories(
             @PathVariable Long id,
             @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest
-    ) {
+            @Valid SortRequest sortRequest) {
         Slice<UserChangeHistoryResponse> slice = userService.getUserChangeHistoriesSlice(
                 id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
-        );
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
-        ));
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 }

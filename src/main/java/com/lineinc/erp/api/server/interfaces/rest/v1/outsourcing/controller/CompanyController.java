@@ -59,7 +59,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/outsourcing-companies")
 @RequiredArgsConstructor
-@Tag(name = "Outsourcing Companies", description = "외주업체 관련 API")
+@Tag(name = "외주업체 관리", description = "외주업체 관련 API")
 public class CompanyController {
 
     private final OutsourcingCompanyService outsourcingCompanyService;
