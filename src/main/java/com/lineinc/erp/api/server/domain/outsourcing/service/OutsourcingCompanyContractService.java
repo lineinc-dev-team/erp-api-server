@@ -602,7 +602,7 @@ public class OutsourcingCompanyContractService {
             contractWorkerService.updateContractWorkers(contract.getId(), request.workers());
         }
 
-        // 8. 사용자 정의 변경 이력 저장
+        // 9. 사용자 정의 변경 이력 저장
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {

@@ -9,6 +9,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -26,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -63,7 +65,8 @@ public class OutsourcingCompanyContractWorker extends BaseEntity {
     private String memo; // 비고
 
     // 인력 서류 목록
-    @DiffIgnore
+    @DiffInclude
+    @Setter
     @OneToMany(mappedBy = "worker", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractWorkerFile> files = new ArrayList<>();
@@ -83,6 +86,18 @@ public class OutsourcingCompanyContractWorker extends BaseEntity {
         }
         if (request.memo() != null) {
             this.memo = request.memo();
+        }
+
+        // 파일 정보 동기화
+        if (request.files() != null) {
+            EntitySyncUtils.syncList(
+                    this.files,
+                    request.files(),
+                    (fileDto) -> OutsourcingCompanyContractWorkerFile.builder()
+                            .worker(this)
+                            .fileUrl(fileDto.fileUrl())
+                            .originalFileName(fileDto.originalFileName())
+                            .build());
         }
     }
 }

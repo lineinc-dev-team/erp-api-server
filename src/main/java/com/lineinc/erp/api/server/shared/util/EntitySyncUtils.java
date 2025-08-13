@@ -1,10 +1,14 @@
 package com.lineinc.erp.api.server.shared.util;
 
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class EntitySyncUtils {
@@ -12,14 +16,16 @@ public class EntitySyncUtils {
     /**
      * 엔티티 리스트와 요청 리스트를 ID 기준으로 동기화합니다.
      *
-     * <p>이 메서드는 아래의 세 가지 동작을 수행합니다:
+     * <p>
+     * 이 메서드는 아래의 세 가지 동작을 수행합니다:
      * <ul>
-     *     <li><b>Soft delete</b>: 기존 엔티티 중 요청 리스트에 존재하지 않는 항목을 markAsDeleted()</li>
-     *     <li><b>Update</b>: 요청 리스트의 ID가 기존 엔티티에 존재하면 updateFrom() 호출</li>
-     *     <li><b>Create</b>: 요청 리스트에만 존재하는 항목은 creator.apply()로 생성 후 리스트에 추가</li>
+     * <li><b>Soft delete</b>: 기존 엔티티 중 요청 리스트에 존재하지 않는 항목을 markAsDeleted()</li>
+     * <li><b>Update</b>: 요청 리스트의 ID가 기존 엔티티에 존재하면 updateFrom() 호출</li>
+     * <li><b>Create</b>: 요청 리스트에만 존재하는 항목은 creator.apply()로 생성 후 리스트에 추가</li>
      * </ul>
      *
-     * <p>리플렉션을 사용하여 엔티티와 요청 DTO에서 getId() 메서드를 자동으로 호출합니다.
+     * <p>
+     * 리플렉션을 사용하여 엔티티와 요청 DTO에서 getId() 메서드를 자동으로 호출합니다.
      *
      * @param existingEntities 현재 보유 중인 엔티티 리스트 (수정 가능한 컬렉션이어야 함)
      * @param requests         동기화할 요청 리스트 (DTO 등)
@@ -30,8 +36,7 @@ public class EntitySyncUtils {
     public static <T, R> void syncList(
             List<T> existingEntities,
             List<R> requests,
-            Function<R, T> creator
-    ) {
+            Function<R, T> creator) {
         if (requests == null) {
             log.debug("요청 리스트가 null이므로 동기화를 건너뜁니다.");
             return;
@@ -57,8 +62,6 @@ public class EntitySyncUtils {
 
         // 5. 새 엔티티들을 기존 리스트에 추가
         existingEntities.addAll(newEntities);
-        
-        log.debug("동기화 완료: 기존 {}개, 새로 생성 {}개", existingMap.size(), newEntities.size());
     }
 
     /**
@@ -73,8 +76,7 @@ public class EntitySyncUtils {
                         (existing, replacement) -> {
                             log.warn("중복된 ID 발견: {}", extractId(existing));
                             return existing; // 기존 엔티티 유지
-                        }
-                ));
+                        }));
     }
 
     /**
@@ -105,8 +107,7 @@ public class EntitySyncUtils {
     private static <T, R> List<T> processRequests(
             List<R> requests,
             Map<Long, T> existingMap,
-            Function<R, T> creator
-    ) {
+            Function<R, T> creator) {
         List<T> newEntities = new ArrayList<>();
 
         for (R request : requests) {
@@ -135,8 +136,8 @@ public class EntitySyncUtils {
                     .getMethod("updateFrom", request.getClass())
                     .invoke(existingEntity, request);
         } catch (Exception e) {
-            log.warn("엔티티 업데이트 실패: {} -> {}", 
-                    existingEntity.getClass().getSimpleName(), 
+            log.warn("엔티티 업데이트 실패: {} -> {}",
+                    existingEntity.getClass().getSimpleName(),
                     request.getClass().getSimpleName(), e);
         }
     }
