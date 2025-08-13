@@ -87,6 +87,7 @@ public class CompanyController {
 
     @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/default-deductions")
     public ResponseEntity<SuccessResponse<List<CompanyDefaultDeductionsResponse>>> getDeductionItems() {
         List<CompanyDefaultDeductionsResponse> responseList = Arrays
@@ -98,6 +99,7 @@ public class CompanyController {
 
     @Operation(summary = "구분 목록 조회", description = "외주업체 구분 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/types")
     public ResponseEntity<SuccessResponse<List<CompanyTypeResponse>>> getSeparations() {
         List<CompanyTypeResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
@@ -225,6 +227,7 @@ public class CompanyController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/{id}/contract-history")
     public ResponseEntity<SuccessResponse<PagingResponse<ContractHistoryResponse>>> getContractHistoryByCompany(
             @PathVariable Long id,
