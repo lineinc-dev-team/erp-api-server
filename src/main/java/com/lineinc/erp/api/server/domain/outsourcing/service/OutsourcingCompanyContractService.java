@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +55,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractWorkerResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -472,6 +474,21 @@ public class OutsourcingCompanyContractService {
                 .orElseThrow(
                         () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
         return ContractDetailResponse.from(contract);
+    }
+
+    /**
+     * 외주업체 계약 인력 정보를 Slice로 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractWorkerResponse> getContractWorkers(Long contractId, Pageable pageable) {
+        // 계약이 존재하는지 확인
+        if (!contractRepository.existsById(contractId)) {
+            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+        }
+
+        Page<OutsourcingCompanyContractWorker> page = workerRepository.findByOutsourcingCompanyContractId(contractId,
+                pageable);
+        return page.map(ContractWorkerResponse::from);
     }
 
     /**
