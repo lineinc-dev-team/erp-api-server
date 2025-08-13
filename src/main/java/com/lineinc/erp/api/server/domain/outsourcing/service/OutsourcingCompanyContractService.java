@@ -51,6 +51,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractSubEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -460,6 +461,17 @@ public class OutsourcingCompanyContractService {
             case "hasFile" -> contract.hasFile() ? "Y" : "N";
             default -> null;
         };
+    }
+
+    /**
+     * 외주업체 계약 상세 정보를 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public ContractDetailResponse getContractDetail(Long contractId) {
+        OutsourcingCompanyContract contract = contractRepository.findById(contractId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
+        return ContractDetailResponse.from(contract);
     }
 
     /**
