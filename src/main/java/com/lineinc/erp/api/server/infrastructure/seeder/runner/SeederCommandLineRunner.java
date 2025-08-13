@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.infrastructure.seeder.runner;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -13,6 +12,8 @@ import com.lineinc.erp.api.server.infrastructure.seeder.role.RolesSeeder;
 import com.lineinc.erp.api.server.infrastructure.seeder.user.UsersRolesSeeder;
 import com.lineinc.erp.api.server.infrastructure.seeder.user.UsersSeeder;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
 @RequiredArgsConstructor
 public class SeederCommandLineRunner implements CommandLineRunner {
@@ -24,7 +25,7 @@ public class SeederCommandLineRunner implements CommandLineRunner {
     private final UsersSeeder usersSeeder;
     private final UsersRolesSeeder usersRolesSeeder;
 
-    @Value("${seeder.enabled:false}")
+    @Value("${seeder.enabled:true}")
     private boolean seederEnabled;
 
     @Override

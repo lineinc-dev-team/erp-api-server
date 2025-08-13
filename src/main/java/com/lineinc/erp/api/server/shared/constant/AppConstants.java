@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.shared.constant;
 
-import java.util.List;
 import java.time.ZoneOffset;
+import java.util.List;
 
 public final class AppConstants {
 
@@ -25,6 +25,7 @@ public final class AppConstants {
     public static final String MENU_STEEL_MANAGEMENT = "강재 관리";
     public static final String MENU_MATERIAL_MANAGEMENT = "자재 관리";
     public static final String MENU_OUTSOURCING_COMPANY = "외주업체 관리";
+    public static final String MENU_OUTSOURCING_COMPANY_CONTRACT = "외주업체 계약 관리";
 
     // 시스템 기본 메뉴 이름 목록
     public static final List<String> MENU_NAMES = List.of(
@@ -35,8 +36,8 @@ public final class AppConstants {
             MENU_MANAGEMENT_COST,
             MENU_STEEL_MANAGEMENT,
             MENU_MATERIAL_MANAGEMENT,
-            MENU_OUTSOURCING_COMPANY
-    );
+            MENU_OUTSOURCING_COMPANY,
+            MENU_OUTSOURCING_COMPANY_CONTRACT);
 
     // 직급(Grade) 관련 상수
     public static final String GRADE_EMPLOYEE = "사원";
@@ -57,22 +58,19 @@ public final class AppConstants {
     public static final List<String> GRADE_NAMES = List.of(
             GRADE_EMPLOYEE,
             GRADE_ASSISTANT_MANAGER,
-            GRADE_MANAGER
-    );
+            GRADE_MANAGER);
 
     // 직책 전체 목록
     public static final List<String> POSITION_NAMES = List.of(
             POSITION_TEAM_LEADER,
             POSITION_PART_LEADER,
-            POSITION_HEAD
-    );
+            POSITION_HEAD);
 
     // 부서 전체 목록
     public static final List<String> DEPARTMENT_NAMES = List.of(
             DEPT_SUPPORT,
             DEPT_DEVELOPMENT,
-            DEPT_SALES
-    );
+            DEPT_SALES);
 
     // 시간 관련 상수
     public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
