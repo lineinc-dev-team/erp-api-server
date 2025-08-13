@@ -220,19 +220,19 @@ public class CompanyController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체별 계약 이력 조회", description = "특정 외주업체의 계약 이력을 조회합니다")
+    @Operation(summary = "외주업체별 계약 이력 히스토리 조회", description = "특정 외주업체의 계약 변경 이력 히스토리를 조회합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
-    @GetMapping("/{companyId}/history")
+    @GetMapping("/{id}/contract-history")
     public ResponseEntity<SuccessResponse<PagingResponse<ContractHistoryResponse>>> getContractHistoryByCompany(
-            @PathVariable Long companyId,
+            @PathVariable Long id,
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest) {
 
         Page<ContractHistoryResponse> page = outsourcingCompanyContractService.getContractHistoryByCompany(
-                companyId,
+                id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
 
