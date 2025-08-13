@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerUpdateRequest;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -38,24 +41,48 @@ public class OutsourcingCompanyContractWorker extends BaseEntity {
     @SequenceGenerator(name = "outsourcing_company_contract_worker_seq", sequenceName = "outsourcing_company_contract_worker_seq", allocationSize = 1)
     private Long id;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
+    @DiffInclude
     @Column(nullable = false)
     private String name;
 
+    @DiffInclude
     @Column
     private String category;
 
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String taskDescription; // 작업내용
 
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
     // 인력 서류 목록
+    @DiffIgnore
     @OneToMany(mappedBy = "worker", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractWorkerFile> files = new ArrayList<>();
+
+    /**
+     * DTO의 정보로 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(OutsourcingCompanyContractWorkerUpdateRequest request) {
+        if (request.name() != null) {
+            this.name = request.name();
+        }
+        if (request.category() != null) {
+            this.category = request.category();
+        }
+        if (request.taskDescription() != null) {
+            this.taskDescription = request.taskDescription();
+        }
+        if (request.memo() != null) {
+            this.memo = request.memo();
+        }
+    }
 }

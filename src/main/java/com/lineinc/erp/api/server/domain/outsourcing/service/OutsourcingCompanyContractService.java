@@ -96,6 +96,7 @@ public class OutsourcingCompanyContractService {
     private final Javers javers;
     private final OutsourcingCompanyContractContactService contractContactService;
     private final OutsourcingCompanyContractFileService contractFileService;
+    private final OutsourcingCompanyContractWorkerService contractWorkerService;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -596,7 +597,12 @@ public class OutsourcingCompanyContractService {
             contractFileService.updateContractFiles(contract.getId(), request.files());
         }
 
-        // 7. 사용자 정의 변경 이력 저장
+        // 7. 인력 정보 수정
+        if (request.workers() != null) {
+            contractWorkerService.updateContractWorkers(contract.getId(), request.workers());
+        }
+
+        // 8. 사용자 정의 변경 이력 저장
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {

@@ -133,6 +133,12 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @Builder.Default
     private List<OutsourcingCompanyContractFile> files = new ArrayList<>();
 
+    // 계약 인력 목록
+    @DiffIgnore
+    @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<OutsourcingCompanyContractWorker> workers = new ArrayList<>();
+
     // 계약 변경 히스토리 목록
     @DiffIgnore
     @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)
