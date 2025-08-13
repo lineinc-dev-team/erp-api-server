@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +21,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Con
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContractDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractCategoryTypeResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractTypeResponse;
@@ -116,26 +114,6 @@ public class CompanyContractController {
                         @Valid @RequestBody OutsourcingCompanyContractCreateRequest request) {
                 outsourcingCompanyContractService.createContract(request);
                 return ResponseEntity.ok().build();
-        }
-
-        @Operation(summary = "외주업체별 계약 이력 조회", description = "특정 외주업체의 계약 이력을 조회합니다")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "조회 성공"),
-                        @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-        })
-        @GetMapping("/{companyId}/history")
-        public ResponseEntity<SuccessResponse<PagingResponse<ContractHistoryResponse>>> getContractHistoryByCompany(
-                        @PathVariable Long companyId,
-                        @Valid PageRequest pageRequest,
-                        @Valid SortRequest sortRequest) {
-
-                Page<ContractHistoryResponse> page = outsourcingCompanyContractService.getContractHistoryByCompany(
-                                companyId,
-                                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                                                sortRequest.sort()));
-
-                return ResponseEntity.ok(SuccessResponse.of(
-                                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
         }
 
         @Operation(summary = "외주계약 리스트 조회", description = "검색 조건에 따라 외주계약 리스트를 페이징하여조회합니다")
