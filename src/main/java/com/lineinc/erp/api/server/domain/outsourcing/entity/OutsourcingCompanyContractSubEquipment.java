@@ -34,6 +34,9 @@ public class OutsourcingCompanyContractSubEquipment {
     @Enumerated(EnumType.STRING)
     private OutsourcingCompanyContactSubEquipmentType type; // 구분값
 
+    @Column
+    private String description; // 구분값 설명
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_contract_equipment_id", nullable = false)
     private OutsourcingCompanyContractEquipment equipment;

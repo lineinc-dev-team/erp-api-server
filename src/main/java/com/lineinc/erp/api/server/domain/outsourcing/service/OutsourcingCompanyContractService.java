@@ -53,6 +53,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractWorkerResponse;
@@ -342,6 +343,7 @@ public class OutsourcingCompanyContractService {
             OutsourcingCompanyContractSubEquipment subEquipment = OutsourcingCompanyContractSubEquipment.builder()
                     .equipment(equipment)
                     .type(subEquipmentRequest.type())
+                    .description(subEquipmentRequest.description())
                     .memo(subEquipmentRequest.memo())
                     .build();
 
@@ -489,6 +491,22 @@ public class OutsourcingCompanyContractService {
         Page<OutsourcingCompanyContractWorker> page = workerRepository.findByOutsourcingCompanyContractId(contractId,
                 pageable);
         return page.map(ContractWorkerResponse::from);
+    }
+
+    /**
+     * 외주업체 계약 장비 정보를 Slice로 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractEquipmentResponse> getContractEquipments(Long contractId, Pageable pageable) {
+        // 계약이 존재하는지 확인
+        if (!contractRepository.existsById(contractId)) {
+            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+        }
+
+        Page<OutsourcingCompanyContractEquipment> page = equipmentRepository.findByOutsourcingCompanyContractId(
+                contractId,
+                pageable);
+        return page.map(ContractEquipmentResponse::from);
     }
 
     /**
