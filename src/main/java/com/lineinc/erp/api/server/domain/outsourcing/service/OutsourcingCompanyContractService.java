@@ -38,6 +38,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractListSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractContstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
@@ -380,6 +381,25 @@ public class OutsourcingCompanyContractService {
                 pageable);
 
         return contractPage.map(ContractListResponse::from);
+    }
+
+    /**
+     * 외주업체 계약들을 삭제합니다 (소프트 삭제).
+     */
+    public void deleteContracts(DeleteOutsourcingCompanyContractsRequest request) {
+        List<Long> contractIds = request.contractIds();
+
+        // 계약들이 존재하는지 확인
+        List<OutsourcingCompanyContract> contracts = contractRepository.findAllById(contractIds);
+
+        if (contracts.size() != contractIds.size()) {
+            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+        }
+
+        // 각 계약에 대해 소프트 삭제 처리
+        for (OutsourcingCompanyContract contract : contracts) {
+            contract.markAsDeleted();
+        }
     }
 
 }

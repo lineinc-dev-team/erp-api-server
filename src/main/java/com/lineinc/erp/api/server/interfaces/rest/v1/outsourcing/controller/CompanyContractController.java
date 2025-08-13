@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyCon
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractListSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContractDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractCategoryTypeResponse;
@@ -48,92 +50,102 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "외주업체 계약 관리", description = "외주업체 계약 관련 API")
 public class CompanyContractController {
 
-        private final OutsourcingCompanyContractService outsourcingCompanyContractService;
+    private final OutsourcingCompanyContractService outsourcingCompanyContractService;
 
-        @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
-        @ApiResponse(responseCode = "200", description = "조회 성공")
-        @GetMapping("/default-deductions")
-        public ResponseEntity<SuccessResponse<List<CompanyContractDefaultDeductionsResponse>>> getDeductionItems() {
-                List<CompanyContractDefaultDeductionsResponse> responseList = Arrays
-                                .stream(OutsourcingCompanyContractDefaultDeductionsType.values())
-                                .map(dd -> new CompanyContractDefaultDeductionsResponse(dd.name(), dd.getLabel()))
-                                .toList();
-                return ResponseEntity.ok(SuccessResponse.of(responseList));
-        }
+    @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/default-deductions")
+    public ResponseEntity<SuccessResponse<List<CompanyContractDefaultDeductionsResponse>>> getDeductionItems() {
+        List<CompanyContractDefaultDeductionsResponse> responseList = Arrays
+                .stream(OutsourcingCompanyContractDefaultDeductionsType.values())
+                .map(dd -> new CompanyContractDefaultDeductionsResponse(dd.name(), dd.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 
-        @Operation(summary = "세금계산서 발행조건 목록 조회", description = "세금계산서 발행조건 목록을 반환합니다.")
-        @ApiResponse(responseCode = "200", description = "조회 성공")
-        @GetMapping("/tax-invoice-conditions")
-        public ResponseEntity<SuccessResponse<List<TaxInvoiceConditionResponse>>> getTaxInvoiceConditions() {
-                List<TaxInvoiceConditionResponse> responseList = Arrays
-                                .stream(OutsourcingCompanyTaxInvoiceConditionType.values())
-                                .map(condition -> new TaxInvoiceConditionResponse(condition.name(),
-                                                condition.getLabel()))
-                                .toList();
-                return ResponseEntity.ok(SuccessResponse.of(responseList));
-        }
+    @Operation(summary = "세금계산서 발행조건 목록 조회", description = "세금계산서 발행조건 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/tax-invoice-conditions")
+    public ResponseEntity<SuccessResponse<List<TaxInvoiceConditionResponse>>> getTaxInvoiceConditions() {
+        List<TaxInvoiceConditionResponse> responseList = Arrays
+                .stream(OutsourcingCompanyTaxInvoiceConditionType.values())
+                .map(condition -> new TaxInvoiceConditionResponse(condition.name(),
+                        condition.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 
-        @Operation(summary = "계약 상태 목록 조회", description = "외주업체 계약 상태 목록을 반환합니다.")
-        @ApiResponse(responseCode = "200", description = "조회 성공")
-        @GetMapping("/statuses")
-        public ResponseEntity<SuccessResponse<List<ContractStatusResponse>>> getContractStatuses() {
-                List<ContractStatusResponse> responseList = Arrays.stream(OutsourcingCompanyContractStatus.values())
-                                .map(status -> new ContractStatusResponse(status.name(), status.getLabel()))
-                                .toList();
-                return ResponseEntity.ok(SuccessResponse.of(responseList));
-        }
+    @Operation(summary = "계약 상태 목록 조회", description = "외주업체 계약 상태 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/statuses")
+    public ResponseEntity<SuccessResponse<List<ContractStatusResponse>>> getContractStatuses() {
+        List<ContractStatusResponse> responseList = Arrays.stream(OutsourcingCompanyContractStatus.values())
+                .map(status -> new ContractStatusResponse(status.name(), status.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 
-        @Operation(summary = "계약 구분 목록 조회", description = "외주업체 계약 구분 목록을 반환합니다.")
-        @ApiResponse(responseCode = "200", description = "조회 성공")
-        @GetMapping("/types")
-        public ResponseEntity<SuccessResponse<List<ContractTypeResponse>>> getContractTypes() {
-                List<ContractTypeResponse> responseList = Arrays.stream(OutsourcingCompanyContractType.values())
-                                .map(type -> new ContractTypeResponse(type.name(), type.getLabel()))
-                                .toList();
-                return ResponseEntity.ok(SuccessResponse.of(responseList));
-        }
+    @Operation(summary = "계약 구분 목록 조회", description = "외주업체 계약 구분 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/types")
+    public ResponseEntity<SuccessResponse<List<ContractTypeResponse>>> getContractTypes() {
+        List<ContractTypeResponse> responseList = Arrays.stream(OutsourcingCompanyContractType.values())
+                .map(type -> new ContractTypeResponse(type.name(), type.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 
-        @Operation(summary = "계약 유형 카테고리 목록 조회", description = "외주업체 계약 유형 카테고리 목록을 반환합니다.")
-        @ApiResponse(responseCode = "200", description = "조회 성공")
-        @GetMapping("/category-types")
-        public ResponseEntity<SuccessResponse<List<ContractCategoryTypeResponse>>> getContractCategoryTypes() {
-                List<ContractCategoryTypeResponse> responseList = Arrays
-                                .stream(OutsourcingCompanyContractCategoryType.values())
-                                .map(type -> new ContractCategoryTypeResponse(type.name(), type.getLabel()))
-                                .toList();
-                return ResponseEntity.ok(SuccessResponse.of(responseList));
-        }
+    @Operation(summary = "계약 유형 카테고리 목록 조회", description = "외주업체 계약 유형 카테고리 목록을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/category-types")
+    public ResponseEntity<SuccessResponse<List<ContractCategoryTypeResponse>>> getContractCategoryTypes() {
+        List<ContractCategoryTypeResponse> responseList = Arrays
+                .stream(OutsourcingCompanyContractCategoryType.values())
+                .map(type -> new ContractCategoryTypeResponse(type.name(), type.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 
-        @Operation(summary = "외주업체 계약 등록", description = "외주업체 계약 정보를 등록합니다")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "성공"),
-                        @ApiResponse(responseCode = "400", description = "입력값 오류")
-        })
-        @PostMapping
-        public ResponseEntity<Void> createOutsourcingCompanyContract(
-                        @Valid @RequestBody OutsourcingCompanyContractCreateRequest request) {
-                outsourcingCompanyContractService.createContract(request);
-                return ResponseEntity.ok().build();
-        }
+    @Operation(summary = "외주업체 계약 등록", description = "외주업체 계약 정보를 등록합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류")
+    })
+    @PostMapping
+    public ResponseEntity<Void> createOutsourcingCompanyContract(
+            @Valid @RequestBody OutsourcingCompanyContractCreateRequest request) {
+        outsourcingCompanyContractService.createContract(request);
+        return ResponseEntity.ok().build();
+    }
 
-        @Operation(summary = "외주계약 리스트 조회", description = "검색 조건에 따라 외주계약 리스트를 페이징하여조회합니다")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "조회 성공"),
-                        @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-        })
-        @GetMapping
-        public ResponseEntity<SuccessResponse<PagingResponse<ContractListResponse>>> getContractList(
-                        @Valid ContractListSearchRequest searchRequest,
-                        @Valid PageRequest pageRequest,
-                        @Valid SortRequest sortRequest) {
+    @Operation(summary = "외주계약 리스트 조회", description = "검색 조건에 따라 외주계약 리스트를 페이징하여조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping
+    public ResponseEntity<SuccessResponse<PagingResponse<ContractListResponse>>> getContractList(
+            @Valid ContractListSearchRequest searchRequest,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest) {
 
-                Page<ContractListResponse> page = outsourcingCompanyContractService.getContractList(
-                                searchRequest,
-                                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                                                sortRequest.sort()));
+        Page<ContractListResponse> page = outsourcingCompanyContractService.getContractList(
+                searchRequest,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
 
-                return ResponseEntity.ok(SuccessResponse.of(
-                                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
-        }
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+
+    @Operation(summary = "외주업체 계약 삭제", description = "하나 이상의 외주업체 계약 ID를 받아 해당 계약을 삭제합니다")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "외주업체 계약 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "외주업체 계약을 찾을 수 없음"), })
+    @DeleteMapping
+    public ResponseEntity<Void> deleteOutsourcingCompanyContracts(
+            @RequestBody DeleteOutsourcingCompanyContractsRequest request) {
+        outsourcingCompanyContractService.deleteContracts(request);
+        return ResponseEntity.ok().build();
+    }
 
 }

@@ -28,6 +28,7 @@ public final class ValidationMessages {
     public static final String NO_MENU_PERMISSION = "해당 메뉴에 대한 권한이 없습니다.";
     public static final String NOT_ACCEPTABLE = "요청한 Accept 타입에 대해 응답할 수 없습니다.";
     public static final String OUTSOURCING_COMPANY_NOT_FOUND = "외주업체를 찾을 수 없습니다.";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND = "존재하지 않는 외주업체 계약입니다.";
     public static final String PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다.";
     public static final String RATE_LIMIT_EXCEEDED = "요청 횟수 제한을 초과했습니다.";
     public static final String RESOURCE_NOT_FOUND = "해당 리소스를 찾을 수 없습니다.";
