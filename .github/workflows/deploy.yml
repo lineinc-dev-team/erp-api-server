@@ -69,11 +69,14 @@ jobs:
             
             echo "▶ 현재 포트: $CURRENT_PORT, 새 포트: $NEW_PORT"
             
-            # 기존 app-new 프로세스 정리
-            pm2 delete "app-new" 2>/dev/null || true
-            
-            # 새 앱 시작
-            pm2 start ecosystem.config.js --only "$NEW_APP"
+            # 새 앱 시작 전에 기존 프로세스 정리
+            if [ "$NEW_APP" = "app" ]; then
+              # app으로 전환하는 경우: app-new 먼저 삭제
+              pm2 start ecosystem.config.js --only "$NEW_APP"
+            else
+              # app-new로 전환하는 경우: app은 그대로 두고 app-new만 시작
+              pm2 start ecosystem.config.js --only "$NEW_APP"
+            fi
             
             # 앱 시작 대기
             echo "▶ 앱 시작 대기 (30초)"
