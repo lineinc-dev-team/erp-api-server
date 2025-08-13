@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyCon
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractUpdateRequest;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -107,4 +108,26 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractFile> files = new ArrayList<>();
+
+    /**
+     * 외주업체 계약 정보를 수정합니다.
+     */
+    public void updateFrom(OutsourcingCompanyContractUpdateRequest request) {
+        java.util.Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
+        java.util.Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
+        java.util.Optional.ofNullable(request.contractStartDate())
+                .ifPresent(val -> this.contractStartDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
+        java.util.Optional.ofNullable(request.contractEndDate())
+                .ifPresent(val -> this.contractEndDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
+        java.util.Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
+        java.util.Optional.ofNullable(request.defaultDeductionsType()).ifPresent(val -> this.defaultDeductions = val);
+        java.util.Optional.ofNullable(request.defaultDeductionsDescription())
+                .ifPresent(val -> this.defaultDeductionsDescription = val);
+        java.util.Optional.ofNullable(request.taxInvoiceCondition()).ifPresent(val -> this.taxInvoiceCondition = val);
+        java.util.Optional.ofNullable(request.taxInvoiceIssueDayOfMonth())
+                .ifPresent(val -> this.taxInvoiceIssueDayOfMonth = val);
+        java.util.Optional.ofNullable(request.category()).ifPresent(val -> this.category = val);
+        java.util.Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);
+        java.util.Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }

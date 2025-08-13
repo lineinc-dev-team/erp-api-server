@@ -176,6 +176,23 @@ public class CompanyContractController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
+    // @Operation(summary = "외주업체 계약 수정", description = "외주업체 계약 정보를 수정합니다")
+    // @ApiResponses(value = {
+    // @ApiResponse(responseCode = "200", description = "수정 성공"),
+    // @ApiResponse(responseCode = "400", description = "입력값 오류"),
+    // @ApiResponse(responseCode = "404", description = "계약을 찾을 수 없음", content =
+    // @Content())
+    // })
+    // @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT,
+    // action = PermissionAction.UPDATE)
+    // @PatchMapping("/{id}")
+    // public ResponseEntity<Void> updateOutsourcingCompanyContract(
+    // @PathVariable Long id,
+    // @Valid @RequestBody OutsourcingCompanyContractUpdateRequest request) {
+    // outsourcingCompanyContractService.updateContract(id, request);
+    // return ResponseEntity.ok().build();
+    // }
+
     @Operation(summary = "외주업체 계약 인력 정보 조회", description = "해당 계약의 인력 정보를 조회합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),

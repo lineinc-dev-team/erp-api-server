@@ -50,6 +50,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractSubEquipmentCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractConstructionResponse;
@@ -541,6 +542,23 @@ public class OutsourcingCompanyContractService {
                 contractId,
                 pageable);
         return page.map(ContractConstructionResponse::from);
+    }
+
+    /**
+     * 외주업체 계약을 수정합니다.
+     */
+    public void updateContract(Long contractId, OutsourcingCompanyContractUpdateRequest request) {
+        log.info("외주업체 계약 수정 시작: contractId={}, request={}", contractId, request);
+
+        // 1. 계약이 존재하는지 확인
+        OutsourcingCompanyContract contract = contractRepository.findById(contractId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
+
+        // 2. 기본 계약 정보 수정 (updateFrom 메서드 사용)
+        contract.updateFrom(request);
+
+        log.info("외주업체 계약 수정 완료: contractId={}", contractId);
     }
 
     /**
