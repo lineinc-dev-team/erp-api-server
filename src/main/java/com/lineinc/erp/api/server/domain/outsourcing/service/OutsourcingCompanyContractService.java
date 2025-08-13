@@ -2,8 +2,11 @@ package com.lineinc.erp.api.server.domain.outsourcing.service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
@@ -23,10 +27,11 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyCo
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorkerFile;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractConstructionRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractContactRepository;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractDriverFileRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractDriverRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractEquipmentRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractFileRepository;
@@ -63,6 +68,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,15 +84,16 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractFileRepository fileRepository;
     private final OutsourcingCompanyContractWorkerRepository workerRepository;
     private final OutsourcingCompanyContractWorkerFileRepository workerFileRepository;
-    private final OutsourcingCompanyContractDriverFileRepository driverFileRepository;
     private final OutsourcingCompanyContractEquipmentRepository equipmentRepository;
     private final OutsourcingCompanyContractDriverRepository driverRepository;
     private final OutsourcingCompanyContractConstructionRepository constructionRepository;
     private final OutsourcingCompanyContractHistoryRepository contractHistoryRepository;
+    private final OutsourcingCompanyContractChangeHistoryRepository contractChangeHistoryRepository;
     private final SiteRepository siteRepository;
     private final SiteProcessRepository siteProcessRepository;
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
     private final OutsourcingCompanyContractSubEquipmentRepository subEquipmentRepository;
+    private final Javers javers;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -555,10 +562,40 @@ public class OutsourcingCompanyContractService {
                 .orElseThrow(
                         () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
-        // 2. 기본 계약 정보 수정 (updateFrom 메서드 사용)
-        contract.updateFrom(request);
+        contract.syncTransientFields();
+        // 2. 변경 전 스냅샷 생성
+        OutsourcingCompanyContract oldSnapshot = JaversUtils.createSnapshot(javers, contract,
+                OutsourcingCompanyContract.class);
 
-        log.info("외주업체 계약 수정 완료: contractId={}", contractId);
+        // 3. 기본 계약 정보 수정 (updateFrom 메서드 사용)
+        contract.updateFrom(request, siteRepository, siteProcessRepository, outsourcingCompanyRepository);
+
+        // 4. 변경사항 추출 및 변경 히스토리 저장
+        Diff diff = javers.compare(oldSnapshot, contract);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            OutsourcingCompanyContractChangeHistory changeHistory = OutsourcingCompanyContractChangeHistory.builder()
+                    .outsourcingCompanyContract(contract)
+                    .type(OutsourcingCompanyContractChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            contractChangeHistoryRepository.save(changeHistory);
+        }
+
+        // 5. 사용자 정의 변경 이력 저장
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
+                    .changeHistories()) {
+                contractChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getOutsourcingCompanyContract().getId().equals(history.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
+
     }
 
     /**

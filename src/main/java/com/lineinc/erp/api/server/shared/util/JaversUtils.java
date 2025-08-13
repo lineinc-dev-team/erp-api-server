@@ -1,20 +1,22 @@
 package com.lineinc.erp.api.server.shared.util;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
+
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
-import lombok.extern.slf4j.Slf4j;
-import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.Javers;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JaversUtils {
@@ -62,8 +64,7 @@ public class JaversUtils {
                                 "property", "null",
                                 "before", beforeValue,
                                 "after", "null",
-                                "type", "삭제"
-                        );
+                                "type", "삭제");
                     } else {
                         String changeType = "수정";
 
@@ -71,8 +72,7 @@ public class JaversUtils {
                                 "property", vc.getPropertyName(),
                                 "before", toJsonSafe(javers, vc.getLeft()),
                                 "after", toJsonSafe(javers, vc.getRight()),
-                                "type", changeType
-                        );
+                                "type", changeType);
                     }
                 })
                 .collect(Collectors.toList());
@@ -101,12 +101,12 @@ public class JaversUtils {
                 "property", "null",
                 "before", "null",
                 "after", afterValue,
-                "type", "추가"
-        );
+                "type", "추가");
     }
 
     private static String toJsonSafe(Javers javers, Object obj) {
-        if (obj == null) return "";
+        if (obj == null)
+            return "";
         if (obj instanceof String || obj instanceof Number || obj instanceof Boolean || obj instanceof Character) {
             return obj.toString();
         }

@@ -1,25 +1,8 @@
 package com.lineinc.erp.api.server.domain.outsourcing.service;
 
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import java.util.List;
+import java.util.Map;
 
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContactResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -32,8 +15,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContactResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +48,8 @@ public class OutsourcingCompanyService {
     public void createOutsourcingCompany(OutsourcingCompanyCreateRequest request) {
 
         if (outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
         }
 
         // 1. OutsourcingCompany 객체 빌드
@@ -83,19 +84,22 @@ public class OutsourcingCompanyService {
     @Transactional(readOnly = true)
     public CompanyDetailResponse getOutsourcingCompanyById(Long id) {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
         return CompanyDetailResponse.from(company);
     }
 
     @Transactional
     public void updateOutsourcingCompany(Long id, OutsourcingCompanyUpdateRequest request) {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
         if (request.businessNumber() != null &&
                 !request.businessNumber().equals(company.getBusinessNumber()) &&
                 outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
         }
 
         company.syncTransientFields();
@@ -138,7 +142,8 @@ public class OutsourcingCompanyService {
 
     @Transactional
     public void deleteOutsourcingCompanies(DeleteOutsourcingCompaniesRequest request) {
-        List<OutsourcingCompany> outsourcingCompanies = outsourcingCompanyRepository.findAllById(request.outsourcingCompanyIds());
+        List<OutsourcingCompany> outsourcingCompanies = outsourcingCompanyRepository
+                .findAllById(request.outsourcingCompanyIds());
         if (outsourcingCompanies.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND);
         }
@@ -154,8 +159,7 @@ public class OutsourcingCompanyService {
     public Workbook downloadExcel(
             OutsourcingCompanyListRequest request,
             Sort sort,
-            List<String> fields
-    ) {
+            List<String> fields) {
         List<CompanyResponse> companyRespons = outsourcingCompanyRepository.findAllWithoutPaging(request, sort)
                 .stream()
                 .map(CompanyResponse::from)
@@ -165,8 +169,7 @@ public class OutsourcingCompanyService {
                 companyRespons,
                 fields,
                 this::getExcelHeaderName,
-                this::getExcelCellValue
-        );
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -208,11 +211,12 @@ public class OutsourcingCompanyService {
             case "landlineNumber" -> company.landlineNumber();
             case "contactName" -> mainContact != null ? mainContact.name() : "";
             case "contactPositionAndDepartment" ->
-                    mainContact != null ? mainContact.position() + "/" + mainContact.department() : "";
+                mainContact != null ? mainContact.position() + "/" + mainContact.department() : "";
             case "defaultDeductions" -> company.defaultDeductions();
             case "isActive" -> company.isActive() ? "Y" : "N";
             case "createdAtAndUpdatedAt" ->
-                    DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/" + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
+                DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/"
+                        + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
             case "hasFile" -> company.hasFile() ? "Y" : "N";
             case "memo" -> company.memo();
             case "email" -> company.email();
@@ -223,9 +227,11 @@ public class OutsourcingCompanyService {
     @Transactional(readOnly = true)
     public Slice<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistories(Long id, Pageable pageable) {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        Slice<OutsourcingChangeHistory> histories = outsourcingChangeRepository.findAllByOutsourcingCompany(company, pageable);
+        Slice<OutsourcingChangeHistory> histories = outsourcingChangeRepository.findAllByOutsourcingCompany(company,
+                pageable);
         return histories.map(CompanyChangeHistoryResponse::from);
     }
 
@@ -242,7 +248,6 @@ public class OutsourcingCompanyService {
         return companies.map(company -> new CompanyResponse.CompanySimpleResponse(
                 company.getId(),
                 company.getName(),
-                company.getBusinessNumber()
-        ));
+                company.getBusinessNumber()));
     }
 }

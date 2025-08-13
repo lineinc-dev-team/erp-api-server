@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record OutsourcingCompanyContractUpdateRequest(
         @Schema(description = "현장 ID", example = "1") Long siteId,
 
-        @Schema(description = "공정 ID", example = "1") Long siteProcessId,
+        @Schema(description = "공정 ID", example = "1") Long processId,
 
         @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
 
@@ -52,16 +52,12 @@ public record OutsourcingCompanyContractUpdateRequest(
 
         @Schema(description = "계약 운전자 목록") List<OutsourcingCompanyContractDriverUpdateRequest> drivers,
 
-        @Schema(description = "계약 공사항목 목록") List<OutsourcingCompanyContractConstructionUpdateRequest> constructions
+        @Schema(description = "계약 공사항목 목록") List<OutsourcingCompanyContractConstructionUpdateRequest> constructions,
 
-// @Schema(description = "변경 이력 리스트")
-// List<OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest>
-// changeHistories
-) {
-    // public record ChangeHistoryRequest(
-    // @Schema(description = "수정 이력 번호", example = "1") Long id,
+        @Schema(description = "변경 이력 리스트") List<OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest> changeHistories) {
+    public record ChangeHistoryRequest(
+            @Schema(description = "수정 이력 번호", example = "1") Long id,
 
-    // @Schema(description = "변경 사유 또는 비고", example = "계약 조건 변경에 따른 업데이트") String
-    // memo) {
-    // }
+            @Schema(description = "변경 사유 또는 비고", example = "계약 조건 변경에 따른 업데이트") String memo) {
+    }
 }
