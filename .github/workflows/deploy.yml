@@ -75,18 +75,18 @@ jobs:
             # 새 앱 시작
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
-            # 앱 시작 대기 (더 긴 시간)
-            echo "▶ 앱 시작 대기 (25초)"
-            sleep 25
+            # 앱 시작 대기
+            echo "▶ 앱 시작 대기 (30초)"
+            sleep 30
             
             # 포트 확인
             echo "▶ 포트 $NEW_PORT 리스닝 확인"
-            for i in {1..15}; do
+            for i in {1..20}; do
               if ss -tlnp | grep -q ":$NEW_PORT "; then
                 echo "✅ 포트 $NEW_PORT 리스닝 확인됨"
                 break
               fi
-              if [ $i -eq 15 ]; then
+              if [ $i -eq 20 ]; then
                 echo "❌ 포트 리스닝 실패"
                 pm2 delete "$NEW_APP" 2>/dev/null || true
                 exit 1
@@ -95,17 +95,17 @@ jobs:
             done
             
             # 추가 안정화 대기
-            echo "▶ 추가 안정화 대기 (10초)"
-            sleep 10
+            echo "▶ 추가 안정화 대기 (15초)"
+            sleep 15
             
             # 헬스체크
             echo "▶ 헬스체크 시작"
-            for i in {1..10}; do
-              if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+            for i in {1..15}; do
+              if curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
                 echo "✅ 헬스체크 성공"
                 break
               fi
-              if [ $i -eq 10 ]; then
+              if [ $i -eq 15 ]; then
                 echo "❌ 헬스체크 실패"
                 pm2 delete "$NEW_APP" 2>/dev/null || true
                 exit 1
@@ -113,13 +113,49 @@ jobs:
               sleep 3
             done
             
-            # Nginx 프록시 전환
+            # 추가 안정화 대기 (헬스체크 후)
+            echo "▶ 헬스체크 후 안정화 대기 (10초)"
+            sleep 10
+            
+            # Nginx 프록시 전환 (백업 후 수정)
             echo "▶ Nginx 프록시 전환 시작"
+            sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
             sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
-            sudo nginx -s reload
+            
+            # Nginx 설정 테스트
+            if ! sudo nginx -t; then
+              echo "❌ Nginx 설정 오류, 백업에서 복원"
+              sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
+              exit 1
+            fi
+            
+            # Nginx 재시작 (reload 대신)
+            sudo systemctl restart nginx
             echo "✅ Nginx 프록시 전환 완료"
             
-            # 이전 앱 종료
+            # 프록시 전환 후 추가 대기
+            echo "▶ 프록시 전환 후 안정화 대기 (5초)"
+            sleep 5
+            
+            # 새 포트로 외부 헬스체크
+            echo "▶ 외부 헬스체크 시작"
+            for i in {1..10}; do
+              if curl -s --max-time 10 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 외부 헬스체크 성공"
+                break
+              fi
+              if [ $i -eq 10 ]; then
+                echo "❌ 외부 헬스체크 실패, 롤백 시작"
+                sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
+                sudo systemctl restart nginx
+                pm2 delete "$NEW_APP" 2>/dev/null || true
+                exit 1
+              fi
+              sleep 3
+            done
+            
+            # 이전 앱 종료 (모든 검증 완료 후)
+            echo "▶ 이전 앱 종료"
             pm2 delete "$OLD_APP" 2>/dev/null || true
             pm2 save --force
             
