@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.controller;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +20,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyCon
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyContractService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractCreateRequest;
@@ -32,13 +35,16 @@ import com.lineinc.erp.api.server.shared.dto.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +142,24 @@ public class CompanyContractController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+
+    @Operation(summary = "외주업체 계약 엑셀 다운로드", description = "검색 조건에 맞는 외주업체 계약 목록을 엑셀 파일로 다운로드합니다.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()) })
+    @GetMapping("/download")
+    public void downloadContractsExcel(@Valid SortRequest sortRequest,
+            @Valid ContractListSearchRequest request,
+            @Valid ContractDownloadRequest downloadRequest,
+            HttpServletResponse response) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, ContractDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "외주업체 계약 목록.xlsx");
+
+        try (Workbook workbook = outsourcingCompanyContractService.downloadExcel(request,
+                PageableUtils.parseSort(sortRequest.sort()), parsed)) {
+            workbook.write(response.getOutputStream());
+        }
     }
 
     @Operation(summary = "외주업체 계약 삭제", description = "하나 이상의 외주업체 계약 ID를 받아 해당 계약을 삭제합니다")

@@ -7,17 +7,23 @@ import static com.lineinc.erp.api.server.domain.site.entity.QSite.site;
 import static com.lineinc.erp.api.server.domain.site.entity.QSiteProcess.siteProcess;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractListSearchRequest;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -29,11 +35,90 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
 
     private final JPAQueryFactory queryFactory;
 
+    // 정렬 필드를 미리 정의하여 정적 매핑. 추후 정렬 기준이 늘어나면 여기에 추가.
+    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = new HashMap<>();
+
+    static {
+        SORT_FIELDS.put("id", outsourcingCompanyContract.id);
+        SORT_FIELDS.put("siteName", site.name);
+        SORT_FIELDS.put("processName", siteProcess.name);
+        SORT_FIELDS.put("companyName", outsourcingCompany.name);
+        SORT_FIELDS.put("businessNumber", outsourcingCompany.businessNumber);
+        SORT_FIELDS.put("contractType", outsourcingCompanyContract.type);
+        SORT_FIELDS.put("contractStatus", outsourcingCompanyContract.status);
+        SORT_FIELDS.put("contractAmount", outsourcingCompanyContract.contractAmount);
+        SORT_FIELDS.put("contractStartDate", outsourcingCompanyContract.contractStartDate);
+        SORT_FIELDS.put("contractEndDate", outsourcingCompanyContract.contractEndDate);
+        SORT_FIELDS.put("createdAt", outsourcingCompanyContract.createdAt);
+        SORT_FIELDS.put("updatedAt", outsourcingCompanyContract.updatedAt);
+    }
+
     @Override
     public Page<OutsourcingCompanyContract> findBySearchConditions(ContractListSearchRequest searchRequest,
             Pageable pageable) {
 
         // 검색 조건을 동적으로 구성
+        BooleanBuilder whereClause = buildSearchCondition(searchRequest);
+
+        // 기본 쿼리 구성
+        JPAQuery<OutsourcingCompanyContract> query = queryFactory
+                .selectFrom(outsourcingCompanyContract)
+                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
+                .leftJoin(outsourcingCompanyContract.site, site)
+                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
+                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
+                .where(whereClause)
+                .distinct();
+
+        // 정렬 적용
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+        query.orderBy(orders);
+
+        // 페이징 적용
+        List<OutsourcingCompanyContract> content = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 개수 조회
+        long total = queryFactory
+                .selectFrom(outsourcingCompanyContract)
+                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
+                .leftJoin(outsourcingCompanyContract.site, site)
+                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
+                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
+                .where(whereClause)
+                .distinct()
+                .fetchCount();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public List<OutsourcingCompanyContract> findAllWithoutPaging(ContractListSearchRequest searchRequest, Sort sort) {
+        // 검색 조건을 동적으로 구성
+        BooleanBuilder whereClause = buildSearchCondition(searchRequest);
+
+        // 정렬 적용
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        // 기본 쿼리 구성
+        return queryFactory
+                .selectFrom(outsourcingCompanyContract)
+                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
+                .leftJoin(outsourcingCompanyContract.site, site)
+                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
+                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
+                .where(whereClause)
+                .orderBy(orders)
+                .distinct()
+                .fetch();
+    }
+
+    /**
+     * 검색 조건을 구성하는 공통 메서드
+     */
+    private BooleanBuilder buildSearchCondition(ContractListSearchRequest searchRequest) {
         BooleanBuilder whereClause = new BooleanBuilder();
 
         // 현장명 검색 (부분 일치)
@@ -90,33 +175,6 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
                     .and(outsourcingCompanyContractContact.name.containsIgnoreCase(searchRequest.contactName().trim()));
         }
 
-        // 기본 쿼리 구성
-        JPAQuery<OutsourcingCompanyContract> query = queryFactory
-                .selectFrom(outsourcingCompanyContract)
-                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
-                .leftJoin(outsourcingCompanyContract.site, site)
-                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
-                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
-                .where(whereClause)
-                .distinct();
-
-        // 페이징 적용
-        List<OutsourcingCompanyContract> content = query
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        // 전체 개수 조회
-        long total = queryFactory
-                .selectFrom(outsourcingCompanyContract)
-                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
-                .leftJoin(outsourcingCompanyContract.site, site)
-                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
-                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
-                .where(whereClause)
-                .distinct()
-                .fetchCount();
-
-        return new PageImpl<>(content, pageable, total);
+        return whereClause;
     }
 }

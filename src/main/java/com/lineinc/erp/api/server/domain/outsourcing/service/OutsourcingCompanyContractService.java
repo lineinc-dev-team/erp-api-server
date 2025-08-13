@@ -3,8 +3,10 @@ package com.lineinc.erp.api.server.domain.outsourcing.service;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +55,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -381,6 +384,80 @@ public class OutsourcingCompanyContractService {
                 pageable);
 
         return contractPage.map(ContractListResponse::from);
+    }
+
+    /**
+     * 외주업체 계약 목록을 엑셀로 다운로드합니다.
+     */
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(ContractListSearchRequest request, Sort sort, List<String> fields) {
+        List<ContractListResponse> contractResponses = contractRepository.findAllWithoutPaging(request, sort)
+                .stream()
+                .map(ContractListResponse::from)
+                .toList();
+
+        return ExcelExportUtils.generateWorkbook(
+                contractResponses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue);
+    }
+
+    /**
+     * 엑셀 헤더명을 반환합니다.
+     */
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "siteName" -> "현장명";
+            case "processName" -> "공정명";
+            case "companyName" -> "외주업체명";
+            case "businessNumber" -> "사업자등록번호";
+            case "contractType" -> "구분";
+            case "contractPeriod" -> "계약기간";
+            case "contractAmount" -> "계약금액(총액)";
+            case "defaultDeductions" -> "공제항목";
+            case "taxInvoiceCondition" -> "세금계산서 발행조건";
+            case "contacts" -> "담당자";
+            case "createdAt" -> "작성일자";
+            case "contractStatus" -> "상태";
+            case "memo" -> "비고";
+            default -> null;
+        };
+    }
+
+    /**
+     * 엑셀 셀 값을 반환합니다.
+     */
+    private String getExcelCellValue(ContractListResponse contract, String field) {
+        return switch (field) {
+            case "id" -> String.valueOf(contract.id());
+            case "siteName" -> contract.siteName();
+            case "processName" -> contract.processName();
+            case "companyName" -> contract.companyName();
+            case "businessNumber" -> contract.businessNumber();
+            case "contractType" -> contract.contractType();
+            case "contractPeriod" -> {
+                String startDate = DateTimeFormatUtils.formatKoreaLocalDate(contract.contractStartDate());
+                String endDate = DateTimeFormatUtils.formatKoreaLocalDate(contract.contractEndDate());
+                yield startDate + " ~ " + endDate;
+            }
+            case "contractAmount" -> contract.contractAmount() != null ? String.valueOf(contract.contractAmount()) : "";
+            case "defaultDeductions" -> contract.defaultDeductions();
+            case "taxInvoiceCondition" -> contract.taxInvoiceCondition();
+            case "contacts" -> {
+                if (contract.contacts() != null && !contract.contacts().isEmpty()) {
+                    yield contract.contacts().stream()
+                            .map(contact -> contact.name())
+                            .collect(java.util.stream.Collectors.joining(", "));
+                }
+                yield "";
+            }
+            case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(contract.createdAt());
+            case "contractStatus" -> contract.contractStatus();
+            case "memo" -> contract.memo();
+            default -> null;
+        };
     }
 
     /**
