@@ -589,7 +589,7 @@ public class OutsourcingCompanyContractService {
             for (OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {
                 contractChangeHistoryRepository.findById(historyRequest.id())
-                        .filter(history -> history.getOutsourcingCompanyContract().getId().equals(history.getId()))
+                        .filter(history -> history.getOutsourcingCompanyContract().getId().equals(contract.getId()))
                         .ifPresent(history -> {
                             history.setMemo(historyRequest.memo());
                         });
