@@ -422,6 +422,7 @@ public class OutsourcingCompanyContractService {
             case "createdAt" -> "작성일자";
             case "contractStatus" -> "상태";
             case "memo" -> "비고";
+            case "hasFile" -> "첨부파일";
             default -> null;
         };
     }
@@ -456,6 +457,7 @@ public class OutsourcingCompanyContractService {
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(contract.createdAt());
             case "contractStatus" -> contract.contractStatus();
             case "memo" -> contract.memo();
+            case "hasFile" -> contract.hasFile() ? "Y" : "N";
             default -> null;
         };
     }
