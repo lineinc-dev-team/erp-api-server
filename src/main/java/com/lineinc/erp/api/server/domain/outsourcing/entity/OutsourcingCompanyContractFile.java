@@ -50,7 +50,7 @@ public class OutsourcingCompanyContractFile extends BaseEntity {
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @DiffInclude
-    @Column(nullable = false)
+    @Column
     private String fileUrl; // S3 경로
 
     /**

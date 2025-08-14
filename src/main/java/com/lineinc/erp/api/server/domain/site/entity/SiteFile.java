@@ -1,20 +1,30 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
+import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteFileRequest;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-
 
 @Entity
 @Getter
@@ -46,7 +56,7 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFile
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @DiffInclude
-    @Column(nullable = false)
+    @Column
     private String fileUrl; // S3 경로
 
     /**
@@ -79,4 +89,3 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFile
         this.type = request.type();
     }
 }
-

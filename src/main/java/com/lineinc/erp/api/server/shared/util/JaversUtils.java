@@ -13,7 +13,9 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractFile;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorkerFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
@@ -117,6 +119,10 @@ public class JaversUtils {
             return worker.getName();
         } else if (entity instanceof OutsourcingCompanyContractWorkerFile file) {
             return file.getOriginalFileName();
+        } else if (entity instanceof OutsourcingCompanyContractEquipment equipment) {
+            return equipment.getSpecification();
+        } else if (entity instanceof OutsourcingCompanyContractSubEquipment subEquipment) {
+            return subEquipment.getDescription();
         }
         return null;
     }
@@ -164,6 +170,10 @@ public class JaversUtils {
             return worker.getName() + "(" + worker.getId() + ")";
         } else if (entity instanceof OutsourcingCompanyContractWorkerFile file) {
             return file.getOriginalFileName() + "(" + file.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContractEquipment equipment) {
+            return equipment.getSpecification() + "(" + equipment.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContractSubEquipment subEquipment) {
+            return subEquipment.getDescription() + "(" + subEquipment.getId() + ")";
         }
         return null;
     }

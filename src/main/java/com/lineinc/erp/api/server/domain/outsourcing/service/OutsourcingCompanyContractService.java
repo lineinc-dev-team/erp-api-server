@@ -97,6 +97,7 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractContactService contractContactService;
     private final OutsourcingCompanyContractFileService contractFileService;
     private final OutsourcingCompanyContractWorkerService contractWorkerService;
+    private final OutsourcingCompanyContractEquipmentService contractEquipmentService;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -558,7 +559,6 @@ public class OutsourcingCompanyContractService {
      * 외주업체 계약을 수정합니다.
      */
     public void updateContract(Long contractId, OutsourcingCompanyContractUpdateRequest request) {
-        log.info("외주업체 계약 수정 시작: contractId={}, request={}", contractId, request);
 
         // 1. 계약이 존재하는지 확인
         OutsourcingCompanyContract contract = contractRepository.findById(contractId)
@@ -600,6 +600,11 @@ public class OutsourcingCompanyContractService {
         // 7. 인력 정보 수정
         if (request.workers() != null) {
             contractWorkerService.updateContractWorkers(contract.getId(), request.workers());
+        }
+
+        // 8. 장비 정보 수정
+        if (request.equipments() != null) {
+            contractEquipmentService.updateContractEquipments(contract.getId(), request.equipments());
         }
 
         // 9. 사용자 정의 변경 이력 저장

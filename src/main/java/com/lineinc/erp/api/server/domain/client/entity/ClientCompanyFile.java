@@ -1,14 +1,26 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.SQLRestriction;
-
 import java.util.Optional;
 
+import org.hibernate.annotations.SQLRestriction;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -39,7 +51,7 @@ public class ClientCompanyFile extends BaseEntity {
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
-    @Column(nullable = false)
+    @Column
     private String fileUrl; // S3 경로
 
     /**
