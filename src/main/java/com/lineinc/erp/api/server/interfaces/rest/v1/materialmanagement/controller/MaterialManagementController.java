@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementInputTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -135,23 +137,19 @@ public class MaterialManagementController {
     // }
     // }
 
-    // @Operation(summary = "자재관리 상세 조회", description = "자재관리 상세 정보를 조회합니다")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "조회 성공"),
-    // @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음", content =
-    // @Content())
-    // })
-    // @GetMapping("/{id}")
-    // @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action =
-    // PermissionAction.VIEW)
-    // public ResponseEntity<SuccessResponse<MaterialManagementDetailViewResponse>>
-    // getMaterialManagementDetail(
-    // @PathVariable Long id) {
-    // MaterialManagementDetailViewResponse response =
-    // materialManagementService.getMaterialManagementById(id);
-    // return ResponseEntity.ok(
-    // SuccessResponse.of(response));
-    // }
+    @Operation(summary = "자재관리 상세 조회", description = "자재관리 상세 정보를 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<MaterialManagementDetailViewResponse>> getMaterialManagementDetail(
+            @PathVariable Long id) {
+        MaterialManagementDetailViewResponse response = materialManagementService.getMaterialManagementById(id);
+        return ResponseEntity.ok(
+                SuccessResponse.of(response));
+    }
 
     // @Operation(summary = "자재관리 정보 수정", description = "자재관리 정보를 수정합니다")
     // @ApiResponses(value = {

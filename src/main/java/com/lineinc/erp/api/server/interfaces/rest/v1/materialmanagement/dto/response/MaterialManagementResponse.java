@@ -31,7 +31,7 @@ public record MaterialManagementResponse(
 
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
 
-        @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
+        @Schema(description = "자재업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
 
         @Schema(description = "상세 목록") List<MaterialManagementDetailResponse> details) {
     public static MaterialManagementResponse from(MaterialManagement entity) {
