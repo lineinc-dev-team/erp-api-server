@@ -12,8 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record ContractChangeHistoryResponse(
         @Schema(description = "변경 이력 ID", example = "1") Long id,
 
-        @Schema(description = "변경 상세 내역") @JsonProperty("changes") String changes,
-
+        @Schema(description = "변경 상세 내역") @JsonProperty("getChanges") String getChanges,
         @Schema(description = "메모", example = "계약 조건 변경") String memo,
 
         @Schema(description = "생성 일시", example = "2025-07-15T10:00:00+09:00") OffsetDateTime createdAt,
