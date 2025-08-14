@@ -168,4 +168,30 @@ public class MaterialManagementController {
     // materialManagementService.updateMaterialManagement(id, request);
     // return ResponseEntity.ok().build();
     // }
+
+    // @Operation(summary = "자재관리 수정이력 조회", description = "자재관리의 수정이력을 조회합니다")
+    // @ApiResponses(value = {
+    // @ApiResponse(responseCode = "200", description = "조회 성공"),
+    // @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음", content =
+    // @Content())
+    // })
+    // @GetMapping("/{id}/change-histories")
+    // @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action =
+    // PermissionAction.VIEW)
+    // public
+    // ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementChangeHistoryResponse>>>
+    // getMaterialManagementChangeHistories(
+    // @PathVariable Long id,
+    // @Valid PageRequest pageRequest,
+    // @Valid SortRequest sortRequest) {
+
+    // Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
+    // pageRequest.size(), sortRequest.sort());
+    // var slice = changeHistoryService.getChangeHistories(id, pageable);
+
+    // return ResponseEntity.ok(SuccessResponse.of(
+    // new SliceResponse<>(SliceInfo.from(slice), slice.getContent().stream()
+    // .map(MaterialManagementChangeHistoryResponse::from)
+    // .toList())));
+    // }
 }
