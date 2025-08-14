@@ -217,8 +217,8 @@ public class MaterialManagementService {
                             ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
         }
 
-        // 변경 전 상태 저장 (Javers 스냅샷)
         materialManagement.syncTransientFields();
+        // 변경 전 상태 저장 (Javers 스냅샷)
         MaterialManagement oldSnapshot = JaversUtils.createSnapshot(javers, materialManagement,
                 MaterialManagement.class);
 

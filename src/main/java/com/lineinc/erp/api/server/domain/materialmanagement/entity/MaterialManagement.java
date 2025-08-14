@@ -78,7 +78,7 @@ public class MaterialManagement extends BaseEntity {
     /**
      * 납품일자
      */
-    @DiffInclude
+    @DiffIgnore
     @Column(nullable = false)
     private OffsetDateTime deliveryDate;
 
