@@ -98,6 +98,7 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractFileService contractFileService;
     private final OutsourcingCompanyContractWorkerService contractWorkerService;
     private final OutsourcingCompanyContractEquipmentService contractEquipmentService;
+    private final OutsourcingCompanyContractDriverService contractDriverService;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -607,7 +608,12 @@ public class OutsourcingCompanyContractService {
             contractEquipmentService.updateContractEquipments(contract.getId(), request.equipments());
         }
 
-        // 9. 사용자 정의 변경 이력 저장
+        // 9. 운전자 정보 수정
+        if (request.drivers() != null) {
+            contractDriverService.updateContractDrivers(contract.getId(), request.drivers());
+        }
+
+        // 10. 사용자 정의 변경 이력 저장
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {

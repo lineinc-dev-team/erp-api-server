@@ -145,6 +145,12 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @Builder.Default
     private List<OutsourcingCompanyContractEquipment> equipments = new ArrayList<>();
 
+    // 계약 운전자 목록
+    @DiffIgnore
+    @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<OutsourcingCompanyContractDriver> drivers = new ArrayList<>();
+
     // 계약 변경 히스토리 목록
     @DiffIgnore
     @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)

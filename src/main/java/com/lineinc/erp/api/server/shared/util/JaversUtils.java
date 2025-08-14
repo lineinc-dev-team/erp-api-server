@@ -13,6 +13,8 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriverFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractSubEquipment;
@@ -123,6 +125,10 @@ public class JaversUtils {
             return equipment.getSpecification();
         } else if (entity instanceof OutsourcingCompanyContractSubEquipment subEquipment) {
             return subEquipment.getDescription();
+        } else if (entity instanceof OutsourcingCompanyContractDriver driver) {
+            return driver.getName();
+        } else if (entity instanceof OutsourcingCompanyContractDriverFile file) {
+            return file.getOriginalFileName();
         }
         return null;
     }
@@ -174,6 +180,10 @@ public class JaversUtils {
             return equipment.getSpecification() + "(" + equipment.getId() + ")";
         } else if (entity instanceof OutsourcingCompanyContractSubEquipment subEquipment) {
             return subEquipment.getDescription() + "(" + subEquipment.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContractDriver driver) {
+            return driver.getName() + "(" + driver.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContractDriverFile file) {
+            return file.getOriginalFileName() + "(" + file.getId() + ")";
         }
         return null;
     }
