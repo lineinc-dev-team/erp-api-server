@@ -13,4 +13,6 @@ public interface MaterialManagementChangeHistoryRepository
         extends JpaRepository<MaterialManagementChangeHistory, Long> {
     Slice<MaterialManagementChangeHistory> findByMaterialManagement(MaterialManagement materialManagement,
             Pageable pageable);
+
+    Slice<MaterialManagementChangeHistory> findByMaterialManagementId(Long materialManagementId, Pageable pageable);
 }
