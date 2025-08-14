@@ -9,6 +9,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
@@ -53,6 +54,10 @@ public class MaterialManagement extends BaseEntity {
     @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_id")
+    private OutsourcingCompany outsourcingCompany;
+
     @Column
     private MaterialManagementInputType inputType;
 
@@ -91,6 +96,10 @@ public class MaterialManagement extends BaseEntity {
                 .ifPresent(value -> this.deliveryDate = DateTimeFormatUtils.toOffsetDateTime(value));
         Optional.ofNullable(request.memo())
                 .ifPresent(value -> this.memo = value);
+    }
+
+    public void changeOutsourcingCompany(OutsourcingCompany outsourcingCompany) {
+        this.outsourcingCompany = outsourcingCompany;
     }
 
     public void changeSite(Site site) {

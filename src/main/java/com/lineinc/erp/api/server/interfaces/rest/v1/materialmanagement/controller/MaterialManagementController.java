@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,13 +14,17 @@ import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManage
 import com.lineinc.erp.api.server.domain.materialmanagement.service.MaterialManagementService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementInputTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,22 +35,19 @@ public class MaterialManagementController {
 
     private final MaterialManagementService materialManagementService;
 
-    // @Operation(summary = "자재관리 등록", description = "자재관리 정보를 등록합니다")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "자재관리 등록 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류", content =
-    // @Content()),
-    // @ApiResponse(responseCode = "404", description = "존재하지 않는 현장 또는 공정을 등록하려는
-    // 경우", content = @Content())
-    // })
-    // @PostMapping
-    // @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action =
-    // PermissionAction.CREATE)
-    // public ResponseEntity<Void> createMaterialManagement(
-    // @Valid @RequestBody MaterialManagementCreateRequest request) {
-    // materialManagementService.createMaterialManagement(request);
-    // return ResponseEntity.ok().build();
-    // }
+    @Operation(summary = "자재관리 등록", description = "자재관리 정보를 등록합니다")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "자재관리 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 현장 또는 공정을 등록하려는경우", content = @Content())
+    })
+
+    @PostMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.CREATE)
+    public ResponseEntity<Void> createMaterialManagement(
+            @Valid @RequestBody MaterialManagementCreateRequest request) {
+        materialManagementService.createMaterialManagement(request);
+        return ResponseEntity.ok().build();
+    }
 
     @Operation(summary = "자재관리 투입구분 목록 조회", description = "자재관리 투입구분 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")

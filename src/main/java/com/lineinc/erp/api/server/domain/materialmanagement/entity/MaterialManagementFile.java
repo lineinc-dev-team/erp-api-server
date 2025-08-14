@@ -41,12 +41,6 @@ public class MaterialManagementFile extends BaseEntity implements UpdatableFrom<
     private MaterialManagement materialManagement;
 
     /**
-     * 문서명 (사용자가 지정하는 파일 이름)
-     */
-    @Column(nullable = false)
-    private String name;
-
-    /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @Column
@@ -65,7 +59,6 @@ public class MaterialManagementFile extends BaseEntity implements UpdatableFrom<
     private String memo;
 
     public void updateFrom(MaterialManagementFileUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(value -> this.name = value);
         Optional.ofNullable(request.fileUrl()).ifPresent(value -> this.fileUrl = value);
         Optional.ofNullable(request.originalFileName()).ifPresent(value -> this.originalFileName = value);
         Optional.ofNullable(request.memo()).ifPresent(value -> this.memo = value);

@@ -1,20 +1,7 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.service;
 
-import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
-import com.lineinc.erp.api.server.domain.site.service.SiteService;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
-import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
-import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +11,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
-import java.util.List;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
+import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
+import com.lineinc.erp.api.server.domain.site.service.SiteService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class MaterialManagementService {
 
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
+    private final OutsourcingCompanyRepository outsourcingCompanyRepository;
     private final MaterialManagementRepository materialManagementRepository;
 
     private final MaterialManagementDetailService materialManagementDetailService;
@@ -51,9 +55,17 @@ public class MaterialManagementService {
                 .siteProcess(siteProcess)
                 .inputType(request.inputType())
                 .inputTypeDescription(request.inputTypeDescription())
-                .deliveryDate(request.deliveryDate().atStartOfDay().atOffset(OffsetDateTime.now().getOffset()))
+                .deliveryDate(DateTimeFormatUtils.toOffsetDateTime(request.deliveryDate()))
                 .memo(request.memo())
                 .build();
+
+        // 외주업체 설정
+        if (request.outsourcingCompanyId() != null) {
+            var outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+            materialManagement.changeOutsourcingCompany(outsourcingCompany);
+        }
 
         materialManagementDetailService.createMaterialDetailManagement(materialManagement, request.details());
         materialManagementFileService.createMaterialFileManagement(materialManagement, request.files());
@@ -61,13 +73,15 @@ public class MaterialManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MaterialManagementResponse> getAllMaterialManagements(MaterialManagementListRequest request, Pageable pageable) {
+    public Page<MaterialManagementResponse> getAllMaterialManagements(MaterialManagementListRequest request,
+            Pageable pageable) {
         return materialManagementRepository.findAll(request, pageable);
     }
 
     @Transactional
     public void deleteMaterialManagements(DeleteMaterialManagementsRequest request) {
-        List<MaterialManagement> materialManagements = materialManagementRepository.findAllById(request.materialManagementIds());
+        List<MaterialManagement> materialManagements = materialManagementRepository
+                .findAllById(request.materialManagementIds());
         if (materialManagements.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND);
         }
@@ -81,7 +95,8 @@ public class MaterialManagementService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(MaterialManagementListRequest request, Sort sort, List<String> fields) {
-        List<MaterialManagementResponse> materialManagementResponses = materialManagementRepository.findAllWithoutPaging(request, sort)
+        List<MaterialManagementResponse> materialManagementResponses = materialManagementRepository
+                .findAllWithoutPaging(request, sort)
                 .stream()
                 .map(MaterialManagementResponse::from)
                 .toList();
@@ -90,8 +105,7 @@ public class MaterialManagementService {
                 materialManagementResponses,
                 fields,
                 this::getExcelHeaderName,
-                this::getExcelCellValue
-        );
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -138,14 +152,16 @@ public class MaterialManagementService {
     @Transactional(readOnly = true)
     public MaterialManagementDetailViewResponse getMaterialManagementById(Long id) {
         MaterialManagement materialManagement = materialManagementRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
         return MaterialManagementDetailViewResponse.from(materialManagement);
     }
 
     @Transactional
     public void updateMaterialManagement(Long id, MaterialManagementUpdateRequest request) {
         MaterialManagement materialManagement = materialManagementRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
         Site site = siteService.getSiteByIdOrThrow(request.siteId());
         SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
@@ -154,11 +170,19 @@ public class MaterialManagementService {
 
         materialManagement.changeSite(site);
         materialManagement.changeSiteProcess(siteProcess);
+
+        // 외주업체 업데이트
+        if (request.outsourcingCompanyId() != null) {
+            var outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "외주업체를 찾을 수 없습니다"));
+            materialManagement.changeOutsourcingCompany(outsourcingCompany);
+        } else {
+            materialManagement.changeOutsourcingCompany(null);
+        }
+
         materialManagement.updateFrom(request);
 
         materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details());
         materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files());
     }
 }
-
-

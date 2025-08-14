@@ -1,21 +1,21 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.service;
 
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MaterialManagementFileService {
-
 
     @Transactional
     public void createMaterialFileManagement(
@@ -30,7 +30,6 @@ public class MaterialManagementFileService {
                 .filter(file -> file.name() != null && !file.name().isBlank())
                 .map(file -> MaterialManagementFile.builder()
                         .materialManagement(materialManagement)
-                        .name(file.name())
                         .fileUrl(file.fileUrl())
                         .originalFileName(file.originalFileName())
                         .memo(file.memo())
@@ -47,12 +46,9 @@ public class MaterialManagementFileService {
                 requests,
                 (MaterialManagementFileUpdateRequest dto) -> MaterialManagementFile.builder()
                         .materialManagement(materialManagement)
-                        .name(dto.name())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
-                        .build()
-        );
+                        .build());
     }
 }
-
