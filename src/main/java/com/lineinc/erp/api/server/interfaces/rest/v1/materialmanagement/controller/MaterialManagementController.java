@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManage
 import com.lineinc.erp.api.server.domain.materialmanagement.service.MaterialManagementService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementInputTypeResponse;
@@ -90,21 +92,19 @@ public class MaterialManagementController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    // @Operation(summary = "자재관리 삭제", description = "하나 이상의 자재관리 ID를 받아 해당 데이터를
-    // 삭제합니다.")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "삭제 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류"),
-    // @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음")
-    // })
-    // @DeleteMapping
-    // @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action =
-    // PermissionAction.DELETE)
-    // public ResponseEntity<Void> deleteMaterialManagements(
-    // @RequestBody DeleteMaterialManagementsRequest materialManagementIds) {
-    // materialManagementService.deleteMaterialManagements(materialManagementIds);
-    // return ResponseEntity.ok().build();
-    // }
+    @Operation(summary = "자재관리 삭제", description = "하나 이상의 자재관리 ID를 받아 해당 데이터를삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음")
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteMaterialManagements(
+            @RequestBody DeleteMaterialManagementsRequest materialManagementIds) {
+        materialManagementService.deleteMaterialManagements(materialManagementIds);
+        return ResponseEntity.ok().build();
+    }
 
     // @Operation(summary = "자재관리 목록 엑셀 다운로드", description = "검색 조건에 맞는 자재관리 목록을 엑셀
     // 파일로 다운로드합니다.")
