@@ -1,22 +1,36 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
-
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.hibernate.annotations.SQLRestriction;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
-import java.time.OffsetDateTime;
-import java.util.Optional;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -32,14 +46,14 @@ public class MaterialManagement extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id", nullable = false)
+    @JoinColumn(name = "site_id")
     private Site site;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id", nullable = false)
+    @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
 
-    @Column(nullable = false)
+    @Column
     private MaterialManagementInputType inputType;
 
     /**
@@ -57,7 +71,7 @@ public class MaterialManagement extends BaseEntity {
     /**
      * 비고
      */
-    @Column(columnDefinition = "TEXT")
+    @Column
     private String memo;
 
     @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -67,7 +81,6 @@ public class MaterialManagement extends BaseEntity {
     @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MaterialManagementFile> files = new ArrayList<>();
-
 
     public void updateFrom(MaterialManagementUpdateRequest request) {
         Optional.ofNullable(request.inputType())
