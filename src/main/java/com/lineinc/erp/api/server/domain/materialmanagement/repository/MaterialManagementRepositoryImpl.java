@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.repository;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import org.springframework.util.StringUtils;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
@@ -34,6 +36,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
     private final JPAQueryFactory queryFactory;
     private final QMaterialManagement materialManagement = QMaterialManagement.materialManagement;
     private final QMaterialManagementDetail materialManagementDetail = QMaterialManagementDetail.materialManagementDetail;
+    private final QOutsourcingCompany outsourcingCompany = QOutsourcingCompany.outsourcingCompany;
     private final QSite site = QSite.site;
     private final QSiteProcess siteProcess = QSiteProcess.siteProcess;
 
@@ -53,6 +56,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .distinct()
                 .leftJoin(materialManagement.site, site).fetchJoin()
                 .leftJoin(materialManagement.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .leftJoin(materialManagement.details, materialManagementDetail)
                 .where(condition)
                 .orderBy(orders)
@@ -65,6 +69,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .from(materialManagement)
                 .leftJoin(materialManagement.site, site)
                 .leftJoin(materialManagement.siteProcess, siteProcess)
+                .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany)
                 .leftJoin(materialManagement.details, materialManagementDetail)
                 .where(condition)
                 .fetchOne();
@@ -87,16 +92,28 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
         if (StringUtils.hasText(request.processName())) {
             builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
         }
+        if (StringUtils.hasText(request.outsourcingCompanyName())) {
+            builder.and(outsourcingCompany.name.containsIgnoreCase(request.outsourcingCompanyName().trim()));
+        }
         if (StringUtils.hasText(request.materialName())) {
             builder.and(materialManagementDetail.name.containsIgnoreCase(request.materialName().trim()));
         }
+
+        // 시작일 검색 (시작일 이후)
         if (request.deliveryStartDate() != null) {
-            builder.and(materialManagement.deliveryDate.goe(
-                    DateTimeFormatUtils.getUtcDateRange(request.deliveryStartDate())[0]));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.deliveryStartDate());
+            builder.and(materialManagement.deliveryDate.goe(dateRange[0]));
+
+            // 종료일이 없으면 시작일의 끝까지로 설정
+            if (request.deliveryEndDate() == null) {
+                builder.and(materialManagement.deliveryDate.lt(dateRange[1]));
+            }
         }
+
+        // 종료일 검색 (종료일 이전)
         if (request.deliveryEndDate() != null) {
-            builder.and(materialManagement.deliveryDate.lt(
-                    DateTimeFormatUtils.getUtcDateRange(request.deliveryEndDate())[1]));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.deliveryEndDate());
+            builder.and(materialManagement.deliveryDate.lt(dateRange[1]));
         }
 
         return builder;
@@ -112,6 +129,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .distinct()
                 .leftJoin(materialManagement.site, site).fetchJoin()
                 .leftJoin(materialManagement.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .leftJoin(materialManagement.details, materialManagementDetail)
                 .where(condition)
                 .orderBy(orders)
