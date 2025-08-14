@@ -9,9 +9,10 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
@@ -30,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JaversUtils {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static <T> T createSnapshot(Javers javers, T entity, Class<T> clazz) {
         try {
@@ -110,6 +109,10 @@ public class JaversUtils {
             return contact.getName();
         } else if (entity instanceof ClientCompanyFile file) {
             return file.getName();
+        } else if (entity instanceof MaterialManagementDetail detail) {
+            return detail.getName();
+        } else if (entity instanceof MaterialManagementFile file) {
+            return file.getOriginalFileName();
         } else if (entity instanceof SiteContract contract) {
             return contract.getName();
         } else if (entity instanceof SiteFile file) {
@@ -167,6 +170,10 @@ public class JaversUtils {
             return contact.getName() + "(" + contact.getId() + ")";
         } else if (entity instanceof ClientCompanyFile file) {
             return file.getName() + "(" + file.getId() + ")";
+        } else if (entity instanceof MaterialManagementDetail detail) {
+            return detail.getName() + "(" + detail.getId() + ")";
+        } else if (entity instanceof MaterialManagementFile file) {
+            return file.getOriginalFileName() + "(" + file.getId() + ")";
         } else if (entity instanceof SiteContract contract) {
             return contract.getName() + "(" + contract.getId() + ")";
         } else if (entity instanceof SiteFile file) {

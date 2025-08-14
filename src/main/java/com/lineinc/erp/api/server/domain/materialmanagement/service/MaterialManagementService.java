@@ -194,9 +194,18 @@ public class MaterialManagementService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
 
-        Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
-        if (!siteProcess.getSite().getId().equals(site.getId())) {
+        // siteId가 null이면 기존 site 유지, 아니면 새로운 site 검증
+        Site site = request.siteId() != null ? siteService.getSiteByIdOrThrow(request.siteId())
+                : materialManagement.getSite();
+
+        // siteProcessId가 null이면 기존 siteProcess 유지, 아니면 새로운 siteProcess 검증
+        SiteProcess siteProcess = request.siteProcessId() != null
+                ? siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId())
+                : materialManagement.getSiteProcess();
+
+        // 새로운 site와 siteProcess가 모두 제공된 경우에만 검증
+        if (request.siteId() != null && request.siteProcessId() != null &&
+                !siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
@@ -216,8 +225,15 @@ public class MaterialManagementService {
         // updateFrom 메서드에서 모든 필드 업데이트
         materialManagement.updateFrom(request, site, siteProcess, outsourcingCompany);
 
-        materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details());
-        materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files());
+        // 자재 상세 정보가 있는 경우에만 업데이트
+        if (request.details() != null) {
+            materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details());
+        }
+
+        // 파일 정보가 있는 경우에만 업데이트
+        if (request.files() != null) {
+            materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files());
+        }
 
         // Javers를 사용하여 변경사항 추적
         Diff diff = javers.compare(oldSnapshot, materialManagement);

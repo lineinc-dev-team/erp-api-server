@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum FileUploadTarget {
     CLIENT_COMPANY("client-company"),
     OUTSOURCING_COMPANY("outsourcing-company"),
+    OUTSOURCING_COMPANY_CONTRACT("outsourcing-company-contract"),
     SITE("site"),
     MANAGEMENT_COST("management-cost"),
     STEEL_MANAGEMENT("steel-management"),

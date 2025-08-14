@@ -3,6 +3,8 @@ package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
@@ -36,6 +38,7 @@ public class MaterialManagementFile extends BaseEntity implements UpdatableFrom<
     @SequenceGenerator(name = "material_management_file_seq", sequenceName = "material_management_file_seq", allocationSize = 1)
     private Long id;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_management_id", nullable = false)
     private MaterialManagement materialManagement;
@@ -43,18 +46,21 @@ public class MaterialManagementFile extends BaseEntity implements UpdatableFrom<
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
+    @DiffInclude
     @Column
     private String fileUrl;
 
     /**
      * 업로드된 파일의 원본 파일명
      */
+    @DiffInclude
     @Column
     private String originalFileName;
 
     /**
      * 파일에 대한 비고 또는 설명
      */
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
 

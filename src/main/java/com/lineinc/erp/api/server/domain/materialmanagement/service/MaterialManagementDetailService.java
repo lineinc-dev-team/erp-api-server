@@ -59,7 +59,10 @@ public class MaterialManagementDetailService {
     @Transactional
     public void updateMaterialManagementDetails(MaterialManagement materialManagement,
             List<MaterialManagementDetailUpdateRequest> requests) {
-        List<MaterialManagementDetail> beforeDetails = new ArrayList<>(materialManagement.getDetails());
+        // 변경 전 상태 저장 (Javers 스냅샷)
+        List<MaterialManagementDetail> beforeDetails = materialManagement.getDetails().stream()
+                .map(detail -> JaversUtils.createSnapshot(javers, detail, MaterialManagementDetail.class))
+                .toList();
 
         EntitySyncUtils.syncList(
                 materialManagement.getDetails(),
@@ -100,7 +103,6 @@ public class MaterialManagementDetailService {
         for (MaterialManagementDetail before : beforeDetails) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
-
             MaterialManagementDetail after = afterMap.get(before.getId());
             Diff diff = javers.compare(before, after);
             List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
