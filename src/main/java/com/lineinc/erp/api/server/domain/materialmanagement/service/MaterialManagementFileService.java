@@ -27,7 +27,6 @@ public class MaterialManagementFileService {
         }
 
         requests.stream()
-                .filter(file -> file.name() != null && !file.name().isBlank())
                 .map(file -> MaterialManagementFile.builder()
                         .materialManagement(materialManagement)
                         .fileUrl(file.fileUrl())
