@@ -9,6 +9,7 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
@@ -29,6 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JaversUtils {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     public static <T> T createSnapshot(Javers javers, T entity, Class<T> clazz) {
         try {
             String json = javers.getJsonConverter().toJson(entity);

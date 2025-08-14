@@ -652,4 +652,13 @@ public class OutsourcingCompanyContractService {
         }
     }
 
+    /**
+     * 계약 변경 이력을 조회합니다.
+     */
+    public Slice<OutsourcingCompanyContractChangeHistory> getContractChangeHistories(Long contractId,
+            Pageable pageable) {
+        return contractChangeHistoryRepository.findByOutsourcingCompanyContractId(contractId,
+                pageable);
+    }
+
 }
