@@ -12,6 +12,7 @@ import org.javers.core.diff.changetype.ValueChange;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriverFile;
@@ -129,6 +130,8 @@ public class JaversUtils {
             return driver.getName();
         } else if (entity instanceof OutsourcingCompanyContractDriverFile file) {
             return file.getOriginalFileName();
+        } else if (entity instanceof OutsourcingCompanyContractConstruction construction) {
+            return construction.getItem();
         }
         return null;
     }
@@ -184,6 +187,8 @@ public class JaversUtils {
             return driver.getName() + "(" + driver.getId() + ")";
         } else if (entity instanceof OutsourcingCompanyContractDriverFile file) {
             return file.getOriginalFileName() + "(" + file.getId() + ")";
+        } else if (entity instanceof OutsourcingCompanyContractConstruction construction) {
+            return construction.getItem() + "(" + construction.getId() + ")";
         }
         return null;
     }
