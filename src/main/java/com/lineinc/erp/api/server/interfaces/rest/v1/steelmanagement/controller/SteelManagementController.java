@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.controller
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +16,16 @@ import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementTy
 import com.lineinc.erp.api.server.domain.steelmanagement.service.SteelManagementService;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.dto.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
+import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,11 +38,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/steel-managements")
 @RequiredArgsConstructor
-@Tag(name = "강재 관리", description = "강재 관리 API")
+@Tag(name = "강재수불부 관리", description = "강재수불부 관리 API")
 public class SteelManagementController {
     private final SteelManagementService steelManagementService;
 
-    @Operation(summary = "강재 관리 등록", description = "강재 관리 정보를 등록합니다.")
+    @Operation(summary = "강재수불부 등록", description = "강재수불부 정보를 등록합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", content = @Content()),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
@@ -67,30 +75,26 @@ public class SteelManagementController {
     // return ResponseEntity.ok().build();
     // }
 
-    // @Operation(summary = "강재 관리 목록 조회", description = "등록된 강재 관리 목록을 조회합니다.")
-    // @ApiResponses({
-    // @ApiResponse(responseCode = "200", description = "조회 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류") })
-    // @GetMapping
-    // @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-    // PermissionAction.VIEW)
-    // public
-    // ResponseEntity<SuccessResponse<PagingResponse<SteelManagementResponse>>>
-    // getSteelManagementList(
-    // @Valid PageRequest pageRequest,
-    // @Valid SortRequest sortRequest,
-    // @Valid SteelManagementListRequest request) {
-    // Page<SteelManagementResponse> page =
-    // steelManagementService.getSteelManagementList(
-    // request,
-    // PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-    // sortRequest.sort()));
+    @Operation(summary = "강재수불부 목록 조회", description = "등록된 강재수불부 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류") })
+    @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementResponse>>> getSteelManagementList(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid SteelManagementListRequest request) {
+        Page<SteelManagementResponse> page = steelManagementService.getSteelManagementList(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
 
-    // return ResponseEntity.ok(SuccessResponse.of(
-    // new PagingResponse<>(PagingInfo.from(page), page.getContent())));
-    // }
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
 
-    @Operation(summary = "강재 관리 구분 목록 조회", description = "강재 관리 구분 목록을 반환합니다")
+    @Operation(summary = "강재수불부 구분 목록 조회", description = "강재수불부 구분 목록을 반환합니다")
     @GetMapping("/steel-management-types")
     public ResponseEntity<SuccessResponse<List<SteelManagementTypeResponse>>> getSteelManagementTypes() {
         List<SteelManagementTypeResponse> responseList = Arrays.stream(SteelManagementType.values())

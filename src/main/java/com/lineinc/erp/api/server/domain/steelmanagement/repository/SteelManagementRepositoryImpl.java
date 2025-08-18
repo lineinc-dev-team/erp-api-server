@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.repository;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.entity.QSteelManagement
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
@@ -109,6 +111,7 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
         if (StringUtils.hasText(request.siteName())) {
             builder.and(site.name.containsIgnoreCase(request.siteName().trim()));
         }
+
         if (StringUtils.hasText(request.processName())) {
             builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
         }
@@ -121,16 +124,14 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
             builder.and(steelManagement.type.eq(request.type()));
         }
 
-        // 기간 시작일 검색 (시작일 이후)
         if (request.startDate() != null) {
-            builder.and(steelManagement.startDate
-                    .goe(request.startDate().atStartOfDay().atOffset(java.time.ZoneOffset.UTC)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.startDate());
+            builder.and(steelManagement.startDate.goe(dateRange[0]));
         }
 
-        // 기간 종료일 검색 (종료일 이전)
         if (request.endDate() != null) {
-            builder.and(steelManagement.endDate
-                    .lt(request.endDate().plusDays(1).atStartOfDay().atOffset(java.time.ZoneOffset.UTC)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.endDate());
+            builder.and(steelManagement.endDate.lt(dateRange[1]));
         }
 
         if (StringUtils.hasText(request.itemName())) {

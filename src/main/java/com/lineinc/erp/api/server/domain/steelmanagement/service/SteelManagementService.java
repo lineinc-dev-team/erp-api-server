@@ -177,29 +177,33 @@ public class SteelManagementService {
     }
 
     private String getExcelCellValue(SteelManagementResponse steelManagement, String field) {
-        boolean hasNoDetails = steelManagement.details().isEmpty();
-        var firstDetail = hasNoDetails ? null : steelManagement.details().get(0);
+        // boolean hasNoDetails = steelManagement.details().isEmpty();
+        // var firstDetail = hasNoDetails ? null : steelManagement.details().get(0);
 
-        return switch (field) {
-            case "id" -> String.valueOf(steelManagement.id());
-            case "siteName" -> steelManagement.site().name();
-            case "processName" -> steelManagement.process().name();
-            case "standard" -> hasNoDetails ? "" : firstDetail.standard();
-            case "name" -> hasNoDetails ? "" : firstDetail.name();
-            case "unit" -> hasNoDetails ? "" : firstDetail.unit();
-            case "count" -> hasNoDetails ? "" : firstDetail.count().toString();
-            case "length" -> hasNoDetails ? "" : firstDetail.length().toString();
-            case "totalLength" -> hasNoDetails ? "" : firstDetail.totalLength().toString();
-            case "unitWeight" -> hasNoDetails ? "" : firstDetail.unitWeight().toString();
-            case "quantity" -> hasNoDetails ? "" : firstDetail.quantity().toString();
-            case "unitPrice" -> hasNoDetails ? "" : firstDetail.unitPrice().toString();
-            case "supplyPrice" -> hasNoDetails ? "" : firstDetail.supplyPrice().toString();
-            case "usage" -> steelManagement.usage();
-            case "hasFile" -> steelManagement.hasFile() ? "Y" : "N";
-            case "type" -> steelManagement.type();
-            case "memo" -> steelManagement.memo();
-            default -> null;
-        };
+        // return switch (field) {
+        // case "id" -> String.valueOf(steelManagement.id());
+        // case "siteName" -> steelManagement.site().name();
+        // case "processName" -> steelManagement.process().name();
+        // case "standard" -> hasNoDetails ? "" : firstDetail.standard();
+        // case "name" -> hasNoDetails ? "" : firstDetail.name();
+        // case "unit" -> hasNoDetails ? "" : firstDetail.unit();
+        // case "count" -> hasNoDetails ? "" : firstDetail.count().toString();
+        // case "length" -> hasNoDetails ? "" : firstDetail.length().toString();
+        // case "totalLength" -> hasNoDetails ? "" :
+        // firstDetail.totalLength().toString();
+        // case "unitWeight" -> hasNoDetails ? "" : firstDetail.unitWeight().toString();
+        // case "quantity" -> hasNoDetails ? "" : firstDetail.quantity().toString();
+        // case "unitPrice" -> hasNoDetails ? "" : firstDetail.unitPrice().toString();
+        // case "supplyPrice" -> hasNoDetails ? "" :
+        // firstDetail.supplyPrice().toString();
+        // case "usage" -> steelManagement.usage();
+        // case "hasFile" -> steelManagement.hasFile() ? "Y" : "N";
+        // case "type" -> steelManagement.type();
+        // case "memo" -> steelManagement.memo();
+        // default -> null;
+        // };
+
+        return null;
     }
 
     @Transactional(readOnly = true)
