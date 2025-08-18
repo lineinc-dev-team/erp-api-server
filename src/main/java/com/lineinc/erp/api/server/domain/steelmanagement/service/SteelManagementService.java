@@ -308,7 +308,6 @@ public class SteelManagementService {
         }
 
         steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details());
-        // steelManagementFileService.updateSteelManagementFiles(steelManagement,
-        // request.files());
+        steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files());
     }
 }
