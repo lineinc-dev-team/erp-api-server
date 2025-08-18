@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.controller
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ReleaseSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementTypeResponse;
@@ -30,13 +32,16 @@ import com.lineinc.erp.api.server.shared.dto.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -152,33 +157,30 @@ public class SteelManagementController {
         return ResponseEntity.ok().build();
     }
 
-    // @Operation(summary = "강재수불부 엑셀 다운로드", description = "검색 조건에 맞는 강재수불부 목록을 엑셀
-    // 파일로 다운로드합니다.")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류")
-    // })
-    // @GetMapping("/download")
-    // @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-    // PermissionAction.VIEW)
-    // public void downloadSteelManagementsExcel(
-    // @Valid SortRequest sortRequest,
-    // @Valid SteelManagementListRequest request,
-    // @Valid SteelManagementDownloadRequest steelManagementDownloadRequest,
-    // HttpServletResponse response) throws java.io.IOException {
-    // List<String> parsed =
-    // DownloadFieldUtils.parseFields(steelManagementDownloadRequest.fields());
-    // DownloadFieldUtils.validateFields(parsed,
-    // SteelManagementDownloadRequest.ALLOWED_FIELDS);
-    // ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 목록.xlsx");
+    @Operation(summary = "강재수불부 엑셀 다운로드", description = "검색 조건에 맞는 강재수불부 목록을 엑셀 파일로 다운로드합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류")
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public void downloadSteelManagementsExcel(
+            @Valid SortRequest sortRequest,
+            @Valid SteelManagementListRequest request,
+            @Valid SteelManagementDownloadRequest steelManagementDownloadRequest,
+            HttpServletResponse response) throws java.io.IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(steelManagementDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed,
+                SteelManagementDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 목록.xlsx");
 
-    // try (Workbook workbook = steelManagementService.downloadExcel(
-    // request,
-    // PageableUtils.parseSort(sortRequest.sort()),
-    // parsed)) {
-    // workbook.write(response.getOutputStream());
-    // }
-    // }
+        try (Workbook workbook = steelManagementService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed)) {
+            workbook.write(response.getOutputStream());
+        }
+    }
 }
 
 // @Operation(

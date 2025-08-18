@@ -161,52 +161,53 @@ public class SteelManagementService {
             case "id" -> "No.";
             case "siteName" -> "현장명";
             case "processName" -> "공정명";
-            case "standard" -> "규격";
-            case "name" -> "품명";
-            case "unit" -> "단위";
-            case "count" -> "본";
-            case "length" -> "길이";
-            case "totalLength" -> "총 길이";
-            case "unitWeight" -> "단위중량";
-            case "quantity" -> "수량";
-            case "unitPrice" -> "단가";
-            case "supplyPrice" -> "공급가";
-            case "usage" -> "용도";
-            case "hasFile" -> "첨부";
             case "type" -> "구분";
+            case "orderDate" -> "발주일";
+            case "approvalDate" -> "승인일";
+            case "releaseDate" -> "반출일";
+            case "startDateAndEndDate" -> "기간";
+            case "outsourcingCompanyName" -> "업체명";
+            case "businessNumber" -> "사업자등록번호";
+            case "totalAmount" -> "총금액";
             case "memo" -> "비고";
             default -> null;
         };
     }
 
     private String getExcelCellValue(SteelManagementResponse steelManagement, String field) {
-        // boolean hasNoDetails = steelManagement.details().isEmpty();
-        // var firstDetail = hasNoDetails ? null : steelManagement.details().get(0);
-
-        // return switch (field) {
-        // case "id" -> String.valueOf(steelManagement.id());
-        // case "siteName" -> steelManagement.site().name();
-        // case "processName" -> steelManagement.process().name();
-        // case "standard" -> hasNoDetails ? "" : firstDetail.standard();
-        // case "name" -> hasNoDetails ? "" : firstDetail.name();
-        // case "unit" -> hasNoDetails ? "" : firstDetail.unit();
-        // case "count" -> hasNoDetails ? "" : firstDetail.count().toString();
-        // case "length" -> hasNoDetails ? "" : firstDetail.length().toString();
-        // case "totalLength" -> hasNoDetails ? "" :
-        // firstDetail.totalLength().toString();
-        // case "unitWeight" -> hasNoDetails ? "" : firstDetail.unitWeight().toString();
-        // case "quantity" -> hasNoDetails ? "" : firstDetail.quantity().toString();
-        // case "unitPrice" -> hasNoDetails ? "" : firstDetail.unitPrice().toString();
-        // case "supplyPrice" -> hasNoDetails ? "" :
-        // firstDetail.supplyPrice().toString();
-        // case "usage" -> steelManagement.usage();
-        // case "hasFile" -> steelManagement.hasFile() ? "Y" : "N";
-        // case "type" -> steelManagement.type();
-        // case "memo" -> steelManagement.memo();
-        // default -> null;
-        // };
-
-        return null;
+        return switch (field) {
+            case "id" -> String.valueOf(steelManagement.id());
+            case "siteName" -> steelManagement.site().name();
+            case "processName" -> steelManagement.process().name();
+            case "type" -> steelManagement.type();
+            case "orderDate" -> steelManagement.orderDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.orderDate())
+                    : "";
+            case "approvalDate" -> steelManagement.approvalDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.approvalDate())
+                    : "";
+            case "releaseDate" -> steelManagement.releaseDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.releaseDate())
+                    : "";
+            case "startDateAndEndDate" -> {
+                String startDate = steelManagement.startDate() != null
+                        ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.startDate())
+                        : "";
+                String endDate = steelManagement.endDate() != null
+                        ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.endDate())
+                        : "";
+                yield startDate + " ~ " + endDate;
+            }
+            case "outsourcingCompanyName" ->
+                steelManagement.outsourcingCompany() != null ? steelManagement.outsourcingCompany().name() : "";
+            case "businessNumber" ->
+                steelManagement.outsourcingCompany() != null ? steelManagement.outsourcingCompany().businessNumber()
+                        : "";
+            case "totalAmount" ->
+                steelManagement.totalAmount() != null ? String.valueOf(steelManagement.totalAmount()) : "";
+            case "memo" -> steelManagement.memo();
+            default -> null;
+        };
     }
 
     @Transactional(readOnly = true)
