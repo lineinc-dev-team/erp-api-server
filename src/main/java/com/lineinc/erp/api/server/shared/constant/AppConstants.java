@@ -24,6 +24,7 @@ public final class AppConstants {
     public static final String MENU_MANAGEMENT_COST = "관리비 관리";
     public static final String MENU_STEEL_MANAGEMENT = "강재수불부 관리";
     public static final String MENU_MATERIAL_MANAGEMENT = "자재 관리";
+    public static final String MENU_FUEL_AGGREGATION = "유류집계";
     public static final String MENU_OUTSOURCING_COMPANY = "외주업체 관리";
     public static final String MENU_OUTSOURCING_COMPANY_CONTRACT = "외주업체 계약 관리";
 
@@ -36,6 +37,7 @@ public final class AppConstants {
             MENU_MANAGEMENT_COST,
             MENU_STEEL_MANAGEMENT,
             MENU_MATERIAL_MANAGEMENT,
+            MENU_FUEL_AGGREGATION,
             MENU_OUTSOURCING_COMPANY,
             MENU_OUTSOURCING_COMPANY_CONTRACT);
 

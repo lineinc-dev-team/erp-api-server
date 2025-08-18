@@ -10,12 +10,12 @@ public enum FileUploadTarget {
     SITE("site"),
     MANAGEMENT_COST("management-cost"),
     STEEL_MANAGEMENT("steel-management"),
-    MATERIAL_MANAGEMENT("material-management");
+    MATERIAL_MANAGEMENT("material-management"),
+    FUEL_AGGREGATION("fuel-aggregation");
 
     private final String directory;
 
     FileUploadTarget(String directory) {
         this.directory = directory;
     }
-
 }
