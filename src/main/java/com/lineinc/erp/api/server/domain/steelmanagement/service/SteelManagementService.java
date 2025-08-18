@@ -234,9 +234,16 @@ public class SteelManagementService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
 
-        Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
-        if (!siteProcess.getSite().getId().equals(site.getId())) {
+        Site site = null;
+        if (request.siteId() != null) {
+            site = siteService.getSiteByIdOrThrow(request.siteId());
+        }
+
+        SiteProcess siteProcess = null;
+        if (request.siteProcessId() != null) {
+            siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        }
+        if (siteProcess != null && site != null && !siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
@@ -289,17 +296,22 @@ public class SteelManagementService {
             steelManagementChangeHistoryRepository.save(outsourcingChangeHistory);
         }
 
-        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (SteelManagementUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
-                steelManagementChangeHistoryRepository.findById(historyRequest.id())
-                        .filter(history -> history.getSteelManagement().getId().equals(steelManagement.getId()))
-                        .ifPresent(history -> {
-                            history.setMemo(historyRequest.memo());
-                        });
-            }
-        }
+        // if (request.changeHistories() != null &&
+        // !request.changeHistories().isEmpty()) {
+        // for (SteelManagementUpdateRequest.ChangeHistoryRequest historyRequest :
+        // request.changeHistories()) {
+        // steelManagementChangeHistoryRepository.findById(historyRequest.id())
+        // .filter(history ->
+        // history.getSteelManagement().getId().equals(steelManagement.getId()))
+        // .ifPresent(history -> {
+        // history.setMemo(historyRequest.memo());
+        // });
+        // }
+        // }
 
-        steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details());
-        steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files());
+        // steelManagementDetailService.updateSteelManagementDetails(steelManagement,
+        // request.details());
+        // steelManagementFileService.updateSteelManagementFiles(steelManagement,
+        // request.files());
     }
 }

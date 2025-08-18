@@ -182,9 +182,15 @@ public class SteelManagement extends BaseEntity {
 
     public void updateFrom(SteelManagementUpdateRequest request, Site site, SiteProcess siteProcess,
             OutsourcingCompany outsourcingCompany) {
-        this.site = site;
-        this.siteProcess = siteProcess;
-        this.outsourcingCompany = outsourcingCompany;
+        if (site != null) {
+            this.site = site;
+        }
+        if (siteProcess != null) {
+            this.siteProcess = siteProcess;
+        }
+        if (outsourcingCompany != null) {
+            this.outsourcingCompany = outsourcingCompany;
+        }
 
         Optional.ofNullable(request.usage()).ifPresent(val -> this.usage = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
