@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
+import com.lineinc.erp.api.server.domain.steelmanagement.service.SteelManagementChangeHistoryService;
 import com.lineinc.erp.api.server.domain.steelmanagement.service.SteelManagementService;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
@@ -26,6 +28,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementTypeResponse;
@@ -34,6 +37,8 @@ import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
+import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
@@ -54,6 +59,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "강재수불부 관리", description = "강재수불부 관리 API")
 public class SteelManagementController {
     private final SteelManagementService steelManagementService;
+    private final SteelManagementChangeHistoryService steelManagementChangeHistoryService;
 
     @Operation(summary = "강재수불부 등록", description = "강재수불부 정보를 등록합니다.")
     @ApiResponses({
@@ -192,5 +198,25 @@ public class SteelManagementController {
         SteelManagementDetailViewResponse steelManagementDetailViewResponse = steelManagementService
                 .getSteelManagementById(id);
         return ResponseEntity.ok(SuccessResponse.of(steelManagementDetailViewResponse));
+    }
+
+    @Operation(summary = "강재수불부 수정이력 조회", description = "강재수불부의 수정이력을 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}/change-histories")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistories(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest) {
+
+        Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
+                pageRequest.size(), sortRequest.sort());
+        var slice = steelManagementChangeHistoryService.getSteelManagementChangeHistory(id, pageable);
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 }
