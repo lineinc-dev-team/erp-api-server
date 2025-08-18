@@ -22,6 +22,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementTy
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ReleaseSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
@@ -121,7 +122,7 @@ public class SteelManagementService {
     }
 
     @Transactional
-    public void releaseSteelManagements(ApproveSteelManagementRequest request) {
+    public void releaseSteelManagements(ReleaseSteelManagementRequest request) {
         List<SteelManagement> steelManagements = steelManagementRepository.findAllById(request.steelManagementIds());
         if (steelManagements.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);

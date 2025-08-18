@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.service.SteelManagement
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ReleaseSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
@@ -135,26 +136,23 @@ public class SteelManagementController {
         steelManagementService.approveSteelManagements(request);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "강재수불부 관리 반출 처리", description = "하나 이상의 강재수불부 관리 ID를 받아 구분값을 반출로 변경합니다.")
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "반출 처리 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "강재수불부 관리를 찾을 수 없음")
+    })
+    @PatchMapping("/release")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<Void> releaseSteelManagements(
+            @Valid @RequestBody ReleaseSteelManagementRequest request) {
+        steelManagementService.releaseSteelManagements(request);
+        return ResponseEntity.ok().build();
+    }
 }
 
-// @Operation(summary = "강재 관리 반출 처리", description = "하나 이상의 강재 관리 ID를 받아 구분값을
-// 반출로 변경합니다.")
-// @ApiResponses({
-// @ApiResponse(responseCode = "200", description = "반출 처리 성공"),
-// @ApiResponse(responseCode = "400", description = "입력값 오류"),
-// @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
-// })
-// @PatchMapping("/release")
-// @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-// PermissionAction.VIEW)
-// public ResponseEntity<Void> releaseSteelManagements(
-// @Valid @RequestBody ApproveSteelManagementRequest request
-// ) {
-// steelManagementService.releaseSteelManagements(request);
-// return ResponseEntity.ok().build();
-// }
-//
-//
 // @Operation(
 // summary = "강재 관리 목록 엑셀 다운로드",
 // description = "검색 조건에 맞는 강재 관리 목록을 엑셀 파일로 다운로드합니다."

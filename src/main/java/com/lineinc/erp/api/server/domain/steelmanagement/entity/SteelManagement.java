@@ -141,13 +141,19 @@ public class SteelManagement extends BaseEntity {
     }
 
     public void changeType(SteelManagementType newType) {
-        if (this.type != null && !this.type.equals(newType)) {
+        // 반출 상태로 변경할 때는 previousType을 변경하지 않음
+        if (newType != SteelManagementType.RELEASE && this.type != null && !this.type.equals(newType)) {
             this.previousType = this.type;
         }
 
         // 승인 상태로 변경될 때 승인일 설정
         if (newType == SteelManagementType.APPROVAL) {
             this.approvalDate = OffsetDateTime.now();
+        }
+
+        // 반출 상태로 변경될 때 반출일 설정
+        if (newType == SteelManagementType.RELEASE) {
+            this.releaseDate = OffsetDateTime.now();
         }
 
         this.type = newType;
