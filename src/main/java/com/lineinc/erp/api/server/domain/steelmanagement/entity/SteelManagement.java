@@ -1,20 +1,40 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.entity;
 
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
-import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.hibernate.annotations.SQLRestriction;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -30,12 +50,16 @@ public class SteelManagement extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id", nullable = false)
+    @JoinColumn(name = "site_id")
     private Site site;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id", nullable = false)
+    @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_id")
+    private OutsourcingCompany outsourcingCompany;
 
     @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -50,8 +74,29 @@ public class SteelManagement extends BaseEntity {
     @Column
     private SteelManagementType type;
 
+    /**
+     * 기간 시작일
+     */
     @Column
-    private OffsetDateTime paymentDate;
+    private OffsetDateTime startDate;
+
+    /**
+     * 기간 종료일
+     */
+    @Column
+    private OffsetDateTime endDate;
+
+    /**
+     * 승인일
+     */
+    @Column
+    private OffsetDateTime approvalDate;
+
+    /**
+     * 반출일
+     */
+    @Column
+    private OffsetDateTime releaseDate;
 
     /**
      * 용도
@@ -68,9 +113,12 @@ public class SteelManagement extends BaseEntity {
     public void updateFrom(SteelManagementUpdateRequest request) {
         Optional.ofNullable(request.usage()).ifPresent(val -> this.usage = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(request.paymentDate())
+        Optional.ofNullable(request.startDate())
                 .map(DateTimeFormatUtils::toOffsetDateTime)
-                .ifPresent(val -> this.paymentDate = val);
+                .ifPresent(val -> this.startDate = val);
+        Optional.ofNullable(request.endDate())
+                .map(DateTimeFormatUtils::toOffsetDateTime)
+                .ifPresent(val -> this.endDate = val);
     }
 
     public void changeSite(Site site) {
@@ -79,5 +127,9 @@ public class SteelManagement extends BaseEntity {
 
     public void changeSiteProcess(SiteProcess siteProcess) {
         this.siteProcess = siteProcess;
+    }
+
+    public void changeOutsourcingCompany(OutsourcingCompany outsourcingCompany) {
+        this.outsourcingCompany = outsourcingCompany;
     }
 }

@@ -17,7 +17,6 @@ import com.lineinc.erp.api.server.domain.steelmanagement.entity.QSteelManagement
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
@@ -44,8 +43,9 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
 
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
             "id", QSteelManagement.steelManagement.id,
-            "paymentDate", QSteelManagement.steelManagement.paymentDate,
             "createdAt", QSteelManagement.steelManagement.createdAt,
+            "startDate", QSteelManagement.steelManagement.startDate,
+            "endDate", QSteelManagement.steelManagement.endDate,
             "updatedAt", QSteelManagement.steelManagement.updatedAt);
 
     @Override
@@ -109,14 +109,7 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
         if (StringUtils.hasText(request.processName())) {
             builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
         }
-        if (request.paymentStartDate() != null) {
-            builder.and(steelManagement.paymentDate.goe(
-                    DateTimeFormatUtils.getUtcDateRange(request.paymentStartDate())[0]));
-        }
-        if (request.paymentEndDate() != null) {
-            builder.and(steelManagement.paymentDate.lt(
-                    DateTimeFormatUtils.getUtcDateRange(request.paymentEndDate())[1]));
-        }
+
         if (request.type() != null) {
             builder.and(steelManagement.type.eq(request.type()));
         }

@@ -89,6 +89,13 @@ public class OutsourcingCompanyService {
         return CompanyDetailResponse.from(company);
     }
 
+    @Transactional(readOnly = true)
+    public OutsourcingCompany getOutsourcingCompanyByIdOrThrow(Long id) {
+        return outsourcingCompanyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+    }
+
     @Transactional
     public void updateOutsourcingCompany(Long id, OutsourcingCompanyUpdateRequest request) {
         OutsourcingCompany company = outsourcingCompanyRepository.findById(id)

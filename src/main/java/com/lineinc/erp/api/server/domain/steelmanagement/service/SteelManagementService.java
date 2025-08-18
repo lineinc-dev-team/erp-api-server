@@ -1,12 +1,22 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.service;
 
-import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
-import com.lineinc.erp.api.server.domain.site.service.SiteService;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
+import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
@@ -17,18 +27,11 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class SteelManagementService {
     private final SteelManagementRepository steelManagementRepository;
     private final SteelManagementDetailService steelManagementDetailService;
     private final SteelManagementFileService steelManagementFileService;
+    private final OutsourcingCompanyService outsourcingCompanyService;
 
     @Transactional
     public void createSteelManagement(SteelManagementCreateRequest request) {
@@ -47,13 +51,22 @@ public class SteelManagementService {
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
+
+        OutsourcingCompany outsourcingCompany = null;
+        if (request.outsourcingCompanyId() != null) {
+            outsourcingCompany = outsourcingCompanyService
+                    .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+        }
+
         validateCreatableSteelType(request.type());
         SteelManagement steelManagement = SteelManagement.builder()
                 .site(site)
                 .siteProcess(siteProcess)
+                .outsourcingCompany(outsourcingCompany)
                 .usage(request.usage())
                 .memo(request.memo())
-                .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
+                .startDate(DateTimeFormatUtils.toOffsetDateTime(request.startDate()))
+                .endDate(DateTimeFormatUtils.toOffsetDateTime(request.endDate()))
                 .type(request.type())
                 .build();
 
@@ -98,7 +111,8 @@ public class SteelManagementService {
 
         for (SteelManagement steelManagement : steelManagements) {
             if (steelManagement.getType() == SteelManagementType.RELEASE) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.CANNOT_APPROVE_RELEASED_STEEL);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        ValidationMessages.CANNOT_APPROVE_RELEASED_STEEL);
             }
             steelManagement.setType(SteelManagementType.APPROVAL);
         }
@@ -115,7 +129,8 @@ public class SteelManagementService {
 
         for (SteelManagement steelManagement : steelManagements) {
             if (steelManagement.getType() != SteelManagementType.APPROVAL) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.CANNOT_RELEASE_NON_APPROVED_STEEL);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        ValidationMessages.CANNOT_RELEASE_NON_APPROVED_STEEL);
             }
             steelManagement.setType(SteelManagementType.RELEASE);
         }
@@ -125,7 +140,8 @@ public class SteelManagementService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(SteelManagementListRequest request, Sort sort, List<String> fields) {
-        List<SteelManagementResponse> steelManagementResponses = steelManagementRepository.findAllWithoutPaging(request, sort)
+        List<SteelManagementResponse> steelManagementResponses = steelManagementRepository
+                .findAllWithoutPaging(request, sort)
                 .stream()
                 .map(SteelManagementResponse::from)
                 .toList();
@@ -134,8 +150,7 @@ public class SteelManagementService {
                 steelManagementResponses,
                 fields,
                 this::getExcelHeaderName,
-                this::getExcelCellValue
-        );
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -143,7 +158,6 @@ public class SteelManagementService {
             case "id" -> "No.";
             case "siteName" -> "현장명";
             case "processName" -> "공정명";
-            case "paymentDate" -> "일자";
             case "standard" -> "규격";
             case "name" -> "품명";
             case "unit" -> "단위";
@@ -170,7 +184,6 @@ public class SteelManagementService {
             case "id" -> String.valueOf(steelManagement.id());
             case "siteName" -> steelManagement.site().name();
             case "processName" -> steelManagement.process().name();
-            case "paymentDate" -> DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.paymentDate());
             case "standard" -> hasNoDetails ? "" : firstDetail.standard();
             case "name" -> hasNoDetails ? "" : firstDetail.name();
             case "unit" -> hasNoDetails ? "" : firstDetail.unit();
@@ -192,14 +205,16 @@ public class SteelManagementService {
     @Transactional(readOnly = true)
     public SteelManagementDetailViewResponse getSteelManagementById(Long siteId) {
         SteelManagement steelManagement = steelManagementRepository.findById(siteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
         return SteelManagementDetailViewResponse.from(steelManagement);
     }
 
     @Transactional
     public void updateSteelManagement(Long id, SteelManagementUpdateRequest request) {
         SteelManagement steelManagement = steelManagementRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
 
         Site site = siteService.getSiteByIdOrThrow(request.siteId());
         SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
