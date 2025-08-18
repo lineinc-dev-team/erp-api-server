@@ -103,11 +103,6 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
         if (request.deliveryStartDate() != null) {
             OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.deliveryStartDate());
             builder.and(materialManagement.deliveryDate.goe(dateRange[0]));
-
-            // 종료일이 없으면 시작일의 끝까지로 설정
-            if (request.deliveryEndDate() == null) {
-                builder.and(materialManagement.deliveryDate.lt(dateRange[1]));
-            }
         }
 
         // 종료일 검색 (종료일 이전)

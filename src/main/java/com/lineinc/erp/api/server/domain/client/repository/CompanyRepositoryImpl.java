@@ -132,11 +132,6 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         if (request.createdStartDate() != null) {
             OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
             builder.and(clientCompany.createdAt.goe(dateRange[0]));
-
-            // 종료일이 없으면 시작일의 끝까지로 설정
-            if (request.createdEndDate() == null) {
-                builder.and(clientCompany.createdAt.lt(dateRange[1]));
-            }
         }
 
         if (request.createdEndDate() != null) {

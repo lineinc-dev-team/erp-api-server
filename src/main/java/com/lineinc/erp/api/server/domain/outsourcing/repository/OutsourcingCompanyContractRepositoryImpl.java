@@ -156,11 +156,6 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
         if (searchRequest.contractStartDate() != null) {
             OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(searchRequest.contractStartDate());
             whereClause.and(outsourcingCompanyContract.contractStartDate.goe(dateRange[0]));
-
-            // 종료일이 없으면 시작일의 끝까지로 설정
-            if (searchRequest.contractEndDate() == null) {
-                whereClause.and(outsourcingCompanyContract.contractStartDate.lt(dateRange[1]));
-            }
         }
 
         // 계약 종료일 검색 (종료일 이전) - LocalDate를 UTC 범위로 변환

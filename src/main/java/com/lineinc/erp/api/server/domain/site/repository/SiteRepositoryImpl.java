@@ -161,11 +161,6 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         if (request.startDate() != null) {
             OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.startDate());
             builder.and(site.startedAt.goe(dateRange[0]));
-
-            // 종료일이 없으면 시작일의 끝까지로 설정
-            if (request.endDate() == null) {
-                builder.and(site.startedAt.lt(dateRange[1]));
-            }
         }
 
         if (request.endDate() != null) {
@@ -176,11 +171,6 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         if (request.createdStartDate() != null) {
             OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
             builder.and(site.createdAt.goe(dateRange[0]));
-
-            // 종료일이 없으면 시작일의 끝까지로 설정
-            if (request.createdEndDate() == null) {
-                builder.and(site.createdAt.lt(dateRange[1]));
-            }
         }
 
         if (request.createdEndDate() != null) {
