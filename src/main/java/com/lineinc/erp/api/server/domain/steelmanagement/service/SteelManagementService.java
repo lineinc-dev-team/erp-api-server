@@ -114,7 +114,7 @@ public class SteelManagementService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ValidationMessages.CANNOT_APPROVE_RELEASED_STEEL);
             }
-            steelManagement.setType(SteelManagementType.APPROVAL);
+            steelManagement.changeType(SteelManagementType.APPROVAL);
         }
 
         steelManagementRepository.saveAll(steelManagements);
@@ -132,7 +132,7 @@ public class SteelManagementService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ValidationMessages.CANNOT_RELEASE_NON_APPROVED_STEEL);
             }
-            steelManagement.setType(SteelManagementType.RELEASE);
+            steelManagement.changeType(SteelManagementType.RELEASE);
         }
 
         steelManagementRepository.saveAll(steelManagements);

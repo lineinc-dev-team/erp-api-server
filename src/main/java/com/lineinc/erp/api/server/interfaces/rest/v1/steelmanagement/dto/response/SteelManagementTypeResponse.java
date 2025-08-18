@@ -6,5 +6,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record SteelManagementTypeResponse(
         @Schema(description = "구분 코드", example = "ORDER") String code,
 
-        @Schema(description = "구분명", example = "발주") String label) {
+        @Schema(description = "구분명", example = "발주") String name) {
 }

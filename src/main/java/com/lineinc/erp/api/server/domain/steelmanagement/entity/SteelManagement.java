@@ -75,6 +75,13 @@ public class SteelManagement extends BaseEntity {
     private SteelManagementType type;
 
     /**
+     * 이전 강재 수불 구분
+     */
+    @Enumerated(EnumType.STRING)
+    @Column
+    private SteelManagementType previousType;
+
+    /**
      * 기간 시작일
      */
     @Column
@@ -131,5 +138,18 @@ public class SteelManagement extends BaseEntity {
 
     public void changeOutsourcingCompany(OutsourcingCompany outsourcingCompany) {
         this.outsourcingCompany = outsourcingCompany;
+    }
+
+    public void changeType(SteelManagementType newType) {
+        if (this.type != null && !this.type.equals(newType)) {
+            this.previousType = this.type;
+        }
+
+        // 승인 상태로 변경될 때 승인일 설정
+        if (newType == SteelManagementType.APPROVAL) {
+            this.approvalDate = OffsetDateTime.now();
+        }
+
+        this.type = newType;
     }
 }
