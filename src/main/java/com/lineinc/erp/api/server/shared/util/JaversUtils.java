@@ -26,6 +26,8 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyCo
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -139,6 +141,10 @@ public class JaversUtils {
             return file.getOriginalFileName();
         } else if (entity instanceof OutsourcingCompanyContractConstruction construction) {
             return construction.getItem();
+        } else if (entity instanceof SteelManagementDetail detail) {
+            return detail.getName();
+        } else if (entity instanceof SteelManagementFile file) {
+            return file.getOriginalFileName();
         }
         return null;
     }
@@ -200,6 +206,10 @@ public class JaversUtils {
             return file.getOriginalFileName() + "(" + file.getId() + ")";
         } else if (entity instanceof OutsourcingCompanyContractConstruction construction) {
             return construction.getItem() + "(" + construction.getId() + ")";
+        } else if (entity instanceof SteelManagementDetail detail) {
+            return detail.getName() + "(" + detail.getId() + ")";
+        } else if (entity instanceof SteelManagementFile file) {
+            return file.getOriginalFileName() + "(" + file.getId() + ")";
         }
         return null;
     }

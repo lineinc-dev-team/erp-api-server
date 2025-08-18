@@ -25,6 +25,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementTypeResponse;
@@ -67,25 +68,20 @@ public class SteelManagementController {
         return ResponseEntity.ok().build();
     }
 
-    //
-    // @Operation(
-    // summary = "강재 관리 수정",
-    // description = "강재 관리 정보를 수정합니다."
-    // )
-    // @ApiResponses({
-    // @ApiResponse(responseCode = "200", description = "수정 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류"),
-    // @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
-    // })
-    // @PatchMapping("/{id}")
-    // @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-    // PermissionAction.UPDATE)
-    // public ResponseEntity<Void> updateSteelManagement(
-    // @PathVariable Long id,
-    // @Valid @RequestBody SteelManagementUpdateRequest request) {
-    // steelManagementService.updateSteelManagement(id, request);
-    // return ResponseEntity.ok().build();
-    // }
+    @Operation(summary = "강재 관리 수정", description = "강재 관리 정보를 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateSteelManagement(
+            @PathVariable Long id,
+            @Valid @RequestBody SteelManagementUpdateRequest request) {
+        steelManagementService.updateSteelManagement(id, request);
+        return ResponseEntity.ok().build();
+    }
 
     @Operation(summary = "강재수불부 목록 조회", description = "등록된 강재수불부 목록을 조회합니다.")
     @ApiResponses({

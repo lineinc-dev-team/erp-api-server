@@ -4,13 +4,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "강재 관리 수정 요청")
 public record SteelManagementUpdateRequest(
-        @NotNull @Schema(description = "현장 ID", example = "1") Long siteId,
+        @Schema(description = "현장 ID", example = "1") Long siteId,
 
-        @NotNull @Schema(description = "공정 ID", example = "10") Long siteProcessId,
+        @Schema(description = "공정 ID", example = "10") Long siteProcessId,
+
+        @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
 
         @Schema(description = "용도", example = "철근 콘크리트 타설용") String usage,
 
@@ -22,5 +23,12 @@ public record SteelManagementUpdateRequest(
 
         @Schema(description = "강재 관리 상세 품목 목록") List<SteelManagementDetailUpdateRequest> details,
 
-        @Schema(description = "강재 관리 파일 목록") List<SteelManagementFileUpdateRequest> files) {
+        @Schema(description = "강재 관리 파일 목록") List<SteelManagementFileUpdateRequest> files,
+
+        @Schema(description = "수정 이력 리스트") List<SteelManagementUpdateRequest.ChangeHistoryRequest> changeHistories) {
+    public record ChangeHistoryRequest(
+            @Schema(description = "수정 이력 번호", example = "1") Long id,
+
+            @Schema(description = "변경 사유 또는 비고", example = "변경에 따른 업데이트") String memo) {
+    }
 }

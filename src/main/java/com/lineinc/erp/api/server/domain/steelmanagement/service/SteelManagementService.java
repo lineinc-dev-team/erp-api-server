@@ -1,9 +1,13 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.service;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,7 +23,10 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementChangeHistory;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeType;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
+import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
@@ -32,6 +39,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.respons
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,6 +53,8 @@ public class SteelManagementService {
     private final SteelManagementDetailService steelManagementDetailService;
     private final SteelManagementFileService steelManagementFileService;
     private final OutsourcingCompanyService outsourcingCompanyService;
+    private final SteelManagementChangeHistoryRepository steelManagementChangeHistoryRepository;
+    private final Javers javers;
 
     @Transactional
     public void createSteelManagement(SteelManagementCreateRequest request) {
@@ -230,9 +240,64 @@ public class SteelManagementService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
-        steelManagement.changeSite(site);
-        steelManagement.changeSiteProcess(siteProcess);
-        steelManagement.updateFrom(request);
+        OutsourcingCompany outsourcingCompany = null;
+        if (request.outsourcingCompanyId() != null) {
+            outsourcingCompany = outsourcingCompanyService
+                    .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+        }
+
+        steelManagement.syncTransientFields();
+        SteelManagement oldSnapshot = JaversUtils.createSnapshot(javers, steelManagement, SteelManagement.class);
+
+        steelManagement.updateFrom(request, site, siteProcess, outsourcingCompany);
+        steelManagementRepository.save(steelManagement);
+
+        Diff diff = javers.compare(oldSnapshot, steelManagement);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+
+        // outsourcingCompanyName 변경사항 분리
+        List<Map<String, String>> outsourcingChanges = new ArrayList<>();
+        List<Map<String, String>> otherChanges = new ArrayList<>();
+
+        for (Map<String, String> change : simpleChanges) {
+            if ("outsourcingCompanyName".equals(change.get("property"))) {
+                outsourcingChanges.add(change);
+            } else {
+                otherChanges.add(change);
+            }
+        }
+
+        // 기본 변경사항 저장 (outsourcingCompanyName 제외)
+        if (!otherChanges.isEmpty()) {
+            String otherChangesJson = javers.getJsonConverter().toJson(otherChanges);
+            SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
+                    .steelManagement(steelManagement)
+                    .type(SteelManagementChangeType.BASIC)
+                    .changes(otherChangesJson)
+                    .build();
+            steelManagementChangeHistoryRepository.save(changeHistory);
+        }
+
+        // 외주업체 변경사항 별도 저장
+        if (!outsourcingChanges.isEmpty()) {
+            String outsourcingChangesJson = javers.getJsonConverter().toJson(outsourcingChanges);
+            SteelManagementChangeHistory outsourcingChangeHistory = SteelManagementChangeHistory.builder()
+                    .steelManagement(steelManagement)
+                    .type(SteelManagementChangeType.OUTSOURCING_COMPANY)
+                    .changes(outsourcingChangesJson)
+                    .build();
+            steelManagementChangeHistoryRepository.save(outsourcingChangeHistory);
+        }
+
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (SteelManagementUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                steelManagementChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getSteelManagement().getId().equals(steelManagement.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
 
         steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details());
         steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files());

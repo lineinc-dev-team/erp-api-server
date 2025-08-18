@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
@@ -28,6 +30,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,26 +52,32 @@ public class SteelManagement extends BaseEntity {
     @SequenceGenerator(name = "steel_management_seq", sequenceName = "steel_management_seq", allocationSize = 1)
     private Long id;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id")
     private Site site;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_id")
     private OutsourcingCompany outsourcingCompany;
 
+    @DiffIgnore
     @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SteelManagementFile> files = new ArrayList<>();
 
+    @DiffIgnore
     @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SteelManagementDetail> details = new ArrayList<>();
 
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Setter
     @Column
@@ -77,6 +86,7 @@ public class SteelManagement extends BaseEntity {
     /**
      * 이전 강재 수불 구분
      */
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
     private SteelManagementType previousType;
@@ -84,46 +94,98 @@ public class SteelManagement extends BaseEntity {
     /**
      * 기간 시작일
      */
+    @DiffIgnore
     @Column
     private OffsetDateTime startDate;
 
     /**
      * 기간 종료일
      */
+    @DiffIgnore
     @Column
     private OffsetDateTime endDate;
 
     /**
      * 주문일
      */
+    @DiffIgnore
     @Column
     private OffsetDateTime orderDate;
 
     /**
      * 승인일
      */
+    @DiffIgnore
     @Column
     private OffsetDateTime approvalDate;
 
     /**
      * 반출일
      */
+    @DiffIgnore
     @Column
     private OffsetDateTime releaseDate;
 
     /**
      * 용도
      */
+    @DiffInclude
     @Column
     private String usage;
 
     /**
      * 비고
      */
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    public void updateFrom(SteelManagementUpdateRequest request) {
+    @Transient
+    @DiffInclude
+    private String siteName;
+
+    @Transient
+    @DiffInclude
+    private String processName;
+
+    @Transient
+    @DiffInclude
+    private String outsourcingCompanyName;
+
+    @Transient
+    @DiffInclude
+    private String typeName;
+
+    @Transient
+    @DiffInclude
+    private String startDateFormat;
+
+    @Transient
+    @DiffInclude
+    private String endDateFormat;
+
+    /**
+     * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
+     */
+    public void syncTransientFields() {
+        this.siteName = this.site != null ? this.site.getName() : null;
+        this.processName = this.siteProcess != null ? this.siteProcess.getName() : null;
+        this.outsourcingCompanyName = this.outsourcingCompany != null ? this.outsourcingCompany.getName() : null;
+        this.typeName = this.type != null ? this.type.getLabel() : null;
+        this.startDateFormat = this.startDate != null
+                ? DateTimeFormatUtils.formatKoreaLocalDate(this.startDate)
+                : null;
+        this.endDateFormat = this.endDate != null
+                ? DateTimeFormatUtils.formatKoreaLocalDate(this.endDate)
+                : null;
+    }
+
+    public void updateFrom(SteelManagementUpdateRequest request, Site site, SiteProcess siteProcess,
+            OutsourcingCompany outsourcingCompany) {
+        this.site = site;
+        this.siteProcess = siteProcess;
+        this.outsourcingCompany = outsourcingCompany;
+
         Optional.ofNullable(request.usage()).ifPresent(val -> this.usage = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.startDate())
@@ -132,18 +194,8 @@ public class SteelManagement extends BaseEntity {
         Optional.ofNullable(request.endDate())
                 .map(DateTimeFormatUtils::toOffsetDateTime)
                 .ifPresent(val -> this.endDate = val);
-    }
 
-    public void changeSite(Site site) {
-        this.site = site;
-    }
-
-    public void changeSiteProcess(SiteProcess siteProcess) {
-        this.siteProcess = siteProcess;
-    }
-
-    public void changeOutsourcingCompany(OutsourcingCompany outsourcingCompany) {
-        this.outsourcingCompany = outsourcingCompany;
+        syncTransientFields();
     }
 
     public void changeType(SteelManagementType newType) {
