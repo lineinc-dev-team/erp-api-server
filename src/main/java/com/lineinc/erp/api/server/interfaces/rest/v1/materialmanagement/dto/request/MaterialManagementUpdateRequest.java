@@ -26,5 +26,13 @@ public record MaterialManagementUpdateRequest(
 
         @Schema(description = "자재 상세 목록") List<MaterialManagementDetailUpdateRequest> details,
 
-        @Schema(description = "자재 파일 목록") List<MaterialManagementFileUpdateRequest> files) {
+        @Schema(description = "자재 파일 목록") List<MaterialManagementFileUpdateRequest> files,
+
+        @Schema(description = "수정 이력 리스트") List<MaterialManagementUpdateRequest.ChangeHistoryRequest> changeHistories) {
+
+    public record ChangeHistoryRequest(
+            @Schema(description = "수정 이력 번호", example = "1") Long id,
+
+            @Schema(description = "변경 사유 또는 비고", example = "변경에 따른 업데이트") String memo) {
+    }
 }

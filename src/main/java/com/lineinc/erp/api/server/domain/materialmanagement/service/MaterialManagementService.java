@@ -51,6 +51,7 @@ public class MaterialManagementService {
     private final SiteProcessService siteProcessService;
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
     private final Javers javers;
+    private final MaterialManagementChangeHistoryRepository materialManagementChangeHistoryRepository;
 
     @Transactional
     public void createMaterialManagement(MaterialManagementCreateRequest request) {
@@ -248,6 +249,16 @@ public class MaterialManagementService {
                     .changes(changesJson)
                     .build();
             changeHistoryRepository.save(changeHistory);
+        }
+
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (MaterialManagementUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                materialManagementChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getMaterialManagement().getId().equals(materialManagement.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
         }
     }
 }
