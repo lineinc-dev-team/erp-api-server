@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.QSteelManagement;
@@ -40,6 +41,7 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
     private final QSite site = QSite.site;
     private final QSiteProcess siteProcess = QSiteProcess.siteProcess;
     private final QSteelManagementDetail detail = QSteelManagementDetail.steelManagementDetail;
+    private final QOutsourcingCompany outsourcingCompany = QOutsourcingCompany.outsourcingCompany;
 
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
             "id", QSteelManagement.steelManagement.id,
@@ -60,6 +62,7 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
                 .distinct()
                 .leftJoin(steelManagement.site, site).fetchJoin()
                 .leftJoin(steelManagement.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(steelManagement.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .leftJoin(steelManagement.details, detail)
                 .where(builder)
                 .offset(pageable.getOffset())
@@ -110,9 +113,26 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
             builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
         }
 
+        if (StringUtils.hasText(request.outsourcingCompanyName())) {
+            builder.and(outsourcingCompany.name.containsIgnoreCase(request.outsourcingCompanyName().trim()));
+        }
+
         if (request.type() != null) {
             builder.and(steelManagement.type.eq(request.type()));
         }
+
+        // 기간 시작일 검색 (시작일 이후)
+        if (request.startDate() != null) {
+            builder.and(steelManagement.startDate
+                    .goe(request.startDate().atStartOfDay().atOffset(java.time.ZoneOffset.UTC)));
+        }
+
+        // 기간 종료일 검색 (종료일 이전)
+        if (request.endDate() != null) {
+            builder.and(steelManagement.endDate
+                    .lt(request.endDate().plusDays(1).atStartOfDay().atOffset(java.time.ZoneOffset.UTC)));
+        }
+
         if (StringUtils.hasText(request.itemName())) {
             builder.and(
                     JPAExpressions.selectOne()

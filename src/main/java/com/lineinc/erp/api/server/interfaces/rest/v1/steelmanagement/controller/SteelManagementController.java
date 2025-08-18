@@ -1,15 +1,21 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.service.SteelManagementService;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
@@ -24,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/steel-managements")
 @RequiredArgsConstructor
-@Tag(name = "Steel Management", description = "강재 관리 API")
+@Tag(name = "강재 관리", description = "강재 관리 API")
 public class SteelManagementController {
     private final SteelManagementService steelManagementService;
 
@@ -40,54 +46,59 @@ public class SteelManagementController {
         steelManagementService.createSteelManagement(request);
         return ResponseEntity.ok().build();
     }
+
+    //
+    // @Operation(
+    // summary = "강재 관리 수정",
+    // description = "강재 관리 정보를 수정합니다."
+    // )
+    // @ApiResponses({
+    // @ApiResponse(responseCode = "200", description = "수정 성공"),
+    // @ApiResponse(responseCode = "400", description = "입력값 오류"),
+    // @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
+    // })
+    // @PatchMapping("/{id}")
+    // @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
+    // PermissionAction.UPDATE)
+    // public ResponseEntity<Void> updateSteelManagement(
+    // @PathVariable Long id,
+    // @Valid @RequestBody SteelManagementUpdateRequest request) {
+    // steelManagementService.updateSteelManagement(id, request);
+    // return ResponseEntity.ok().build();
+    // }
+
+    // @Operation(summary = "강재 관리 목록 조회", description = "등록된 강재 관리 목록을 조회합니다.")
+    // @ApiResponses({
+    // @ApiResponse(responseCode = "200", description = "조회 성공"),
+    // @ApiResponse(responseCode = "400", description = "입력값 오류") })
+    // @GetMapping
+    // @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
+    // PermissionAction.VIEW)
+    // public
+    // ResponseEntity<SuccessResponse<PagingResponse<SteelManagementResponse>>>
+    // getSteelManagementList(
+    // @Valid PageRequest pageRequest,
+    // @Valid SortRequest sortRequest,
+    // @Valid SteelManagementListRequest request) {
+    // Page<SteelManagementResponse> page =
+    // steelManagementService.getSteelManagementList(
+    // request,
+    // PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+    // sortRequest.sort()));
+
+    // return ResponseEntity.ok(SuccessResponse.of(
+    // new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    // }
+
+    @Operation(summary = "강재 관리 구분 목록 조회", description = "강재 관리 구분 목록을 반환합니다")
+    @GetMapping("/steel-management-types")
+    public ResponseEntity<SuccessResponse<List<SteelManagementTypeResponse>>> getSteelManagementTypes() {
+        List<SteelManagementTypeResponse> responseList = Arrays.stream(SteelManagementType.values())
+                .map(type -> new SteelManagementTypeResponse(type.name(), type.getLabel()))
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
 }
-//
-// @Operation(
-// summary = "강재 관리 수정",
-// description = "강재 관리 정보를 수정합니다."
-// )
-// @ApiResponses({
-// @ApiResponse(responseCode = "200", description = "수정 성공"),
-// @ApiResponse(responseCode = "400", description = "입력값 오류"),
-// @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
-// })
-// @PatchMapping("/{id}")
-// @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-// PermissionAction.UPDATE)
-// public ResponseEntity<Void> updateSteelManagement(
-// @PathVariable Long id,
-// @Valid @RequestBody SteelManagementUpdateRequest request) {
-// steelManagementService.updateSteelManagement(id, request);
-// return ResponseEntity.ok().build();
-// }
-//
-// @Operation(summary = "강재 관리 목록 조회", description = "등록된 강재 관리 목록을 조회합니다.")
-// @ApiResponses({
-// @ApiResponse(responseCode = "200", description = "조회 성공"),
-// @ApiResponse(responseCode = "400", description = "입력값 오류")
-// })
-// @GetMapping
-// @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-// PermissionAction.VIEW)
-// public
-// ResponseEntity<SuccessResponse<PagingResponse<SteelManagementResponse>>>
-// getSteelManagementList(
-// @Valid PageRequest pageRequest,
-// @Valid SortRequest sortRequest,
-// @Valid SteelManagementListRequest request
-// ) {
-// Page<SteelManagementResponse> page =
-// steelManagementService.getSteelManagementList(
-// request,
-// PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-// sortRequest.sort())
-// );
-//
-// return ResponseEntity.ok(SuccessResponse.of(
-// new PagingResponse<>(PagingInfo.from(page), page.getContent())
-// ));
-// }
-//
 // @Operation(
 // summary = "강재 관리 삭제",
 // description = "하나 이상의 강재 관리 ID를 받아 해당 데이터를 삭제합니다.")
@@ -192,5 +203,6 @@ public class SteelManagementController {
 // steelManagementService.getSteelManagementById(id);
 // return
 // ResponseEntity.ok(SuccessResponse.of(steelManagementDetailViewResponse));
+// }
 // }
 // }
