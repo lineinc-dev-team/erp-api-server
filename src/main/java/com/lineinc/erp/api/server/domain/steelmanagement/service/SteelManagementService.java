@@ -296,18 +296,16 @@ public class SteelManagementService {
             steelManagementChangeHistoryRepository.save(outsourcingChangeHistory);
         }
 
-        // if (request.changeHistories() != null &&
-        // !request.changeHistories().isEmpty()) {
-        // for (SteelManagementUpdateRequest.ChangeHistoryRequest historyRequest :
-        // request.changeHistories()) {
-        // steelManagementChangeHistoryRepository.findById(historyRequest.id())
-        // .filter(history ->
-        // history.getSteelManagement().getId().equals(steelManagement.getId()))
-        // .ifPresent(history -> {
-        // history.setMemo(historyRequest.memo());
-        // });
-        // }
-        // }
+        if (request.changeHistories() != null &&
+                !request.changeHistories().isEmpty()) {
+            for (SteelManagementUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                steelManagementChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getSteelManagement().getId().equals(steelManagement.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
 
         // steelManagementDetailService.updateSteelManagementDetails(steelManagement,
         // request.details());
