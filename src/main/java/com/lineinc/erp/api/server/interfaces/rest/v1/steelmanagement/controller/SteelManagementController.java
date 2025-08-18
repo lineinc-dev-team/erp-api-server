@@ -120,13 +120,13 @@ public class SteelManagementController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "강재수불부 품명 키워드 조회", description = "강재수불부 품명 목록을 반환합니다")
+    @Operation(summary = "강재수불부 상세 품명 목록 조회", description = "강재수불부 상세 품명 목록을 반환합니다")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    @GetMapping("/names")
+    @GetMapping("/detail-names")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementNameResponse>>> getSteelManagementNames(
+    public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementNameResponse>>> getSteelManagementDetailNames(
             @Valid PageRequest pageRequest,
             @RequestParam(required = false) String keyword) {
         Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
