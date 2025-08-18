@@ -23,6 +23,8 @@ public record SteelManagementResponse(
 
         @Schema(description = "기간 종료일", example = "2024-07-31T00:00:00+09:00") OffsetDateTime endDate,
 
+        @Schema(description = "주문일", example = "2024-07-15T00:00:00+09:00") OffsetDateTime orderDate,
+
         @Schema(description = "승인일", example = "2024-07-20T00:00:00+09:00") OffsetDateTime approvalDate,
 
         @Schema(description = "반출일", example = "2024-07-25T00:00:00+09:00") OffsetDateTime releaseDate,
@@ -53,6 +55,7 @@ public record SteelManagementResponse(
                 entity.getType() != null ? entity.getType().name() : null,
                 entity.getStartDate(),
                 entity.getEndDate(),
+                entity.getOrderDate(),
                 entity.getApprovalDate(),
                 entity.getReleaseDate(),
                 entity.getFiles() != null && !entity.getFiles().isEmpty(),
