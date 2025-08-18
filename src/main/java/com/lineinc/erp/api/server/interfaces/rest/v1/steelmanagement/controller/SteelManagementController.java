@@ -108,11 +108,11 @@ public class SteelManagementController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "강재수불부 관리 삭제", description = "하나 이상의 강재수불부 관리 ID를 받아 해당 데이터를 삭제합니다.")
+    @Operation(summary = "강재수불부 삭제", description = "하나 이상의 강재수불부 ID를 받아 해당 데이터를 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "강재수불부 관리를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음")
     })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.DELETE)
@@ -122,12 +122,12 @@ public class SteelManagementController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "강재수불부 관리 승인 처리", description = "하나 이상의 강재수불부 관리 ID를 받아 구분값을 승인으로 변경합니다.")
+    @Operation(summary = "강재수불부 승인 처리", description = "하나 이상의 강재수불부 ID를 받아 구분값을 승인으로 변경합니다.")
 
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "승인 처리 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "강재수불부 관리를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음")
     })
     @PatchMapping("/approve")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.APPROVE)
@@ -137,12 +137,12 @@ public class SteelManagementController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "강재수불부 관리 반출 처리", description = "하나 이상의 강재수불부 관리 ID를 받아 구분값을 반출로 변경합니다.")
+    @Operation(summary = "강재수불부 반출 처리", description = "하나 이상의 강재수불부 ID를 받아 구분값을 반출로 변경합니다.")
 
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "반출 처리 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "강재수불부 관리를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음")
     })
     @PatchMapping("/release")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
@@ -151,40 +151,36 @@ public class SteelManagementController {
         steelManagementService.releaseSteelManagements(request);
         return ResponseEntity.ok().build();
     }
+
+    // @Operation(summary = "강재수불부 엑셀 다운로드", description = "검색 조건에 맞는 강재수불부 목록을 엑셀
+    // 파일로 다운로드합니다.")
+    // @ApiResponses(value = {
+    // @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+    // @ApiResponse(responseCode = "400", description = "입력값 오류")
+    // })
+    // @GetMapping("/download")
+    // @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
+    // PermissionAction.VIEW)
+    // public void downloadSteelManagementsExcel(
+    // @Valid SortRequest sortRequest,
+    // @Valid SteelManagementListRequest request,
+    // @Valid SteelManagementDownloadRequest steelManagementDownloadRequest,
+    // HttpServletResponse response) throws java.io.IOException {
+    // List<String> parsed =
+    // DownloadFieldUtils.parseFields(steelManagementDownloadRequest.fields());
+    // DownloadFieldUtils.validateFields(parsed,
+    // SteelManagementDownloadRequest.ALLOWED_FIELDS);
+    // ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 목록.xlsx");
+
+    // try (Workbook workbook = steelManagementService.downloadExcel(
+    // request,
+    // PageableUtils.parseSort(sortRequest.sort()),
+    // parsed)) {
+    // workbook.write(response.getOutputStream());
+    // }
+    // }
 }
 
-// @Operation(
-// summary = "강재 관리 목록 엑셀 다운로드",
-// description = "검색 조건에 맞는 강재 관리 목록을 엑셀 파일로 다운로드합니다."
-// )
-// @ApiResponses(value = {
-// @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-// @ApiResponse(responseCode = "400", description = "입력값 오류")
-// })
-// @GetMapping("/download")
-// @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-// PermissionAction.VIEW)
-// public void downloadSteelManagementsExcel(
-// @Valid SortRequest sortRequest,
-// @Valid SteelManagementListRequest request,
-// @Valid SteelManagementDownloadRequest steelManagementDownloadRequest,
-// HttpServletResponse response
-// ) throws java.io.IOException {
-// List<String> parsed =
-// DownloadFieldUtils.parseFields(steelManagementDownloadRequest.fields());
-// DownloadFieldUtils.validateFields(parsed,
-// SteelManagementDownloadRequest.ALLOWED_FIELDS);
-// ResponseHeaderUtils.setExcelDownloadHeader(response, "강재 관리 목록.xlsx");
-//
-// try (Workbook workbook = steelManagementService.downloadExcel(
-// request,
-// PageableUtils.parseSort(sortRequest.sort()),
-// parsed
-// )) {
-// workbook.write(response.getOutputStream());
-// }
-// }
-//
 // @Operation(
 // summary = "강재 관리 상세 조회",
 // description = "강재 관리 상세 정보를 조회합니다.")

@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -68,6 +69,7 @@ public class SteelManagementService {
                 .memo(request.memo())
                 .startDate(DateTimeFormatUtils.toOffsetDateTime(request.startDate()))
                 .endDate(DateTimeFormatUtils.toOffsetDateTime(request.endDate()))
+                .orderDate(OffsetDateTime.now())
                 .type(request.type())
                 .build();
 

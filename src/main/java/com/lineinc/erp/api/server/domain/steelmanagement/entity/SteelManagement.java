@@ -94,6 +94,12 @@ public class SteelManagement extends BaseEntity {
     private OffsetDateTime endDate;
 
     /**
+     * 주문일
+     */
+    @Column
+    private OffsetDateTime orderDate;
+
+    /**
      * 승인일
      */
     @Column
