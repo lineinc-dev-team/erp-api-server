@@ -10,6 +10,7 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementC
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeType;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementDetailRepository;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
@@ -35,6 +37,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -50,6 +53,7 @@ public class SteelManagementService {
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
     private final SteelManagementRepository steelManagementRepository;
+    private final SteelManagementDetailRepository steelManagementDetailRepository;
     private final SteelManagementDetailService steelManagementDetailService;
     private final SteelManagementFileService steelManagementFileService;
     private final OutsourcingCompanyService outsourcingCompanyService;
@@ -226,6 +230,18 @@ public class SteelManagementService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
         return SteelManagementDetailViewResponse.from(steelManagement);
+    }
+
+    public Slice<SteelManagementNameResponse> getSteelManagementNames(String keyword, Pageable pageable) {
+        Slice<Object[]> resultSlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            resultSlice = steelManagementDetailRepository.findAllDistinctNames(pageable);
+        } else {
+            resultSlice = steelManagementDetailRepository.findDistinctNamesByKeyword(keyword, pageable);
+        }
+
+        return resultSlice.map(result -> new SteelManagementNameResponse((Long) result[1], (String) result[0]));
     }
 
     @Transactional

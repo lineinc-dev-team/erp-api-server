@@ -1,19 +1,8 @@
 package com.lineinc.erp.api.server.domain.site.service;
 
-import com.lineinc.erp.api.server.domain.user.service.UserService;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteProcessRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.siteprocess.CreateSiteProcessRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
-import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
-import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
-import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
-import com.lineinc.erp.api.server.domain.user.entity.User;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +12,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
+import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteProcessRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.siteprocess.CreateSiteProcessRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +45,7 @@ public class SiteProcessService {
                 .status(request.status())
                 .memo(request.memo())
                 .manager(userService.getUserByIdOrThrow(request.managerId()))
-                .build()
-        );
+                .build());
     }
 
     public void updateProcess(Site site, UpdateSiteProcessRequest request) {
@@ -72,11 +73,13 @@ public class SiteProcessService {
 
     public SiteProcess getSiteProcessByIdOrThrow(Long id) {
         return siteProcessRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_PROCESS_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.SITE_PROCESS_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(Long siteId, String keyword, Pageable pageable) {
+    public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(Long siteId, String keyword,
+            Pageable pageable) {
         Slice<SiteProcess> siteProcessesSlice;
 
         boolean hasKeyword = keyword != null && !keyword.isBlank();
