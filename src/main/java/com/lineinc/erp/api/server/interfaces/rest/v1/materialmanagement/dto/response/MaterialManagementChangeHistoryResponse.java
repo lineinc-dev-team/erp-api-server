@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record MaterialManagementChangeHistoryResponse(
         @Schema(description = "변경 이력 ID", example = "1") Long id,
 
-        @Schema(description = "변경 상세 내역") @JsonProperty("changes") String changes,
+        @Schema(description = "변경 상세 내역") @JsonProperty("getChanges") String getChanges,
 
         @Schema(description = "메모", example = "자재 정보 수정") String memo,
 
