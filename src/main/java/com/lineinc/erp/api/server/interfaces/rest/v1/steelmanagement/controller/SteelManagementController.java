@@ -124,7 +124,7 @@ public class SteelManagementController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    @GetMapping("/detail-names")
+    @GetMapping("/detail-names/search")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementNameResponse>>> getSteelManagementDetailNames(
             @Valid PageRequest pageRequest,
