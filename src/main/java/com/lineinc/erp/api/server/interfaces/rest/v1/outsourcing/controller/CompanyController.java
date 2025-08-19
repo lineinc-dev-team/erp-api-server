@@ -35,6 +35,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDriverResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
@@ -244,30 +245,24 @@ public class CompanyController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    // @Operation(summary = "외주업체별 계약 장비 정보 조회", description = "해당 외주업체와 계약된 계약의 장비
-    // 정보를 조회합니다")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "조회 성공"),
-    // @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content =
-    // @Content())
-    // })
-    // @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action =
-    // PermissionAction.VIEW)
-    // @GetMapping("/{id}/contract-equipments")
-    // public
-    // ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>>
-    // getContractEquipmentsByCompany(
-    // @PathVariable Long id,
-    // @Valid PageRequest pageRequest,
-    // @Valid SortRequest sortRequest) {
-    // Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> slice =
-    // outsourcingCompanyContractService
-    // .getContractEquipmentsByCompany(
-    // id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-    // sortRequest.sort()));
-    // return ResponseEntity.ok(SuccessResponse.of(
-    // new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
-    // }
+    @Operation(summary = "외주업체별 계약 장비 정보 조회", description = "해당 외주업체와 계약된 계약의 장비 정보를 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
+    })
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
+    @GetMapping("/{id}/contract-equipments")
+    public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> getContractEquipmentsByCompany(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest) {
+        Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> slice = outsourcingCompanyContractService
+                .getContractEquipmentsByCompany(
+                        id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                                sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
 
     @Operation(summary = "외주업체별 계약 기사(운전자) 정보 조회", description = "해당 외주업체와 계약된 계약의 기사(운전자) 정보를 조회합니다")
     @ApiResponses(value = {
