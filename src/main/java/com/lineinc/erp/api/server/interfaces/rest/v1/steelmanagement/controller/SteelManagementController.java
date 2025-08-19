@@ -120,7 +120,7 @@ public class SteelManagementController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "강재수불부 상세 품명 목록 조회", description = "강재수불부 상세 품명 목록을 반환합니다")
+    @Operation(summary = "강재수불부 상세 품명 키워드 검색", description = "상세 품명으로 간단한 검색을 수행합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
