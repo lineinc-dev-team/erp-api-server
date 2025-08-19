@@ -6,6 +6,7 @@ import java.util.List;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "자재관리 수정 요청")
 public record MaterialManagementUpdateRequest(
@@ -24,7 +25,7 @@ public record MaterialManagementUpdateRequest(
 
         @Schema(description = "비고", example = "1차 자재 납품 완료") String memo,
 
-        @Schema(description = "자재 상세 목록") List<MaterialManagementDetailUpdateRequest> details,
+        @Schema(description = "자재 상세 목록") @Size(min = 1) List<MaterialManagementDetailUpdateRequest> details,
 
         @Schema(description = "자재 파일 목록") List<MaterialManagementFileUpdateRequest> files,
 
