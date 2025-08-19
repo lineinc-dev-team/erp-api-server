@@ -123,7 +123,7 @@ public class MaterialManagementService {
         return switch (field) {
             case "siteName" -> "현장명";
             case "processName" -> "공정명";
-            case "outsourcingCompanyName" -> "납품업체명";
+            case "outsourcingCompanyName" -> "자재업체명";
             case "inputType" -> "투입구분";
             case "inputTypeDescription" -> "투입구분 상세";
             case "deliveryDate" -> "납품일자";
