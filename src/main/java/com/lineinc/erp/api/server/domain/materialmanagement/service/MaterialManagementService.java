@@ -36,7 +36,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.resp
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -110,17 +109,8 @@ public class MaterialManagementService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(MaterialManagementListRequest request, Sort sort, List<String> fields) {
-        List<MaterialManagementResponse> materialManagementResponses = materialManagementRepository
-                .findAllWithoutPaging(request, sort)
-                .stream()
-                .map(MaterialManagementResponse::from)
-                .toList();
-
-        return ExcelExportUtils.generateWorkbook(
-                materialManagementResponses,
-                fields,
-                this::getExcelHeaderName,
-                this::getExcelCellValue);
+        // TODO: 플랫 구조로 변경 후 수정 필요
+        throw new UnsupportedOperationException("엑셀 다운로드는 현재 플랫 구조 변경으로 인해 일시적으로 비활성화되었습니다.");
     }
 
     private String getExcelHeaderName(String field) {
@@ -155,29 +145,24 @@ public class MaterialManagementService {
             case "inputTypeDescription" -> materialManagement.inputTypeDescription();
             case "deliveryDate" ->
                 materialManagement.deliveryDate() != null ? materialManagement.deliveryDate().toString() : "";
-            case "name" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).name()
+            case "name" -> materialManagement.detail() != null ? materialManagement.detail().name() : "";
+            case "standard" -> materialManagement.detail() != null ? materialManagement.detail().standard() : "";
+            case "usage" -> materialManagement.detail() != null ? materialManagement.detail().usage() : "";
+            case "quantity" -> materialManagement.detail() != null && materialManagement.detail().quantity() != null
+                    ? materialManagement.detail().quantity().toString()
                     : "";
-            case "standard" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).standard()
+            case "unitPrice" -> materialManagement.detail() != null && materialManagement.detail().unitPrice() != null
+                    ? materialManagement.detail().unitPrice().toString()
                     : "";
-            case "usage" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).usage()
+            case "supplyPrice" ->
+                materialManagement.detail() != null && materialManagement.detail().supplyPrice() != null
+                        ? materialManagement.detail().supplyPrice().toString()
+                        : "";
+            case "vat" -> materialManagement.detail() != null && materialManagement.detail().vat() != null
+                    ? materialManagement.detail().vat().toString()
                     : "";
-            case "quantity" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).quantity().toString()
-                    : "";
-            case "unitPrice" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).unitPrice().toString()
-                    : "";
-            case "supplyPrice" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).supplyPrice().toString()
-                    : "";
-            case "vat" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).vat().toString()
-                    : "";
-            case "total" -> materialManagement.details() != null && !materialManagement.details().isEmpty()
-                    ? materialManagement.details().get(0).total().toString()
+            case "total" -> materialManagement.detail() != null && materialManagement.detail().total() != null
+                    ? materialManagement.detail().total().toString()
                     : "";
             case "hasFile" -> materialManagement.hasFile() ? "Y" : "N";
             case "memo" -> materialManagement.memo();

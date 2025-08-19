@@ -1,10 +1,9 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
@@ -27,14 +26,18 @@ public record MaterialManagementResponse(
 
         @Schema(description = "비고", example = "1차 납품 완료") String memo,
 
+        @Schema(description = "생성일", example = "2025-01-15T10:30:00+09:00") OffsetDateTime createdAt,
+
+        @Schema(description = "수정일", example = "2025-01-16T14:20:00+09:00") OffsetDateTime updatedAt,
+
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
 
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
 
         @Schema(description = "자재업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
 
-        @Schema(description = "상세 목록") List<MaterialManagementDetailResponse> details) {
-    public static MaterialManagementResponse from(MaterialManagement entity) {
+        @Schema(description = "상세 품목 정보") MaterialManagementDetailResponse detail) {
+    public static MaterialManagementResponse from(MaterialManagement entity, MaterialManagementDetail detail) {
         return new MaterialManagementResponse(
                 entity.getId(),
                 entity.getInputType() != null ? entity.getInputType().getLabel() : null,
@@ -43,13 +46,13 @@ public record MaterialManagementResponse(
                 entity.getDeliveryDate() != null ? entity.getDeliveryDate() : null,
                 entity.getFiles() != null && !entity.getFiles().isEmpty(),
                 entity.getMemo(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
                 SiteResponse.SiteSimpleResponse.from(entity.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(entity.getSiteProcess()),
                 entity.getOutsourcingCompany() != null
                         ? CompanyResponse.CompanySimpleResponse.from(entity.getOutsourcingCompany())
                         : null,
-                entity.getDetails().stream()
-                        .map(MaterialManagementDetailResponse::from)
-                        .collect(Collectors.toList()));
+                MaterialManagementDetailResponse.from(detail));
     }
 }

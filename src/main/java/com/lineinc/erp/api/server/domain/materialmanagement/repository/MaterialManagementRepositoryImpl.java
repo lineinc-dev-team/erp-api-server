@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
@@ -51,33 +52,35 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        List<MaterialManagement> content = queryFactory
-                .selectFrom(materialManagement)
-                .distinct()
+        // MaterialManagementDetail을 기준으로 조회하되, MaterialManagement 기준으로만 정렬
+        List<MaterialManagementDetail> detailContent = queryFactory
+                .selectFrom(materialManagementDetail)
+                .innerJoin(materialManagementDetail.materialManagement, materialManagement).fetchJoin()
                 .leftJoin(materialManagement.site, site).fetchJoin()
                 .leftJoin(materialManagement.siteProcess, siteProcess).fetchJoin()
                 .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany).fetchJoin()
-                .leftJoin(materialManagement.details, materialManagementDetail)
                 .where(condition)
                 .orderBy(orders)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        // 전체 MaterialManagementDetail 개수 조회 (페이지네이션용)
         Long totalCount = queryFactory
-                .select(materialManagement.count())
-                .from(materialManagement)
+                .select(materialManagementDetail.count())
+                .from(materialManagementDetail)
+                .innerJoin(materialManagementDetail.materialManagement, materialManagement)
                 .leftJoin(materialManagement.site, site)
                 .leftJoin(materialManagement.siteProcess, siteProcess)
                 .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany)
-                .leftJoin(materialManagement.details, materialManagementDetail)
                 .where(condition)
                 .fetchOne();
 
         long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        List<MaterialManagementResponse> responses = content.stream()
-                .map(MaterialManagementResponse::from)
+        // 각 상세품목에 대해 MaterialManagement 정보와 해당 상세품목을 포함하여 응답 생성
+        List<MaterialManagementResponse> responses = detailContent.stream()
+                .map(detail -> MaterialManagementResponse.from(detail.getMaterialManagement(), detail))
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
@@ -119,18 +122,21 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
-        List<MaterialManagement> content = queryFactory
-                .selectFrom(materialManagement)
-                .distinct()
+        // MaterialManagementDetail을 기준으로 조회하되, MaterialManagement 기준으로만 정렬
+        List<MaterialManagementDetail> detailContent = queryFactory
+                .selectFrom(materialManagementDetail)
+                .innerJoin(materialManagementDetail.materialManagement, materialManagement).fetchJoin()
                 .leftJoin(materialManagement.site, site).fetchJoin()
                 .leftJoin(materialManagement.siteProcess, siteProcess).fetchJoin()
                 .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany).fetchJoin()
-                .leftJoin(materialManagement.details, materialManagementDetail)
                 .where(condition)
-                .orderBy(orders)
+                .orderBy(orders) // MaterialManagement 기준으로만 정렬
                 .fetch();
 
-        return content;
+        // 각 상세품목에 대해 MaterialManagement 정보를 반환
+        return detailContent.stream()
+                .map(MaterialManagementDetail::getMaterialManagement)
+                .toList();
     }
 
 }
