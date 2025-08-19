@@ -36,6 +36,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.resp
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -109,8 +110,13 @@ public class MaterialManagementService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(MaterialManagementListRequest request, Sort sort, List<String> fields) {
-        // TODO: 플랫 구조로 변경 후 수정 필요
-        throw new UnsupportedOperationException("엑셀 다운로드는 현재 플랫 구조 변경으로 인해 일시적으로 비활성화되었습니다.");
+        List<MaterialManagementResponse> responses = materialManagementRepository.findAllWithoutPaging(request, sort);
+
+        return ExcelExportUtils.generateWorkbook(
+                responses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -141,10 +147,13 @@ public class MaterialManagementService {
             case "processName" -> materialManagement.process() != null ? materialManagement.process().name() : "";
             case "outsourcingCompanyName" ->
                 materialManagement.outsourcingCompany() != null ? materialManagement.outsourcingCompany().name() : "";
-            case "inputType" -> materialManagement.inputType();
-            case "inputTypeDescription" -> materialManagement.inputTypeDescription();
+            case "inputType" -> materialManagement.inputType() != null ? materialManagement.inputType() : "";
+            case "inputTypeDescription" ->
+                materialManagement.inputTypeDescription() != null ? materialManagement.inputTypeDescription() : "";
             case "deliveryDate" ->
-                materialManagement.deliveryDate() != null ? materialManagement.deliveryDate().toString() : "";
+                materialManagement.deliveryDate() != null
+                        ? DateTimeFormatUtils.formatKoreaLocalDate(materialManagement.deliveryDate())
+                        : "";
             case "name" -> materialManagement.detail() != null ? materialManagement.detail().name() : "";
             case "standard" -> materialManagement.detail() != null ? materialManagement.detail().standard() : "";
             case "usage" -> materialManagement.detail() != null ? materialManagement.detail().usage() : "";
@@ -165,7 +174,7 @@ public class MaterialManagementService {
                     ? materialManagement.detail().total().toString()
                     : "";
             case "hasFile" -> materialManagement.hasFile() ? "Y" : "N";
-            case "memo" -> materialManagement.memo();
+            case "memo" -> materialManagement.memo() != null ? materialManagement.memo() : "";
             default -> "";
         };
     }

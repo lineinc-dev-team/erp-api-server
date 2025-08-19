@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.controller;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -22,6 +24,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.service.MaterialMana
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementChangeHistoryResponse;
@@ -37,13 +40,16 @@ import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -136,34 +142,31 @@ public class MaterialManagementController {
     // return ResponseEntity.ok().build();
     // }
 
-    // @Operation(summary = "자재관리 목록 엑셀 다운로드", description = "검색 조건에 맞는 자재관리 목록을 엑셀
-    // 파일로 다운로드합니다.")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류", content =
-    // @Content())
-    // })
-    // @GetMapping("/download")
-    // @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action =
-    // PermissionAction.VIEW)
-    // public void downloadSitesExcel(
-    // @Valid SortRequest sortRequest,
-    // @Valid MaterialManagementListRequest request,
-    // @Valid MaterialManagementDownloadRequest materialManagementDownloadRequest,
-    // HttpServletResponse response) throws IOException {
-    // List<String> parsed =
-    // DownloadFieldUtils.parseFields(materialManagementDownloadRequest.fields());
-    // DownloadFieldUtils.validateFields(parsed,
-    // MaterialManagementDownloadRequest.ALLOWED_FIELDS);
-    // ResponseHeaderUtils.setExcelDownloadHeader(response, "자재관리 목록.xlsx");
+    @Operation(summary = "자재관리 목록 엑셀 다운로드", description = "검색 조건에 맞는 자재관리 목록을 엑셀 파일로 다운로드합니다.")
 
-    // try (Workbook workbook = materialManagementService.downloadExcel(
-    // request,
-    // PageableUtils.parseSort(sortRequest.sort()),
-    // parsed)) {
-    // workbook.write(response.getOutputStream());
-    // }
-    // }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
+    public void downloadSitesExcel(
+            @Valid SortRequest sortRequest,
+            @Valid MaterialManagementListRequest request,
+            @Valid MaterialManagementDownloadRequest materialManagementDownloadRequest,
+            HttpServletResponse response) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(materialManagementDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed,
+                MaterialManagementDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "자재관리 목록.xlsx");
+
+        try (Workbook workbook = materialManagementService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed)) {
+            workbook.write(response.getOutputStream());
+        }
+    }
 
     @Operation(summary = "자재관리 상세 조회", description = "자재관리 상세 정보를 조회합니다")
     @ApiResponses(value = {

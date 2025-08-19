@@ -1,25 +1,20 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import java.util.List;
+
 import org.springdoc.core.annotations.ParameterObject;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 @ParameterObject
 @Schema(description = "자재관리 엑셀 다운로드 요청")
 public record MaterialManagementDownloadRequest(
-        @NotBlank
-        @Schema(
-                description = "허용 필드: id, siteName, processName, inputType, deliveryDate, name, " +
-                        "standard, usage, quantity, unitPrice, supplyPrice, vat, total, hasFile, memo",
-                example = "id,siteName,processName,inputType"
-        )
-        String fields
-) {
+        @NotBlank @Schema(description = "허용 필드: id, siteName, processName, inputType, deliveryDate, outsourcingCompanyName, name, "
+                +
+                "standard, usage, quantity, unitPrice, supplyPrice, vat, total, hasFile, memo", example = "id,siteName,processName,inputType") String fields) {
     public static final List<String> ALLOWED_FIELDS = List.of(
-            "id", "siteName", "processName", "inputType", "deliveryDate", "name",
-            "standard", "usage", "quantity", "unitPrice", "supplyPrice", "vat", "total", "hasFile", "memo"
-    );
+            "id", "siteName", "processName", "inputType", "deliveryDate", "outsourcingCompanyName", "name",
+            "standard", "usage", "quantity", "unitPrice", "supplyPrice", "vat", "total", "hasFile", "memo");
 
 }

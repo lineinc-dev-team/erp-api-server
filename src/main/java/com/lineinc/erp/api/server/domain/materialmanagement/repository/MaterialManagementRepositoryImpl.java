@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
@@ -118,7 +117,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
     }
 
     @Override
-    public List<MaterialManagement> findAllWithoutPaging(MaterialManagementListRequest request, Sort sort) {
+    public List<MaterialManagementResponse> findAllWithoutPaging(MaterialManagementListRequest request, Sort sort) {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
@@ -133,10 +132,12 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .orderBy(orders) // MaterialManagement 기준으로만 정렬
                 .fetch();
 
-        // 각 상세품목에 대해 MaterialManagement 정보를 반환
-        return detailContent.stream()
-                .map(MaterialManagementDetail::getMaterialManagement)
+        // 각 상세품목에 대해 MaterialManagement 정보와 해당 상세품목을 포함하여 응답 생성
+        List<MaterialManagementResponse> responses = detailContent.stream()
+                .map(detail -> MaterialManagementResponse.from(detail.getMaterialManagement(), detail))
                 .toList();
+
+        return responses;
     }
 
 }
