@@ -142,8 +142,6 @@ public class OutsourcingCompanyContractService {
 
         // 8. 계약 이력 생성
         createContractHistory(contract);
-
-        log.info("외주업체 계약 생성 완료: ID={}", contract.getId());
     }
 
     /**
@@ -703,5 +701,19 @@ public class OutsourcingCompanyContractService {
                 .stream()
                 .map(OutsourcingCompanyContract::getId)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public OutsourcingCompanyContractDriver getDriverByIdOrThrow(Long driverId) {
+        return driverRepository.findById(driverId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_DRIVER_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public OutsourcingCompanyContractEquipment getEquipmentByIdOrThrow(Long equipmentId) {
+        return equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND));
     }
 }

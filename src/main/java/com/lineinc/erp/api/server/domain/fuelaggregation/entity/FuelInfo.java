@@ -85,7 +85,7 @@ public class FuelInfo extends BaseEntity {
      */
     @DiffInclude
     @Column
-    private Double fuelAmount;
+    private Long fuelAmount;
 
     /**
      * 비고 (메모)

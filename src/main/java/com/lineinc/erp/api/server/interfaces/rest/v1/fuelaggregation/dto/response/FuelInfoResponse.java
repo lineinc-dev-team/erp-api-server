@@ -12,7 +12,7 @@ public record FuelInfoResponse(
         @Schema(description = "장비 정보", example = "덤프트럭 (12톤)") String equipmentInfo,
         @Schema(description = "유종", example = "휘발유") String fuelType,
         @Schema(description = "유종 코드", example = "GASOLINE") String fuelTypeCode,
-        @Schema(description = "주유량 (리터)", example = "50.0") Double fuelAmount,
+        @Schema(description = "주유량 (리터)", example = "50") Long fuelAmount,
         @Schema(description = "비고", example = "오전 주유") String memo) {
 
     public static FuelInfoResponse from(FuelInfo entity) {
