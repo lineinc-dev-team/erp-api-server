@@ -37,7 +37,6 @@ public class FuelAggregationService {
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
                 .weather(request.weather())
-                .memo(request.memo())
                 .build();
 
         fuelAggregationRepository.save(fuelAggregation);

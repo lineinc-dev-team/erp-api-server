@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.entity;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -21,10 +23,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -62,7 +66,7 @@ public class FuelAggregation extends BaseEntity {
      * 일자
      */
     @DiffInclude
-    @Column(nullable = false)
+    @Column
     private OffsetDateTime date;
 
     /**
@@ -73,13 +77,6 @@ public class FuelAggregation extends BaseEntity {
     @Column
     private WeatherType weather;
 
-    /**
-     * 비고
-     */
-    @DiffInclude
-    @Column(columnDefinition = "TEXT")
-    private String memo;
-
     @Transient
     @DiffInclude
     private String siteName;
@@ -87,6 +84,13 @@ public class FuelAggregation extends BaseEntity {
     @Transient
     @DiffInclude
     private String processName;
+
+    /**
+     * 유류정보 목록
+     */
+    @Builder.Default
+    @OneToMany(mappedBy = "fuelAggregation", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<FuelInfo> fuelInfos = new ArrayList<>();
 
     /**
      * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
