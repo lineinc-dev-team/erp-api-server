@@ -8,6 +8,7 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManag
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeType;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementDetailRepository;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
@@ -30,6 +32,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.requ
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -47,6 +50,7 @@ public class MaterialManagementService {
     private final MaterialManagementDetailService materialManagementDetailService;
     private final MaterialManagementFileService materialManagementFileService;
     private final MaterialManagementChangeHistoryRepository changeHistoryRepository;
+    private final MaterialManagementDetailRepository materialManagementDetailRepository;
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
@@ -187,6 +191,18 @@ public class MaterialManagementService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
         return MaterialManagementDetailViewResponse.from(materialManagement);
+    }
+
+    public Slice<MaterialManagementNameResponse> getMaterialManagementNames(String keyword, Pageable pageable) {
+        Slice<Object[]> resultSlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            resultSlice = materialManagementDetailRepository.findAllDistinctNames(pageable);
+        } else {
+            resultSlice = materialManagementDetailRepository.findDistinctNamesByKeyword(keyword, pageable);
+        }
+
+        return resultSlice.map(result -> new MaterialManagementNameResponse((Long) result[1], (String) result[0]));
     }
 
     @Transactional

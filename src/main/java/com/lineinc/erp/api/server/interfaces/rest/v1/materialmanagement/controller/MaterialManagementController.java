@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
@@ -27,6 +29,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.requ
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementInputTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
@@ -79,6 +82,23 @@ public class MaterialManagementController {
                 .map(type -> new MaterialManagementInputTypeResponse(type.name(), type.getLabel()))
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
+    @Operation(summary = "자재관리 상세 품명 키워드 검색", description = "상세 품명으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/detail-names")
+    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementNameResponse>>> getMaterialManagementDetailNames(
+            @Valid PageRequest pageRequest,
+            @RequestParam(required = false) String keyword) {
+        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
+        Slice<MaterialManagementNameResponse> slice = materialManagementService.getMaterialManagementNames(keyword,
+                pageable);
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "자재관리 목록 조회", description = "필터 조건에 맞는 자재관리 목록을 조회합니다")

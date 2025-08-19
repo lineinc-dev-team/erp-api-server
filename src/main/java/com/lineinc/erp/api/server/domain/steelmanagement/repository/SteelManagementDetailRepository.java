@@ -10,9 +10,9 @@ import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementD
 
 @Repository
 public interface SteelManagementDetailRepository extends JpaRepository<SteelManagementDetail, Long> {
-    @Query("SELECT smd.name, MIN(smd.id) FROM SteelManagementDetail smd WHERE smd.deleted = false GROUP BY smd.name ORDER BY smd.name")
+    @Query("SELECT smd.name, MIN(smd.id) FROM SteelManagementDetail smd GROUP BY smd.name ORDER BY smd.name")
     Slice<Object[]> findAllDistinctNames(Pageable pageable);
 
-    @Query("SELECT smd.name, MIN(smd.id) FROM SteelManagementDetail smd WHERE smd.deleted = false AND smd.name LIKE %:keyword% GROUP BY smd.name ORDER BY smd.name")
+    @Query("SELECT smd.name, MIN(smd.id) FROM SteelManagementDetail smd WHERE smd.name LIKE %:keyword% GROUP BY smd.name ORDER BY smd.name")
     Slice<Object[]> findDistinctNamesByKeyword(String keyword, Pageable pageable);
 }
