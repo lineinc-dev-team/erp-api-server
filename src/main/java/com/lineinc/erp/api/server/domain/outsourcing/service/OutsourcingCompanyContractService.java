@@ -542,6 +542,34 @@ public class OutsourcingCompanyContractService {
     }
 
     /**
+     * 외주업체별 계약 장비 정보를 Slice로 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> getContractEquipmentsByCompany(
+            Long companyId, Pageable pageable) {
+        List<Long> contractIds = getContractIdsByCompany(companyId);
+
+        // 계약 ID들로 장비 조회
+        Page<OutsourcingCompanyContractEquipment> page = equipmentRepository
+                .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
+        return page.map(ContractEquipmentResponse.ContractEquipmentSimpleResponse::from);
+    }
+
+    /**
+     * 외주업체별 계약 기사(운전자) 정보를 Slice로 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractDriverResponse.ContractDriverSimpleResponse> getContractDriversByCompany(Long companyId,
+            Pageable pageable) {
+        List<Long> contractIds = getContractIdsByCompany(companyId);
+
+        // 계약 ID들로 기사 조회
+        Page<OutsourcingCompanyContractDriver> page = driverRepository
+                .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
+        return page.map(ContractDriverResponse.ContractDriverSimpleResponse::from);
+    }
+
+    /**
      * 외주업체 계약 공사항목 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
@@ -661,4 +689,19 @@ public class OutsourcingCompanyContractService {
                 pageable);
     }
 
+    /**
+     * 외주업체 ID로 계약 ID 목록을 조회합니다.
+     */
+    private List<Long> getContractIdsByCompany(Long companyId) {
+        // 외주업체가 존재하는지 확인
+        if (!outsourcingCompanyRepository.existsById(companyId)) {
+            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND);
+        }
+
+        // 해당 외주업체의 계약 ID들을 조회
+        return contractRepository.findByOutsourcingCompanyId(companyId)
+                .stream()
+                .map(OutsourcingCompanyContract::getId)
+                .toList();
+    }
 }

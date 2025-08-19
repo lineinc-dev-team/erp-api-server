@@ -37,4 +37,16 @@ public record ContractEquipmentResponse(
                         .map(ContractSubEquipmentResponse::from)
                         .toList() : List.of());
     }
+
+    @Schema(description = "외주업체 계약 장비 간단 정보 응답")
+    public record ContractEquipmentSimpleResponse(
+            @Schema(description = "장비 ID", example = "1") Long id,
+            @Schema(description = "규격", example = "25톤 크레인") String specification) {
+
+        public static ContractEquipmentSimpleResponse from(OutsourcingCompanyContractEquipment equipment) {
+            return new ContractEquipmentSimpleResponse(
+                    equipment.getId(),
+                    equipment.getSpecification());
+        }
+    }
 }

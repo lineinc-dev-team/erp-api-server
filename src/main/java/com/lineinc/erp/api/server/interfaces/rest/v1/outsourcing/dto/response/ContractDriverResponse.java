@@ -27,4 +27,16 @@ public record ContractDriverResponse(
                         .map(ContractDriverFileResponse::from)
                         .toList() : List.of());
     }
+
+    @Schema(description = "외주업체 계약 기사(운전자) 간단 정보 응답")
+    public record ContractDriverSimpleResponse(
+            @Schema(description = "기사 ID", example = "1") Long id,
+            @Schema(description = "기사명", example = "김운전") String name) {
+
+        public static ContractDriverSimpleResponse from(OutsourcingCompanyContractDriver driver) {
+            return new ContractDriverSimpleResponse(
+                    driver.getId(),
+                    driver.getName());
+        }
+    }
 }
