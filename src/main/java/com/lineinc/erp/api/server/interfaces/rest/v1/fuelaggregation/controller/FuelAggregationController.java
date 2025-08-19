@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.WeatherTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -43,6 +45,20 @@ public class FuelAggregationController {
                 .map(WeatherTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(weatherTypes));
+    }
+
+    @Operation(summary = "유종 타입 조회", description = "사용 가능한 유종 타입 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/fuel-types")
+    @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<FuelTypeResponse>>> getFuelTypes() {
+        List<FuelTypeResponse> fuelTypes = Arrays.stream(FuelType.values())
+                .map(FuelTypeResponse::from)
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(fuelTypes));
     }
 
     // @Operation(summary = "유류집계 등록", description = "유류집계 정보를 등록합니다.")
