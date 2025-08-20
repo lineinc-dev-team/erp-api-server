@@ -135,7 +135,7 @@ public class FuelAggregationController {
             @ApiResponse(responseCode = "200", description = "유류집계 목록 조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
-    @GetMapping("/list")
+    @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationListResponse>>> getFuelAggregations(
             @Valid PageRequest pageRequest,
