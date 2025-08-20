@@ -8,6 +8,7 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -166,6 +168,15 @@ public class FuelAggregationService {
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
         return FuelAggregationDetailResponse.from(fuelAggregation);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistories(Long fuelAggregationId,
+            Pageable pageable) {
+
+        Slice<FuelAggregationChangeHistory> histories = fuelAggregationChangeHistoryRepository
+                .findByFuelAggregationId(fuelAggregationId, pageable);
+        return histories.map(FuelAggregationChangeHistoryResponse::from);
     }
 
     @Transactional
