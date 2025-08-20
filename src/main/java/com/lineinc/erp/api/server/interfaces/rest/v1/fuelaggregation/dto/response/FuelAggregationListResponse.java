@@ -5,6 +5,8 @@ import java.time.OffsetDateTime;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDriverResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
 
@@ -41,11 +43,9 @@ public record FuelAggregationListResponse(
     public record FuelInfoListResponse(
             @Schema(description = "유류정보 ID", example = "1") Long id,
 
-            @Schema(description = "기사명", example = "김철수") String driverName,
+            @Schema(description = "기사 정보") ContractDriverResponse.ContractDriverSimpleResponse driver,
 
-            @Schema(description = "차량번호", example = "12가3456") String vehicleNumber,
-
-            @Schema(description = "규격", example = "굴삭기") String specification,
+            @Schema(description = "장비 정보") ContractEquipmentResponse.ContractEquipmentSimpleResponse equipment,
 
             @Schema(description = "유종", example = "경유") String fuelType,
 
@@ -64,9 +64,12 @@ public record FuelAggregationListResponse(
         public static FuelInfoListResponse from(FuelInfo entity) {
             return new FuelInfoListResponse(
                     entity.getId(),
-                    entity.getDriver() != null ? entity.getDriver().getName() : null,
-                    entity.getEquipment() != null ? entity.getEquipment().getVehicleNumber() : null,
-                    entity.getEquipment() != null ? entity.getEquipment().getSpecification() : null,
+                    entity.getDriver() != null
+                            ? ContractDriverResponse.ContractDriverSimpleResponse.from(entity.getDriver())
+                            : null,
+                    entity.getEquipment() != null
+                            ? ContractEquipmentResponse.ContractEquipmentSimpleResponse.from(entity.getEquipment())
+                            : null,
                     entity.getFuelType() != null ? entity.getFuelType().getLabel() : null,
                     entity.getFuelType() != null ? entity.getFuelType().name() : null,
                     entity.getFuelAmount(),

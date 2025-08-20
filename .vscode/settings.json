@@ -6,7 +6,7 @@
     "editor.formatOnPaste": true,
     // Java 전용 설정
     "java.format.enabled": true,
-    "java.saveActions.organizeImports": true,
+    "java.saveActions.organizeImports": false,
     // 파일 자동 저장
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,

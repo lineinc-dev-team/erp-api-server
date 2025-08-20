@@ -146,9 +146,15 @@ public class FuelAggregationService {
                 response.fuelInfo() != null && response.fuelInfo().outsourcingCompany() != null
                         ? response.fuelInfo().outsourcingCompany().name()
                         : "";
-            case "driverName" -> response.fuelInfo() != null ? response.fuelInfo().driverName() : "";
-            case "vehicleNumber" -> response.fuelInfo() != null ? response.fuelInfo().vehicleNumber() : "";
-            case "specification" -> response.fuelInfo() != null ? response.fuelInfo().specification() : "";
+            case "driverName" -> response.fuelInfo() != null && response.fuelInfo().driver() != null
+                    ? response.fuelInfo().driver().name()
+                    : "";
+            case "vehicleNumber" -> response.fuelInfo() != null && response.fuelInfo().equipment() != null
+                    ? response.fuelInfo().equipment().vehicleNumber()
+                    : "";
+            case "specification" -> response.fuelInfo() != null && response.fuelInfo().equipment() != null
+                    ? response.fuelInfo().equipment().specification()
+                    : "";
             case "fuelType" -> response.fuelInfo() != null ? response.fuelInfo().fuelType() : "";
             case "fuelAmount" -> response.fuelInfo() != null ? String.valueOf(response.fuelInfo().fuelAmount()) : "";
             case "createdAtAndUpdatedAt" ->
