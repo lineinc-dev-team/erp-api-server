@@ -85,8 +85,9 @@ public class Labor extends BaseEntity {
      * 본사 인력 여부
      */
     @DiffInclude
-    @Column
-    private Boolean isHeadOffice;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isHeadOffice = false;
 
     /**
      * 주작업
