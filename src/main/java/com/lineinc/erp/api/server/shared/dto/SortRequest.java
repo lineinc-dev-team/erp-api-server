@@ -10,12 +10,9 @@ public record SortRequest(
                 허용 필드 예시: id, name, createdAt, updatedAt.
                 정렬 방향은 'asc' (오름차순) 또는 'desc' (내림차순) 사용.
                 API별로 허용하는 필드는 다를 수 있습니다.
-                """,
-                example = "id,asc"
-        )
-        String sort
-) {
+                """, example = "id,asc") String sort) {
     public SortRequest {
-        if (sort == null) sort = "id,asc";
+        if (sort == null)
+            sort = "id,asc";
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 
 @Repository
-public interface LaborRepository extends JpaRepository<Labor, Long> {
+public interface LaborRepository extends JpaRepository<Labor, Long>, LaborRepositoryCustom {
 
     /**
      * 이름과 주민등록번호로 중복 체크 (삭제되지 않은 것만)

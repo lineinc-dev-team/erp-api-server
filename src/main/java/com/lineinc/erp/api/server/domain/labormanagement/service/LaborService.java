@@ -13,10 +13,15 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborFileRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -102,5 +107,13 @@ public class LaborService {
     public Labor getLaborByIdOrThrow(Long id) {
         return laborRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.LABOR_NOT_FOUND));
+    }
+
+    /**
+     * 인력정보 목록 조회
+     */
+    @Transactional(readOnly = true)
+    public Page<LaborListResponse> getLaborList(LaborListRequest request, Pageable pageable) {
+        return laborRepository.findAll(request, pageable);
     }
 }
