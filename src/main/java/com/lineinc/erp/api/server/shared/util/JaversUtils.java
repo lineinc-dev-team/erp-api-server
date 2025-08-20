@@ -11,6 +11,7 @@ import org.javers.core.diff.changetype.ValueChange;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
@@ -107,6 +108,7 @@ public class JaversUtils {
     }
 
     private static String extractEntityName(Object entity) {
+        System.out.println("entity: " + entity);
         if (entity instanceof ClientCompanyContact contact) {
             return contact.getName();
         } else if (entity instanceof ClientCompanyFile file) {
@@ -145,6 +147,8 @@ public class JaversUtils {
             return detail.getName();
         } else if (entity instanceof SteelManagementFile file) {
             return file.getOriginalFileName();
+        } else if (entity instanceof FuelInfo fuelInfo) {
+            return fuelInfo.getEquipmentSpecification();
         }
         return null;
     }
@@ -210,6 +214,8 @@ public class JaversUtils {
             return detail.getName() + "(" + detail.getId() + ")";
         } else if (entity instanceof SteelManagementFile file) {
             return file.getOriginalFileName() + "(" + file.getId() + ")";
+        } else if (entity instanceof FuelInfo fuelInfo) {
+            return fuelInfo.getEquipmentSpecification() + "(" + fuelInfo.getId() + ")";
         }
         return null;
     }

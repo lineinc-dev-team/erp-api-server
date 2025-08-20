@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.entity;
 
+import java.util.Optional;
+
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -22,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -76,7 +79,7 @@ public class FuelInfo extends BaseEntity {
     /**
      * 유종
      */
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
     private FuelType fuelType;
@@ -95,13 +98,60 @@ public class FuelInfo extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    public void updateFrom(FuelInfoUpdateRequest request, OutsourcingCompany outsourcingCompany,
-            OutsourcingCompanyContractDriver driver, OutsourcingCompanyContractEquipment equipment) {
+    @Transient
+    @DiffInclude
+    private String outsourcingCompanyName;
+
+    @Transient
+    @DiffInclude
+    private String driverName;
+
+    @Transient
+    @DiffInclude
+    private String equipmentSpecification;
+
+    @Transient
+    @DiffInclude
+    private String fuelTypeName;
+
+    // ID만 저장할 필드들 추가
+    @Transient
+    private Long outsourcingCompanyId;
+
+    @Transient
+    private Long driverId;
+
+    @Transient
+    private Long equipmentId;
+
+    /**
+     * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
+     */
+    public void syncTransientFields() {
+        this.outsourcingCompanyName = this.outsourcingCompany != null ? this.outsourcingCompany.getName() : null;
+        this.driverName = this.driver != null ? this.driver.getName() : null;
+        this.equipmentSpecification = this.equipment != null ? this.equipment.getSpecification() : null;
+        this.fuelTypeName = this.fuelType != null ? this.fuelType.getLabel() : null;
+    }
+
+    public void updateFrom(FuelInfoUpdateRequest request) {
+        // ID만 저장
+        this.outsourcingCompanyId = request.outsourcingCompanyId();
+        this.driverId = request.driverId();
+        this.equipmentId = request.equipmentId();
+
+        // 직접 업데이트 가능한 필드들
+        Optional.ofNullable(request.fuelType()).ifPresent(val -> this.fuelType = val);
+        Optional.ofNullable(request.fuelAmount()).ifPresent(val -> this.fuelAmount = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
+
+    // ID로부터 실제 엔티티를 설정하는 메서드 (별도로 호출)
+    public void setEntities(OutsourcingCompany outsourcingCompany,
+            OutsourcingCompanyContractDriver driver,
+            OutsourcingCompanyContractEquipment equipment) {
         this.outsourcingCompany = outsourcingCompany;
         this.driver = driver;
         this.equipment = equipment;
-        this.fuelType = request.fuelType();
-        this.fuelAmount = request.fuelAmount();
-        this.memo = request.memo();
     }
 }

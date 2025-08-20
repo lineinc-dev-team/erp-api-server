@@ -56,6 +56,7 @@ public class FuelAggregationService {
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
     private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
+    private final FuelInfoService fuelInfoService;
     private final Javers javers;
 
     @Transactional
@@ -248,6 +249,11 @@ public class FuelAggregationService {
                             history.setMemo(historyRequest.memo());
                         });
             }
+        }
+
+        // 유류정보 수정 처리
+        if (request.fuelInfos() != null) {
+            fuelInfoService.updateFuelInfos(fuelAggregation, request.fuelInfos());
         }
     }
 
