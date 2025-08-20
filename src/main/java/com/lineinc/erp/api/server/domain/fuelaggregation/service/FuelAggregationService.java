@@ -24,6 +24,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
@@ -153,5 +154,18 @@ public class FuelAggregationService {
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
         return FuelAggregationDetailResponse.from(fuelAggregation);
+    }
+
+    @Transactional
+    public void deleteFuelAggregations(DeleteFuelAggregationsRequest request) {
+        List<FuelAggregation> fuelAggregations = fuelAggregationRepository.findAllById(request.fuelAggregationIds());
+        if (fuelAggregations.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.FUEL_AGGREGATION_NOT_FOUND);
+        }
+
+        for (FuelAggregation fuelAggregation : fuelAggregations) {
+            fuelAggregation.markAsDeleted();
+        }
+        fuelAggregationRepository.saveAll(fuelAggregations);
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
@@ -91,6 +93,19 @@ public class FuelAggregationController {
     public ResponseEntity<SuccessResponse<Void>> createFuelAggregation(
             @Valid @RequestBody FuelAggregationCreateRequest request) {
         fuelAggregationService.createFuelAggregation(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "유류집계 삭제", description = "하나 이상의 유류집계 ID를 받아 해당 유류집계를 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "유류집계를 찾을 수 없음")
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteFuelAggregations(
+            @RequestBody DeleteFuelAggregationsRequest request) {
+        fuelAggregationService.deleteFuelAggregations(request);
         return ResponseEntity.ok().build();
     }
 
