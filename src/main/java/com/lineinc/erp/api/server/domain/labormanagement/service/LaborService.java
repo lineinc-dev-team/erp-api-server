@@ -30,11 +30,16 @@ public class LaborService {
      * 노무 등록
      */
     public void createLabor(LaborCreateRequest request) {
-        // 외주업체 조회
+        // 외주업체 조회 및 본사 인력 여부 판단
         OutsourcingCompany outsourcingCompany = null;
-        if (request.outsourcingCompanyId() != null) {
+        Boolean isHeadOffice = false;
+
+        if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() != 0) {
             outsourcingCompany = outsourcingCompanyService
                     .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+        } else if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() == 0) {
+            // outsourcingCompanyId가 0인 경우 본사 인력으로 처리
+            isHeadOffice = true;
         }
 
         Labor labor = Labor.builder()
@@ -42,6 +47,7 @@ public class LaborService {
                 .typeDescription(request.typeDescription())
                 .workType(request.workType())
                 .workTypeDescription(request.workTypeDescription())
+                .isHeadOffice(isHeadOffice)
                 .mainWork(request.mainWork())
                 .dailyWage(request.dailyWage())
                 .bankName(request.bankName())

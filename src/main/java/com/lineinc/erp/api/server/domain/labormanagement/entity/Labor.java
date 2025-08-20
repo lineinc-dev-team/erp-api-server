@@ -26,6 +26,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -79,6 +80,13 @@ public class Labor extends BaseEntity {
     @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String workTypeDescription;
+
+    /**
+     * 본사 인력 여부
+     */
+    @DiffInclude
+    @Column
+    private Boolean isHeadOffice;
 
     /**
      * 주작업
