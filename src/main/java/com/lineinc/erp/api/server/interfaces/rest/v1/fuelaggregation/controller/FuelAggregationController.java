@@ -21,7 +21,6 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
-import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.AddFuelInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationDownloadRequest;
@@ -109,21 +108,6 @@ public class FuelAggregationController {
     public ResponseEntity<Void> deleteFuelAggregations(
             @RequestBody DeleteFuelAggregationsRequest request) {
         fuelAggregationService.deleteFuelAggregations(request);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "유류정보 추가", description = "기존 유류집계에 유류정보를 추가합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "유류정보 추가 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "유류집계를 찾을 수 없음")
-    })
-    @PostMapping("/{id}/fuel-infos")
-    @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.CREATE)
-    public ResponseEntity<Void> addFuelInfoToAggregation(
-            @PathVariable Long id,
-            @Valid @RequestBody AddFuelInfoRequest request) {
-        fuelAggregationService.addFuelInfoToAggregation(id, request);
         return ResponseEntity.ok().build();
     }
 
