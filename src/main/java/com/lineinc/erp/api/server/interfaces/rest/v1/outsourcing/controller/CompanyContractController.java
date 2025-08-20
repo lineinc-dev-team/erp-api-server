@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractChangeHistory;
@@ -131,6 +132,24 @@ public class CompanyContractController {
                 .map(type -> new ContractCategoryTypeResponse(type.name(), type.getLabel()))
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
+    @Operation(summary = "차량번호 키워드 검색", description = "차량번호로 간단한 검색을 수행합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/equipments/vehicle-numbers/search")
+    public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> searchVehicleNumber(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @RequestParam(required = false) String keyword) {
+        Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> slice = outsourcingCompanyContractService
+                .searchVehicleNumber(keyword,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                                sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "외주업체 계약 등록", description = "외주업체 계약 정보를 등록합니다")

@@ -716,4 +716,18 @@ public class OutsourcingCompanyContractService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND));
     }
+
+    @Transactional(readOnly = true)
+    public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> searchVehicleNumber(String keyword,
+            Pageable pageable) {
+        Slice<OutsourcingCompanyContractEquipment> equipmentSlice;
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            equipmentSlice = equipmentRepository.findAllBy(pageable);
+        } else {
+            equipmentSlice = equipmentRepository.findByVehicleNumberContainingIgnoreCase(keyword.trim(), pageable);
+        }
+
+        return equipmentSlice.map(ContractEquipmentResponse.ContractEquipmentSimpleResponse::from);
+    }
 }
