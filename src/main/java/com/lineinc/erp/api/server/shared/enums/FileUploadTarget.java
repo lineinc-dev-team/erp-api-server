@@ -11,7 +11,8 @@ public enum FileUploadTarget {
     MANAGEMENT_COST("management-cost"),
     STEEL_MANAGEMENT("steel-management"),
     MATERIAL_MANAGEMENT("material-management"),
-    FUEL_AGGREGATION("fuel-aggregation");
+    FUEL_AGGREGATION("fuel-aggregation"),
+    LABOR_MANAGEMENT("labor-management");
 
     private final String directory;
 
