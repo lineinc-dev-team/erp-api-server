@@ -95,7 +95,6 @@ public class MaterialManagementController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping("/detail-names/search")
-    @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementNameResponse>>> getMaterialManagementDetailNames(
             @Valid PageRequest pageRequest,
             @RequestParam(required = false) String keyword) {

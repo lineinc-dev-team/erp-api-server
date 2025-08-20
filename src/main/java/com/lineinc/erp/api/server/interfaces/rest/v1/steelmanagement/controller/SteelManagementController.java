@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
@@ -30,6 +32,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementDetailViewResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -117,27 +120,21 @@ public class SteelManagementController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    // @Operation(summary = "강재수불부 상세 품명 키워드 검색", description = "상세 품명으로 간단한 검색을
-    // 수행합니다.")
-    // @ApiResponses({
-    // @ApiResponse(responseCode = "200", description = "조회 성공")
-    // })
-    // @GetMapping("/detail-names/search")
-    // @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action =
-    // PermissionAction.VIEW)
-    // public
-    // ResponseEntity<SuccessResponse<SliceResponse<SteelManagementNameResponse>>>
-    // getSteelManagementDetailNames(
-    // @Valid PageRequest pageRequest,
-    // @RequestParam(required = false) String keyword) {
-    // Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
-    // pageRequest.size());
-    // Slice<SteelManagementNameResponse> slice =
-    // steelManagementService.getSteelManagementNames(keyword, pageable);
+    @Operation(summary = "강재수불부 상세 품명 키워드 검색", description = "상세 품명으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/detail-names/search")
+    public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementNameResponse>>> getSteelManagementDetailNames(
+            @Valid PageRequest pageRequest,
+            @RequestParam(required = false) String keyword) {
+        Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
+                pageRequest.size());
+        Slice<SteelManagementNameResponse> slice = steelManagementService.getSteelManagementNames(keyword, pageable);
 
-    // return ResponseEntity.ok(SuccessResponse.of(
-    // new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
-    // }
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
 
     @Operation(summary = "강재수불부 삭제", description = "하나 이상의 강재수불부 ID를 받아 해당 데이터를 삭제합니다.")
     @ApiResponses({

@@ -1,5 +1,26 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.site.controller;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
@@ -17,32 +38,23 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.sitefile.
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
-import com.lineinc.erp.api.server.shared.dto.response.*;
+import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
+import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
+import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Slice;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/sites")
@@ -74,23 +86,17 @@ public class SiteController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
-            @Valid SiteListRequest request
-    ) {
+            @Valid SiteListRequest request) {
         Page<SiteResponse> page = siteService.getAllSites(
                 userDetails.getUserId(),
                 request,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort())
-        );
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())
-        ));
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(
-            summary = "현장 목록 엑셀 다운로드",
-            description = "검색 조건에 맞는 현장 목록을 엑셀 파일로 다운로드합니다."
-    )
+    @Operation(summary = "현장 목록 엑셀 다운로드", description = "검색 조건에 맞는 현장 목록을 엑셀 파일로 다운로드합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
@@ -102,8 +108,7 @@ public class SiteController {
             @Valid SortRequest sortRequest,
             @Valid SiteListRequest request,
             @Valid SiteDownloadRequest siteDownloadRequest,
-            HttpServletResponse response
-    ) throws IOException {
+            HttpServletResponse response) throws IOException {
         List<String> parsed = DownloadFieldUtils.parseFields(siteDownloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed, SiteDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "현장 목록.xlsx");
@@ -112,8 +117,7 @@ public class SiteController {
                 userDetails.getUserId(),
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
-                parsed
-        )) {
+                parsed)) {
             workbook.write(response.getOutputStream());
         }
     }
@@ -126,8 +130,7 @@ public class SiteController {
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteSites(
-            @RequestBody DeleteSitesRequest siteIds
-    ) {
+            @RequestBody DeleteSitesRequest siteIds) {
         siteService.deleteSites(siteIds);
         return ResponseEntity.ok().build();
     }
@@ -141,8 +144,7 @@ public class SiteController {
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SiteDetailResponse>> getSiteDetail(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         SiteDetailResponse siteResponse = siteService.getSiteById(id, userDetails.getUserId());
         return ResponseEntity.ok(SuccessResponse.of(siteResponse));
     }
@@ -157,8 +159,7 @@ public class SiteController {
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateSite(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateSiteRequest request
-    ) {
+            @Valid @RequestBody UpdateSiteRequest request) {
         siteService.updateSite(id, request);
         return ResponseEntity.ok().build();
     }
@@ -168,18 +169,15 @@ public class SiteController {
             @ApiResponse(responseCode = "200", description = "검색 성공")
     })
     @GetMapping("/search")
-    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<SiteResponse.SiteSimpleResponse>>> searchClientCompanyByName(
             @Valid SortRequest sortRequest,
             @Valid PageRequest pageRequest,
-            @RequestParam(required = false) String keyword
-    ) {
+            @RequestParam(required = false) String keyword) {
         Slice<SiteResponse.SiteSimpleResponse> slice = siteService.searchSiteByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())
-        ));
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "현장 구분 목록 조회", description = "현장 구분 목록을 반환합니다")
@@ -209,8 +207,7 @@ public class SiteController {
     public ResponseEntity<SuccessResponse<SliceResponse<SiteChangeHistoryResponse>>> getSiteChangeHistories(
             @PathVariable Long id,
             @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest
-    ) {
+            @Valid SortRequest sortRequest) {
         Slice<SiteChangeHistoryResponse> slice = siteService.getSiteChangeHistories(id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
