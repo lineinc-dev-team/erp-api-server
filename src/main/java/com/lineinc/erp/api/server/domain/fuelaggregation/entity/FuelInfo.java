@@ -9,6 +9,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest.FuelInfoUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -93,4 +94,14 @@ public class FuelInfo extends BaseEntity {
     @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    public void updateFrom(FuelInfoUpdateRequest request, OutsourcingCompany outsourcingCompany,
+            OutsourcingCompanyContractDriver driver, OutsourcingCompanyContractEquipment equipment) {
+        this.outsourcingCompany = outsourcingCompany;
+        this.driver = driver;
+        this.equipment = equipment;
+        this.fuelType = request.fuelType();
+        this.fuelAmount = request.fuelAmount();
+        this.memo = request.memo();
+    }
 }

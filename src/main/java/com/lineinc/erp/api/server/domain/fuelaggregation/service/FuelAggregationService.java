@@ -1,8 +1,11 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,7 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationChangeType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
@@ -24,15 +30,18 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.AddFuelInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,6 +55,8 @@ public class FuelAggregationService {
     private final FuelInfoRepository fuelInfoRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
+    private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
+    private final Javers javers;
 
     @Transactional
     public void createFuelAggregation(FuelAggregationCreateRequest request) {
@@ -168,4 +179,76 @@ public class FuelAggregationService {
         }
         fuelAggregationRepository.saveAll(fuelAggregations);
     }
+
+    @Transactional
+    public void addFuelInfoToAggregation(Long fuelAggregationId, AddFuelInfoRequest request) {
+        FuelAggregation fuelAggregation = fuelAggregationRepository.findById(fuelAggregationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
+
+        // 업체, 기사, 장비 ID 검증
+        OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+        OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
+                .getDriverByIdOrThrow(request.driverId());
+        OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
+                .getEquipmentByIdOrThrow(request.equipmentId());
+
+        FuelInfo fuelInfo = FuelInfo.builder()
+                .fuelAggregation(fuelAggregation)
+                .outsourcingCompany(outsourcingCompany)
+                .driver(driver)
+                .equipment(equipment)
+                .fuelType(request.fuelType())
+                .fuelAmount(request.fuelAmount())
+                .memo(request.memo())
+                .build();
+
+        fuelInfoRepository.save(fuelInfo);
+    }
+
+    @Transactional
+    public void updateFuelAggregation(Long id, FuelAggregationUpdateRequest request) {
+        FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
+
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        if (!siteProcess.getSite().getId().equals(site.getId())) {
+            throw new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+        }
+
+        fuelAggregation.syncTransientFields();
+        FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
+
+        fuelAggregation.updateFrom(request, site, siteProcess);
+        fuelAggregationRepository.save(fuelAggregation);
+
+        Diff diff = javers.compare(oldSnapshot, fuelAggregation);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
+                    .fuelAggregation(fuelAggregation)
+                    .type(FuelAggregationChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            fuelAggregationChangeHistoryRepository.save(changeHistory);
+        }
+
+        // 변경이력 memo 업데이트 처리
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (FuelAggregationUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                fuelAggregationChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getFuelAggregation().getId().equals(fuelAggregation.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
+    }
+
 }

@@ -12,6 +12,8 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -66,14 +68,14 @@ public class FuelAggregation extends BaseEntity {
     /**
      * 일자
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private OffsetDateTime date;
 
     /**
      * 날씨
      */
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
     private WeatherType weather;
@@ -85,6 +87,14 @@ public class FuelAggregation extends BaseEntity {
     @Transient
     @DiffInclude
     private String processName;
+
+    @Transient
+    @DiffInclude
+    private String dateFormat;
+
+    @Transient
+    @DiffInclude
+    private String weatherName;
 
     /**
      * 유류정보 목록
@@ -100,23 +110,20 @@ public class FuelAggregation extends BaseEntity {
     public void syncTransientFields() {
         this.siteName = this.site != null ? this.site.getName() : null;
         this.processName = this.siteProcess != null ? this.siteProcess.getName() : null;
+        this.dateFormat = this.date != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.getDate()) : null;
+        this.weatherName = this.weather != null ? this.weather.getLabel() : null;
     }
 
-    // public void updateFrom(FuelAggregationUpdateRequest request, Site site,
-    // SiteProcess siteProcess) {
-    // this.site = site;
-    // this.siteProcess = siteProcess;
+    public void updateFrom(FuelAggregationUpdateRequest request, Site site, SiteProcess siteProcess) {
+        this.site = site;
+        this.siteProcess = siteProcess;
 
-    // if (request.date() != null) {
-    // this.date = request.date();
-    // }
-    // if (request.weather() != null) {
-    // this.weather = request.weather();
-    // }
-    // if (request.memo() != null) {
-    // this.memo = request.memo();
-    // }
-
-    // syncTransientFields();
-    // }
+        if (request.date() != null) {
+            this.date = DateTimeFormatUtils.toOffsetDateTime(request.date());
+        }
+        if (request.weather() != null) {
+            this.weather = request.weather();
+        }
+        syncTransientFields();
+    }
 }
