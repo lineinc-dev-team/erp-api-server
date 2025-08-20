@@ -1,7 +1,11 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.service;
 
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -82,5 +87,59 @@ public class FuelAggregationService {
     public Page<FuelAggregationListResponse> getAllFuelAggregations(FuelAggregationListRequest request,
             Pageable pageable) {
         return fuelAggregationRepository.findAll(request, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(FuelAggregationListRequest request, Sort sort, List<String> fields) {
+        List<FuelAggregationListResponse> responses = fuelAggregationRepository.findAllWithoutPaging(request, sort);
+
+        return ExcelExportUtils.generateWorkbook(
+                responses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue);
+    }
+
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "siteName" -> "현장명";
+            case "processName" -> "공정명";
+            case "date" -> "일자";
+            case "outsourcingCompanyName" -> "업체명";
+            case "driverName" -> "기사명";
+            case "vehicleNumber" -> "차량번호";
+            case "specification" -> "규격";
+            case "fuelType" -> "유종";
+            case "fuelAmount" -> "주유량";
+            case "createdAtAndUpdatedAt" -> "등록/수정일";
+            case "memo" -> "비고";
+            default -> null;
+        };
+    }
+
+    private String getExcelCellValue(FuelAggregationListResponse response, String field) {
+        return switch (field) {
+            case "id" -> String.valueOf(response.id());
+            case "siteName" -> response.site() != null ? response.site().name() : "";
+            case "processName" -> response.process() != null ? response.process().name() : "";
+            case "date" -> response.date() != null ? response.date().toString() : "";
+            case "outsourcingCompanyName" ->
+                response.fuelInfo() != null && response.fuelInfo().outsourcingCompany() != null
+                        ? response.fuelInfo().outsourcingCompany().name()
+                        : "";
+            case "driverName" -> response.fuelInfo() != null ? response.fuelInfo().driverName() : "";
+            case "vehicleNumber" -> response.fuelInfo() != null ? response.fuelInfo().vehicleNumber() : "";
+            case "specification" -> response.fuelInfo() != null ? response.fuelInfo().specification() : "";
+            case "fuelType" -> response.fuelInfo() != null ? response.fuelInfo().fuelType() : "";
+            case "fuelAmount" -> response.fuelInfo() != null ? String.valueOf(response.fuelInfo().fuelAmount()) : "";
+            case "createdAtAndUpdatedAt" ->
+                response.createdAt() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
+                        + " / "
+                        + DateTimeFormatUtils.formatKoreaLocalDate(response.updatedAt())
+                        : "";
+            case "memo" -> response.fuelInfo() != null ? response.fuelInfo().memo() : "";
+            default -> "";
+        };
     }
 }

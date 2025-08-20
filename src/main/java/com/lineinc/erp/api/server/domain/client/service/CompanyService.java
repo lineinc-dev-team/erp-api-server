@@ -1,25 +1,8 @@
 package com.lineinc.erp.api.server.domain.client.service;
 
-import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
-import com.lineinc.erp.api.server.domain.user.service.UserService;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
-import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
-import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.DeleteClientCompaniesRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyContactResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -32,8 +15,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
+import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
+import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.DeleteClientCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyContactResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +53,8 @@ public class CompanyService {
     public void createClientCompany(ClientCompanyCreateRequest request) {
 
         if (companyRepository.existsByBusinessNumber(request.businessNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
         }
 
         // 1. ClientCompany 객체 먼저 빌드
@@ -87,7 +90,8 @@ public class CompanyService {
     @Transactional(readOnly = true)
     public ClientCompany getClientCompanyByIdOrThrow(Long id) {
         return companyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.CLIENT_COMPANY_NOT_FOUND));
     }
 
     @Transactional
@@ -147,7 +151,6 @@ public class CompanyService {
         fileService.updateClientCompanyFiles(clientCompany, request.files());
     }
 
-
     @Transactional(readOnly = true)
     public Workbook downloadExcel(ClientCompanyListRequest request, Sort sort, List<String> fields) {
         List<ClientCompanyResponse> clientCompanyResponses = companyRepository.findAllWithoutPaging(request, sort)
@@ -159,8 +162,7 @@ public class CompanyService {
                 clientCompanyResponses,
                 fields,
                 this::getExcelHeaderName,
-                this::getExcelCellValue
-        );
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -200,13 +202,14 @@ public class CompanyService {
             case "landlineNumber" -> company.landlineNumber();
             case "contactName" -> mainContact != null ? mainContact.name() : "";
             case "contactPositionAndDepartment" ->
-                    mainContact != null ? mainContact.position() + " / " + mainContact.department() : "";
+                mainContact != null ? mainContact.position() + " / " + mainContact.department() : "";
             case "contactLandlineNumberAndEmail" ->
-                    mainContact != null ? mainContact.landlineNumber() + " / " + mainContact.email() : "";
+                mainContact != null ? mainContact.landlineNumber() + " / " + mainContact.email() : "";
             case "userName" -> company.user().username();
             case "isActive" -> company.isActive() ? "Y" : "N";
             case "createdAtAndUpdatedAt" ->
-                    DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/" + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
+                DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/"
+                        + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
             case "hasFile" -> company.hasFile() ? "Y" : "N";
             case "memo" -> company.memo();
             default -> null;
@@ -220,7 +223,8 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanyResponse.ClientCompanySimpleResponse> searchClientCompanyByName(String keyword, Pageable pageable) {
+    public Slice<ClientCompanyResponse.ClientCompanySimpleResponse> searchClientCompanyByName(String keyword,
+            Pageable pageable) {
         Slice<ClientCompany> companySlice;
 
         if (keyword == null || keyword.isBlank()) {
@@ -233,9 +237,11 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(Long clientCompanyId, Pageable pageable) {
+    public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(Long clientCompanyId,
+            Pageable pageable) {
         ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
-        Slice<ClientCompanyChangeHistory> historySlice = companyChangeHistoryRepository.findByClientCompany(clientCompany, pageable);
+        Slice<ClientCompanyChangeHistory> historySlice = companyChangeHistoryRepository
+                .findByClientCompany(clientCompany, pageable);
         return historySlice.map(ClientCompanyChangeHistoryResponse::from);
     }
 }

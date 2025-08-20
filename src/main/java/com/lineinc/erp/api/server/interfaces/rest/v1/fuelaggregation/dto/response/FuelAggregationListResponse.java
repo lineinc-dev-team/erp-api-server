@@ -41,9 +41,11 @@ public record FuelAggregationListResponse(
     public record FuelInfoListResponse(
             @Schema(description = "유류정보 ID", example = "1") Long id,
 
+            @Schema(description = "기사명", example = "김철수") String driverName,
+
             @Schema(description = "차량번호", example = "12가3456") String vehicleNumber,
 
-            @Schema(description = "장비명", example = "굴삭기") String equipmentName,
+            @Schema(description = "규격", example = "굴삭기") String specification,
 
             @Schema(description = "유종", example = "경유") String fuelType,
 
@@ -62,6 +64,7 @@ public record FuelAggregationListResponse(
         public static FuelInfoListResponse from(FuelInfo entity) {
             return new FuelInfoListResponse(
                     entity.getId(),
+                    entity.getDriver() != null ? entity.getDriver().getName() : null,
                     entity.getEquipment() != null ? entity.getEquipment().getVehicleNumber() : null,
                     entity.getEquipment() != null ? entity.getEquipment().getSpecification() : null,
                     entity.getFuelType() != null ? entity.getFuelType().getLabel() : null,
