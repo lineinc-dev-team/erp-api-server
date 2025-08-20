@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.WeatherTypeResponse;
@@ -111,6 +113,19 @@ public class FuelAggregationController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+
+    @Operation(summary = "유류집계 상세 조회", description = "유류집계 상세 정보를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유류집계 상세 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유류집계를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<FuelAggregationDetailResponse>> getFuelAggregationById(
+            @PathVariable Long id) {
+        FuelAggregationDetailResponse response = fuelAggregationService.getFuelAggregationById(id);
+        return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
     @Operation(summary = "유류집계 목록 엑셀 다운로드", description = "검색 조건에 맞는 유류집계 목록을 엑셀 파일로 다운로드합니다.")

@@ -6,8 +6,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
@@ -25,6 +27,7 @@ import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -141,5 +144,14 @@ public class FuelAggregationService {
             case "memo" -> response.fuelInfo() != null ? response.fuelInfo().memo() : "";
             default -> "";
         };
+    }
+
+    @Transactional(readOnly = true)
+    public FuelAggregationDetailResponse getFuelAggregationById(Long id) {
+        FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
+
+        return FuelAggregationDetailResponse.from(fuelAggregation);
     }
 }

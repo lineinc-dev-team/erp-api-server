@@ -45,4 +45,5 @@ public final class ValidationMessages {
     public static final String USER_NOT_ACTIVE = "비활성화된 계정입니다.";
     public static final String USER_NOT_FOUND = "존재하지 않는 사용자입니다.";
     public static final String UNSUPPORTED_CONTENT_TYPE = "지원하지 않는 Content-Type입니다.";
+    public static final String FUEL_AGGREGATION_NOT_FOUND = "유류집계를 찾을 수 없습니다.";
 }
