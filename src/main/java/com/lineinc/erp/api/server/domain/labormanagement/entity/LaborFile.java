@@ -38,7 +38,7 @@ public class LaborFile extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id", nullable = false)
+    @JoinColumn(name = "labor_id")
     private Labor labor;
 
     /**
@@ -69,4 +69,10 @@ public class LaborFile extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고 / 메모
 
+    /**
+     * 노무를 설정합니다.
+     */
+    public void setLabor(Labor labor) {
+        this.labor = labor;
+    }
 }

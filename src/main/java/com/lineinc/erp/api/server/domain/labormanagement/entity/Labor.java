@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.labormanagement.entity;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -21,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -118,14 +120,14 @@ public class Labor extends BaseEntity {
      */
     @DiffInclude
     @Column
-    private LocalDate hireDate;
+    private OffsetDateTime hireDate;
 
     /**
      * 퇴사일
      */
     @DiffInclude
     @Column
-    private LocalDate resignationDate;
+    private OffsetDateTime resignationDate;
 
     /**
      * 외주업체 연결 (용역, 현장계약직인 경우)
@@ -170,4 +172,20 @@ public class Labor extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    /**
+     * 첨부파일 목록
+     */
+    @DiffIgnore
+    @OneToMany(mappedBy = "labor", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<LaborFile> files;
+
+    /**
+     * 파일 목록을 설정합니다.
+     */
+    public void setFiles(List<LaborFile> files) {
+        this.files = files;
+        if (files != null) {
+            files.forEach(file -> file.setLabor(this));
+        }
+    }
 }
