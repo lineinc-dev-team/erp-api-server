@@ -31,6 +31,7 @@ public final class ValidationMessages {
     public static final String OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND = "존재하지 않는 외주업체 계약입니다.";
     public static final String OUTSOURCING_COMPANY_CONTRACT_DRIVER_NOT_FOUND = "기사를 찾을 수 없습니다.";
     public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND = "장비를 찾을 수 없습니다.";
+    public static final String LABOR_NOT_FOUND = "존재하지 않는 노무입니다.";
     public static final String PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다.";
     public static final String RATE_LIMIT_EXCEEDED = "요청 횟수 제한을 초과했습니다.";
     public static final String RESOURCE_NOT_FOUND = "해당 리소스를 찾을 수 없습니다.";
