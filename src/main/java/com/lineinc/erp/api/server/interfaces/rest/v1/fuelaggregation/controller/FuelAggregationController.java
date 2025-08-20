@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.controller
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +17,17 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregation
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.WeatherTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.dto.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
+import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -76,5 +84,26 @@ public class FuelAggregationController {
             @Valid @RequestBody FuelAggregationCreateRequest request) {
         fuelAggregationService.createFuelAggregation(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "유류집계 목록 조회", description = "필터 조건에 맞는 유류집계 목록을 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유류집계 목록 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/list")
+    @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationListResponse>>> getFuelAggregations(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid FuelAggregationListRequest request) {
+
+        Page<FuelAggregationListResponse> page = fuelAggregationService.getAllFuelAggregations(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 }

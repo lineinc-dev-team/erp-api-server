@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 
 @Repository
-public interface FuelAggregationRepository extends JpaRepository<FuelAggregation, Long> {
+public interface FuelAggregationRepository
+        extends JpaRepository<FuelAggregation, Long>, FuelAggregationRepositoryCustom {
 
 }

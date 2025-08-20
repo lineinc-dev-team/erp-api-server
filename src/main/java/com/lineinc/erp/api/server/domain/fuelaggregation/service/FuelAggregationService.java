@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +19,9 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
@@ -72,5 +76,11 @@ public class FuelAggregationService {
             fuelInfoRepository.save(fuelInfoEntity);
         }
 
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FuelAggregationListResponse> getAllFuelAggregations(FuelAggregationListRequest request,
+            Pageable pageable) {
+        return fuelAggregationRepository.findAll(request, pageable);
     }
 }
