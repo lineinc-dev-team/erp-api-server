@@ -1,16 +1,25 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.WorkTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,5 +47,33 @@ public class LaborController {
     public ResponseEntity<Void> createLabor(@Valid @RequestBody LaborCreateRequest request) {
         laborService.createLabor(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "노무 구분 조회", description = "사용 가능한 노무 구분 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/labor-types")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<LaborTypeResponse>>> getLaborTypes() {
+        List<LaborTypeResponse> laborTypes = Arrays.stream(LaborType.values())
+                .map(LaborTypeResponse::from)
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(laborTypes));
+    }
+
+    @Operation(summary = "공종 구분 조회", description = "사용 가능한 공종 구분 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/work-types")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<WorkTypeResponse>>> getWorkTypes() {
+        List<WorkTypeResponse> workTypes = Arrays.stream(WorkType.values())
+                .map(WorkTypeResponse::from)
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(workTypes));
     }
 }
