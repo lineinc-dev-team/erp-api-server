@@ -9,7 +9,7 @@ import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 public interface LaborRepository extends JpaRepository<Labor, Long> {
 
     /**
-     * 주민등록번호로 노무 조회 (삭제되지 않은 것만)
+     * 이름과 주민등록번호로 중복 체크 (삭제되지 않은 것만)
      */
-    boolean existsByResidentNumberAndDeletedFalse(String residentNumber);
+    boolean existsByNameAndResidentNumber(String name, String residentNumber);
 }

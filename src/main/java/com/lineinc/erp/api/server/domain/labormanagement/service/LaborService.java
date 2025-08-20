@@ -30,6 +30,11 @@ public class LaborService {
      * 노무 등록
      */
     public void createLabor(LaborCreateRequest request) {
+        // 이름과 주민등록번호 중복 체크
+        if (laborRepository.existsByNameAndResidentNumber(request.name(), request.residentNumber())) {
+            throw new IllegalArgumentException(ValidationMessages.LABOR_ALREADY_EXISTS);
+        }
+
         // 외주업체 조회 및 본사 인력 여부 판단
         OutsourcingCompany outsourcingCompany = null;
         Boolean isHeadOffice = false;
