@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum FuelType {
     GASOLINE("휘발유"),
     DIESEL("경유"),
-    UREA("요소수");
+    UREA("요소수"),
+    ETC("기타");
 
     private final String label;
 }
