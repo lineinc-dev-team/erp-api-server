@@ -50,6 +50,8 @@ import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.web.bind.annotation.PathVariable;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
 
 @RestController
 @RequestMapping("/api/v1/labors")
@@ -170,5 +172,17 @@ public class LaborController {
                 parsed)) {
             workbook.write(response.getOutputStream());
         }
+    }
+
+    @Operation(summary = "인력정보 상세 조회", description = "특정 인력정보의 상세 정보를 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "인력정보 상세 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "인력정보를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<LaborDetailResponse>> getLaborDetail(@PathVariable Long id) {
+        LaborDetailResponse laborResponse = laborService.getLaborById(id);
+        return ResponseEntity.ok(SuccessResponse.of(laborResponse));
     }
 }

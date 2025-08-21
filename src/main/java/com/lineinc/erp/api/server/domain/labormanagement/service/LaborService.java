@@ -32,6 +32,7 @@ import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -152,6 +153,17 @@ public class LaborService {
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+    }
+
+    /**
+     * 특정 인력정보 조회
+     */
+    @Transactional(readOnly = true)
+    public LaborDetailResponse getLaborById(Long id) {
+        Labor labor = laborRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.LABOR_NOT_FOUND));
+        return LaborDetailResponse.from(labor);
     }
 
     /**
