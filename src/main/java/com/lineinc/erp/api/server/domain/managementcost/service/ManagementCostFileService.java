@@ -24,7 +24,6 @@ public class ManagementCostFileService {
             for (ManagementCostFileCreateRequest fileReq : files) {
                 ManagementCostFile file = ManagementCostFile.builder()
                         .managementCost(managementCost)
-                        .name(fileReq.name())
                         .fileUrl(fileReq.fileUrl())
                         .originalFileName(fileReq.originalFileName())
                         .memo(fileReq.memo())
@@ -35,18 +34,16 @@ public class ManagementCostFileService {
     }
 
     @Transactional
-    public void updateManagementCostFiles(ManagementCost managementCost, List<ManagementCostFileUpdateRequest> requests) {
+    public void updateManagementCostFiles(ManagementCost managementCost,
+            List<ManagementCostFileUpdateRequest> requests) {
         EntitySyncUtils.syncList(
                 managementCost.getFiles(),
                 requests,
-                (ManagementCostFileUpdateRequest dto) ->
-                        ManagementCostFile.builder()
-                                .managementCost(managementCost)
-                                .name(dto.name())
-                                .fileUrl(dto.fileUrl())
-                                .originalFileName(dto.originalFileName())
-                                .memo(dto.memo())
-                                .build()
-        );
+                (ManagementCostFileUpdateRequest dto) -> ManagementCostFile.builder()
+                        .managementCost(managementCost)
+                        .fileUrl(dto.fileUrl())
+                        .originalFileName(dto.originalFileName())
+                        .memo(dto.memo())
+                        .build());
     }
 }

@@ -44,12 +44,6 @@ public class ManagementCostFile extends BaseEntity implements UpdatableFrom<Mana
     private ManagementCost managementCost;
 
     /**
-     * 문서명 (사용자가 지정하는 파일 이름)
-     */
-    @Column(nullable = false)
-    private String name;
-
-    /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @Column
@@ -68,7 +62,6 @@ public class ManagementCostFile extends BaseEntity implements UpdatableFrom<Mana
     private String memo;
 
     public void updateFrom(ManagementCostFileUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
         Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);

@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.managementcost.entity;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
@@ -38,15 +39,19 @@ public class ManagementCost extends BaseEntity {
     @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_id")
+    private OutsourcingCompany outsourcingCompany;
+
     /**
-     * 품목 타입 (예: 전기, 수도 등)
+     * 항목 타입 (예: 전기, 수도 등)
      */
     @Enumerated(EnumType.STRING)
     @Column
     private ItemType itemType;
 
     /**
-     * 품목 설명 (예: 6월 전기요금 등)
+     * 항목 설명 (예: 6월 전기요금 등)
      */
     @Column
     private String itemDescription;
@@ -75,6 +80,10 @@ public class ManagementCost extends BaseEntity {
                 .map(DateTimeFormatUtils::toOffsetDateTime)
                 .ifPresent(val -> this.paymentDate = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
+
+    public void changeOutsourcingCompany(OutsourcingCompany outsourcingCompany) {
+        this.outsourcingCompany = outsourcingCompany;
     }
 
     public void changeSite(Site site) {
