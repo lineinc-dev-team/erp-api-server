@@ -197,4 +197,11 @@ public class Labor extends BaseEntity {
             files.forEach(file -> file.setLabor(this));
         }
     }
+
+    /**
+     * 첨부파일 존재 여부를 반환합니다.
+     */
+    public Boolean getHasFile() {
+        return files != null && !files.isEmpty();
+    }
 }

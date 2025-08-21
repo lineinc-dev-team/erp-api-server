@@ -86,7 +86,7 @@ public class LaborController {
         return ResponseEntity.ok(SuccessResponse.of(workTypes));
     }
 
-    @Operation(summary = "인력정보 목록 조회 (작업중)", description = "조건에 따른 인력정보 목록을 조회합니다.")
+    @Operation(summary = "인력정보 목록 조회", description = "조건에 따른 인력정보 목록을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())

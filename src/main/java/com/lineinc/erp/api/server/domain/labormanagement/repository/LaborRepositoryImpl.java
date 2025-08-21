@@ -76,7 +76,11 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (request.type() != null) {
-            builder.and(labor.type.eq(LaborType.valueOf(request.type())));
+            builder.and(labor.type.eq((request.type())));
+        }
+
+        if (StringUtils.hasText(request.typeDescription())) {
+            builder.and(labor.typeDescription.containsIgnoreCase(request.typeDescription().trim()));
         }
 
         if (StringUtils.hasText(request.name())) {
@@ -85,6 +89,10 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
 
         if (StringUtils.hasText(request.residentNumber())) {
             builder.and(labor.residentNumber.containsIgnoreCase(request.residentNumber().trim()));
+        }
+
+        if (request.isHeadOffice() != null) {
+            builder.and(labor.isHeadOffice.eq(request.isHeadOffice()));
         }
 
         if (request.outsourcingCompanyId() != null) {
