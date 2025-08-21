@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
+package com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

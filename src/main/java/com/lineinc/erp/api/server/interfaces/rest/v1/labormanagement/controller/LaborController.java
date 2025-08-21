@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.WorkTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -37,6 +38,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
@@ -216,5 +219,21 @@ public class LaborController {
         Slice<LaborChangeHistoryResponse> slice = laborService.getLaborChangeHistories(id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "인력명 키워드 검색", description = "인력명으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/search")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
+            @Valid PageRequest pageRequest,
+            @RequestParam(required = false) String keyword) {
+        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
+        Slice<LaborNameResponse> slice = laborService.getLaborNames(keyword, pageable);
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 }

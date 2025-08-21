@@ -22,6 +22,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -39,7 +40,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.LaborNameResponse;
 
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;

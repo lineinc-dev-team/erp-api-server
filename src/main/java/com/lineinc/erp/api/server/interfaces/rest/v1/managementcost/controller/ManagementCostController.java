@@ -4,11 +4,11 @@ import com.lineinc.erp.api.server.domain.managementcost.service.ManagementCostSe
 import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemTypeResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -73,22 +73,6 @@ public class ManagementCostController {
                 .map(ItemTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(itemTypes));
-    }
-
-    @Operation(summary = "인력명 키워드 검색", description = "인력명으로 간단한 검색을 수행합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
-    @GetMapping("/labor-names/search")
-    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
-            @Valid PageRequest pageRequest,
-            @RequestParam(required = false) String keyword) {
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
-        Slice<LaborNameResponse> slice = managementCostService.getLaborNames(keyword, pageable);
-
-        return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "관리비 ETC 항목 설명 키워드 검색", description = "itemType이 ETC인 모든 관리비의 항목 설명을 키워드로 검색합니다.")
