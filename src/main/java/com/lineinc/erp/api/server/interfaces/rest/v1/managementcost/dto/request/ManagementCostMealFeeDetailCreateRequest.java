@@ -14,8 +14,6 @@ public record ManagementCostMealFeeDetailCreateRequest(
 
         @Schema(description = "중식 개수", example = "25") Integer lunchCount,
 
-        @Schema(description = "석식 개수", example = "15") Integer dinnerCount,
-
         @Schema(description = "단가", example = "8000") Long unitPrice,
 
         @Schema(description = "금액", example = "200000") Long amount,
