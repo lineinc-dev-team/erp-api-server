@@ -7,9 +7,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
+
+import java.util.List;
 
 @Repository
 public interface LaborRepository extends JpaRepository<Labor, Long>, LaborRepositoryCustom {

@@ -20,6 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.data.domain.Sort;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
 import org.springframework.data.domain.Slice;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 @Service
 @RequiredArgsConstructor
@@ -134,6 +138,86 @@ public class LaborService {
             labor.markAsDeleted();
         }
         laborRepository.saveAll(labors);
+    }
+
+    /**
+     * 인력정보 엑셀 다운로드
+     */
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(LaborListRequest request, Sort sort, List<String> fields) {
+        List<LaborListResponse> laborResponses = laborRepository.findAllWithoutPaging(request, sort);
+
+        return ExcelExportUtils.generateWorkbook(
+                laborResponses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue);
+    }
+
+    /**
+     * 엑셀 헤더명 반환
+     */
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "type" -> "구분";
+            case "name" -> "이름";
+            case "residentNumber" -> "주민번호";
+            case "outsourcingCompanyName" -> "소속업체";
+            case "workType" -> "공종";
+            case "mainWork" -> "주 작업";
+            case "phoneNumber" -> "연락처";
+            case "dailyWage" -> "기준일당";
+            case "accountNumber" -> "계좌번호";
+            case "hireDate" -> "입사일";
+            case "resignationDate" -> "퇴사일";
+            case "hasFile" -> "첨부파일";
+            default -> null;
+        };
+    }
+
+    /**
+     * 엑셀 셀 값 반환
+     */
+    private String getExcelCellValue(LaborListResponse labor, String field) {
+        return switch (field) {
+            case "id" -> labor.id() != null ? labor.id().toString() : "";
+            case "type" -> labor.type() != null ? labor.type() : "";
+            case "name" -> labor.name() != null ? labor.name() : "";
+            case "residentNumber" -> labor.residentNumber() != null ? labor.residentNumber() : "";
+            case "outsourcingCompanyName" -> {
+                if (labor.isHeadOffice() != null && labor.isHeadOffice()) {
+                    yield AppConstants.LINE_INC_NAME;
+                } else {
+                    yield labor.outsourcingCompany() != null ? labor.outsourcingCompany().name() : "";
+                }
+            }
+            case "workType" -> labor.workType() != null ? labor.workType().getLabel() : "";
+            case "mainWork" -> labor.mainWork() != null ? labor.mainWork() : "";
+            case "phoneNumber" -> labor.phoneNumber() != null ? labor.phoneNumber() : "";
+            case "dailyWage" -> labor.dailyWage() != null ? labor.dailyWage().toString() : "";
+            case "accountNumber" -> {
+                String bankName = labor.bankName() != null ? labor.bankName() : "";
+                String accountNumber = labor.accountNumber() != null ? labor.accountNumber() : "";
+                if (!bankName.isEmpty() && !accountNumber.isEmpty()) {
+                    yield bankName + " " + accountNumber;
+                } else if (!bankName.isEmpty()) {
+                    yield bankName;
+                } else if (!accountNumber.isEmpty()) {
+                    yield accountNumber;
+                } else {
+                    yield "";
+                }
+            }
+            case "hireDate" -> labor.hireDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(labor.hireDate())
+                    : "";
+            case "resignationDate" -> labor.resignationDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(labor.resignationDate())
+                    : "";
+            case "hasFile" -> labor.hasFile() != null ? (labor.hasFile() ? "Y" : "N") : "";
+            default -> "";
+        };
     }
 
     /**

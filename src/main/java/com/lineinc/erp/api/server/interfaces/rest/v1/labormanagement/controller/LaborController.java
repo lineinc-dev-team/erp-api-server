@@ -44,6 +44,12 @@ import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.DeleteLaborsRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborDownloadRequest;
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import org.apache.poi.ss.usermodel.Workbook;
 
 @RestController
 @RequestMapping("/api/v1/labors")
@@ -140,5 +146,29 @@ public class LaborController {
     public ResponseEntity<Void> deleteLabors(@Valid @RequestBody DeleteLaborsRequest request) {
         laborService.deleteLaborsByIds(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "인력정보 목록 엑셀 다운로드", description = "검색 조건에 맞는 인력정보 목록을 엑셀 파일로 다운로드합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    public void downloadLaborsExcel(
+            @Valid SortRequest sortRequest,
+            @Valid LaborListRequest request,
+            @Valid LaborDownloadRequest laborDownloadRequest,
+            HttpServletResponse response) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(laborDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, LaborDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "인력정보 목록.xlsx");
+
+        try (Workbook workbook = laborService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed)) {
+            workbook.write(response.getOutputStream());
+        }
     }
 }

@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -70,6 +71,24 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
+    }
+
+    @Override
+    public List<LaborListResponse> findAllWithoutPaging(LaborListRequest request, Sort sort) {
+        BooleanBuilder condition = buildCondition(request);
+        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        List<com.lineinc.erp.api.server.domain.labormanagement.entity.Labor> content = queryFactory
+                .selectFrom(labor)
+                .leftJoin(labor.outsourcingCompany, outsourcingCompany).fetchJoin()
+                .leftJoin(labor.files, laborFile)
+                .where(condition)
+                .orderBy(orders)
+                .fetch();
+
+        return content.stream()
+                .map(LaborListResponse::from)
+                .toList();
     }
 
     private BooleanBuilder buildCondition(LaborListRequest request) {

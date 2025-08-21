@@ -16,6 +16,9 @@ public final class AppConstants {
     // 시스템 관련 상수
     public static final String SYSTEM_NAME = "system";
 
+    // 회사명 관련 상수
+    public static final String LINE_INC_NAME = "라인공영";
+
     // 시스템 기본 메뉴 이름 관련 상수
     public static final String MENU_ACCOUNT = "계정 관리";
     public static final String MENU_PERMISSION = "권한 관리";
