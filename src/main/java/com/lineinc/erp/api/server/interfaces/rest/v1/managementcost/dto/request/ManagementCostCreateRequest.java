@@ -26,5 +26,9 @@ public record ManagementCostCreateRequest(
 
         @Schema(description = "관리비 상세 품목 목록") List<ManagementCostDetailCreateRequest> details,
 
+        @Schema(description = "관리비 전도금 상세 목록") List<ManagementCostKeyMoneyDetailCreateRequest> keyMoneyDetails,
+
+        @Schema(description = "관리비 식대 상세 목록") List<ManagementCostMealFeeDetailCreateRequest> mealFeeDetails,
+
         @Schema(description = "관리비 파일 목록") List<ManagementCostFileCreateRequest> files) {
 }
