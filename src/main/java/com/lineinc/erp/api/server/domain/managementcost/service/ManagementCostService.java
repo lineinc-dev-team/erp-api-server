@@ -13,9 +13,20 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest.OutsourcingCompanyInfo;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
@@ -27,12 +38,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ManagementCostService {
 
     private final ManagementCostRepository managementCostRepository;
+    private final OutsourcingCompanyService outsourcingCompanyService;
+    private final OutsourcingCompanyRepository outsourcingCompanyRepository;
+    private final LaborService laborService;
 
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
@@ -48,10 +63,61 @@ public class ManagementCostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
-        // 2. 관리비 엔티티 생성 및 저장
+        // 2. 외주업체 처리
+        OutsourcingCompany outsourcingCompany = null;
+        if (request.outsourcingCompanyId() != null) {
+            // 기존 외주업체 수정
+            outsourcingCompany = outsourcingCompanyService
+                    .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+            if (request.outsourcingCompanyInfo() != null) {
+                OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
+                outsourcingCompanyService.updateOutsourcingCompany(
+                        outsourcingCompany.getId(),
+                        new OutsourcingCompanyUpdateRequest(
+                                companyInfo.name(),
+                                companyInfo.businessNumber(),
+                                null, // type
+                                null, // typeDescription
+                                companyInfo.ceoName(),
+                                null, // address
+                                null, // detailAddress
+                                null, // landlineNumber
+                                null, // phoneNumber
+                                null, // email
+                                null, // isActive
+                                null, // defaultDeductions
+                                null, // defaultDeductionsDescription
+                                companyInfo.bankName(),
+                                companyInfo.accountNumber(),
+                                companyInfo.accountHolder(),
+                                companyInfo.memo(),
+                                null, // contacts
+                                null, // files
+                                null // changeHistories
+                        ));
+                outsourcingCompany = outsourcingCompanyService
+                        .getOutsourcingCompanyByIdOrThrow(outsourcingCompany.getId());
+            }
+        } else if (request.outsourcingCompanyInfo() != null) {
+            // 신규 외주업체 생성
+            OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
+            outsourcingCompany = OutsourcingCompany.builder()
+                    .name(companyInfo.name())
+                    .businessNumber(companyInfo.businessNumber())
+                    .ceoName(companyInfo.ceoName())
+                    .bankName(companyInfo.bankName())
+                    .accountNumber(companyInfo.accountNumber())
+                    .accountHolder(companyInfo.accountHolder())
+                    .memo(companyInfo.memo())
+                    .build();
+            outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
+        }
+
+        // 3. 관리비 엔티티 생성 및 저장
         ManagementCost managementCost = ManagementCost.builder()
                 .site(site)
                 .siteProcess(siteProcess)
+                .outsourcingCompany(outsourcingCompany)
                 .itemType(request.itemType())
                 .itemDescription(request.itemDescription())
                 .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
@@ -60,11 +126,74 @@ public class ManagementCostService {
 
         managementCost = managementCostRepository.save(managementCost);
 
-        // 3. 상세 목록 저장
-        managementCostDetailService.createManagementCostDetails(managementCost, request.details());
+        // 4. 상세 목록 저장
+        if (request.details() != null && !request.details().isEmpty()) {
+            managementCostDetailService.createManagementCostDetails(managementCost, request.details());
+        }
 
-        // 4. 파일 목록 저장
-        managementCostFileService.createManagementCostFiles(request.files(), managementCost);
+        // 5. 전도금 상세 목록 저장
+        if (request.keyMoneyDetails() != null && !request.keyMoneyDetails().isEmpty()) {
+            createKeyMoneyDetails(managementCost, request.keyMoneyDetails());
+        }
+
+        // 6. 식대 상세 목록 저장
+        if (request.mealFeeDetails() != null && !request.mealFeeDetails().isEmpty()) {
+            createMealFeeDetails(managementCost, request.mealFeeDetails());
+        }
+
+        // 7. 파일 목록 저장
+        if (request.files() != null && !request.files().isEmpty()) {
+            managementCostFileService.createManagementCostFiles(request.files(), managementCost);
+        }
+    }
+
+    /**
+     * 전도금 상세 목록 생성
+     */
+    private void createKeyMoneyDetails(ManagementCost managementCost,
+            List<ManagementCostKeyMoneyDetailCreateRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        List<ManagementCostKeyMoneyDetail> details = requests.stream()
+                .map(request -> ManagementCostKeyMoneyDetail.builder()
+                        .managementCost(managementCost)
+                        .account(request.account())
+                        .purpose(request.purpose())
+                        .personnelCount(request.personnelCount())
+                        .amount(request.amount())
+                        .memo(request.memo())
+                        .build())
+                .collect(Collectors.toList());
+
+        managementCost.getKeyMoneyDetails().addAll(details);
+    }
+
+    /**
+     * 식대 상세 목록 생성
+     */
+    private void createMealFeeDetails(ManagementCost managementCost,
+            List<ManagementCostMealFeeDetailCreateRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        List<ManagementCostMealFeeDetail> details = requests.stream()
+                .<ManagementCostMealFeeDetail>map(request -> ManagementCostMealFeeDetail.builder()
+                        .managementCost(managementCost)
+                        .workType(request.workType())
+                        .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId()) : null)
+                        .name(request.name())
+                        .breakfastCount(request.breakfastCount())
+                        .lunchCount(request.lunchCount())
+                        .unitPrice(request.unitPrice())
+                        .amount(request.amount())
+                        .memo(request.memo())
+                        .build())
+                .collect(Collectors.toList());
+
+        managementCost.getMealFeeDetails().addAll(details);
     }
 
     @Transactional(readOnly = true)

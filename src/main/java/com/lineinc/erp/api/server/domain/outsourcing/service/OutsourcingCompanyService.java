@@ -213,7 +213,12 @@ public class OutsourcingCompanyService {
             case "businessNumber" -> company.businessNumber();
             case "type" -> company.type();
             case "ceoName" -> company.ceoName();
-            case "address" -> company.address() + " " + company.detailAddress();
+            case "address" -> {
+                String address = company.address() != null ? company.address() : "";
+                String detailAddress = company.detailAddress() != null ? company.detailAddress() : "";
+                String fullAddress = (address + " " + detailAddress).trim();
+                yield fullAddress.isEmpty() ? null : fullAddress;
+            }
             case "phoneNumber" -> company.phoneNumber();
             case "landlineNumber" -> company.landlineNumber();
             case "contactName" -> mainContact != null ? mainContact.name() : "";

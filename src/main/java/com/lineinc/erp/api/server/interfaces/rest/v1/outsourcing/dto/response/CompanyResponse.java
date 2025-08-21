@@ -58,7 +58,7 @@ public record CompanyResponse(
                 company.getId(),
                 company.getName(),
                 company.getBusinessNumber(),
-                company.getType().getLabel(),
+                company.getType() != null ? company.getType().getLabel() : null,
                 company.getType(),
                 company.getCeoName(),
                 company.getAddress(),
@@ -67,9 +67,11 @@ public record CompanyResponse(
                 company.getPhoneNumber(),
                 company.getEmail(),
                 company.isActive(),
-                Arrays.stream(company.getDefaultDeductions().split(","))
-                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(",")),
+                company.getDefaultDeductions() != null && !company.getDefaultDeductions().isEmpty()
+                        ? Arrays.stream(company.getDefaultDeductions().split(","))
+                                .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
+                                .collect(Collectors.joining(","))
+                        : null,
                 company.getDefaultDeductions(),
                 company.getDefaultDeductionsDescription(),
                 company.getMemo(),

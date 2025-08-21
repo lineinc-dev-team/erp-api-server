@@ -19,27 +19,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/management-costs")
 @RequiredArgsConstructor
-@Tag(name = "Management Cost", description = "관리비 관련 API")
+@Tag(name = "관리비 관리", description = "관리비 관련 API")
 public class ManagementCostController {
 
     private final ManagementCostService managementCostService;
 
-    // @Operation(summary = "관리비 등록", description = "관리비 정보를 등록합니다")
-    // @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "관리비
-    // 등록 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류", content =
-    // @Content()),
-    // @ApiResponse(responseCode = "404", description = "존재하지 않는 현장 또는 공정을 등록하려는경우")
-    // })
+    @Operation(summary = "관리비 등록", description = "관리비 정보를 등록합니다")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "관리비등록 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 현장 또는 공정을 등록하려는경우")
+    })
 
-    // @PostMapping
-    // @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action =
-    // PermissionAction.CREATE)
-    // public ResponseEntity<Void> createManagementCost(
-    // @Valid @RequestBody ManagementCostCreateRequest request) {
-    // managementCostService.createManagementCost(request);
-    // return ResponseEntity.ok().build();
-    // }
+    @PostMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.CREATE)
+    public ResponseEntity<Void> createManagementCost(
+            @Valid @RequestBody ManagementCostCreateRequest request) {
+        managementCostService.createManagementCost(request);
+        return ResponseEntity.ok().build();
+    }
 
     // @Operation(summary = "관리비 삭제", description = "하나 이상의 관리비 ID를 받아 해당 데이터를
     // 삭제합니다.")
