@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.labormanagement.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -8,7 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
+import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborChangeHistory;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborChangeType;
 import com.lineinc.erp.api.server.domain.labormanagement.repository.LaborRepository;
+import com.lineinc.erp.api.server.domain.labormanagement.repository.LaborChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborCreateRequest;
@@ -22,6 +26,9 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Sort;
@@ -43,8 +50,10 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request
 public class LaborService {
 
     private final LaborRepository laborRepository;
+    private final LaborChangeHistoryRepository laborChangeHistoryRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final LaborFileService laborFileService;
+    private final Javers javers;
 
     /**
      * 노무 등록
@@ -89,8 +98,6 @@ public class LaborService {
                 .memo(request.memo())
                 .build();
 
-        laborRepository.save(labor);
-
         // 첨부파일 처리
         if (request.files() != null && !request.files().isEmpty()) {
             List<LaborFile> laborFiles = request.files().stream()
@@ -100,6 +107,9 @@ public class LaborService {
             // Labor 엔티티에 파일 목록 설정 (양방향 관계)
             labor.setFiles(laborFiles);
         }
+
+        labor.syncTransientFields();
+        laborRepository.save(labor);
     }
 
     /**
@@ -194,9 +204,30 @@ public class LaborService {
             isHeadOffice = true;
         }
 
+        // 변경 전 상태 저장 (Javers 스냅샷)
+        labor.syncTransientFields();
+        Labor oldSnapshot = JaversUtils.createSnapshot(javers, labor, Labor.class);
+
         // 기본 정보 업데이트
         labor.updateFrom(request, outsourcingCompany, isHeadOffice);
+
+        labor.syncTransientFields();
         laborRepository.save(labor);
+
+        // Javers를 사용하여 변경사항 추적
+        Diff diff = javers.compare(oldSnapshot, labor);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        // 변경사항이 있을 때만 수정이력 생성
+        if (!simpleChanges.isEmpty()) {
+            LaborChangeHistory changeHistory = LaborChangeHistory.builder()
+                    .labor(labor)
+                    .type(LaborChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            laborChangeHistoryRepository.save(changeHistory);
+        }
 
         // 첨부파일 처리
         laborFileService.updateLaborFiles(labor, request.files());

@@ -1,16 +1,13 @@
 package com.lineinc.erp.api.server.domain.labormanagement.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum LaborChangeType {
-    BASIC("정보"),
-    ATTACHMENT("첨부파일");
+    BASIC("기본정보"),
+    FILE("첨부파일");
 
     private final String label;
-
-    LaborChangeType(String label) {
-        this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
-    }
 }

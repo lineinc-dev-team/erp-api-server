@@ -12,6 +12,7 @@ import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,7 +52,7 @@ public class Labor extends BaseEntity {
     /**
      * 노무 구분
      */
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LaborType type;
@@ -72,7 +74,7 @@ public class Labor extends BaseEntity {
     /**
      * 공종
      */
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private WorkType workType;
@@ -87,7 +89,7 @@ public class Labor extends BaseEntity {
     /**
      * 본사 인력 여부
      */
-    @DiffInclude
+    @DiffIgnore
     @Column(nullable = false)
     @Builder.Default
     private Boolean isHeadOffice = false;
@@ -130,14 +132,14 @@ public class Labor extends BaseEntity {
     /**
      * 입사일
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private OffsetDateTime hireDate;
 
     /**
      * 퇴사일
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private OffsetDateTime resignationDate;
 
@@ -242,5 +244,44 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasFile() {
         return files != null && !files.isEmpty();
+    }
+
+    @Transient
+    @DiffInclude
+    private String outsourcingCompanyName;
+
+    @Transient
+    @DiffInclude
+    private String typeName;
+
+    @Transient
+    @DiffInclude
+    private String workTypeName;
+
+    @Transient
+    @DiffInclude
+    private String hireDateFormat;
+
+    @Transient
+    @DiffInclude
+    private String resignationDateFormat;
+
+    /**
+     * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
+     */
+    public void syncTransientFields() {
+        if (this.isHeadOffice != null && this.isHeadOffice) {
+            this.outsourcingCompanyName = AppConstants.LINE_INC_NAME;
+        } else {
+            this.outsourcingCompanyName = this.outsourcingCompany != null ? this.outsourcingCompany.getName() : null;
+        }
+        this.typeName = this.type != null ? this.type.getLabel() : null;
+        this.workTypeName = this.workType != null ? this.workType.getLabel() : null;
+        this.hireDateFormat = this.hireDate != null
+                ? DateTimeFormatUtils.formatKoreaLocalDate(this.hireDate)
+                : null;
+        this.resignationDateFormat = this.resignationDate != null
+                ? DateTimeFormatUtils.formatKoreaLocalDate(this.resignationDate)
+                : null;
     }
 }

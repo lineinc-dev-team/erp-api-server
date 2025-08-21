@@ -1,9 +1,6 @@
 package com.lineinc.erp.api.server.domain.labormanagement.entity;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborChangeType;
@@ -21,9 +18,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -31,6 +28,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class LaborChangeHistory extends BaseEntity {
 
     @Id
@@ -38,23 +36,29 @@ public class LaborChangeHistory extends BaseEntity {
     @SequenceGenerator(name = "labor_change_history_seq", sequenceName = "labor_change_history_seq", allocationSize = 1)
     private Long id;
 
-    @DiffIgnore
+    /**
+     * 노무 참조
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id", nullable = false)
+    @JoinColumn(name = "labor_id")
     private Labor labor;
 
-    @DiffInclude
+    /**
+     * 변경 유형
+     */
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     private LaborChangeType type;
 
-    @DiffInclude
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
+    /**
+     * 변경사항 JSON
+     */
+    @Column(columnDefinition = "TEXT")
     private String changes;
 
-    @Setter
-    @DiffInclude
+    /**
+     * 메모
+     */
     @Column(columnDefinition = "TEXT")
-    private String memo; // 선택적 변경 사유, 비고 등
+    private String memo;
 }
