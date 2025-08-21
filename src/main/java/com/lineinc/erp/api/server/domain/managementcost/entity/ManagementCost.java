@@ -42,35 +42,20 @@ public class ManagementCost extends BaseEntity {
      * 품목 타입 (예: 전기, 수도 등)
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private ItemType itemType;
 
     /**
      * 품목 설명 (예: 6월 전기요금 등)
      */
-    @Column(nullable = false)
+    @Column
     private String itemDescription;
 
     /**
      * 관리비가 발생(결제)된 날짜
      */
-    @Column(nullable = false)
+    @Column
     private OffsetDateTime paymentDate;
-
-    @Column
-    private String businessNumber;
-
-    @Column
-    private String ceoName;
-
-    @Column
-    private String accountNumber;
-
-    @Column
-    private String accountHolder;
-
-    @Column
-    private String bankName;
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "managementCost", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -89,11 +74,6 @@ public class ManagementCost extends BaseEntity {
         Optional.ofNullable(request.paymentDate())
                 .map(DateTimeFormatUtils::toOffsetDateTime)
                 .ifPresent(val -> this.paymentDate = val);
-        Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
-        Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
-        Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
-        Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
-        Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

@@ -55,11 +55,6 @@ public class ManagementCostService {
                 .itemType(request.itemType())
                 .itemDescription(request.itemDescription())
                 .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
-                .businessNumber(request.businessNumber())
-                .bankName(request.bankName())
-                .ceoName(request.ceoName())
-                .accountNumber(request.accountNumber())
-                .accountHolder(request.accountHolder())
                 .memo(request.memo())
                 .build();
 
@@ -93,7 +88,8 @@ public class ManagementCostService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(ManagementCostListRequest request, Sort sort, List<String> fields) {
-        List<ManagementCostResponse> managementCostResponses = managementCostRepository.findAllWithoutPaging(request, sort)
+        List<ManagementCostResponse> managementCostResponses = managementCostRepository
+                .findAllWithoutPaging(request, sort)
                 .stream()
                 .map(ManagementCostResponse::from)
                 .toList();
@@ -102,8 +98,7 @@ public class ManagementCostService {
                 managementCostResponses,
                 fields,
                 this::getExcelHeaderName,
-                this::getExcelCellValue
-        );
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -113,10 +108,6 @@ public class ManagementCostService {
             case "processName" -> "공정명";
             case "itemType" -> "품목";
             case "paymentDate" -> "일자";
-            case "businessNumber" -> "사업자번호";
-            case "ceoName" -> "대표자";
-            case "accountNumber" -> "청구계좌";
-            case "accountHolder" -> "계좌명";
             case "supplyPrice" -> "공급가";
             case "vat" -> "부가세";
             case "total" -> "합계";
@@ -133,28 +124,21 @@ public class ManagementCostService {
             case "processName" -> managementCost.process().name();
             case "itemType" -> managementCost.itemType();
             case "paymentDate" -> DateTimeFormatUtils.formatKoreaLocalDate(managementCost.paymentDate());
-            case "businessNumber" -> managementCost.businessNumber();
-            case "ceoName" -> managementCost.ceoName();
-            case "accountNumber" -> managementCost.bankName() + " / " + managementCost.accountNumber();
-            case "accountHolder" -> managementCost.accountHolder();
             case "supplyPrice" -> String.valueOf(
                     managementCost.details().stream()
                             .filter(detail -> detail.supplyPrice() != null)
                             .mapToLong(ManagementCostDetailResponse::supplyPrice)
-                            .sum()
-            );
+                            .sum());
             case "vat" -> String.valueOf(
                     managementCost.details().stream()
                             .filter(detail -> detail.vat() != null)
                             .mapToLong(ManagementCostDetailResponse::vat)
-                            .sum()
-            );
+                            .sum());
             case "total" -> String.valueOf(
                     managementCost.details().stream()
                             .filter(detail -> detail.total() != null)
                             .mapToLong(ManagementCostDetailResponse::total)
-                            .sum()
-            );
+                            .sum());
             case "hasFile" -> managementCost.hasFile() ? "Y" : "N";
             case "memo" -> managementCost.memo();
             default -> null;
@@ -164,14 +148,16 @@ public class ManagementCostService {
     @Transactional(readOnly = true)
     public ManagementCostDetailViewResponse getManagementCostById(Long siteId) {
         ManagementCost managementCost = managementCostRepository.findById(siteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
         return ManagementCostDetailViewResponse.from(managementCost);
     }
 
     @Transactional(readOnly = true)
     public ManagementCost getManagementCostByIdOrThrow(Long id) {
         return managementCostRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
     }
 
     @Transactional
