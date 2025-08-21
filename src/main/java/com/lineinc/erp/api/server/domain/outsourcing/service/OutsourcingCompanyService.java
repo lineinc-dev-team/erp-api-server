@@ -255,6 +255,10 @@ public class OutsourcingCompanyService {
         return companies.map(company -> new CompanyResponse.CompanySimpleResponse(
                 company.getId(),
                 company.getName(),
-                company.getBusinessNumber()));
+                company.getBusinessNumber(),
+                company.getCeoName(),
+                company.getBankName(),
+                company.getAccountNumber(),
+                company.getAccountHolder()));
     }
 }
