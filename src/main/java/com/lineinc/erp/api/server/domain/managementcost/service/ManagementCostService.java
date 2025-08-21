@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
@@ -15,6 +16,7 @@ import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
@@ -30,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -302,5 +305,21 @@ public class ManagementCostService {
 
         managementCostDetailService.updateManagementCostDetails(managementCost, request.details());
         managementCostFileService.updateManagementCostFiles(managementCost, request.files());
+    }
+
+    /**
+     * ETC 항목의 description 목록 조회
+     */
+    public Slice<ItemDescriptionResponse> getEtcItemDescriptions(String keyword, Pageable pageable) {
+        Slice<Object[]> resultSlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            resultSlice = managementCostRepository.findAllDistinctItemDescriptions(ItemType.ETC, pageable);
+        } else {
+            resultSlice = managementCostRepository.findDistinctItemDescriptionsByKeyword(ItemType.ETC, keyword,
+                    pageable);
+        }
+
+        return resultSlice.map(result -> new ItemDescriptionResponse((Long) result[1], (String) result[0]));
     }
 }

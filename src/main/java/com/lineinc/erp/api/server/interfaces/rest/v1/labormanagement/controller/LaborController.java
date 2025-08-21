@@ -130,11 +130,9 @@ public class LaborController {
     @GetMapping("/etc-type-descriptions/search")
     public ResponseEntity<SuccessResponse<SliceResponse<TypeDescriptionResponse>>> searchEtcTypeDescriptions(
             @RequestParam(required = false) String keyword,
-            @ModelAttribute PageRequest pageRequest,
-            @ModelAttribute SortRequest sortRequest) {
+            @ModelAttribute PageRequest pageRequest) {
         Slice<TypeDescriptionResponse> slice = laborService.getEtcTypeDescriptions(
-                keyword, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                        sortRequest.sort()));
+                keyword, PageableUtils.createPageable(pageRequest.page(), pageRequest.size()));
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));

@@ -4,7 +4,15 @@ import com.lineinc.erp.api.server.domain.managementcost.service.ManagementCostSe
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
+import org.springframework.data.domain.Slice;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.dto.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.SortRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,6 +44,23 @@ public class ManagementCostController {
             @Valid @RequestBody ManagementCostCreateRequest request) {
         managementCostService.createManagementCost(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "관리비 ETC 항목 설명 키워드 검색", description = "itemType이 ETC인 모든 관리비의 항목 설명을 키워드로 검색합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/etc-item-descriptions/search")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<ItemDescriptionResponse>>> searchEtcItemDescriptions(
+            @RequestParam(required = false) String keyword,
+            @ModelAttribute PageRequest pageRequest) {
+        Slice<ItemDescriptionResponse> slice = managementCostService.getEtcItemDescriptions(
+                keyword, PageableUtils.createPageable(pageRequest.page(), pageRequest.size()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     // @Operation(summary = "관리비 삭제", description = "하나 이상의 관리비 ID를 받아 해당 데이터를
