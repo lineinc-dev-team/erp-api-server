@@ -154,7 +154,7 @@ public class Labor extends BaseEntity {
     /**
      * 주민등록번호
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String residentNumber;
 
