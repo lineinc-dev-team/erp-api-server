@@ -52,6 +52,7 @@ import java.io.IOException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
 import org.springframework.web.bind.annotation.PatchMapping;
 
@@ -201,5 +202,21 @@ public class LaborController {
             @Valid @RequestBody LaborUpdateRequest request) {
         laborService.updateLabor(id, request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "인력정보 변경 이력 조회", description = "특정 인력정보의 변경 이력을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "인력정보를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}/change-histories")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<LaborChangeHistoryResponse>>> getLaborChangeHistories(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest) {
+        Slice<LaborChangeHistoryResponse> slice = laborService.getLaborChangeHistories(id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 }

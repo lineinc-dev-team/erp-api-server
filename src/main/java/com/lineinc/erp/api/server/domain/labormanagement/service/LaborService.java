@@ -41,6 +41,7 @@ import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
 
@@ -326,5 +327,20 @@ public class LaborService {
     @Transactional(readOnly = true)
     public Page<LaborListResponse> getLaborList(LaborListRequest request, Pageable pageable) {
         return laborRepository.findAll(request, pageable);
+    }
+
+    /**
+     * 인력정보 변경 이력 조회
+     */
+    @Transactional(readOnly = true)
+    public Slice<LaborChangeHistoryResponse> getLaborChangeHistories(Long id, Pageable pageable) {
+        // 인력정보 존재 확인
+        Labor labor = getLaborByIdOrThrow(id);
+
+        // LaborChangeHistory를 labor 기준으로 슬라이스 조회
+        Slice<LaborChangeHistory> historySlice = laborChangeHistoryRepository.findByLabor(labor, pageable);
+
+        // 엔티티를 DTO로 변환하여 슬라이스 반환
+        return historySlice.map(LaborChangeHistoryResponse::from);
     }
 }

@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.labormanagement.entity;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborChangeType;
@@ -50,10 +52,8 @@ public class LaborChangeHistory extends BaseEntity {
     @Column(nullable = false)
     private LaborChangeType type;
 
-    /**
-     * 변경사항 JSON
-     */
-    @Column(columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
     private String changes;
 
     /**
