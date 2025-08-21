@@ -22,6 +22,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
+import org.springframework.data.domain.Slice;
 
 @Service
 @RequiredArgsConstructor
@@ -98,6 +101,21 @@ public class LaborService {
                 .originalFileName(fileRequest.originalFileName())
                 .memo(fileRequest.memo())
                 .build();
+    }
+
+    /**
+     * ETC 노무 구분 설명 목록 조회
+     */
+    public Slice<TypeDescriptionResponse> getEtcTypeDescriptions(String keyword, Pageable pageable) {
+        Slice<Object[]> resultSlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            resultSlice = laborRepository.findAllDistinctTypeDescriptions(LaborType.ETC, pageable);
+        } else {
+            resultSlice = laborRepository.findDistinctTypeDescriptionsByKeyword(LaborType.ETC, keyword, pageable);
+        }
+
+        return resultSlice.map(result -> new TypeDescriptionResponse((Long) result[1], (String) result[0]));
     }
 
     /**
