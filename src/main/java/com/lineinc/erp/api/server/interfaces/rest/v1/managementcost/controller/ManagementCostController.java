@@ -1,11 +1,13 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.controller;
 
 import com.lineinc.erp.api.server.domain.managementcost.service.ManagementCostService;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -30,6 +32,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/management-costs")
 @RequiredArgsConstructor
@@ -50,6 +55,20 @@ public class ManagementCostController {
             @Valid @RequestBody ManagementCostCreateRequest request) {
         managementCostService.createManagementCost(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "관리비 항목 구분 조회", description = "사용 가능한 관리비 항목 구분 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/item-types")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<ItemTypeResponse>>> getItemTypes() {
+        List<ItemTypeResponse> itemTypes = Arrays.stream(ItemType.values())
+                .map(ItemTypeResponse::from)
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(itemTypes));
     }
 
     @Operation(summary = "관리비 ETC 항목 설명 키워드 검색", description = "itemType이 ETC인 모든 관리비의 항목 설명을 키워드로 검색합니다.")

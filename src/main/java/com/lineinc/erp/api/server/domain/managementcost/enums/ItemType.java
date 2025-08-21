@@ -10,7 +10,6 @@ public enum ItemType {
     PARKING_FEE("주차비"),
     MEAL_FEE("식대"),
     KEY_MONEY("전도금"),
-    MISC_EXPENSE("기타잡비"),
     ETC("기타");
 
     private final String label;

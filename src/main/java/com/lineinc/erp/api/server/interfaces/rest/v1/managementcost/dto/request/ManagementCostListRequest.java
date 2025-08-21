@@ -19,8 +19,6 @@ public record ManagementCostListRequest(
 
         @Schema(description = "항목 타입 설명", example = "관리비(가스/전기/수도)") String itemTypeDescription,
 
-        @Schema(description = "항목 설명", example = "6월 전기요금") String itemDescription,
-
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "결제 시작일", example = "2024-01-01") LocalDate paymentStartDate,
 
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "결제 종료일", example = "2025-12-31") LocalDate paymentEndDate) {

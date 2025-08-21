@@ -13,7 +13,6 @@ import org.springframework.util.StringUtils;
 
 import com.lineinc.erp.api.server.domain.labormanagement.entity.QLabor;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.QLaborFile;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborListResponse;

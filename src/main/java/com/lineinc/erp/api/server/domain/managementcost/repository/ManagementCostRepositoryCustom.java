@@ -16,14 +16,12 @@ public interface ManagementCostRepositoryCustom {
      */
     Page<ManagementCostResponse> findAll(
             ManagementCostListRequest request,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     /**
      * 엑셀 다운로드용 - 페이지네이션 없이 관리비 목록 전체 조회
      */
     List<ManagementCost> findAllWithoutPaging(
             ManagementCostListRequest request,
-            Sort sort
-    );
+            Sort sort);
 }
