@@ -42,6 +42,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import org.springframework.data.domain.Slice;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.DeleteLaborsRequest;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/v1/labors")
@@ -115,7 +117,6 @@ public class LaborController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @GetMapping("/etc-type-descriptions/search")
-    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<TypeDescriptionResponse>>> searchEtcTypeDescriptions(
             @RequestParam(required = false) String keyword,
             @ModelAttribute PageRequest pageRequest,
@@ -126,5 +127,18 @@ public class LaborController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "인력정보 삭제", description = "하나 이상의 인력정보 ID를 받아 해당 인력정보를 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "일부 인력정보를 찾을 수 없음", content = @Content())
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteLabors(@Valid @RequestBody DeleteLaborsRequest request) {
+        laborService.deleteLaborsByIds(request);
+        return ResponseEntity.ok().build();
     }
 }

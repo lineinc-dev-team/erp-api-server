@@ -14,6 +14,9 @@ import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyS
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborFileRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.DeleteLaborsRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborListResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -116,6 +119,21 @@ public class LaborService {
         }
 
         return resultSlice.map(result -> new TypeDescriptionResponse((Long) result[1], (String) result[0]));
+    }
+
+    /**
+     * 여러 인력정보 삭제
+     */
+    public void deleteLaborsByIds(DeleteLaborsRequest request) {
+        List<Labor> labors = laborRepository.findAllById(request.laborIds());
+        if (request.laborIds().size() != labors.size()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.LABOR_NOT_FOUND);
+        }
+
+        for (Labor labor : labors) {
+            labor.markAsDeleted();
+        }
+        laborRepository.saveAll(labors);
     }
 
     /**
