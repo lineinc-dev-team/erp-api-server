@@ -37,4 +37,14 @@ public interface LaborRepository extends JpaRepository<Labor, Long>, LaborReposi
     @Query("SELECT DISTINCT l.typeDescription, l.id FROM Labor l WHERE l.type = :type AND l.typeDescription IS NOT NULL AND l.typeDescription LIKE %:keyword%")
     Slice<Object[]> findDistinctTypeDescriptionsByKeyword(@Param("type") LaborType type,
             @Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * 모든 인력 정보를 페이지네이션으로 조회
+     */
+    Slice<Labor> findAllBy(Pageable pageable);
+
+    /**
+     * 이름으로 키워드 검색하여 인력 정보를 페이지네이션으로 조회
+     */
+    Slice<Labor> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

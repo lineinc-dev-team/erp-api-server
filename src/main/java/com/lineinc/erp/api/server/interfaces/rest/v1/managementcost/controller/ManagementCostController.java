@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -17,6 +18,7 @@ import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
@@ -31,6 +33,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Arrays;
 import java.util.List;
@@ -69,6 +73,22 @@ public class ManagementCostController {
                 .map(ItemTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(itemTypes));
+    }
+
+    @Operation(summary = "인력명 키워드 검색", description = "인력명으로 간단한 검색을 수행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/labor-names/search")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
+            @Valid PageRequest pageRequest,
+            @RequestParam(required = false) String keyword) {
+        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
+        Slice<LaborNameResponse> slice = managementCostService.getLaborNames(keyword, pageable);
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "관리비 ETC 항목 설명 키워드 검색", description = "itemType이 ETC인 모든 관리비의 항목 설명을 키워드로 검색합니다.")

@@ -39,6 +39,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.LaborNameResponse;
+
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborChangeHistoryResponse;
@@ -139,6 +141,21 @@ public class LaborService {
         }
 
         return resultSlice.map(result -> new TypeDescriptionResponse((Long) result[1], (String) result[0]));
+    }
+
+    /**
+     * 인력명 키워드 검색
+     */
+    public Slice<LaborNameResponse> getLaborNames(String keyword, Pageable pageable) {
+        Slice<Labor> laborSlice;
+
+        if (keyword == null || keyword.isBlank()) {
+            laborSlice = laborRepository.findAllBy(pageable);
+        } else {
+            laborSlice = laborRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        }
+
+        return laborSlice.map(labor -> new LaborNameResponse(labor.getId(), labor.getName()));
     }
 
     /**
