@@ -28,5 +28,12 @@ public record LaborUpdateRequest(
         @Schema(description = "상세주소", example = "역삼동 123-45") String detailAddress,
         @Schema(description = "휴대폰", example = "010-1234-5678") String phoneNumber,
         @Schema(description = "비고", example = "경력 10년") String memo,
-        @Schema(description = "첨부파일 목록") List<LaborFileUpdateRequest> files) {
+        @Schema(description = "첨부파일 목록") List<LaborFileUpdateRequest> files,
+        @Schema(description = "변경이력 목록") List<ChangeHistoryRequest> changeHistories) {
+
+    @Schema(description = "변경이력 수정 요청")
+    public record ChangeHistoryRequest(
+            @Schema(description = "변경이력 ID", example = "1") Long id,
+            @Schema(description = "메모", example = "수정 사유") String memo) {
+    }
 }

@@ -231,6 +231,17 @@ public class LaborService {
 
         // 첨부파일 처리
         laborFileService.updateLaborFiles(labor, request.files());
+
+        // 변경이력 메모 수정 처리
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (LaborUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                laborChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getLabor().getId().equals(labor.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
     }
 
     /**

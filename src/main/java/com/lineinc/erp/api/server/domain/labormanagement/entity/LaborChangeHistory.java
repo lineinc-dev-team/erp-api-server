@@ -61,4 +61,11 @@ public class LaborChangeHistory extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    /**
+     * 메모를 설정합니다.
+     */
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
 }
