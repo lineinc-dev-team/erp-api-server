@@ -284,7 +284,7 @@ public class LaborService {
                     yield labor.outsourcingCompany() != null ? labor.outsourcingCompany().name() : "";
                 }
             }
-            case "workType" -> labor.workType() != null ? labor.workType().getLabel() : "";
+            case "workType" -> labor.workType() != null ? labor.workType() : "";
             case "mainWork" -> labor.mainWork() != null ? labor.mainWork() : "";
             case "phoneNumber" -> labor.phoneNumber() != null ? labor.phoneNumber() : "";
             case "dailyWage" -> labor.dailyWage() != null ? labor.dailyWage().toString() : "";
