@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.managementcost.entity;
+package com.lineinc.erp.api.server.domain.managementcost.enums;
 
 import lombok.Getter;
 
@@ -10,7 +10,8 @@ public enum ItemType {
     PARKING_FEE("주차비"),
     MEAL_FEE("식대"),
     KEY_MONEY("전도금"),
-    MISC_EXPENSE("기타잡비");
+    MISC_EXPENSE("기타잡비"),
+    ETC("기타");
 
     private final String label;
 

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.lineinc.erp.api.server.domain.managementcost.entity.ItemType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 
 import java.time.LocalDate;
 

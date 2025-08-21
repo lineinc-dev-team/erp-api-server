@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.managementcost.entity.ItemType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 
 @Schema(description = "관리비 수정 요청")
 public record ManagementCostUpdateRequest(

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.managementcost.entity.ItemType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 
 @Schema(description = "관리비 등록 요청")
 public record ManagementCostCreateRequest(
