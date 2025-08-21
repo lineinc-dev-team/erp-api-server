@@ -29,6 +29,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
+import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -149,6 +150,8 @@ public class JaversUtils {
             return file.getOriginalFileName();
         } else if (entity instanceof FuelInfo fuelInfo) {
             return fuelInfo.getEquipmentSpecification();
+        } else if (entity instanceof LaborFile file) {
+            return file.getName();
         }
         return null;
     }
@@ -216,6 +219,8 @@ public class JaversUtils {
             return file.getOriginalFileName() + "(" + file.getId() + ")";
         } else if (entity instanceof FuelInfo fuelInfo) {
             return fuelInfo.getEquipmentSpecification() + "(" + fuelInfo.getId() + ")";
+        } else if (entity instanceof LaborFile file) {
+            return file.getName() + "(" + file.getId() + ")";
         }
         return null;
     }

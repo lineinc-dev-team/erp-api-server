@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum LaborChangeType {
     BASIC("기본정보"),
-    FILE("첨부파일");
+    ATTACHMENT("첨부파일");
 
     private final String label;
 }
