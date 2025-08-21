@@ -48,7 +48,7 @@ public record LaborCreateRequest(
 
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "퇴사일", example = "2024-12-31") LocalDate resignationDate,
 
-        @Schema(description = "첨부파일 목록") List<LaborFileRequest> files
+        @Schema(description = "첨부파일 목록") List<LaborFileCreateRequest> files
 
 ) {
 }

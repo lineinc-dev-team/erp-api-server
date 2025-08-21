@@ -52,6 +52,8 @@ import java.io.IOException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 @RequestMapping("/api/v1/labors")
@@ -184,5 +186,20 @@ public class LaborController {
     public ResponseEntity<SuccessResponse<LaborDetailResponse>> getLaborDetail(@PathVariable Long id) {
         LaborDetailResponse laborResponse = laborService.getLaborById(id);
         return ResponseEntity.ok(SuccessResponse.of(laborResponse));
+    }
+
+    @Operation(summary = "인력정보 수정", description = "기존 인력정보를 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "수정 대상 인력정보를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateLabor(
+            @PathVariable Long id,
+            @Valid @RequestBody LaborUpdateRequest request) {
+        laborService.updateLabor(id, request);
+        return ResponseEntity.ok().build();
     }
 }

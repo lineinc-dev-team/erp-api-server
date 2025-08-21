@@ -12,7 +12,7 @@ import com.lineinc.erp.api.server.domain.labormanagement.repository.LaborReposit
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborFileRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.DeleteLaborsRequest;
 import org.springframework.http.HttpStatus;
@@ -35,6 +35,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.respons
 import org.springframework.data.domain.Slice;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +44,7 @@ public class LaborService {
 
     private final LaborRepository laborRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
+    private final LaborFileService laborFileService;
 
     /**
      * 노무 등록
@@ -103,7 +105,7 @@ public class LaborService {
     /**
      * 노무 파일 생성
      */
-    private LaborFile createLaborFile(Labor labor, LaborFileRequest fileRequest) {
+    private LaborFile createLaborFile(Labor labor, LaborFileCreateRequest fileRequest) {
         return LaborFile.builder()
                 .labor(labor)
                 .name(fileRequest.name())
@@ -166,6 +168,38 @@ public class LaborService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.LABOR_NOT_FOUND));
         return LaborDetailResponse.from(labor);
+    }
+
+    /**
+     * 인력정보 수정
+     */
+    @Transactional
+    public void updateLabor(Long id, LaborUpdateRequest request) {
+        Labor labor = getLaborByIdOrThrow(id);
+
+        // 이름과 주민등록번호 중복 체크 (현재 인력 제외)
+        if (laborRepository.existsByNameAndResidentNumberExcludingId(request.name(), request.residentNumber(), id)) {
+            throw new IllegalArgumentException(ValidationMessages.LABOR_ALREADY_EXISTS);
+        }
+
+        // 외주업체 조회 및 본사 인력 여부 판단
+        OutsourcingCompany outsourcingCompany = null;
+        Boolean isHeadOffice = false;
+
+        if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() != 0) {
+            outsourcingCompany = outsourcingCompanyService
+                    .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+        } else if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() == 0) {
+            // outsourcingCompanyId가 0인 경우 본사 인력으로 처리
+            isHeadOffice = true;
+        }
+
+        // 기본 정보 업데이트
+        labor.updateFrom(request, outsourcingCompany, isHeadOffice);
+        laborRepository.save(labor);
+
+        // 첨부파일 처리
+        laborFileService.updateLaborFiles(labor, request.files());
     }
 
     /**

@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.reques
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "노무 파일 요청")
-public record LaborFileRequest(
+public record LaborFileCreateRequest(
         @Schema(description = "문서명 (사용자가 지정하는 파일 이름)", example = "계약서") String name,
 
         @Schema(description = "S3 또는 외부 스토리지에 저장된 파일의 URL", example = "https://s3.amazonaws.com/bucket/file.pdf") String fileUrl,

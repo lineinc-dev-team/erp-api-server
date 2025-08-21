@@ -11,6 +11,9 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import java.util.Optional;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -189,6 +192,13 @@ public class Labor extends BaseEntity {
     private List<LaborFile> files;
 
     /**
+     * 변경 이력 목록
+     */
+    @DiffIgnore
+    @OneToMany(mappedBy = "labor", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<LaborChangeHistory> changeHistories;
+
+    /**
      * 파일 목록을 설정합니다.
      */
     public void setFiles(List<LaborFile> files) {
@@ -196,6 +206,35 @@ public class Labor extends BaseEntity {
         if (files != null) {
             files.forEach(file -> file.setLabor(this));
         }
+    }
+
+    /**
+     * LaborUpdateRequest DTO로부터 인력정보를 업데이트합니다.
+     */
+    public void updateFrom(LaborUpdateRequest request, OutsourcingCompany outsourcingCompany, Boolean isHeadOffice) {
+        Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
+        Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.residentNumber()).ifPresent(val -> this.residentNumber = val);
+        Optional.ofNullable(request.workType()).ifPresent(val -> this.workType = val);
+        Optional.ofNullable(request.workTypeDescription()).ifPresent(val -> this.workTypeDescription = val);
+        Optional.ofNullable(request.mainWork()).ifPresent(val -> this.mainWork = val);
+        Optional.ofNullable(request.dailyWage()).ifPresent(val -> this.dailyWage = val);
+        Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
+        Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
+        Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
+        Optional.ofNullable(request.hireDate())
+                .ifPresent(val -> this.hireDate = DateTimeFormatUtils.toOffsetDateTime(val));
+        Optional.ofNullable(request.resignationDate())
+                .ifPresent(val -> this.resignationDate = DateTimeFormatUtils.toOffsetDateTime(val));
+        Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
+        Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
+        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+
+        // 외주업체 정보와 본사 인력 여부 업데이트
+        Optional.ofNullable(outsourcingCompany).ifPresent(val -> this.outsourcingCompany = val);
+        Optional.ofNullable(isHeadOffice).ifPresent(val -> this.isHeadOffice = val);
     }
 
     /**

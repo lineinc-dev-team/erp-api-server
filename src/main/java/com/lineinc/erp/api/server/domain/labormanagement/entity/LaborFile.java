@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborFileUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -74,5 +75,15 @@ public class LaborFile extends BaseEntity {
      */
     public void setLabor(Labor labor) {
         this.labor = labor;
+    }
+
+    /**
+     * LaborFileRequest로부터 필드들을 업데이트합니다.
+     */
+    public void updateFrom(LaborFileUpdateRequest request) {
+        this.name = request.name();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.memo = request.memo();
     }
 }
