@@ -21,6 +21,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.respons
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
+
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Sort;
 
@@ -196,7 +198,8 @@ public class LaborService {
             case "id" -> labor.id() != null ? labor.id().toString() : "";
             case "type" -> labor.type() != null ? labor.type() : "";
             case "name" -> labor.name() != null ? labor.name() : "";
-            case "residentNumber" -> labor.residentNumber() != null ? labor.residentNumber() : "";
+            case "residentNumber" ->
+                labor.residentNumber() != null ? PrivacyMaskingUtils.maskResidentNumber(labor.residentNumber()) : "";
             case "outsourcingCompanyName" -> {
                 if (labor.isHeadOffice() != null && labor.isHeadOffice()) {
                     yield AppConstants.LINE_INC_NAME;

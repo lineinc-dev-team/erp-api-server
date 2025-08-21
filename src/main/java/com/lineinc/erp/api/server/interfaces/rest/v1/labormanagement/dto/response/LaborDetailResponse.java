@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
+import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -63,7 +64,7 @@ public record LaborDetailResponse(
                 labor.getResignationDate(),
                 labor.getOutsourcingCompany() != null ? CompanySimpleResponse.from(labor.getOutsourcingCompany())
                         : null,
-                labor.getResidentNumber(),
+                PrivacyMaskingUtils.maskResidentNumber(labor.getResidentNumber()),
                 labor.getAddress(),
                 labor.getDetailAddress(),
                 labor.getPhoneNumber(),
