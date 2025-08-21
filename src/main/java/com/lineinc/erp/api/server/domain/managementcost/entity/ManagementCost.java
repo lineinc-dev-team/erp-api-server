@@ -57,7 +57,7 @@ public class ManagementCost extends BaseEntity {
      * 항목 설명 (예: 6월 전기요금 등)
      */
     @Column
-    private String itemDescription;
+    private String itemTypeDescription;
 
     /**
      * 관리비가 발생(결제)된 날짜
@@ -86,7 +86,7 @@ public class ManagementCost extends BaseEntity {
 
     public void updateFrom(ManagementCostUpdateRequest request) {
         Optional.ofNullable(request.itemType()).ifPresent(val -> this.itemType = val);
-        Optional.ofNullable(request.itemDescription()).ifPresent(val -> this.itemDescription = val);
+        Optional.ofNullable(request.itemTypeDescription()).ifPresent(val -> this.itemTypeDescription = val);
         Optional.ofNullable(request.paymentDate())
                 .map(DateTimeFormatUtils::toOffsetDateTime)
                 .ifPresent(val -> this.paymentDate = val);

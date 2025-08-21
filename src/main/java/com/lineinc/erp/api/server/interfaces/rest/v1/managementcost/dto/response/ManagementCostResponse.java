@@ -33,7 +33,7 @@ public record ManagementCostResponse(
         return new ManagementCostResponse(
                 cost.getId(),
                 cost.getItemType().getLabel(),
-                cost.getItemDescription(),
+                cost.getItemTypeDescription(),
                 cost.getPaymentDate(),
                 cost.getFiles() != null && !cost.getFiles().isEmpty(),
                 cost.getMemo(),

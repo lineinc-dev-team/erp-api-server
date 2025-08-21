@@ -81,8 +81,8 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
     private BooleanBuilder buildCondition(ManagementCostListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (StringUtils.hasText(request.name())) {
-            builder.and(site.name.containsIgnoreCase(request.name().trim()));
+        if (StringUtils.hasText(request.siteName())) {
+            builder.and(site.name.containsIgnoreCase(request.siteName().trim()));
         }
         if (StringUtils.hasText(request.processName())) {
             builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
@@ -90,8 +90,8 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
         if (request.itemType() != null) {
             builder.and(managementCost.itemType.eq(request.itemType()));
         }
-        if (StringUtils.hasText(request.itemDescription())) {
-            builder.and(managementCost.itemDescription.containsIgnoreCase(request.itemDescription().trim()));
+        if (StringUtils.hasText(request.itemTypeDescription())) {
+            builder.and(managementCost.itemTypeDescription.containsIgnoreCase(request.itemTypeDescription().trim()));
         }
         if (request.paymentStartDate() != null) {
             builder.and(managementCost.paymentDate.goe(

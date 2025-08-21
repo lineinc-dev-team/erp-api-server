@@ -121,7 +121,7 @@ public class ManagementCostService {
                 .siteProcess(siteProcess)
                 .outsourcingCompany(outsourcingCompany)
                 .itemType(request.itemType())
-                .itemDescription(request.itemDescription())
+                .itemTypeDescription(request.itemTypeDescription())
                 .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
                 .memo(request.memo())
                 .build();

@@ -33,7 +33,7 @@ public record ManagementCostDetailViewResponse(
         return new ManagementCostDetailViewResponse(
                 cost.getId(),
                 cost.getItemType().getLabel(),
-                cost.getItemDescription(),
+                cost.getItemTypeDescription(),
                 cost.getPaymentDate(),
                 cost.getMemo(),
                 cost.getDetails().stream().map(ManagementCostDetailResponse::from).toList(),

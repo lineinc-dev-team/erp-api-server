@@ -17,7 +17,7 @@ public record ManagementCostCreateRequest(
 
         @Schema(description = "관리비 항목 구분", example = "DEPOSIT") ItemType itemType,
 
-        @Schema(description = "관리비 항목 설명", example = "6월 전기요금") String itemDescription,
+        @Schema(description = "관리비 항목 설명", example = "6월 전기요금") String itemTypeDescription,
 
         @Schema(description = "결제일자", example = "2024-07-15") LocalDate paymentDate,
 
