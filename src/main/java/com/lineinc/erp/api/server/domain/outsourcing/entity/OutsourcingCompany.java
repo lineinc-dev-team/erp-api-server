@@ -132,8 +132,8 @@ public class OutsourcingCompany extends BaseEntity {
 
     public void syncTransientFields() {
         this.typeName = this.type != null ? this.type.getLabel() : null;
-        this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null :
-                Arrays.stream(this.defaultDeductions.split(","))
+        this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null
+                : Arrays.stream(this.defaultDeductions.split(","))
                         .map(String::trim)
                         .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
                         .collect(Collectors.joining(","));
@@ -152,7 +152,8 @@ public class OutsourcingCompany extends BaseEntity {
         java.util.Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         java.util.Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
         java.util.Optional.ofNullable(request.defaultDeductions()).ifPresent(val -> this.defaultDeductions = val);
-        java.util.Optional.ofNullable(request.defaultDeductionsDescription()).ifPresent(val -> this.defaultDeductionsDescription = val);
+        java.util.Optional.ofNullable(request.defaultDeductionsDescription())
+                .ifPresent(val -> this.defaultDeductionsDescription = val);
         java.util.Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
         java.util.Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
         java.util.Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);

@@ -238,8 +238,13 @@ public class ManagementCostService {
             case "id" -> "No.";
             case "siteName" -> "현장명";
             case "processName" -> "공정명";
-            case "itemType" -> "품목";
+            case "itemType" -> "항목";
             case "paymentDate" -> "일자";
+            case "outsourcingCompanyName" -> "업체명";
+            case "outsourcingCompanyBusinessNumber" -> "사업자번호";
+            case "outsourcingCompanyCeoName" -> "대표자";
+            case "outsourcingCompanyAccountNumber" -> "청구계좌";
+            case "outsourcingCompanyAccountHolder" -> "계좌명";
             case "supplyPrice" -> "공급가";
             case "vat" -> "부가세";
             case "total" -> "합계";
@@ -256,6 +261,22 @@ public class ManagementCostService {
             case "processName" -> managementCost.process().name();
             case "itemType" -> managementCost.itemType();
             case "paymentDate" -> DateTimeFormatUtils.formatKoreaLocalDate(managementCost.paymentDate());
+            case "outsourcingCompanyName" -> managementCost.outsourcingCompany() != null
+                    ? managementCost.outsourcingCompany().name()
+                    : "";
+            case "outsourcingCompanyBusinessNumber" -> managementCost.outsourcingCompany() != null
+                    ? managementCost.outsourcingCompany().businessNumber()
+                    : "";
+            case "outsourcingCompanyCeoName" -> managementCost.outsourcingCompany() != null
+                    ? managementCost.outsourcingCompany().ceoName()
+                    : "";
+            case "outsourcingCompanyAccountNumber" -> managementCost.outsourcingCompany() != null
+                    ? managementCost.outsourcingCompany().bankName() + " "
+                            + managementCost.outsourcingCompany().accountNumber()
+                    : "";
+            case "outsourcingCompanyAccountHolder" -> managementCost.outsourcingCompany() != null
+                    ? managementCost.outsourcingCompany().accountHolder()
+                    : "";
             case "supplyPrice" -> String.valueOf(managementCost.supplyPrice());
             case "vat" -> String.valueOf(managementCost.vat());
             case "total" -> String.valueOf(managementCost.total());

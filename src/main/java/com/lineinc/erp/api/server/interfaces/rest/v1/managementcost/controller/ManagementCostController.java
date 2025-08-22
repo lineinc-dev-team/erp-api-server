@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemTypeResponse;
@@ -18,10 +19,14 @@ import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
 
@@ -30,6 +35,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +43,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -147,34 +154,31 @@ public class ManagementCostController {
     // SuccessResponse.of(response));
     // }
 
-    // @Operation(summary = "관리비 목록 엑셀 다운로드", description = "검색 조건에 맞는 관리비 목록을 엑셀
-    // 파일로 다운로드합니다.")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류", content =
-    // @Content())
-    // })
-    // @GetMapping("/download")
-    // @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action =
-    // PermissionAction.VIEW)
-    // public void downloadSitesExcel(
-    // @Valid SortRequest sortRequest,
-    // @Valid ManagementCostListRequest request,
-    // @Valid ManagementCostDownloadRequest managementCostDownloadRequest,
-    // HttpServletResponse response) throws IOException {
-    // List<String> parsed =
-    // DownloadFieldUtils.parseFields(managementCostDownloadRequest.fields());
-    // DownloadFieldUtils.validateFields(parsed,
-    // ManagementCostDownloadRequest.ALLOWED_FIELDS);
-    // ResponseHeaderUtils.setExcelDownloadHeader(response, "관리비 목록.xlsx");
+    @Operation(summary = "관리비 목록 엑셀 다운로드", description = "검색 조건에 맞는 관리비 목록을 엑셀 파일로 다운로드합니다.")
 
-    // try (Workbook workbook = managementCostService.downloadExcel(
-    // request,
-    // PageableUtils.parseSort(sortRequest.sort()),
-    // parsed)) {
-    // workbook.write(response.getOutputStream());
-    // }
-    // }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public void downloadSitesExcel(
+            @Valid SortRequest sortRequest,
+            @Valid ManagementCostListRequest request,
+            @Valid ManagementCostDownloadRequest managementCostDownloadRequest,
+            HttpServletResponse response) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(managementCostDownloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed,
+                ManagementCostDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "관리비 목록.xlsx");
+
+        try (Workbook workbook = managementCostService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed)) {
+            workbook.write(response.getOutputStream());
+        }
+    }
 
     // @Operation(summary = "관리비 정보 수정", description = "관리비 정보를 수정합니다")
     // @ApiResponses(value = {
