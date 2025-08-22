@@ -65,6 +65,7 @@ public class ManagementCostService {
     private final SiteProcessService siteProcessService;
     private final ManagementCostDetailService managementCostDetailService;
     private final ManagementCostFileService managementCostFileService;
+    private final ManagementCostKeyMoneyDetailService managementCostKeyMoneyDetailService;
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
 
     private final Javers javers;
@@ -413,10 +414,11 @@ public class ManagementCostService {
                     request.details());
         }
 
-        // // 전도금 상세 정보 업데이트
-        // if (request.keyMoneyDetails() != null) {
-        // updateKeyMoneyDetails(managementCost, request.keyMoneyDetails());
-        // }
+        // 전도금 상세 정보 업데이트
+        if (request.keyMoneyDetails() != null) {
+            managementCostKeyMoneyDetailService.updateManagementCostKeyMoneyDetails(managementCost,
+                    request.keyMoneyDetails());
+        }
 
         // // 식대 상세 정보 업데이트
         // if (request.mealFeeDetails() != null) {
