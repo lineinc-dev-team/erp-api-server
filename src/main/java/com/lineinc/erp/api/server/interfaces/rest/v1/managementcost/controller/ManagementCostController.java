@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
@@ -92,21 +93,19 @@ public class ManagementCostController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    // @Operation(summary = "관리비 삭제", description = "하나 이상의 관리비 ID를 받아 해당 데이터를
-    // 삭제합니다.")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "삭제 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류"),
-    // @ApiResponse(responseCode = "404", description = "관리비를 찾을 수 없음")
-    // })
-    // @DeleteMapping
-    // @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action =
-    // PermissionAction.DELETE)
-    // public ResponseEntity<Void> deleteManagementCosts(
-    // @RequestBody DeleteManagementCostsRequest managementCostIds) {
-    // managementCostService.deleteManagementCosts(managementCostIds);
-    // return ResponseEntity.ok().build();
-    // }
+    @Operation(summary = "관리비 삭제", description = "하나 이상의 관리비 ID를 받아 해당 데이터를 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "관리비를 찾을 수 없음")
+    })
+    @DeleteMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteManagementCosts(
+            @RequestBody DeleteManagementCostsRequest managementCostIds) {
+        managementCostService.deleteManagementCosts(managementCostIds);
+        return ResponseEntity.ok().build();
+    }
 
     @Operation(summary = "관리비 목록 조회", description = "필터 조건에 맞는 관리비 목록을 조회합니다")
     @ApiResponses(value = {
