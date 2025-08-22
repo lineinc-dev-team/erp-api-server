@@ -11,7 +11,7 @@ public enum ManagementCostChangeType {
     MEAL_FEE("식대"),
     ITEM_DETAIL("품목상세"),
     KEY_MONEY_DETAIL("전도금 상세"),
-    DOCUMENT("증빙서류");
+    ATTACHMENT("증빙서류");
 
     private final String label;
 }
