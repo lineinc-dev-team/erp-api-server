@@ -44,9 +44,9 @@ public class DailyReport extends BaseEntity {
 
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<DailyReportWorker> workers = new ArrayList<>(); // 출역일보 직원 목록
+    private List<DailyReportEmployee> employees = new ArrayList<>(); // 출역일보 직원 목록
 
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<DailyReportWork> works = new ArrayList<>(); // 출역일보 직영/용역 작업 목록
+    private List<DailyReportOutsourcingWork> outsourcingWorks = new ArrayList<>(); // 출역일보 직영/용역 작업 목록
 }
