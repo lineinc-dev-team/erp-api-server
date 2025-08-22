@@ -330,7 +330,6 @@ public class ManagementCostService {
         ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
         Site site = siteService.getSiteByIdOrThrow(request.siteId());
         SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
-
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
@@ -340,7 +339,7 @@ public class ManagementCostService {
                 request.outsourcingCompanyId(),
                 request.outsourcingCompanyInfo());
 
-        // 수정 전 스냅샷 생성
+        // // 수정 전 스냅샷 생성
         managementCost.syncTransientFields();
         ManagementCost oldSnapshot = JaversUtils.createSnapshot(javers, managementCost, ManagementCost.class);
 
