@@ -11,6 +11,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -135,24 +136,20 @@ public class ManagementCostController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    // @Operation(summary = "관리비 상세 조회", description = "관리비 상세 정보를 조회합니다")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "조회 성공"),
-    // @ApiResponse(responseCode = "404", description = "관리비를 찾을 수 없음", content =
-    // @Content())
-    // })
-    // @GetMapping("/{id}")
-    // @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action =
-    // PermissionAction.VIEW)
-    // public ResponseEntity<SuccessResponse<ManagementCostDetailViewResponse>>
-    // getManagementCostDetail(
-    // @PathVariable Long id) {
-    // ManagementCostDetailViewResponse response =
-    // managementCostService.getManagementCostById(id);
+    @Operation(summary = "관리비 상세 조회", description = "관리비 상세 정보를 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "관리비를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<ManagementCostDetailViewResponse>> getManagementCostDetail(
+            @PathVariable Long id) {
+        ManagementCostDetailViewResponse response = managementCostService.getManagementCostById(id);
 
-    // return ResponseEntity.ok(
-    // SuccessResponse.of(response));
-    // }
+        return ResponseEntity.ok(
+                SuccessResponse.of(response));
+    }
 
     @Operation(summary = "관리비 목록 엑셀 다운로드", description = "검색 조건에 맞는 관리비 목록을 엑셀 파일로 다운로드합니다.")
 

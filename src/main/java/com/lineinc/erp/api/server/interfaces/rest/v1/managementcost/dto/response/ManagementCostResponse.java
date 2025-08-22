@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
