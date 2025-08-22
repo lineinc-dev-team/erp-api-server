@@ -407,11 +407,11 @@ public class ManagementCostService {
             }
         }
 
-        // // 상세 정보 업데이트
-        // if (request.details() != null) {
-        // managementCostDetailService.updateManagementCostDetails(managementCost,
-        // request.details());
-        // }
+        // 상세 정보 업데이트
+        if (request.details() != null) {
+            managementCostDetailService.updateManagementCostDetails(managementCost,
+                    request.details());
+        }
 
         // // 전도금 상세 정보 업데이트
         // if (request.keyMoneyDetails() != null) {

@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffInclude;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import java.util.Optional;
 
@@ -23,6 +25,7 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
     @SequenceGenerator(name = "management_cost_detail_seq", sequenceName = "management_cost_detail_seq", allocationSize = 1)
     private Long id;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "management_cost_id", nullable = false)
     private ManagementCost managementCost;
@@ -30,33 +33,39 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
     /**
      * 품목 이름
      */
+    @DiffInclude
     @Column(nullable = false)
     private String name;
 
     /**
      * 단가
      */
+    @DiffInclude
     @Column(nullable = false)
     private Long unitPrice;
 
     /**
      * 공급가 (부가세 제외 금액)
      */
+    @DiffInclude
     @Column(nullable = false)
     private Long supplyPrice;
 
     /**
      * 부가세
      */
+    @DiffInclude
     @Column(nullable = false)
     private Long vat;
 
     /**
      * 합계 (공사 가액 + 부가세)
      */
+    @DiffInclude
     @Column(nullable = false)
     private Long total;
 
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
 
@@ -68,5 +77,13 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
         Optional.ofNullable(request.vat()).ifPresent(val -> this.vat = val);
         Optional.ofNullable(request.total()).ifPresent(val -> this.total = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
+
+    /**
+     * Javers 감사 로그를 위한 transient 필드 동기화
+     */
+    public void syncTransientFields() {
+        // 현재는 추가 transient 필드가 없으므로 비워둠
+        // 필요시 여기에 transient 필드 동기화 로직 추가
     }
 }

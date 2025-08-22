@@ -30,6 +30,9 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -152,6 +155,12 @@ public class JaversUtils {
             return fuelInfo.getEquipmentSpecification();
         } else if (entity instanceof LaborFile file) {
             return file.getName();
+        } else if (entity instanceof ManagementCostDetail detail) {
+            return detail.getName();
+        } else if (entity instanceof ManagementCostKeyMoneyDetail detail) {
+            return detail.getAccount();
+        } else if (entity instanceof ManagementCostMealFeeDetail detail) {
+            return detail.getName();
         }
         return null;
     }
@@ -221,6 +230,12 @@ public class JaversUtils {
             return fuelInfo.getEquipmentSpecification() + "(" + fuelInfo.getId() + ")";
         } else if (entity instanceof LaborFile file) {
             return file.getName() + "(" + file.getId() + ")";
+        } else if (entity instanceof ManagementCostDetail detail) {
+            return detail.getName() + "(" + detail.getId() + ")";
+        } else if (entity instanceof ManagementCostKeyMoneyDetail detail) {
+            return detail.getAccount() + "(" + detail.getId() + ")";
+        } else if (entity instanceof ManagementCostMealFeeDetail detail) {
+            return detail.getName() + "(" + detail.getId() + ")";
         }
         return null;
     }
