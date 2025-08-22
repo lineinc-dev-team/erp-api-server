@@ -26,12 +26,10 @@ import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCos
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest.OutsourcingCompanyInfo;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyBasicInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
@@ -81,54 +79,9 @@ public class ManagementCostService {
         }
 
         // 2. 외주업체 처리
-        OutsourcingCompany outsourcingCompany = null;
-        if (request.outsourcingCompanyId() != null) {
-            // 기존 외주업체 수정
-            outsourcingCompany = outsourcingCompanyService
-                    .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
-            if (request.outsourcingCompanyInfo() != null) {
-                ManagementCostCreateRequest.OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
-                outsourcingCompanyService.updateOutsourcingCompany(
-                        outsourcingCompany.getId(),
-                        new OutsourcingCompanyUpdateRequest(
-                                companyInfo.name(),
-                                companyInfo.businessNumber(),
-                                null, // type
-                                null, // typeDescription
-                                companyInfo.ceoName(),
-                                null, // address
-                                null, // detailAddress
-                                null, // landlineNumber
-                                null, // phoneNumber
-                                null, // email
-                                null, // isActive
-                                null, // defaultDeductions
-                                null, // defaultDeductionsDescription
-                                companyInfo.bankName(),
-                                companyInfo.accountNumber(),
-                                companyInfo.accountHolder(),
-                                companyInfo.memo(),
-                                null, // contacts
-                                null, // files
-                                null // changeHistories
-                        ));
-                outsourcingCompany = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(outsourcingCompany.getId());
-            }
-        } else if (request.outsourcingCompanyInfo() != null) {
-            // 신규 외주업체 생성
-            ManagementCostCreateRequest.OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
-            outsourcingCompany = OutsourcingCompany.builder()
-                    .name(companyInfo.name())
-                    .businessNumber(companyInfo.businessNumber())
-                    .ceoName(companyInfo.ceoName())
-                    .bankName(companyInfo.bankName())
-                    .accountNumber(companyInfo.accountNumber())
-                    .accountHolder(companyInfo.accountHolder())
-                    .memo(companyInfo.memo())
-                    .build();
-            outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
-        }
+        OutsourcingCompany outsourcingCompany = processOutsourcingCompany(
+                request.outsourcingCompanyId(),
+                request.outsourcingCompanyInfo());
 
         // 3. 관리비 엔티티 생성 및 저장
         ManagementCost managementCost = ManagementCost.builder()
@@ -162,6 +115,63 @@ public class ManagementCostService {
         if (request.files() != null && !request.files().isEmpty()) {
             managementCostFileService.createManagementCostFiles(request.files(), managementCost);
         }
+    }
+
+    /**
+     * 외주업체 처리 (생성 또는 수정)
+     */
+    private OutsourcingCompany processOutsourcingCompany(Long outsourcingCompanyId,
+            OutsourcingCompanyBasicInfoRequest outsourcingCompanyInfo) {
+        OutsourcingCompany outsourcingCompany = null;
+
+        if (outsourcingCompanyId != null) {
+            // 기존 외주업체 수정
+            outsourcingCompany = outsourcingCompanyService
+                    .getOutsourcingCompanyByIdOrThrow(outsourcingCompanyId);
+
+            if (outsourcingCompanyInfo != null) {
+                outsourcingCompanyService.updateOutsourcingCompany(
+                        outsourcingCompany.getId(),
+                        new OutsourcingCompanyUpdateRequest(
+                                outsourcingCompanyInfo.name(),
+                                outsourcingCompanyInfo.businessNumber(),
+                                null, // type
+                                null, // typeDescription
+                                outsourcingCompanyInfo.ceoName(),
+                                null, // address
+                                null, // detailAddress
+                                null, // landlineNumber
+                                null, // phoneNumber
+                                null, // email
+                                null, // isActive
+                                null, // defaultDeductions
+                                null, // defaultDeductionsDescription
+                                outsourcingCompanyInfo.bankName(),
+                                outsourcingCompanyInfo.accountNumber(),
+                                outsourcingCompanyInfo.accountHolder(),
+                                outsourcingCompanyInfo.memo(),
+                                null, // contacts
+                                null, // files
+                                null // changeHistories
+                        ));
+                outsourcingCompany = outsourcingCompanyService
+                        .getOutsourcingCompanyByIdOrThrow(outsourcingCompany.getId());
+            }
+        } else if (outsourcingCompanyInfo != null) {
+            // 신규 외주업체 생성
+            outsourcingCompany = OutsourcingCompany.builder()
+                    .name(outsourcingCompanyInfo.name())
+                    .businessNumber(outsourcingCompanyInfo.businessNumber())
+                    .ceoName(outsourcingCompanyInfo.ceoName())
+                    .bankName(outsourcingCompanyInfo.bankName())
+                    .accountNumber(outsourcingCompanyInfo.accountNumber())
+                    .accountHolder(outsourcingCompanyInfo.accountHolder())
+                    .memo(outsourcingCompanyInfo.memo())
+                    .build();
+            outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
+        }
+
+        return outsourcingCompany;
     }
 
     /**
@@ -325,56 +335,10 @@ public class ManagementCostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
-        // 외주업체 처리
-        OutsourcingCompany outsourcingCompany = null;
-        if (request.outsourcingCompanyId() != null) {
-            outsourcingCompany = outsourcingCompanyService
-                    .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
-        } else if (request.outsourcingCompanyInfo() != null) {
-            // 신규 외주업체 생성 또는 기존 업체 업데이트
-            ManagementCostUpdateRequest.OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
-            if (managementCost.getOutsourcingCompany() != null) {
-                // 기존 업체 업데이트
-                outsourcingCompanyService.updateOutsourcingCompany(
-                        managementCost.getOutsourcingCompany().getId(),
-                        new OutsourcingCompanyUpdateRequest(
-                                companyInfo.name(),
-                                companyInfo.businessNumber(),
-                                null, // type
-                                null, // typeDescription
-                                companyInfo.ceoName(),
-                                null, // address
-                                null, // detailAddress
-                                null, // landlineNumber
-                                null, // phoneNumber
-                                null, // email
-                                null, // isActive
-                                null, // defaultDeductions
-                                null, // defaultDeductionsDescription
-                                companyInfo.bankName(),
-                                companyInfo.accountNumber(),
-                                companyInfo.accountHolder(),
-                                companyInfo.memo(),
-                                null, // contacts
-                                null, // files
-                                null // changeHistories
-                        ));
-                outsourcingCompany = outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(
-                        managementCost.getOutsourcingCompany().getId());
-            } else {
-                // 신규 업체 생성
-                outsourcingCompany = OutsourcingCompany.builder()
-                        .name(companyInfo.name())
-                        .businessNumber(companyInfo.businessNumber())
-                        .ceoName(companyInfo.ceoName())
-                        .bankName(companyInfo.bankName())
-                        .accountNumber(companyInfo.accountNumber())
-                        .accountHolder(companyInfo.accountHolder())
-                        .memo(companyInfo.memo())
-                        .build();
-                outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
-            }
-        }
+        // 2. 외주업체 처리
+        OutsourcingCompany outsourcingCompany = processOutsourcingCompany(
+                request.outsourcingCompanyId(),
+                request.outsourcingCompanyInfo());
 
         // 수정 전 스냅샷 생성
         managementCost.syncTransientFields();
