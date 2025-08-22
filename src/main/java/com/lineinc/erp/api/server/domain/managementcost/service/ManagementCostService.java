@@ -131,32 +131,31 @@ public class ManagementCostService {
                     .getOutsourcingCompanyByIdOrThrow(outsourcingCompanyId);
 
             if (outsourcingCompanyInfo != null) {
-                outsourcingCompanyService.updateOutsourcingCompany(
-                        outsourcingCompany.getId(),
-                        new OutsourcingCompanyUpdateRequest(
-                                outsourcingCompanyInfo.name(),
-                                outsourcingCompanyInfo.businessNumber(),
-                                null, // type
-                                null, // typeDescription
-                                outsourcingCompanyInfo.ceoName(),
-                                null, // address
-                                null, // detailAddress
-                                null, // landlineNumber
-                                null, // phoneNumber
-                                null, // email
-                                null, // isActive
-                                null, // defaultDeductions
-                                null, // defaultDeductionsDescription
-                                outsourcingCompanyInfo.bankName(),
-                                outsourcingCompanyInfo.accountNumber(),
-                                outsourcingCompanyInfo.accountHolder(),
-                                outsourcingCompanyInfo.memo(),
-                                null, // contacts
-                                null, // files
-                                null // changeHistories
-                        ));
-                outsourcingCompany = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(outsourcingCompany.getId());
+                // 직접 엔티티 수정하여 Javers 스냅샷 생성 방지
+                OutsourcingCompanyUpdateRequest updateRequest = new OutsourcingCompanyUpdateRequest(
+                        outsourcingCompanyInfo.name(),
+                        outsourcingCompanyInfo.businessNumber(),
+                        null, // type
+                        null, // typeDescription
+                        outsourcingCompanyInfo.ceoName(),
+                        null, // address
+                        null, // detailAddress
+                        null, // landlineNumber
+                        null, // phoneNumber
+                        null, // email
+                        null, // isActive
+                        null, // defaultDeductions
+                        null, // defaultDeductionsDescription
+                        outsourcingCompanyInfo.bankName(),
+                        outsourcingCompanyInfo.accountNumber(),
+                        outsourcingCompanyInfo.accountHolder(),
+                        outsourcingCompanyInfo.memo(),
+                        null, // contacts
+                        null, // files
+                        null // changeHistories
+                );
+                outsourcingCompany.updateFrom(updateRequest);
+                outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
             }
         } else if (outsourcingCompanyInfo != null) {
             // 신규 외주업체 생성
