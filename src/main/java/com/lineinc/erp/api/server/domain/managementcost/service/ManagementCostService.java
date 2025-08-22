@@ -339,7 +339,7 @@ public class ManagementCostService {
                 request.outsourcingCompanyId(),
                 request.outsourcingCompanyInfo());
 
-        // // 수정 전 스냅샷 생성
+        // 수정 전 스냅샷 생성
         managementCost.syncTransientFields();
         ManagementCost oldSnapshot = JaversUtils.createSnapshot(javers, managementCost, ManagementCost.class);
 

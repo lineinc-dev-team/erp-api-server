@@ -334,6 +334,10 @@ public class LaborService {
      */
     @Transactional(readOnly = true)
     public Labor getLaborByIdOrThrow(Long id) {
+        // -1인 경우 null 반환 (연관관계 끊기)
+        if (id != null && id == -1L) {
+            return null;
+        }
         return laborRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.LABOR_NOT_FOUND));
     }
