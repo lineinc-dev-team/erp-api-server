@@ -12,6 +12,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,4 +41,8 @@ public class DailyReport extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private WeatherType weather; // 날씨
+
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DailyReportWorker> workers = new ArrayList<>(); // 출역일보 직원 목록
 }
