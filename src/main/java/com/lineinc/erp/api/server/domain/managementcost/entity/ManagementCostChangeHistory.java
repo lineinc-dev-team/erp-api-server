@@ -1,11 +1,11 @@
-package com.lineinc.erp.api.server.domain.labormanagement.entity;
+package com.lineinc.erp.api.server.domain.managementcost.entity;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborChangeType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -30,26 +31,26 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class LaborChangeHistory extends BaseEntity {
+public class ManagementCostChangeHistory extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "labor_change_history_seq")
-    @SequenceGenerator(name = "labor_change_history_seq", sequenceName = "labor_change_history_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_change_history_seq")
+    @SequenceGenerator(name = "management_cost_change_history_seq", sequenceName = "management_cost_change_history_seq", allocationSize = 1)
     private Long id;
 
     /**
-     * 노무 참조
+     * 관리비 참조
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id")
-    private Labor labor;
+    @JoinColumn(name = "management_cost_id")
+    private ManagementCost managementCost;
 
     /**
      * 변경 유형
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LaborChangeType type;
+    private ManagementCostChangeType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")

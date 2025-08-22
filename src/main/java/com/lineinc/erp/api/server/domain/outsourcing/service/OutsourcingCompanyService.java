@@ -45,7 +45,7 @@ public class OutsourcingCompanyService {
     private final Javers javers;
 
     @Transactional
-    public void createOutsourcingCompany(OutsourcingCompanyCreateRequest request) {
+    public OutsourcingCompany createOutsourcingCompany(OutsourcingCompanyCreateRequest request) {
 
         if (outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -77,8 +77,7 @@ public class OutsourcingCompanyService {
         outsourcingCompanyContactService.createOutsourcingCompanyContacts(outsourcingCompany, request.contacts());
         outsourcingCompanyFileService.createOutsourcingCompanyFiles(outsourcingCompany, request.files());
 
-        // 3. 저장
-        outsourcingCompanyRepository.save(outsourcingCompany);
+        return outsourcingCompanyRepository.save(outsourcingCompany);
     }
 
     @Transactional(readOnly = true)

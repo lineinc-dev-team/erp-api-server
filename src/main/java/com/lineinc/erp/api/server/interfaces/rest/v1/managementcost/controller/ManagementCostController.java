@@ -9,6 +9,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostDetailViewResponse;
@@ -177,21 +178,18 @@ public class ManagementCostController {
         }
     }
 
-    // @Operation(summary = "관리비 정보 수정", description = "관리비 정보를 수정합니다")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "수정 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류", content =
-    // @Content()),
-    // @ApiResponse(responseCode = "404", description = "해당 관리비를 찾을 수 없음", content =
-    // @Content())
-    // })
-    // @PatchMapping("/{id}")
-    // @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action =
-    // PermissionAction.UPDATE)
-    // public ResponseEntity<Void> updateManagementCost(
-    // @PathVariable Long id,
-    // @Valid @RequestBody ManagementCostUpdateRequest request) {
-    // managementCostService.updateManagementCost(id, request);
-    // return ResponseEntity.ok().build();
-    // }
+    @Operation(summary = "관리비 정보 수정 (작업중)", description = "관리비 정보를 수정합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "해당 관리비를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateManagementCost(
+            @PathVariable Long id,
+            @Valid @RequestBody ManagementCostUpdateRequest request) {
+        managementCostService.updateManagementCost(id, request);
+        return ResponseEntity.ok().build();
+    }
 }

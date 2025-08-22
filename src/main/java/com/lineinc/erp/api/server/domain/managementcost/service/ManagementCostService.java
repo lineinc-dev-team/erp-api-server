@@ -14,23 +14,31 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
+import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest.OutsourcingCompanyInfo;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest.OutsourcingCompanyInfo;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -41,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +65,9 @@ public class ManagementCostService {
     private final SiteProcessService siteProcessService;
     private final ManagementCostDetailService managementCostDetailService;
     private final ManagementCostFileService managementCostFileService;
+    private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
+
+    private final Javers javers;
 
     @Transactional
     public void createManagementCost(ManagementCostCreateRequest request) {
@@ -73,7 +85,7 @@ public class ManagementCostService {
             outsourcingCompany = outsourcingCompanyService
                     .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
             if (request.outsourcingCompanyInfo() != null) {
-                OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
+                ManagementCostCreateRequest.OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
                 outsourcingCompanyService.updateOutsourcingCompany(
                         outsourcingCompany.getId(),
                         new OutsourcingCompanyUpdateRequest(
@@ -103,7 +115,7 @@ public class ManagementCostService {
             }
         } else if (request.outsourcingCompanyInfo() != null) {
             // 신규 외주업체 생성
-            OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
+            ManagementCostCreateRequest.OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
             outsourcingCompany = OutsourcingCompany.builder()
                     .name(companyInfo.name())
                     .businessNumber(companyInfo.businessNumber())
@@ -306,15 +318,105 @@ public class ManagementCostService {
         ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
         Site site = siteService.getSiteByIdOrThrow(request.siteId());
         SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
-        managementCost.changeSite(site);
-        managementCost.changeSiteProcess(siteProcess);
-        managementCost.updateFrom(request);
 
-        managementCostDetailService.updateManagementCostDetails(managementCost, request.details());
-        managementCostFileService.updateManagementCostFiles(managementCost, request.files());
+        // 외주업체 처리
+        OutsourcingCompany outsourcingCompany = null;
+        if (request.outsourcingCompanyId() != null) {
+            outsourcingCompany = outsourcingCompanyService
+                    .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+        } else if (request.outsourcingCompanyInfo() != null) {
+            // 신규 외주업체 생성 또는 기존 업체 업데이트
+            ManagementCostUpdateRequest.OutsourcingCompanyInfo companyInfo = request.outsourcingCompanyInfo();
+            if (managementCost.getOutsourcingCompany() != null) {
+                // 기존 업체 업데이트
+                outsourcingCompanyService.updateOutsourcingCompany(
+                        managementCost.getOutsourcingCompany().getId(),
+                        new OutsourcingCompanyUpdateRequest(
+                                companyInfo.name(),
+                                companyInfo.businessNumber(),
+                                null, // type
+                                null, // typeDescription
+                                companyInfo.ceoName(),
+                                null, // address
+                                null, // detailAddress
+                                null, // landlineNumber
+                                null, // phoneNumber
+                                null, // email
+                                null, // isActive
+                                null, // defaultDeductions
+                                null, // defaultDeductionsDescription
+                                companyInfo.bankName(),
+                                companyInfo.accountNumber(),
+                                companyInfo.accountHolder(),
+                                companyInfo.memo(),
+                                null, // contacts
+                                null, // files
+                                null // changeHistories
+                        ));
+                outsourcingCompany = outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(
+                        managementCost.getOutsourcingCompany().getId());
+            } else {
+                // 신규 업체 생성
+                outsourcingCompany = OutsourcingCompany.builder()
+                        .name(companyInfo.name())
+                        .businessNumber(companyInfo.businessNumber())
+                        .ceoName(companyInfo.ceoName())
+                        .bankName(companyInfo.bankName())
+                        .accountNumber(companyInfo.accountNumber())
+                        .accountHolder(companyInfo.accountHolder())
+                        .memo(companyInfo.memo())
+                        .build();
+                outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
+            }
+        }
+
+        // 수정 전 스냅샷 생성
+        managementCost.syncTransientFields();
+        ManagementCost oldSnapshot = JaversUtils.createSnapshot(javers, managementCost, ManagementCost.class);
+
+        // 엔티티 업데이트
+        managementCost.updateFrom(request, site, siteProcess, outsourcingCompany);
+        managementCostRepository.save(managementCost);
+
+        // 변경 이력 추적
+        Diff diff = javers.compare(oldSnapshot, managementCost);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            managementCostChangeHistoryRepository.save(changeHistory);
+        }
+
+        // // 상세 정보 업데이트
+        // if (request.details() != null) {
+        // managementCostDetailService.updateManagementCostDetails(managementCost,
+        // request.details());
+        // }
+
+        // // 전도금 상세 정보 업데이트
+        // if (request.keyMoneyDetails() != null) {
+        // updateKeyMoneyDetails(managementCost, request.keyMoneyDetails());
+        // }
+
+        // // 식대 상세 정보 업데이트
+        // if (request.mealFeeDetails() != null) {
+        // updateMealFeeDetails(managementCost, request.mealFeeDetails());
+        // }
+
+        // // 파일 업데이트
+        // if (request.files() != null) {
+        // managementCostFileService.updateManagementCostFiles(managementCost,
+        // request.files());
+        // }
     }
 
     /**
