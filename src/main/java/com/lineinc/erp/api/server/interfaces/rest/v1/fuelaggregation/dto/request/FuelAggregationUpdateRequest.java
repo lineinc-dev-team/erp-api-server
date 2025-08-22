@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
+import com.lineinc.erp.api.server.shared.enums.WeatherType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

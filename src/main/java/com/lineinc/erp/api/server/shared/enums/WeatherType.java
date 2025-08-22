@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.fuelaggregation.enums;
+package com.lineinc.erp.api.server.shared.enums;
 
 import lombok.Getter;
 

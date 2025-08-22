@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
+import com.lineinc.erp.api.server.shared.enums.WeatherType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
