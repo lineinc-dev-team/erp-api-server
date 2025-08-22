@@ -31,7 +31,15 @@ public record ManagementCostUpdateRequest(
 
         @Schema(description = "관리비 파일 목록") List<ManagementCostFileUpdateRequest> files,
 
-        @Schema(description = "외주업체 정보 (신규 등록 또는 수정용)") OutsourcingCompanyInfo outsourcingCompanyInfo) {
+        @Schema(description = "외주업체 정보 (신규 등록 또는 수정용)") OutsourcingCompanyInfo outsourcingCompanyInfo,
+
+        @Schema(description = "변경이력 메모 수정 목록") List<ChangeHistoryRequest> changeHistories) {
+
+    @Schema(description = "변경이력 메모 수정 요청")
+    public record ChangeHistoryRequest(
+            @Schema(description = "변경이력 ID", example = "1") Long id,
+            @Schema(description = "메모", example = "수정 사유") String memo) {
+    }
 
     @Schema(description = "외주업체 정보")
     public record OutsourcingCompanyInfo(

@@ -396,6 +396,17 @@ public class ManagementCostService {
             managementCostChangeHistoryRepository.save(changeHistory);
         }
 
+        // 변경이력 메모 수정 처리
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (ManagementCostUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+                managementCostChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getManagementCost().getId().equals(managementCost.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
+
         // // 상세 정보 업데이트
         // if (request.details() != null) {
         // managementCostDetailService.updateManagementCostDetails(managementCost,
