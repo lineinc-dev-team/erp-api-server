@@ -11,6 +11,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostDetailViewResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostChangeHistoryResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -418,5 +419,17 @@ public class ManagementCostService {
      */
     public Slice<LaborNameResponse> getLaborNames(String keyword, Pageable pageable) {
         return laborService.getLaborNames(keyword, pageable);
+    }
+
+    /**
+     * 관리비 수정이력 조회
+     */
+    @Transactional(readOnly = true)
+    public Slice<ManagementCostChangeHistoryResponse> getManagementCostChangeHistories(Long managementCostId,
+            Pageable pageable) {
+        ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
+
+        return managementCostChangeHistoryRepository.findAllByManagementCost(managementCost, pageable)
+                .map(ManagementCostChangeHistoryResponse::from);
     }
 }
