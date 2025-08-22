@@ -66,6 +66,7 @@ public class ManagementCostService {
     private final ManagementCostDetailService managementCostDetailService;
     private final ManagementCostFileService managementCostFileService;
     private final ManagementCostKeyMoneyDetailService managementCostKeyMoneyDetailService;
+    private final ManagementCostMealFeeDetailService managementCostMealFeeDetailService;
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
 
     private final Javers javers;
@@ -420,10 +421,11 @@ public class ManagementCostService {
                     request.keyMoneyDetails());
         }
 
-        // // 식대 상세 정보 업데이트
-        // if (request.mealFeeDetails() != null) {
-        // updateMealFeeDetails(managementCost, request.mealFeeDetails());
-        // }
+        // 식대 상세 정보 업데이트
+        if (request.mealFeeDetails() != null) {
+            managementCostMealFeeDetailService.updateManagementCostMealFeeDetails(managementCost,
+                    request.mealFeeDetails());
+        }
 
         // // 파일 업데이트
         // if (request.files() != null) {
