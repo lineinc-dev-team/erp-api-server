@@ -31,6 +31,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementD
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 
@@ -161,6 +162,8 @@ public class JaversUtils {
             return detail.getAccount();
         } else if (entity instanceof ManagementCostMealFeeDetail detail) {
             return detail.getName();
+        } else if (entity instanceof ManagementCostFile file) {
+            return file.getOriginalFileName();
         }
         return null;
     }
@@ -236,6 +239,8 @@ public class JaversUtils {
             return detail.getAccount() + "(" + detail.getId() + ")";
         } else if (entity instanceof ManagementCostMealFeeDetail detail) {
             return detail.getName() + "(" + detail.getId() + ")";
+        } else if (entity instanceof ManagementCostFile file) {
+            return file.getOriginalFileName() + "(" + file.getId() + ")";
         }
         return null;
     }

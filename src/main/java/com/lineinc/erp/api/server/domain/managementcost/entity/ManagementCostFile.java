@@ -3,6 +3,8 @@ package com.lineinc.erp.api.server.domain.managementcost.entity;
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
@@ -41,24 +43,28 @@ public class ManagementCostFile extends BaseEntity implements UpdatableFrom<Mana
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "management_cost_id", nullable = false)
+    @DiffIgnore
     private ManagementCost managementCost;
 
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @Column
+    @DiffInclude
     private String fileUrl;
 
     /**
      * 업로드된 파일의 원본 파일명
      */
     @Column
+    @DiffInclude
     private String originalFileName;
 
     /**
      * 파일에 대한 비고 또는 설명
      */
     @Column(columnDefinition = "TEXT")
+    @DiffInclude
     private String memo;
 
     public void updateFrom(ManagementCostFileUpdateRequest request) {

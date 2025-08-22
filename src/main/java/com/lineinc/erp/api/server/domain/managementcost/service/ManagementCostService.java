@@ -427,11 +427,11 @@ public class ManagementCostService {
                     request.mealFeeDetails());
         }
 
-        // // 파일 업데이트
-        // if (request.files() != null) {
-        // managementCostFileService.updateManagementCostFiles(managementCost,
-        // request.files());
-        // }
+        // 파일 업데이트
+        if (request.files() != null) {
+            managementCostFileService.updateManagementCostFiles(managementCost,
+                    request.files());
+        }
     }
 
     /**
