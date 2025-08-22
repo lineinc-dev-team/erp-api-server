@@ -108,31 +108,26 @@ public class ManagementCostController {
     // return ResponseEntity.ok().build();
     // }
 
-    // @Operation(summary = "관리비 목록 조회", description = "필터 조건에 맞는 관리비 목록을 조회합니다")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "관리비 목록 조회 성공"),
-    // @ApiResponse(responseCode = "400", description = "입력값 오류", content =
-    // @Content())
-    // })
-    // @GetMapping
-    // @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action =
-    // PermissionAction.VIEW)
-    // public
-    // ResponseEntity<SuccessResponse<PagingResponse<ManagementCostResponse>>>
-    // getManagementCosts(
-    // @Valid PageRequest pageRequest,
-    // @Valid SortRequest sortRequest,
-    // @Valid ManagementCostListRequest request) {
+    @Operation(summary = "관리비 목록 조회", description = "필터 조건에 맞는 관리비 목록을 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "관리비 목록 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<ManagementCostResponse>>> getManagementCosts(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid ManagementCostListRequest request) {
 
-    // Page<ManagementCostResponse> page =
-    // managementCostService.getAllManagementCosts(
-    // request,
-    // PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-    // sortRequest.sort()));
+        Page<ManagementCostResponse> page = managementCostService.getAllManagementCosts(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
 
-    // return ResponseEntity.ok(SuccessResponse.of(
-    // new PagingResponse<>(PagingInfo.from(page), page.getContent())));
-    // }
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
 
     // @Operation(summary = "관리비 상세 조회", description = "관리비 상세 정보를 조회합니다")
     // @ApiResponses(value = {

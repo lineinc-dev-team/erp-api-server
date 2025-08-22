@@ -256,21 +256,9 @@ public class ManagementCostService {
             case "processName" -> managementCost.process().name();
             case "itemType" -> managementCost.itemType();
             case "paymentDate" -> DateTimeFormatUtils.formatKoreaLocalDate(managementCost.paymentDate());
-            case "supplyPrice" -> String.valueOf(
-                    managementCost.details().stream()
-                            .filter(detail -> detail.supplyPrice() != null)
-                            .mapToLong(ManagementCostDetailResponse::supplyPrice)
-                            .sum());
-            case "vat" -> String.valueOf(
-                    managementCost.details().stream()
-                            .filter(detail -> detail.vat() != null)
-                            .mapToLong(ManagementCostDetailResponse::vat)
-                            .sum());
-            case "total" -> String.valueOf(
-                    managementCost.details().stream()
-                            .filter(detail -> detail.total() != null)
-                            .mapToLong(ManagementCostDetailResponse::total)
-                            .sum());
+            case "supplyPrice" -> String.valueOf(managementCost.supplyPrice());
+            case "vat" -> String.valueOf(managementCost.vat());
+            case "total" -> String.valueOf(managementCost.total());
             case "hasFile" -> managementCost.hasFile() ? "Y" : "N";
             case "memo" -> managementCost.memo();
             default -> null;
