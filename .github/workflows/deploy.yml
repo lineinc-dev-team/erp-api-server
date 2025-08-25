@@ -55,11 +55,27 @@ jobs:
             
             # 현재 활성 포트 확인 (weight=100인 포트)
             CURRENT_PORT=$(sudo grep -oP 'server 127.0.0.1:\K[0-9]+.*weight=100' /etc/nginx/sites-available/erp.conf | head -n 1)
-            NEW_PORT=$([ "$CURRENT_PORT" = "8080" ] && echo "8081" || echo "8080")
-            NEW_APP="app-${NEW_PORT}"
-            OLD_APP="app-$([ "$NEW_PORT" = "8080" ] && echo "8081" || echo "8080")"
             
-            echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
+            # 디버깅을 위한 현재 상태 출력
+            echo "▶ 현재 Nginx upstream 상태:"
+            sudo grep "server 127.0.0.1:" /etc/nginx/sites-available/erp.conf
+            
+            # 포트 전환 로직 수정
+            if [ "$CURRENT_PORT" = "8080" ]; then
+              NEW_PORT="8081"
+            elif [ "$CURRENT_PORT" = "8081" ]; then
+              NEW_PORT="8080"
+            else
+              echo "❌ 현재 활성 포트를 확인할 수 없습니다: $CURRENT_PORT"
+              echo "▶ 기본값으로 8081로 전환"
+              NEW_PORT="8081"
+              CURRENT_PORT="8080"
+            fi
+            
+            NEW_APP="app-${NEW_PORT}"
+            OLD_APP="app-${CURRENT_PORT}"
+            
+            echo "▶ 포트 전환: $CURRENT_PORT (weight=100) → $NEW_PORT (weight=100)"
             echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
             
             # 새 앱 시작/재시작
