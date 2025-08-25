@@ -54,7 +54,13 @@ jobs:
             mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
             
             # 현재 포트 확인 및 새 포트 결정
-            CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
+            if [ -f "/etc/nginx/sites-available/erp.conf" ]; then
+              CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
+            else
+              echo "⚠️ erp.conf 파일이 없습니다. 기본 포트 8080 사용"
+              CURRENT_PORT="8080"
+            fi
+            
             NEW_PORT=$([ "$CURRENT_PORT" = "8080" ] && echo "8081" || echo "8080")
             NEW_APP="app-${NEW_PORT}"
             OLD_APP="app-$([ "$NEW_PORT" = "8080" ] && echo "8081" || echo "8080")"
