@@ -76,10 +76,11 @@ jobs:
             # 현재 포트 확인 및 새 포트 결정
             CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
             NEW_PORT=$([ "$CURRENT_PORT" = "8080" ] && echo "8081" || echo "8080")
-            NEW_APP=$([ "$NEW_PORT" = "8080" ] && echo "app" || echo "app-new")
-            OLD_APP=$([ "$NEW_APP" = "app" ] && echo "app-new" || echo "app")
+            NEW_APP="app-${NEW_PORT}"    # app-8080 또는 app-8081
+            OLD_APP="app-$([ "$NEW_PORT" = "8080" ] && echo "8081" || echo "8080")"    # 반대 포트의 앱
             
             echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
+            echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
             
             # 새 앱 시작
             pm2 start ecosystem.config.js --only "$NEW_APP"
@@ -130,4 +131,5 @@ jobs:
             trap - ERR
             
             echo "✅ 무중단 배포 완료"
+            echo "🎉 새 앱 $NEW_APP이 포트 $NEW_PORT에서 정상 실행 중입니다"
           EOF
