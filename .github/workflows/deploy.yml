@@ -111,10 +111,10 @@ jobs:
               
               log "Nginx 설정 생성 (새 포트: $new_port, 현재 포트: $current_port)"
               
-              cat > /tmp/nginx-fast.conf << EOF
+              cat > /tmp/nginx-fast.conf << 'NGINX_EOF'
             upstream backend {
-                server 127.0.0.1:$new_port weight=100;
-                server 127.0.0.1:$current_port weight=0;
+                server 127.0.0.1:${new_port} weight=100;
+                server 127.0.0.1:${current_port} weight=0;
             }
             
             server {
@@ -126,9 +126,9 @@ jobs:
                     proxy_http_version 1.1;
                     proxy_connect_timeout 5s;
                     proxy_read_timeout 5s;
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                     add_header Cache-Control "no-cache, no-store, must-revalidate";
                 }
                 
@@ -138,16 +138,16 @@ jobs:
                     proxy_connect_timeout 10s;
                     proxy_read_timeout 30s;
                     proxy_send_timeout 30s;
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                     add_header X-Frame-Options "SAMEORIGIN" always;
                     add_header X-Content-Type-Options "nosniff" always;
                 }
                 
                 location ~ /\. { deny all; }
             }
-            EOF
+            NGINX_EOF
             }
             
             # ===== 메인 배포 로직 =====
