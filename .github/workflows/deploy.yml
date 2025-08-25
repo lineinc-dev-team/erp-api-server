@@ -30,16 +30,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: 🧱 Gradle로 JAR 빌드 (최적화)
-        run: |
-          ./gradlew bootJar \
-            --no-daemon \
-            --parallel \
-            --max-workers=4 \
-            --build-cache \
-            --configure-on-demand \
-            -x test \
-            -x check
+      - name: 🧱 Gradle로 JAR 빌드
+        run: ./gradlew bootJar --no-daemon --parallel -x test
 
       - name: 🔐 SSH 키 설정
         run: |
@@ -48,30 +40,13 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 📦 JAR 파일 EC2로 전송 (최적화)
-        run: |
-          # JAR 파일 압축 (전송 속도 향상)
-          gzip -c build/libs/*.jar > app-new.jar.gz
-          
-          # 압축된 파일 전송
-          rsync -avz --progress \
-            --compress-level=9 \
-            --partial \
-            --inplace \
-            app-new.jar.gz \
-            ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/
-          
-          # 실서버에서 압축 해제
-          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} \
-            "gunzip -f /home/ubuntu/app-new.jar.gz"
+      - name: 📦 JAR 파일 EC2로 전송
+        run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
       - name: 🚀 EC2 간단 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
-            
-            # 배포 시작 시간 측정
-            DEPLOY_START_TIME=$(date +%s)
             
             echo "🚀 간단 무중단 배포 시작"
             
@@ -124,9 +99,8 @@ jobs:
             
             # 1단계: 포트 열림 확인 (빠른 확인)
             echo "▶ 1단계: 포트 열림 확인..."
-            PORT_READY_TIME=0
-            for i in {1..10}; do  # 15 → 10 (더 빠른 확인)
-              echo "▶ 포트 확인 시도 $i/10..."
+            for i in {1..15}; do
+              echo "▶ 포트 확인 시도 $i/15..."
               
               # 현재 열린 포트 목록 출력
               echo "▶ 현재 열린 포트 목록:"
@@ -137,13 +111,12 @@ jobs:
                 echo "✅ 포트 $NEW_PORT에서 프로세스 확인됨"
                 echo "▶ 포트 $NEW_PORT 상세 정보:"
                 ss -tlnp | grep ":$NEW_PORT[[:space:]]"
-                PORT_READY_TIME=$((i * 1))
                 break
               else
                 echo "⚠️ 포트 $NEW_PORT에서 프로세스 없음"
               fi
               
-              if [ $i -eq 10 ]; then
+              if [ $i -eq 15 ]; then
                 echo "❌ 포트 $NEW_PORT에서 프로세스가 열리지 않음"
                 echo "▶ PM2 상태:"
                 pm2 list
@@ -152,22 +125,21 @@ jobs:
                 exit 1
               fi
               
-              sleep 1  # 3초 → 1초 (더 빠른 반응)
+              echo "▶ 3초 대기 후 재시도..."
+              sleep 3
             done
             
-            # 2단계: Spring Boot 완전 시작 대기 (최적화)
+            # 2단계: Spring Boot 완전 시작 대기 (더 긴 대기)
             echo "▶ 2단계: Spring Boot 완전 시작 대기..."
-            HEALTH_CHECK_TIME=0
-            for i in {1..15}; do  # 20 → 15 (적절한 대기)
-              echo "▶ 헬스체크 시도 $i/15..."
+            for i in {1..20}; do
+              echo "▶ 헬스체크 시도 $i/20..."
               
-              if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+              if curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
                 echo "✅ 새 앱 준비 완료 (헬스체크 성공)"
-                HEALTH_CHECK_TIME=$((i * 2))
                 break
               fi
               
-              if [ $i -eq 15 ]; then
+              if [ $i -eq 20 ]; then
                 echo "❌ 새 앱 시작 실패 (헬스체크 타임아웃)"
                 echo "▶ PM2 상태:"
                 pm2 list
@@ -178,7 +150,7 @@ jobs:
                 exit 1
               fi
               
-              sleep 2  # 3초 → 2초 (적절한 간격)
+              sleep 3
             done
             
             # 진짜 무중단 전환: Nginx weight만 변경 (프로세스 종료 없음)
@@ -201,13 +173,6 @@ jobs:
               
               # PM2 상태 저장
               pm2 save --force
-              
-              # 성능 메트릭 출력
-              echo "🎯 배포 성능 메트릭:"
-              echo "▶ JAR 파일 크기: $(ls -lh /home/ubuntu/app-latest.jar | awk '{print $5}')"
-              echo "▶ 포트 열림 시간: ${PORT_READY_TIME}s"
-              echo "▶ 헬스체크 시간: ${HEALTH_CHECK_TIME}s"
-              echo "▶ 총 배포 시간: $(( $(date +%s) - DEPLOY_START_TIME ))s"
               
               echo "✅ 진짜 무중단 배포 완료! (Bad Gateway 0초)"
             else

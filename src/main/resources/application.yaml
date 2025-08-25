@@ -1,5 +1,5 @@
 # 기본 설정 파일 - 공통 설정과 기본 프로파일 정의
 spring:
   profiles:
-    active: local  # 기본 프로파일 (로컬 환경)
+    active: ${SPRING_PROFILES_ACTIVE:local}  # 환경변수 우선
     include: common  # 공통 설정 파일 포함
