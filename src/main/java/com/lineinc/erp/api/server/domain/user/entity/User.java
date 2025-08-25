@@ -30,7 +30,7 @@ public class User extends BaseEntity implements UserDetails {
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column
     private String loginId;
 
     @Column
@@ -40,7 +40,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String passwordHash;
 
-    @Column(nullable = false, unique = true)
+    @Column
     @DiffInclude
     private String email;
 
@@ -123,26 +123,6 @@ public class User extends BaseEntity implements UserDetails {
         return this.passwordHash;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.isActive;
-    }
-
     // ===== 핵심 비즈니스 메서드 =====
     public void updatePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
@@ -151,27 +131,6 @@ public class User extends BaseEntity implements UserDetails {
 
     public void updateLastLoginAt() {
         this.lastLoginAt = OffsetDateTime.now();
-    }
-
-    public void activate() {
-        this.isActive = true;
-    }
-
-    public void deactivate() {
-        this.isActive = false;
-    }
-
-    public boolean hasRole(String roleName) {
-        return this.userRoles.stream()
-                .anyMatch(userRole -> userRole.getRole().getName().equals(roleName));
-    }
-
-    public void addRole(UserRole userRole) {
-        this.userRoles.add(userRole);
-    }
-
-    public void removeRole(UserRole userRole) {
-        this.userRoles.remove(userRole);
     }
 
     public void syncTransientFields() {
@@ -186,7 +145,7 @@ public class User extends BaseEntity implements UserDetails {
                 .orElse(null);
     }
 
-    // ===== 통합 업데이트 메서드 =====
+    // ===== 업데이트 메서드 =====
     public void updateFrom(String username, String email, String landlineNumber, String phoneNumber,
             String memo, Department department, Grade grade, Position position,
             Boolean isActive) {
@@ -199,6 +158,7 @@ public class User extends BaseEntity implements UserDetails {
         Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
         Optional.ofNullable(position).ifPresent(val -> this.position = val);
         Optional.ofNullable(isActive).ifPresent(val -> this.isActive = val);
+        syncTransientFields();
     }
 
 }
