@@ -43,154 +43,162 @@ jobs:
       - name: 📦 JAR 파일 EC2로 전송
         run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
-      - name: 🚀 EC2 무중단 배포
+      - name: 🚀 EC2 초고속 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
             
-            # 롤백 함수
+            # ===== 상수 정의 =====
+            readonly MAX_HEALTH_CHECK_ATTEMPTS=10
+            readonly HEALTH_CHECK_TIMEOUT=3
+            readonly HEALTH_CHECK_INTERVAL=1
+            readonly NGINX_RELOAD_WAIT=1
+            
+            # ===== 유틸리티 함수 =====
+            log() { echo "▶ $1"; }
+            success() { echo "✅ $1"; }
+            error() { echo "❌ $1"; }
+            warning() { echo "⚠️ $1"; }
+            
+            # ===== 롤백 함수 =====
             rollback() {
-              echo "🔄 롤백 시작"
+              warning "롤백 시작"
               
-              # 백업 파일 존재 여부 확인
               if [ -f "/etc/nginx/sites-available/erp.conf.backup" ]; then
                 sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
-                echo "✅ Nginx 설정 롤백 완료"
+                success "Nginx 설정 롤백 완료"
               else
-                echo "⚠️ 백업 파일이 없습니다. 수동 복구가 필요합니다."
-                # 최소한의 안전한 설정으로 복구
+                warning "백업 파일이 없습니다. 수동 복구가 필요합니다."
                 sudo systemctl stop nginx
               fi
               
-              # 새 앱 프로세스 정리
               if [ -n "${NEW_APP:-}" ]; then
                 pm2 delete "$NEW_APP" 2>/dev/null || true
-                echo "✅ 새 앱 프로세스 정리 완료"
+                success "새 앱 프로세스 정리 완료"
               fi
               
-              echo "✅ 롤백 완료"
+              success "롤백 완료"
               exit 1
             }
             
-            trap rollback ERR
+            # ===== 헬스체크 함수 =====
+            wait_for_app_ready() {
+              local port=$1
+              local app_name=$2
+              
+              log "앱 $app_name 헬스체크 시작 (포트: $port)"
+              
+              for i in $(seq 1 $MAX_HEALTH_CHECK_ATTEMPTS); do
+                if ss -tlnp | grep -q ":$port " && \
+                   curl -s --max-time $HEALTH_CHECK_TIMEOUT "http://localhost:$port/actuator/health" | grep -q '"status":"UP"'; then
+                  success "앱 $app_name 준비 완료 (${i}초)"
+                  return 0
+                fi
+                
+                if [ $i -eq $MAX_HEALTH_CHECK_ATTEMPTS ]; then
+                  error "앱 $app_name 시작 실패"
+                  return 1
+                fi
+                
+                sleep $HEALTH_CHECK_INTERVAL
+              done
+            }
             
-            echo "🚀 무중단 배포 시작"
-            
-            # JAR 파일 교체
-            mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
-            
-            # 현재 포트 확인 및 새 포트 결정
-            CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
-            NEW_PORT=$([ "$CURRENT_PORT" = "8080" ] && echo "8081" || echo "8080")
-            NEW_APP="app-${NEW_PORT}"    # app-8080 또는 app-8081
-            OLD_APP="app-$([ "$NEW_PORT" = "8080" ] && echo "8081" || echo "8080")"    # 반대 포트의 앱
-            
-            echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
-            echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
-            
-            # 새 앱 시작 (백그라운드)
-            pm2 start ecosystem.config.js --only "$NEW_APP"
-            
-            # 새 앱이 완전히 준비될 때까지 대기 (기존 앱은 계속 서비스)
-            for i in {1..20}; do
-              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 새 앱 준비 완료"
-                break
-              fi
-              if [ $i -eq 20 ]; then
-                echo "❌ 새 앱 시작 실패"
-                exit 1
-              fi
-              sleep 2
-            done
-            
-            # 핵심: Nginx upstream 설정으로 무중단 전환
-            echo "▶ Nginx upstream 설정 변경"
-            sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
-            
-            # 백업 파일 검증
-            if [ ! -f "/etc/nginx/sites-available/erp.conf.backup" ]; then
-              echo "❌ 백업 파일 생성 실패"
-              exit 1
-            fi
-            
-            # 기존 설정을 유지하면서 upstream만 추가 (Bad Gateway 방지)
-            cat > /tmp/nginx-upstream.conf << 'EOF'
+            # ===== Nginx 설정 생성 함수 =====
+            create_nginx_config() {
+              local new_port=$1
+              local current_port=$2
+              
+              log "Nginx 설정 생성 (새 포트: $new_port, 현재 포트: $current_port)"
+              
+              cat > /tmp/nginx-fast.conf << EOF
             upstream backend {
-                server 127.0.0.1:${NEW_PORT} weight=100;
-                server 127.0.0.1:${CURRENT_PORT} weight=0;
+                server 127.0.0.1:$new_port weight=100;
+                server 127.0.0.1:$current_port weight=0;
             }
             
-            # ERP API 서버 Nginx 설정
             server {
                 listen 80;
                 server_name dev-erp-api.dooson.it;
                 
-                # 헬스체크 경로 - Spring Boot Actuator
                 location = /actuator/health {
                     proxy_pass http://backend;
                     proxy_http_version 1.1;
-                    proxy_connect_timeout 30s;
-                    proxy_read_timeout 30s;
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto $scheme;
+                    proxy_connect_timeout 5s;
+                    proxy_read_timeout 5s;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
                     add_header Cache-Control "no-cache, no-store, must-revalidate";
                 }
                 
-                # 모든 API 요청 처리
                 location / {
                     proxy_pass http://backend;
                     proxy_http_version 1.1;
-                    proxy_connect_timeout 90s;
-                    proxy_read_timeout 90s;
-                    proxy_send_timeout 90s;
-                    proxy_set_header Upgrade $http_upgrade;
-                    proxy_set_header Connection $http_connection;
-                    proxy_set_header Host $host;
-                    proxy_cache_bypass $http_upgrade;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto $scheme;
+                    proxy_connect_timeout 10s;
+                    proxy_read_timeout 30s;
+                    proxy_send_timeout 30s;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
                     add_header X-Frame-Options "SAMEORIGIN" always;
                     add_header X-Content-Type-Options "nosniff" always;
                 }
                 
-                # 숨겨진 파일 접근 차단 (보안)
-                location ~ /\. {
-                    deny all;
-                }
+                location ~ /\. { deny all; }
             }
             EOF
+            }
             
-            sudo cp /tmp/nginx-upstream.conf /etc/nginx/sites-available/erp.conf
-            
-            # Nginx 설정 테스트 후 reload
-            sudo nginx -t && sudo nginx -s reload
-            
-            # 새 앱으로 트래픽 전환 확인 (5초 대기)
-            echo "▶ 새 앱으로 트래픽 전환 확인"
-            sleep 5
-            
-            # 새 앱 헬스체크
-            if curl -s --max-time 5 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
-              echo "✅ 새 앱으로 전환 완료"
+            # ===== 메인 배포 로직 =====
+            main() {
+              trap rollback ERR
               
-              # 이전 앱 종료 (새 앱이 정상 동작하는 것을 확인한 후)
-              pm2 delete "$OLD_APP" 2>/dev/null || true
-              pm2 save --force
+              log "초고속 무중단 배포 시작"
               
-              echo "✅ 진정한 무중단 배포 완료"
-            else
-              echo "❌ 새 앱 전환 실패, 롤백"
-              sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
-              sudo nginx -s reload
-              pm2 delete "$NEW_APP" 2>/dev/null || true
-              exit 1
-            fi
-            trap - ERR
+              # JAR 파일 교체
+              mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
+              
+              # 포트 결정
+              local current_port=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
+              local new_port=$([ "$current_port" = "8080" ] && echo "8081" || echo "8080")
+              local new_app="app-${new_port}"
+              local old_app="app-$([ "$new_port" = "8080" ] && echo "8081" || echo "8080")"
+              
+              log "포트 전환: $current_port → $new_port"
+              log "새 앱: $new_app, 이전 앱: $old_app"
+              
+              # 새 앱 시작
+              pm2 start ecosystem.config.js --only "$new_app"
+              
+              # 헬스체크
+              wait_for_app_ready "$new_port" "$new_app" || exit 1
+              
+              # Nginx 설정 백업 및 변경
+              sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
+              create_nginx_config "$new_port" "$current_port"
+              sudo cp /tmp/nginx-fast.conf /etc/nginx/sites-available/erp.conf
+              
+              # Nginx reload
+              sudo nginx -t && sudo nginx -s reload
+              sleep $NGINX_RELOAD_WAIT
+              
+              # 전환 확인
+              if curl -s --max-time $HEALTH_CHECK_TIMEOUT "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
+                success "새 앱으로 전환 완료"
+                
+                # 이전 앱 정리
+                pm2 delete "$old_app" 2>/dev/null || true
+                pm2 save --force
+                
+                success "초고속 무중단 배포 완료"
+                trap - ERR
+              else
+                error "새 앱 전환 실패, 롤백"
+                rollback
+              fi
+            }
             
-            echo "✅ 무중단 배포 완료"
-            echo "🎉 새 앱 $NEW_APP이 포트 $NEW_PORT에서 정상 실행 중입니다"
+            # ===== 실행 =====
+            main
           EOF
