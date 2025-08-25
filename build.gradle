@@ -59,7 +59,6 @@ dependencies {
     implementation "org.apache.poi:poi-ooxml:${poiVersion}"
 
     // 외부 서비스
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation "software.amazon.awssdk:s3:${awsSdkVersion}"
 
     // 유틸리티
