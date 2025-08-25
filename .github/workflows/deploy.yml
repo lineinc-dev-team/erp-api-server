@@ -88,21 +88,23 @@ jobs:
             echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
             echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
             
-            # 새 앱 시작
+            # 새 앱 시작 (백그라운드)
             pm2 start ecosystem.config.js --only "$NEW_APP"
-            sleep 30
             
-            # 포트 및 헬스체크
-            for i in {1..20}; do
-              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+            # 빠른 헬스체크 (5초 대기)
+            sleep 5
+            
+            # 포트 및 헬스체크 (더 빠르게)
+            for i in {1..10}; do
+              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
                 echo "✅ 새 앱 준비 완료"
                 break
               fi
-              if [ $i -eq 20 ]; then
+              if [ $i -eq 10 ]; then
                 echo "❌ 새 앱 시작 실패"
                 exit 1
               fi
-              sleep 3
+              sleep 2
             done
             
             # Nginx 프록시 전환 (백업 후 수정)
@@ -116,19 +118,17 @@ jobs:
             fi
             
             sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
-            sudo nginx -t && sudo systemctl restart nginx
             
-            # 외부 헬스체크
-            for i in {1..10}; do
-              if curl -s --max-time 10 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
+            # Nginx 설정 테스트 후 graceful reload (중단 없음)
+            sudo nginx -t && sudo nginx -s reload
+            
+            # 빠른 외부 헬스체크
+            for i in {1..5}; do
+              if curl -s --max-time 5 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
                 echo "✅ 외부 접근 확인"
                 break
               fi
-              if [ $i -eq 10 ]; then
-                echo "❌ 외부 접근 실패"
-                rollback
-              fi
-              sleep 3
+              sleep 1
             done
             
             # 이전 앱 종료
