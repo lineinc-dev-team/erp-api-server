@@ -24,7 +24,7 @@ public class S3FileService {
     @Value("${cloud.aws.s3.cdn-url}")
     private String cdnUrl;
 
-    @Value("${aws.s3.bucket}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
     public PresignedUrlResponse generatePresignedUrl(PresignedUrlRequest request) {
@@ -33,7 +33,8 @@ public class S3FileService {
         }
 
         FileMimeType mimeType = FileMimeType.fromMime(request.contentType());
-        String uniqueFileName = request.uploadTarget().getDirectory() + "/" + UUID.randomUUID() + mimeType.getExtension();
+        String uniqueFileName = request.uploadTarget().getDirectory() + "/" + UUID.randomUUID()
+                + mimeType.getExtension();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)

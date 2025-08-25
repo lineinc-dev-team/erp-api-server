@@ -11,28 +11,21 @@ import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffInclude;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.Serial;
 import java.time.OffsetDateTime;
 import java.util.*;
 
 @Entity
 @Table(name = "users")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@NoArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class User extends BaseEntity implements UserDetails {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
@@ -106,6 +99,14 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     /**
+     * 인증에 사용할 사용자명 반환
+     */
+    @Override
+    public String getUsername() {
+        return this.loginId;
+    }
+
+    /**
      * 인증에 사용할 비밀번호 반환
      */
     @Override
@@ -154,10 +155,10 @@ public class User extends BaseEntity implements UserDetails {
      * UpdateUserRequest DTO로부터 사용자 정보를 업데이트합니다.
      */
     public void updateFrom(UpdateUserRequest request,
-                           PasswordEncoder passwordEncoder,
-                           DepartmentRepository departmentRepository,
-                           GradeRepository gradeRepository,
-                           PositionRepository positionRepository) {
+            PasswordEncoder passwordEncoder,
+            DepartmentRepository departmentRepository,
+            GradeRepository gradeRepository,
+            PositionRepository positionRepository) {
         Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);

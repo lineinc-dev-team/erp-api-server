@@ -29,7 +29,7 @@ spring:
   # JPA 및 Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto: update         # 테이블을 삭제하지 않고 데이터베이스 스키마 자동 업데이트
+      ddl-auto: create-drop         # 테이블을 삭제하지 않고 데이터베이스 스키마 자동 업데이트
     properties:
       hibernate:
         jdbc:
@@ -60,16 +60,10 @@ management:
 cloud:
   aws:
     credentials:
-      access-key: ${AWS_ACCESS_KEY}
+      access-key: ${AWS_ACCESS_KEY} 
       secret-key: ${AWS_SECRET_KEY}
     region:
       static: ap-northeast-2             
     s3:
       bucket: ${AWS_S3_BUCKET}
       cdn-url: ${AWS_CDN_URL}
-
-# 사용자 관련 기본 설정
-user:
-  default-password: ${USER_DEFAULT_PASSWORD:line1234}
-
-

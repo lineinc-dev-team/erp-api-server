@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config.cloud;
+package com.lineinc.erp.api.server.infrastructure.config.cloud;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,15 +15,12 @@ public class S3Config {
     public S3Presigner s3Presigner(
             @Value("${cloud.aws.credentials.access-key}") String accessKey,
             @Value("${cloud.aws.credentials.secret-key}") String secretKey,
-            @Value("${cloud.aws.region.static}") String region
-    ) {
+            @Value("${cloud.aws.region.static}") String region) {
         return S3Presigner.builder()
                 .region(Region.of(region))
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(accessKey, secretKey)
-                        )
-                )
+                                AwsBasicCredentials.create(accessKey, secretKey)))
                 .build();
     }
 }

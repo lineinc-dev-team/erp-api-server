@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.common.entity;
 import java.time.OffsetDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.javers.core.metamodel.annotation.DiffInclude;
 import org.springframework.data.annotation.CreatedBy;
@@ -21,12 +22,14 @@ import lombok.experimental.SuperBuilder;
 /**
  * 모든 Entity의 공통 필드를 정의한 추상 클래스입니다.
  * - JPA Auditing 기능을 통해 생성자/수정자 자동 주입이 가능합니다.
+ * - 공통 JPA 어노테이션들을 포함하여 하위 클래스에서 중복 제거
  */
 @Getter
 @MappedSuperclass // JPA 엔티티 클래스가 상속할 경우, 해당 필드들을 자식 테이블 컬럼으로 인식하게 함
 @EntityListeners(AuditingEntityListener.class) // JPA Auditing 기능 활성화: 생성자/수정자, 생성일/수정일 자동 기록
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public abstract class BaseEntity {
 
     /**

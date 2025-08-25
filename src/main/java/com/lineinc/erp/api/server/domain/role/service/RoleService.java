@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Comparator;
 
-
 @Service
 @RequiredArgsConstructor
 public class RoleService {
@@ -110,7 +109,8 @@ public class RoleService {
     public void removeUsersFromRole(Long roleId, RemoveUsersFromRoleRequest request) {
         if (roleId != 1L) {
             Role role = roleRepository.findById(roleId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+                    .orElseThrow(
+                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
             List<User> users = userRepository.findAllById(request.userIds());
 
@@ -128,10 +128,12 @@ public class RoleService {
     public void addUsersToRole(Long roleId, AddUsersToRoleRequest request) {
         if (roleId != 1L) {
             Role role = roleRepository.findById(roleId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+                    .orElseThrow(
+                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
             Map<Long, String> memoMap = request.users().stream()
-                    .collect(Collectors.toMap(AddUsersToRoleRequest.UserWithMemo::userId, AddUsersToRoleRequest.UserWithMemo::memo));
+                    .collect(Collectors.toMap(AddUsersToRoleRequest.UserWithMemo::userId,
+                            AddUsersToRoleRequest.UserWithMemo::memo));
 
             List<Long> userIds = request.users().stream()
                     .map(AddUsersToRoleRequest.UserWithMemo::userId)
@@ -215,7 +217,8 @@ public class RoleService {
         if (request.users() != null && !request.users().isEmpty()) {
             List<Long> userIds = request.users().stream().map(CreateRolesRequest.UserWithMemo::userId).toList();
             Map<Long, String> memoMap = request.users().stream()
-                    .collect(Collectors.toMap(CreateRolesRequest.UserWithMemo::userId, CreateRolesRequest.UserWithMemo::memo));
+                    .collect(Collectors.toMap(CreateRolesRequest.UserWithMemo::userId,
+                            CreateRolesRequest.UserWithMemo::memo));
 
             List<User> users = userRepository.findAllById(userIds);
             for (User user : users) {
@@ -256,15 +259,18 @@ public class RoleService {
                         Site site = null;
                         if (dto.siteId() != null) {
                             site = siteRepository.findById(dto.siteId())
-                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                            ValidationMessages.SITE_NOT_FOUND));
                         }
                         SiteProcess process = null;
                         if (dto.processId() != null) {
                             process = siteProcessRepository.findById(dto.processId())
-                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_PROCESS_NOT_FOUND));
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                            ValidationMessages.SITE_PROCESS_NOT_FOUND));
                         }
                         if (site != null && process != null && !process.getSite().getId().equals(site.getId())) {
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                    ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
                         }
                         return RoleSiteProcess.builder()
                                 .role(newRole)
@@ -305,25 +311,26 @@ public class RoleService {
     @Transactional(readOnly = true)
     public boolean hasPermission(Long userId, String menuName, PermissionAction action) {
         User user = userRepository.findByIdWithPermissions(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
         return user.getUserRoles().stream()
                 .map(UserRole::getRole)
                 .flatMap(role -> role.getPermissions().stream())
                 .map(RolePermission::getPermission)
-                .anyMatch(permission ->
-                        permission.getMenu() != null &&
-                                permission.getMenu().getName().equalsIgnoreCase(menuName.trim()) &&
-                                PermissionAction.fromLabel(permission.getAction().getLabel()) == action
-                );
+                .anyMatch(permission -> permission.getMenu() != null &&
+                        permission.getMenu().getName().equalsIgnoreCase(menuName.trim()) &&
+                        PermissionAction.fromLabel(permission.getAction().getLabel()) == action);
     }
 
     @Transactional
     public void updateRole(Long roleId, UpdateRolesRequest request) {
-        if (roleId == 1L) return;
+        if (roleId == 1L)
+            return;
 
         Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
 
         role.updateFrom(request);
 
@@ -342,8 +349,7 @@ public class RoleService {
                 Map<Long, String> memoMap = request.users().stream()
                         .collect(Collectors.toMap(
                                 UpdateRolesRequest.UserWithMemo::userId,
-                                UpdateRolesRequest.UserWithMemo::memo
-                        ));
+                                UpdateRolesRequest.UserWithMemo::memo));
 
                 List<User> users = userRepository.findAllById(userIds);
                 List<UserRole> newUserRoles = users.stream()
@@ -353,7 +359,7 @@ public class RoleService {
                                 .role(role)
                                 .memo(memoMap.get(user.getId()))
                                 .build())
-                        .toList();
+                        .collect(Collectors.toList());
 
                 if (!newUserRoles.isEmpty()) {
                     userRoleRepository.saveAll(newUserRoles);
@@ -369,7 +375,8 @@ public class RoleService {
             if (!request.permissionIds().isEmpty()) {
                 List<Permission> permissions = permissionRepository.findAllById(request.permissionIds());
                 if (permissions.size() != request.permissionIds().size()) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SOME_PERMISSIONS_NOT_FOUND);
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            ValidationMessages.SOME_PERMISSIONS_NOT_FOUND);
                 }
 
                 List<RolePermission> rolePermissions = permissions.stream()
@@ -391,18 +398,20 @@ public class RoleService {
             if (request.siteProcesses() != null && !request.siteProcesses().isEmpty()) {
                 List<RoleSiteProcess> siteProcesses = request.siteProcesses().stream()
                         .map(dto -> {
-                            Site site = dto.siteId() != null ?
-                                    siteRepository.findById(dto.siteId())
-                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND))
+                            Site site = dto.siteId() != null ? siteRepository.findById(dto.siteId())
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                            ValidationMessages.SITE_NOT_FOUND))
                                     : null;
 
-                            SiteProcess process = dto.processId() != null ?
-                                    siteProcessRepository.findById(dto.processId())
-                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_PROCESS_NOT_FOUND))
+                            SiteProcess process = dto.processId() != null
+                                    ? siteProcessRepository.findById(dto.processId())
+                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                    ValidationMessages.SITE_PROCESS_NOT_FOUND))
                                     : null;
 
                             if (site != null && process != null && !process.getSite().getId().equals(site.getId())) {
-                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
                             }
 
                             return RoleSiteProcess.builder()

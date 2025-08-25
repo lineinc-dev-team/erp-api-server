@@ -55,7 +55,7 @@ public class UserService {
     private final Javers javers;
     private final UserChangeHistoryRepository userChangeHistoryRepository;
 
-    @Value("${USER_DEFAULT_PASSWORD}")
+    @Value("${USER_DEFAULT_PASSWORD:line1234}")
     private String defaultPassword;
 
     @Transactional(readOnly = true)
@@ -66,9 +66,11 @@ public class UserService {
 
     @Transactional
     public void resetPassword(long id) {
-        if (id == 1L) return; // 1번 계정은 비밀번호 초기화 금지
+        if (id == 1L)
+            return; // 1번 계정은 비밀번호 초기화 금지
         User user = usersRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
         String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.updatePassword(encodedPassword);
@@ -90,7 +92,8 @@ public class UserService {
         User user = User.builder()
                 .username(request.username())
                 .loginId(request.loginId())
-                .department(request.departmentId() != null ? Department.builder().id(request.departmentId()).build() : null)
+                .department(
+                        request.departmentId() != null ? Department.builder().id(request.departmentId()).build() : null)
                 .grade(request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null)
                 .position(request.positionId() != null ? Position.builder().id(request.positionId()).build() : null)
                 .passwordHash(passwordEncoder.encode(defaultPassword))
@@ -111,8 +114,7 @@ public class UserService {
                 userResponses,
                 fields,
                 this::getExcelHeaderName,
-                this::getExcelCellValue
-        );
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -170,10 +172,12 @@ public class UserService {
 
     @Transactional
     public void updateUser(Long id, UpdateUserRequest request) {
-        if (id == 1L) return;
+        if (id == 1L)
+            return;
 
         User oldUser = usersRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
         oldUser.syncTransientFields();
         User oldUserSnapshot = JaversUtils.createSnapshot(javers, oldUser, User.class);
@@ -221,7 +225,8 @@ public class UserService {
     @Transactional(readOnly = true)
     public User getUserByIdOrThrow(Long id) {
         return usersRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
     }
 
     @Transactional
@@ -234,27 +239,31 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserInfoResponse getUserDetail(Long id) {
         User user = usersRepository.findByIdWithRoles(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         return UserInfoResponse.from(user);
     }
 
     @Transactional(readOnly = true)
     public UserResponse getUser(Long id) {
         User user = usersRepository.findByIdWithRoles(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         return UserResponse.from(user);
     }
 
     @Transactional(readOnly = true)
     public User getUserEntity(Long userId) {
         return usersRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
     }
 
     @Transactional
     public void changePassword(Long userId, PasswordChangeRequest request) {
         User user = usersRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
         user.setRequirePasswordReset(false);
         usersRepository.save(user);
@@ -264,7 +273,8 @@ public class UserService {
     public Slice<UserChangeHistoryResponse> getUserChangeHistoriesSlice(Long userId, Pageable pageable) {
         // 유저 존재 확인 (필요 시)
         User user = usersRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
         // UserChangeHistory를 user 기준으로 슬라이스 조회
         Slice<UserChangeHistory> historySlice = userChangeHistoryRepository.findByUser(user, pageable);
@@ -276,7 +286,7 @@ public class UserService {
     public List<Long> getAccessibleSiteIds(User user) {
         // 유저 권한 없음 → 접근 불가 (빈 리스트 반환)
         if (user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
-            return List.of();  // 빈 리스트로 명시적 반환
+            return List.of(); // 빈 리스트로 명시적 반환
         }
 
         // 글로벌 권한 보유 → 전체 접근 가능 → null 반환
@@ -284,7 +294,7 @@ public class UserService {
                 .anyMatch(role -> role.getRole().isHasGlobalSiteProcessAccess());
 
         if (hasGlobalAccess) {
-            return null;  // 특별히 null 처리로 전체 조회를 허용
+            return null; // 특별히 null 처리로 전체 조회를 허용
         }
 
         // 제한된 접근 권한 → siteId 목록 추출

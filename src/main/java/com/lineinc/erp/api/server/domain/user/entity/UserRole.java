@@ -4,15 +4,12 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLRestriction;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "users_roles")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
-@SQLRestriction("deleted = false")
+@NoArgsConstructor
+@SuperBuilder
 public class UserRole extends BaseEntity {
 
     @Id
