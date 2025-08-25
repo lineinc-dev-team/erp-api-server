@@ -43,7 +43,7 @@ jobs:
       - name: 📦 JAR 파일 EC2로 전송
         run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
-      - name: 🚀 EC2 초고속 무중단 배포
+      - name: 🚀 EC2 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
@@ -154,7 +154,7 @@ jobs:
             main() {
               trap rollback ERR
               
-              log "초고속 무중단 배포 시작"
+              log "무중단 배포 시작"
               
               # JAR 파일 교체
               mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
@@ -191,7 +191,7 @@ jobs:
                 pm2 delete "$old_app" 2>/dev/null || true
                 pm2 save --force
                 
-                success "초고속 무중단 배포 완료"
+                success "무중단 배포 완료"
                 trap - ERR
               else
                 error "새 앱 전환 실패, 롤백"
@@ -201,4 +201,4 @@ jobs:
             
             # ===== 실행 =====
             main
-          EOF
+          'EOF'
