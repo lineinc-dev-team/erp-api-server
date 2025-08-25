@@ -1,95 +1,106 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.0'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.5.0'        // Spring Boot 3.5.0 버전 사용
+    id 'io.spring.dependency-management' version '1.1.7'  // Spring 의존성 자동 관리
 }
 
-group = 'com.lineinc'
-version = '0.0.1-SNAPSHOT'
+group = 'com.lineinc'           // 프로젝트 그룹 ID
+version = '0.0.1-SNAPSHOT'      // 프로젝트 버전 (개발 중인 스냅샷)
 
-// 의존성 버전 관리
+// ===== 의존성 버전 관리 =====
+// 외부 라이브러리들의 버전을 중앙에서 관리하여 일관성 유지
 ext {
-    springdocVersion = '2.8.0'
-    querydslVersion  = '5.1.0'
-    poiVersion       = '5.2.5'
-    awsSdkVersion    = '2.26.11'
-    bucket4jVersion  = '7.3.0'
-    javersVersion    = '7.4.0'
+    springdocVersion = '2.8.0'      // SpringDoc OpenAPI 문서화 라이브러리 버전
+    querydslVersion  = '5.1.0'     // QueryDSL JPA 쿼리 빌더 버전
+    poiVersion       = '5.2.5'     // Apache POI (Excel 파일 처리) 버전
+    awsSdkVersion    = '2.26.11'   // AWS SDK v2 버전
+    bucket4jVersion  = '7.3.0'     // Bucket4j (Rate Limiting) 버전
+    javersVersion    = '7.4.0'     // Javers (데이터 변경 추적) 버전
 }
 
+// ===== Java 버전 설정 =====
 java {
     toolchain {
-        // Gradle 8.x는 아직 JDK 24 정식 지원 안함 → 21 권장
+        // Gradle 8.x는 아직 JDK 24 정식 지원 안함 → JDK 21 권장
+        // LTS 버전으로 안정성 확보
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
+// ===== 저장소 설정 =====
 repositories {
-    mavenCentral()
-    maven { url = 'https://repo.spring.io/milestone' }
-    maven { url = 'https://repo.spring.io/snapshot' }
+    mavenCentral()                                                    // 메인 Maven 중앙 저장소
+    maven { url = 'https://repo.spring.io/milestone' }               // Spring 마일스톤 버전 저장소
+    maven { url = 'https://repo.spring.io/snapshot' }                // Spring 스냅샷 버전 저장소
 }
 
+// ===== 컴파일 설정 =====
 configurations {
     compileOnly {
-        extendsFrom annotationProcessor
+        extendsFrom annotationProcessor  // Lombok 등 annotation processor와 compileOnly 설정 연결
     }
 }
 
+// ===== 프로젝트 의존성 정의 =====
 dependencies {
-    // Spring Boot 스타터들
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // ----- Spring Boot 핵심 스타터들 -----
+    implementation 'org.springframework.boot:spring-boot-starter-web'           // 웹 애플리케이션 개발용
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'     // JPA 데이터 접근용
+    implementation 'org.springframework.boot:spring-boot-starter-security'     // 보안 기능용
+    implementation 'org.springframework.boot:spring-boot-starter-validation'   // 데이터 검증용
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'     // 모니터링 및 관리용
 
-    // 데이터베이스 및 세션 관리
-    runtimeOnly 'org.postgresql:postgresql'
-    implementation 'org.springframework.session:spring-session-jdbc'
+    // ----- 데이터베이스 및 세션 관리 -----
+    runtimeOnly 'org.postgresql:postgresql'                                    // PostgreSQL 드라이버 (런타임에만 필요)
+    implementation 'org.springframework.session:spring-session-jdbc'          // JDBC 기반 세션 관리
 
-    // 개발 도구
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    // ----- 개발 도구 -----
+    compileOnly 'org.projectlombok:lombok'                                    // Lombok (컴파일 타임에만 필요)
+    annotationProcessor 'org.projectlombok:lombok'                            // Lombok annotation processor
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'  // 설정 메타데이터 생성
 
-    // API 문서화
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+    // ----- API 문서화 -----
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"  // Swagger UI 대체
 
-    // QueryDSL
-    implementation      "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
-    annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
-    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    // ----- QueryDSL (타입 안전한 쿼리 빌더) -----
+    implementation      "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"             // QueryDSL JPA 모듈
+    annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"            // QueryDSL 코드 생성기
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'                     // JPA API
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'                       // Jakarta Annotation API
 
-    // 파일 처리
-    implementation "org.apache.poi:poi-ooxml:${poiVersion}"
+    // ----- 파일 처리 -----
+    implementation "org.apache.poi:poi-ooxml:${poiVersion}"                               // Excel 파일 읽기/쓰기
 
-    // 외부 서비스
-    implementation "software.amazon.awssdk:s3:${awsSdkVersion}"
+    // ----- 외부 서비스 연동 -----
+    implementation "software.amazon.awssdk:s3:${awsSdkVersion}"                           // AWS S3 서비스 연동
 
-    // 유틸리티
-    implementation "com.github.vladimir-bukhtoyarov:bucket4j-core:${bucket4jVersion}"
-    implementation "org.javers:javers-spring-boot-starter-sql:${javersVersion}"
+    // ----- 유틸리티 라이브러리 -----
+    implementation "com.github.vladimir-bukhtoyarov:bucket4j-core:${bucket4jVersion}"     // Rate Limiting 구현
+    implementation "org.javers:javers-spring-boot-starter-sql:${javersVersion}"           // 데이터 변경 이력 추적
 }
 
+// ===== 소스셋 설정 =====
 sourceSets {
     main {
         java {
-            // QueryDSL이 생성한 소스 코드 포함
+            // QueryDSL이 생성한 소스 코드를 메인 소스셋에 포함
+            // build/generated/querydsl 디렉토리의 생성된 코드를 컴파일 대상에 추가
             srcDirs += 'build/generated/querydsl'
         }
     }
 }
 
+// ===== Java 컴파일 설정 =====
 tasks.withType(JavaCompile).configureEach {
     // QueryDSL을 위한 생성된 소스 출력 디렉토리 설정
     options.generatedSourceOutputDirectory.set(file("build/generated/querydsl"))
-    options.compilerArgs += ['-parameters']
-    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']  // 메서드 파라미터 정보 보존 (Spring에서 필요)
+    options.encoding = 'UTF-8'               // 소스 코드 인코딩 설정
 }
 
+// ===== JAR 설정 =====
 // 일반 JAR 생성을 비활성화하고, Spring Boot 실행용 JAR만 생성
+// Spring Boot의 fat JAR가 생성되어 모든 의존성을 포함한 실행 가능한 JAR 생성
 tasks.named('jar') {
     enabled = false
 }
