@@ -71,16 +71,40 @@ jobs:
             # 새 앱 시작
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
-            # 새 앱이 준비될 때까지 대기
+            # 새 앱이 준비될 때까지 대기 (상세한 디버깅)
+            echo "▶ 헬스체크 시작 (포트: $NEW_PORT)"
             for i in {1..10}; do
-              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 3 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 새 앱 준비 완료"
-                break
+              echo "▶ 헬스체크 시도 $i/10..."
+              
+              # 포트 확인
+              if ss -tlnp | grep -q ":$NEW_PORT "; then
+                echo "✅ 포트 $NEW_PORT에서 프로세스 확인"
+                
+                # 헬스체크
+                if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                  echo "✅ 새 앱 준비 완료"
+                  break
+                else
+                  echo "⚠️ 포트는 열려있지만 헬스체크 실패"
+                  echo "▶ 헬스체크 응답:"
+                  curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" || echo "연결 실패"
+                fi
+              else
+                echo "⚠️ 포트 $NEW_PORT에서 프로세스 없음"
+                echo "▶ 현재 열린 포트:"
+                ss -tlnp | grep LISTEN || echo "열린 포트 없음"
               fi
+              
               if [ $i -eq 10 ]; then
                 echo "❌ 새 앱 시작 실패"
+                echo "▶ PM2 상태:"
+                pm2 list
+                echo "▶ PM2 로그 (마지막 10줄):"
+                pm2 logs "$NEW_APP" --lines 10
                 exit 1
               fi
+              
+              echo "▶ 2초 대기 후 재시도..."
               sleep 2
             done
             
