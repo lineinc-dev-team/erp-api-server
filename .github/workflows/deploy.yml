@@ -111,10 +111,11 @@ jobs:
               
               log "Nginx 설정 생성 (새 포트: $new_port, 현재 포트: $current_port)"
               
-              cat > /tmp/nginx-fast.conf << NGINX_EOF
+              # echo 명령어로 설정 파일 생성 (here document 문제 해결)
+              cat > /tmp/nginx-fast.conf << 'EOF'
             upstream backend {
-                server 127.0.0.1:$new_port weight=100;
-                server 127.0.0.1:$current_port weight=0;
+                server 127.0.0.1:NEW_PORT weight=100;
+                server 127.0.0.1:CURRENT_PORT weight=0;
             }
             
             server {
@@ -126,9 +127,9 @@ jobs:
                     proxy_http_version 1.1;
                     proxy_connect_timeout 5s;
                     proxy_read_timeout 5s;
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                     add_header Cache-Control "no-cache, no-store, must-revalidate";
                 }
                 
@@ -138,16 +139,20 @@ jobs:
                     proxy_connect_timeout 10s;
                     proxy_read_timeout 30s;
                     proxy_send_timeout 30s;
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                     add_header X-Frame-Options "SAMEORIGIN" always;
                     add_header X-Content-Type-Options "nosniff" always;
                 }
                 
                 location ~ /\. { deny all; }
             }
-            NGINX_EOF
+            EOF
+              
+              # 플레이스홀더를 실제 값으로 치환
+              sed -i "s/NEW_PORT/$new_port/g" /tmp/nginx-fast.conf
+              sed -i "s/CURRENT_PORT/$current_port/g" /tmp/nginx-fast.conf
             }
             
             # ===== 메인 배포 로직 =====
