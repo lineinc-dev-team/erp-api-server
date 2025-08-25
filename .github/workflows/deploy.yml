@@ -43,38 +43,26 @@ jobs:
       - name: 📦 JAR 파일 EC2로 전송
         run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
-      - name: 🚀 EC2 무중단 배포
+      - name: 🚀 EC2 간단 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
             
-            echo "🚀 무중단 배포 시작"
+            echo "🚀 간단 무중단 배포 시작"
             
             # JAR 파일 교체
             mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
             
-            # 현재 포트 확인 및 새 포트 결정 (안전한 로직)
-            if [ -f "/etc/nginx/sites-available/erp.conf" ]; then
-              CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
-            else
-              echo "⚠️ erp.conf 파일이 없습니다. 기본 포트 8080 사용"
-              CURRENT_PORT="8080"
-            fi
-            
-            # 더 안전한 포트 전환 로직
-            if [ "$CURRENT_PORT" = "8080" ]; then
-              NEW_PORT="8081"
-            else
-              NEW_PORT="8080"
-            fi
-            
+            # 현재 활성 포트 확인 (weight=100인 포트)
+            CURRENT_PORT=$(sudo grep -oP 'server 127.0.0.1:\K[0-9]+.*weight=100' /etc/nginx/sites-available/erp.conf | head -n 1)
+            NEW_PORT=$([ "$CURRENT_PORT" = "8080" ] && echo "8081" || echo "8080")
             NEW_APP="app-${NEW_PORT}"
             OLD_APP="app-$([ "$NEW_PORT" = "8080" ] && echo "8081" || echo "8080")"
             
             echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
             echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
             
-            # 새 앱 시작 (기존 프로세스가 있으면 restart, 없으면 start)
+            # 새 앱 시작/재시작
             if pm2 list | grep -q "$NEW_APP"; then
               echo "▶ 기존 $NEW_APP 프로세스 재시작"
               pm2 restart "$NEW_APP"
@@ -83,126 +71,52 @@ jobs:
               pm2 start ecosystem.config.js --only "$NEW_APP"
             fi
             
-            # 새 앱이 준비될 때까지 대기 (상세한 디버깅)
-            echo "▶ 헬스체크 시작 (포트: $NEW_PORT)"
+            # 새 앱 준비 대기
+            echo "▶ 새 앱 준비 대기 (포트: $NEW_PORT)"
             for i in {1..10}; do
               echo "▶ 헬스체크 시도 $i/10..."
               
-              # 포트 확인
-              if ss -tlnp | grep -q ":$NEW_PORT "; then
-                echo "✅ 포트 $NEW_PORT에서 프로세스 확인"
-                
-                # 헬스체크
-                if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                  echo "✅ 새 앱 준비 완료"
-                  break
-                else
-                  echo "⚠️ 포트는 열려있지만 헬스체크 실패"
-                  echo "▶ 헬스체크 응답:"
-                  curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" || echo "연결 실패"
-                fi
-              else
-                echo "⚠️ 포트 $NEW_PORT에서 프로세스 없음"
-                echo "▶ 현재 열린 포트:"
-                ss -tlnp | grep LISTEN || echo "열린 포트 없음"
+              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 새 앱 준비 완료"
+                break
               fi
               
               if [ $i -eq 10 ]; then
                 echo "❌ 새 앱 시작 실패"
-                echo "▶ PM2 상태:"
                 pm2 list
-                echo "▶ PM2 로그 (마지막 10줄):"
                 pm2 logs "$NEW_APP" --lines 10
                 exit 1
               fi
               
-              echo "▶ 2초 대기 후 재시도..."
               sleep 2
             done
             
-            # Nginx 설정 백업 (파일이 없어도 안전하게)
-            if [ -f "/etc/nginx/sites-available/erp.conf" ]; then
-              sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
-              echo "✅ 기존 Nginx 설정 백업 완료"
-            else
-              echo "⚠️ erp.conf 파일이 없습니다. 빈 백업 파일 생성"
-              touch /etc/nginx/sites-available/erp.conf.backup
-            fi
+            # Nginx upstream weight 변경 (간단한 sed 명령어)
+            echo "▶ Nginx upstream weight 변경"
+            sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=100/server 127.0.0.1:$CURRENT_PORT weight=0/" /etc/nginx/sites-available/erp.conf
+            sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=0/server 127.0.0.1:$NEW_PORT weight=100/" /etc/nginx/sites-available/erp.conf
             
-            # 새로운 Nginx 설정 생성 (고유한 플레이스홀더 사용)
-            cat > /tmp/nginx-upstream.conf << 'NGINX_EOF'
-            upstream backend {
-                server 127.0.0.1:NEW_PORT_PLACEHOLDER weight=100;
-                server 127.0.0.1:CURRENT_PORT_PLACEHOLDER weight=0;
-            }
-            
-            server {
-                listen 80;
-                server_name dev-erp-api.dooson.it;
-                
-                location = /actuator/health {
-                    proxy_pass http://backend;
-                    proxy_http_version 1.1;
-                    proxy_connect_timeout 5s;
-                    proxy_read_timeout 5s;
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    add_header Cache-Control "no-cache, no-store, must-revalidate";
-                }
-                
-                location / {
-                    proxy_pass http://backend;
-                    proxy_http_version 1.1;
-                    proxy_connect_timeout 10s;
-                    proxy_read_timeout 30s;
-                    proxy_send_timeout 30s;
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    add_header X-Frame-Options "SAMEORIGIN" always;
-                    add_header X-Content-Type-Options "nosniff" always;
-                }
-                
-                location ~ /\. { deny all; }
-            }
-            NGINX_EOF
-            
-            # 플레이스홀더 치환 (고유한 플레이스홀더로 안전하게)
-            sed -i "s/NEW_PORT_PLACEHOLDER/$NEW_PORT/g" /tmp/nginx-upstream.conf
-            sed -i "s/CURRENT_PORT_PLACEHOLDER/$CURRENT_PORT/g" /tmp/nginx-upstream.conf
-            
-            # Nginx 설정 적용
-            sudo cp /tmp/nginx-upstream.conf /etc/nginx/sites-available/erp.conf
+            # Nginx reload (설정 변경만)
             sudo nginx -t && sudo nginx -s reload
+            echo "✅ Nginx upstream 전환 완료"
             
-            # 전환 확인 및 안전한 롤백
-            if curl -s --max-time 3 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
+            # 전환 확인
+            sleep 2
+            if curl -s --max-time 5 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
               echo "✅ 새 앱으로 전환 완료"
               
               # 이전 앱 정리
               pm2 delete "$OLD_APP" 2>/dev/null || true
               pm2 save --force
               
-              echo "✅ 무중단 배포 완료"
+              echo "✅ 간단 무중단 배포 완료!"
             else
-              echo "❌ 새 앱 전환 실패, 안전한 롤백 시작"
-              
-              # Nginx 설정 롤백
-              if [ -s "/etc/nginx/sites-available/erp.conf.backup" ]; then
-                sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
-                sudo nginx -s reload
-                echo "✅ Nginx 설정 롤백 완료"
-              else
-                echo "⚠️ 백업 파일이 비어있습니다. Nginx 중지"
-                sudo systemctl stop nginx
-              fi
-              
-              # 새 앱 프로세스 정리
+              echo "❌ 전환 실패, 롤백"
+              # weight 롤백
+              sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=0/server 127.0.0.1:$CURRENT_PORT weight=100/" /etc/nginx/sites-available/erp.conf
+              sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=100/server 127.0.0.1:$NEW_PORT weight=0/" /etc/nginx/sites-available/erp.conf
+              sudo nginx -s reload
               pm2 delete "$NEW_APP" 2>/dev/null || true
-              echo "✅ 새 앱 프로세스 정리 완료"
-              
-              echo "❌ 배포 실패, 롤백 완료"
               exit 1
             fi
           EOF
