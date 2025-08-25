@@ -41,126 +41,93 @@ jobs:
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
-
+            
+            # 롤백 함수
+            rollback() {
+              echo "🔄 롤백 시작"
+              
+              # 백업 파일 존재 여부 확인
+              if [ -f "/etc/nginx/sites-available/erp.conf.backup" ]; then
+                sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
+                echo "✅ Nginx 설정 롤백 완료"
+              else
+                echo "⚠️ 백업 파일이 없습니다. 수동 복구가 필요합니다."
+                # 최소한의 안전한 설정으로 복구
+                sudo systemctl stop nginx
+              fi
+              
+              # 새 앱 프로세스 정리
+              if [ -n "${NEW_APP:-}" ]; then
+                pm2 delete "$NEW_APP" 2>/dev/null || true
+                echo "✅ 새 앱 프로세스 정리 완료"
+              fi
+              
+              echo "✅ 롤백 완료"
+              exit 1
+            }
+            
+            trap rollback ERR
+            
             echo "🚀 무중단 배포 시작"
             
-            # 변수 설정
-            APP_NEW_JAR="/home/ubuntu/app-new.jar"
-            APP_LATEST_JAR="/home/ubuntu/app-latest.jar"
-            PORT_1=8080
-            PORT_2=8081
+            # JAR 파일 교체
+            mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
             
-            # 새 JAR를 최신 JAR로 교체
-            mv "$APP_NEW_JAR" "$APP_LATEST_JAR"
+            # 현재 포트 확인 및 새 포트 결정
+            CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
+            NEW_PORT=$([ "$CURRENT_PORT" = "8080" ] && echo "8081" || echo "8080")
+            NEW_APP=$([ "$NEW_PORT" = "8080" ] && echo "app" || echo "app-new")
+            OLD_APP=$([ "$NEW_APP" = "app" ] && echo "app-new" || echo "app")
             
-            # 현재 실행 중인 포트 확인
-            CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "$PORT_1")
+            echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
             
-            # 새 포트 결정
-            if [ "$CURRENT_PORT" = "$PORT_1" ]; then
-              NEW_PORT=$PORT_2
-              OLD_APP="app"
-              NEW_APP="app-new"
-            else
-              NEW_PORT=$PORT_1
-              OLD_APP="app-new"
-              NEW_APP="app"
-            fi
-            
-            echo "▶ 현재 포트: $CURRENT_PORT, 새 포트: $NEW_PORT"
-            
-            # 새 앱 시작 전에 기존 프로세스 정리
-            if [ "$NEW_APP" = "app" ]; then
-              # app으로 전환하는 경우: app-new 먼저 삭제
-              pm2 start ecosystem.config.js --only "$NEW_APP"
-            else
-              # app-new로 전환하는 경우: app은 그대로 두고 app-new만 시작
-              pm2 start ecosystem.config.js --only "$NEW_APP"
-            fi
-            
-            # 앱 시작 대기
-            echo "▶ 앱 시작 대기 (30초)"
+            # 새 앱 시작
+            pm2 start ecosystem.config.js --only "$NEW_APP"
             sleep 30
             
-            # 포트 확인
-            echo "▶ 포트 $NEW_PORT 리스닝 확인"
+            # 포트 및 헬스체크
             for i in {1..20}; do
-              if ss -tlnp | grep -q ":$NEW_PORT "; then
-                echo "✅ 포트 $NEW_PORT 리스닝 확인됨"
+              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 새 앱 준비 완료"
                 break
               fi
               if [ $i -eq 20 ]; then
-                echo "❌ 포트 리스닝 실패"
-                pm2 delete "$NEW_APP" 2>/dev/null || true
-                exit 1
-              fi
-              sleep 2
-            done
-            
-            # 추가 안정화 대기
-            echo "▶ 추가 안정화 대기 (15초)"
-            sleep 15
-            
-            # 헬스체크
-            echo "▶ 헬스체크 시작"
-            for i in {1..15}; do
-              if curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 헬스체크 성공"
-                break
-              fi
-              if [ $i -eq 15 ]; then
-                echo "❌ 헬스체크 실패"
-                pm2 delete "$NEW_APP" 2>/dev/null || true
+                echo "❌ 새 앱 시작 실패"
                 exit 1
               fi
               sleep 3
             done
-            
-            # 추가 안정화 대기 (헬스체크 후)
-            echo "▶ 헬스체크 후 안정화 대기 (10초)"
-            sleep 10
             
             # Nginx 프록시 전환 (백업 후 수정)
             echo "▶ Nginx 프록시 전환 시작"
             sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
-            sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
             
-            # Nginx 설정 테스트
-            if ! sudo nginx -t; then
-              echo "❌ Nginx 설정 오류, 백업에서 복원"
-              sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
+            # 백업 파일 검증
+            if [ ! -f "/etc/nginx/sites-available/erp.conf.backup" ]; then
+              echo "❌ 백업 파일 생성 실패"
               exit 1
             fi
             
-            # Nginx 재시작 (reload 대신)
-            sudo systemctl restart nginx
-            echo "✅ Nginx 프록시 전환 완료"
+            sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
+            sudo nginx -t && sudo systemctl restart nginx
             
-            # 프록시 전환 후 추가 대기
-            echo "▶ 프록시 전환 후 안정화 대기 (5초)"
-            sleep 5
-            
-            # 새 포트로 외부 헬스체크
-            echo "▶ 외부 헬스체크 시작"
+            # 외부 헬스체크
             for i in {1..10}; do
               if curl -s --max-time 10 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 외부 헬스체크 성공"
+                echo "✅ 외부 접근 확인"
                 break
               fi
               if [ $i -eq 10 ]; then
-                echo "❌ 외부 헬스체크 실패, 롤백 시작"
-                sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
-                sudo systemctl restart nginx
-                pm2 delete "$NEW_APP" 2>/dev/null || true
-                exit 1
+                echo "❌ 외부 접근 실패"
+                rollback
               fi
               sleep 3
             done
             
-            # 이전 앱 종료 (모든 검증 완료 후)
-            echo "▶ 이전 앱 종료"
+            # 이전 앱 종료
             pm2 delete "$OLD_APP" 2>/dev/null || true
             pm2 save --force
+            trap - ERR
             
             echo "✅ 무중단 배포 완료"
           EOF
