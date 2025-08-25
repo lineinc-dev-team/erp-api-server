@@ -26,6 +26,9 @@ import java.util.*;
 @NoArgsConstructor
 @SuperBuilder
 public class User extends BaseEntity implements UserDetails {
+
+    private static final long serialVersionUID = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
