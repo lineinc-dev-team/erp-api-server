@@ -61,7 +61,7 @@ jobs:
             echo "✅ JAR 파일 준비 완료: /home/ubuntu/app-latest.jar"
             
             # 현재 활성 포트 확인 (weight=100인 포트)
-            CURRENT_PORT=$(sudo grep -oP 'server 127.0.0.1:\K[0-9]+.*weight=100' /etc/nginx/sites-available/erp.conf | head -n 1)
+            CURRENT_PORT=$(sudo grep "weight=100" /etc/nginx/sites-available/erp.conf | grep -oP '127.0.0.1:\K[0-9]+' | head -n 1)
             
             # 디버깅을 위한 현재 상태 출력
             echo "▶ 현재 Nginx upstream 상태:"
