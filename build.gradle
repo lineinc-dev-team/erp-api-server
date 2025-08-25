@@ -10,16 +10,16 @@ version = '0.0.1-SNAPSHOT'
 // 의존성 버전 관리
 ext {
     springdocVersion = '2.8.0'
-    querydslVersion = '5.1.0'
-    poiVersion = '5.2.5'
-    awsSdkVersion = '2.26.11'
-    bucket4jVersion = '7.3.0'
-    javersVersion = '7.4.0'
+    querydslVersion  = '5.1.0'
+    poiVersion       = '5.2.5'
+    awsSdkVersion    = '2.26.11'
+    bucket4jVersion  = '7.3.0'
+    javersVersion    = '7.4.0'
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -50,7 +50,7 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
 
     // QueryDSL
-    implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
+    implementation      "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
     annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
