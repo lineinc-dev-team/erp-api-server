@@ -68,8 +68,14 @@ jobs:
             echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
             echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
             
-            # 새 앱 시작
-            pm2 start ecosystem.config.js --only "$NEW_APP"
+            # 새 앱 시작 (기존 프로세스가 있으면 restart, 없으면 start)
+            if pm2 list | grep -q "$NEW_APP"; then
+              echo "▶ 기존 $NEW_APP 프로세스 재시작"
+              pm2 restart "$NEW_APP"
+            else
+              echo "▶ 새 $NEW_APP 프로세스 시작"
+              pm2 start ecosystem.config.js --only "$NEW_APP"
+            fi
             
             # 새 앱이 준비될 때까지 대기 (상세한 디버깅)
             echo "▶ 헬스체크 시작 (포트: $NEW_PORT)"
