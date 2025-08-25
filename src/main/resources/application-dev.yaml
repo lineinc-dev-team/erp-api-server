@@ -1,69 +1,11 @@
-spring:
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
+# 개발 환경 설정 - 공통 설정 상속 후 개발 전용 설정만 오버라이드
 
-  session:
-    store-type: jdbc
-    jdbc:
-      initialize-schema: always
-
-  data:
-    web:
-      pageable:
-        max-page-size: 200
-
-  jackson:
-    time-zone: Asia/Seoul
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        jdbc.time_zone: UTC
-        format_sql: true
-        default_batch_fetch_size: 200
-    open-in-view: false
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-
-  endpoint:
-    health:
-      show-details: always
-
+# Swagger API 문서 서버 URL (개발)
 swagger:
   server-url: https://dev-erp-api.dooson.it
 
+# CORS 설정 (개발 환경용)
 cors:
   allowed-origins: https://dev-erp.dooson.it,https://dev-erp-api.dooson.it,http://localhost:3000
-
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
-    region:
-      static: ap-northeast-2
-    s3:
-      bucket: ${AWS_S3_BUCKET}
-      cdn-url: ${AWS_CDN_URL}
-
-user:
-  default-password: ${USER_DEFAULT_PASSWORD}
-
-server:
-  port: ${SERVER_PORT:8080}
-  shutdown: graceful
 
 
