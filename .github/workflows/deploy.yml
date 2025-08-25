@@ -104,8 +104,8 @@ jobs:
               sleep 2
             done
             
-            # 새 앱이 완전히 준비된 후에만 Nginx 전환 (즉시 전환)
-            echo "▶ Nginx 프록시 전환 시작"
+            # 핵심: Nginx upstream 설정으로 무중단 전환
+            echo "▶ Nginx upstream 설정 변경"
             sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
             
             # 백업 파일 검증
@@ -114,20 +114,74 @@ jobs:
               exit 1
             fi
             
-            sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
+            # 기존 설정을 유지하면서 upstream만 추가 (Bad Gateway 방지)
+            cat > /tmp/nginx-upstream.conf << UPSTREAM
+            upstream backend {
+                server 127.0.0.1:${NEW_PORT} weight=100;
+                server 127.0.0.1:${CURRENT_PORT} weight=0;
+            }
             
-            # Nginx graceful reload (중단 없음)
+            # ERP API 서버 Nginx 설정
+            server {
+                listen 80;
+                server_name dev-erp-api.dooson.it;
+                
+                # 헬스체크 경로 - Spring Boot Actuator
+                location = /actuator/health {
+                    proxy_pass http://backend;
+                    proxy_http_version 1.1;
+                    proxy_connect_timeout 30s;
+                    proxy_read_timeout 30s;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                    add_header Cache-Control "no-cache, no-store, must-revalidate";
+                }
+                
+                # 모든 API 요청 처리
+                location / {
+                    proxy_pass http://backend;
+                    proxy_http_version 1.1;
+                    proxy_connect_timeout 90s;
+                    proxy_read_timeout 90s;
+                    proxy_send_timeout 90s;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection \$http_connection;
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                    add_header X-Frame-Options "SAMEORIGIN" always;
+                    add_header X-Content-Type-Options "nosniff" always;
+                }
+                
+                # 숨겨진 파일 접근 차단 (보안)
+                location ~ /\. {
+                    deny all;
+                }
+            }
+            UPSTREAM
+            
+            sudo cp /tmp/nginx-upstream.conf /etc/nginx/sites-available/erp.conf
+            
+            # Nginx 설정 테스트 후 reload
             sudo nginx -t && sudo nginx -s reload
             
-            # 새 앱으로 전환 확인
-            if curl -s --max-time 3 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
+            # 새 앱으로 트래픽 전환 확인 (5초 대기)
+            echo "▶ 새 앱으로 트래픽 전환 확인"
+            sleep 5
+            
+            # 새 앱 헬스체크
+            if curl -s --max-time 5 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
               echo "✅ 새 앱으로 전환 완료"
               
               # 이전 앱 종료 (새 앱이 정상 동작하는 것을 확인한 후)
               pm2 delete "$OLD_APP" 2>/dev/null || true
               pm2 save --force
               
-              echo "✅ 무중단 배포 완료"
+              echo "✅ 진정한 무중단 배포 완료"
             else
               echo "❌ 새 앱 전환 실패, 롤백"
               sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf

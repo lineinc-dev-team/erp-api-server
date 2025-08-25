@@ -4,10 +4,6 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
-import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
-import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
-import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.UpdateUserRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -15,7 +11,6 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -35,7 +30,7 @@ public class User extends BaseEntity implements UserDetails {
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String loginId;
 
     @Column
@@ -45,7 +40,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String passwordHash;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @DiffInclude
     private String email;
 
@@ -151,6 +146,7 @@ public class User extends BaseEntity implements UserDetails {
     // ===== 비즈니스 메서드 =====
     public void updatePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
+        this.requirePasswordReset = false;
     }
 
     public void updateLastLoginAt() {
@@ -169,52 +165,43 @@ public class User extends BaseEntity implements UserDetails {
                 .orElse(null);
     }
 
-    public void updateFrom(UpdateUserRequest request,
-            PasswordEncoder passwordEncoder,
-            DepartmentRepository departmentRepository,
-            GradeRepository gradeRepository,
-            PositionRepository positionRepository) {
-
-        updateBasicInfo(request);
-        updateContactInfo(request);
-        updateOrganizationInfo(request, departmentRepository, gradeRepository, positionRepository);
-        updatePasswordIfProvided(request, passwordEncoder);
-        syncTransientFields();
+    // ===== 도메인 로직 =====
+    public void updateBasicInfo(String username, String email, boolean isActive, String memo) {
+        Optional.ofNullable(username).ifPresent(val -> this.username = val);
+        Optional.ofNullable(email).ifPresent(val -> this.email = val);
+        Optional.ofNullable(isActive).ifPresent(val -> this.isActive = val);
+        Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
     }
 
-    // ===== Private 메서드 =====
-    private void updateBasicInfo(UpdateUserRequest request) {
-        Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
-        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
-        Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    public void updateContactInfo(String phoneNumber, String landlineNumber) {
+        Optional.ofNullable(phoneNumber).ifPresent(val -> this.phoneNumber = val);
+        Optional.ofNullable(landlineNumber).ifPresent(val -> this.landlineNumber = val);
     }
 
-    private void updateContactInfo(UpdateUserRequest request) {
-        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
-        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
+    public void updateOrganizationInfo(Department department, Grade grade, Position position) {
+        this.department = department;
+        this.grade = grade;
+        this.position = position;
     }
 
-    private void updateOrganizationInfo(UpdateUserRequest request,
-            DepartmentRepository departmentRepository,
-            GradeRepository gradeRepository,
-            PositionRepository positionRepository) {
-        Optional.ofNullable(request.departmentId())
-                .flatMap(departmentRepository::findById)
-                .ifPresent(entity -> this.department = entity);
-
-        Optional.ofNullable(request.gradeId())
-                .flatMap(gradeRepository::findById)
-                .ifPresent(entity -> this.grade = entity);
-
-        Optional.ofNullable(request.positionId())
-                .flatMap(positionRepository::findById)
-                .ifPresent(entity -> this.position = entity);
+    public void activate() {
+        this.isActive = true;
     }
 
-    private void updatePasswordIfProvided(UpdateUserRequest request, PasswordEncoder passwordEncoder) {
-        if (request.password() != null && !request.password().isBlank()) {
-            this.updatePassword(passwordEncoder.encode(request.password()));
-        }
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+    public boolean hasRole(String roleName) {
+        return this.userRoles.stream()
+                .anyMatch(userRole -> userRole.getRole().getName().equals(roleName));
+    }
+
+    public void addRole(UserRole userRole) {
+        this.userRoles.add(userRole);
+    }
+
+    public void removeRole(UserRole userRole) {
+        this.userRoles.remove(userRole);
     }
 }
