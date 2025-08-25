@@ -53,7 +53,7 @@ jobs:
             # JAR 파일 교체
             mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
             
-            # 현재 포트 확인 및 새 포트 결정
+            # 현재 포트 확인 및 새 포트 결정 (안전한 로직)
             if [ -f "/etc/nginx/sites-available/erp.conf" ]; then
               CURRENT_PORT=$(sudo grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' /etc/nginx/sites-available/erp.conf | head -n 1 || echo "8080")
             else
@@ -61,7 +61,13 @@ jobs:
               CURRENT_PORT="8080"
             fi
             
-            NEW_PORT=$([ "$CURRENT_PORT" = "8080" ] && echo "8081" || echo "8080")
+            # 더 안전한 포트 전환 로직
+            if [ "$CURRENT_PORT" = "8080" ]; then
+              NEW_PORT="8081"
+            else
+              NEW_PORT="8080"
+            fi
+            
             NEW_APP="app-${NEW_PORT}"
             OLD_APP="app-$([ "$NEW_PORT" = "8080" ] && echo "8081" || echo "8080")"
             
@@ -114,14 +120,20 @@ jobs:
               sleep 2
             done
             
-            # Nginx 설정 백업
-            sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
+            # Nginx 설정 백업 (파일이 없어도 안전하게)
+            if [ -f "/etc/nginx/sites-available/erp.conf" ]; then
+              sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
+              echo "✅ 기존 Nginx 설정 백업 완료"
+            else
+              echo "⚠️ erp.conf 파일이 없습니다. 빈 백업 파일 생성"
+              touch /etc/nginx/sites-available/erp.conf.backup
+            fi
             
-            # 새로운 Nginx 설정 생성
+            # 새로운 Nginx 설정 생성 (고유한 플레이스홀더 사용)
             cat > /tmp/nginx-upstream.conf << 'NGINX_EOF'
             upstream backend {
-                server 127.0.0.1:NEW_PORT weight=100;
-                server 127.0.0.1:CURRENT_PORT weight=0;
+                server 127.0.0.1:NEW_PORT_PLACEHOLDER weight=100;
+                server 127.0.0.1:CURRENT_PORT_PLACEHOLDER weight=0;
             }
             
             server {
@@ -156,15 +168,15 @@ jobs:
             }
             NGINX_EOF
             
-            # 플레이스홀더 치환
-            sed -i "s/NEW_PORT/$NEW_PORT/g" /tmp/nginx-upstream.conf
-            sed -i "s/CURRENT_PORT/$CURRENT_PORT/g" /tmp/nginx-upstream.conf
+            # 플레이스홀더 치환 (고유한 플레이스홀더로 안전하게)
+            sed -i "s/NEW_PORT_PLACEHOLDER/$NEW_PORT/g" /tmp/nginx-upstream.conf
+            sed -i "s/CURRENT_PORT_PLACEHOLDER/$CURRENT_PORT/g" /tmp/nginx-upstream.conf
             
             # Nginx 설정 적용
             sudo cp /tmp/nginx-upstream.conf /etc/nginx/sites-available/erp.conf
             sudo nginx -t && sudo nginx -s reload
             
-            # 전환 확인
+            # 전환 확인 및 안전한 롤백
             if curl -s --max-time 3 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
               echo "✅ 새 앱으로 전환 완료"
               
@@ -174,10 +186,23 @@ jobs:
               
               echo "✅ 무중단 배포 완료"
             else
-              echo "❌ 새 앱 전환 실패, 롤백"
-              sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
-              sudo nginx -s reload
+              echo "❌ 새 앱 전환 실패, 안전한 롤백 시작"
+              
+              # Nginx 설정 롤백
+              if [ -s "/etc/nginx/sites-available/erp.conf.backup" ]; then
+                sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
+                sudo nginx -s reload
+                echo "✅ Nginx 설정 롤백 완료"
+              else
+                echo "⚠️ 백업 파일이 비어있습니다. Nginx 중지"
+                sudo systemctl stop nginx
+              fi
+              
+              # 새 앱 프로세스 정리
               pm2 delete "$NEW_APP" 2>/dev/null || true
+              echo "✅ 새 앱 프로세스 정리 완료"
+              
+              echo "❌ 배포 실패, 롤백 완료"
               exit 1
             fi
           EOF
