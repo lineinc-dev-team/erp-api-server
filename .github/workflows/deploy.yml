@@ -100,18 +100,32 @@ jobs:
             # 1단계: 포트 열림 확인 (빠른 확인)
             echo "▶ 1단계: 포트 열림 확인..."
             for i in {1..15}; do
-              if ss -tlnp | grep -q ":$NEW_PORT "; then
+              echo "▶ 포트 확인 시도 $i/15..."
+              
+              # 현재 열린 포트 목록 출력
+              echo "▶ 현재 열린 포트 목록:"
+              ss -tlnp | grep LISTEN || echo "열린 포트 없음"
+              
+              # 특정 포트 상태 확인
+              if ss -tlnp | grep -q ":$NEW_PORT[[:space:]]"; then
                 echo "✅ 포트 $NEW_PORT에서 프로세스 확인됨"
+                echo "▶ 포트 $NEW_PORT 상세 정보:"
+                ss -tlnp | grep ":$NEW_PORT[[:space:]]"
                 break
+              else
+                echo "⚠️ 포트 $NEW_PORT에서 프로세스 없음"
               fi
               
               if [ $i -eq 15 ]; then
                 echo "❌ 포트 $NEW_PORT에서 프로세스가 열리지 않음"
+                echo "▶ PM2 상태:"
+                pm2 list
+                echo "▶ PM2 로그 (마지막 20줄):"
                 pm2 logs "$NEW_APP" --lines 20
                 exit 1
               fi
               
-              echo "▶ 포트 확인 시도 $i/15..."
+              echo "▶ 2초 대기 후 재시도..."
               sleep 2
             done
             
