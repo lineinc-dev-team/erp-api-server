@@ -96,18 +96,43 @@ jobs:
             
             # 새 앱 준비 대기
             echo "▶ 새 앱 준비 대기 (포트: $NEW_PORT)"
-            for i in {1..10}; do
-              echo "▶ 헬스체크 시도 $i/10..."
-              
-              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 새 앱 준비 완료"
+            
+            # 1단계: 포트 열림 확인 (빠른 확인)
+            echo "▶ 1단계: 포트 열림 확인..."
+            for i in {1..15}; do
+              if ss -tlnp | grep -q ":$NEW_PORT "; then
+                echo "✅ 포트 $NEW_PORT에서 프로세스 확인됨"
                 break
               fi
               
-              if [ $i -eq 10 ]; then
-                echo "❌ 새 앱 시작 실패"
+              if [ $i -eq 15 ]; then
+                echo "❌ 포트 $NEW_PORT에서 프로세스가 열리지 않음"
+                pm2 logs "$NEW_APP" --lines 20
+                exit 1
+              fi
+              
+              echo "▶ 포트 확인 시도 $i/15..."
+              sleep 2
+            done
+            
+            # 2단계: Spring Boot 완전 시작 대기 (더 긴 대기)
+            echo "▶ 2단계: Spring Boot 완전 시작 대기..."
+            for i in {1..20}; do
+              echo "▶ 헬스체크 시도 $i/20..."
+              
+              if curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 새 앱 준비 완료 (헬스체크 성공)"
+                break
+              fi
+              
+              if [ $i -eq 20 ]; then
+                echo "❌ 새 앱 시작 실패 (헬스체크 타임아웃)"
+                echo "▶ PM2 상태:"
                 pm2 list
-                pm2 logs "$NEW_APP" --lines 10
+                echo "▶ PM2 로그 (마지막 20줄):"
+                pm2 logs "$NEW_APP" --lines 20
+                echo "▶ 포트 상태:"
+                ss -tlnp | grep ":$NEW_PORT " || echo "포트 $NEW_PORT에서 프로세스 없음"
                 exit 1
               fi
               
