@@ -91,23 +91,20 @@ jobs:
             # 새 앱 시작 (백그라운드)
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
-            # 앱 시작 대기 (15초)
-            sleep 15
-            
-            # 포트 및 헬스체크
-            for i in {1..15}; do
-              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+            # 새 앱이 완전히 준비될 때까지 대기 (기존 앱은 계속 서비스)
+            for i in {1..20}; do
+              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
                 echo "✅ 새 앱 준비 완료"
                 break
               fi
-              if [ $i -eq 15 ]; then
+              if [ $i -eq 20 ]; then
                 echo "❌ 새 앱 시작 실패"
                 exit 1
               fi
-              sleep 3
+              sleep 2
             done
             
-            # Nginx 프록시 전환 (백업 후 수정)
+            # 새 앱이 완전히 준비된 후에만 Nginx 전환 (즉시 전환)
             echo "▶ Nginx 프록시 전환 시작"
             sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
             
@@ -119,21 +116,25 @@ jobs:
             
             sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:${NEW_PORT}/g" /etc/nginx/sites-available/erp.conf
             
-            # Nginx 설정 테스트 후 graceful reload (중단 없음)
+            # Nginx graceful reload (중단 없음)
             sudo nginx -t && sudo nginx -s reload
             
-            # 빠른 외부 헬스체크
-            for i in {1..5}; do
-              if curl -s --max-time 5 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 외부 접근 확인"
-                break
-              fi
-              sleep 1
-            done
-            
-            # 이전 앱 종료
-            pm2 delete "$OLD_APP" 2>/dev/null || true
-            pm2 save --force
+            # 새 앱으로 전환 확인
+            if curl -s --max-time 3 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
+              echo "✅ 새 앱으로 전환 완료"
+              
+              # 이전 앱 종료 (새 앱이 정상 동작하는 것을 확인한 후)
+              pm2 delete "$OLD_APP" 2>/dev/null || true
+              pm2 save --force
+              
+              echo "✅ 무중단 배포 완료"
+            else
+              echo "❌ 새 앱 전환 실패, 롤백"
+              sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
+              sudo nginx -s reload
+              pm2 delete "$NEW_APP" 2>/dev/null || true
+              exit 1
+            fi
             trap - ERR
             
             echo "✅ 무중단 배포 완료"
