@@ -143,7 +143,7 @@ public class User extends BaseEntity implements UserDetails {
         return this.isActive;
     }
 
-    // ===== 비즈니스 메서드 =====
+    // ===== 핵심 비즈니스 메서드 =====
     public void updatePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
         this.requirePasswordReset = false;
@@ -151,37 +151,6 @@ public class User extends BaseEntity implements UserDetails {
 
     public void updateLastLoginAt() {
         this.lastLoginAt = OffsetDateTime.now();
-    }
-
-    public void syncTransientFields() {
-        this.departmentName = Optional.ofNullable(this.department)
-                .map(Department::getName)
-                .orElse(null);
-        this.gradeName = Optional.ofNullable(this.grade)
-                .map(Grade::getName)
-                .orElse(null);
-        this.positionName = Optional.ofNullable(this.position)
-                .map(Position::getName)
-                .orElse(null);
-    }
-
-    // ===== 도메인 로직 =====
-    public void updateBasicInfo(String username, String email, boolean isActive, String memo) {
-        Optional.ofNullable(username).ifPresent(val -> this.username = val);
-        Optional.ofNullable(email).ifPresent(val -> this.email = val);
-        Optional.ofNullable(isActive).ifPresent(val -> this.isActive = val);
-        Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
-    }
-
-    public void updateContactInfo(String phoneNumber, String landlineNumber) {
-        Optional.ofNullable(phoneNumber).ifPresent(val -> this.phoneNumber = val);
-        Optional.ofNullable(landlineNumber).ifPresent(val -> this.landlineNumber = val);
-    }
-
-    public void updateOrganizationInfo(Department department, Grade grade, Position position) {
-        this.department = department;
-        this.grade = grade;
-        this.position = position;
     }
 
     public void activate() {
@@ -204,4 +173,32 @@ public class User extends BaseEntity implements UserDetails {
     public void removeRole(UserRole userRole) {
         this.userRoles.remove(userRole);
     }
+
+    public void syncTransientFields() {
+        this.departmentName = Optional.ofNullable(this.department)
+                .map(Department::getName)
+                .orElse(null);
+        this.gradeName = Optional.ofNullable(this.grade)
+                .map(Grade::getName)
+                .orElse(null);
+        this.positionName = Optional.ofNullable(this.position)
+                .map(Position::getName)
+                .orElse(null);
+    }
+
+    // ===== 통합 업데이트 메서드 =====
+    public void updateFrom(String username, String email, String landlineNumber, String phoneNumber,
+            String memo, Department department, Grade grade, Position position,
+            Boolean isActive) {
+        Optional.ofNullable(username).ifPresent(val -> this.username = val);
+        Optional.ofNullable(email).ifPresent(val -> this.email = val);
+        Optional.ofNullable(landlineNumber).ifPresent(val -> this.landlineNumber = val);
+        Optional.ofNullable(phoneNumber).ifPresent(val -> this.phoneNumber = val);
+        Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
+        Optional.ofNullable(department).ifPresent(val -> this.department = val);
+        Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
+        Optional.ofNullable(position).ifPresent(val -> this.position = val);
+        Optional.ofNullable(isActive).ifPresent(val -> this.isActive = val);
+    }
+
 }

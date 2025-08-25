@@ -10,6 +10,7 @@ import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @SuperBuilder
 public class UserChangeHistory extends BaseEntity {
 

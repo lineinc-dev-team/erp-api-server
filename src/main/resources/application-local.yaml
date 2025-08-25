@@ -7,16 +7,3 @@ swagger:
 # CORS 설정 (로컬 개발용)
 cors:
   allowed-origins: http://localhost:8080,http://localhost:3000
-
-# AWS 클라우드 자격 증명 및 서비스 설정
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY} 
-      secret-key: ${AWS_SECRET_KEY}
-    region:
-      static: ap-northeast-2             
-    s3:
-      bucket: ${AWS_S3_BUCKET}
-      cdn-url: ${AWS_CDN_URL}
-

@@ -13,7 +13,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -87,8 +86,6 @@ public abstract class BaseEntity {
 
     /**
      * 소프트 삭제 처리 메서드
-     * - deleted 플래그를 true로 설정하고
-     * - 삭제 일시(deletedAt)를 현재 시간으로 설정합니다.
      */
     public void markAsDeleted() {
         this.deleted = true;

@@ -183,22 +183,12 @@ public class UserService {
         User oldUserSnapshot = JaversUtils.createSnapshot(javers, oldUser, User.class);
 
         // 새로운 메서드들을 사용하여 사용자 정보 업데이트
-        oldUser.updateBasicInfo(request.username(), request.email(), request.isActive(), request.memo());
-        oldUser.updateContactInfo(request.phoneNumber(), request.landlineNumber());
-
-        // 조직 정보 업데이트
-        if (request.departmentId() != null) {
-            Department dept = departmentRepository.findById(request.departmentId()).orElse(null);
-            oldUser.updateOrganizationInfo(dept, oldUser.getGrade(), oldUser.getPosition());
-        }
-        if (request.gradeId() != null) {
-            Grade grade = gradeRepository.findById(request.gradeId()).orElse(null);
-            oldUser.updateOrganizationInfo(oldUser.getDepartment(), grade, oldUser.getPosition());
-        }
-        if (request.positionId() != null) {
-            Position position = positionRepository.findById(request.positionId()).orElse(null);
-            oldUser.updateOrganizationInfo(oldUser.getDepartment(), oldUser.getGrade(), position);
-        }
+        oldUser.updateFrom(request.username(), request.email(), request.phoneNumber(), request.landlineNumber(),
+                request.memo(),
+                request.departmentId() != null ? Department.builder().id(request.departmentId()).build() : null,
+                request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null,
+                request.positionId() != null ? Position.builder().id(request.positionId()).build() : null,
+                request.isActive());
 
         // 비밀번호 업데이트
         if (request.password() != null && !request.password().isBlank()) {
