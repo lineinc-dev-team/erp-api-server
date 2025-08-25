@@ -13,12 +13,6 @@ jobs:
       - name: ✅ 코드 체크아웃
         uses: actions/checkout@v4
 
-      - name: ☕ Java 24 설정
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '24'
-
       - name: 🔁 Gradle 캐시 복원
         uses: actions/cache@v4
         with:
@@ -91,20 +85,20 @@ jobs:
             # 새 앱 시작 (백그라운드)
             pm2 start ecosystem.config.js --only "$NEW_APP"
             
-            # 빠른 헬스체크 (5초 대기)
-            sleep 5
+            # 앱 시작 대기 (15초)
+            sleep 15
             
-            # 포트 및 헬스체크 (더 빠르게)
-            for i in {1..10}; do
-              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+            # 포트 및 헬스체크
+            for i in {1..15}; do
+              if ss -tlnp | grep -q ":$NEW_PORT " && curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
                 echo "✅ 새 앱 준비 완료"
                 break
               fi
-              if [ $i -eq 10 ]; then
+              if [ $i -eq 15 ]; then
                 echo "❌ 새 앱 시작 실패"
                 exit 1
               fi
-              sleep 2
+              sleep 3
             done
             
             # Nginx 프록시 전환 (백업 후 수정)
