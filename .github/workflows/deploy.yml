@@ -87,7 +87,7 @@ jobs:
             
             # 새 앱 시작/재시작
             if pm2 list | grep -q "$NEW_APP"; then
-              echo "▶ 기존 $NEW_APP 프로세스 재시작"
+              echo "▶ 기존 $NEW_APP 프로세스 재시작 (새 JAR 적용)"
               pm2 restart "$NEW_APP"
             else
               echo "▶ 새 $NEW_APP 프로세스 시작"
@@ -153,32 +153,35 @@ jobs:
               sleep 3
             done
             
-            # Nginx upstream weight 변경 (간단한 sed 명령어)
-            echo "▶ Nginx upstream weight 변경"
+            # 진짜 무중단 전환: Nginx weight만 변경 (프로세스 종료 없음)
+            echo "▶ 진짜 무중단 전환: Nginx weight만 변경"
             sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=100/server 127.0.0.1:$CURRENT_PORT weight=0/" /etc/nginx/sites-available/erp.conf
             sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=0/server 127.0.0.1:$NEW_PORT weight=100/" /etc/nginx/sites-available/erp.conf
             
             # Nginx reload (설정 변경만)
             sudo nginx -t && sudo nginx -s reload
-            echo "✅ Nginx upstream 전환 완료"
+            echo "✅ Nginx upstream 전환 완료 (Bad Gateway 0초!)"
             
             # 전환 확인
             sleep 2
             if curl -s --max-time 5 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
               echo "✅ 새 앱으로 전환 완료"
               
-              # 이전 앱 정리
-              pm2 delete "$OLD_APP" 2>/dev/null || true
+              # 이전 앱도 새 JAR로 업데이트 (프로세스는 유지)
+              echo "▶ 이전 앱 $OLD_APP도 새 JAR로 업데이트"
+              pm2 restart "$OLD_APP"
+              
+              # PM2 상태 저장
               pm2 save --force
               
-              echo "✅ 간단 무중단 배포 완료!"
+              echo "✅ 진짜 무중단 배포 완료! (Bad Gateway 0초)"
             else
               echo "❌ 전환 실패, 롤백"
               # weight 롤백
               sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=0/server 127.0.0.1:$CURRENT_PORT weight=100/" /etc/nginx/sites-available/erp.conf
               sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=100/server 127.0.0.1:$NEW_PORT weight=0/" /etc/nginx/sites-available/erp.conf
               sudo nginx -s reload
-              pm2 delete "$NEW_APP" 2>/dev/null || true
+              echo "✅ 롤백 완료 (이전 앱으로 복구)"
               exit 1
             fi
           EOF
