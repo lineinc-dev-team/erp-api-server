@@ -60,8 +60,8 @@ jobs:
             fi
             echo "✅ JAR 파일 준비 완료: /home/ubuntu/app-latest.jar"
             
-            # 현재 활성 포트 확인 (weight=100인 포트)
-            CURRENT_PORT=$(sudo grep "weight=100" /etc/nginx/sites-available/erp.conf | grep -oP '127.0.0.1:\K[0-9]+' | head -n 1)
+            # 현재 활성 포트 확인 (weight=99인 포트)
+            CURRENT_PORT=$(sudo grep "weight=99" /etc/nginx/sites-available/erp.conf | grep -oP '127.0.0.1:\K[0-9]+' | head -n 1)
             
             # 디버깅을 위한 현재 상태 출력
             echo "▶ 현재 Nginx upstream 상태:"
@@ -82,7 +82,7 @@ jobs:
             NEW_APP="app-${NEW_PORT}"
             OLD_APP="app-${CURRENT_PORT}"
             
-            echo "▶ 포트 전환: $CURRENT_PORT (weight=100) → $NEW_PORT (weight=100)"
+            echo "▶ 포트 전환: $CURRENT_PORT (weight=99) → $NEW_PORT (weight=99)"
             echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
             
             # 새 앱 시작/재시작
@@ -162,8 +162,8 @@ jobs:
               echo "✅ 새 앱 헬스체크 최종 확인 완료"
               
               # weight 변경
-              sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=100/server 127.0.0.1:$CURRENT_PORT weight=0/" /etc/nginx/sites-available/erp.conf
-              sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=0/server 127.0.0.1:$NEW_PORT weight=100/" /etc/nginx/sites-available/erp.conf
+              sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=99/server 127.0.0.1:$CURRENT_PORT weight=1/" /etc/nginx/sites-available/erp.conf
+              sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=1/server 127.0.0.1:$NEW_PORT weight=99/" /etc/nginx/sites-available/erp.conf
               
               # Nginx reload (설정 변경만)
               sudo nginx -t && sudo nginx -s reload
@@ -189,8 +189,8 @@ jobs:
             else
               echo "❌ 전환 실패, 롤백"
               # weight 롤백
-              sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=0/server 127.0.0.1:$CURRENT_PORT weight=100/" /etc/nginx/sites-available/erp.conf
-              sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=100/server 127.0.0.1:$NEW_PORT weight=0/" /etc/nginx/sites-available/erp.conf
+              sudo sed -i "s/server 127.0.0.1:$CURRENT_PORT.*weight=1/server 127.0.0.1:$CURRENT_PORT weight=99/" /etc/nginx/sites-available/erp.conf
+              sudo sed -i "s/server 127.0.0.1:$NEW_PORT.*weight=99/server 127.0.0.1:$NEW_PORT weight=1/" /etc/nginx/sites-available/erp.conf
               sudo nginx -s reload
               echo "✅ 롤백 완료 (이전 앱으로 복구)"
               exit 1
