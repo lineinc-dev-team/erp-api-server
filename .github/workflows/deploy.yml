@@ -13,6 +13,12 @@ jobs:
       - name: ✅ 코드 체크아웃
         uses: actions/checkout@v4
 
+      - name: ☕ Java 24 설정
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
       - name: 🔁 Gradle 캐시 복원
         uses: actions/cache@v4
         with:
