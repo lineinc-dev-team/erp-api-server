@@ -125,8 +125,8 @@ jobs:
                 exit 1
               fi
               
-              echo "▶ 2초 대기 후 재시도..."
-              sleep 2
+              echo "▶ 3초 대기 후 재시도..."
+              sleep 3
             done
             
             # 2단계: Spring Boot 완전 시작 대기 (더 긴 대기)
