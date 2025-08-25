@@ -66,8 +66,6 @@ public class UserService {
 
     @Transactional
     public void resetPassword(long id) {
-        if (id == 1L)
-            return; // 1번 계정은 비밀번호 초기화 금지
         User user = usersRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
@@ -172,9 +170,6 @@ public class UserService {
 
     @Transactional
     public void updateUser(Long id, UpdateUserRequest request) {
-        if (id == 1L)
-            return;
-
         User oldUser = usersRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));

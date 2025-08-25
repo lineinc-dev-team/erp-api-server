@@ -325,9 +325,6 @@ public class RoleService {
 
     @Transactional
     public void updateRole(Long roleId, UpdateRolesRequest request) {
-        if (roleId == 1L)
-            return;
-
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.ROLE_NOT_FOUND));
