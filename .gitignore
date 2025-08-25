@@ -1,24 +1,24 @@
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,macos,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,macos,java
 
-### Intellij ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
-# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+### IntelliJ IDEA ###
+# JetBrains IDE 관련 파일들 (IntelliJ, WebStorm, PyCharm 등)
+# 참고: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
-# User-specific stuff
+# 사용자별 설정 파일
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
 
-# AWS User-specific
+# AWS 사용자 설정
 .idea/**/aws.xml
 
-# Generated files
+# 자동 생성 파일들
 .idea/**/contentModel.xml
 
-# Sensitive or high-churn files
+# 민감하거나 자주 변경되는 파일들
 .idea/**/dataSources/
 .idea/**/dataSources.ids
 .idea/**/dataSources.local.xml
@@ -27,14 +27,12 @@
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-# Gradle
+# Gradle 관련 설정
 .idea/**/gradle.xml
 .idea/**/libraries
 
-# Gradle and Maven with auto-import
-# When using Gradle or Maven with auto-import, you should exclude module files,
-# since they will be recreated, and may cause churn.  Uncomment if using
-# auto-import.
+# Gradle/Maven 자동 임포트 시 제외할 파일들
+# 자동 임포트 사용 시 모듈 파일들은 재생성되므로 제외
 # .idea/artifacts
 # .idea/compiler.xml
 # .idea/jarRepositories.xml
@@ -44,90 +42,85 @@
 # *.iml
 # *.ipr
 
-# CMake
+# CMake 빌드 디렉토리
 cmake-build-*/
 
-# Mongo Explorer plugin
+# MongoDB Explorer 플러그인
 .idea/**/mongoSettings.xml
 
-# File-based project format
+# 파일 기반 프로젝트 형식
 *.iws
 
-# IntelliJ
+# IntelliJ 출력 디렉토리
 out/
 
-# mpeltonen/sbt-idea plugin
+# sbt-idea 플러그인
 .idea_modules/
 
-# JIRA plugin
+# JIRA 플러그인
 atlassian-ide-plugin.xml
 
-# Cursive Clojure plugin
+# Clojure REPL 플러그인
 .idea/replstate.xml
 
-# SonarLint plugin
+# SonarLint 플러그인
 .idea/sonarlint/
 
-# Crashlytics plugin (for Android Studio and IntelliJ)
+# Crashlytics 플러그인 (Android Studio, IntelliJ)
 com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-# Editor-based Rest Client
+# REST Client 요청 파일
 .idea/httpRequests
 
-# Android studio 3.1+ serialized cache file
+# Android Studio 3.1+ 캐시 파일
 .idea/caches/build_file_checksums.ser
 
-### Intellij Patch ###
-# Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
+### IntelliJ 패치 ###
+# 참고: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
-# *.iml
-# modules.xml
-# .idea/misc.xml
-# *.ipr
-
-# Sonarlint plugin
+# SonarLint 플러그인
 # https://plugins.jetbrains.com/plugin/7973-sonarlint
 .idea/**/sonarlint/
 
-# SonarQube Plugin
+# SonarQube 플러그인
 # https://plugins.jetbrains.com/plugin/7238-sonarqube-community-plugin
 .idea/**/sonarIssues.xml
 
-# Markdown Navigator plugin
+# Markdown Navigator 플러그인
 # https://plugins.jetbrains.com/plugin/7896-markdown-navigator-enhanced
 .idea/**/markdown-navigator.xml
 .idea/**/markdown-navigator-enh.xml
 .idea/**/markdown-navigator/
 
-# Cache file creation bug
-# See https://youtrack.jetbrains.com/issue/JBR-2257
+# 캐시 파일 생성 버그 수정
+# 참고: https://youtrack.jetbrains.com/issue/JBR-2257
 .idea/$CACHE_FILE$
 
-# CodeStream plugin
+# CodeStream 플러그인
 # https://plugins.jetbrains.com/plugin/12206-codestream
 .idea/codestream.xml
 
-# Azure Toolkit for IntelliJ plugin
+# Azure Toolkit 플러그인
 # https://plugins.jetbrains.com/plugin/8053-azure-toolkit-for-intellij
 .idea/**/azureSettings.xml
 
 ### Java ###
-# Compiled class file
+# 컴파일된 클래스 파일
 *.class
 
-# Log file
+# 로그 파일
 *.log
 
-# BlueJ files
+# BlueJ 파일
 *.ctxt
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# 패키지 파일들
 *.jar
 *.war
 *.nar
@@ -136,24 +129,24 @@ fabric.properties
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# JVM 크래시 로그
+# 참고: http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
 
 ### macOS ###
-# General
+# 일반적인 macOS 파일들
 .DS_Store
 .AppleDouble
 .LSOverride
 
-# Icon must end with two \r
+# 아이콘 파일 (두 개의 \r로 끝나야 함)
 Icon
 
-
-# Thumbnails
+# 썸네일 파일
 ._*
 
-# Files that might appear in the root of a volume
+# 볼륨 루트에 나타날 수 있는 파일들
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
@@ -162,23 +155,62 @@ Icon
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 
-# Directories potentially created on remote AFP share
+# 원격 AFP 공유에서 생성될 수 있는 디렉토리들
 .AppleDB
 .AppleDesktop
 Network Trash Folder
 Temporary Items
 .apdisk
 
-### macOS Patch ###
-# iCloud generated files
+### macOS 패치 ###
+# iCloud 생성 파일
 *.icloud
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,macos,java
 
+### 프로젝트 특화 ###
+# Gradle 관련
 .gradle/
 build/
-logs/
-.env
+gradle-app.setting
 
-# 예외 규칙 추가
+# 로그 파일들
+logs/
+*.log
+
+# 환경 변수 파일
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# 데이터베이스 관련
+*.db
+*.sqlite
+*.sqlite3
+
+# 임시 파일들
+temp/
+tmp/
+*.tmp
+*.temp
+
+# 백업 파일들
+*.bak
+*.backup
+*.old
+
+# IDE 설정 파일들 (IntelliJ 외)
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS 생성 파일들
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 예외 규칙: Gradle Wrapper JAR 파일은 포함
 !gradle/wrapper/gradle-wrapper.jar
