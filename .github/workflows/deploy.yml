@@ -121,7 +121,7 @@ jobs:
                 exit 1
               fi
               
-              sleep 2
+              sleep 3
             done
             
             # 2단계: Spring Boot 완전 시작 대기
