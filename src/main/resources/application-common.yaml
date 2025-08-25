@@ -41,6 +41,7 @@ spring:
 
         # SQL 로깅 및 포맷팅 설정
         format_sql: true              # SQL을 보기 좋게 포맷팅
+        highlight_sql: true           # SQL 구문 하이라이팅
     open-in-view: false        # 지연 로딩 문제 방지를 위해 Open Session in View 패턴 비활성화
 
 # 서버 설정
