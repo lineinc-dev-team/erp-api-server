@@ -19,8 +19,15 @@ ext {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        // Gradle 8.x는 아직 JDK 24 정식 지원 안함 → 21 권장
+        languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.spring.io/milestone' }
+    maven { url = 'https://repo.spring.io/snapshot' }
 }
 
 configurations {
