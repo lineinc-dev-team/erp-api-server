@@ -29,7 +29,7 @@ spring:
   # JPA 및 Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto: create-drop         # 테이블을 삭제하지 않고 데이터베이스 스키마 자동 업데이트
+      ddl-auto: update         # 테이블을 삭제하지 않고 데이터베이스 스키마 자동 업데이트
     properties:
       hibernate:
         jdbc:
