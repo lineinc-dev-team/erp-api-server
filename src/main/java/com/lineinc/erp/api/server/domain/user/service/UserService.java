@@ -28,6 +28,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.User
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserInfoResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.SearchUserRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository usersRepository;
@@ -174,15 +176,17 @@ public class UserService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
 
+        // 스냅샷 생성 전에 transient 필드 동기화 (현재 상태 기준)
         oldUser.syncTransientFields();
         User oldUserSnapshot = JaversUtils.createSnapshot(javers, oldUser, User.class);
 
         // 새로운 메서드들을 사용하여 사용자 정보 업데이트
         oldUser.updateFrom(request.username(), request.email(), request.phoneNumber(), request.landlineNumber(),
                 request.memo(),
-                request.departmentId() != null ? Department.builder().id(request.departmentId()).build() : null,
-                request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null,
-                request.positionId() != null ? Position.builder().id(request.positionId()).build() : null,
+                request.departmentId() != null ? departmentRepository.findById(request.departmentId()).orElse(null)
+                        : null,
+                request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null,
+                request.positionId() != null ? positionRepository.findById(request.positionId()).orElse(null) : null,
                 request.isActive());
 
         // 비밀번호 업데이트
@@ -195,6 +199,7 @@ public class UserService {
         Diff diff = javers.compare(oldUserSnapshot, oldUser);
 
         List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+
         String changesJson = javers.getJsonConverter().toJson(simpleChanges);
         if (!simpleChanges.isEmpty()) {
             UserChangeHistory changeHistory = UserChangeHistory.builder()
