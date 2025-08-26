@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;

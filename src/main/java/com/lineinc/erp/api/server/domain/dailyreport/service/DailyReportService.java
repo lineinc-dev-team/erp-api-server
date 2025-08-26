@@ -21,12 +21,10 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractEquipment;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractDriverRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractEquipmentRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractRepository;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractSubEquipmentRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyContractWorkerRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -74,7 +72,6 @@ public class DailyReportService {
     private final OutsourcingCompanyContractWorkerRepository outsourcingCompanyContractWorkerRepository;
     private final OutsourcingCompanyContractDriverRepository outsourcingCompanyContractDriverRepository;
     private final OutsourcingCompanyContractEquipmentRepository outsourcingCompanyContractEquipmentRepository;
-    private final OutsourcingCompanyContractSubEquipmentRepository outsourcingCompanyContractSubEquipmentRepository;
 
     @Transactional
     public void createDailyReport(DailyReportCreateRequest request) {
@@ -502,13 +499,6 @@ public class DailyReportService {
         return outsourcingCompanyContractEquipmentRepository.findById(equipmentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND));
-    }
-
-    private OutsourcingCompanyContractSubEquipment getOutsourcingCompanyContractSubEquipmentByIdOrThrow(
-            Long subEquipmentId) {
-        return outsourcingCompanyContractSubEquipmentRepository.findById(subEquipmentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_SUB_EQUIPMENT_NOT_FOUND));
     }
 
     private DailyReport getDailyReportByIdOrThrow(Long id) {
