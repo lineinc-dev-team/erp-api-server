@@ -226,7 +226,6 @@ public class LaborController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping("/search")
-    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
             @Valid PageRequest pageRequest,
             @RequestParam(required = false) String keyword,
