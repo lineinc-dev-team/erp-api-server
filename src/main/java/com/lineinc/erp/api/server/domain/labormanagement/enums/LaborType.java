@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum LaborType {
     REGULAR_EMPLOYEE("정직원"),
-    DIRECT_EMPLOYEE("직영"),
-    OUTSOURCING("용역"),
-    SITE_CONTRACT("현장계약직"),
+    DIRECT_CONTRACT("직영/계약직"),
     ETC("기타");
 
     private final String label;
