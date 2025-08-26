@@ -31,6 +31,7 @@ public final class AppConstants {
     public static final String MENU_LABOR_MANAGEMENT = "노무 관리";
     public static final String MENU_OUTSOURCING_COMPANY = "외주업체 관리";
     public static final String MENU_OUTSOURCING_COMPANY_CONTRACT = "외주업체 계약 관리";
+    public static final String MENU_WORK_DAILY_REPORT = "출역일보";
 
     // 시스템 기본 메뉴 이름 목록
     public static final List<String> MENU_NAMES = List.of(
@@ -44,7 +45,8 @@ public final class AppConstants {
             MENU_FUEL_AGGREGATION,
             MENU_LABOR_MANAGEMENT,
             MENU_OUTSOURCING_COMPANY,
-            MENU_OUTSOURCING_COMPANY_CONTRACT);
+            MENU_OUTSOURCING_COMPANY_CONTRACT,
+            MENU_WORK_DAILY_REPORT);
 
     // 직급(Grade) 관련 상수
     public static final String GRADE_EMPLOYEE = "사원";
