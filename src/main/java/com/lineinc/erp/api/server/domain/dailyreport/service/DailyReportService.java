@@ -109,7 +109,7 @@ public class DailyReportService {
         if (request.directContracts() != null) {
             for (DailyReportDirectContractCreateRequest directContractRequest : request.directContracts()) {
                 OutsourcingCompany company = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(directContractRequest.companyId());
+                        .getOutsourcingCompanyByIdOrThrow(directContractRequest.outsourcingCompanyId());
 
                 Labor labor;
                 // 임시 인력인 경우 새로운 인력을 생성
@@ -139,7 +139,7 @@ public class DailyReportService {
         if (request.outsourcings() != null) {
             for (DailyReportOutsourcingCreateRequest outsourcingRequest : request.outsourcings()) {
                 OutsourcingCompany company = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(outsourcingRequest.companyId());
+                        .getOutsourcingCompanyByIdOrThrow(outsourcingRequest.outsourcingCompanyId());
                 OutsourcingCompanyContractWorker worker = getOutsourcingCompanyContractWorkerByIdOrThrow(
                         outsourcingRequest.outsourcingCompanyContractWorkerId());
 
@@ -160,7 +160,7 @@ public class DailyReportService {
         if (request.outsourcingEquipments() != null) {
             for (DailyReportOutsourcingEquipmentCreateRequest equipmentRequest : request.outsourcingEquipments()) {
                 OutsourcingCompany company = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(equipmentRequest.companyId());
+                        .getOutsourcingCompanyByIdOrThrow(equipmentRequest.outsourcingCompanyId());
 
                 OutsourcingCompanyContractDriver driver = null;
                 if (equipmentRequest.outsourcingCompanyContractDriverId() != null) {
