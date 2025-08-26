@@ -42,6 +42,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -325,6 +326,45 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return directContractSlice;
+    }
+
+    /**
+     * 출역일보 외주 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 외주 정보 슬라이스
+     */
+    public Slice<DailyReportOutsourcingResponse> searchDailyReportOutsourcings(DailyReportSearchRequest request,
+            Pageable pageable) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        request.weather(), pageable);
+
+        // DailyReport 슬라이스를 DailyReportOutsourcingResponse 슬라이스로 변환
+        // 각 DailyReport의 외주들을 개별 항목으로 변환
+        List<DailyReportOutsourcingResponse> allOutsourcings = new ArrayList<>();
+
+        for (DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (DailyReportOutsourcing outsourcing : dailyReport.getOutsourcings()) {
+                allOutsourcings.add(DailyReportOutsourcingResponse.from(outsourcing));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        Slice<DailyReportOutsourcingResponse> outsourcingSlice = new SliceImpl<>(
+                allOutsourcings,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return outsourcingSlice;
     }
 
     private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {
