@@ -6,6 +6,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.OffsetDateTime;
+
 @Schema(description = "출역일보 직영/계약직 응답")
 public record DailyReportDirectContractResponse(
         @Schema(description = "ID", example = "1") Long id,
@@ -22,7 +24,11 @@ public record DailyReportDirectContractResponse(
 
         @Schema(description = "인력 정보") LaborNameResponse labor,
 
-        @Schema(description = "업체 정보") CompanySimpleResponse outsourcingCompany) {
+        @Schema(description = "업체 정보") CompanySimpleResponse outsourcingCompany,
+
+        @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
+
+        @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
 
     public static DailyReportDirectContractResponse from(DailyReportDirectContract directContract) {
         return new DailyReportDirectContractResponse(
@@ -33,6 +39,8 @@ public record DailyReportDirectContractResponse(
                 directContract.getWorkQuantity(),
                 directContract.getMemo(),
                 directContract.getLabor() != null ? LaborNameResponse.from(directContract.getLabor()) : null,
-                directContract.getCompany() != null ? CompanySimpleResponse.from(directContract.getCompany()) : null);
+                directContract.getCompany() != null ? CompanySimpleResponse.from(directContract.getCompany()) : null,
+                directContract.getCreatedAt(),
+                directContract.getUpdatedAt());
     }
 }
