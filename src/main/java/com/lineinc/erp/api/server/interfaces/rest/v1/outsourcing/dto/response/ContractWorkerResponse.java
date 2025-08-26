@@ -31,4 +31,18 @@ public record ContractWorkerResponse(
                         .map(ContractWorkerFileResponse::from)
                         .toList() : List.of());
     }
+
+    @Schema(description = "외주업체 계약 인력 간단 정보 응답")
+    public record ContractWorkerSimpleResponse(
+            @Schema(description = "인력 ID", example = "1") Long id,
+            @Schema(description = "인력명", example = "김철수") String name,
+            @Schema(description = "카테고리", example = "용접공") String category) {
+
+        public static ContractWorkerSimpleResponse from(OutsourcingCompanyContractWorker worker) {
+            return new ContractWorkerSimpleResponse(
+                    worker.getId(),
+                    worker.getName(),
+                    worker.getCategory());
+        }
+    }
 }

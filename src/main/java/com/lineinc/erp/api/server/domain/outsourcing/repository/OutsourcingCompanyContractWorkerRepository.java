@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractWorker;
 
+import java.util.List;
+
 @Repository
 public interface OutsourcingCompanyContractWorkerRepository
         extends JpaRepository<OutsourcingCompanyContractWorker, Long> {
@@ -21,5 +23,11 @@ public interface OutsourcingCompanyContractWorkerRepository
             "AND w.deleted = false")
     Page<OutsourcingCompanyContractWorker> findByOutsourcingCompanyContractId(
             @Param("contractId") Long contractId,
+            Pageable pageable);
+
+    /**
+     * 계약 ID 목록으로 인력 정보를 페이징하여 조회합니다.
+     */
+    Page<OutsourcingCompanyContractWorker> findByOutsourcingCompanyContractIdIn(List<Long> contractIds,
             Pageable pageable);
 }

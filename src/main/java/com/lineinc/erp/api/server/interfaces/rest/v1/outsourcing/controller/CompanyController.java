@@ -37,6 +37,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDriverResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractWorkerResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
@@ -250,7 +251,6 @@ public class CompanyController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
     })
-    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/{id}/contract-equipments")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> getContractEquipmentsByCompany(
             @PathVariable Long id,
@@ -269,7 +269,6 @@ public class CompanyController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
     })
-    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/{id}/contract-drivers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractDriverResponse.ContractDriverSimpleResponse>>> getContractDriversByCompany(
             @PathVariable Long id,
@@ -277,6 +276,23 @@ public class CompanyController {
             @Valid SortRequest sortRequest) {
         Slice<ContractDriverResponse.ContractDriverSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractDriversByCompany(
+                        id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "외주업체별 계약 인력 정보 조회", description = "해당 외주업체와 계약된 계약의 인력 정보를 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}/contract-workers")
+    public ResponseEntity<SuccessResponse<SliceResponse<ContractWorkerResponse.ContractWorkerSimpleResponse>>> getContractWorkersByCompany(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest) {
+        Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> slice = outsourcingCompanyContractService
+                .getContractWorkersByCompany(
                         id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));

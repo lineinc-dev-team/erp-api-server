@@ -568,6 +568,20 @@ public class OutsourcingCompanyContractService {
     }
 
     /**
+     * 외주업체별 계약 인력 정보를 Slice로 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> getContractWorkersByCompany(Long companyId,
+            Pageable pageable) {
+        List<Long> contractIds = getContractIdsByCompany(companyId);
+
+        // 계약 ID들로 인력 조회
+        Page<OutsourcingCompanyContractWorker> page = workerRepository
+                .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
+        return page.map(ContractWorkerResponse.ContractWorkerSimpleResponse::from);
+    }
+
+    /**
      * 외주업체 계약 공사항목 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
