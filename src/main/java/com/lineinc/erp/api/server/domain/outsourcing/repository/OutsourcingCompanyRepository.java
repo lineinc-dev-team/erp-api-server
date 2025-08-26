@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface OutsourcingCompanyRepository
         extends JpaRepository<OutsourcingCompany, Long>, OutsourcingCompanyRepositoryCustom {
     boolean existsByBusinessNumber(String businessNumber);
