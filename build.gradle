@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.0'        // Spring Boot 3.5.0 버전 사용
+    id 'org.springframework.boot' version '3.5.5'        // Spring Boot 3.5.5 버전 사용 (최신 패치)
     id 'io.spring.dependency-management' version '1.1.7'  // Spring 의존성 자동 관리
 }
 
