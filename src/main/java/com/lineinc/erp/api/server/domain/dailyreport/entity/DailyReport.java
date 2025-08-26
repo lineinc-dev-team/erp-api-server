@@ -1,9 +1,9 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.shared.enums.WeatherType;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class DailyReport extends BaseEntity {
     private SiteProcess siteProcess; // 공정
 
     @Column
-    private LocalDate reportDate; // 출역일보 일자
+    private OffsetDateTime reportDate; // 출역일보 일자
 
     @Enumerated(EnumType.STRING)
     private WeatherType weather; // 날씨
@@ -48,5 +48,21 @@ public class DailyReport extends BaseEntity {
 
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<DailyReportOutsourcingWork> outsourcingWorks = new ArrayList<>(); // 출역일보 직영/용역 작업 목록
+    private List<DailyReportDirectContract> directContracts = new ArrayList<>(); // 직영/계약직 출역일보 목록
+
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DailyReportOutsourcing> outsourcings = new ArrayList<>(); // 외주 출역일보 목록
+
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DailyReportOutsourcingEquipment> outsourcingEquipments = new ArrayList<>(); // 외주업체계약 장비 출역일보 목록
+
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DailyReportFuel> fuels = new ArrayList<>(); // 유류 출역일보 목록
+
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DailyReportFile> files = new ArrayList<>(); // 현장 사진 등록 목록
 }

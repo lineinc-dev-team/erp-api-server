@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response;
 
-import com.lineinc.erp.api.server.shared.enums.WeatherType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
