@@ -42,6 +42,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -365,6 +366,45 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return outsourcingSlice;
+    }
+
+    /**
+     * 출역일보 유류 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 유류 정보 슬라이스
+     */
+    public Slice<DailyReportFuelResponse> searchDailyReportFuels(DailyReportSearchRequest request,
+            Pageable pageable) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        request.weather(), pageable);
+
+        // DailyReport 슬라이스를 DailyReportFuelResponse 슬라이스로 변환
+        // 각 DailyReport의 유류들을 개별 항목으로 변환
+        List<DailyReportFuelResponse> allFuels = new ArrayList<>();
+
+        for (DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (DailyReportFuel fuel : dailyReport.getFuels()) {
+                allFuels.add(DailyReportFuelResponse.from(fuel));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        Slice<DailyReportFuelResponse> fuelSlice = new SliceImpl<>(
+                allFuels,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return fuelSlice;
     }
 
     private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {

@@ -14,6 +14,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.shared.dto.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
@@ -102,6 +103,26 @@ public class DailyReportController {
             @Valid SortRequest sortRequest,
             @Valid DailyReportSearchRequest request) {
         Slice<DailyReportOutsourcingResponse> slice = dailyReportService.searchDailyReportOutsourcings(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "출역일보 유류 조회", description = "출역일보 유류 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "현장 또는 공정을 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/fuels")
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportFuelResponse>>> searchDailyReportFuels(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
+            @Valid DailyReportSearchRequest request) {
+        Slice<DailyReportFuelResponse> slice = dailyReportService.searchDailyReportFuels(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
