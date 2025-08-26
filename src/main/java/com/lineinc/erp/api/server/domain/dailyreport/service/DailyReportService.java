@@ -176,18 +176,11 @@ public class DailyReportService {
                             equipmentRequest.outsourcingCompanyContractEquipmentId());
                 }
 
-                OutsourcingCompanyContractSubEquipment subEquipment = null;
-                if (equipmentRequest.outsourcingCompanyContractSubEquipmentId() != null) {
-                    subEquipment = getOutsourcingCompanyContractSubEquipmentByIdOrThrow(
-                            equipmentRequest.outsourcingCompanyContractSubEquipmentId());
-                }
-
                 DailyReportOutsourcingEquipment outsourcingEquipment = DailyReportOutsourcingEquipment.builder()
                         .dailyReport(dailyReport)
                         .company(company)
                         .outsourcingCompanyContractDriver(driver)
                         .outsourcingCompanyContractEquipment(equipment)
-                        .outsourcingCompanyContractSubEquipment(subEquipment)
                         .workContent(equipmentRequest.workContent())
                         .unitPrice(equipmentRequest.unitPrice())
                         .workHours(equipmentRequest.workHours())

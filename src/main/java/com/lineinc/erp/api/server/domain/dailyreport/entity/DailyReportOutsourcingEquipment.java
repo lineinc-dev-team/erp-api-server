@@ -41,10 +41,6 @@ public class DailyReportOutsourcingEquipment extends BaseEntity {
     @JoinColumn(name = "outsourcing_company_contract_equipment_id")
     private OutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment; // 외주업체계약 장비
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_sub_equipment_id")
-    private OutsourcingCompanyContractSubEquipment outsourcingCompanyContractSubEquipment; // 외주업체계약 서브장비
-
     @Column(columnDefinition = "TEXT")
     private String workContent; // 작업내용
 
