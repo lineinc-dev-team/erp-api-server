@@ -250,11 +250,12 @@ public class DailyReportService {
         Site site = siteService.getSiteByIdOrThrow(request.siteId());
         SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
-        // 해당 일자와 날씨의 출역일보를 슬라이스로 조회
-        Slice<DailyReport> dailyReportSlice = dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeather(
-                site, siteProcess,
-                DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                request.weather(), pageable);
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        request.weather(), pageable);
 
         // DailyReport 슬라이스를 DailyReportEmployeeResponse 슬라이스로 변환
         // 각 DailyReport의 직원들을 개별 항목으로 변환
