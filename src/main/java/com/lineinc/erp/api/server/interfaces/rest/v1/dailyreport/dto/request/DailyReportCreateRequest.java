@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public record DailyReportCreateRequest(
 
         @Schema(description = "공정 ID", example = "1") Long siteProcessId,
 
-        @NotNull @Schema(description = "출역일보 일자", example = "2024-01-01T00:00:00Z") OffsetDateTime reportDate,
+        @NotNull @Schema(description = "출역일보 일자", example = "2024-01-01") LocalDate reportDate,
 
         @Schema(description = "날씨", example = "SUNNY") WeatherType weather,
 

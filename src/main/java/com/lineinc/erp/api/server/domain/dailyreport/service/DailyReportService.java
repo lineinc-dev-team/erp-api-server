@@ -38,7 +38,17 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
@@ -68,7 +78,8 @@ public class DailyReportService {
         DailyReport dailyReport = DailyReport.builder()
                 .site(site)
                 .siteProcess(siteProcess)
-                .reportDate(request.reportDate())
+                .reportDate(
+                        DateTimeFormatUtils.toOffsetDateTime(request.reportDate()))
                 .weather(request.weather())
                 .build();
 
@@ -224,6 +235,44 @@ public class DailyReportService {
 
     public DailyReport getDailyReportById(Long id) {
         return getDailyReportByIdOrThrow(id);
+    }
+
+    /**
+     * 출역일보 직원정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 직원정보 슬라이스
+     */
+    public Slice<DailyReportEmployeeResponse> searchDailyReportEmployees(DailyReportSearchRequest request,
+            Pageable pageable) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨의 출역일보를 슬라이스로 조회
+        Slice<DailyReport> dailyReportSlice = dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeather(
+                site, siteProcess,
+                DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                request.weather(), pageable);
+
+        // DailyReport 슬라이스를 DailyReportEmployeeResponse 슬라이스로 변환
+        // 각 DailyReport의 직원들을 개별 항목으로 변환
+        List<DailyReportEmployeeResponse> allEmployees = new ArrayList<>();
+
+        for (DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (DailyReportEmployee employee : dailyReport.getEmployees()) {
+                allEmployees.add(DailyReportEmployeeResponse.from(employee));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        Slice<DailyReportEmployeeResponse> employeeSlice = new SliceImpl<>(
+                allEmployees,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return employeeSlice;
     }
 
     private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {
