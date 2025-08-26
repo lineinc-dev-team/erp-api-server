@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "노무 생성 요청")
 public record LaborCreateRequest(
-        @Schema(description = "노무 구분", example = "OUTSOURCING") LaborType type,
+        @Schema(description = "노무 구분", example = "DIRECT_CONTRACT") LaborType type,
 
         @Schema(description = "구분 설명", example = "현장 작업용역") String typeDescription,
 

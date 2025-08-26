@@ -31,6 +31,8 @@ public final class ValidationMessages {
     public static final String OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND = "존재하지 않는 외주업체 계약입니다.";
     public static final String OUTSOURCING_COMPANY_CONTRACT_DRIVER_NOT_FOUND = "기사를 찾을 수 없습니다.";
     public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND = "장비를 찾을 수 없습니다.";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_SUB_EQUIPMENT_NOT_FOUND = "서브장비를 찾을 수 없습니다.";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_NOT_FOUND = "인력을 찾을 수 없습니다.";
     public static final String LABOR_NOT_FOUND = "존재하지 않는 노무입니다.";
     public static final String LABOR_ALREADY_EXISTS = "이미 등록된 인력입니다. 이름과 주민등록번호가 동일한 인력이 존재합니다.";
     public static final String PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다.";
@@ -48,4 +50,5 @@ public final class ValidationMessages {
     public static final String USER_NOT_FOUND = "존재하지 않는 사용자입니다.";
     public static final String UNSUPPORTED_CONTENT_TYPE = "지원하지 않는 Content-Type입니다.";
     public static final String FUEL_AGGREGATION_NOT_FOUND = "유류집계를 찾을 수 없습니다.";
+    public static final String DAILY_REPORT_NOT_FOUND = "출역일보를 찾을 수 없습니다.";
 }

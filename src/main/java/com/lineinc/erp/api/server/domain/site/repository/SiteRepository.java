@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.domain.site.repository;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
