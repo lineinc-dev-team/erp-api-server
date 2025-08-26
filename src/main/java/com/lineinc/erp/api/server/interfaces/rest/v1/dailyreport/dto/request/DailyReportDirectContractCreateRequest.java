@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record DailyReportDirectContractCreateRequest(
         @NotNull @Schema(description = "업체 ID", example = "1") Long companyId,
 
-        @NotNull @Schema(description = "노무인력 ID", example = "1") Long laborId,
+        @Schema(description = "노무인력 ID", example = "1") Long laborId,
 
         @Schema(description = "직급", example = "기사") String position,
 
@@ -17,5 +17,9 @@ public record DailyReportDirectContractCreateRequest(
 
         @Schema(description = "공수", example = "8.0") Double workQuantity,
 
-        @Schema(description = "비고", example = "특별 지시사항") String memo) {
+        @Schema(description = "비고", example = "특별 지시사항") String memo,
+
+        @Schema(description = "임시 인력 여부", example = "false") Boolean isTemporary,
+
+        @Schema(description = "임시 인력 이름", example = "김철수") String temporaryLaborName) {
 }

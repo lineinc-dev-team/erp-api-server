@@ -14,7 +14,9 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourci
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
+import com.lineinc.erp.api.server.domain.labormanagement.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
@@ -62,6 +64,7 @@ public class DailyReportService {
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
     private final LaborService laborService;
+    private final LaborRepository laborRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractRepository outsourcingCompanyContractRepository;
     private final OutsourcingCompanyContractWorkerRepository outsourcingCompanyContractWorkerRepository;
@@ -106,7 +109,15 @@ public class DailyReportService {
             for (DailyReportDirectContractCreateRequest directContractRequest : request.directContracts()) {
                 OutsourcingCompany company = outsourcingCompanyService
                         .getOutsourcingCompanyByIdOrThrow(directContractRequest.companyId());
-                Labor labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
+
+                Labor labor;
+                // 임시 인력인 경우 새로운 인력을 생성
+                if (Boolean.TRUE.equals(directContractRequest.isTemporary())) {
+                    labor = createTemporaryLabor(directContractRequest);
+                } else {
+                    // 기존 인력 검색
+                    labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
+                }
 
                 DailyReportDirectContract directContract = DailyReportDirectContract.builder()
                         .dailyReport(dailyReport)
@@ -351,5 +362,23 @@ public class DailyReportService {
         return dailyReportRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+    }
+
+    /**
+     * 임시 인력을 생성합니다.
+     */
+    private Labor createTemporaryLabor(DailyReportDirectContractCreateRequest request) {
+        // 임시 인력 이름이 필수
+        if (request.temporaryLaborName() == null || request.temporaryLaborName().trim().isEmpty()) {
+            throw new IllegalArgumentException(ValidationMessages.TEMPORARY_LABOR_NAME_REQUIRED);
+        }
+
+        // 임시 인력 생성
+        Labor temporaryLabor = Labor.builder()
+                .name(request.temporaryLaborName())
+                .type(LaborType.DIRECT_CONTRACT)
+                .build();
+
+        return laborRepository.save(temporaryLabor);
     }
 }

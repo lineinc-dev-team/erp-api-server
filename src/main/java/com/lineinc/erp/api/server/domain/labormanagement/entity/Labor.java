@@ -76,7 +76,7 @@ public class Labor extends BaseEntity {
      */
     @DiffIgnore
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private WorkType workType;
 
     /**
