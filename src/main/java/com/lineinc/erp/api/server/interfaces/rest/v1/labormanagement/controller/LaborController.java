@@ -221,7 +221,7 @@ public class LaborController {
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "인력명 키워드 검색", description = "인력명으로 간단한 검색을 수행합니다.")
+    @Operation(summary = "인력명 키워드 검색", description = "인력명과 노무인력 검색을 수행합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
@@ -229,9 +229,10 @@ public class LaborController {
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
             @Valid PageRequest pageRequest,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) LaborType type) {
         Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
-        Slice<LaborNameResponse> slice = laborService.getLaborNames(keyword, pageable);
+        Slice<LaborNameResponse> slice = laborService.getLaborNames(keyword, type, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));

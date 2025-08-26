@@ -33,6 +33,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -416,8 +417,8 @@ public class ManagementCostService {
     /**
      * 인력명 키워드 검색
      */
-    public Slice<LaborNameResponse> getLaborNames(String keyword, Pageable pageable) {
-        return laborService.getLaborNames(keyword, pageable);
+    public Slice<LaborNameResponse> getLaborNames(String keyword, LaborType type, Pageable pageable) {
+        return laborService.getLaborNames(keyword, type, pageable);
     }
 
     /**

@@ -144,15 +144,15 @@ public class LaborService {
     }
 
     /**
-     * 인력명 키워드 검색
+     * 인력명 키워드 검색 (노무인력 유형별 필터링 포함)
      */
-    public Slice<LaborNameResponse> getLaborNames(String keyword, Pageable pageable) {
+    public Slice<LaborNameResponse> getLaborNames(String keyword, LaborType type, Pageable pageable) {
         Slice<Labor> laborSlice;
 
         if (keyword == null || keyword.isBlank()) {
-            laborSlice = laborRepository.findAllBy(pageable);
+            laborSlice = laborRepository.findAllByType(type, pageable);
         } else {
-            laborSlice = laborRepository.findByNameContainingIgnoreCase(keyword, pageable);
+            laborSlice = laborRepository.findByNameContainingIgnoreCaseAndType(keyword, type, pageable);
         }
 
         return laborSlice.map(labor -> new LaborNameResponse(labor.getId(), labor.getName()));
