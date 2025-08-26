@@ -155,7 +155,11 @@ public class LaborService {
             laborSlice = laborRepository.findByNameContainingIgnoreCaseAndType(keyword, type, pageable);
         }
 
-        return laborSlice.map(labor -> new LaborNameResponse(labor.getId(), labor.getName()));
+        return laborSlice.map(labor -> new LaborNameResponse(
+                labor.getId(),
+                labor.getName(),
+                labor.getType().getLabel(),
+                labor.getType()));
     }
 
     /**
