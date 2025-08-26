@@ -57,6 +57,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -438,6 +439,45 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return equipmentSlice;
+    }
+
+    /**
+     * 출역일보 파일 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 파일 정보 슬라이스
+     */
+    public Slice<DailyReportFileResponse> searchDailyReportFiles(DailyReportSearchRequest request,
+            Pageable pageable) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        request.weather(), pageable);
+
+        // DailyReport 슬라이스를 DailyReportFileResponse 슬라이스로 변환
+        // 각 DailyReport의 파일들을 개별 항목으로 변환
+        List<DailyReportFileResponse> allFiles = new ArrayList<>();
+
+        for (DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (DailyReportFile file : dailyReport.getFiles()) {
+                allFiles.add(DailyReportFileResponse.from(file));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        Slice<DailyReportFileResponse> fileSlice = new SliceImpl<>(
+                allFiles,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return fileSlice;
     }
 
     private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {
