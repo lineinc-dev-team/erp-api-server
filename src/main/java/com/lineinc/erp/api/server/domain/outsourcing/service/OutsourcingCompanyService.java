@@ -265,4 +265,13 @@ public class OutsourcingCompanyService {
                 company.getAccountNumber(),
                 company.getAccountHolder()));
     }
+
+    /**
+     * 장비 데이터가 존재하는 외주업체 목록을 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public Page<CompanyResponse.CompanySimpleResponse> getCompaniesWithEquipment(Pageable pageable) {
+        Page<OutsourcingCompany> page = outsourcingCompanyRepository.findCompaniesWithEquipment(pageable);
+        return page.map(CompanyResponse.CompanySimpleResponse::from);
+    }
 }

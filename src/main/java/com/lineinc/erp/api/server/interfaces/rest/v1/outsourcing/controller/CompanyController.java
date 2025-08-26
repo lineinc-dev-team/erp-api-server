@@ -297,4 +297,20 @@ public class CompanyController {
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
+
+    @Operation(summary = "장비 데이터가 존재하는 외주업체 목록 조회", description = "연결된 외주업체계약에 장비데이터가 존재하는 모든 외주업체 리스트를 반환합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content())
+    })
+    @GetMapping("/with-equipment")
+    public ResponseEntity<SuccessResponse<SliceResponse<CompanyResponse.CompanySimpleResponse>>> getCompaniesWithEquipment(
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest) {
+        Page<CompanyResponse.CompanySimpleResponse> page = outsourcingCompanyService
+                .getCompaniesWithEquipment(
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(page), page.getContent())));
+    }
 }
