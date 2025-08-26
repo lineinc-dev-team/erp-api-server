@@ -21,9 +21,9 @@ ext {
 // ===== Java 버전 설정 =====
 java {
     toolchain {
-        // Gradle 8.x는 아직 JDK 24 정식 지원 안함 → JDK 21 권장
-        // LTS 버전으로 안정성 확보
-        languageVersion = JavaLanguageVersion.of(21)
+        // 배포 환경과 일치시키기 위해 JDK 24 사용
+        // Gradle 8.14.2는 JDK 24를 지원함
+        languageVersion = JavaLanguageVersion.of(24)
     }
 }
 
