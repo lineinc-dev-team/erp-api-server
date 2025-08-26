@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -405,6 +406,45 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return fuelSlice;
+    }
+
+    /**
+     * 출역일보 장비 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 장비 정보 슬라이스
+     */
+    public Slice<DailyReportEquipmentResponse> searchDailyReportEquipments(DailyReportSearchRequest request,
+            Pageable pageable) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        request.weather(), pageable);
+
+        // DailyReport 슬라이스를 DailyReportEquipmentResponse 슬라이스로 변환
+        // 각 DailyReport의 장비들을 개별 항목으로 변환
+        List<DailyReportEquipmentResponse> allEquipments = new ArrayList<>();
+
+        for (DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (DailyReportOutsourcingEquipment equipment : dailyReport.getOutsourcingEquipments()) {
+                allEquipments.add(DailyReportEquipmentResponse.from(equipment));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        Slice<DailyReportEquipmentResponse> equipmentSlice = new SliceImpl<>(
+                allEquipments,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return equipmentSlice;
     }
 
     private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {
