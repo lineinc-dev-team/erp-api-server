@@ -42,7 +42,7 @@ public record LaborListResponse(
                 labor.getType(),
                 labor.getTypeDescription(),
                 labor.getName(),
-                labor.getWorkType().getLabel(),
+                labor.getWorkType() != null ? labor.getWorkType().getLabel() : null,
                 labor.getWorkType(),
                 labor.getWorkTypeDescription(),
                 labor.getIsHeadOffice(),

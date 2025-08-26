@@ -13,7 +13,7 @@ public class PrivacyMaskingUtils {
      */
     public static String maskResidentNumber(String residentNumber) {
         if (!StringUtils.hasText(residentNumber)) {
-            return "";
+            return null;
         }
 
         // 하이픈 제거
