@@ -158,6 +158,7 @@ public class LaborService {
         return laborSlice.map(labor -> new LaborNameResponse(
                 labor.getId(),
                 labor.getName(),
+                labor.getDailyWage(),
                 labor.getType().getLabel(),
                 labor.getType()));
     }
