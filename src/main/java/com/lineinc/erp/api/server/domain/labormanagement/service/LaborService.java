@@ -159,6 +159,7 @@ public class LaborService {
                 labor.getId(),
                 labor.getName(),
                 labor.getDailyWage(),
+                labor.getPreviousDailyWage(),
                 labor.getType().getLabel(),
                 labor.getType()));
     }

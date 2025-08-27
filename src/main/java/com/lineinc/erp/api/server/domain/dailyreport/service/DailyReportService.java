@@ -131,12 +131,15 @@ public class DailyReportService {
                         .memo(directContractRequest.memo())
                         .build();
 
+                labor.updatePreviousDailyWage(directContractRequest.unitPrice());
                 dailyReport.getDirectContracts().add(directContract);
             }
         }
 
         // 외주 출역 정보 추가
-        if (request.outsourcings() != null) {
+        if (request.outsourcings() != null)
+
+        {
             for (DailyReportOutsourcingCreateRequest outsourcingRequest : request.outsourcings()) {
                 OutsourcingCompany company = outsourcingCompanyService
                         .getOutsourcingCompanyByIdOrThrow(outsourcingRequest.outsourcingCompanyId());

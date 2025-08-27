@@ -109,6 +109,13 @@ public class Labor extends BaseEntity {
     private Long dailyWage;
 
     /**
+     * 이전단가
+     */
+    @DiffIgnore
+    @Column
+    private Long previousDailyWage;
+
+    /**
      * 은행명
      */
     @DiffInclude
@@ -237,6 +244,13 @@ public class Labor extends BaseEntity {
         // 외주업체 정보와 본사 인력 여부 업데이트
         Optional.ofNullable(outsourcingCompany).ifPresent(val -> this.outsourcingCompany = val);
         Optional.ofNullable(isHeadOffice).ifPresent(val -> this.isHeadOffice = val);
+    }
+
+    /**
+     * 이전단가를 업데이트합니다.
+     */
+    public void updatePreviousDailyWage(Long previousDailyWage) {
+        this.previousDailyWage = previousDailyWage;
     }
 
     /**
