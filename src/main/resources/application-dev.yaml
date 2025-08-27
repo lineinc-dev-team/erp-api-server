@@ -40,7 +40,6 @@ spring:
           '[order-updates]': true  # 배치 최적화를 위해 수정문 정렬
         '[default-batch-fetch-size]': 200  # 쿼리 최적화를 위한 배치 페치 크기
         '[format_sql]': true  # SQL을 보기 좋게 포맷팅 (개발용)
-        '[highlight_sql]': true  # SQL 구문 하이라이팅 (개발용)
     open-in-view: false  # 지연 로딩 문제 방지를 위해 Open Session in View 패턴 비활성화
 
 # 서버 설정

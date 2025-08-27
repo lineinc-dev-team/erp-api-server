@@ -28,8 +28,8 @@
         <file>${LOG_DIR}/${LOG_FILE_NAME}.log</file>
         <!-- 로그 파일 롤링 정책: 일별 + 크기별로 파일을 분할합니다 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- 파일명 패턴: erp-api.2024-01-15.0.log.gz 형태로 저장 -->
-            <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- 파일명 패턴: erp-api.2024-01-15.0.log 형태로 저장 (압축 없음) -->
+            <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 개별 파일 최대 크기: 100MB 초과 시 새 파일 생성 -->
             <maxFileSize>100MB</maxFileSize>
             <!-- 보관 기간: 30일간 보관 -->
@@ -57,7 +57,7 @@
         <file>${LOG_DIR}/${LOG_FILE_NAME}-error.log</file>
         <!-- 에러 로그 롤링 정책: 일반 로그보다 작은 크기로 관리 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
             <!-- 에러 로그는 전체 크기를 2GB로 제한 -->
@@ -94,6 +94,8 @@
     <springProfile name="local">
         <!-- 프로젝트 패키지의 로그 레벨을 DEBUG로 설정하여 상세한 정보 확인 가능 -->
         <logger name="com.lineinc" level="DEBUG"/>
+        <!-- Hibernate SQL 쿼리 로그를 DEBUG로 설정하여 SQL 쿼리 확인 가능 -->
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
         <!-- Hibernate SQL 바인딩 로그를 TRACE로 설정하여 쿼리 디버깅 가능 -->
         <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
         
@@ -109,6 +111,8 @@
     <springProfile name="dev">
         <!-- 프로덕션과 유사하지만 콘솔 출력은 유지 -->
         <logger name="com.lineinc" level="INFO"/>
+        <!-- Hibernate SQL 쿼리 로그를 INFO로 설정하여 SQL 쿼리 확인 가능 -->
+        <logger name="org.hibernate.SQL" level="INFO"/>
         <!-- Hibernate SQL 바인딩 로그는 비활성화 -->
         <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
         
@@ -123,6 +127,8 @@
     <springProfile name="prod">
         <!-- 프로덕션에서는 WARN 레벨 이상만 로깅하여 성능 최적화 -->
         <logger name="com.lineinc" level="WARN"/>
+        <!-- Hibernate SQL 쿼리 로그를 INFO로 설정하여 SQL 쿼리 확인 가능 -->
+        <logger name="org.hibernate.SQL" level="INFO"/>
         <!-- Hibernate SQL 바인딩 로그는 보안상 비활성화 -->
         <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
         
