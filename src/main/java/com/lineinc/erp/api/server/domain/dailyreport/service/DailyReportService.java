@@ -44,6 +44,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
@@ -796,6 +797,48 @@ public class DailyReportService {
                             fuel.setEntities(outsourcingCompanyContract, outsourcingCompanyContractDriver,
                                     outsourcingCompanyContractEquipment);
                         });
+            }
+        }
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    @Transactional
+    public void updateDailyReportFiles(DailyReportSearchRequest searchRequest,
+            DailyReportFileUpdateRequest request) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+        DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // EntitySyncUtils.syncList를 사용하여 파일 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getFiles(),
+                request.files(),
+                (DailyReportFileUpdateRequest.FileUpdateInfo dto) -> {
+                    return DailyReportFile.builder()
+                            .dailyReport(dailyReport)
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
+                            .description(dto.description())
+                            .memo(dto.memo())
+                            .build();
+                });
+
+        // 기존 엔티티 업데이트를 위해 추가 처리 (한 번만 반복)
+        for (DailyReportFileUpdateRequest.FileUpdateInfo fileInfo : request.files()) {
+            if (fileInfo.id() != null) { // ID가 있는 것만 처리
+                // 기존 엔티티만 찾아서 업데이트 (ID가 null이 아닌 것만)
+                dailyReport.getFiles().stream()
+                        .filter(file -> file.getId() != null && file.getId().equals(fileInfo.id()))
+                        .findFirst()
+                        .ifPresent(file -> file.updateFrom(fileInfo));
             }
         }
 

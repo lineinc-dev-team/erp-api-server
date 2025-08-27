@@ -17,9 +17,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest.FileUpdateInfo;
+
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -69,4 +74,14 @@ public class DailyReportFile extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     @DiffInclude
     private String memo;
+
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(FileUpdateInfo request) {
+        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
+        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        Optional.ofNullable(request.description()).ifPresent(val -> this.description = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    }
 }

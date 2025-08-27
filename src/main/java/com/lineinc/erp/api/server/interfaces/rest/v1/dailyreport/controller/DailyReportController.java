@@ -14,6 +14,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
@@ -146,6 +147,20 @@ public class DailyReportController {
             @Valid DailyReportSearchRequest searchRequest,
             @Valid @RequestBody DailyReportFuelUpdateRequest request) {
         dailyReportService.updateDailyReportFuels(searchRequest, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 파일 수정", description = "출역일보 파일 정보를 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "출역일보 파일 정보를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/files")
+    public ResponseEntity<Void> updateDailyReportFile(
+            @Valid DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody DailyReportFileUpdateRequest request) {
+        dailyReportService.updateDailyReportFiles(searchRequest, request);
         return ResponseEntity.ok().build();
     }
 
