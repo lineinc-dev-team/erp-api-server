@@ -72,9 +72,10 @@ public class UserController {
 
     @Operation(summary = "유저 목록 조회", description = "모든 유저 정보를 반환합니다")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
+            @ApiResponse(responseCode = "200")
     })
     @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
