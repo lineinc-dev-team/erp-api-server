@@ -10,10 +10,7 @@ fi
 
 # .env 파일 로드
 if [ -f .env ]; then
-  echo ".env 파일 로드 중..."
-  set -a  # 자동 export 활성화
-  source .env
-  set +a  # 자동 export 비활성화
+  export $(cat .env | grep -v '^#' | xargs)
 else
   echo "⚠️  .env 파일이 존재하지 않습니다. 서비스를 종료합니다."
   exit 1

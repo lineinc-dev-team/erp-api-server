@@ -1,9 +1,63 @@
-# 로컬 환경 설정 - 공통 설정 상속 후 로컬 전용 설정만 오버라이드
+# 로컬 환경 설정
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
-# Swagger API 문서 서버 URL (로컬)
-swagger:
-  server-url: http://localhost:8080
+  data:
+    web:
+      pageable:
+        max-page-size: 200
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/erpdb
+    username: erpuser
+    password: erppassword
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          time-zone: UTC
+          batch-size: 50
+          order-inserts: true
+          order-updates: true
+        default-batch-fetch-size: 200
+        format-sql: true
+        highlight-sql: true
+    open-in-view: false
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    shutdown:
+      access: unrestricted
 
 # CORS 설정 (로컬 개발용)
 cors:
   allowed-origins: http://localhost:8080,http://localhost:3000
+
+# AWS 설정 (로컬)
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: local-key
+      secret-key: local-secret
+    s3:
+      bucket: local-bucket
+      cdn-url: http://localhost:9000

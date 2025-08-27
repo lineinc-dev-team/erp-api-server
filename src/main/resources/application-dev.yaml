@@ -1,9 +1,67 @@
-# 개발 환경 설정 - 공통 설정 상속 후 개발 전용 설정만 오버라이드
+# 개발 환경 설정
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
-# Swagger API 문서 서버 URL (개발)
-swagger:
-  server-url: https://dev-erp-api.dooson.it
+  session:
+    jdbc:
+      initialize-schema: always
 
-# CORS 설정 (개발 환경용)
+  data:
+    web:
+      pageable:
+        max-page-size: 200
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+          order_inserts: true
+          order_updates: true
+        default_batch_fetch_size: 200
+        format_sql: true
+        highlight_sql: true
+    open-in-view: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    shutdown:
+      access: unrestricted
+
+# CORS 설정 (개발용)
 cors:
   allowed-origins: https://dev-erp.dooson.it,https://dev-erp-api.dooson.it,http://localhost:3000
+
+# AWS 설정 (개발)
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+      cdn-url: ${AWS_CDN_URL}
