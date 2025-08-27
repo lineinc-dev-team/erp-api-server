@@ -42,6 +42,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
@@ -647,6 +648,79 @@ public class DailyReportService {
                         .ifPresent(os -> {
                             os.updateFrom(outsourcingInfo);
                             os.setEntities(company, outsourcingCompanyContractWorker);
+                        });
+            }
+        }
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    @Transactional
+    public void updateDailyReportEquipments(DailyReportSearchRequest searchRequest,
+            DailyReportEquipmentUpdateRequest request) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+        DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // EntitySyncUtils.syncList를 사용하여 장비 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getOutsourcingEquipments(),
+                request.equipments(),
+                (DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo dto) -> {
+                    return DailyReportOutsourcingEquipment.builder()
+                            .dailyReport(dailyReport)
+                            .outsourcingCompany(outsourcingCompanyService
+                                    .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
+                            .outsourcingCompanyContractDriver(dto.outsourcingCompanyContractDriverId() != null
+                                    ? getOutsourcingCompanyContractDriverByIdOrThrow(
+                                            dto.outsourcingCompanyContractDriverId())
+                                    : null)
+                            .outsourcingCompanyContractEquipment(dto.outsourcingCompanyContractEquipmentId() != null
+                                    ? getOutsourcingCompanyContractEquipmentByIdOrThrow(
+                                            dto.outsourcingCompanyContractEquipmentId())
+                                    : null)
+                            .workContent(dto.workContent())
+                            .unitPrice(dto.unitPrice())
+                            .workHours(dto.workHours())
+                            .memo(dto.memo())
+                            .build();
+                });
+
+        // outsourcingCompany, outsourcingCompanyContractDriver,
+        // outsourcingCompanyContractEquipment 업데이트를 위해 추가 처리 (한 번만 반복)
+        for (DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo equipmentInfo : request.equipments()) {
+            if (equipmentInfo.id() != null) { // ID가 있는 것만 처리
+                final OutsourcingCompany outsourcingCompany = equipmentInfo.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(equipmentInfo.outsourcingCompanyId())
+                        : null;
+                final OutsourcingCompanyContractDriver outsourcingCompanyContractDriver = equipmentInfo
+                        .outsourcingCompanyContractDriverId() != null
+                                ? getOutsourcingCompanyContractDriverByIdOrThrow(
+                                        equipmentInfo.outsourcingCompanyContractDriverId())
+                                : null;
+                final OutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment = equipmentInfo
+                        .outsourcingCompanyContractEquipmentId() != null
+                                ? getOutsourcingCompanyContractEquipmentByIdOrThrow(
+                                        equipmentInfo.outsourcingCompanyContractEquipmentId())
+                                : null;
+
+                // 기존 엔티티만 찾아서 outsourcingCompany, outsourcingCompanyContractDriver,
+                // outsourcingCompanyContractEquipment 설정 (ID가 null이 아닌 것만)
+                dailyReport.getOutsourcingEquipments().stream()
+                        .filter(eq -> eq.getId() != null && eq.getId().equals(equipmentInfo.id()))
+                        .findFirst()
+                        .ifPresent(eq -> {
+                            eq.updateFrom(equipmentInfo);
+                            eq.setEntities(outsourcingCompany, outsourcingCompanyContractDriver,
+                                    outsourcingCompanyContractEquipment);
                         });
             }
         }
