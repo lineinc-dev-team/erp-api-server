@@ -73,7 +73,7 @@ public class EntitySyncUtils {
                 .collect(Collectors.toMap(
                         EntitySyncUtils::extractId,
                         Function.identity(),
-                        (existing, replacement) -> {
+                        (existing, _) -> {
                             log.warn("중복된 ID 발견: {}", extractId(existing));
                             return existing; // 기존 엔티티 유지
                         }));

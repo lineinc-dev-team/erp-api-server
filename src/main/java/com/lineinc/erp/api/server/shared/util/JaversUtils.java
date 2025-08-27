@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.shared.util;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.javers.core.Javers;
@@ -39,6 +40,44 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JaversUtils {
+
+    // 엔티티 타입별 이름 추출 함수를 미리 정의
+    private static final Map<Class<?>, Function<Object, String>> ENTITY_NAME_EXTRACTORS = Map.ofEntries(
+            Map.entry(ClientCompanyContact.class, entity -> ((ClientCompanyContact) entity).getName()),
+            Map.entry(ClientCompanyFile.class, entity -> ((ClientCompanyFile) entity).getName()),
+            Map.entry(MaterialManagementDetail.class, entity -> ((MaterialManagementDetail) entity).getName()),
+            Map.entry(MaterialManagementFile.class, entity -> ((MaterialManagementFile) entity).getOriginalFileName()),
+            Map.entry(SiteContract.class, entity -> ((SiteContract) entity).getName()),
+            Map.entry(SiteFile.class, entity -> ((SiteFile) entity).getName()),
+            Map.entry(OutsourcingCompanyContact.class, entity -> ((OutsourcingCompanyContact) entity).getName()),
+            Map.entry(OutsourcingCompanyFile.class, entity -> ((OutsourcingCompanyFile) entity).getName()),
+            Map.entry(OutsourcingCompanyContractContact.class,
+                    entity -> ((OutsourcingCompanyContractContact) entity).getName()),
+            Map.entry(OutsourcingCompanyContractFile.class,
+                    entity -> ((OutsourcingCompanyContractFile) entity).getName()),
+            Map.entry(OutsourcingCompanyContractWorker.class,
+                    entity -> ((OutsourcingCompanyContractWorker) entity).getName()),
+            Map.entry(OutsourcingCompanyContractWorkerFile.class,
+                    entity -> ((OutsourcingCompanyContractWorkerFile) entity).getOriginalFileName()),
+            Map.entry(OutsourcingCompanyContractEquipment.class,
+                    entity -> ((OutsourcingCompanyContractEquipment) entity).getSpecification()),
+            Map.entry(OutsourcingCompanyContractSubEquipment.class,
+                    entity -> ((OutsourcingCompanyContractSubEquipment) entity).getDescription()),
+            Map.entry(OutsourcingCompanyContractDriver.class,
+                    entity -> ((OutsourcingCompanyContractDriver) entity).getName()),
+            Map.entry(OutsourcingCompanyContractDriverFile.class,
+                    entity -> ((OutsourcingCompanyContractDriverFile) entity).getOriginalFileName()),
+            Map.entry(OutsourcingCompanyContractConstruction.class,
+                    entity -> ((OutsourcingCompanyContractConstruction) entity).getItem()),
+            Map.entry(SteelManagementDetail.class, entity -> ((SteelManagementDetail) entity).getName()),
+            Map.entry(SteelManagementFile.class, entity -> ((SteelManagementFile) entity).getOriginalFileName()),
+            Map.entry(FuelInfo.class, entity -> ((FuelInfo) entity).getEquipmentSpecification()),
+            Map.entry(LaborFile.class, entity -> ((LaborFile) entity).getName()),
+            Map.entry(ManagementCostDetail.class, entity -> ((ManagementCostDetail) entity).getName()),
+            Map.entry(ManagementCostKeyMoneyDetail.class,
+                    entity -> ((ManagementCostKeyMoneyDetail) entity).getAccount()),
+            Map.entry(ManagementCostMealFeeDetail.class, entity -> ((ManagementCostMealFeeDetail) entity).getName()),
+            Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getOriginalFileName()));
 
     public static <T> T createSnapshot(Javers javers, T entity, Class<T> clazz) {
         try {
@@ -113,59 +152,47 @@ public class JaversUtils {
     }
 
     private static String extractEntityName(Object entity) {
-        System.out.println("entity: " + entity);
-        if (entity instanceof ClientCompanyContact contact) {
-            return contact.getName();
-        } else if (entity instanceof ClientCompanyFile file) {
-            return file.getName();
-        } else if (entity instanceof MaterialManagementDetail detail) {
-            return detail.getName();
-        } else if (entity instanceof MaterialManagementFile file) {
-            return file.getOriginalFileName();
-        } else if (entity instanceof SiteContract contract) {
-            return contract.getName();
-        } else if (entity instanceof SiteFile file) {
-            return file.getName();
-        } else if (entity instanceof OutsourcingCompanyContact contact) {
-            return contact.getName();
-        } else if (entity instanceof OutsourcingCompanyFile file) {
-            return file.getName();
-        } else if (entity instanceof OutsourcingCompanyContractContact contact) {
-            return contact.getName();
-        } else if (entity instanceof OutsourcingCompanyContractFile file) {
-            return file.getName();
-        } else if (entity instanceof OutsourcingCompanyContractWorker worker) {
-            return worker.getName();
-        } else if (entity instanceof OutsourcingCompanyContractWorkerFile file) {
-            return file.getOriginalFileName();
-        } else if (entity instanceof OutsourcingCompanyContractEquipment equipment) {
-            return equipment.getSpecification();
-        } else if (entity instanceof OutsourcingCompanyContractSubEquipment subEquipment) {
-            return subEquipment.getDescription();
-        } else if (entity instanceof OutsourcingCompanyContractDriver driver) {
-            return driver.getName();
-        } else if (entity instanceof OutsourcingCompanyContractDriverFile file) {
-            return file.getOriginalFileName();
-        } else if (entity instanceof OutsourcingCompanyContractConstruction construction) {
-            return construction.getItem();
-        } else if (entity instanceof SteelManagementDetail detail) {
-            return detail.getName();
-        } else if (entity instanceof SteelManagementFile file) {
-            return file.getOriginalFileName();
-        } else if (entity instanceof FuelInfo fuelInfo) {
-            return fuelInfo.getEquipmentSpecification();
-        } else if (entity instanceof LaborFile file) {
-            return file.getName();
-        } else if (entity instanceof ManagementCostDetail detail) {
-            return detail.getName();
-        } else if (entity instanceof ManagementCostKeyMoneyDetail detail) {
-            return detail.getAccount();
-        } else if (entity instanceof ManagementCostMealFeeDetail detail) {
-            return detail.getName();
-        } else if (entity instanceof ManagementCostFile file) {
-            return file.getOriginalFileName();
+        if (entity == null)
+            return null;
+
+        log.debug("엔티티 타입: {}", entity.getClass().getSimpleName());
+
+        // 엔티티 타입에 맞는 이름 추출 함수 찾기
+        Function<Object, String> extractor = ENTITY_NAME_EXTRACTORS.get(entity.getClass());
+        if (extractor != null) {
+            try {
+                return extractor.apply(entity);
+            } catch (Exception e) {
+                log.warn("엔티티 이름 추출 실패: {}", entity.getClass().getSimpleName(), e);
+                return null;
+            }
         }
+
         return null;
+    }
+
+    /**
+     * 엔티티에서 ID를 추출하는 공통 메서드
+     */
+    private static Long extractEntityId(Object entity) {
+        if (entity == null)
+            return null;
+
+        try {
+            // getId() 메서드가 있는 경우
+            var getIdMethod = entity.getClass().getMethod("getId");
+            Object result = getIdMethod.invoke(entity);
+            return result instanceof Long ? (Long) result : null;
+        } catch (Exception e) {
+            try {
+                // id() 메서드가 있는 경우 (record 클래스용)
+                var idMethod = entity.getClass().getMethod("id");
+                Object result = idMethod.invoke(entity);
+                return result instanceof Long ? (Long) result : null;
+            } catch (Exception ignored) {
+                return null;
+            }
+        }
     }
 
     private static String toJsonSafe(Javers javers, Object obj) {
@@ -191,57 +218,19 @@ public class JaversUtils {
     }
 
     private static String extractEntityNameWithId(Object entity) {
-        if (entity instanceof ClientCompanyContact contact) {
-            return contact.getName() + "(" + contact.getId() + ")";
-        } else if (entity instanceof ClientCompanyFile file) {
-            return file.getName() + "(" + file.getId() + ")";
-        } else if (entity instanceof MaterialManagementDetail detail) {
-            return detail.getName() + "(" + detail.getId() + ")";
-        } else if (entity instanceof MaterialManagementFile file) {
-            return file.getOriginalFileName() + "(" + file.getId() + ")";
-        } else if (entity instanceof SiteContract contract) {
-            return contract.getName() + "(" + contract.getId() + ")";
-        } else if (entity instanceof SiteFile file) {
-            return file.getName() + "(" + file.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContact contact) {
-            return contact.getName() + "(" + contact.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyFile file) {
-            return file.getName() + "(" + file.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractContact contact) {
-            return contact.getName() + "(" + contact.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractFile file) {
-            return file.getName() + "(" + file.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractWorker worker) {
-            return worker.getName() + "(" + worker.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractWorkerFile file) {
-            return file.getOriginalFileName() + "(" + file.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractEquipment equipment) {
-            return equipment.getSpecification() + "(" + equipment.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractSubEquipment subEquipment) {
-            return subEquipment.getDescription() + "(" + subEquipment.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractDriver driver) {
-            return driver.getName() + "(" + driver.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractDriverFile file) {
-            return file.getOriginalFileName() + "(" + file.getId() + ")";
-        } else if (entity instanceof OutsourcingCompanyContractConstruction construction) {
-            return construction.getItem() + "(" + construction.getId() + ")";
-        } else if (entity instanceof SteelManagementDetail detail) {
-            return detail.getName() + "(" + detail.getId() + ")";
-        } else if (entity instanceof SteelManagementFile file) {
-            return file.getOriginalFileName() + "(" + file.getId() + ")";
-        } else if (entity instanceof FuelInfo fuelInfo) {
-            return fuelInfo.getEquipmentSpecification() + "(" + fuelInfo.getId() + ")";
-        } else if (entity instanceof LaborFile file) {
-            return file.getName() + "(" + file.getId() + ")";
-        } else if (entity instanceof ManagementCostDetail detail) {
-            return detail.getName() + "(" + detail.getId() + ")";
-        } else if (entity instanceof ManagementCostKeyMoneyDetail detail) {
-            return detail.getAccount() + "(" + detail.getId() + ")";
-        } else if (entity instanceof ManagementCostMealFeeDetail detail) {
-            return detail.getName() + "(" + detail.getId() + ")";
-        } else if (entity instanceof ManagementCostFile file) {
-            return file.getOriginalFileName() + "(" + file.getId() + ")";
-        }
-        return null;
+        if (entity == null)
+            return null;
+
+        // 기존 Map을 활용하여 이름 추출
+        String name = extractEntityName(entity);
+        if (name == null)
+            return null;
+
+        // ID 추출
+        Long id = extractEntityId(entity);
+        if (id == null)
+            return name; // ID가 없어도 이름은 반환
+
+        return name + "(" + id + ")";
     }
 }
