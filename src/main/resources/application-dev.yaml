@@ -28,13 +28,13 @@ spring:
     properties:
       hibernate:
         jdbc:
-          time_zone: UTC
-          batch_size: 50
-          order_inserts: true
-          order_updates: true
-        default_batch_fetch_size: 200
-        format_sql: true
-        highlight_sql: true
+          time-zone: UTC
+          batch-size: 50
+          order-inserts: true
+          order-updates: true
+        default-batch-fetch-size: 200
+        format-sql: true
+        highlight-sql: true
     open-in-view: false
 
 server:
