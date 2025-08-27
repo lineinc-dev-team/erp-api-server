@@ -1,6 +1,6 @@
-package com.lineinc.erp.api.server.config.web;
+package com.lineinc.erp.api.server.infrastructure.config.web;
 
-import com.lineinc.erp.api.server.config.web.filter.RequestLoggingFilter;
+import com.lineinc.erp.api.server.infrastructure.config.web.filter.RequestLoggingFilter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -39,8 +39,8 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<RequestLoggingFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(new RequestLoggingFilter()); // 필터 인스턴스 설정
-        registrationBean.addUrlPatterns("/api/*");              // Swagger 등은 제외됨
-        registrationBean.setOrder(1);                           // 필터 체인 내 우선순위 설정 (낮을수록 먼저 실행)
+        registrationBean.addUrlPatterns("/api/*"); // Swagger 등은 제외됨
+        registrationBean.setOrder(1); // 필터 체인 내 우선순위 설정 (낮을수록 먼저 실행)
 
         return registrationBean;
     }
@@ -48,9 +48,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setUseHttpOnlyCookie(true);  // HttpOnly 설정
-        serializer.setSameSite("None");         // 크로스 도메인 쿠키 허용
-        serializer.setUseSecureCookie(true);    // HTTPS 환경에서만 쿠키 전송
+        serializer.setUseHttpOnlyCookie(true); // HttpOnly 설정
+        serializer.setSameSite("None"); // 크로스 도메인 쿠키 허용
+        serializer.setUseSecureCookie(true); // HTTPS 환경에서만 쿠키 전송
 
         return serializer;
     }
