@@ -69,7 +69,6 @@
     <!-- 환경별 설정 -->
     <springProfile name="local">
         <logger name="com.lineinc" level="DEBUG"/>
-        <logger name="org.hibernate.SQL" level="DEBUG"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
         
         <root level="DEBUG">
@@ -81,7 +80,6 @@
 
     <springProfile name="dev">
         <logger name="com.lineinc" level="INFO"/>
-        <logger name="org.hibernate.SQL" level="INFO"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
         
         <root level="INFO">
@@ -93,7 +91,6 @@
 
     <springProfile name="prod">
         <logger name="com.lineinc" level="WARN"/>
-        <logger name="org.hibernate.SQL" level="OFF"/>
         <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
         
         <root level="WARN">

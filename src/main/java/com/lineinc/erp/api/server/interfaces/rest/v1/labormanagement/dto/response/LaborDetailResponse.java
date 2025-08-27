@@ -49,7 +49,7 @@ public record LaborDetailResponse(
                 .collect(Collectors.toList()) : List.of();
 
         Integer accumulatedWorkDays = LaborWorkDaysCalculator.calculateAccumulatedWorkDays(labor);
-        Boolean isSeverancePayEligible = LaborWorkDaysCalculator.calculateSeverancePayEligibility(accumulatedWorkDays);
+        Boolean isSeverancePayEligible = LaborWorkDaysCalculator.isEligibleForSeverance(labor);
 
         return new LaborDetailResponse(
                 labor.getId(),
@@ -78,7 +78,7 @@ public record LaborDetailResponse(
                 labor.getCreatedAt(),
                 labor.getUpdatedAt(),
                 fileResponses,
-                0,
-                false);
+                accumulatedWorkDays,
+                isSeverancePayEligible);
     }
 }
