@@ -23,8 +23,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.respons
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.WorkTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.dto.PageRequest;
-import com.lineinc.erp.api.server.shared.dto.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;

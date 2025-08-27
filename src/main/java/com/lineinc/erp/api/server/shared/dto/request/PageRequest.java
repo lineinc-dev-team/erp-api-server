@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.shared.dto;
+package com.lineinc.erp.api.server.shared.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;

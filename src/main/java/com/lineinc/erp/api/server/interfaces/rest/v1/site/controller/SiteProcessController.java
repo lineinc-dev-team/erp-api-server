@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
-import com.lineinc.erp.api.server.shared.dto.PageRequest;
-import com.lineinc.erp.api.server.shared.dto.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;

@@ -35,8 +35,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.resp
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.dto.PageRequest;
-import com.lineinc.erp.api.server.shared.dto.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
