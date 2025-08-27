@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 
-public class CustomUserDetails implements UserDetails, java.io.Serializable {
+public class CustomUserDetails implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
     @Getter
