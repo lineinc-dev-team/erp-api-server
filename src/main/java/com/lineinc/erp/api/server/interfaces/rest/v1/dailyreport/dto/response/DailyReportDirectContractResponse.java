@@ -39,7 +39,9 @@ public record DailyReportDirectContractResponse(
                 directContract.getWorkQuantity(),
                 directContract.getMemo(),
                 directContract.getLabor() != null ? LaborNameResponse.from(directContract.getLabor()) : null,
-                directContract.getCompany() != null ? CompanySimpleResponse.from(directContract.getCompany()) : null,
+                directContract.getOutsourcingCompany() != null
+                        ? CompanySimpleResponse.from(directContract.getOutsourcingCompany())
+                        : null,
                 directContract.getCreatedAt(),
                 directContract.getUpdatedAt());
     }

@@ -40,6 +40,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
@@ -132,7 +133,7 @@ public class DailyReportService {
 
                 DailyReportDirectContract directContract = DailyReportDirectContract.builder()
                         .dailyReport(dailyReport)
-                        .company(company)
+                        .outsourcingCompany(company)
                         .labor(labor)
                         .position(directContractRequest.position())
                         .workContent(directContractRequest.workContent())
@@ -529,6 +530,64 @@ public class DailyReportService {
                         .filter(emp -> emp.getId() != null && emp.getId().equals(employeeInfo.id()))
                         .findFirst()
                         .ifPresent(emp -> emp.setEntities(labor));
+            }
+        }
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    @Transactional
+    public void updateDailyReportDirectContracts(DailyReportSearchRequest searchRequest,
+            DailyReportDirectContractUpdateRequest request) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+        DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // EntitySyncUtils.syncList를 사용하여 직영/계약직 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getDirectContracts(),
+                request.directContracts(),
+                (DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo dto) -> {
+                    return DailyReportDirectContract.builder()
+                            .dailyReport(dailyReport)
+                            .outsourcingCompany(outsourcingCompanyService
+                                    .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
+                            .labor(laborService.getLaborByIdOrThrow(dto.laborId()))
+                            .position(dto.position())
+                            .workContent(dto.workContent())
+                            .unitPrice(dto.unitPrice())
+                            .workQuantity(dto.workQuantity())
+                            .memo(dto.memo())
+                            .build();
+                });
+
+        // company와 labor 업데이트를 위해 추가 처리 (한 번만 반복)
+        for (DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo directContractInfo : request
+                .directContracts()) {
+            if (directContractInfo.id() != null) { // ID가 있는 것만 처리
+                final OutsourcingCompany company = directContractInfo.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(directContractInfo.outsourcingCompanyId())
+                        : null;
+                final Labor labor = directContractInfo.laborId() != null
+                        ? laborService.getLaborByIdOrThrow(directContractInfo.laborId())
+                        : null;
+
+                // 기존 엔티티만 찾아서 company와 labor 설정 (ID가 null이 아닌 것만)
+                dailyReport.getDirectContracts().stream()
+                        .filter(dc -> dc.getId() != null && dc.getId().equals(directContractInfo.id()))
+                        .findFirst()
+                        .ifPresent(dc -> {
+                            dc.updateFrom(directContractInfo);
+                            dc.setEntities(company, labor);
+                        });
             }
         }
 
