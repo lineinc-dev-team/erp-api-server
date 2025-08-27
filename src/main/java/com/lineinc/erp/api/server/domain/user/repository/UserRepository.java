@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.user.repository;
 
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -35,6 +36,17 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
             "left join fetch p.menu m " +
             "where u.id = :id")
     Optional<User> findByIdWithPermissions(@Param("id") Long id);
+
+    // 권한 체크 전용 쿼리 - 성능 최적화
+    @Query("SELECT COUNT(p) > 0 FROM User u " +
+            "JOIN u.userRoles ur " +
+            "JOIN ur.role r " +
+            "JOIN r.permissions rp " +
+            "JOIN rp.permission p " +
+            "JOIN p.menu m " +
+            "WHERE u.id = :userId AND m.name = :menuName AND p.action = :action ")
+    boolean hasPermission(@Param("userId") Long userId, @Param("menuName") String menuName,
+            @Param("action") PermissionAction action);
 
     long countByIdIn(Iterable<Long> ids);
 }

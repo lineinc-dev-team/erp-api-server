@@ -310,17 +310,8 @@ public class RoleService {
 
     @Transactional(readOnly = true)
     public boolean hasPermission(Long userId, String menuName, PermissionAction action) {
-        User user = userRepository.findByIdWithPermissions(userId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
-
-        return user.getUserRoles().stream()
-                .map(UserRole::getRole)
-                .flatMap(role -> role.getPermissions().stream())
-                .map(RolePermission::getPermission)
-                .anyMatch(permission -> permission.getMenu() != null &&
-                        permission.getMenu().getName().equalsIgnoreCase(menuName.trim()) &&
-                        PermissionAction.fromLabel(permission.getAction().getLabel()) == action);
+        // 최적화된 권한 체크 쿼리 사용
+        return userRepository.hasPermission(userId, menuName.trim(), action);
     }
 
     @Transactional
