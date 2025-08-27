@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.controller;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.dailyreport.service.DailyReportService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
@@ -71,6 +73,20 @@ public class DailyReportController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "출역일보 직원정보 수정", description = "출역일보 직원정보를 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "출역일보 직원정보를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/employees")
+    public ResponseEntity<Void> updateDailyReportEmployee(
+            @Valid DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody DailyReportEmployeeUpdateRequest request) {
+        dailyReportService.updateDailyReportEmployees(searchRequest, request);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "출역일보 직영/계약직 조회", description = "출역일보 직영/계약직 정보를 조회합니다.")

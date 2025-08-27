@@ -15,6 +15,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DailyReportRepository extends JpaRepository<DailyReport, Long> {
@@ -62,5 +63,16 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             "AND dr.reportDate = :reportDate")
     boolean existsBySiteAndSiteProcessAndReportDate(@Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
+            @Param("reportDate") OffsetDateTime reportDate);
+
+    /**
+     * 같은 날짜, 현장, 공정에 대한 출역일보를 조회합니다.
+     */
+    @Query("SELECT dr FROM DailyReport dr " +
+            "WHERE dr.site = :site " +
+            "AND dr.siteProcess = :siteProcess " +
+            "AND dr.reportDate = :reportDate")
+    Optional<DailyReport> findBySiteAndSiteProcessAndReportDate(@Param("site") Site site,
+            @Param("siteProcess") SiteProcess siteProcess,
             @Param("reportDate") OffsetDateTime reportDate);
 }

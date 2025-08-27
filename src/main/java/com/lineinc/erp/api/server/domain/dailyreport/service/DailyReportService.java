@@ -39,12 +39,14 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -487,6 +489,50 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return fileSlice;
+    }
+
+    @Transactional
+    public void updateDailyReportEmployees(DailyReportSearchRequest searchRequest,
+            DailyReportEmployeeUpdateRequest request) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+        DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // EntitySyncUtils.syncList를 사용하여 직원정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getEmployees(),
+                request.employees(),
+                (DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo dto) -> {
+                    return DailyReportEmployee.builder()
+                            .dailyReport(dailyReport)
+                            .labor(laborService.getLaborByIdOrThrow(dto.laborId()))
+                            .workContent(dto.workContent())
+                            .workQuantity(dto.workQuantity())
+                            .memo(dto.memo())
+                            .build();
+                });
+
+        // labor 업데이트를 위해 추가 처리 (한 번만 반복)
+        for (DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo employeeInfo : request.employees()) {
+            if (employeeInfo.laborId() != null && employeeInfo.id() != null) { // ID가 있는 것만 처리
+                Labor labor = laborService.getLaborByIdOrThrow(employeeInfo.laborId());
+
+                // 기존 엔티티만 찾아서 labor 설정 (ID가 null이 아닌 것만)
+                dailyReport.getEmployees().stream()
+                        .filter(emp -> emp.getId() != null && emp.getId().equals(employeeInfo.id()))
+                        .findFirst()
+                        .ifPresent(emp -> emp.setEntities(labor));
+            }
+        }
+
+        dailyReportRepository.save(dailyReport);
     }
 
     private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {
