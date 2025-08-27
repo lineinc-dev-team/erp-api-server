@@ -112,7 +112,7 @@ jobs:
                 echo "⚠️ 포트 $NEW_PORT에서 프로세스 없음"
               fi
               
-              if [ $i -eq 15 ]; then
+              if [ $i -eq 20 ]; then
                 echo "❌ 포트 $NEW_PORT에서 프로세스가 열리지 않음"
                 echo "▶ PM2 상태:"
                 pm2 list
