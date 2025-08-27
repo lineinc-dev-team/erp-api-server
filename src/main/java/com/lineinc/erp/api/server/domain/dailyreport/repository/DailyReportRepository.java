@@ -14,6 +14,8 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 
+import java.util.List;
+
 @Repository
 public interface DailyReportRepository extends JpaRepository<DailyReport, Long> {
 
@@ -37,4 +39,17 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             @Param("reportDate") OffsetDateTime reportDate,
             @Param("weather") WeatherType weather,
             Pageable pageable);
+
+    /**
+     * 특정 인력의 특정 기간 출역일보를 조회합니다.
+     * 직영/계약직 인력만 고려합니다.
+     */
+    @Query("SELECT DISTINCT dr FROM DailyReport dr " +
+            "LEFT JOIN dr.employees e " +
+            "LEFT JOIN dr.directContracts dc " +
+            "WHERE (e.labor.id = :laborId OR dc.labor.id = :laborId) " +
+            "AND dr.reportDate >= :startDate AND dr.reportDate <= :endDate")
+    List<DailyReport> findByLaborIdAndDateRange(@Param("laborId") Long laborId,
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate);
 }
