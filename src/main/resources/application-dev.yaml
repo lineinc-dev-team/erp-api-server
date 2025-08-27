@@ -38,7 +38,6 @@ spring:
     open-in-view: false
 
 server:
-  port: ${SERVER_PORT:8080}
   shutdown: graceful
 
 management:
@@ -49,19 +48,3 @@ management:
   endpoint:
     shutdown:
       access: unrestricted
-
-# CORS 설정 (개발용)
-cors:
-  allowed-origins: https://dev-erp.dooson.it,https://dev-erp-api.dooson.it,http://localhost:3000
-
-# AWS 설정 (개발)
-cloud:
-  aws:
-    region:
-      static: ap-northeast-2
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
-    s3:
-      bucket: ${AWS_S3_BUCKET}
-      cdn-url: ${AWS_CDN_URL}

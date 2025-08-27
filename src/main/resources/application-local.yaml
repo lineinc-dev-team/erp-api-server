@@ -34,7 +34,6 @@ spring:
     open-in-view: false
 
 server:
-  port: 8080
   shutdown: graceful
 
 management:
@@ -45,19 +44,3 @@ management:
   endpoint:
     shutdown:
       access: unrestricted
-
-# CORS 설정 (로컬 개발용)
-cors:
-  allowed-origins: http://localhost:8080,http://localhost:3000
-
-# AWS 설정 (로컬)
-cloud:
-  aws:
-    region:
-      static: ap-northeast-2
-    credentials:
-      access-key: local-key
-      secret-key: local-secret
-    s3:
-      bucket: local-bucket
-      cdn-url: http://localhost:9000

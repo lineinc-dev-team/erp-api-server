@@ -13,9 +13,9 @@ public class S3Config {
 
     @Bean
     public S3Presigner s3Presigner(
-            @Value("${cloud.aws.credentials.access-key}") String accessKey,
-            @Value("${cloud.aws.credentials.secret-key}") String secretKey,
-            @Value("${cloud.aws.region.static}") String region) {
+            @Value("${AWS_ACCESS_KEY}") String accessKey,
+            @Value("${AWS_SECRET_KEY}") String secretKey,
+            @Value("${AWS_REGION:ap-northeast-2}") String region) {
         return S3Presigner.builder()
                 .region(Region.of(region))
                 .credentialsProvider(

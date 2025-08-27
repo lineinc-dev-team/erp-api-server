@@ -21,10 +21,10 @@ public class S3FileService {
 
     private final S3Presigner s3Presigner;
 
-    @Value("${cloud.aws.s3.cdn-url}")
+    @Value("${AWS_CDN_URL}")
     private String cdnUrl;
 
-    @Value("${cloud.aws.s3.bucket}")
+    @Value("${AWS_S3_BUCKET}")
     private String bucketName;
 
     public PresignedUrlResponse generatePresignedUrl(PresignedUrlRequest request) {

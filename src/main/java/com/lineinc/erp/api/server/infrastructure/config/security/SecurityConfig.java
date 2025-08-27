@@ -40,18 +40,15 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/actuator/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                                "/actuator/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(sess -> sess
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
+                        .authenticationEntryPoint((_, response, _) -> {
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                        })
-                )
+                        }))
                 .userDetailsService(customUserDetailsService)
                 .build();
     }

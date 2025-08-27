@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "🔧 로컬 환경 실행 중..."
 
 # Docker Compose 실행 및 에러 체크
