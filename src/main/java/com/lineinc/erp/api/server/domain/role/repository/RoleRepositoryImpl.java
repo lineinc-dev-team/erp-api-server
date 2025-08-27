@@ -39,8 +39,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
             "id", QRole.role.id,
             "name", QRole.role.name,
             "createdAt", QRole.role.createdAt,
-            "updatedAt", QRole.role.updatedAt
-    );
+            "updatedAt", QRole.role.updatedAt);
 
     @Override
     public Page<RolesResponse> findAll(UserWithRolesListRequest request, Pageable pageable) {
@@ -56,7 +55,19 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        // fetchJoin 사용: role.userRoles 컬렉션, siteProcesses, site, process를 한 번에 같이 조회
+        // 1단계: 페이징된 ID 목록 조회 (fetchJoin 없음)
+        List<Long> roleIds = queryFactory
+                .select(role.id)
+                .from(role)
+                .leftJoin(role.userRoles, QUserRole.userRole)
+                .join(QUserRole.userRole.user, user)
+                .where(whereCondition)
+                .orderBy(orders)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 2단계: ID로 상세 정보 조회 (fetchJoin 사용)
         List<Role> content = queryFactory
                 .selectFrom(role)
                 .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
@@ -64,12 +75,11 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
                 .leftJoin(roleSiteProcess.site, site).fetchJoin()
                 .leftJoin(roleSiteProcess.process, process).fetchJoin()
-                .where(whereCondition)
+                .where(role.id.in(roleIds))
                 .orderBy(orders)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
 
+        // 3단계: 총 개수 조회
         Long totalCount = queryFactory
                 .select(role.countDistinct())
                 .from(role)
