@@ -1,6 +1,6 @@
-package com.lineinc.erp.api.server.config.persistence;
+package com.lineinc.erp.api.server.infrastructure.config.persistence;
 
-import com.lineinc.erp.api.server.config.audit.AuditorAwareImpl;
+import com.lineinc.erp.api.server.infrastructure.config.audit.AuditorAwareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
