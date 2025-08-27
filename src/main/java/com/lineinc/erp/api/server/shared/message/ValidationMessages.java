@@ -52,4 +52,5 @@ public final class ValidationMessages {
     public static final String FUEL_AGGREGATION_NOT_FOUND = "유류집계를 찾을 수 없습니다.";
     public static final String DAILY_REPORT_NOT_FOUND = "출역일보를 찾을 수 없습니다.";
     public static final String TEMPORARY_LABOR_NAME_REQUIRED = "임시 인력 등록시 이름은 필수입니다.";
+    public static final String DAILY_REPORT_ALREADY_EXISTS = "같은 날짜, 현장, 공정에 대한 출역일보가 이미 존재합니다.";
 }

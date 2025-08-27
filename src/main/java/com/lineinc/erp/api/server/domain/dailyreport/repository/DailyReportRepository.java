@@ -52,4 +52,15 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     List<DailyReport> findByLaborIdAndDateRange(@Param("laborId") Long laborId,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
+
+    /**
+     * 같은 날짜, 현장, 공정에 대한 출역일보 존재 여부를 확인합니다.
+     */
+    @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
+            "WHERE dr.site.id = :siteId " +
+            "AND dr.siteProcess.id = :siteProcessId " +
+            "AND dr.reportDate = :reportDate")
+    boolean existsBySiteAndSiteProcessAndReportDate(@Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId,
+            @Param("reportDate") OffsetDateTime reportDate);
 }

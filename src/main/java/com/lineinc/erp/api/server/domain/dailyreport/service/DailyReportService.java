@@ -50,6 +50,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,12 +80,19 @@ public class DailyReportService {
         Site site = siteService.getSiteByIdOrThrow(request.siteId());
         SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
+        // 같은 날짜, 현장, 공정에 대한 출역일보 중복 체크
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(request.reportDate());
+        if (dailyReportRepository.existsBySiteAndSiteProcessAndReportDate(
+                site.getId(), siteProcess.getId(), reportDate)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    ValidationMessages.DAILY_REPORT_ALREADY_EXISTS);
+        }
+
         // 출역일보 생성
         DailyReport dailyReport = DailyReport.builder()
                 .site(site)
                 .siteProcess(siteProcess)
-                .reportDate(
-                        DateTimeFormatUtils.toOffsetDateTime(request.reportDate()))
+                .reportDate(reportDate)
                 .weather(request.weather())
                 .build();
 
