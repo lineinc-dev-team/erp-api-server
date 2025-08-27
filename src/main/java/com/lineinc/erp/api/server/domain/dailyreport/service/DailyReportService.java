@@ -891,6 +891,11 @@ public class DailyReportService {
         Labor temporaryLabor = Labor.builder()
                 .name(request.temporaryLaborName())
                 .type(LaborType.DIRECT_CONTRACT)
+                .isTemporary(true)
+                .outsourcingCompany(request.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
+                        : null)
+                .dailyWage(request.unitPrice())
                 .build();
 
         return laborRepository.save(temporaryLabor);
