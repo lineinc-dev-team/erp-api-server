@@ -13,6 +13,8 @@ public record DailyReportOutsourcingResponse(
 
         @Schema(description = "공수", example = "8.0") Double workQuantity,
 
+        @Schema(description = "구분값", example = "기초공사") String category,
+
         @Schema(description = "비고", example = "오전 작업") String memo,
 
         @Schema(description = "업체 정보") CompanySimpleResponse outsourcingCompany,
@@ -24,6 +26,7 @@ public record DailyReportOutsourcingResponse(
                 outsourcing.getId(),
                 outsourcing.getWorkContent(),
                 outsourcing.getWorkQuantity(),
+                outsourcing.getCategory(),
                 outsourcing.getMemo(),
                 outsourcing.getCompany() != null ? CompanySimpleResponse.from(outsourcing.getCompany()) : null,
                 outsourcing.getOutsourcingCompanyContractWorker() != null

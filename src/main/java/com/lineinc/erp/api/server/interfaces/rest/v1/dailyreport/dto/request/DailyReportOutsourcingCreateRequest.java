@@ -9,6 +9,8 @@ public record DailyReportOutsourcingCreateRequest(
 
         @NotNull @Schema(description = "외주업체계약 인력 ID", example = "1") Long outsourcingCompanyContractWorkerId,
 
+        @Schema(description = "구분값", example = "기초공사") String category,
+
         @Schema(description = "작업내용", example = "기초공사") String workContent,
 
         @Schema(description = "공수", example = "8.0") Double workQuantity,

@@ -35,6 +35,9 @@ public class DailyReportOutsourcing extends BaseEntity {
     @JoinColumn(name = "outsourcing_company_contract_worker_id")
     private OutsourcingCompanyContractWorker outsourcingCompanyContractWorker; // 외주업체계약 인력
 
+    @Column
+    private String category; // 구분값
+
     @Column(columnDefinition = "TEXT")
     private String workContent; // 작업내용
 

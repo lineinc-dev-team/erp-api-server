@@ -150,6 +150,7 @@ public class DailyReportService {
                         .dailyReport(dailyReport)
                         .company(company)
                         .outsourcingCompanyContractWorker(worker)
+                        .category(outsourcingRequest.category())
                         .workContent(outsourcingRequest.workContent())
                         .workQuantity(outsourcingRequest.workQuantity())
                         .memo(outsourcingRequest.memo())

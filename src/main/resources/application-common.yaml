@@ -30,6 +30,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update         # 테이블을 삭제하지 않고 데이터베이스 스키마 자동 업데이트
+    show-sql: true
     properties:
       hibernate:
         jdbc:
