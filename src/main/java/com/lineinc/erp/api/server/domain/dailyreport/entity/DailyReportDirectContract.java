@@ -59,10 +59,11 @@ public class DailyReportDirectContract extends BaseEntity {
      */
     public void updateFrom(DirectContractUpdateInfo request) {
         Optional.ofNullable(request.position()).ifPresent(val -> this.position = val);
-        Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
+        Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.labor.updatePreviousDailyWage(this.unitPrice);
     }
 
     public void setEntities(OutsourcingCompany outsourcingCompany, Labor labor) {

@@ -559,11 +559,14 @@ public class DailyReportService {
                 dailyReport.getDirectContracts(),
                 request.directContracts(),
                 (DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo dto) -> {
+                    Labor labor = laborService.getLaborByIdOrThrow(dto.laborId());
+                    labor.updatePreviousDailyWage(dto.unitPrice());
+
                     return DailyReportDirectContract.builder()
                             .dailyReport(dailyReport)
                             .outsourcingCompany(outsourcingCompanyService
                                     .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
-                            .labor(laborService.getLaborByIdOrThrow(dto.laborId()))
+                            .labor(labor)
                             .position(dto.position())
                             .workContent(dto.workContent())
                             .unitPrice(dto.unitPrice())
