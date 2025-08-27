@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.infrastructure.config.web.filter;
+package com.lineinc.erp.api.server.infrastructure.config.web;
 
 import com.lineinc.erp.api.server.shared.util.HttpUtils;
 import org.slf4j.Logger;
