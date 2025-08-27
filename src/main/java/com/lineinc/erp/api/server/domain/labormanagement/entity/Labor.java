@@ -95,6 +95,14 @@ public class Labor extends BaseEntity {
     private Boolean isHeadOffice = false;
 
     /**
+     * 임시 인력 여부
+     */
+    @DiffIgnore
+    @Column
+    @Builder.Default
+    private Boolean isTemporary = false;
+
+    /**
      * 주작업
      */
     @DiffInclude
