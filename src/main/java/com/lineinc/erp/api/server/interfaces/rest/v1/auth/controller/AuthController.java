@@ -40,19 +40,18 @@ public class AuthController {
 
     @Operation(summary = "로그인", description = "사용자 로그인 후 세션 생성 및 쿠키 발급")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "401", description = "존재하지 않는 계정 또는 비밀번호 오류", content = @Content()),
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400"),
+            @ApiResponse(responseCode = "401")
     })
     @PostMapping("/login")
     public ResponseEntity<Void> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
-            HttpServletResponse response
-    ) {
+            HttpServletResponse response) {
         // 1. 로그인 인증 토큰 생성
-        UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(request.loginId(), request.password());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(request.loginId(),
+                request.password());
 
         // 2. 실제 인증 수행
         Authentication authentication = authenticationManager.authenticate(token);
@@ -75,8 +74,7 @@ public class AuthController {
         HttpSession session = httpRequest.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                context
-        );
+                context);
 
         // 세션 타임아웃 설정
         session.setMaxInactiveInterval(AppConstants.DEFAULT_SESSION_TIMEOUT_SECONDS);
@@ -91,8 +89,7 @@ public class AuthController {
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody PasswordChangeRequest request
-    ) {
+            @Valid @RequestBody PasswordChangeRequest request) {
         userService.changePassword(userDetails.getUserId(), request);
         return ResponseEntity.ok().build();
     }
@@ -113,7 +110,8 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userService.getUserEntity(userDetails.getUserId());
         UserResponse response = userService.getUser(user.getId());
         return ResponseEntity.ok(SuccessResponse.of(response));

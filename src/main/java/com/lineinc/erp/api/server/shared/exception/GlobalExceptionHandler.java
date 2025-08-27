@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -30,6 +31,12 @@ import java.util.List;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        log.warn("로그인 실패: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ValidationMessages.PASSWORD_MISMATCH, List.of());
+    }
 
     // 1. 인증/인가 관련
     @ExceptionHandler(InternalAuthenticationServiceException.class)
@@ -82,7 +89,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
         log.warn("UnsupportedMediaTypeException: {} - {}", ex.getContentType(), ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ValidationMessages.UNSUPPORTED_CONTENT_TYPE + ": " + ex.getContentType(), List.of());
+        return buildErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                ValidationMessages.UNSUPPORTED_CONTENT_TYPE + ": " + ex.getContentType(), List.of());
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
@@ -107,7 +115,7 @@ public class GlobalExceptionHandler {
     }
 
     // 5. 데이터 액세스 관련
-    @ExceptionHandler({PropertyReferenceException.class, InvalidDataAccessApiUsageException.class})
+    @ExceptionHandler({ PropertyReferenceException.class, InvalidDataAccessApiUsageException.class })
     public ResponseEntity<ErrorResponse> handleInvalidDataAccess(Exception ex) {
         log.warn("InvalidDataAccessException: {}", ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.INVALID_PROPERTY_REFERENCE, List.of());
@@ -123,16 +131,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
         log.error("RuntimeException: {}", ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ValidationMessages.INTERNAL_SERVER_ERROR, List.of());
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ValidationMessages.INTERNAL_SERVER_ERROR,
+                List.of());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Exception: {}", ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ValidationMessages.INTERNAL_SERVER_ERROR, List.of());
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ValidationMessages.INTERNAL_SERVER_ERROR,
+                List.of());
     }
 
-    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, List<FieldErrorDetail> errors) {
+    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message,
+            List<FieldErrorDetail> errors) {
         return ResponseEntity.status(status).body(ErrorResponse.of(status.value(), message, errors));
     }
 }
