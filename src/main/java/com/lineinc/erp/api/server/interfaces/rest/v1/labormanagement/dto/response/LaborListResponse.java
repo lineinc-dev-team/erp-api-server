@@ -31,6 +31,7 @@ public record LaborListResponse(
         @Schema(description = "소속업체 정보") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "휴대폰 번호") String phoneNumber,
         @Schema(description = "주민등록번호") String residentNumber,
+        @Schema(description = "임시 인력 여부", example = "true") Boolean isTemporary,
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt,
         @Schema(description = "첨부파일 존재 여부", example = "true") Boolean hasFile) {
@@ -57,6 +58,7 @@ public record LaborListResponse(
                         : null,
                 labor.getPhoneNumber(),
                 PrivacyMaskingUtils.maskResidentNumber(labor.getResidentNumber()),
+                labor.getIsTemporary(),
                 labor.getCreatedAt(),
                 labor.getUpdatedAt(),
                 labor.getHasFile());
