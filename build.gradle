@@ -1,11 +1,11 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.5'        // Spring Boot 3.5.5 버전 사용 (최신 패치)
+    id 'org.springframework.boot' version '3.5.5'        // Spring Boot 3.5.5 버전 사용
     id 'io.spring.dependency-management' version '1.1.7'  // Spring 의존성 자동 관리
 }
 
 group = 'com.lineinc'           // 프로젝트 그룹 ID
-version = '0.0.1-SNAPSHOT'      // 프로젝트 버전 (개발 중인 스냅샷)
+version = '0.0.1-SNAPSHOT'      // 프로젝트 버전
 
 // ===== 의존성 버전 관리 =====
 // 외부 라이브러리들의 버전을 중앙에서 관리하여 일관성 유지
@@ -21,8 +21,6 @@ ext {
 // ===== Java 버전 설정 =====
 java {
     toolchain {
-        // 배포 환경과 일치시키기 위해 JDK 24 사용
-        // Gradle 8.14.2는 JDK 24를 지원함
         languageVersion = JavaLanguageVersion.of(24)
     }
 }
