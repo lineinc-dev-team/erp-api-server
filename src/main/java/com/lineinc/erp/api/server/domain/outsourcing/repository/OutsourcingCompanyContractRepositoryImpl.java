@@ -89,7 +89,8 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
                 .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
                 .where(whereClause)
                 .distinct()
-                .fetchCount();
+                .fetch()
+                .size();
 
         return new PageImpl<>(content, pageable, total);
     }
