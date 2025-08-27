@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.config.aop;
+package com.lineinc.erp.api.server.infrastructure.config.aop;
 
 import com.lineinc.erp.api.server.domain.common.service.RateLimitService;
 import com.lineinc.erp.api.server.shared.annotation.RateLimit;
@@ -40,7 +40,7 @@ public class RateLimitAspect {
         // 사용자 식별자 및 제한 설정 값으로 Bucket 생성 또는 가져오기
         Bucket bucket = rateLimitService.resolveBucket(
                 resolvedUserId,
-                rateLimit.limit(),           // 허용 요청 수
+                rateLimit.limit(), // 허용 요청 수
                 rateLimit.durationSeconds() // 제한 시간 (초)
         );
 
