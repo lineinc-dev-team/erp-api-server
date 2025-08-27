@@ -68,10 +68,7 @@ public class UserService {
 
     @Transactional
     public void resetPassword(long id) {
-        User user = usersRepository.findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
-
+        User user = getUserByIdOrThrow(id);
         String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.updatePassword(encodedPassword);
         user.setRequirePasswordReset(true);

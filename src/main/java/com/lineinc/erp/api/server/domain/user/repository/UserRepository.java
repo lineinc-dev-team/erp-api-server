@@ -38,4 +38,3 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     long countByIdIn(Iterable<Long> ids);
 }
-

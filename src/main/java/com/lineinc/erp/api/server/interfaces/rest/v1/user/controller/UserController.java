@@ -59,9 +59,9 @@ public class UserController {
 
     @Operation(summary = "비밀번호 초기화", description = "유저 로그인 비밀번호 초기화")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "비밀번호 초기화 성공", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400"),
+            @ApiResponse(responseCode = "404")
     })
     @PostMapping("/{id}/reset-password")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
