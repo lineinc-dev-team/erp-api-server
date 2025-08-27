@@ -38,8 +38,8 @@ public record DailyReportEquipmentResponse(
                 equipment.getUnitPrice(),
                 equipment.getWorkHours(),
                 equipment.getMemo(),
-                equipment.getCompany() != null
-                        ? CompanySimpleResponse.from(equipment.getCompany())
+                equipment.getOutsourcingCompany() != null
+                        ? CompanySimpleResponse.from(equipment.getOutsourcingCompany())
                         : null,
                 equipment.getOutsourcingCompanyContractDriver() != null
                         ? ContractDriverSimpleResponse.from(equipment.getOutsourcingCompanyContractDriver())

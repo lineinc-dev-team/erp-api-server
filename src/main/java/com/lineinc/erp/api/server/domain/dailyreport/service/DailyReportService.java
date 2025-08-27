@@ -41,6 +41,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
@@ -159,7 +160,7 @@ public class DailyReportService {
 
                 DailyReportOutsourcing outsourcing = DailyReportOutsourcing.builder()
                         .dailyReport(dailyReport)
-                        .company(company)
+                        .outsourcingCompany(company)
                         .outsourcingCompanyContractWorker(worker)
                         .category(outsourcingRequest.category())
                         .workContent(outsourcingRequest.workContent())
@@ -191,7 +192,7 @@ public class DailyReportService {
 
                 DailyReportOutsourcingEquipment outsourcingEquipment = DailyReportOutsourcingEquipment.builder()
                         .dailyReport(dailyReport)
-                        .company(company)
+                        .outsourcingCompany(company)
                         .outsourcingCompanyContractDriver(driver)
                         .outsourcingCompanyContractEquipment(equipment)
                         .workContent(equipmentRequest.workContent())
@@ -587,6 +588,65 @@ public class DailyReportService {
                         .ifPresent(dc -> {
                             dc.updateFrom(directContractInfo);
                             dc.setEntities(company, labor);
+                        });
+            }
+        }
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    @Transactional
+    public void updateDailyReportOutsourcings(DailyReportSearchRequest searchRequest,
+            DailyReportOutsourcingUpdateRequest request) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+        DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // EntitySyncUtils.syncList를 사용하여 외주 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getOutsourcings(),
+                request.outsourcings(),
+                (DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo dto) -> {
+                    return DailyReportOutsourcing.builder()
+                            .dailyReport(dailyReport)
+                            .outsourcingCompany(outsourcingCompanyService
+                                    .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
+                            .outsourcingCompanyContractWorker(getOutsourcingCompanyContractWorkerByIdOrThrow(
+                                    dto.outsourcingCompanyContractWorkerId()))
+                            .category(dto.category())
+                            .workContent(dto.workContent())
+                            .workQuantity(dto.workQuantity())
+                            .memo(dto.memo())
+                            .build();
+                });
+
+        // company와 outsourcingCompanyContractWorker 업데이트를 위해 추가 처리 (한 번만 반복)
+        for (DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo outsourcingInfo : request.outsourcings()) {
+            if (outsourcingInfo.id() != null) { // ID가 있는 것만 처리
+                final OutsourcingCompany company = outsourcingInfo.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(outsourcingInfo.outsourcingCompanyId())
+                        : null;
+                final OutsourcingCompanyContractWorker outsourcingCompanyContractWorker = outsourcingInfo
+                        .outsourcingCompanyContractWorkerId() != null
+                                ? getOutsourcingCompanyContractWorkerByIdOrThrow(
+                                        outsourcingInfo.outsourcingCompanyContractWorkerId())
+                                : null;
+
+                // 기존 엔티티만 찾아서 company와 outsourcingCompanyContractWorker 설정 (ID가 null이 아닌 것만)
+                dailyReport.getOutsourcings().stream()
+                        .filter(os -> os.getId() != null && os.getId().equals(outsourcingInfo.id()))
+                        .findFirst()
+                        .ifPresent(os -> {
+                            os.updateFrom(outsourcingInfo);
+                            os.setEntities(company, outsourcingCompanyContractWorker);
                         });
             }
         }

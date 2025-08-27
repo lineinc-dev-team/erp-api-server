@@ -16,6 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@Builder
 @SQLRestriction("deleted = false")
 public class DailyReportOutsourcingEquipment extends BaseEntity {
 
@@ -29,8 +30,8 @@ public class DailyReportOutsourcingEquipment extends BaseEntity {
     private DailyReport dailyReport; // 출역일보
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
-    private OutsourcingCompany company; // 외주업체
+    @JoinColumn(name = "outsourcing_company_id")
+    private OutsourcingCompany outsourcingCompany; // 외주업체
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_contract_driver_id")

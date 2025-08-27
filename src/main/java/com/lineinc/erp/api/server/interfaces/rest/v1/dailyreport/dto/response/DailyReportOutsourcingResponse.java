@@ -28,7 +28,9 @@ public record DailyReportOutsourcingResponse(
                 outsourcing.getWorkQuantity(),
                 outsourcing.getCategory(),
                 outsourcing.getMemo(),
-                outsourcing.getCompany() != null ? CompanySimpleResponse.from(outsourcing.getCompany()) : null,
+                outsourcing.getOutsourcingCompany() != null
+                        ? CompanySimpleResponse.from(outsourcing.getOutsourcingCompany())
+                        : null,
                 outsourcing.getOutsourcingCompanyContractWorker() != null
                         ? ContractWorkerSimpleResponse.from(outsourcing.getOutsourcingCompanyContractWorker())
                         : null);
