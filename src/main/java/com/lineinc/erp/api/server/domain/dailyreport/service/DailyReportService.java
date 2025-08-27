@@ -43,6 +43,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
@@ -720,6 +721,79 @@ public class DailyReportService {
                         .ifPresent(eq -> {
                             eq.updateFrom(equipmentInfo);
                             eq.setEntities(outsourcingCompany, outsourcingCompanyContractDriver,
+                                    outsourcingCompanyContractEquipment);
+                        });
+            }
+        }
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    @Transactional
+    public void updateDailyReportFuels(DailyReportSearchRequest searchRequest,
+            DailyReportFuelUpdateRequest request) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+        DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // EntitySyncUtils.syncList를 사용하여 유류 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getFuels(),
+                request.fuels(),
+                (DailyReportFuelUpdateRequest.FuelUpdateInfo dto) -> {
+                    return DailyReportFuel.builder()
+                            .dailyReport(dailyReport)
+                            .outsourcingCompanyContract(dto.outsourcingCompanyContractId() != null
+                                    ? getOutsourcingCompanyContractByIdOrThrow(dto.outsourcingCompanyContractId())
+                                    : null)
+                            .outsourcingCompanyContractDriver(dto.outsourcingCompanyContractDriverId() != null
+                                    ? getOutsourcingCompanyContractDriverByIdOrThrow(
+                                            dto.outsourcingCompanyContractDriverId())
+                                    : null)
+                            .outsourcingCompanyContractEquipment(dto.outsourcingCompanyContractEquipmentId() != null
+                                    ? getOutsourcingCompanyContractEquipmentByIdOrThrow(
+                                            dto.outsourcingCompanyContractEquipmentId())
+                                    : null)
+                            .fuelType(dto.fuelType())
+                            .fuelAmount(dto.fuelAmount())
+                            .memo(dto.memo())
+                            .build();
+                });
+
+        // outsourcingCompanyContract, outsourcingCompanyContractDriver,
+        // outsourcingCompanyContractEquipment 업데이트를 위해 추가 처리 (한 번만 반복)
+        for (DailyReportFuelUpdateRequest.FuelUpdateInfo fuelInfo : request.fuels()) {
+            if (fuelInfo.id() != null) { // ID가 있는 것만 처리
+                final OutsourcingCompanyContract outsourcingCompanyContract = fuelInfo
+                        .outsourcingCompanyContractId() != null
+                                ? getOutsourcingCompanyContractByIdOrThrow(fuelInfo.outsourcingCompanyContractId())
+                                : null;
+                final OutsourcingCompanyContractDriver outsourcingCompanyContractDriver = fuelInfo
+                        .outsourcingCompanyContractDriverId() != null
+                                ? getOutsourcingCompanyContractDriverByIdOrThrow(
+                                        fuelInfo.outsourcingCompanyContractDriverId())
+                                : null;
+                final OutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment = fuelInfo
+                        .outsourcingCompanyContractEquipmentId() != null
+                                ? getOutsourcingCompanyContractEquipmentByIdOrThrow(
+                                        fuelInfo.outsourcingCompanyContractEquipmentId())
+                                : null;
+
+                // 기존 엔티티만 찾아서 outsourcingCompanyContract, outsourcingCompanyContractDriver,
+                // outsourcingCompanyContractEquipment 설정 (ID가 null이 아닌 것만)
+                dailyReport.getFuels().stream()
+                        .filter(fuel -> fuel.getId() != null && fuel.getId().equals(fuelInfo.id()))
+                        .findFirst()
+                        .ifPresent(fuel -> {
+                            fuel.updateFrom(fuelInfo);
+                            fuel.setEntities(outsourcingCompanyContract, outsourcingCompanyContractDriver,
                                     outsourcingCompanyContractEquipment);
                         });
             }
