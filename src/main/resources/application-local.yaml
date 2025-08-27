@@ -1,46 +1,58 @@
 # 로컬 환경 설정
 spring:
+  # 애플리케이션 종료 시 각 단계별 최대 대기 시간 (30초)
   lifecycle:
     timeout-per-shutdown-phase: 30s
 
+  # 세션 관리 설정
+  session:
+    jdbc:
+      initialize-schema: always  # 세션을 위한 데이터베이스 스키마를 항상 초기화
+
+  # Spring Data 웹 지원 설정
   data:
     web:
       pageable:
-        max-page-size: 200
+        max-page-size: 200  # 페이지네이션의 최대 페이지 크기 (최대 200개 항목)
 
+  # Jackson JSON 직렬화 설정
   jackson:
-    time-zone: Asia/Seoul
+    time-zone: Asia/Seoul  # JSON 직렬화의 시간대를 Asia/Seoul로 설정
 
+  # 데이터베이스 연결 설정 (로컬 PostgreSQL)
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/erpdb
-    username: erpuser
-    password: erppassword
+    driver-class-name: org.postgresql.Driver  # PostgreSQL JDBC 드라이버
+    url: jdbc:postgresql://localhost:5432/erpdb  # 로컬 PostgreSQL 데이터베이스 URL
+    username: erpuser  # 데이터베이스 사용자명
+    password: erppassword  # 데이터베이스 비밀번호
 
+  # JPA 및 Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: update  # 테이블을 삭제하지 않고 데이터베이스 스키마 자동 업데이트
+    show-sql: true  # SQL 쿼리를 콘솔에 출력 (로컬 개발용)
     properties:
       hibernate:
         jdbc:
-          time-zone: UTC
-          batch-size: 50
-          order-inserts: true
-          order-updates: true
-        default-batch-fetch-size: 200
-        format-sql: true
-        highlight-sql: true
-    open-in-view: false
+          time-zone: UTC  # 일관성을 위해 JDBC 시간대를 UTC로 설정
+          batch-size: 50  # 삽입/수정 작업의 배치 크기
+          order-inserts: true  # 배치 최적화를 위해 삽입문 정렬
+          order-updates: true  # 배치 최적화를 위해 수정문 정렬
+        default-batch-fetch-size: 200  # 쿼리 최적화를 위한 배치 페치 크기
+        format-sql: true  # SQL을 보기 좋게 포맷팅 (로컬 개발용)
+        highlight-sql: true  # SQL 구문 하이라이팅 (로컬 개발용)
+    open-in-view: false  # 지연 로딩 문제 방지를 위해 Open Session in View 패턴 비활성화
 
+# 서버 설정
 server:
-  shutdown: graceful
+  shutdown: graceful  # 애플리케이션 종료 시 graceful shutdown 사용
 
+# 관리 엔드포인트 설정
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health  # 시스템 모니터링을 위해 health 엔드포인트만 HTTP로 노출
   endpoint:
     shutdown:
-      access: unrestricted
+      access: unrestricted  # shutdown 엔드포인트 접근 허용
