@@ -83,8 +83,8 @@ public class AuthController {
 
     @Operation(summary = "비밀번호 변경", description = "새 비밀번호로 변경합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400"),
     })
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
@@ -96,7 +96,7 @@ public class AuthController {
 
     @Operation(summary = "로그아웃", description = "세션 만료를 통한 사용자 로그아웃 처리")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그아웃 성공", content = @Content()),
+            @ApiResponse(responseCode = "200"),
     })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
@@ -106,8 +106,8 @@ public class AuthController {
 
     @Operation(summary = "내 정보 조회", description = "현재 로그인된 사용자 정보를 반환")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 정보 반환"),
-            @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없음", content = @Content())
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404")
     })
     @GetMapping("/me")
     public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(

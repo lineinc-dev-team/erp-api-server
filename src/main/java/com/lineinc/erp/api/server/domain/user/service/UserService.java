@@ -270,9 +270,7 @@ public class UserService {
 
     @Transactional
     public void changePassword(Long userId, PasswordChangeRequest request) {
-        User user = usersRepository.findById(userId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+        User user = getUserByIdOrThrow(userId);
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
         user.setRequirePasswordReset(false);
         usersRepository.save(user);
@@ -281,9 +279,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public Slice<UserChangeHistoryResponse> getUserChangeHistoriesSlice(Long userId, Pageable pageable) {
         // 유저 존재 확인 (필요 시)
-        User user = usersRepository.findById(userId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+        User user = getUserByIdOrThrow(userId);
 
         // UserChangeHistory를 user 기준으로 슬라이스 조회
         Slice<UserChangeHistory> historySlice = userChangeHistoryRepository.findByUser(user, pageable);
