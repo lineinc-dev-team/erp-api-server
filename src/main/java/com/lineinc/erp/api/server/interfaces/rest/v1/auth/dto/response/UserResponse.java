@@ -77,13 +77,15 @@ public record UserResponse(
     public static record UserSimpleResponse(
             @Schema(description = "사용자 ID", example = "123") Long id,
 
+            @Schema(description = "로그인 ID", example = "admin01") String loginId,
+
             @Schema(description = "사용자 이름", example = "홍길동") String username,
 
             @Schema(description = "사용자 부서", example = "개발팀") String department,
 
             @Schema(description = "사용자 권한 목록") List<RoleSummaryResponse> roles) {
         public static UserSimpleResponse from(User user) {
-            return new UserSimpleResponse(user.getId(), user.getUsername(),
+            return new UserSimpleResponse(user.getId(), user.getLoginId(), user.getUsername(),
                     user.getDepartment() != null ? user.getDepartment().getName() : null,
                     user.getUserRoles().stream()
                             .map(UserRole::getRole)

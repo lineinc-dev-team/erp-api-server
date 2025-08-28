@@ -135,24 +135,4 @@ public class RoleController {
         roleService.deleteRolesByIds(request.roleIds());
         return ResponseEntity.ok().build();
     }
-
-    // @Operation(
-    // summary = "권한 그룹의 권한 수정",
-    // description = "권한 그룹 ID에 권한 ID 리스트로 권한 목록을 수정합니다"
-    // )
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "권한 수정 성공"),
-    // @ApiResponse(responseCode = "404", description = "권한 그룹 또는 권한을 찾을 수 없음",
-    // content = @Content())
-    // })
-    // @PostMapping("/{id}/permissions")
-    // @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action =
-    // PermissionAction.UPDATE) // 수정 권한으로 변경하는 것도 고려
-    // public ResponseEntity<Void> updatePermissionsOfRole(
-    // @PathVariable Long id,
-    // @RequestBody @Valid AddPermissionsToRoleRequest request
-    // ) {
-    // roleService.setPermissionsToRole(id, request);
-    // return ResponseEntity.ok().build();
-    // }
 }
