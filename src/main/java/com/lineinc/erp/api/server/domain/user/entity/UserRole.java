@@ -7,11 +7,15 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "user_id"),
+        @Index(columnList = "role_id"),
+        @Index(columnList = "user_id,role_id")
+})
 @Getter
 @NoArgsConstructor
 @SuperBuilder
 public class UserRole extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_roles_seq")
     @SequenceGenerator(name = "users_roles_seq", sequenceName = "users_roles_seq", allocationSize = 1)
@@ -27,5 +31,4 @@ public class UserRole extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo;
-
 }
