@@ -99,11 +99,9 @@
         <!-- Hibernate SQL 바인딩 로그를 TRACE로 설정하여 쿼리 디버깅 가능 -->
         <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
         
-        <!-- 루트 로거: 모든 로그를 DEBUG 레벨로 출력 -->
+        <!-- 루트 로거: 콘솔만 출력 (파일 로깅 없음) -->
         <root level="DEBUG">
             <appender-ref ref="Console"/>
-            <appender-ref ref="AsyncFile"/>
-            <appender-ref ref="AsyncErrorFile"/>
         </root>
     </springProfile>
 
@@ -116,10 +114,9 @@
         <!-- Hibernate SQL 바인딩 로그는 비활성화 -->
         <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
         
+        <!-- 루트 로거: 콘솔만 출력 (파일 로깅 없음) -->
         <root level="INFO">
             <appender-ref ref="Console"/>
-            <appender-ref ref="AsyncFile"/>
-            <appender-ref ref="AsyncErrorFile"/>
         </root>
     </springProfile>
 

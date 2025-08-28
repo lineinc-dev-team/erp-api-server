@@ -12,60 +12,33 @@ import java.util.List;
 
 @Schema(description = "발주처 등록 요청")
 public record ClientCompanyCreateRequest(
-        @NotBlank
-        @Schema(description = "발주처명", example = "삼성건설")
-        String name,
+        @NotBlank @Schema(description = "발주처명", example = "삼성건설") String name,
 
-        @NotBlank
-        @MultiConstraint(type = ValidatorType.BUSINESS_NUMBER)
-        @Schema(description = "사업자등록번호", example = "123-45-67890")
-        String businessNumber,
+        @NotBlank @MultiConstraint(type = ValidatorType.BUSINESS_NUMBER) @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
 
-        @NotBlank
-        @Schema(description = "대표자명", example = "홍길동")
-        String ceoName,
+        @NotBlank @Schema(description = "대표자명", example = "홍길동") String ceoName,
 
-        @NotBlank
-        @Schema(description = "본사 주소", example = "서울시 강남구")
-        String address,
+        @NotBlank @Schema(description = "본사 주소", example = "서울시 강남구") String address,
 
-        @NotBlank
-        @Schema(description = "상세 주소", example = "강남구 테헤란로 123")
-        String detailAddress,
+        @NotBlank @Schema(description = "상세 주소", example = "강남구 테헤란로 123") String detailAddress,
 
-        @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER)
-        @Schema(description = "전화번호", example = "02-123-5678")
-        String landlineNumber,
+        @NotBlank @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER) @Schema(description = "전화번호", example = "02-123-5678") String landlineNumber,
 
-        @MultiConstraint(type = ValidatorType.PHONE)
-        @Schema(description = "개인 휴대폰", example = "010-1234-5678")
-        String phoneNumber,
+        @NotBlank @MultiConstraint(type = ValidatorType.PHONE) @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
 
-        @Email
-        @Schema(description = "이메일", example = "example@samsung.com")
-        String email,
+        @NotBlank @Email @Schema(description = "이메일", example = "example@samsung.com") String email,
 
-        @Schema(description = "결제 방식", example = "CASH")
-        PaymentMethod paymentMethod,
+        @NotBlank @Schema(description = "결제 방식", example = "CASH") PaymentMethod paymentMethod,
 
-        @Schema(description = "결제 유예 기간", example = "2")
-        String paymentPeriod,
+        @NotBlank @Schema(description = "결제 유예 기간", example = "2") String paymentPeriod,
 
-        @Schema(description = "비고 / 메모")
-        String memo,
+        @Schema(description = "비고 / 메모") String memo,
 
-        @Schema(description = "사용 여부", example = "true")
-        boolean isActive,
+        @NotBlank @Schema(description = "사용 여부", example = "true") boolean isActive,
 
-        @Schema(description = "본사 담당자 ID", example = "2")
-        Long userId,
+        @NotBlank @Schema(description = "본사 담당자 ID", example = "2") Long userId,
 
-        @Valid
-        @Schema(description = "담당자 목록")
-        List<ClientCompanyContactCreateRequest> contacts,
+        @Valid @Schema(description = "담당자 목록") List<ClientCompanyContactCreateRequest> contacts,
 
-        @Valid
-        @Schema(description = "파일 목록")
-        List<ClientCompanyFileCreateRequest> files
-) {
+        @Valid @Schema(description = "파일 목록") List<ClientCompanyFileCreateRequest> files) {
 }
