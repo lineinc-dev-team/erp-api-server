@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.domain.client.service;
 
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
@@ -16,8 +15,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCo
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,10 +26,6 @@ public class CompanyFileService {
     private final Javers javers;
 
     public void createClientCompanyFile(ClientCompany clientCompany, List<ClientCompanyFileCreateRequest> requests) {
-        if (Objects.isNull(requests) || requests.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.CLIENT_COMPANY_FILE_NOT_FOUND);
-        }
-
         requests.stream()
                 .map(dto -> ClientCompanyFile.builder()
                         .name(dto.name())

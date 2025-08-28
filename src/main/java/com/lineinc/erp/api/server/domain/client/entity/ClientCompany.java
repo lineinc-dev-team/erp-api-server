@@ -21,7 +21,6 @@ import java.util.Optional;
 @Table(indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "businessNumber"),
-        @Index(columnList = "isActive"),
         @Index(columnList = "paymentMethod"),
         @Index(columnList = "email"),
         @Index(columnList = "createdAt"),
