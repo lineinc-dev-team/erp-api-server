@@ -22,7 +22,6 @@ import java.util.Set;
 @SuperBuilder
 @Table(name = "roles", indexes = {
         @Index(columnList = "name"),
-        @Index(columnList = "has_global_site_process_access"),
         @Index(columnList = "created_at")
 })
 @SQLRestriction("deleted = false")

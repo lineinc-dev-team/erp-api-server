@@ -12,8 +12,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "role_permissions", indexes = {
-        @Index(columnList = "role_id"),
-        @Index(columnList = "permission_id"),
         @Index(columnList = "role_id,permission_id")
 })
 @Getter

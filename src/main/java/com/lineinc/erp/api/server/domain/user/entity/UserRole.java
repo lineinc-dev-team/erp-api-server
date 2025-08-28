@@ -10,8 +10,6 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "user_id"),
-        @Index(columnList = "role_id"),
         @Index(columnList = "user_id,role_id")
 })
 @Getter
