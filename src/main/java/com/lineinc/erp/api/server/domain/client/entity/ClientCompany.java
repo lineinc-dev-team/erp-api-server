@@ -75,7 +75,7 @@ public class ClientCompany extends BaseEntity {
      */
     @DiffIgnore
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private PaymentMethod paymentMethod;
 
     /**
