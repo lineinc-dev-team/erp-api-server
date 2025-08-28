@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     boolean existsByLoginId(String loginId);
 
-    @Query("SELECT u FROM User u WHERE LOWER(u.username) != :excludeUsername AND (:keyword IS NULL OR :keyword = '' OR u.username LIKE %:keyword%)")
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) != :excludeUsername AND (:keyword IS NULL OR :keyword = '' OR u.username LIKE %:keyword%) ORDER BY u.username ASC")
     Slice<User> findAllByKeywordAndExcludeUsername(@Param("keyword") String keyword,
             @Param("excludeUsername") String excludeUsername, Pageable pageable);
 

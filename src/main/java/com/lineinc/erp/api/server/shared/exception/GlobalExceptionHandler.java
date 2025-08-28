@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         log.warn("MethodArgumentNotValidException: {}", ex.getMessage(), ex);
         List<FieldErrorDetail> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> new FieldErrorDetail(error.getField()))
+                .map(error -> new FieldErrorDetail(error.getField(), error.getDefaultMessage()))
                 .toList();
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.DEFAULT_INVALID_INPUT, errors);
     }
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
         log.warn("HttpMessageNotReadableException: {}", ex.getMessage(), ex);
         if (ex.getCause() instanceof InvalidFormatException ife && !ife.getPath().isEmpty()) {
             List<FieldErrorDetail> errors = ife.getPath().stream()
-                    .map(ref -> new FieldErrorDetail(ref.getFieldName()))
+                    .map(ref -> new FieldErrorDetail(ref.getFieldName(), null))
                     .toList();
             return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.DEFAULT_INVALID_INPUT, errors);
         }
