@@ -3,10 +3,11 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "권한 그룹 수정 요청")
 public record UpdateRolesRequest(
-        @Schema(description = "권한 그룹 이름", example = "현장 관리자") String name,
+        @NotBlank @Schema(description = "권한 그룹 이름", example = "현장 관리자") String name,
 
         @Schema(description = "메모", example = "특별 권한 그룹입니다.") String memo,
 
