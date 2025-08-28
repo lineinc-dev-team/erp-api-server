@@ -17,8 +17,6 @@ public record UpdateUserRequest(
 
         @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER) @Schema(description = "전화번호", example = "02-123-4567") String landlineNumber,
 
-        @Schema(description = "비밀번호", example = "password123!") String password,
-
         @Schema(description = "사용자 활성화 여부", example = "true") Boolean isActive,
 
         @Schema(description = "부서 ID", example = "1") Long departmentId,

@@ -187,11 +187,6 @@ public class UserService {
                 request.positionId() != null ? positionRepository.findById(request.positionId()).orElse(null) : null,
                 request.isActive());
 
-        // 비밀번호 업데이트
-        if (request.password() != null && !request.password().isBlank()) {
-            oldUser.updatePassword(passwordEncoder.encode(request.password()));
-        }
-
         usersRepository.save(oldUser);
 
         Diff diff = javers.compare(oldUserSnapshot, oldUser);
