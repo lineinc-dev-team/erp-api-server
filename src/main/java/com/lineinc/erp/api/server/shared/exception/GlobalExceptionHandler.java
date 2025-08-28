@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -66,7 +67,22 @@ public class GlobalExceptionHandler {
         log.warn("HttpMessageNotReadableException: {}", ex.getMessage(), ex);
         if (ex.getCause() instanceof InvalidFormatException ife && !ife.getPath().isEmpty()) {
             List<FieldErrorDetail> errors = ife.getPath().stream()
-                    .map(ref -> new FieldErrorDetail(ref.getFieldName(), null))
+                    .map(ref -> {
+                        String fieldName = ref.getFieldName();
+                        String message = null;
+
+                        // Enum 타입 에러인 경우 사용 가능한 값들을 포함한 메시지 생성
+                        if (ife.getTargetType() != null && ife.getTargetType().isEnum()) {
+                            @SuppressWarnings("unchecked")
+                            Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) ife.getTargetType();
+                            String[] enumValues = Arrays.stream(enumClass.getEnumConstants())
+                                    .map(Enum::name)
+                                    .toArray(String[]::new);
+                            message = String.format("사용 가능한 값: %s", String.join(", ", enumValues));
+                        }
+
+                        return new FieldErrorDetail(fieldName, message);
+                    })
                     .toList();
             return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.DEFAULT_INVALID_INPUT, errors);
         }
