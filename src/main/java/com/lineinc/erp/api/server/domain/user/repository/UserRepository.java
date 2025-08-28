@@ -18,9 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     boolean existsByLoginId(String loginId);
 
-    Slice<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
-
-    Slice<User> findAllBy(Pageable pageable);
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) != :excludeUsername AND (:keyword IS NULL OR :keyword = '' OR u.username LIKE %:keyword%)")
+    Slice<User> findAllByKeywordAndExcludeUsername(@Param("keyword") String keyword,
+            @Param("excludeUsername") String excludeUsername, Pageable pageable);
 
     @Query("select u from User u " +
             "left join fetch u.userRoles ur " +

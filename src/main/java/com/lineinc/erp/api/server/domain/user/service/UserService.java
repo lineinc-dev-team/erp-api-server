@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.user.service;
 
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -220,14 +221,8 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Slice<UserResponse.UserSimpleResponse> searchUsersByName(String keyword, Pageable pageable) {
-        Slice<User> userSlice;
-
-        if (keyword == null || keyword.isBlank()) {
-            userSlice = usersRepository.findAllBy(pageable);
-        } else {
-            userSlice = usersRepository.findByUsernameContainingIgnoreCase(keyword, pageable);
-        }
-
+        Slice<User> userSlice = usersRepository.findAllByKeywordAndExcludeUsername(keyword, AppConstants.ADMIN_USERNAME,
+                pageable);
         return userSlice.map(UserResponse.UserSimpleResponse::from);
     }
 
