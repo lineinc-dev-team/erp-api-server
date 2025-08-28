@@ -7,20 +7,11 @@ import com.lineinc.erp.api.server.shared.validation.ValidatorType;
 
 @Schema(description = "발주처 파일 등록 요청")
 public record ClientCompanyFileCreateRequest(
-        @NotBlank
-        @Schema(description = "문서명", example = "계약서_2024")
-        String name,
+        @NotBlank @Schema(description = "문서명", example = "계약서_2024") String name,
 
-        @NotBlank
-        @MultiConstraint(type = ValidatorType.URL)
-        @Schema(description = "파일 접근용 URL", example = "https://s3.amazonaws.com/bucket/contract_2024.pdf")
-        String fileUrl,
+        @NotBlank @MultiConstraint(type = ValidatorType.URL) @Schema(description = "파일 접근용 URL", example = "https://s3.amazonaws.com/bucket/contract_2024.pdf") String fileUrl,
 
-        @NotBlank
-        @Schema(description = "원본 파일명", example = "contract_2024.pdf")
-        String originalFileName,
+        @NotBlank @Schema(description = "원본 파일명", example = "contract_2024.pdf") String originalFileName,
 
-        @Schema(description = "파일에 대한 메모", example = "계약서 사본")
-        String memo
-) {
+        @Schema(description = "파일에 대한 메모", example = "계약서 사본") String memo) {
 }
