@@ -16,7 +16,7 @@ import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.SearchUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.SearchUserRequest;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;

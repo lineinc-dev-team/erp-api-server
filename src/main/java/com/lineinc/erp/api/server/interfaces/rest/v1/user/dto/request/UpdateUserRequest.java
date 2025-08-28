@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user;
+package com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request;
 
 import java.util.List;
 

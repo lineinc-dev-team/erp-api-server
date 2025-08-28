@@ -1,7 +1,8 @@
 package com.lineinc.erp.api.server.domain.user.repository;
 
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.SearchUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.SearchUserRequest;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

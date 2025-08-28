@@ -22,12 +22,13 @@ import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.CreateUserRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.BulkDeleteUsersRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.UpdateUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.BulkDeleteUsersRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.CreateUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.SearchUserRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.UpdateUserRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserInfoResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.SearchUserRequest;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
