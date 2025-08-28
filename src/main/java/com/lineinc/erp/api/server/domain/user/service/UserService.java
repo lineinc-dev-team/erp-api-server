@@ -216,8 +216,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<UserResponse.UserSimpleResponse> searchUsersByName(String keyword, Pageable pageable) {
+    public Slice<UserResponse.UserSimpleResponse> searchUsersByName(String keyword, Boolean hasRole,
+            Pageable pageable) {
         Slice<User> userSlice = usersRepository.findAllByKeywordAndExcludeUsername(keyword, AppConstants.ADMIN_USERNAME,
+                hasRole,
                 pageable);
         return userSlice.map(UserResponse.UserSimpleResponse::from);
     }
