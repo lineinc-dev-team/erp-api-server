@@ -126,9 +126,9 @@ public class UserService {
             case "phoneNumber" -> "개인 휴대폰";
             case "landlineNumber" -> "전화번호";
             case "isActive" -> "계정상태";
-            case "lastLoginAt" -> "최종접속일";
+            case "lastLoginAt" -> "최종 접속일";
             case "createdAt" -> "생성일자";
-            case "updatedAt" -> "최종수정일";
+            case "updatedAt" -> "최종 수정일";
             case "updatedBy" -> "수정자";
             case "memo" -> "비고";
             default -> null;
