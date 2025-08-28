@@ -200,87 +200,134 @@ public class RoleService {
 
     @Transactional
     public void createRole(CreateRolesRequest request) {
-        boolean exists = roleRepository.existsByName(request.name());
-        if (exists) {
+        // 권한 그룹명 중복 체크
+        validateRoleName(request.name());
+
+        // 권한 그룹 생성
+        Role newRole = createRoleEntity(request);
+        roleRepository.save(newRole);
+
+        // 사용자 연결
+        connectUsersToRole(newRole, request.users());
+
+        // 권한 연결
+        connectPermissionsToRole(newRole, request.permissionIds());
+
+        // 현장/공정 연결
+        connectSiteProcessesToRole(newRole, request.hasGlobalSiteProcessAccess(), request.siteProcesses());
+
+        // 최종 저장
+        roleRepository.save(newRole);
+    }
+
+    private void validateRoleName(String roleName) {
+        if (roleRepository.existsByName(roleName)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.ROLE_NAME_ALREADY_EXISTS);
         }
+    }
 
-        Role newRole = Role.builder()
+    private Role createRoleEntity(CreateRolesRequest request) {
+        return Role.builder()
                 .name(request.name())
                 .memo(request.memo())
                 .hasGlobalSiteProcessAccess(Boolean.TRUE.equals(request.hasGlobalSiteProcessAccess()))
                 .build();
+    }
 
-        roleRepository.save(newRole);
-
-        // 유저 연결
-        if (request.users() != null && !request.users().isEmpty()) {
-            List<Long> userIds = request.users().stream().map(CreateRolesRequest.UserWithMemo::userId).toList();
-            Map<Long, String> memoMap = request.users().stream()
-                    .collect(Collectors.toMap(CreateRolesRequest.UserWithMemo::userId,
-                            CreateRolesRequest.UserWithMemo::memo));
-
-            List<User> users = userRepository.findAllById(userIds);
-            for (User user : users) {
-                if (!user.getUserRoles().isEmpty()) {
-                    continue;
-                }
-
-                UserRole userRole = UserRole.builder()
-                        .user(user)
-                        .role(newRole)
-                        .memo(memoMap.get(user.getId()))
-                        .build();
-                user.getUserRoles().add(userRole);
-                userRepository.save(user);
-            }
+    private void connectUsersToRole(Role role, List<CreateRolesRequest.UserWithMemo> users) {
+        if (users == null || users.isEmpty()) {
+            return;
         }
 
-        // 권한 연결
-        if (request.permissionIds() != null && !request.permissionIds().isEmpty()) {
-            List<Permission> permissions = permissionRepository.findAllById(request.permissionIds());
-            List<RolePermission> rolePermissions = permissions.stream()
-                    .filter(permission -> permission.getMenu() != null)
-                    .map(permission -> RolePermission.builder()
-                            .role(newRole)
-                            .permission(permission)
-                            .build())
-                    .collect(Collectors.toList());
-            newRole.getPermissions().addAll(rolePermissions);
-            roleRepository.save(newRole);
+        List<Long> userIds = users.stream()
+                .map(CreateRolesRequest.UserWithMemo::userId)
+                .toList();
+
+        Map<Long, String> memoMap = users.stream()
+                .collect(Collectors.toMap(
+                        CreateRolesRequest.UserWithMemo::userId,
+                        CreateRolesRequest.UserWithMemo::memo));
+
+        List<User> foundUsers = userRepository.findAllById(userIds);
+
+        foundUsers.stream()
+                .filter(user -> user.getUserRoles().isEmpty())
+                .forEach(user -> {
+                    UserRole userRole = UserRole.builder()
+                            .user(user)
+                            .role(role)
+                            .memo(memoMap.get(user.getId()))
+                            .build();
+                    user.getUserRoles().add(userRole);
+                    userRepository.save(user);
+                });
+    }
+
+    private void connectPermissionsToRole(Role role, List<Long> permissionIds) {
+        if (permissionIds == null || permissionIds.isEmpty()) {
+            return;
         }
 
-        // 현장/공정 연결
-        if (!Boolean.TRUE.equals(request.hasGlobalSiteProcessAccess())
-                && request.siteProcesses() != null && !request.siteProcesses().isEmpty()) {
+        List<Permission> permissions = permissionRepository.findAllById(permissionIds);
+        List<RolePermission> rolePermissions = permissions.stream()
+                .filter(permission -> permission.getMenu() != null)
+                .map(permission -> RolePermission.builder()
+                        .role(role)
+                        .permission(permission)
+                        .build())
+                .collect(Collectors.toList());
 
-            List<RoleSiteProcess> siteProcesses = request.siteProcesses().stream()
-                    .map(dto -> {
-                        Site site = null;
-                        if (dto.siteId() != null) {
-                            site = siteRepository.findById(dto.siteId())
-                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                            ValidationMessages.SITE_NOT_FOUND));
-                        }
-                        SiteProcess process = null;
-                        if (dto.processId() != null) {
-                            process = siteProcessRepository.findById(dto.processId())
-                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                            ValidationMessages.SITE_PROCESS_NOT_FOUND));
-                        }
-                        if (site != null && process != null && !process.getSite().getId().equals(site.getId())) {
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                    ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
-                        }
-                        return RoleSiteProcess.builder()
-                                .role(newRole)
-                                .site(site)
-                                .process(process)
-                                .build();
-                    })
-                    .collect(Collectors.toList());
-            newRole.getSiteProcesses().addAll(siteProcesses);
-            roleRepository.save(newRole);
+        role.getPermissions().addAll(rolePermissions);
+    }
+
+    private void connectSiteProcessesToRole(Role role, Boolean hasGlobalAccess,
+            List<CreateRolesRequest.SiteProcessAccess> siteProcesses) {
+        if (siteProcesses == null || siteProcesses.isEmpty()) {
+            return;
+        }
+
+        // hasGlobalAccess가 true여도 siteProcesses가 제공된 경우 유효성 검증 필요
+        List<RoleSiteProcess> roleSiteProcesses = siteProcesses.stream()
+                .map(dto -> createRoleSiteProcess(role, dto))
+                .collect(Collectors.toList());
+
+        role.getSiteProcesses().addAll(roleSiteProcesses);
+    }
+
+    private RoleSiteProcess createRoleSiteProcess(Role role, CreateRolesRequest.SiteProcessAccess dto) {
+        Site site = findSiteById(dto.siteId());
+        SiteProcess process = findSiteProcessById(dto.processId());
+
+        validateSiteProcessMatch(site, process);
+
+        return RoleSiteProcess.builder()
+                .role(role)
+                .site(site)
+                .process(process)
+                .build();
+    }
+
+    private Site findSiteById(Long siteId) {
+        if (siteId == null) {
+            return null;
+        }
+        return siteRepository.findById(siteId)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+    }
+
+    private SiteProcess findSiteProcessById(Long processId) {
+        if (processId == null) {
+            return null;
+        }
+        return siteProcessRepository.findById(processId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.SITE_PROCESS_NOT_FOUND));
+    }
+
+    private void validateSiteProcessMatch(Site site, SiteProcess process) {
+        if (site != null && process != null && !process.getSite().getId().equals(site.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
     }
 
