@@ -9,6 +9,12 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "user_id"),
+        @Index(columnList = "type"),
+        @Index(columnList = "created_at"),
+        @Index(columnList = "user_id,created_at")
+})
 @Getter
 @NoArgsConstructor
 @SuperBuilder
