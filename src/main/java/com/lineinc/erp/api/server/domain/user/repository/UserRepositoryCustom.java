@@ -15,14 +15,12 @@ public interface UserRepositoryCustom {
      */
     Page<UserResponse> findAll(
             SearchUserRequest request,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     /**
      * 엑셀 다운로드용 - 페이지네이션 없이 유저 목록 전체 조회
      */
     List<UserResponse> findAllWithoutPaging(
             SearchUserRequest request,
-            Sort sort
-    );
+            Sort sort);
 }
