@@ -32,8 +32,10 @@ public class CompanyContactService {
      * @param clientCompany 연락처가 속할 ClientCompany 엔티티
      * @param requests      생성 요청 리스트 (null 또는 빈 리스트면 아무 작업 안 함)
      */
-    public void createClientCompanyContacts(ClientCompany clientCompany, List<ClientCompanyContactCreateRequest> requests) {
-        if (Objects.isNull(requests) || requests.isEmpty()) return;
+    public void createClientCompanyContacts(ClientCompany clientCompany,
+            List<ClientCompanyContactCreateRequest> requests) {
+        if (Objects.isNull(requests) || requests.isEmpty())
+            return;
 
         long mainCount = requests.stream().filter(ClientCompanyContactCreateRequest::isMain).count();
         if (mainCount != 1) {
@@ -65,7 +67,8 @@ public class CompanyContactService {
      * @param requests      수정 요청 리스트 (null일 경우 무시)
      */
     @Transactional
-    public void updateClientCompanyContacts(ClientCompany clientCompany, List<ClientCompanyContactUpdateRequest> requests) {
+    public void updateClientCompanyContacts(ClientCompany clientCompany,
+            List<ClientCompanyContactUpdateRequest> requests) {
         if (Objects.nonNull(requests) && !requests.isEmpty()) {
             long mainCount = requests.stream().filter(ClientCompanyContactUpdateRequest::isMain).count();
             if (mainCount != 1) {
@@ -90,8 +93,7 @@ public class CompanyContactService {
                         .email(dto.email())
                         .memo(dto.memo())
                         .clientCompany(clientCompany)
-                        .build()
-        );
+                        .build());
 
         List<ClientCompanyContact> afterContacts = new ArrayList<>(clientCompany.getContacts());
 
@@ -115,7 +117,8 @@ public class CompanyContactService {
                 .collect(Collectors.toMap(ClientCompanyContact::getId, c -> c));
 
         for (ClientCompanyContact before : beforeContacts) {
-            if (before.getId() == null || !afterMap.containsKey(before.getId())) continue;
+            if (before.getId() == null || !afterMap.containsKey(before.getId()))
+                continue;
 
             ClientCompanyContact after = afterMap.get(before.getId());
             Diff diff = javers.compare(before, after);

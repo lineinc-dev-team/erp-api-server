@@ -34,6 +34,7 @@ public final class ValidationMessages {
     public static final String SITE_NAME_ALREADY_EXISTS = "이미 존재하는 현장명입니다.";
     public static final String SITE_PROCESS_NOT_FOUND = "존재하지 않는 공정입니다.";
     public static final String SITE_PROCESS_NOT_MATCH_SITE = "해당 공정은 요청한 현장에 포함되어 있지 않습니다.";
+    public static final String CLIENT_COMPANY_FILE_NOT_FOUND = "파일은 최소 1개 이상 등록해야 합니다.";
 
     // ===== 외주업체 관련 메시지 =====
     public static final String OUTSOURCING_COMPANY_NOT_FOUND = "외주업체를 찾을 수 없습니다.";

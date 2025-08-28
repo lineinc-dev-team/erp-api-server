@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.client.service;
 
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
@@ -7,7 +8,6 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
@@ -16,6 +16,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCo
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,10 +27,12 @@ import java.util.stream.Collectors;
 public class CompanyFileService {
     private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
     private final Javers javers;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void createClientCompanyFile(ClientCompany clientCompany, List<ClientCompanyFileCreateRequest> requests) {
-        if (Objects.isNull(requests) || requests.isEmpty()) return;
+        if (Objects.isNull(requests) || requests.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.CLIENT_COMPANY_FILE_NOT_FOUND);
+        }
+
         requests.stream()
                 .map(dto -> ClientCompanyFile.builder()
                         .name(dto.name())
@@ -63,8 +67,7 @@ public class CompanyFileService {
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
                         .clientCompany(clientCompany)
-                        .build()
-        );
+                        .build());
 
         List<ClientCompanyFile> afterFiles = new ArrayList<>(clientCompany.getFiles());
         List<Map<String, String>> allChanges = new ArrayList<>();
@@ -86,7 +89,8 @@ public class CompanyFileService {
                 .collect(Collectors.toMap(ClientCompanyFile::getId, c -> c));
 
         for (ClientCompanyFile before : beforeFiles) {
-            if (before.getId() == null || !afterMap.containsKey(before.getId())) continue;
+            if (before.getId() == null || !afterMap.containsKey(before.getId()))
+                continue;
 
             ClientCompanyFile after = afterMap.get(before.getId());
             Diff diff = javers.compare(before, after);
