@@ -125,7 +125,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.loginId;
+        return this.username;
     }
 
     @Override
