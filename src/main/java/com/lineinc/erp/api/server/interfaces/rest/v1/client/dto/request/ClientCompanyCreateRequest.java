@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -28,15 +29,15 @@ public record ClientCompanyCreateRequest(
 
         @NotBlank @Email @Schema(description = "이메일", example = "example@samsung.com") String email,
 
-        @NotBlank @Schema(description = "결제 방식", example = "CASH") PaymentMethod paymentMethod,
+        @NotNull @Schema(description = "결제 방식", example = "CASH") PaymentMethod paymentMethod,
 
         @NotBlank @Schema(description = "결제 유예 기간", example = "2") String paymentPeriod,
 
         @Schema(description = "비고 / 메모") String memo,
 
-        @NotBlank @Schema(description = "사용 여부", example = "true") boolean isActive,
+        @NotNull @Schema(description = "사용 여부", example = "true") boolean isActive,
 
-        @NotBlank @Schema(description = "본사 담당자 ID", example = "2") Long userId,
+        @NotNull @Schema(description = "본사 담당자 ID", example = "2") Long userId,
 
         @Valid @Schema(description = "담당자 목록") List<ClientCompanyContactCreateRequest> contacts,
 
