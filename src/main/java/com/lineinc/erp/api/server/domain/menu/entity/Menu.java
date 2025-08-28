@@ -10,6 +10,10 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "created_at")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
