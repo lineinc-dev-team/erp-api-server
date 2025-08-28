@@ -6,13 +6,20 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "client_company_id"),
+        @Index(columnList = "type"),
+        @Index(columnList = "createdAt"),
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class ClientCompanyChangeHistory extends BaseEntity {
 
     @Id
@@ -36,4 +43,3 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 선택적 변경 사유, 비고 등
 }
-

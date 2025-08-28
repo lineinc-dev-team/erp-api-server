@@ -23,7 +23,6 @@ import java.util.Optional;
         @Index(columnList = "businessNumber"),
         @Index(columnList = "user_id"),
         @Index(columnList = "isActive"),
-        @Index(columnList = "deleted"),
         @Index(columnList = "paymentMethod"),
         @Index(columnList = "email"),
         @Index(columnList = "createdAt"),
