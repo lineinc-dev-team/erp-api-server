@@ -75,28 +75,27 @@ public class RoleService {
         Role role = roleRepository.findWithPermissionsAndMenusById(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        // Permission ID 기준으로 중복 제거
-        Map<Long, Permission> uniquePermissions = role.getPermissions().stream()
+        // 한 번의 스트림으로 모든 처리 완료 - 성능 최적화
+        return role.getPermissions().stream()
                 .map(RolePermission::getPermission)
-                .collect(Collectors.toMap(
-                        Permission::getId,
-                        p -> p,
-                        (existing, replacement) -> existing // 중복 시 기존 값 유지
-                ));
-
-        // Menu ID로 그룹핑
-        return uniquePermissions.values().stream()
-                .collect(Collectors.groupingBy(p -> p.getMenu().getId()))
-                .entrySet().stream()
-                .map(entry -> {
-                    var permissions = entry.getValue().stream()
-                            .sorted(Comparator.comparing(Permission::getId))
-                            .map(MenusPermissionsResponse.PermissionDto::from)
-                            .toList();
-
-                    String menuName = entry.getValue().get(0).getMenu().getName();
-                    return MenusPermissionsResponse.from(entry.getKey(), menuName, permissions);
-                })
+                .collect(Collectors.groupingBy(
+                        permission -> permission.getMenu().getId(),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                permissions -> {
+                                    // 권한 정렬 및 DTO 변환
+                                    var sortedPermissions = permissions.stream()
+                                            .sorted(Comparator.comparing(Permission::getId))
+                                            .map(MenusPermissionsResponse.PermissionDto::from)
+                                            .toList();
+                                    String menuName = permissions.get(0).getMenu().getName();
+                                    return MenusPermissionsResponse.from(
+                                            permissions.get(0).getMenu().getId(),
+                                            menuName,
+                                            sortedPermissions);
+                                })))
+                .values()
+                .stream()
                 .toList();
     }
 

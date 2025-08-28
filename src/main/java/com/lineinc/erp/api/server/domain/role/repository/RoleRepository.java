@@ -13,10 +13,10 @@ public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositor
 
     boolean existsByName(String name);
 
-    @Query("SELECT DISTINCT r FROM Role r " +
-            "JOIN FETCH r.permissions rp " +
-            "JOIN FETCH rp.permission p " +
-            "JOIN FETCH p.menu m " +
+    @Query("SELECT r FROM Role r " +
+            "JOIN FETCH r.permissions " +
+            "JOIN FETCH r.permissions.permission " +
+            "JOIN FETCH r.permissions.permission.menu " +
             "WHERE r.id = :roleId")
     Optional<Role> findWithPermissionsAndMenusById(@Param("roleId") Long roleId);
 }
