@@ -12,6 +12,16 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import java.util.Optional;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "client_company_id"),
+        @Index(columnList = "name"),
+        @Index(columnList = "department"),
+        @Index(columnList = "position"),
+        @Index(columnList = "phoneNumber"),
+        @Index(columnList = "email"),
+        @Index(columnList = "isMain"),
+        @Index(columnList = "deleted")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
