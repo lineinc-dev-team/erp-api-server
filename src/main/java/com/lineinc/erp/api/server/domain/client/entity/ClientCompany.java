@@ -19,7 +19,15 @@ import java.util.Optional;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "name")
+        @Index(columnList = "name"),
+        @Index(columnList = "businessNumber"),
+        @Index(columnList = "user_id"),
+        @Index(columnList = "isActive"),
+        @Index(columnList = "deleted"),
+        @Index(columnList = "paymentMethod"),
+        @Index(columnList = "email"),
+        @Index(columnList = "createdAt"),
+        @Index(columnList = "phoneNumber")
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
