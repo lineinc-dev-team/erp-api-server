@@ -41,7 +41,8 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
             "id", QRole.role.id,
             "name", QRole.role.name,
             "createdAt", QRole.role.createdAt,
-            "updatedAt", QRole.role.updatedAt);
+            "updatedAt", QRole.role.updatedAt,
+            "siteName", QSite.site.name);
 
     @Override
     public Page<RolesResponse> findAll(UserWithRolesListRequest request, Pageable pageable) {
@@ -110,7 +111,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .select(role.id)
                 .from(role)
                 .leftJoin(role.userRoles, QUserRole.userRole)
-                .join(QUserRole.userRole.user, user)
+                .leftJoin(QUserRole.userRole.user, user)
                 .where(whereCondition)
                 .orderBy(orders)
                 .offset(pageable.getOffset())
@@ -138,7 +139,9 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .select(role.countDistinct())
                 .from(role)
                 .leftJoin(role.userRoles, QUserRole.userRole)
-                .join(QUserRole.userRole.user, user)
+                .leftJoin(QUserRole.userRole.user, user)
+                .leftJoin(role.siteProcesses, QRoleSiteProcess.roleSiteProcess)
+                .leftJoin(QRoleSiteProcess.roleSiteProcess.site, QSite.site)
                 .where(whereCondition)
                 .fetchOne();
 

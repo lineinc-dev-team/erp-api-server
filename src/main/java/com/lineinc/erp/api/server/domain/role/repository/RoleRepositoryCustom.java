@@ -15,8 +15,7 @@ public interface RoleRepositoryCustom {
      */
     Page<RolesResponse> findAll(
             UserWithRolesListRequest request,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     /**
      * 특정 권한 그룹에 속한 사용자 목록을 검색어로 조회합니다.
