@@ -41,8 +41,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
             "id", QRole.role.id,
             "name", QRole.role.name,
             "createdAt", QRole.role.createdAt,
-            "updatedAt", QRole.role.updatedAt,
-            "siteName", QSite.site.name);
+            "updatedAt", QRole.role.updatedAt);
 
     @Override
     public Page<RolesResponse> findAll(UserWithRolesListRequest request, Pageable pageable) {
@@ -92,7 +91,13 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
     }
 
     private BooleanExpression buildWhereCondition(QRole role, QUser user, String search) {
-        return role.id.ne(ADMIN_ROLE_ID).and(buildSearchPredicate(user, search));
+        BooleanExpression baseCondition = role.id.ne(ADMIN_ROLE_ID);
+        BooleanExpression searchCondition = buildSearchPredicate(user, search);
+
+        if (searchCondition != null) {
+            return baseCondition.and(searchCondition);
+        }
+        return baseCondition;
     }
 
     private BooleanExpression buildSearchPredicate(QUser user, String search) {
@@ -107,16 +112,28 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
     private List<Long> fetchRoleIds(QRole role, QUser user, BooleanExpression whereCondition,
             OrderSpecifier<?>[] orders, Pageable pageable) {
-        return queryFactory
-                .select(role.id)
-                .from(role)
-                .leftJoin(role.userRoles, QUserRole.userRole)
-                .leftJoin(QUserRole.userRole.user, user)
-                .where(whereCondition)
-                .orderBy(orders)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        // 검색 조건이 있는 경우에만 user 조인, 없으면 role만 조회
+        if (whereCondition.toString().contains("user")) {
+            return queryFactory
+                    .select(role.id)
+                    .from(role)
+                    .leftJoin(role.userRoles, QUserRole.userRole)
+                    .leftJoin(QUserRole.userRole.user, user)
+                    .where(whereCondition)
+                    .orderBy(orders)
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        } else {
+            return queryFactory
+                    .select(role.id)
+                    .from(role)
+                    .where(whereCondition)
+                    .orderBy(orders)
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        }
     }
 
     private List<Role> fetchRoleDetails(QRole role, QUser user, QRoleSiteProcess roleSiteProcess,
