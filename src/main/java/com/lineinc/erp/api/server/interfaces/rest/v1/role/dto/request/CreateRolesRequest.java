@@ -17,7 +17,7 @@ public record CreateRolesRequest(
 
         @Schema(description = "전체 현장 및 공정 접근 권한 여부", example = "true") Boolean hasGlobalSiteProcessAccess,
 
-        @Schema(description = "현장 및 공정 접근 리스트", example = "[{\"siteId\": 1, \"processId\": 3]") List<SiteProcessAccess> siteProcesses) {
+        @Schema(description = "현장 및 공정 접근 리스트", example = "[{\"siteId\": 1, \"processId\": 3}]") List<SiteProcessAccess> siteProcesses) {
 
     public static record UserWithMemo(
             @Schema(description = "계정 ID", example = "1") Long userId,
