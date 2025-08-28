@@ -16,7 +16,17 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(columnList = "login_id"),
+        @Index(columnList = "username"),
+        @Index(columnList = "email"),
+        @Index(columnList = "department_id"),
+        @Index(columnList = "grade_id"),
+        @Index(columnList = "position_id"),
+        @Index(columnList = "is_active"),
+        @Index(columnList = "created_at"),
+        @Index(columnList = "last_login_at")
+})
 @Getter
 @NoArgsConstructor
 @SuperBuilder
