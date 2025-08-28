@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.javers.core.metamodel.annotation.DiffInclude;
+import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,7 @@ import java.util.*;
 @Getter
 @NoArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class User extends BaseEntity implements UserDetails {
 
     private static final long serialVersionUID = 1L;
