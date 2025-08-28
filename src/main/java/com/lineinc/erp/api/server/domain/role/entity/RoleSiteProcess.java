@@ -12,6 +12,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "role_id"),
+        @Index(columnList = "site_id"),
+        @Index(columnList = "process_id"),
+        @Index(columnList = "role_id,site_id"),
+        @Index(columnList = "role_id,process_id")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

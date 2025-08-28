@@ -20,7 +20,11 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@Table(name = "roles")
+@Table(name = "roles", indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "has_global_site_process_access"),
+        @Index(columnList = "created_at")
+})
 @SQLRestriction("deleted = false")
 public class Role extends BaseEntity implements Serializable {
     @Serial
@@ -56,6 +60,7 @@ public class Role extends BaseEntity implements Serializable {
     public void updateFrom(UpdateRolesRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(request.hasGlobalSiteProcessAccess()).ifPresent(val -> this.hasGlobalSiteProcessAccess = val);
+        Optional.ofNullable(request.hasGlobalSiteProcessAccess())
+                .ifPresent(val -> this.hasGlobalSiteProcessAccess = val);
     }
 }

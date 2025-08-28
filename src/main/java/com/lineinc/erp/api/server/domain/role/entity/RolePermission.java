@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.role.entity;
 
-import com.lineinc.erp.api.server.domain.menu.entity.Menu;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import jakarta.persistence.*;
@@ -13,7 +11,11 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "role_permissions")
+@Table(name = "role_permissions", indexes = {
+        @Index(columnList = "role_id"),
+        @Index(columnList = "permission_id"),
+        @Index(columnList = "role_id,permission_id")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
