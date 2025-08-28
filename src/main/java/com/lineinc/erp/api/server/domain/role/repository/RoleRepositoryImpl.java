@@ -35,6 +35,8 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    // 상수 정의
+    private static final Long ADMIN_ROLE_ID = 1L;
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
             "id", QRole.role.id,
             "name", QRole.role.name,
@@ -49,46 +51,18 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         QSite site = QSite.site;
         QSiteProcess process = QSiteProcess.siteProcess;
 
-        String search = (request != null) ? request.userSearch() : null;
-
-        BooleanExpression whereCondition = role.id.ne(1L).and(containsSearch(user, search));
-
+        String search = extractSearchTerm(request);
+        BooleanExpression whereCondition = buildWhereCondition(role, user, search);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        // 1단계: 페이징된 ID 목록 조회 (fetchJoin 없음)
-        List<Long> roleIds = queryFactory
-                .select(role.id)
-                .from(role)
-                .leftJoin(role.userRoles, QUserRole.userRole)
-                .join(QUserRole.userRole.user, user)
-                .where(whereCondition)
-                .orderBy(orders)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        // 1단계: 페이징된 ID 목록 조회
+        List<Long> roleIds = fetchRoleIds(role, user, whereCondition, orders, pageable);
 
-        // 2단계: ID로 상세 정보 조회 (fetchJoin 사용)
-        List<Role> content = queryFactory
-                .selectFrom(role)
-                .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
-                .leftJoin(QUserRole.userRole.user, user).fetchJoin()
-                .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
-                .leftJoin(roleSiteProcess.site, site).fetchJoin()
-                .leftJoin(roleSiteProcess.process, process).fetchJoin()
-                .where(role.id.in(roleIds))
-                .orderBy(orders)
-                .fetch();
+        // 2단계: ID로 상세 정보 조회
+        List<Role> content = fetchRoleDetails(role, user, roleSiteProcess, site, process, roleIds, orders);
 
         // 3단계: 총 개수 조회
-        Long totalCount = queryFactory
-                .select(role.countDistinct())
-                .from(role)
-                .leftJoin(role.userRoles, QUserRole.userRole)
-                .join(QUserRole.userRole.user, user)
-                .where(whereCondition)
-                .fetchOne();
-
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        long total = fetchTotalCount(role, user, whereCondition);
 
         List<RolesResponse> responses = content.stream()
                 .map(RolesResponse::from)
@@ -103,15 +77,83 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         QRole role = QRole.role;
         QUserRole userRole = QUserRole.userRole;
 
-        BooleanExpression searchPredicate = containsSearch(user, request.search());
+        BooleanExpression searchPredicate = buildSearchPredicate(user, request.search());
 
-        List<RoleUserListResponse> content = queryFactory
+        List<RoleUserListResponse> content = fetchUsersByRole(user, role, userRole, roleId, searchPredicate, pageable);
+        long total = fetchUserCountByRole(user, role, userRole, roleId, searchPredicate);
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    // 헬퍼 메서드들
+    private String extractSearchTerm(UserWithRolesListRequest request) {
+        return request != null ? request.userSearch() : null;
+    }
+
+    private BooleanExpression buildWhereCondition(QRole role, QUser user, String search) {
+        return role.id.ne(ADMIN_ROLE_ID).and(buildSearchPredicate(user, search));
+    }
+
+    private BooleanExpression buildSearchPredicate(QUser user, String search) {
+        if (search == null || search.trim().isEmpty()) {
+            return null;
+        }
+
+        String trimmedSearch = search.trim();
+        return user.username.containsIgnoreCase(trimmedSearch)
+                .or(user.loginId.containsIgnoreCase(trimmedSearch));
+    }
+
+    private List<Long> fetchRoleIds(QRole role, QUser user, BooleanExpression whereCondition,
+            OrderSpecifier<?>[] orders, Pageable pageable) {
+        return queryFactory
+                .select(role.id)
+                .from(role)
+                .leftJoin(role.userRoles, QUserRole.userRole)
+                .join(QUserRole.userRole.user, user)
+                .where(whereCondition)
+                .orderBy(orders)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
+
+    private List<Role> fetchRoleDetails(QRole role, QUser user, QRoleSiteProcess roleSiteProcess,
+            QSite site, QSiteProcess process, List<Long> roleIds,
+            OrderSpecifier<?>[] orders) {
+        return queryFactory
+                .selectFrom(role)
+                .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
+                .leftJoin(QUserRole.userRole.user, user).fetchJoin()
+                .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
+                .leftJoin(roleSiteProcess.site, site).fetchJoin()
+                .leftJoin(roleSiteProcess.process, process).fetchJoin()
+                .where(role.id.in(roleIds))
+                .orderBy(orders)
+                .fetch();
+    }
+
+    private long fetchTotalCount(QRole role, QUser user, BooleanExpression whereCondition) {
+        Long totalCount = queryFactory
+                .select(role.countDistinct())
+                .from(role)
+                .leftJoin(role.userRoles, QUserRole.userRole)
+                .join(QUserRole.userRole.user, user)
+                .where(whereCondition)
+                .fetchOne();
+
+        return Objects.requireNonNullElse(totalCount, 0L);
+    }
+
+    private List<RoleUserListResponse> fetchUsersByRole(QUser user, QRole role, QUserRole userRole,
+            Long roleId, BooleanExpression searchPredicate,
+            Pageable pageable) {
+        return queryFactory
                 .selectDistinct(user)
                 .from(user)
                 .join(user.userRoles, userRole)
                 .join(userRole.role, role)
-                .where(role.id.eq(roleId)
-                        .and(searchPredicate))
+                .where(role.id.eq(roleId).and(searchPredicate))
                 .orderBy(user.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -119,30 +161,18 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .stream()
                 .map(userObj -> RoleUserListResponse.from(userObj, roleId))
                 .toList();
+    }
 
+    private long fetchUserCountByRole(QUser user, QRole role, QUserRole userRole,
+            Long roleId, BooleanExpression searchPredicate) {
         Long totalCount = queryFactory
                 .select(user.countDistinct())
                 .from(user)
                 .join(user.userRoles, userRole)
                 .join(userRole.role, role)
-                .where(role.id.eq(roleId)
-                        .and(searchPredicate))
+                .where(role.id.eq(roleId).and(searchPredicate))
                 .fetchOne();
 
-        long total = Objects.requireNonNullElse(totalCount, 0L);
-        return new PageImpl<>(content, pageable, total);
+        return Objects.requireNonNullElse(totalCount, 0L);
     }
-
-    private BooleanExpression containsSearch(QUser user, String search) {
-        if (search == null) {
-            return null;
-        }
-        String trimmed = search.trim();
-        if (trimmed.isEmpty()) {
-            return null;
-        }
-        return user.username.containsIgnoreCase(trimmed)
-                .or(user.loginId.containsIgnoreCase(trimmed));
-    }
-
 }
