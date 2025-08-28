@@ -73,7 +73,6 @@ public class GlobalExceptionHandler {
 
                         // Enum 타입 에러인 경우 사용 가능한 값들을 포함한 메시지 생성
                         if (ife.getTargetType() != null && ife.getTargetType().isEnum()) {
-                            @SuppressWarnings("unchecked")
                             Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) ife.getTargetType();
                             String[] enumValues = Arrays.stream(enumClass.getEnumConstants())
                                     .map(Enum::name)
