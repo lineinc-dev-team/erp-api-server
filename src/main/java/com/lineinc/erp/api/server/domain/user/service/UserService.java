@@ -178,21 +178,21 @@ public class UserService {
         oldUser.syncTransientFields();
         User oldUserSnapshot = JaversUtils.createSnapshot(javers, oldUser, User.class);
 
-        // 새로운 메서드들을 사용하여 사용자 정보 업데이트
-        oldUser.updateFrom(request.username(), request.email(), request.phoneNumber(), request.landlineNumber(),
-                request.memo(),
-                request.departmentId() != null ? departmentRepository.findById(request.departmentId()).orElse(null)
-                        : null,
-                request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null,
-                request.positionId() != null ? positionRepository.findById(request.positionId()).orElse(null) : null,
-                request.isActive());
+        // DB에서 실제 엔티티 조회
+        Department department = request.departmentId() != null
+                ? departmentRepository.findById(request.departmentId()).orElse(null)
+                : null;
+        Grade grade = request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null;
+        Position position = request.positionId() != null
+                ? positionRepository.findById(request.positionId()).orElse(null)
+                : null;
 
+        // 사용자 정보 업데이트
+        oldUser.updateFrom(request, department, grade, position);
         usersRepository.save(oldUser);
 
         Diff diff = javers.compare(oldUserSnapshot, oldUser);
-
         List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-
         String changesJson = javers.getJsonConverter().toJson(simpleChanges);
         if (!simpleChanges.isEmpty()) {
             UserChangeHistory changeHistory = UserChangeHistory.builder()

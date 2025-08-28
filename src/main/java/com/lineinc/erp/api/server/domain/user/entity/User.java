@@ -4,6 +4,8 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.user.UpdateUserRequest;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -158,18 +160,18 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     // ===== 업데이트 메서드 =====
-    public void updateFrom(String username, String email, String landlineNumber, String phoneNumber,
-            String memo, Department department, Grade grade, Position position,
-            Boolean isActive) {
-        Optional.ofNullable(username).ifPresent(val -> this.username = val);
-        Optional.ofNullable(email).ifPresent(val -> this.email = val);
-        Optional.ofNullable(landlineNumber).ifPresent(val -> this.landlineNumber = val);
-        Optional.ofNullable(phoneNumber).ifPresent(val -> this.phoneNumber = val);
-        Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
+    public void updateFrom(UpdateUserRequest request, Department department, Grade grade, Position position) {
+        Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
+        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
+        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
+        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
+
         Optional.ofNullable(department).ifPresent(val -> this.department = val);
         Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
         Optional.ofNullable(position).ifPresent(val -> this.position = val);
-        Optional.ofNullable(isActive).ifPresent(val -> this.isActive = val);
+
         syncTransientFields();
     }
 
