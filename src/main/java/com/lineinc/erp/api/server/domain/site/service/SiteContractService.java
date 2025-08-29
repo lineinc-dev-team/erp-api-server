@@ -40,8 +40,7 @@ public class SiteContractService {
                     .name(contractReq.name())
                     .amount(contractReq.amount())
                     .memo(contractReq.memo())
-                    .build()
-            );
+                    .build());
 
             if (contractReq.files() != null && !contractReq.files().isEmpty()) {
                 siteFileService.createFiles(contract, contractReq.files());
@@ -74,19 +73,15 @@ public class SiteContractService {
                         contract.setFiles(dto.files().stream()
                                 .map(fileDto -> SiteFile.builder()
                                         .siteContract(contract)
-                                        .name(fileDto.name())
                                         .fileUrl(fileDto.fileUrl())
                                         .originalFileName(fileDto.originalFileName())
                                         .memo(fileDto.memo())
                                         .type(fileDto.type())
-                                        .build()
-                                )
-                                .collect(Collectors.toList())
-                        );
+                                        .build())
+                                .collect(Collectors.toList()));
                     }
                     return contract;
-                }
-        );
+                });
 
         // 저장을 명시적으로 호출
         siteContractRepository.saveAll(site.getContracts());
@@ -95,13 +90,11 @@ public class SiteContractService {
         List<SiteContract> afterContracts = new ArrayList<>(site.getContracts());
         List<Map<String, String>> allChanges = new ArrayList<>();
 
-
         // 4. 새롭게 추가된 계약서 감지
         Set<Long> beforeIds = beforeContracts.stream()
                 .map(SiteContract::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-
 
         for (SiteContract after : afterContracts) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
@@ -115,7 +108,8 @@ public class SiteContractService {
                 .collect(Collectors.toMap(SiteContract::getId, c -> c));
 
         for (SiteContract before : beforeContracts) {
-            if (before.getId() == null || !afterMap.containsKey(before.getId())) continue;
+            if (before.getId() == null || !afterMap.containsKey(before.getId()))
+                continue;
 
             SiteContract after = afterMap.get(before.getId());
 

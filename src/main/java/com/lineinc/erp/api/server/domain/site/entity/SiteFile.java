@@ -46,13 +46,6 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFile
     private SiteContract siteContract;
 
     /**
-     * 문서명 (사용자가 지정하는 파일 이름)
-     */
-    @DiffInclude
-    @Column(nullable = false)
-    private String name;
-
-    /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @DiffInclude
@@ -82,7 +75,6 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFile
 
     @Override
     public void updateFrom(UpdateSiteFileRequest request) {
-        this.name = request.name();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
         this.memo = request.memo();

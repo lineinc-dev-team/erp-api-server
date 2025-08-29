@@ -20,13 +20,11 @@ public class SiteFileService {
         for (CreateSiteFileRequest fileReq : fileRequests) {
             siteFileRepository.save(SiteFile.builder()
                     .siteContract(contract)
-                    .name(fileReq.name())
                     .fileUrl(fileReq.fileUrl())
                     .originalFileName(fileReq.originalFileName())
                     .memo(fileReq.memo())
                     .type(fileReq.type())
-                    .build()
-            );
+                    .build());
         }
     }
 }

@@ -31,19 +31,19 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id", nullable = false)
-    private Site site;  // 현장
+    private Site site; // 현장
 
     @Column(nullable = false)
     @DiffInclude
-    private String name;  // 계약명
+    private String name; // 계약명
 
     @Column
     @DiffInclude
-    private Long amount;  // 계약금액
+    private Long amount; // 계약금액
 
     @Column
     @DiffInclude
-    private String memo;  // 비고
+    private String memo; // 비고
 
     @Setter
     @DiffInclude
@@ -63,13 +63,11 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
                     request.files(),
                     (fileDto) -> SiteFile.builder()
                             .siteContract(this)
-                            .name(fileDto.name())
                             .fileUrl(fileDto.fileUrl())
                             .originalFileName(fileDto.originalFileName())
                             .memo(fileDto.memo())
                             .type(fileDto.type())
-                            .build()
-            );
+                            .build());
         }
     }
 }
