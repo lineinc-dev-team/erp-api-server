@@ -4,11 +4,14 @@ import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import com.lineinc.erp.api.server.domain.client.enums.FileType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -67,6 +70,13 @@ public class ClientCompanyFile extends BaseEntity {
     private String originalFileName;
 
     /**
+     * 파일 타입 (사업자등록증, 일반 등)
+     */
+    @Enumerated(EnumType.STRING)
+    @Column
+    private FileType type;
+
+    /**
      * 파일에 대한 비고 또는 설명
      */
     @Column(columnDefinition = "TEXT")
@@ -76,6 +86,7 @@ public class ClientCompanyFile extends BaseEntity {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
         Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

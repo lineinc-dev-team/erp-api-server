@@ -33,6 +33,7 @@ public class CompanyFileService {
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
                         .clientCompany(clientCompany)
+                        .type(dto.type())
                         .build())
                 .forEach(clientCompany.getFiles()::add);
     }

@@ -72,7 +72,7 @@ public class CompanyService {
                 .paymentPeriod(request.paymentPeriod())
                 .memo(request.memo())
                 .isActive(request.isActive())
-                .build();   
+                .build();
 
         // 2. 자식 엔티티 생성 + 연관관계 설정
         contactService.createClientCompanyContacts(clientCompany, request.contacts());
