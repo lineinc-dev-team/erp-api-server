@@ -112,7 +112,6 @@ public class JaversUtils {
         return diff.getChanges().stream()
                 .filter(change -> change instanceof ValueChange)
                 .map(change -> (ValueChange) change)
-                .filter(vc -> vc.getLeft() != null) // left만 null이 아니면 됨 (right는 null이거나 빈 값일 수 있음)
                 .map(vc -> {
                     if ("deleted".equals(vc.getPropertyName())
                             && Boolean.FALSE.equals(vc.getLeft())
