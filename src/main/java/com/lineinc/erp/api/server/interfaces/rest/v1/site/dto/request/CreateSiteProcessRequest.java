@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.siteprocess;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request;
 
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import com.lineinc.erp.api.server.shared.validation.MultiConstraint;

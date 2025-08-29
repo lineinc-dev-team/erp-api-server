@@ -2,10 +2,10 @@ package com.lineinc.erp.api.server.domain.site.service;
 
 import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.site.CreateSiteRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.site.DeleteSitesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.changehistory.SiteChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
@@ -52,7 +52,6 @@ public class SiteService {
 
     @Transactional
     public void createSite(CreateSiteRequest request) {
-        validateDuplicateName(request.name());
         ClientCompany clientCompany = companyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
         User user = userService.getUserByIdOrThrow(request.userId());
 
@@ -72,8 +71,7 @@ public class SiteService {
                 .user(user)
                 .contractAmount(request.contractAmount())
                 .memo(request.memo())
-                .build()
-        );
+                .build());
 
         if (request.process() != null) {
             siteProcessService.createProcess(site, request.process());
@@ -124,8 +122,7 @@ public class SiteService {
                 siteResponses,
                 fields,
                 this::getExcelHeaderName,
-                this::getExcelCellValue
-        );
+                this::getExcelCellValue);
     }
 
     private String getExcelHeaderName(String field) {
@@ -157,7 +154,8 @@ public class SiteService {
             case "type" -> siteResponse.type();
             case "clientCompanyName" -> siteResponse.clientCompany() != null ? siteResponse.clientCompany().name() : "";
             case "period" ->
-                    DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.startedAt()) + "~" + DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.endedAt());
+                DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.startedAt()) + "~"
+                        + DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.endedAt());
             case "processStatuses" -> siteResponse.process().status();
             case "createdBy" -> siteResponse.createdBy();
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.createdAt());
@@ -172,13 +170,15 @@ public class SiteService {
     @Transactional(readOnly = true)
     public Site getSiteByIdOrThrow(Long siteId) {
         return siteRepository.findById(siteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public SiteDetailResponse getSiteById(Long siteId, Long userId) {
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
         User user = userService.getUserByIdOrThrow(userId);
         boolean hasAccess = hasSiteProcessAccess(user, siteId);
         return SiteDetailResponse.from(site, hasAccess);
@@ -203,7 +203,8 @@ public class SiteService {
     @Transactional
     public void updateSite(Long siteId, UpdateSiteRequest request) {
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
 
         if (!site.getName().equals(request.name())) {
             validateDuplicateName(request.name());
@@ -265,7 +266,8 @@ public class SiteService {
     public Slice<SiteChangeHistoryResponse> getSiteChangeHistories(Long siteId, Pageable pageable) {
         // 해당 현장 존재 여부 확인 (예외 처리)
         siteRepository.findById(siteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
 
         // 현장 변경 이력 조회 (페이지 단위)
         Slice<SiteChangeHistory> historySlice = siteChangeHistoryRepository.findBySiteId(siteId, pageable);

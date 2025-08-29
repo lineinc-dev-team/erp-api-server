@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.sitecontract.SiteContractUpdateRequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;

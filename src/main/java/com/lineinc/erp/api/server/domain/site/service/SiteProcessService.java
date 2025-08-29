@@ -20,8 +20,8 @@ import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryReposi
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteProcessRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteProcessRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.siteprocess.CreateSiteProcessRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;

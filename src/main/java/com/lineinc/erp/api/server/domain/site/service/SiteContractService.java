@@ -5,8 +5,8 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.site.repository.SiteContractRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.sitecontract.CreateSiteContractRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.sitecontract.SiteContractUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteContractRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteContractUpdateRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
