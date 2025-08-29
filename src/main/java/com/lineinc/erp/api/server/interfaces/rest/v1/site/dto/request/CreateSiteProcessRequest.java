@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
 public record CreateSiteProcessRequest(
         @NotBlank @Schema(description = "공정명", example = "기초 공사") String name,
 
-        @MultiConstraint(type = ValidatorType.PHONE_OR_LANDLINE) @Schema(description = "사무실 연락처", example = "02-123-4567") String officePhone,
+        @NotBlank @MultiConstraint(type = ValidatorType.PHONE_OR_LANDLINE) @Schema(description = "사무실 연락처", example = "02-123-4567") String officePhone,
 
         @NotNull @Schema(description = "진행 상태", example = "NOT_STARTED") SiteProcessStatus status,
 
