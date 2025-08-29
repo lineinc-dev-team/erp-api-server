@@ -24,7 +24,7 @@ public record CreateSiteRequest(
 
         @NotBlank @Schema(description = "구", example = "강남구") String district,
 
-        @NotNull @Schema(description = "현장 유형", example = "CONSTRUCTION") SiteType type,
+        @NotNull @Schema(description = "현장 유형", example = "RETAINING_WALL") SiteType type,
 
         @NotNull @Schema(description = "발주처 ID", example = "1") Long clientCompanyId,
 
