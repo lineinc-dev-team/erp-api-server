@@ -86,7 +86,7 @@ public class SiteProcessService {
 
         if (siteId != null) {
             siteProcessesSlice = hasKeyword
-                    ? siteProcessRepository.findBySiteIdAndNameContainingIgnoreCase(siteId, keyword, pageable)
+                    ? siteProcessRepository.findByNameContainingIgnoreCase(keyword, pageable)
                     : siteProcessRepository.findBySiteId(siteId, pageable);
         } else {
             siteProcessesSlice = hasKeyword
