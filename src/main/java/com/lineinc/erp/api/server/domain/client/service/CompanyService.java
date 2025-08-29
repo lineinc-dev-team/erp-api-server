@@ -205,7 +205,7 @@ public class CompanyService {
                 mainContact != null ? mainContact.position() + " / " + mainContact.department() : "";
             case "contactLandlineNumberAndEmail" ->
                 mainContact != null ? mainContact.landlineNumber() + " / " + mainContact.email() : "";
-            case "userName" -> company.user().username();
+            case "userName" -> company.user() != null ? company.user().username() : "";
             case "isActive" -> company.isActive() ? "Y" : "N";
             case "createdAtAndUpdatedAt" ->
                 DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/"

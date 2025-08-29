@@ -162,7 +162,7 @@ public class SiteService {
             case "hasFile" -> siteResponse.hasFile() ? "Y" : "N";
             case "memo" -> siteResponse.memo();
             case "contractAmount" -> String.valueOf(siteResponse.contractAmount());
-            case "managerName" -> siteResponse.manager().username();
+            case "managerName" -> siteResponse.manager() != null ? siteResponse.manager().username() : null;
             default -> null;
         };
     }

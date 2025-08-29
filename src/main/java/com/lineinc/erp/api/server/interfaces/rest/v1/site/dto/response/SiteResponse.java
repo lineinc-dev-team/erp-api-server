@@ -26,7 +26,7 @@ public record SiteResponse(
 
         @Schema(description = "현장 유형", example = "건축") String type,
 
-        @Schema(description = "현장 유형 코드", example = "CONSTRUCTION") SiteType typeCode,
+        @Schema(description = "현장 유형 코드", example = "RETAINING_WALL") SiteType typeCode,
 
         @Schema(description = "사업 시작일", example = "2024-01-01T00:00:00+09:00") OffsetDateTime startedAt,
 
