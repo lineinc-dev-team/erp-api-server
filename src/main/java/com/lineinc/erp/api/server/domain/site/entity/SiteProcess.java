@@ -20,6 +20,11 @@ import java.util.Optional;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "status"),
+        @Index(columnList = "created_at")
+})
 public class SiteProcess extends BaseEntity {
 
     @Id
@@ -30,19 +35,19 @@ public class SiteProcess extends BaseEntity {
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id", nullable = false)
-    private Site site;  // 현장
+    private Site site; // 현장
 
     @DiffInclude
     @Column(nullable = false)
-    private String name;  // 공정명
+    private String name; // 공정명
 
     @DiffInclude
     @Column
-    private String officePhone;  // 사무실 연락처
+    private String officePhone; // 사무실 연락처
 
     @DiffIgnore
     @Column
-    private SiteProcessStatus status;  // 진행 상태
+    private SiteProcessStatus status; // 진행 상태
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,7 +57,7 @@ public class SiteProcess extends BaseEntity {
 
     @DiffInclude
     @Column(columnDefinition = "TEXT")
-    private String memo;  // 비고
+    private String memo; // 비고
 
     @Transient
     @DiffInclude
