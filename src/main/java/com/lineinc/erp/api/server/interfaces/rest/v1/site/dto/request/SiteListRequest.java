@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record SiteListRequest(
         @Schema(description = "현장명", example = "서울 APT 신축공사") String name,
 
-        @Schema(description = "현장 유형", example = "CONSTRUCTION") SiteType type,
+        @Schema(description = "현장 유형", example = "RETAINING_WALL") SiteType type,
 
         @Schema(description = "공정명", example = "기초 공사") String processName,
 
