@@ -21,6 +21,11 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "amount"),
+        @Index(columnList = "created_at")
+})
 public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContractUpdateRequest> {
 
     @Id
