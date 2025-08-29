@@ -22,7 +22,7 @@ public record UpdateSiteRequest(
 
         @Schema(description = "구", example = "강남구") String district,
 
-        @Schema(description = "현장 유형", example = "CONSTRUCTION") SiteType type,
+        @Schema(description = "현장 유형", example = "RETAINING_WALL") SiteType type,
 
         @Schema(description = "발주처 ID", example = "1") Long clientCompanyId,
 
