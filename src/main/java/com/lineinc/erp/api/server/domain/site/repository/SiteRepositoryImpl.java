@@ -72,8 +72,8 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         List<Site> content = queryFactory
                 .selectFrom(site)
                 .leftJoin(site.clientCompany).fetchJoin()
-                .leftJoin(site.processes, siteProcess)
-                .leftJoin(siteProcess.manager)
+                .leftJoin(site.user).fetchJoin()
+                .leftJoin(site.processes, siteProcess).fetchJoin()
                 .distinct()
                 .where(condition)
                 .orderBy(orders)
@@ -110,8 +110,8 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         return queryFactory
                 .selectFrom(site)
                 .leftJoin(site.clientCompany).fetchJoin()
+                .leftJoin(site.user).fetchJoin()
                 .leftJoin(site.processes, siteProcess).fetchJoin()
-                .leftJoin(siteProcess.manager)
                 .distinct()
                 .where(condition)
                 .orderBy(orders)
