@@ -16,6 +16,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
@@ -84,6 +85,7 @@ public class Site extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @DiffIgnore
     @JoinColumn(name = "user_id")
+    @Where(clause = "deleted = false")
     private User user; // 본사 담당자
 
     @DiffInclude
@@ -93,11 +95,13 @@ public class Site extends BaseEntity {
     @Builder.Default
     @DiffIgnore
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Where(clause = "deleted = false")
     private List<SiteContract> contracts = new ArrayList<>();
 
     @Builder.Default
     @DiffIgnore
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Where(clause = "deleted = false")
     private List<SiteProcess> processes = new ArrayList<>();
 
     @DiffInclude
