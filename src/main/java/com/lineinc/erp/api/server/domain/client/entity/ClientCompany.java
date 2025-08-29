@@ -87,7 +87,7 @@ public class ClientCompany extends BaseEntity {
 
     @Setter
     @DiffIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user; // 본사 담당자
 
