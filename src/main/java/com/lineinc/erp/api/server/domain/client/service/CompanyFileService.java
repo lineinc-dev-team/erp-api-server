@@ -57,6 +57,7 @@ public class CompanyFileService {
                 requests,
                 (ClientCompanyFileUpdateRequest dto) -> ClientCompanyFile.builder()
                         .name(dto.name())
+                        .type(dto.type())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
