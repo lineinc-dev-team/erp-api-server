@@ -73,6 +73,22 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getFiles().stream()
                         .map(ClientCompanyFileResponse::from)
                         .collect(Collectors.toList()),
-                clientCompany.getUser() != null ? UserResponse.UserSimpleResponse.from(clientCompany.getUser()) : null);
+                getUserSafely(clientCompany));
+    }
+
+    /**
+     * user를 안전하게 가져오는 메서드
+     */
+    private static UserResponse.UserSimpleResponse getUserSafely(ClientCompany clientCompany) {
+        try {
+            if (clientCompany.getUser() != null) {
+                return clientCompany.getUser().getDeletedAt() == null
+                        ? UserResponse.UserSimpleResponse.from(clientCompany.getUser())
+                        : null;
+            }
+        } catch (Exception e) {
+            // 에러 발생 시 null 반환
+        }
+        return null;
     }
 }
