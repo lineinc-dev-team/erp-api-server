@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lineinc.erp.api.server.domain.client.enums.FileType;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
@@ -30,6 +31,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCo
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyFileTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyPaymentMethodResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -180,6 +182,15 @@ public class ClientCompanyController {
         List<ClientCompanyPaymentMethodResponse> responseList = Arrays.stream(PaymentMethod.values())
                 .map(pm -> new ClientCompanyPaymentMethodResponse(
                         pm.name(), pm.getDisplayName()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
+    @Operation(summary = "발주처 파일 타입 목록 조회", description = "발주처 파일 타입 목록을 반환합니다")
+    @GetMapping("/file-types")
+    public ResponseEntity<SuccessResponse<List<ClientCompanyFileTypeResponse>>> getFileTypes() {
+        List<ClientCompanyFileTypeResponse> responseList = Arrays.stream(FileType.values())
+                .map(ClientCompanyFileTypeResponse::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
