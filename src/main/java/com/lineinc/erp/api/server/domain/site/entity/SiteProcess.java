@@ -50,7 +50,7 @@ public class SiteProcess extends BaseEntity {
     private SiteProcessStatus status; // 진행 상태
 
     @DiffIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn
     @Setter
     private User manager;

@@ -70,27 +70,13 @@ public record SiteResponse(
                 site.getProcesses() != null && !site.getProcesses().isEmpty()
                         ? SiteProcessResponse.from(site.getProcesses().get(0))
                         : null,
-                getManagerSafely(site),
+                site.getProcesses() != null && !site.getProcesses().isEmpty()
+                        && site.getProcesses().get(0).getManager() != null
+                                ? UserResponse.UserSimpleResponse.from(site.getProcesses().get(0).getManager())
+                                : null,
                 site.getClientCompany() != null
                         ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany())
                         : null);
-    }
-
-    /**
-     * manager를 안전하게 가져오는 메서드
-     */
-    private static UserResponse.UserSimpleResponse getManagerSafely(Site site) {
-        try {
-            if (site.getProcesses() != null && !site.getProcesses().isEmpty()
-                    && site.getProcesses().get(0).getManager() != null) {
-                return site.getProcesses().get(0).getManager().getDeletedAt() == null
-                        ? UserResponse.UserSimpleResponse.from(site.getProcesses().get(0).getManager())
-                        : null;
-            }
-        } catch (Exception e) {
-            // 에러 발생 시 null 반환
-        }
-        return null;
     }
 
     @Schema(description = "간단한 현장 응답")
