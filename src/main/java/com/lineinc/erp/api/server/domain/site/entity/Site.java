@@ -25,7 +25,10 @@ import java.util.List;
 
 @Table(indexes = {
         @Index(columnList = "city"),
-        @Index(columnList = "district")
+        @Index(columnList = "district"),
+        @Index(columnList = "type"),
+        @Index(columnList = "started_at"),
+        @Index(columnList = "ended_at")
 })
 @Entity
 @Getter
