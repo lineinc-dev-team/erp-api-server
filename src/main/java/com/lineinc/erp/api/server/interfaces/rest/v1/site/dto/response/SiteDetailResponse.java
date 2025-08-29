@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response;
 
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse.UserSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
 
@@ -81,41 +82,12 @@ public record SiteDetailResponse(
                 site.getClientCompany() != null
                         ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany())
                         : null,
-                getUserSafely(site),
-                getManagerSafely(site, hasAccess),
+                site.getUser() != null ? UserResponse.UserSimpleResponse.from(site.getUser()) : null,
+                site.getProcesses() != null && !site.getProcesses().isEmpty()
+                        && site.getProcesses().get(0).getManager() != null
+                                ? UserResponse.UserSimpleResponse.from(site.getProcesses().get(0).getManager())
+                                : null,
                 contractResponses);
     }
 
-    /**
-     * user를 안전하게 가져오는 메서드
-     */
-    private static UserSimpleResponse getUserSafely(Site site) {
-        try {
-            if (site.getUser() != null) {
-                return site.getUser().getDeletedAt() == null
-                        ? UserSimpleResponse.from(site.getUser())
-                        : null;
-            }
-        } catch (Exception e) {
-            // 에러 발생 시 null 반환
-        }
-        return null;
-    }
-
-    /**
-     * manager를 안전하게 가져오는 메서드
-     */
-    private static UserSimpleResponse getManagerSafely(Site site, boolean hasAccess) {
-        try {
-            if (hasAccess && site.getProcesses() != null && !site.getProcesses().isEmpty()
-                    && site.getProcesses().get(0).getManager() != null) {
-                return site.getProcesses().get(0).getManager().getDeletedAt() == null
-                        ? UserSimpleResponse.from(site.getProcesses().get(0).getManager())
-                        : null;
-            }
-        } catch (Exception e) {
-            // 에러 발생 시 null 반환
-        }
-        return null;
-    }
 }

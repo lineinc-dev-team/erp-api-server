@@ -82,10 +82,9 @@ public class Site extends BaseEntity {
     @Column
     private OffsetDateTime endedAt; // 사업 종료일
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @DiffIgnore
     @JoinColumn(name = "user_id")
-    @Where(clause = "deleted = false")
     private User user; // 본사 담당자
 
     @DiffInclude
@@ -95,13 +94,11 @@ public class Site extends BaseEntity {
     @Builder.Default
     @DiffIgnore
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Where(clause = "deleted = false")
     private List<SiteContract> contracts = new ArrayList<>();
 
     @Builder.Default
     @DiffIgnore
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Where(clause = "deleted = false")
     private List<SiteProcess> processes = new ArrayList<>();
 
     @DiffInclude
