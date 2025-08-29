@@ -176,12 +176,12 @@ public class CompanyService {
             case "landlineNumber" -> "전화번호";
             case "contactName" -> "담당자명";
             case "contactPositionAndDepartment" -> "직급/부서";
-            case "contactLandlineNumberAndEmail" -> "담당자 전화번호/이메일";
-            case "userName" -> "본사담당자";
+            case "contactLandlineNumberAndEmail" -> "담당자 연락처/이메일";
+            case "userName" -> "본사 담당자";
             case "isActive" -> "사용여부";
             case "createdAtAndUpdatedAt" -> "등록일/수정일";
             case "hasFile" -> "첨부파일 유무";
-            case "memo" -> "비고/메모";
+            case "memo" -> "비고";
             default -> null;
         };
     }
