@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.changehistory;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;

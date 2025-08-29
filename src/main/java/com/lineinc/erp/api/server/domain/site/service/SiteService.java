@@ -6,9 +6,9 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSite
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.changehistory.SiteChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;

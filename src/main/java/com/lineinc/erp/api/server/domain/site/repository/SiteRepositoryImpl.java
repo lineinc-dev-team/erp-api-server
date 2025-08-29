@@ -18,7 +18,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;

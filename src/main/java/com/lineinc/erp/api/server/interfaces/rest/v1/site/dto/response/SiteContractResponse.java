@@ -1,7 +1,6 @@
-package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.sitecontract;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response;
 
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.sitefile.SiteFileResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

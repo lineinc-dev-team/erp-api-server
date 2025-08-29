@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess.SiteProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -30,11 +30,11 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.DeleteSite
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.changehistory.SiteChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.site.SiteTypeResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.sitefile.SiteFileTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteFileTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;

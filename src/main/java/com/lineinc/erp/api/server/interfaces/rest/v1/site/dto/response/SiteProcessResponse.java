@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.siteprocess;
+package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response;
 
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
