@@ -60,7 +60,7 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFile
     /**
      * 업로드된 파일의 원본 파일명
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String originalFileName;
 
