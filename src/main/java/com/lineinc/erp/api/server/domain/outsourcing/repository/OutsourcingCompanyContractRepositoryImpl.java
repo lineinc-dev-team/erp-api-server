@@ -26,6 +26,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.JPAExpressions;
 
 import lombok.RequiredArgsConstructor;
 
@@ -60,15 +61,16 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
         // 검색 조건을 동적으로 구성
         BooleanBuilder whereClause = buildSearchCondition(searchRequest);
 
-        // 기본 쿼리 구성
+        // 기본 쿼리 구성 - files만 fetch join (MultipleBagFetchException 회피), contacts는 배치 페치
+        // 사용
         JPAQuery<OutsourcingCompanyContract> query = queryFactory
                 .selectFrom(outsourcingCompanyContract)
-                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
-                .leftJoin(outsourcingCompanyContract.site, site)
-                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
-                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
+                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany).fetchJoin()
+                .leftJoin(outsourcingCompanyContract.site, site).fetchJoin()
+                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(outsourcingCompanyContract.files).fetchJoin()
                 .where(whereClause)
-                .distinct();
+                .distinct(); // files fetch join으로 인한 중복 제거
 
         // 정렬 적용
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
@@ -81,18 +83,17 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
                 .fetch();
 
         // 전체 개수 조회
-        long total = queryFactory
-                .selectFrom(outsourcingCompanyContract)
+        // count 쿼리는 전량 fetch 후 size 계산 대신 count 사용
+        Long total = queryFactory
+                .select(outsourcingCompanyContract.id.count())
+                .from(outsourcingCompanyContract)
                 .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
                 .leftJoin(outsourcingCompanyContract.site, site)
                 .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
-                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
                 .where(whereClause)
-                .distinct()
-                .fetch()
-                .size();
+                .fetchOne();
 
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
     @Override
@@ -106,13 +107,13 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
         // 기본 쿼리 구성
         return queryFactory
                 .selectFrom(outsourcingCompanyContract)
-                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
-                .leftJoin(outsourcingCompanyContract.site, site)
-                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess)
-                .leftJoin(outsourcingCompanyContract.contacts, outsourcingCompanyContractContact)
+                .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany).fetchJoin()
+                .leftJoin(outsourcingCompanyContract.site, site).fetchJoin()
+                .leftJoin(outsourcingCompanyContract.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(outsourcingCompanyContract.files).fetchJoin()
                 .where(whereClause)
                 .orderBy(orders)
-                .distinct()
+                .distinct() // files fetch join으로 인한 중복 제거
                 .fetch();
     }
 
@@ -165,10 +166,18 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
             whereClause.and(outsourcingCompanyContract.contractEndDate.lt(dateRange[1]));
         }
 
-        // 담당자명 검색 (부분 일치)
+        // 담당자명 검색 (부분 일치) - exists 서브쿼리로 다대일 중복/distinct 제거 및 페이징 성능 개선
         if (searchRequest.contactName() != null && !searchRequest.contactName().trim().isEmpty()) {
-            whereClause
-                    .and(outsourcingCompanyContractContact.name.containsIgnoreCase(searchRequest.contactName().trim()));
+            whereClause.and(
+                    JPAExpressions
+                            .selectOne()
+                            .from(outsourcingCompanyContractContact)
+                            .where(
+                                    outsourcingCompanyContractContact.outsourcingCompanyContract
+                                            .eq(outsourcingCompanyContract)
+                                            .and(outsourcingCompanyContractContact.name
+                                                    .containsIgnoreCase(searchRequest.contactName().trim())))
+                            .exists());
         }
 
         return whereClause;
