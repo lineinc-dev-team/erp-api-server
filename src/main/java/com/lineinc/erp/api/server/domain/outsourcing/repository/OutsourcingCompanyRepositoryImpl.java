@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyContact;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyFile;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -37,7 +36,6 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
     private final JPAQueryFactory queryFactory;
     private final QOutsourcingCompany outsourcingCompany = QOutsourcingCompany.outsourcingCompany;
     private final QOutsourcingCompanyContact outsourcingCompanyContact = QOutsourcingCompanyContact.outsourcingCompanyContact;
-    private final QOutsourcingCompanyFile outsourcingCompanyFile = QOutsourcingCompanyFile.outsourcingCompanyFile;
 
     // 정렬 필드를 미리 정의하여 정적 매핑. 추후 정렬 기준이 늘어나면 여기에 추가.
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
@@ -107,6 +105,9 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
      */
     private BooleanBuilder buildCondition(OutsourcingCompanyListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        // 삭제되지 않은 데이터만 조회
+        builder.and(outsourcingCompany.deleted.eq(false));
 
         if (StringUtils.hasText(request.name())) {
             builder.and(outsourcingCompany.name.containsIgnoreCase(request.name().trim()));
