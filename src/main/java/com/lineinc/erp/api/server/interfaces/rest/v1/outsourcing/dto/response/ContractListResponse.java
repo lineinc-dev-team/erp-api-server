@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractFileType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -58,7 +59,8 @@ public record ContractListResponse(
 
         @Schema(description = "수정일") OffsetDateTime updatedAt,
 
-        @Schema(description = "파일 첨부 여부") Boolean hasFile) {
+        @Schema(description = "보증서 첨부 여부") Boolean hasGuaranteeCertificate,
+        @Schema(description = "계약서 첨부 여부") Boolean hasContractCertificate) {
 
     public static ContractListResponse from(OutsourcingCompanyContract contract) {
         // 담당자 목록 생성
@@ -77,9 +79,6 @@ public record ContractListResponse(
                     .map(OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
                     .collect(java.util.stream.Collectors.joining(","));
         }
-
-        // 파일 첨부 여부 확인
-        Boolean hasFile = contract.getFiles() != null && !contract.getFiles().isEmpty();
 
         return new ContractListResponse(
                 contract.getId(),
@@ -108,6 +107,11 @@ public record ContractListResponse(
                 contract.getContractEndDate(),
                 contract.getCreatedAt(),
                 contract.getUpdatedAt(),
-                hasFile);
+                contract.getFiles().stream()
+                        .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().isBlank()
+                                && file.getType() == OutsourcingCompanyContractFileType.GUARANTEE),
+                contract.getFiles().stream()
+                        .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().isBlank()
+                                && file.getType() == OutsourcingCompanyContractFileType.CONTRACT));
     }
 }

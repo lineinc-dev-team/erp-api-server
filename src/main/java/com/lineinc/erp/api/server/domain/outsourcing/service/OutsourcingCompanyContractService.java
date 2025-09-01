@@ -442,7 +442,8 @@ public class OutsourcingCompanyContractService {
             case "createdAt" -> "작성일자";
             case "contractStatus" -> "상태";
             case "memo" -> "비고";
-            case "hasFile" -> "첨부파일";
+            case "hasGuaranteeCertificate" -> "보증서 여부";
+            case "hasContractCertificate" -> "계약서 여부";
             default -> null;
         };
     }
@@ -477,7 +478,8 @@ public class OutsourcingCompanyContractService {
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(contract.createdAt());
             case "contractStatus" -> contract.contractStatus();
             case "memo" -> contract.memo();
-            case "hasFile" -> contract.hasFile() ? "Y" : "N";
+            case "hasGuaranteeCertificate" -> contract.hasGuaranteeCertificate() ? "Y" : "N";
+            case "hasContractCertificate" -> contract.hasContractCertificate() ? "Y" : "N";
             default -> null;
         };
     }
