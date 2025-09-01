@@ -29,9 +29,9 @@ public class OutsourcingCompanyContactService {
     @Transactional
     public void createOutsourcingCompanyContacts(
             OutsourcingCompany outsourcingCompany,
-            List<OutsourcingCompanyContactCreateRequest> requests
-    ) {
-        if (requests == null || requests.isEmpty()) return;
+            List<OutsourcingCompanyContactCreateRequest> requests) {
+        if (requests == null || requests.isEmpty())
+            return;
 
         long mainCount = requests.stream().filter(OutsourcingCompanyContactCreateRequest::isMain).count();
         if (mainCount != 1) {
@@ -55,9 +55,9 @@ public class OutsourcingCompanyContactService {
         outsourcingCompany.getContacts().addAll(contacts);
     }
 
-
     @Transactional
-    public void updateOutsourcingCompanyContacts(OutsourcingCompany company, List<OutsourcingCompanyContactUpdateRequest> requests) {
+    public void updateOutsourcingCompanyContacts(OutsourcingCompany company,
+            List<OutsourcingCompanyContactUpdateRequest> requests) {
         if (requests != null && !requests.isEmpty()) {
             long mainCount = requests.stream().filter(OutsourcingCompanyContactUpdateRequest::isMain).count();
             if (mainCount != 1) {
@@ -82,8 +82,7 @@ public class OutsourcingCompanyContactService {
                         .email(dto.email())
                         .memo(dto.memo())
                         .outsourcingCompany(company)
-                        .build()
-        );
+                        .build());
 
         List<OutsourcingCompanyContact> afterContacts = new ArrayList<>(company.getContacts());
         List<Map<String, String>> allChanges = new ArrayList<>();
@@ -104,7 +103,8 @@ public class OutsourcingCompanyContactService {
                 .collect(Collectors.toMap(OutsourcingCompanyContact::getId, c -> c));
 
         for (OutsourcingCompanyContact before : beforeContacts) {
-            if (before.getId() == null || !afterMap.containsKey(before.getId())) continue;
+            if (before.getId() == null || !afterMap.containsKey(before.getId()))
+                continue;
             OutsourcingCompanyContact after = afterMap.get(before.getId());
             Diff diff = javers.compare(before, after);
             List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
@@ -122,4 +122,3 @@ public class OutsourcingCompanyContactService {
         }
     }
 }
-
