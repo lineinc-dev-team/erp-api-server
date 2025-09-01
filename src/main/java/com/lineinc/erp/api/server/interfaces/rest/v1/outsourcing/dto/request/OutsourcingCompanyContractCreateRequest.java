@@ -22,7 +22,7 @@ public record OutsourcingCompanyContractCreateRequest(
 
         @Schema(description = "계약 구분", example = "SERVICE") @NotNull OutsourcingCompanyContractType type,
 
-        @Schema(description = "계약 유형 설명", example = "설비 설치 계약") @NotNull String typeDescription,
+        @Schema(description = "계약 유형 설명", example = "설비 설치 계약") String typeDescription,
 
         @Schema(description = "계약 시작일", example = "2025-01-01") @NotNull LocalDate contractStartDate,
 
@@ -32,7 +32,7 @@ public record OutsourcingCompanyContractCreateRequest(
 
         @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FOUR_INSURANCES,MEAL_COST") @NotNull String defaultDeductionsType,
 
-        @Schema(description = "기본 공제 항목 설명", example = "4대 보험 및 연료비") @NotNull String defaultDeductionsDescription,
+        @Schema(description = "기본 공제 항목 설명", example = "4대 보험 및 연료비") String defaultDeductionsDescription,
 
         @Schema(description = "세금계산서 발행조건", example = "MONTH_END") @NotNull OutsourcingCompanyTaxInvoiceConditionType taxInvoiceCondition,
 
