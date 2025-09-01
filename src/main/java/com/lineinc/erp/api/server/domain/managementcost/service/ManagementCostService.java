@@ -136,7 +136,6 @@ public class ManagementCostService {
                 OutsourcingCompanyUpdateRequest updateRequest = new OutsourcingCompanyUpdateRequest(
                         outsourcingCompanyInfo.name(),
                         outsourcingCompanyInfo.businessNumber(),
-                        null, // type
                         null, // typeDescription
                         outsourcingCompanyInfo.ceoName(),
                         null, // address
