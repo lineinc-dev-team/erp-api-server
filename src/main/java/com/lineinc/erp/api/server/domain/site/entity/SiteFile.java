@@ -54,7 +54,6 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFile
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
-    @DiffInclude
     @Column
     private String fileUrl; // S3 경로
 
