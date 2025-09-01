@@ -161,7 +161,7 @@ public class SiteService {
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(siteResponse.createdAt());
             case "hasFile" -> siteResponse.hasFile() ? "Y" : "N";
             case "memo" -> siteResponse.memo();
-            case "contractAmount" -> String.valueOf(siteResponse.contractAmount());
+            case "contractAmount" -> String.format("%,d", siteResponse.contractAmount());
             case "managerName" -> siteResponse.manager() != null ? siteResponse.manager().username() : null;
             default -> null;
         };
