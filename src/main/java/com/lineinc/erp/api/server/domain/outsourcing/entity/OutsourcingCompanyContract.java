@@ -30,10 +30,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -48,6 +50,14 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
+@Table(indexes = {
+        @Index(columnList = "status"),
+        @Index(columnList = "type"),
+        @Index(columnList = "category"),
+        @Index(columnList = "contract_start_date"),
+        @Index(columnList = "contract_end_date"),
+        @Index(columnList = "created_at")
+})
 public class OutsourcingCompanyContract extends BaseEntity {
 
     @Id
