@@ -16,9 +16,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +33,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "original_file_name"),
+        @Index(columnList = "created_at")
+})
 public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<OutsourcingCompanyFileUpdateRequest> {
 
     @Id
@@ -56,7 +63,7 @@ public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String fileUrl; // S3 경로
 

@@ -16,7 +16,14 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class OutsourcingCompanyContact extends BaseEntity implements UpdatableFrom<OutsourcingCompanyContactUpdateRequest> {
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "email"),
+        @Index(columnList = "phone_number"),
+        @Index(columnList = "created_at"),
+})
+public class OutsourcingCompanyContact extends BaseEntity
+        implements UpdatableFrom<OutsourcingCompanyContactUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contact_seq")

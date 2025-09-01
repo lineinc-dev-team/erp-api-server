@@ -23,6 +23,13 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "business_number"),
+        @Index(columnList = "type"),
+        @Index(columnList = "landline_number"),
+        @Index(columnList = "created_at"),
+})
 public class OutsourcingCompany extends BaseEntity {
 
     @Id
