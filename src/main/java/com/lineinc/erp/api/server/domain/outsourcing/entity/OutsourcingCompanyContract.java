@@ -66,17 +66,17 @@ public class OutsourcingCompanyContract extends BaseEntity {
     private Long id;
 
     @DiffIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "site_id")
     private Site site;
 
     @DiffIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
 
     @DiffIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "outsourcing_company_id")
     private OutsourcingCompany outsourcingCompany;
 
