@@ -18,6 +18,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -98,6 +99,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex) {
         log.warn("IllegalStateException: {}", ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.warn("MethodArgumentTypeMismatchException: {} - {}", ex.getName(), ex.getValue(), ex);
+
+        String message;
+        if (ex.getValue() != null && "NaN".equals(ex.getValue().toString())) {
+            message = "잘못된 숫자 형식입니다. 숫자를 입력해주세요.";
+        } else {
+            message = String.format("파라미터 '%s'의 값 '%s'을(를) 올바른 형식으로 변환할 수 없습니다.",
+                    ex.getName(), ex.getValue());
+        }
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, message, List.of());
     }
 
     // 3. 미디어 타입 관련
