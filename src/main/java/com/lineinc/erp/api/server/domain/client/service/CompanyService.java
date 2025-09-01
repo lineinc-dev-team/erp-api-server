@@ -204,7 +204,7 @@ public class CompanyService {
             case "contactPositionAndDepartment" ->
                 mainContact != null ? mainContact.position() + " / " + mainContact.department() : "";
             case "contactLandlineNumberAndEmail" ->
-                mainContact != null ? mainContact.landlineNumber() + " / " + mainContact.email() : "";
+                mainContact != null ? mainContact.phoneNumber() + " / " + mainContact.email() : "";
             case "userName" -> company.user() != null ? company.user().username() : "";
             case "isActive" -> company.isActive() ? "Y" : "N";
             case "createdAtAndUpdatedAt" ->
