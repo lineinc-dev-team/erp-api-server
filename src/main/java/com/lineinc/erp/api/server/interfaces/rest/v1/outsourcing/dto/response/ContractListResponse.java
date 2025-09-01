@@ -86,7 +86,7 @@ public record ContractListResponse(
                 contract.getSiteProcess() != null ? contract.getSiteProcess().getName() : null,
                 contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getName()
                         : null,
-                contract.getOutsourcingCompany().getBusinessNumber(),
+                contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getBusinessNumber() : null,
                 contract.getType() != null ? contract.getType().getLabel() : null,
                 contract.getType() != null ? contract.getType().name() : null,
                 contract.getTypeDescription(),

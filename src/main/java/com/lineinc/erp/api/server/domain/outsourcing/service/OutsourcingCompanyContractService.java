@@ -478,8 +478,6 @@ public class OutsourcingCompanyContractService {
             case "createdAt" -> DateTimeFormatUtils.formatKoreaLocalDate(contract.createdAt());
             case "contractStatus" -> contract.contractStatus();
             case "memo" -> contract.memo();
-            case "hasGuaranteeCertificate" -> contract.hasGuaranteeCertificate() ? "Y" : "N";
-            case "hasContractCertificate" -> contract.hasContractCertificate() ? "Y" : "N";
             default -> null;
         };
     }
