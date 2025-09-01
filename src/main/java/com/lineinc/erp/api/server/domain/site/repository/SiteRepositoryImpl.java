@@ -127,6 +127,9 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
     private BooleanBuilder buildCondition(SiteListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
 
+        // 삭제되지 않은 데이터만 조회
+        builder.and(site.deleted.eq(false));
+
         if (StringUtils.hasText(request.name())) {
             builder.and(site.name.containsIgnoreCase(request.name().trim()));
         }

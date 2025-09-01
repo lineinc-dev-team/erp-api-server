@@ -13,7 +13,6 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTyp
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
@@ -22,7 +21,6 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 @Table(indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "business_number"),

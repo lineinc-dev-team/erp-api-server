@@ -35,7 +35,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class Site extends BaseEntity {
 
     @Id
