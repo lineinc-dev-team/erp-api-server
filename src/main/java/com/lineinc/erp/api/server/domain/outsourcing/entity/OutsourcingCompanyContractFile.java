@@ -5,10 +5,13 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanContractFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -68,6 +71,14 @@ public class OutsourcingCompanyContractFile extends BaseEntity {
     private String memo; // 비고 / 메모
 
     /**
+     * 파일 타입 (계약서, 견적서, 기타 등)
+     */
+    @Enumerated(EnumType.STRING)
+    @DiffIgnore
+    @Column
+    private OutsourcingCompanContractFileType type;
+
+    /**
      * DTO의 정보로 엔티티를 업데이트합니다.
      */
     public void updateFrom(OutsourcingCompanyContractFileUpdateRequest request) {
@@ -82,6 +93,9 @@ public class OutsourcingCompanyContractFile extends BaseEntity {
         }
         if (request.memo() != null) {
             this.memo = request.memo();
+        }
+        if (request.type() != null) {
+            this.type = OutsourcingCompanContractFileType.valueOf(request.type());
         }
     }
 }
