@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.client.entity;
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.client.enums.FileType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
@@ -54,6 +55,7 @@ public class ClientCompanyFile extends BaseEntity {
     /**
      * 문서명 (사용자가 지정하는 파일 이름)
      */
+    @DiffInclude
     @Column(nullable = false)
     private String name;
 
@@ -66,6 +68,7 @@ public class ClientCompanyFile extends BaseEntity {
     /**
      * 업로드된 파일의 원본 파일명
      */
+    @DiffInclude
     @Column
     private String originalFileName;
 
