@@ -137,13 +137,20 @@ public class SiteContractService {
 
         // 7. 변경된 이력이 있다면 SiteChangeHistory 엔티티로 저장
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            SiteChangeHistory changeHistory = SiteChangeHistory.builder()
-                    .site(site)
-                    .type(SiteChangeType.CONTRACT)
-                    .changes(json)
-                    .build();
-            siteChangeHistoryRepository.save(changeHistory);
+            // property가 "id"인 변경사항 제외
+            List<Map<String, String>> filteredChanges = allChanges.stream()
+                    .filter(change -> !"id".equals(change.get("property")))
+                    .toList();
+
+            if (!filteredChanges.isEmpty()) {
+                String json = javers.getJsonConverter().toJson(filteredChanges);
+                SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+                        .site(site)
+                        .type(SiteChangeType.CONTRACT)
+                        .changes(json)
+                        .build();
+                siteChangeHistoryRepository.save(changeHistory);
+            }
         }
     }
 }
