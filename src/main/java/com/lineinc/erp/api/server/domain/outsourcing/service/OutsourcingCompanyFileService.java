@@ -34,9 +34,9 @@ public class OutsourcingCompanyFileService {
     @Transactional
     public void createOutsourcingCompanyFiles(
             OutsourcingCompany outsourcingCompany,
-            List<OutsourcingCompanyFileCreateRequest> requests
-    ) {
-        if (requests == null || requests.isEmpty()) return;
+            List<OutsourcingCompanyFileCreateRequest> requests) {
+        if (requests == null || requests.isEmpty())
+            return;
 
         List<OutsourcingCompanyFile> files = requests.stream()
                 .map(req -> OutsourcingCompanyFile.builder()
@@ -44,6 +44,7 @@ public class OutsourcingCompanyFileService {
                         .name(req.name())
                         .fileUrl(req.fileUrl())
                         .originalFileName(req.originalFileName())
+                        .type(req.type())
                         .memo(req.memo())
                         .build())
                 .collect(Collectors.toList());
@@ -54,8 +55,7 @@ public class OutsourcingCompanyFileService {
     @Transactional
     public void updateOutsourcingCompanyFiles(
             OutsourcingCompany company,
-            List<OutsourcingCompanyFileUpdateRequest> requests
-    ) {
+            List<OutsourcingCompanyFileUpdateRequest> requests) {
         List<OutsourcingCompanyFile> beforeFiles = company.getFiles().stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, OutsourcingCompanyFile.class))
                 .toList();
@@ -69,8 +69,7 @@ public class OutsourcingCompanyFileService {
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
-                        .build()
-        );
+                        .build());
 
         List<OutsourcingCompanyFile> afterFiles = new ArrayList<>(company.getFiles());
         List<Map<String, String>> allChanges = new ArrayList<>();
@@ -91,7 +90,8 @@ public class OutsourcingCompanyFileService {
                 .collect(Collectors.toMap(OutsourcingCompanyFile::getId, f -> f));
 
         for (OutsourcingCompanyFile before : beforeFiles) {
-            if (before.getId() == null || !afterMap.containsKey(before.getId())) continue;
+            if (before.getId() == null || !afterMap.containsKey(before.getId()))
+                continue;
             OutsourcingCompanyFile after = afterMap.get(before.getId());
             Diff diff = javers.compare(before, after);
             List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);

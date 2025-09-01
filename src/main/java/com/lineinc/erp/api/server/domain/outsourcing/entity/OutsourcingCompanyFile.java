@@ -8,10 +8,13 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,6 +39,7 @@ import lombok.experimental.SuperBuilder;
 @Table(indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "original_file_name"),
+        @Index(columnList = "type"),
         @Index(columnList = "created_at")
 })
 public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<OutsourcingCompanyFileUpdateRequest> {
@@ -61,6 +65,14 @@ public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<
     private String name;
 
     /**
+     * 파일 타입
+     */
+    @DiffIgnore
+    @Enumerated(EnumType.STRING)
+    @Column
+    private OutsourcingCompanyFileType type;
+
+    /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @DiffIgnore
@@ -84,6 +96,7 @@ public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<
     @Override
     public void updateFrom(OutsourcingCompanyFileUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
         Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
