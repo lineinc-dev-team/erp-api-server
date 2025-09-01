@@ -464,7 +464,8 @@ public class OutsourcingCompanyContractService {
                 String endDate = DateTimeFormatUtils.formatKoreaLocalDate(contract.contractEndDate());
                 yield startDate + " ~ " + endDate;
             }
-            case "contractAmount" -> contract.contractAmount() != null ? String.valueOf(contract.contractAmount()) : "";
+            case "contractAmount" ->
+                contract.contractAmount() != null ? String.format("%,d", contract.contractAmount()) : "";
             case "defaultDeductions" -> contract.defaultDeductions();
             case "taxInvoiceCondition" -> contract.taxInvoiceCondition();
             case "contactName" -> {
