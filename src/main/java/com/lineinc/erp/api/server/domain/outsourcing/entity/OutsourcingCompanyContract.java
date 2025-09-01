@@ -48,7 +48,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 @Table(indexes = {
         @Index(columnList = "status"),
         @Index(columnList = "type"),

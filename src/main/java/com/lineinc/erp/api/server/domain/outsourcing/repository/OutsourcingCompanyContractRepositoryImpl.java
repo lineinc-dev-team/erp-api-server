@@ -123,6 +123,9 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
     private BooleanBuilder buildSearchCondition(ContractListSearchRequest searchRequest) {
         BooleanBuilder whereClause = new BooleanBuilder();
 
+        // 삭제되지 않은 데이터만 조회
+        whereClause.and(outsourcingCompanyContract.deleted.eq(false));
+
         // 현장명 검색 (부분 일치)
         if (searchRequest.siteName() != null && !searchRequest.siteName().trim().isEmpty()) {
             whereClause.and(site.name.containsIgnoreCase(searchRequest.siteName().trim()));
