@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum OutsourcingCompanyType {
     SERVICE("용역"),
     EQUIPMENT("장비"),
-    CATERING("식당"),
+    CONSTRUCTION("공사"),
     ETC("기타");
 
     private final String label;
