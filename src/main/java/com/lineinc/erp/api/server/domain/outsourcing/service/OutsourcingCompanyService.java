@@ -62,7 +62,6 @@ public class OutsourcingCompanyService {
                 .address(request.address())
                 .detailAddress(request.detailAddress())
                 .landlineNumber(request.landlineNumber())
-                .phoneNumber(request.phoneNumber())
                 .email(request.email())
                 .defaultDeductions(request.defaultDeductions())
                 .defaultDeductionsDescription(request.defaultDeductionsDescription())

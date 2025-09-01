@@ -18,7 +18,7 @@ public record OutsourcingCompanyCreateRequest(
 
         @Schema(description = "외주업체 구분", example = "EQUIPMENT") @NotNull OutsourcingCompanyType type,
 
-        @Schema(description = "구분 설명", example = "직접 시공 업체") @NotBlank String typeDescription,
+        @Schema(description = "구분 설명", example = "직접 시공 업체") String typeDescription,
 
         @Schema(description = "대표자명", example = "김대표") @NotBlank String ceoName,
 
@@ -28,13 +28,11 @@ public record OutsourcingCompanyCreateRequest(
 
         @Schema(description = "전화번호", example = "02-123-4567") @NotBlank String landlineNumber,
 
-        @Schema(description = "개인 휴대폰", example = "010-1234-5678") @NotBlank String phoneNumber,
-
         @Schema(description = "이메일", example = "ceo@outsourcing.com") @NotBlank @Email String email,
 
         @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FUEL_COST,FOUR_INSURANCES") @NotBlank String defaultDeductions,
 
-        @Schema(description = "기본 공제 항목 설명", example = "3.3% 원천징수") @NotBlank String defaultDeductionsDescription,
+        @Schema(description = "기본 공제 항목 설명", example = "3.3% 원천징수") String defaultDeductionsDescription,
 
         @Schema(description = "은행명", example = "국민은행") @NotBlank String bankName,
 
