@@ -77,7 +77,8 @@ public record CompanyResponse(
                 company.getMemo(),
                 company.getCreatedAt(),
                 company.getUpdatedAt(),
-                !company.getFiles().isEmpty(),
+                company.getFiles().stream()
+                        .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().isBlank()),
                 company.getContacts().stream()
                         .map(CompanyContactResponse::from)
                         .toList());
