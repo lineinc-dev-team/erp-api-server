@@ -41,7 +41,7 @@ import lombok.experimental.SuperBuilder;
 public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFileRequest> {
 
     @Id
-    @DiffInclude
+    @DiffIgnore
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_file_seq")
     @SequenceGenerator(name = "site_file_seq", sequenceName = "site_file_seq", allocationSize = 1)
     private Long id;
