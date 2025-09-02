@@ -1,9 +1,5 @@
 # 개발 환경 설정
 spring:
-  # 애플리케이션 종료 시 각 단계별 최대 대기 시간 (10초)
-  lifecycle:
-    timeout-per-shutdown-phase: 10s
-
   # 세션 관리 설정
   session:
     jdbc:
@@ -40,10 +36,6 @@ spring:
         default_batch_fetch_size: 200  # 엔티티 컬렉션 페치(batch fetch) 크기
         format_sql: true               # SQL을 보기 좋게 포맷팅
     open-in-view: false  # 지연 로딩 문제 방지를 위해 Open Session in View 비활성화
-
-# 서버 설정
-server:
-  shutdown: graceful  # 애플리케이션 종료 시 graceful shutdown 사용
 
 # 관리 엔드포인트 설정
 management:
