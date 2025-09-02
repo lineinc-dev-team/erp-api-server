@@ -124,6 +124,7 @@ public class LaborService {
                 .name(fileRequest.name())
                 .fileUrl(fileRequest.fileUrl())
                 .originalFileName(fileRequest.originalFileName())
+                .type(fileRequest.type())
                 .memo(fileRequest.memo())
                 .build();
     }
