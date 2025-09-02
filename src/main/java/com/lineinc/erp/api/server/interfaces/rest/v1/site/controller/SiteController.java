@@ -82,6 +82,7 @@ public class SiteController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
     })
     @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<SiteResponse>>> getAllSites(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid PageRequest pageRequest,

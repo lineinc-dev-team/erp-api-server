@@ -298,6 +298,7 @@ public class UserService {
         // 제한된 접근 권한 → siteId 목록 추출
         return user.getUserRoles().stream()
                 .flatMap(role -> role.getRole().getSiteProcesses().stream())
+                .filter(siteProcess -> siteProcess.getSite() != null && !siteProcess.getSite().isDeleted())
                 .map(siteProcess -> siteProcess.getSite().getId())
                 .distinct()
                 .toList();
