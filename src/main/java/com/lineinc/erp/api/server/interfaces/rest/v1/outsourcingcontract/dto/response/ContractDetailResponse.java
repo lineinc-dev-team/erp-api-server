@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 

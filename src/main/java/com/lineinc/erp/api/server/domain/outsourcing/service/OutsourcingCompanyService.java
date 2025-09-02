@@ -255,14 +255,7 @@ public class OutsourcingCompanyService {
             companies = outsourcingCompanyRepository.findByNameContainingIgnoreCase(name.trim(), pageable);
         }
 
-        return companies.map(company -> new CompanyResponse.CompanySimpleResponse(
-                company.getId(),
-                company.getName(),
-                company.getBusinessNumber(),
-                company.getCeoName(),
-                company.getBankName(),
-                company.getAccountNumber(),
-                company.getAccountHolder()));
+        return companies.map(company -> CompanyResponse.CompanySimpleResponse.from(company));
     }
 
     /**

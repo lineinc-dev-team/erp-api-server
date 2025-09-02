@@ -99,7 +99,8 @@ public record CompanyResponse(
 
             @Schema(description = "계좌번호", example = "123-456-789012") String accountNumber,
 
-            @Schema(description = "예금주", example = "홍길동") String accountHolder) {
+            @Schema(description = "예금주", example = "홍길동") String accountHolder,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static CompanyResponse.CompanySimpleResponse from(OutsourcingCompany company) {
             return new CompanyResponse.CompanySimpleResponse(
                     company.getId(),
@@ -108,7 +109,8 @@ public record CompanyResponse(
                     company.getCeoName(),
                     company.getBankName(),
                     company.getAccountNumber(),
-                    company.getAccountHolder());
+                    company.getAccountHolder(),
+                    company.isDeleted());
         }
     }
 
