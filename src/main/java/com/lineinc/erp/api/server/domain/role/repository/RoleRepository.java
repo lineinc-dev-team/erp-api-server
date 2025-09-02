@@ -9,9 +9,11 @@ import java.util.Optional;
 
 public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositoryCustom {
 
-    Optional<Role> findByName(String name);
+    @Query("SELECT r FROM Role r WHERE r.name = :name AND r.deleted = false")
+    Optional<Role> findByName(@Param("name") String name);
 
-    boolean existsByName(String name);
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Role r WHERE r.name = :name AND r.deleted = false")
+    boolean existsByName(@Param("name") String name);
 
     @Query("SELECT r FROM Role r " +
             "LEFT JOIN FETCH r.permissions rp " +

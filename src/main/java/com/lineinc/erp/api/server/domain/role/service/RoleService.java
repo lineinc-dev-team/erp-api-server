@@ -250,7 +250,6 @@ public class RoleService {
         List<User> foundUsers = userRepository.findAllById(userIds);
 
         foundUsers.stream()
-                .filter(user -> user.getUserRoles().isEmpty())
                 .forEach(user -> {
                     UserRole userRole = UserRole.builder()
                             .user(user)
