@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.user.entity;
 
-import org.hibernate.annotations.SQLRestriction;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import jakarta.persistence.*;
@@ -15,7 +13,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @NoArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class UserRole extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_roles_seq")

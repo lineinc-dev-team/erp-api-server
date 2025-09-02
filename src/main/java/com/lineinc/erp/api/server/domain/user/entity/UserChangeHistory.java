@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 @Entity
@@ -18,7 +17,6 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @NoArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class UserChangeHistory extends BaseEntity {
 
     @Id

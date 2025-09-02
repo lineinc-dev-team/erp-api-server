@@ -63,7 +63,8 @@ public record UserInfoResponse(
                 user.isDeleted(),
                 user.getUserRoles().stream()
                         .map(UserRole::getRole)
-                        .map(role -> new UserResponse.RoleSummaryResponse(role.getId(), role.getName()))
+                        .map(role -> new UserResponse.RoleSummaryResponse(role.getId(), role.getName(),
+                                role.isDeleted()))
                         .toList());
     }
 

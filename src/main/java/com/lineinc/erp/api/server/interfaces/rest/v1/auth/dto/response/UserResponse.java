@@ -62,7 +62,7 @@ public record UserResponse(
                 user.isRequirePasswordReset(),
                 user.getUserRoles().stream()
                         .map(UserRole::getRole)
-                        .map(role -> new RoleSummaryResponse(role.getId(), role.getName()))
+                        .map(role -> new RoleSummaryResponse(role.getId(), role.getName(), role.isDeleted()))
                         .toList());
     }
 
@@ -70,7 +70,9 @@ public record UserResponse(
     public static record RoleSummaryResponse(
             @Schema(description = "권한 그룹 ID", example = "1") Long id,
 
-            @Schema(description = "권한 그룹 이름", example = "어드민") String name) {
+            @Schema(description = "권한 그룹 이름", example = "어드민") String name,
+
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
     }
 
     @Schema(description = "간단한 유저 응답")
@@ -89,7 +91,7 @@ public record UserResponse(
                     user.getDepartment() != null ? user.getDepartment().getName() : null,
                     user.getUserRoles().stream()
                             .map(UserRole::getRole)
-                            .map(role -> new RoleSummaryResponse(role.getId(), role.getName()))
+                            .map(role -> new RoleSummaryResponse(role.getId(), role.getName(), role.isDeleted()))
                             .toList());
         }
     }
