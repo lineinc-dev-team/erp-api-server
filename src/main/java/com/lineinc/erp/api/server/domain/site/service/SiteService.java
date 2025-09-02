@@ -104,6 +104,7 @@ public class SiteService {
 
         for (Site site : sites) {
             site.markAsDeleted();
+            site.getProcesses().forEach(process -> process.markAsDeleted());
         }
 
         siteRepository.saveAll(sites);
