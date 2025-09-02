@@ -95,6 +95,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
      */
     private BooleanBuilder buildCondition(ClientCompanyListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(clientCompany.deleted.eq(false));
 
         if (StringUtils.hasText(request.name())) {
             builder.and(clientCompany.name.containsIgnoreCase(request.name().trim()));
