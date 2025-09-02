@@ -92,6 +92,7 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
 
     private BooleanBuilder buildCondition(LaborListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(labor.deleted.eq(false));
 
         if (request.type() != null) {
             builder.and(labor.type.eq((request.type())));
