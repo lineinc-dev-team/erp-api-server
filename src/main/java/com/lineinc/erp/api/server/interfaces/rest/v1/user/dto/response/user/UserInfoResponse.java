@@ -40,6 +40,8 @@ public record UserInfoResponse(
 
         @Schema(description = "직책", example = "팀장") String position,
 
+        @Schema(description = "삭제 여부", example = "false") Boolean deleted,
+
         @Schema(description = "사용자 권한 목록") List<UserResponse.RoleSummaryResponse> roles) {
     public static UserInfoResponse from(User user) {
         return new UserInfoResponse(
@@ -58,6 +60,7 @@ public record UserInfoResponse(
                 user.getDepartment() != null ? user.getDepartment().getName() : null,
                 user.getGrade() != null ? user.getGrade().getName() : null,
                 user.getPosition() != null ? user.getPosition().getName() : null,
+                user.isDeleted(),
                 user.getUserRoles().stream()
                         .map(UserRole::getRole)
                         .map(role -> new UserResponse.RoleSummaryResponse(role.getId(), role.getName()))
