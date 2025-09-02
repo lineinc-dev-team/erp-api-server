@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.loginId = :loginId AND u.deleted = false")
     boolean existsByLoginId(@Param("loginId") String loginId);
 
-    @Query("SELECT u FROM User u WHERE u.deleted = false AND LOWER(u.username) != :excludeUsername AND (:keyword IS NULL OR :keyword = '' OR u.username LIKE %:keyword%) AND (:hasRole IS NULL OR (CASE WHEN :hasRole = true THEN EXISTS (SELECT 1 FROM u.userRoles) ELSE NOT EXISTS (SELECT 1 FROM u.userRoles) END)) ORDER BY u.username ASC")
+    @Query("SELECT u FROM User u WHERE u.deleted = false AND LOWER(u.username) != :excludeUsername AND (:keyword IS NULL OR :keyword = '' OR u.username LIKE %:keyword%) AND (:hasRole IS NULL OR (CASE WHEN :hasRole = true THEN SIZE(u.userRoles) > 0 ELSE SIZE(u.userRoles) = 0 END)) ORDER BY u.username ASC")
     Slice<User> findAllByKeywordAndExcludeUsername(@Param("keyword") String keyword,
             @Param("excludeUsername") String excludeUsername, @Param("hasRole") Boolean hasRole, Pageable pageable);
 
