@@ -120,25 +120,6 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         if (request.positionId() != null) {
             builder.and(user.position.id.eq(request.positionId()));
         }
-
-        if (request.hasRole() != null) {
-            if (request.hasRole()) {
-                // 삭제되지 않은 역할이라도 하나 이상 가지고 있는 유저만 조회
-                builder.and(user.id.in(
-                        queryFactory.select(userRole.user.id)
-                                .from(userRole)
-                                .where(userRole.role.deleted.eq(false))
-                                .distinct()));
-            } else {
-                // 삭제되지 않은 역할을 하나도 가지고 있지 않은 유저만 조회
-                builder.and(user.id.notIn(
-                        queryFactory.select(userRole.user.id)
-                                .from(userRole)
-                                .where(userRole.role.deleted.eq(false))
-                                .distinct()));
-            }
-        }
-
         return builder;
     }
 

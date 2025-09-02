@@ -28,9 +28,5 @@ public record SearchUserRequest(
 
         @Schema(description = "직급 ID", example = "2") Long gradeId,
 
-        @Schema(description = "직책 ID", example = "3") Long positionId,
-
-        @Schema(description = "역할(권한) 보유 여부 필터", example = "true") Boolean hasRole
-
-) {
+        @Schema(description = "직책 ID", example = "3") Long positionId) {
 }
