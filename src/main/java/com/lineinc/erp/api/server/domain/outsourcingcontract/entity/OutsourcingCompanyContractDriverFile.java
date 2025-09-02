@@ -51,7 +51,7 @@ public class OutsourcingCompanyContractDriverFile extends BaseEntity {
     @Column(nullable = false)
     private OutsourcingCompanyContractDriverDocumentType documentType; // 서류 타입
 
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String fileUrl; // 파일 URL
 
