@@ -2,7 +2,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractWorkerResponse.ContractWorkerSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractWorkerResponse.ContractWorkerSimpleResponse;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "출역일보 외주 응답")

@@ -6,7 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractFileType;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractFileUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractFileUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

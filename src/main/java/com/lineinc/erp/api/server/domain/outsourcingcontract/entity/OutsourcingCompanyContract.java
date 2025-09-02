@@ -18,7 +18,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContractUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractUpdateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
 import jakarta.persistence.CascadeType;

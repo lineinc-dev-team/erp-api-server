@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.ContractListSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.ContractListSearchRequest;
 
 public interface OutsourcingCompanyContractRepositoryCustom {
 

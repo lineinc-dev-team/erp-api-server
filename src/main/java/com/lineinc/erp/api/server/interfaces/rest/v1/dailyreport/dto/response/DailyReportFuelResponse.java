@@ -2,8 +2,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractDriverResponse.ContractDriverSimpleResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.ContractEquipmentResponse.ContractEquipmentSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse.ContractDriverSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractEquipmentResponse.ContractEquipmentSimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
