@@ -91,7 +91,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
     }
 
     private BooleanExpression buildWhereCondition(QRole role, QUser user, String search) {
-        BooleanExpression baseCondition = role.id.ne(ADMIN_ROLE_ID);
+        BooleanExpression baseCondition = role.id.ne(ADMIN_ROLE_ID).and(role.deleted.eq(false));
         BooleanExpression searchCondition = buildSearchPredicate(user, search);
 
         if (searchCondition != null) {

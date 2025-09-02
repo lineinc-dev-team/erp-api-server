@@ -6,7 +6,6 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -20,7 +19,6 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class RoleSiteProcess extends BaseEntity implements Serializable {
 
     @Serial

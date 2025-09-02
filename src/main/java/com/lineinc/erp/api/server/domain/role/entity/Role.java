@@ -7,7 +7,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.UpdateRole
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -24,7 +23,6 @@ import java.util.Set;
         @Index(columnList = "name"),
         @Index(columnList = "created_at")
 })
-@SQLRestriction("deleted = false")
 public class Role extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
