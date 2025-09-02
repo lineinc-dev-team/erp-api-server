@@ -3,8 +3,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractChangeHistory;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractChangeType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

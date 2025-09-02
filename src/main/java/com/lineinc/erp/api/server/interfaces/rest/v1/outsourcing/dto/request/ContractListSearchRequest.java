@@ -4,8 +4,8 @@ import java.time.LocalDate;
 
 import org.springdoc.core.annotations.ParameterObject;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractStatus;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

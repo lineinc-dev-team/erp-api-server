@@ -2,8 +2,8 @@ package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo;
 
 import jakarta.persistence.*;

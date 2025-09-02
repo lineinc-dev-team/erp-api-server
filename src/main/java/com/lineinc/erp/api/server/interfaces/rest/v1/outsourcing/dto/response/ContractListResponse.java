@@ -3,9 +3,9 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractFileType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractFileType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractDriver;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

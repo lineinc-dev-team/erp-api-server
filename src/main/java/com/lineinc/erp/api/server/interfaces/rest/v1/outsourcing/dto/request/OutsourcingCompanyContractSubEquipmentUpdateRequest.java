@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContactSubEquipmentType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContactSubEquipmentType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

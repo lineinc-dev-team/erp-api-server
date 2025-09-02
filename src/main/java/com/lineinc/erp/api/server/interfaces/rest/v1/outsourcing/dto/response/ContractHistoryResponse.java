@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContractHistory;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractHistory;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

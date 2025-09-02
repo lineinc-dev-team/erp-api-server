@@ -3,10 +3,10 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractCategoryType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractStatus;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractCategoryType;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractStatus;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

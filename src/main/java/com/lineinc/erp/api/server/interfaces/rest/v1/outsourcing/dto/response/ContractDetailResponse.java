@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 
@@ -51,7 +51,7 @@ public record ContractDetailResponse(
                 contract.getDefaultDeductions() != null && !contract.getDefaultDeductions().trim().isEmpty()
                         ? Arrays.stream(contract.getDefaultDeductions().split(","))
                                 .map(String::trim)
-                                .map(com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
+                                .map(com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
                                 .collect(Collectors.joining(","))
                         : null,
                 contract.getDefaultDeductions() != null ? contract.getDefaultDeductions() : null,
