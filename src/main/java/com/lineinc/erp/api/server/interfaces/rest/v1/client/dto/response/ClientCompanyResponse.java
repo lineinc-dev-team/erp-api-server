@@ -69,10 +69,12 @@ public record ClientCompanyResponse(
     @Schema(description = "간단한 발주처 응답")
     public static record ClientCompanySimpleResponse(
             @Schema(description = "발주처 ID", example = "123") Long id,
+            @Schema(description = "발주처 이름", example = "삼성건설") String name,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
-            @Schema(description = "발주처 이름", example = "삼성건설") String name) {
         public static ClientCompanySimpleResponse from(ClientCompany clientCompany) {
-            return new ClientCompanySimpleResponse(clientCompany.getId(), clientCompany.getName());
+            return new ClientCompanySimpleResponse(clientCompany.getId(), clientCompany.getName(),
+                    clientCompany.isDeleted());
         }
     }
 }
