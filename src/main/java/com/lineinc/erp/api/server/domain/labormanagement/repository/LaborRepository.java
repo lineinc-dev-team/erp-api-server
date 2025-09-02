@@ -28,13 +28,13 @@ public interface LaborRepository extends JpaRepository<Labor, Long>, LaborReposi
     /**
      * 특정 type의 typeDescription 값들을 조회
      */
-    @Query("SELECT DISTINCT l.typeDescription, l.id FROM Labor l WHERE l.type = :type AND l.typeDescription IS NOT NULL")
+    @Query("SELECT DISTINCT l.typeDescription, l.id FROM Labor l WHERE l.type = :type AND l.typeDescription IS NOT NULL AND l.deleted = false")
     Slice<Object[]> findAllDistinctTypeDescriptions(@Param("type") LaborType type, Pageable pageable);
 
     /**
      * 특정 type의 typeDescription 값들을 키워드로 검색
      */
-    @Query("SELECT DISTINCT l.typeDescription, l.id FROM Labor l WHERE l.type = :type AND l.typeDescription IS NOT NULL AND l.typeDescription LIKE %:keyword%")
+    @Query("SELECT DISTINCT l.typeDescription, l.id FROM Labor l WHERE l.type = :type AND l.typeDescription IS NOT NULL AND l.deleted = false AND l.typeDescription LIKE %:keyword%")
     Slice<Object[]> findDistinctTypeDescriptionsByKeyword(@Param("type") LaborType type,
             @Param("keyword") String keyword, Pageable pageable);
 
