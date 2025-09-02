@@ -16,7 +16,6 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationC
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationChangeType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
-import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
@@ -32,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FuelInfoService {
 
-    private final FuelInfoRepository fuelInfoRepository;
     private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
