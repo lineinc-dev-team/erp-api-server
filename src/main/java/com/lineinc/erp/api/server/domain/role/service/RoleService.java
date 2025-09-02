@@ -58,7 +58,7 @@ public class RoleService {
 
     @Transactional(readOnly = true)
     public RolesResponse getRoleById(Long roleId) {
-        Role role = roleRepository.findById(roleId)
+        Role role = roleRepository.findWithPermissionsAndActiveSiteProcessesById(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return RolesResponse.from(role);

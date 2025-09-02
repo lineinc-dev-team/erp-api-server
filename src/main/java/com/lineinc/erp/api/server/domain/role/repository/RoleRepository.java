@@ -21,4 +21,14 @@ public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositor
             "LEFT JOIN FETCH p.menu m " +
             "WHERE r.id = :roleId")
     Optional<Role> findWithPermissionsAndMenusById(@Param("roleId") Long roleId);
+
+    @Query("SELECT r FROM Role r " +
+            "LEFT JOIN FETCH r.permissions rp " +
+            "LEFT JOIN FETCH rp.permission p " +
+            "LEFT JOIN FETCH p.menu m " +
+            "LEFT JOIN FETCH r.siteProcesses rsp " +
+            "LEFT JOIN FETCH rsp.site s " +
+            "LEFT JOIN FETCH rsp.process sp " +
+            "WHERE r.id = :roleId AND r.deleted = false AND (s.deleted = false OR s IS NULL) AND (sp.deleted = false OR sp IS NULL)")
+    Optional<Role> findWithPermissionsAndActiveSiteProcessesById(@Param("roleId") Long roleId);
 }
