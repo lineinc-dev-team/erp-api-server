@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractFile;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractFileType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -13,6 +14,8 @@ public record ContractFileResponse(
         @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/files/contract_document.pdf") String fileUrl,
         @Schema(description = "원본 파일명", example = "계약서_최종본.pdf") String originalFileName,
         @Schema(description = "메모", example = "계약서 최종본") String memo,
+        @Schema(description = "파일 유형", example = "계약서") String type,
+        @Schema(description = "파일 유형 코드", example = "CONTRACT") OutsourcingCompanyContractFileType typeCode,
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt) {
     public static ContractFileResponse from(OutsourcingCompanyContractFile file) {
@@ -22,6 +25,8 @@ public record ContractFileResponse(
                 file.getFileUrl(),
                 file.getOriginalFileName(),
                 file.getMemo(),
+                file.getType() != null ? file.getType().getLabel() : null,
+                file.getType(),
                 file.getCreatedAt(),
                 file.getUpdatedAt());
     }
