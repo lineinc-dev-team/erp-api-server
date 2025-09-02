@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.domain.user.repository.UserRoleRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse.RoleSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.AddPermissionsToRoleRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.AddUsersToRoleRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.CreateRolesRequest;
@@ -54,6 +55,12 @@ public class RoleService {
     @Transactional(readOnly = true)
     public Page<RolesResponse> getAllRoles(UserWithRolesListRequest request, Pageable pageable) {
         return roleRepository.findAll(request, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RoleSummaryResponse> searchRolesByName(String keyword, Pageable pageable) {
+        Page<Role> roles = roleRepository.findByNameContainingIgnoreCaseAndDeletedFalseAndIdNot(keyword, pageable);
+        return roles.map(role -> new RoleSummaryResponse(role.getId(), role.getName(), role.isDeleted()));
     }
 
     @Transactional(readOnly = true)

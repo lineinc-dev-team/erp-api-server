@@ -7,6 +7,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.DeleteRole
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.RoleUserListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.UpdateRolesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.UserWithRolesListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse.RoleSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.response.MenusPermissionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.response.RoleUserListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.response.RolesResponse;
@@ -49,6 +50,21 @@ public class RoleController {
             @Valid UserWithRolesListRequest userWithRolesListRequest) {
         Page<RolesResponse> page = roleService.getAllRoles(
                 userWithRolesListRequest,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+
+    @Operation(summary = "권한 그룹명 키워드 검색", description = "권한 그룹명으로 키워드 검색을 수행합니다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "검색 성공")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<SuccessResponse<PagingResponse<RoleSummaryResponse>>> searchRolesByName(
+            @Valid SortRequest sortRequest,
+            @Valid PageRequest pageRequest,
+            @RequestParam(required = false) String keyword) {
+        Page<RoleSummaryResponse> page = roleService.searchRolesByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));

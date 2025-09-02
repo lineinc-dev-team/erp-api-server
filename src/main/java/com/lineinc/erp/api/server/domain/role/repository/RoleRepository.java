@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.role.repository;
 
 import com.lineinc.erp.api.server.domain.role.entity.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +33,8 @@ public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositor
             "LEFT JOIN FETCH rsp.process sp " +
             "WHERE r.id = :roleId AND r.deleted = false AND (s.deleted = false OR s IS NULL) AND (sp.deleted = false OR sp IS NULL)")
     Optional<Role> findWithPermissionsAndActiveSiteProcessesById(@Param("roleId") Long roleId);
+
+    @Query(value = "SELECT * FROM roles r WHERE r.deleted = false AND r.id != 1 AND (:keyword IS NULL OR r.name::text LIKE CONCAT('%', :keyword, '%'))", countQuery = "SELECT COUNT(*) FROM roles r WHERE r.deleted = false AND r.id != 1 AND (:keyword IS NULL OR r.name::text LIKE CONCAT('%', :keyword, '%'))", nativeQuery = true)
+    Page<Role> findByNameContainingIgnoreCaseAndDeletedFalseAndIdNot(@Param("keyword") String keyword,
+            Pageable pageable);
 }
