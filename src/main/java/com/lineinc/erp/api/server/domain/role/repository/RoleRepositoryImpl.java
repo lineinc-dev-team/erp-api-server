@@ -154,7 +154,10 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
                 .leftJoin(roleSiteProcess.site, site).fetchJoin()
                 .leftJoin(roleSiteProcess.process, process).fetchJoin()
-                .where(role.id.in(roleIds).and(role.deleted.eq(false)))
+                .where(role.id.in(roleIds)
+                        .and(role.deleted.eq(false))
+                        .and(site.deleted.eq(false).or(site.isNull()))
+                        .and(process.deleted.eq(false).or(process.isNull())))
                 .orderBy(orders)
                 .fetch();
     }
