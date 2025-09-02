@@ -82,10 +82,10 @@ public record SiteResponse(
     @Schema(description = "간단한 현장 응답")
     public static record SiteSimpleResponse(
             @Schema(description = "현장 ID", example = "123") Long id,
-
-            @Schema(description = "현장명", example = "서울 APT 신축공사") String name) {
+            @Schema(description = "현장명", example = "서울 APT 신축공사") String name,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static SiteResponse.SiteSimpleResponse from(Site site) {
-            return new SiteResponse.SiteSimpleResponse(site.getId(), site.getName());
+            return new SiteResponse.SiteSimpleResponse(site.getId(), site.getName(), site.isDeleted());
         }
     }
 }
