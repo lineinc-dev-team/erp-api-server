@@ -37,24 +37,37 @@ public class ExcelExportUtils {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Sheet1");
 
-        // 1. 헤더 생성 (첫 번째 컬럼은 무조건 "No.")
+        // id 필드가 있는지 확인
+        boolean hasIdField = fields.contains("id");
+
+        // 1. 헤더 생성
         Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("No.");
-        for (int i = 0, col = 1; i < fields.size(); i++) {
-            String field = fields.get(i);
+        int col = 0;
+
+        // id 필드가 있으면 No. 컬럼 추가
+        if (hasIdField) {
+            headerRow.createCell(col++).setCellValue("No.");
+        }
+
+        for (String field : fields) {
             if ("id".equals(field))
                 continue;
             String resolvedHeader = headerResolver.resolve(field);
             headerRow.createCell(col++).setCellValue(resolvedHeader != null ? resolvedHeader : field);
         }
 
-        // 2. 데이터 생성 (첫 번째 컬럼에 행 번호 삽입 - 역순)
+        // 2. 데이터 생성
         int rowIdx = 1;
         int totalCount = data.size();
         for (T item : data) {
             Row row = sheet.createRow(rowIdx);
-            row.createCell(0).setCellValue(String.valueOf(totalCount - rowIdx + 1));
-            int col = 1;
+            col = 0;
+
+            // id 필드가 있으면 No. 컬럼 추가 (역순)
+            if (hasIdField) {
+                row.createCell(col++).setCellValue(String.valueOf(totalCount - rowIdx + 1));
+            }
+
             for (String field : fields) {
                 if ("id".equals(field))
                     continue;
