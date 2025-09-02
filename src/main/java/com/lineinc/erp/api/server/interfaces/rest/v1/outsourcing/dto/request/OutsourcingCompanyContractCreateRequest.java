@@ -38,7 +38,7 @@ public record OutsourcingCompanyContractCreateRequest(
 
         @Schema(description = "세금계산서 발행일(월)", example = "25") @NotNull Integer taxInvoiceIssueDayOfMonth,
 
-        @Schema(description = "계약 카테고리", example = "MONTHLY") @NotNull OutsourcingCompanyContractCategoryType category,
+        @Schema(description = "계약 카테고리", example = "MONTHLY") OutsourcingCompanyContractCategoryType category,
 
         @Schema(description = "계약 상태", example = "IN_PROGRESS") @NotNull OutsourcingCompanyContractStatus status,
 
