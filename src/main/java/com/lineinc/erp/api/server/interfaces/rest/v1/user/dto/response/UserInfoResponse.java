@@ -62,10 +62,12 @@ public record UserInfoResponse(
                 user.getPosition() != null ? user.getPosition().getName() : null,
                 user.isDeleted(),
                 user.getUserRoles().stream()
+                        .max((ur1, ur2) -> ur1.getCreatedAt().compareTo(ur2.getCreatedAt())) // 가장 최근 것
                         .map(UserRole::getRole)
                         .map(role -> new UserResponse.RoleSummaryResponse(role.getId(), role.getName(),
                                 role.isDeleted()))
-                        .toList());
+                        .map(List::of) // 단일 요소를 리스트로 변환
+                        .orElse(List.of())); // 없으면 빈 리스트
     }
 
 }

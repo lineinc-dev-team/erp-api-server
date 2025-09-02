@@ -61,9 +61,11 @@ public record UserResponse(
                 user.getPosition() != null ? user.getPosition().getName() : null,
                 user.isRequirePasswordReset(),
                 user.getUserRoles().stream()
+                        .max((ur1, ur2) -> ur1.getCreatedAt().compareTo(ur2.getCreatedAt())) // 가장 최근 것
                         .map(UserRole::getRole)
                         .map(role -> new RoleSummaryResponse(role.getId(), role.getName(), role.isDeleted()))
-                        .toList());
+                        .map(List::of) // 단일 요소를 리스트로 변환
+                        .orElse(List.of())); // 없으면 빈 리스트
     }
 
     @Schema(description = "권한 그룹 요약 응답")
@@ -90,9 +92,11 @@ public record UserResponse(
             return new UserSimpleResponse(user.getId(), user.getLoginId(), user.getUsername(),
                     user.getDepartment() != null ? user.getDepartment().getName() : null,
                     user.getUserRoles().stream()
+                            .max((ur1, ur2) -> ur1.getCreatedAt().compareTo(ur2.getCreatedAt())) // 가장 최근 것
                             .map(UserRole::getRole)
                             .map(role -> new RoleSummaryResponse(role.getId(), role.getName(), role.isDeleted()))
-                            .toList());
+                            .map(List::of) // 단일 요소를 리스트로 변환
+                            .orElse(List.of())); // 없으면 빈 리스트
         }
     }
 }

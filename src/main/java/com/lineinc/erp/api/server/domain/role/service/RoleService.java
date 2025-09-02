@@ -250,6 +250,8 @@ public class RoleService {
         List<User> foundUsers = userRepository.findAllById(userIds);
 
         foundUsers.stream()
+                .filter(user -> user.getUserRoles().stream()
+                        .noneMatch(ur -> !ur.getRole().isDeleted())) // 삭제되지 않은 역할이 없는 사용자만
                 .forEach(user -> {
                     UserRole userRole = UserRole.builder()
                             .user(user)
