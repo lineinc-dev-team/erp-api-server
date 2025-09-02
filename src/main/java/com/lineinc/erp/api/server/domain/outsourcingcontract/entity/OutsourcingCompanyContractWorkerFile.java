@@ -40,7 +40,7 @@ public class OutsourcingCompanyContractWorkerFile extends BaseEntity {
     @JoinColumn(name = "outsourcing_company_contract_worker_id", nullable = false)
     private OutsourcingCompanyContractWorker worker;
 
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String fileUrl; // 파일 URL
 
