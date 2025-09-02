@@ -85,18 +85,10 @@ public record UserResponse(
 
             @Schema(description = "사용자 이름", example = "홍길동") String username,
 
-            @Schema(description = "사용자 부서", example = "개발팀") String department,
-
-            @Schema(description = "사용자 권한 목록") List<RoleSummaryResponse> roles) {
+            @Schema(description = "사용자 부서", example = "개발팀") String department) {
         public static UserSimpleResponse from(User user) {
             return new UserSimpleResponse(user.getId(), user.getLoginId(), user.getUsername(),
-                    user.getDepartment() != null ? user.getDepartment().getName() : null,
-                    user.getUserRoles().stream()
-                            .max((ur1, ur2) -> ur1.getCreatedAt().compareTo(ur2.getCreatedAt())) // 가장 최근 것
-                            .map(UserRole::getRole)
-                            .map(role -> new RoleSummaryResponse(role.getId(), role.getName(), role.isDeleted()))
-                            .map(List::of) // 단일 요소를 리스트로 변환
-                            .orElse(List.of())); // 없으면 빈 리스트
+                    user.getDepartment() != null ? user.getDepartment().getName() : null);
         }
     }
 }
