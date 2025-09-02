@@ -26,8 +26,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.BulkDelete
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.CreateUserRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.SearchUserRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.UpdateUserRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.user.UserInfoResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.UserChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.UserInfoResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
