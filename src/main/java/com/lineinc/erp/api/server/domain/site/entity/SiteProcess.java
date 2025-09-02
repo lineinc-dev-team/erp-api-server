@@ -8,7 +8,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSite
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
@@ -19,7 +18,6 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 @Table(indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "status"),
