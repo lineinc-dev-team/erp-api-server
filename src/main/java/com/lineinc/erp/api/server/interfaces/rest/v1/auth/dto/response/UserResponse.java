@@ -85,10 +85,11 @@ public record UserResponse(
 
             @Schema(description = "사용자 이름", example = "홍길동") String username,
 
-            @Schema(description = "사용자 부서", example = "개발팀") String department) {
+            @Schema(description = "사용자 부서", example = "개발팀") String department,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static UserSimpleResponse from(User user) {
             return new UserSimpleResponse(user.getId(), user.getLoginId(), user.getUsername(),
-                    user.getDepartment() != null ? user.getDepartment().getName() : null);
+                    user.getDepartment() != null ? user.getDepartment().getName() : null, user.isDeleted());
         }
     }
 }
