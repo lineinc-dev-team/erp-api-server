@@ -101,13 +101,18 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
     }
 
     private BooleanExpression buildSearchPredicate(QUser user, String search) {
+        // 삭제되지 않은 사용자만 조회
+        BooleanExpression baseCondition = user.deleted.eq(false);
+
         if (search == null || search.trim().isEmpty()) {
-            return null;
+            return baseCondition;
         }
 
         String trimmedSearch = search.trim();
-        return user.username.containsIgnoreCase(trimmedSearch)
+        BooleanExpression searchCondition = user.username.containsIgnoreCase(trimmedSearch)
                 .or(user.loginId.containsIgnoreCase(trimmedSearch));
+
+        return baseCondition.and(searchCondition);
     }
 
     private List<Long> fetchRoleIds(QRole role, QUser user, BooleanExpression whereCondition,
