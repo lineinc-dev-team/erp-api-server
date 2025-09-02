@@ -92,11 +92,13 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
     private BooleanExpression buildWhereCondition(QRole role, QUser user, String search) {
         BooleanExpression baseCondition = role.id.ne(ADMIN_ROLE_ID).and(role.deleted.eq(false));
-        BooleanExpression searchCondition = buildSearchPredicate(user, search);
 
-        if (searchCondition != null) {
+        // 사용자 검색 조건이 있을 때만 사용자 관련 조건 추가
+        if (search != null && !search.trim().isEmpty()) {
+            BooleanExpression searchCondition = buildSearchPredicate(user, search);
             return baseCondition.and(searchCondition);
         }
+
         return baseCondition;
     }
 
@@ -130,6 +132,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                     .limit(pageable.getPageSize())
                     .fetch();
         } else {
+            // 사용자 검색 조건이 없으면 역할만 조회 (사용자 조인 없이)
             return queryFactory
                     .select(role.id)
                     .from(role)
@@ -151,7 +154,7 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
                 .leftJoin(roleSiteProcess.site, site).fetchJoin()
                 .leftJoin(roleSiteProcess.process, process).fetchJoin()
-                .where(role.id.in(roleIds))
+                .where(role.id.in(roleIds).and(role.deleted.eq(false)))
                 .orderBy(orders)
                 .fetch();
     }
