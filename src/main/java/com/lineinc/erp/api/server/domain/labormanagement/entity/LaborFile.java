@@ -5,10 +5,13 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.FileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborFileUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -64,6 +67,14 @@ public class LaborFile extends BaseEntity {
     private String originalFileName;
 
     /**
+     * 파일 타입 (예: 계약서, 증명서, 기타)
+     */
+    @DiffIgnore
+    @Enumerated(EnumType.STRING)
+    @Column
+    private FileType type;
+
+    /**
      * 파일에 대한 비고 또는 설명
      */
     @DiffInclude
@@ -84,6 +95,7 @@ public class LaborFile extends BaseEntity {
         this.name = request.name();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
+        this.type = request.type();
         this.memo = request.memo();
     }
 }
