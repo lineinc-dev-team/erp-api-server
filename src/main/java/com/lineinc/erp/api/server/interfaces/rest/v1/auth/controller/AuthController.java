@@ -60,6 +60,9 @@ public class AuthController {
         if (!userDetails.isActive()) {
             throw new IllegalStateException(ValidationMessages.USER_NOT_ACTIVE);
         }
+        if (userDetails.isDeleted()) {
+            throw new IllegalStateException(ValidationMessages.USER_NOT_FOUND);
+        }
 
         // 4. 마지막 로그인 시간 갱신
         userService.updateLastLoginAt(userDetails.getUserId());

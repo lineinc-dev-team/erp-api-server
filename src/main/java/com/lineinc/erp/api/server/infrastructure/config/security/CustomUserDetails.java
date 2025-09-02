@@ -17,12 +17,15 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     @Getter
     private final boolean active;
+    @Getter
+    private final boolean deleted;
 
-    public CustomUserDetails(Long userId, String username, String password, boolean active) {
+    public CustomUserDetails(Long userId, String username, String password, boolean active, boolean deleted) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.active = active;
+        this.deleted = deleted;
     }
 
     @Override
