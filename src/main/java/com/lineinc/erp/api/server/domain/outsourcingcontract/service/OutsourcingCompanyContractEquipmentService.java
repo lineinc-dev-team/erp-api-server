@@ -126,10 +126,20 @@ public class OutsourcingCompanyContractEquipmentService {
 
             OutsourcingCompanyContractEquipment after = afterMap.get(before.getId());
 
-            // 장비 단위 변경 감지 (보조장비는 포함되지 않음)
+            // 장비 단위 변경 감지 (보조장비는 제외)
+            // 보조장비를 임시로 제거하여 비교
+            List<OutsourcingCompanyContractSubEquipment> beforeSubEquipmentsTemp = before.getSubEquipments();
+            List<OutsourcingCompanyContractSubEquipment> afterSubEquipmentsTemp = after.getSubEquipments();
+            before.setSubEquipments(new ArrayList<>());
+            after.setSubEquipments(new ArrayList<>());
+
             Diff diff = javers.compare(before, after);
             List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
+
+            // 보조장비 목록 복원
+            before.setSubEquipments(beforeSubEquipmentsTemp);
+            after.setSubEquipments(afterSubEquipmentsTemp);
 
             // 장비가 그대로 존재하는 경우에만 보조장비 변경사항 감지
             List<OutsourcingCompanyContractSubEquipment> beforeSubEquipments = before.getSubEquipments();
