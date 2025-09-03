@@ -275,6 +275,13 @@ public class Labor extends BaseEntity {
     }
 
     /**
+     * 첫 근무 시작일을 설정합니다.
+     */
+    public void setFirstWorkDate(OffsetDateTime firstWorkDate) {
+        this.firstWorkDate = firstWorkDate;
+    }
+
+    /**
      * 첨부파일 존재 여부를 반환합니다.
      * 타입이 기본인 파일 중에 fileUrl이 하나라도 있으면 true를 반환합니다.
      */

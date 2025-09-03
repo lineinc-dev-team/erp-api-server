@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.dailyreport.service;
 
+import java.time.OffsetDateTime;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -147,6 +149,12 @@ public class DailyReportService {
                         .build();
 
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
+
+                // 첫 근무 시작일이 비어있으면 현재 날짜로 설정
+                if (labor.getFirstWorkDate() == null) {
+                    labor.setFirstWorkDate(OffsetDateTime.now());
+                }
+
                 dailyReport.getDirectContracts().add(directContract);
             }
         }
