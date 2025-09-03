@@ -165,6 +165,13 @@ public class Labor extends BaseEntity {
     private OffsetDateTime resignationDate;
 
     /**
+     * 첫 근무 시작일
+     */
+    @DiffInclude
+    @Column
+    private OffsetDateTime firstWorkDate;
+
+    /**
      * 외주업체 연결 (용역, 현장계약직인 경우)
      */
     @DiffIgnore
