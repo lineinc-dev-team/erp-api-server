@@ -128,7 +128,16 @@ public class Labor extends BaseEntity {
      */
     @DiffIgnore
     @Column
-    private Long tenureDays;
+    @Builder.Default
+    private Long tenureDays = 0L;
+
+    /**
+     * 퇴직금 발생 여부
+     */
+    @DiffInclude
+    @Column
+    @Builder.Default
+    private Boolean isSeverancePayEligible = false;
 
     /**
      * 은행명
@@ -294,6 +303,13 @@ public class Labor extends BaseEntity {
      */
     public void setSeverancePayEligibilityDate(OffsetDateTime severancePayEligibilityDate) {
         this.severancePayEligibilityDate = severancePayEligibilityDate;
+    }
+
+    /**
+     * 퇴직금 발생 여부를 설정합니다.
+     */
+    public void setIsSeverancePayEligible(Boolean isSeverancePayEligible) {
+        this.isSeverancePayEligible = isSeverancePayEligible;
     }
 
     /**

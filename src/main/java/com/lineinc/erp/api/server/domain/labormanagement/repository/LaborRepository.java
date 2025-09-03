@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -69,4 +72,31 @@ public interface LaborRepository extends JpaRepository<Labor, Long>, LaborReposi
     @Modifying
     @Query("UPDATE Labor l SET l.tenureDays = :tenureDays WHERE l.id = :laborId")
     void updateTenureDays(@Param("laborId") Long laborId, @Param("tenureDays") Long tenureDays);
+
+    /**
+     * 근속일수 산정을 위해 유효한 인력을 조회합니다.
+     * 조건: 삭제되지 않음, 지정된 type, 첫 근무일 존재
+     */
+    @Query("""
+            SELECT l FROM Labor l
+            WHERE l.deleted = false
+              AND (l.type = :type1 OR l.type = :type2)
+              AND l.firstWorkDate IS NOT NULL
+            """)
+    List<Labor> findEligibleLaborsForTenureDaysCalculation(@Param("type1") LaborType type1,
+            @Param("type2") LaborType type2);
+
+    /**
+     * 퇴직금 산정을 위해 유효한 인력을 조회합니다.
+     * 조건: 삭제되지 않음, 지정된 type, 첫 근무일 존재, 퇴직금 기준일 존재
+     */
+    @Query("""
+            SELECT l FROM Labor l
+            WHERE l.deleted = false
+              AND (l.type = :type1 OR l.type = :type2)
+              AND l.firstWorkDate IS NOT NULL
+              AND l.severancePayEligibilityDate IS NOT NULL
+            """)
+    List<Labor> findEligibleLaborsForSeverancePayCalculation(@Param("type1") LaborType type1,
+            @Param("type2") LaborType type2);
 }

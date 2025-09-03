@@ -80,10 +80,7 @@ public class TenureDaysBatchService implements BatchService {
         // 지난달 마지막일 (지난달 근로시간 계산 종료점)
         LocalDate lastMonthEnd = now.withDayOfMonth(1).minusDays(1);
 
-        laborRepository.findAll().stream()
-                .filter(labor -> !labor.isDeleted())
-                .filter(labor -> labor.getType() == LaborType.DIRECT_CONTRACT || labor.getType() == LaborType.ETC)
-                .filter(labor -> labor.getFirstWorkDate() != null) // 첫 근무일이 있는 인력만
+        laborRepository.findEligibleLaborsForTenureDaysCalculation(LaborType.DIRECT_CONTRACT, LaborType.ETC).stream()
                 .forEach(labor -> updateLaborTenureDays(labor, fortyFiveDaysAgo,
                         lastMonthStart, lastMonthEnd));
     }

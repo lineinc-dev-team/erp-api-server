@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
 import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.BatchService;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.SeverancePayBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureDaysBatchService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchScheduler {
 
     private final TenureDaysBatchService tenureDaysBatchService;
+    private final SeverancePayBatchService severancePayBatchService;
     private final BatchExecutionHistoryRepository batchExecutionHistoryRepository;
 
     /**
@@ -31,6 +33,15 @@ public class BatchScheduler {
     @Scheduled(cron = "0 0 1 * * ?", zone = "Asia/Seoul")
     public void updateTenureDays() {
         executeBatchWithHistory(tenureDaysBatchService);
+    }
+
+    /**
+     * 매일 새벽 2시에 퇴직금 발생 배치 실행
+     * Cron 표현식: "0 0 2 * * ?" (한국시간 새벽 2시)
+     */
+    @Scheduled(cron = "0 0 2 * * ?", zone = "Asia/Seoul")
+    public void updateSeverancePayEligibility() {
+        executeBatchWithHistory(severancePayBatchService);
     }
 
     /**
@@ -59,6 +70,4 @@ public class BatchScheduler {
                     batchService.getBatchName(), history.getExecutionTimeSeconds(), e);
         }
     }
-
-    // TODO: 다른 배치 작업들을 여기에 추가
 }

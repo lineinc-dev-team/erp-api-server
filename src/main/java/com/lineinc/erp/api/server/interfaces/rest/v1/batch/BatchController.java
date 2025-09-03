@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.SeverancePayBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureDaysBatchService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchController {
 
     private final TenureDaysBatchService tenureDaysBatchService;
+    private final SeverancePayBatchService severancePayBatchService;
 
     /**
      * 근속일수 업데이트 배치를 수동으로 실행합니다.
@@ -31,7 +33,7 @@ public class BatchController {
      * @return 배치 실행 결과
      */
     @PostMapping("/tenure-days")
-    @Operation(summary = "근속일수 업데이트 배치 실행", description = "직영/계약직, 기타 인력의 근속일수를 계산하고 업데이트합니다.")
+    @Operation(summary = "근속일수 업데이트 배치 실행", description = "직영/계약직, 기타 인력의 근속일수를 계산하고 업데이트합니다. (관리자만 실행 가능)")
     public ResponseEntity<String> runTenureDaysBatch() {
         try {
             log.info("근속일수 업데이트 배치 수동 실행 시작");
@@ -46,6 +48,24 @@ public class BatchController {
         }
     }
 
-    // TODO: 다른 배치 작업들을 여기에 추가
-    // 예: 월간 리포트 생성, 데이터 정리, 알림 발송 등
+    /**
+     * 퇴직금 발생 배치를 수동으로 실행합니다.
+     * 
+     * @return 배치 실행 결과
+     */
+    @PostMapping("/severance-pay")
+    @Operation(summary = "퇴직금 발생 배치 실행", description = "직영/계약직, 기타 인력의 퇴직금 발생 요건을 확인하고 기준일을 갱신합니다. (관리자만 실행 가능)")
+    public ResponseEntity<String> runSeverancePayBatch() {
+        try {
+            log.info("퇴직금 발생 배치 수동 실행 시작");
+            severancePayBatchService.execute();
+            String message = "퇴직금 발생 배치 완료";
+            log.info(message);
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+            log.error("퇴직금 발생 배치 실행 중 오류 발생", e);
+            return ResponseEntity.status(500)
+                    .body("배치 실행 실패: " + e.getMessage());
+        }
+    }
 }
