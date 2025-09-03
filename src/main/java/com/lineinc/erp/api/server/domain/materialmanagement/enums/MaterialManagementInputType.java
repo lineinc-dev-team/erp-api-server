@@ -12,7 +12,8 @@ public enum MaterialManagementInputType {
     METAL_MISC("잡자재(잡철)"),
     SAFETY("안전(안전관리비)"),
     ENVIRONMENT("환경(환경관리비)"),
-    TRANSPORT("운반비");
+    TRANSPORT("운반비"),
+    DIRECT_INPUT("직접입력");
 
     private final String label;
 
