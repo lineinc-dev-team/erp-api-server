@@ -34,7 +34,10 @@ public record LaborListResponse(
         @Schema(description = "임시 인력 여부", example = "true") Boolean isTemporary,
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt,
-        @Schema(description = "첨부파일 존재 여부", example = "true") Boolean hasFile) {
+        @Schema(description = "통장사본 첨부", example = "true") Boolean hasBankbook,
+        @Schema(description = "신분증 사본 첨부", example = "true") Boolean hasIdCard,
+        @Schema(description = "서명이미지 첨부", example = "true") Boolean hasSignatureImage,
+        @Schema(description = "기타 첨부", example = "true") Boolean hasFile) {
 
     public static LaborListResponse from(Labor labor) {
         return new LaborListResponse(
@@ -61,6 +64,9 @@ public record LaborListResponse(
                 labor.getIsTemporary(),
                 labor.getCreatedAt(),
                 labor.getUpdatedAt(),
+                labor.getHasBankbook(),
+                labor.getHasIdCard(),
+                labor.getHasSignatureImage(),
                 labor.getHasFile());
     }
 }
