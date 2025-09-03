@@ -10,9 +10,9 @@ import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManag
 
 @Repository
 public interface MaterialManagementDetailRepository extends JpaRepository<MaterialManagementDetail, Long> {
-    @Query("SELECT mmd.name, MIN(mmd.id) FROM MaterialManagementDetail mmd GROUP BY mmd.name ORDER BY mmd.name")
+    @Query("SELECT mmd.name, mmd.id FROM MaterialManagementDetail mmd WHERE mmd.deleted = false AND mmd.materialManagement.deleted = false")
     Slice<Object[]> findAllDistinctNames(Pageable pageable);
 
-    @Query("SELECT mmd.name, MIN(mmd.id) FROM MaterialManagementDetail mmd WHERE mmd.name LIKE %:keyword% GROUP BY mmd.name ORDER BY mmd.name")
+    @Query("SELECT mmd.name, mmd.id FROM MaterialManagementDetail mmd WHERE mmd.deleted = false AND mmd.materialManagement.deleted = false AND mmd.name LIKE %:keyword%")
     Slice<Object[]> findDistinctNamesByKeyword(String keyword, Pageable pageable);
 }
