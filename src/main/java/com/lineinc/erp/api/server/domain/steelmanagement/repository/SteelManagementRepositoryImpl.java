@@ -107,6 +107,7 @@ public class SteelManagementRepositoryImpl implements SteelManagementRepositoryC
     private BooleanBuilder buildCondition(SteelManagementListRequest request) {
 
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(steelManagement.deleted.isFalse());
 
         if (StringUtils.hasText(request.siteName())) {
             builder.and(site.name.containsIgnoreCase(request.siteName().trim()));
