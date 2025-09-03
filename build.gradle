@@ -47,6 +47,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'     // 보안 기능용
     implementation 'org.springframework.boot:spring-boot-starter-validation'   // 데이터 검증용
     implementation 'org.springframework.boot:spring-boot-starter-actuator'     // 모니터링 및 관리용
+    implementation 'org.springframework.boot:spring-boot-starter-batch'        // 배치 처리용
 
     // ----- 데이터베이스 및 세션 관리 -----
     runtimeOnly 'org.postgresql:postgresql'                                    // PostgreSQL 드라이버 (런타임에만 필요)

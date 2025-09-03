@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * ERP API 서버의 메인 애플리케이션 클래스
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *                        - @ComponentScan: 컴포넌트 스캔 활성화
  */
 @SpringBootApplication
+@EnableScheduling
 public class ErpApiServerApplication {
 
     /**
