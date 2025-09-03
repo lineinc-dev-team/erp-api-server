@@ -31,15 +31,13 @@ public class BatchController {
      * @return 배치 실행 결과
      */
     @PostMapping("/tenure-days")
-    @Operation(summary = "근속일수 업데이트 배치 실행", description = "모든 인력의 근속일수를 계산하고 업데이트합니다.")
+    @Operation(summary = "근속일수 업데이트 배치 실행", description = "직영/계약직, 기타 인력의 근속일수를 계산하고 업데이트합니다.")
     public ResponseEntity<String> runTenureDaysBatch() {
         try {
             log.info("근속일수 업데이트 배치 수동 실행 시작");
             tenureDaysBatchService.execute();
-
             String message = "근속일수 업데이트 배치 완료";
             log.info(message);
-
             return ResponseEntity.ok(message);
         } catch (Exception e) {
             log.error("근속일수 업데이트 배치 실행 중 오류 발생", e);

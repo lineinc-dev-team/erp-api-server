@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.dailyreport.service;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -150,7 +152,7 @@ public class DailyReportService {
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
 
                 if (labor.getFirstWorkDate() == null) {
-                    OffsetDateTime firstWorkDate = OffsetDateTime.now();
+                    LocalDate firstWorkDate = LocalDate.now(AppConstants.KOREA_ZONE);
                     labor.setFirstWorkDate(firstWorkDate);
                     labor.setSeverancePayEligibilityDate(firstWorkDate);
                 }

@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.infrastructure.config.batch.service;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.labormanagement.repository.LaborRepository;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,14 +41,20 @@ public class TenureDaysBatchService implements BatchService {
     public void updateAllTenureDays() {
         log.info("근속일수 업데이트 배치 시작");
 
-        OffsetDateTime now = OffsetDateTime.now(ZoneId.of("Asia/Seoul"));
+        OffsetDateTime now = OffsetDateTime.now(AppConstants.KOREA_ZONE);
         OffsetDateTime fortyFiveDaysAgo = now.minus(45, ChronoUnit.DAYS);
         OffsetDateTime lastMonthStart = now.minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
         OffsetDateTime lastMonthEnd = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
 
-        laborRepository.findAll().stream()
-                .filter(labor -> !labor.isDeleted())
-                .forEach(labor -> updateLaborTenureDays(labor, fortyFiveDaysAgo, lastMonthStart, lastMonthEnd));
+        System.out.println(now);
+        System.out.println(fortyFiveDaysAgo);
+        System.out.println(lastMonthStart);
+        System.out.println(lastMonthEnd);
+
+        // laborRepository.findAll().stream()
+        // .filter(labor -> !labor.isDeleted())
+        // .forEach(labor -> updateLaborTenureDays(labor, fortyFiveDaysAgo,
+        // lastMonthStart, lastMonthEnd));
     }
 
     private void updateLaborTenureDays(Labor labor, OffsetDateTime fortyFiveDaysAgo,

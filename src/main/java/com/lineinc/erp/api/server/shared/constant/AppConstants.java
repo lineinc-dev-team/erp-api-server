@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.shared.constant;
 
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -83,6 +84,9 @@ public final class AppConstants {
 
     // 시간 관련 상수
     public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
+
+    // 한국 시간대
+    public static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     // 세션 타임아웃 기본값 (초 단위, 예: 1800초 = 30분)
     public static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 1800;
