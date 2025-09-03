@@ -62,7 +62,7 @@ public class JaversUtils {
             Map.entry(OutsourcingCompanyContractEquipment.class,
                     entity -> ((OutsourcingCompanyContractEquipment) entity).getSpecification()),
             Map.entry(OutsourcingCompanyContractSubEquipment.class,
-                    entity -> ((OutsourcingCompanyContractSubEquipment) entity).getDescription()),
+                    entity -> ((OutsourcingCompanyContractSubEquipment) entity).getType().getLabel()),
             Map.entry(OutsourcingCompanyContractDriver.class,
                     entity -> ((OutsourcingCompanyContractDriver) entity).getName()),
             Map.entry(OutsourcingCompanyContractDriverFile.class,
