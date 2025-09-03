@@ -97,8 +97,9 @@ public class MaterialManagementController {
     @GetMapping("/detail-names/search")
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementNameResponse>>> getMaterialManagementDetailNames(
             @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
             @RequestParam(required = false) String keyword) {
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
+        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
         Slice<MaterialManagementNameResponse> slice = materialManagementService.getMaterialManagementNames(keyword,
                 pageable);
 
