@@ -170,14 +170,14 @@ public class Labor extends BaseEntity {
      */
     @DiffInclude
     @Column
-    private LocalDate firstWorkDate;
+    private OffsetDateTime firstWorkDate;
 
     /**
      * 퇴직금 발생 요건 기준일
      */
     @DiffInclude
     @Column
-    private LocalDate severancePayEligibilityDate;
+    private OffsetDateTime severancePayEligibilityDate;
 
     /**
      * 외주업체 연결 (용역, 현장계약직인 경우)
@@ -285,14 +285,14 @@ public class Labor extends BaseEntity {
     /**
      * 첫 근무 시작일을 설정합니다.
      */
-    public void setFirstWorkDate(LocalDate firstWorkDate) {
+    public void setFirstWorkDate(OffsetDateTime firstWorkDate) {
         this.firstWorkDate = firstWorkDate;
     }
 
     /**
      * 퇴직금 발생 요건 기준일을 설정합니다.
      */
-    public void setSeverancePayEligibilityDate(LocalDate severancePayEligibilityDate) {
+    public void setSeverancePayEligibilityDate(OffsetDateTime severancePayEligibilityDate) {
         this.severancePayEligibilityDate = severancePayEligibilityDate;
     }
 

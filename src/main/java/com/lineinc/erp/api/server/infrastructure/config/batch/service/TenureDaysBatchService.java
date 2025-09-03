@@ -38,6 +38,18 @@ public class TenureDaysBatchService implements BatchService {
     @Override
     @Transactional
     public void execute() throws Exception {
+        // 오늘 이미 실행된 배치가 있는지 확인
+        LocalDate today = LocalDate.now(AppConstants.KOREA_ZONE);
+        boolean alreadyExecuted = batchExecutionHistoryRepository.existsByBatchNameAndStartTimeBetween(
+                getBatchName(),
+                DateTimeFormatUtils.toUtcStartOfDay(today),
+                DateTimeFormatUtils.toUtcEndOfDay(today));
+
+        if (alreadyExecuted) {
+            log.info("근속일수 업데이트 배치가 오늘 이미 실행되었습니다. 중복 실행을 건너뜁니다.");
+            return;
+        }
+
         // 배치 실행 이력 생성
         BatchExecutionHistory history = createExecutionHistory();
         batchExecutionHistoryRepository.save(history);
@@ -79,7 +91,7 @@ public class TenureDaysBatchService implements BatchService {
     private void updateLaborTenureDays(Labor labor, LocalDate fortyFiveDaysAgo,
             LocalDate lastMonthStart, LocalDate lastMonthEnd) {
         Long newTenureDays = calculateTenureDays(labor, fortyFiveDaysAgo, lastMonthStart, lastMonthEnd);
-        System.out.println("newTenureDays: " + newTenureDays);
+
         if (newTenureDays != null && !newTenureDays.equals(labor.getTenureDays())) {
             laborRepository.updateTenureDays(labor.getId(), newTenureDays);
             log.info("인력 {} - 근속일수: {} → {}", labor.getName(), labor.getTenureDays(),
@@ -91,13 +103,14 @@ public class TenureDaysBatchService implements BatchService {
             LocalDate lastMonthStart, LocalDate lastMonthEnd) {
 
         // 1. 45일 이내 출근 기록 없음 → 0
-        if (!dailyReportRepository.hasWorkRecordInLast45Days(labor.getId(),
+        if (!dailyReportRepository.hasWorkRecordSince(labor.getId(),
                 DateTimeFormatUtils.toUtcStartOfDay(fortyFiveDaysAgo))) {
             return 0L;
         }
 
         // 2. 첫 근무 시작일이 지난달 이후인 경우 → 근속일수 +1 (신규 입사자)
-        if (labor.getFirstWorkDate().isAfter(lastMonthStart)) {
+        LocalDate firstWorkDateKorea = DateTimeFormatUtils.toKoreaLocalDate(labor.getFirstWorkDate());
+        if (firstWorkDateKorea.isAfter(lastMonthStart)) {
             return labor.getTenureDays() == null ? 1L : labor.getTenureDays() + 1;
         }
 

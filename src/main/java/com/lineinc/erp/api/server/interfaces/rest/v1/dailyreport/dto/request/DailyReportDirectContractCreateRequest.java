@@ -15,7 +15,7 @@ public record DailyReportDirectContractCreateRequest(
 
         @Schema(description = "단가", example = "50000") Long unitPrice,
 
-        @Schema(description = "공수", example = "8.0") Double workQuantity,
+        @Schema(description = "공수", example = "1.0") Double workQuantity,
 
         @Schema(description = "비고", example = "특별 지시사항") String memo,
 

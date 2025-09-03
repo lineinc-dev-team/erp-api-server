@@ -77,14 +77,14 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             @Param("reportDate") OffsetDateTime reportDate);
 
     /**
-     * 특정 인력의 최근 45일 이내 출근 기록이 있는지 확인합니다.
+     * 특정 인력의 지정된 날짜 이후 출근 기록이 있는지 확인합니다.
      * 계약직 인력만 대상으로 합니다.
      */
     @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
             "LEFT JOIN dr.directContracts dc " +
             "WHERE dc.labor.id = :laborId " +
             "AND dr.reportDate >= :startDate")
-    boolean hasWorkRecordInLast45Days(@Param("laborId") Long laborId, @Param("startDate") OffsetDateTime startDate);
+    boolean hasWorkRecordSince(@Param("laborId") Long laborId, @Param("startDate") OffsetDateTime startDate);
 
     /**
      * 특정 인력의 지난달 근로시간(공수)을 계산합니다.
