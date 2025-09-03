@@ -226,9 +226,9 @@ public class OutsourcingCompanyContract extends BaseEntity {
             this.site = site;
         }
 
-        if (request.processId() != null) {
+        if (request.siteProcessId() != null) {
             com.lineinc.erp.api.server.domain.site.entity.SiteProcess siteProcess = siteProcessRepository
-                    .findById(request.processId())
+                    .findById(request.siteProcessId())
                     .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_FOUND));
             this.siteProcess = siteProcess;
         }
