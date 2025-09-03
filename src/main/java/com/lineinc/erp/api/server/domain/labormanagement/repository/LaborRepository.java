@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.labormanagement.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -61,4 +62,11 @@ public interface LaborRepository extends JpaRepository<Labor, Long>, LaborReposi
     @Query("SELECT l FROM Labor l WHERE l.deleted = false AND l.name LIKE %:name% AND (:type IS NULL OR l.type = :type)")
     Slice<Labor> findByNameContainingIgnoreCaseAndType(@Param("name") String name, @Param("type") LaborType type,
             Pageable pageable);
+
+    /**
+     * 근속일수를 업데이트합니다.
+     */
+    @Modifying
+    @Query("UPDATE Labor l SET l.tenureDays = :tenureDays WHERE l.id = :laborId")
+    void updateTenureDays(@Param("laborId") Long laborId, @Param("tenureDays") Long tenureDays);
 }
