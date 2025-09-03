@@ -46,7 +46,7 @@ public final class ValidationMessages {
 
     // ===== 노무/인력 관련 메시지 =====
     public static final String LABOR_NOT_FOUND = "존재하지 않는 노무입니다.";
-    public static final String LABOR_ALREADY_EXISTS = "이미 등록된 인력입니다. 이름과 주민등록번호가 동일한 인력이 존재합니다.";
+    public static final String LABOR_ALREADY_EXISTS = "이미 등록된 인력입니다. 동일한 주민등록번호의 인력이 존재합니다.";
     public static final String TEMPORARY_LABOR_NAME_REQUIRED = "임시 인력 등록시 이름은 필수입니다.";
     public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 반드시 한 명이어야 합니다.";
 

@@ -14,16 +14,17 @@ import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 public interface LaborRepository extends JpaRepository<Labor, Long>, LaborRepositoryCustom {
 
     /**
-     * 이름과 주민등록번호로 중복 체크
+     * 주민등록번호로 중복 체크 (삭제되지 않은 인력 중에서)
      */
-    boolean existsByNameAndResidentNumber(String name, String residentNumber);
+    @Query("SELECT COUNT(l) > 0 FROM Labor l WHERE l.residentNumber = :residentNumber AND l.deleted = false")
+    boolean existsByResidentNumber(@Param("residentNumber") String residentNumber);
 
     /**
-     * 특정 ID를 제외하고 이름과 주민등록번호로 중복 체크
+     * 특정 ID를 제외하고 주민등록번호로 중복 체크 (삭제되지 않은 인력 중에서)
      */
-    @Query("SELECT COUNT(l) > 0 FROM Labor l WHERE l.name = :name AND l.residentNumber = :residentNumber AND l.id != :excludeId")
-    boolean existsByNameAndResidentNumberExcludingId(@Param("name") String name,
-            @Param("residentNumber") String residentNumber, @Param("excludeId") Long excludeId);
+    @Query("SELECT COUNT(l) > 0 FROM Labor l WHERE l.residentNumber = :residentNumber AND l.deleted = false AND l.id != :excludeId")
+    boolean existsByResidentNumberExcludingId(@Param("residentNumber") String residentNumber,
+            @Param("excludeId") Long excludeId);
 
     /**
      * 특정 type의 typeDescription 값들을 조회

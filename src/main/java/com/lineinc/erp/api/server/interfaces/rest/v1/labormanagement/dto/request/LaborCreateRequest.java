@@ -17,7 +17,7 @@ import jakarta.validation.constraints.NotNull;
 public record LaborCreateRequest(
         @NotNull @Schema(description = "노무 구분", example = "DIRECT_CONTRACT") LaborType type,
 
-        @NotBlank @Schema(description = "구분 설명", example = "현장 작업용역") String typeDescription,
+        @Schema(description = "구분 설명", example = "현장 작업용역") String typeDescription,
 
         @NotNull @Schema(description = "소속업체 ID", example = "1") Long outsourcingCompanyId,
 
@@ -51,7 +51,5 @@ public record LaborCreateRequest(
 
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "퇴사일", example = "2024-12-31") LocalDate resignationDate,
 
-        @Schema(description = "첨부파일 목록") @Valid List<LaborFileCreateRequest> files
-
-) {
+        @Schema(description = "첨부파일 목록") @Valid List<LaborFileCreateRequest> files) {
 }
