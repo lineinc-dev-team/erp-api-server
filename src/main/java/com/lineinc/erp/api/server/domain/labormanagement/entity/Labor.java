@@ -123,6 +123,13 @@ public class Labor extends BaseEntity {
     private Long previousDailyWage;
 
     /**
+     * 근속일수
+     */
+    @DiffIgnore
+    @Column
+    private Long tenureDays;
+
+    /**
      * 은행명
      */
     @DiffInclude
