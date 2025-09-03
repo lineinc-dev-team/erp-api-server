@@ -142,7 +142,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 목록 엑셀 다운로드", description = "검색 조건에 맞는 자재관리 목록을 엑셀 파일로 다운로드합니다.")
-
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
