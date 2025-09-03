@@ -8,11 +8,11 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "외주업체 계약 첨부파일 수정 요청")
 public record OutsourcingCompanyContractFileUpdateRequest(
-        @Schema(description = "파일 ID", example = "1") Long id,
+        @Schema(description = "파일 ID", example = "1") @NotNull Long id,
 
         @Schema(description = "문서명", example = "계약서") @NotBlank String name,
 
-        @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/bucket/path/to/contract.pdf") @NotBlank String fileUrl,
+        @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/bucket/path/to/contract.pdf") String fileUrl,
 
         @Schema(description = "원본 파일명", example = "계약서_2025.pdf") String originalFileName,
 

@@ -3,12 +3,13 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDriverDocumentType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "외주업체 계약 드라이버 파일 수정 요청")
 public record OutsourcingCompanyContractDriverFileUpdateRequest(
-        @Schema(description = "파일 ID", example = "1") Long id,
+        @Schema(description = "파일 ID", example = "1") @NotNull Long id,
 
-        @Schema(description = "서류 타입", example = "DRIVER_LICENSE") OutsourcingCompanyContractDriverDocumentType documentType,
+        @Schema(description = "서류 타입", example = "DRIVER_LICENSE") @NotNull OutsourcingCompanyContractDriverDocumentType documentType,
 
         @Schema(description = "파일 URL", example = "https://example.com/files/driver_license.pdf") String fileUrl,
 

@@ -242,7 +242,6 @@ public class OutsourcingCompanyContract extends BaseEntity {
         }
 
         // 기존 필드들 수정
-        java.util.Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         java.util.Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
         java.util.Optional.ofNullable(request.contractStartDate())
                 .ifPresent(val -> this.contractStartDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
