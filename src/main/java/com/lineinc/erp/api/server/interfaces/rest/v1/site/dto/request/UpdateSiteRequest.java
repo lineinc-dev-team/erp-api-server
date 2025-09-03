@@ -9,30 +9,32 @@ import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "현장 수정 요청")
 public record UpdateSiteRequest(
-        @Schema(description = "현장명", example = "서울 APT 신축공사") String name,
+        @Schema(description = "현장명", example = "서울 APT 신축공사") @NotBlank String name,
 
-        @Schema(description = "주소", example = "서울시 강남구 역삼동") String address,
+        @Schema(description = "주소", example = "서울시 강남구 역삼동") @NotBlank String address,
 
-        @Schema(description = "상세 주소", example = "역삼로 123") String detailAddress,
+        @Schema(description = "상세 주소", example = "역삼로 123") @NotBlank String detailAddress,
 
-        @Schema(description = "시", example = "서울시") String city,
+        @Schema(description = "시", example = "서울시") @NotBlank String city,
 
-        @Schema(description = "구", example = "강남구") String district,
+        @Schema(description = "구", example = "강남구") @NotBlank String district,
 
-        @Schema(description = "현장 유형", example = "RETAINING_WALL") SiteType type,
+        @Schema(description = "현장 유형", example = "RETAINING_WALL") @NotNull SiteType type,
 
-        @Schema(description = "발주처 ID", example = "1") Long clientCompanyId,
+        @Schema(description = "발주처 ID", example = "1") @NotNull Long clientCompanyId,
 
-        @Schema(description = "사업 시작일", example = "2024-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startedAt,
+        @Schema(description = "사업 시작일", example = "2024-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @NotNull LocalDate startedAt,
 
-        @Schema(description = "사업 종료일", example = "2025-12-31") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endedAt,
+        @Schema(description = "사업 종료일", example = "2025-12-31") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @NotNull LocalDate endedAt,
 
-        @Schema(description = "본사 담당자 ID", example = "1") Long userId,
+        @Schema(description = "본사 담당자 ID", example = "1") @NotNull Long userId,
 
-        @Schema(description = "도급 금액", example = "100000000") Long contractAmount,
+        @Schema(description = "도급 금액", example = "100000000") @NotNull Long contractAmount,
 
         @Schema(description = "비고") String memo,
 
