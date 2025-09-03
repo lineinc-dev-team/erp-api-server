@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.domain.labormanagement.entity;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
