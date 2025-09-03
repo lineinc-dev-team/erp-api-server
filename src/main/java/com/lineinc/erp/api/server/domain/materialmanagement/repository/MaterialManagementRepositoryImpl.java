@@ -87,6 +87,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
 
     private BooleanBuilder buildCondition(MaterialManagementListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(materialManagement.deleted.eq(false));
 
         if (StringUtils.hasText(request.siteName())) {
             builder.and(site.name.containsIgnoreCase(request.siteName().trim()));
