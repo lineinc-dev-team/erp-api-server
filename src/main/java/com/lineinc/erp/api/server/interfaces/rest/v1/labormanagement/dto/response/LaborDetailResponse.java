@@ -9,7 +9,6 @@ import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
-import com.lineinc.erp.api.server.domain.labormanagement.util.LaborWorkDaysCalculator;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -39,17 +38,12 @@ public record LaborDetailResponse(
         @Schema(description = "비고") String memo,
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt,
-        @Schema(description = "첨부파일 목록") List<LaborFileResponse> files,
-        @Schema(description = "누적 근무일수") Integer accumulatedWorkDays,
-        @Schema(description = "퇴직금 발생 여부") Boolean isSeverancePayEligible) {
+        @Schema(description = "첨부파일 목록") List<LaborFileResponse> files) {
 
     public static LaborDetailResponse from(Labor labor) {
         List<LaborFileResponse> fileResponses = labor.getFiles() != null ? labor.getFiles().stream()
                 .map(LaborFileResponse::from)
                 .collect(Collectors.toList()) : List.of();
-
-        Integer accumulatedWorkDays = LaborWorkDaysCalculator.calculateAccumulatedWorkDays(labor);
-        Boolean isSeverancePayEligible = LaborWorkDaysCalculator.isEligibleForSeverance(labor);
 
         return new LaborDetailResponse(
                 labor.getId(),
@@ -77,8 +71,8 @@ public record LaborDetailResponse(
                 labor.getMemo(),
                 labor.getCreatedAt(),
                 labor.getUpdatedAt(),
-                fileResponses,
-                accumulatedWorkDays,
-                isSeverancePayEligible);
+                fileResponses
+
+        );
     }
 }
