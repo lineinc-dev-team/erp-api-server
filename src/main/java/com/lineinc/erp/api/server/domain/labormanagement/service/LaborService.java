@@ -286,7 +286,10 @@ public class LaborService {
             case "accountNumber" -> "계좌번호";
             case "hireDate" -> "입사일";
             case "resignationDate" -> "퇴사일";
-            case "hasFile" -> "첨부파일";
+            case "hasBankbook" -> "통장사본";
+            case "hasIdCard" -> "신분증사본";
+            case "hasSignatureImage" -> "서명이미지";
+            case "hasFile" -> "기타첨부";
             default -> null;
         };
     }
@@ -331,6 +334,10 @@ public class LaborService {
             case "resignationDate" -> labor.resignationDate() != null
                     ? DateTimeFormatUtils.formatKoreaLocalDate(labor.resignationDate())
                     : "";
+            case "hasBankbook" -> labor.hasBankbook() != null ? (labor.hasBankbook() ? "Y" : "N") : "";
+            case "hasIdCard" -> labor.hasIdCard() != null ? (labor.hasIdCard() ? "Y" : "N") : "";
+            case "hasSignatureImage" ->
+                labor.hasSignatureImage() != null ? (labor.hasSignatureImage() ? "Y" : "N") : "";
             case "hasFile" -> labor.hasFile() != null ? (labor.hasFile() ? "Y" : "N") : "";
             default -> "";
         };
