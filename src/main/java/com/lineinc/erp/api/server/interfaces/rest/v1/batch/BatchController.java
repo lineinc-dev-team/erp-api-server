@@ -35,9 +35,9 @@ public class BatchController {
     public ResponseEntity<String> runTenureDaysBatch() {
         try {
             log.info("근속일수 업데이트 배치 수동 실행 시작");
-            int updatedCount = tenureDaysBatchService.execute();
+            tenureDaysBatchService.execute();
 
-            String message = String.format("근속일수 업데이트 배치 완료 - %d명 업데이트", updatedCount);
+            String message = "근속일수 업데이트 배치 완료";
             log.info(message);
 
             return ResponseEntity.ok(message);

@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.infrastructure.config.batch.service;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,12 +33,12 @@ public class TenureDaysBatchService implements BatchService {
 
     @Override
     @Transactional
-    public int execute() throws Exception {
-        return updateAllTenureDays();
+    public void execute() throws Exception {
+        updateAllTenureDays();
     }
 
     @Transactional
-    public int updateAllTenureDays() {
+    public void updateAllTenureDays() {
         log.info("근속일수 업데이트 배치 시작");
 
         OffsetDateTime now = OffsetDateTime.now(ZoneId.of("Asia/Seoul"));
@@ -47,22 +46,19 @@ public class TenureDaysBatchService implements BatchService {
         OffsetDateTime lastMonthStart = now.minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
         OffsetDateTime lastMonthEnd = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
 
-        return laborRepository.findAll().stream()
+        laborRepository.findAll().stream()
                 .filter(labor -> !labor.isDeleted())
-                .mapToInt(labor -> updateLaborTenureDays(labor, fortyFiveDaysAgo, lastMonthStart, lastMonthEnd))
-                .sum();
+                .forEach(labor -> updateLaborTenureDays(labor, fortyFiveDaysAgo, lastMonthStart, lastMonthEnd));
     }
 
-    private int updateLaborTenureDays(Labor labor, OffsetDateTime fortyFiveDaysAgo,
+    private void updateLaborTenureDays(Labor labor, OffsetDateTime fortyFiveDaysAgo,
             OffsetDateTime lastMonthStart, OffsetDateTime lastMonthEnd) {
         Long newTenureDays = calculateTenureDays(labor, fortyFiveDaysAgo, lastMonthStart, lastMonthEnd);
 
         if (newTenureDays != null && !newTenureDays.equals(labor.getTenureDays())) {
             laborRepository.updateTenureDays(labor.getId(), newTenureDays);
             log.info("인력 {} - 근속일수: {} → {}", labor.getName(), labor.getTenureDays(), newTenureDays);
-            return 1;
         }
-        return 0;
     }
 
     private Long calculateTenureDays(Labor labor, OffsetDateTime fortyFiveDaysAgo,
