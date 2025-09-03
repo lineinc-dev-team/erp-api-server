@@ -1,10 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "자재관리 파일 수정 요청")
 public record MaterialManagementFileUpdateRequest(
-        @Schema(description = "자재관리 파일 상세 ID", example = "1") Long id,
+        @Schema(description = "자재관리 파일 상세 ID", example = "1") @NotNull Long id,
 
         @Schema(description = "파일 URL", example = "https://s3.bucket.com/path/to/file.pdf") String fileUrl,
 
