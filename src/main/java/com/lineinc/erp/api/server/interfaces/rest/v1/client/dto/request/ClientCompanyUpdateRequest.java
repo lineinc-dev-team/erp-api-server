@@ -6,35 +6,37 @@ import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
 public record ClientCompanyUpdateRequest(
-        @Schema(description = "발주처명", example = "삼성건설") String name,
+        @Schema(description = "발주처명", example = "삼성건설") @NotBlank String name,
 
-        @MultiConstraint(type = ValidatorType.BUSINESS_NUMBER) @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
+        @MultiConstraint(type = ValidatorType.BUSINESS_NUMBER) @Schema(description = "사업자등록번호", example = "123-45-67890") @NotBlank String businessNumber,
 
-        @Schema(description = "대표자명", example = "홍길동") String ceoName,
+        @Schema(description = "대표자명", example = "홍길동") @NotBlank String ceoName,
 
-        @Schema(description = "주소", example = "서울시 강남구") String address,
+        @Schema(description = "주소", example = "서울시 강남구") @NotBlank String address,
 
-        @Schema(description = "상세 주소", example = "강남대로 123, 3층") String detailAddress,
+        @Schema(description = "상세 주소", example = "강남대로 123, 3층") @NotBlank String detailAddress,
 
-        @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER) @Schema(description = "전화번호", example = "02-123-5678") String landlineNumber,
+        @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER) @Schema(description = "전화번호", example = "02-123-5678") @NotBlank String landlineNumber,
 
-        @MultiConstraint(type = ValidatorType.PHONE) @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
+        @MultiConstraint(type = ValidatorType.PHONE) @Schema(description = "개인 휴대폰", example = "010-1234-5678") @NotBlank String phoneNumber,
 
-        @Email @Schema(description = "이메일", example = "example@samsung.com") String email,
+        @Email @Schema(description = "이메일", example = "example@samsung.com") @NotBlank String email,
 
-        @Schema(description = "결제 방식", example = "CASH") PaymentMethod paymentMethod,
+        @Schema(description = "결제 방식", example = "CASH") @NotNull PaymentMethod paymentMethod,
 
-        @Schema(description = "결제 유예 기간", example = "2") String paymentPeriod,
+        @Schema(description = "결제 유예 기간", example = "2") @NotBlank String paymentPeriod,
 
         @Schema(description = "비고 / 메모") String memo,
 
-        @Schema(description = "사용 여부", example = "true") Boolean isActive,
+        @Schema(description = "사용 여부", example = "true") @NotNull Boolean isActive,
 
-        @Schema(description = "본사 담당자 ID", example = "123") Long userId,
+        @Schema(description = "본사 담당자 ID", example = "123") @NotNull Long userId,
 
         @Valid @Schema(description = "담당자 목록") List<ClientCompanyContactUpdateRequest> contacts,
 
