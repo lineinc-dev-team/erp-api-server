@@ -149,9 +149,10 @@ public class DailyReportService {
 
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
 
-                // 첫 근무 시작일이 비어있으면 현재 날짜로 설정
                 if (labor.getFirstWorkDate() == null) {
-                    labor.setFirstWorkDate(OffsetDateTime.now());
+                    OffsetDateTime firstWorkDate = OffsetDateTime.now();
+                    labor.setFirstWorkDate(firstWorkDate);
+                    labor.setSeverancePayEligibilityDate(firstWorkDate);
                 }
 
                 dailyReport.getDirectContracts().add(directContract);
