@@ -64,6 +64,7 @@ public class OutsourcingCompanyContractFileService {
                         .name(dto.name())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
+                        .type(dto.type())
                         .memo(dto.memo())
                         .outsourcingCompanyContract(contract)
                         .build());
