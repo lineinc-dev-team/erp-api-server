@@ -127,9 +127,10 @@ public class SteelManagementController {
     @GetMapping("/detail-names/search")
     public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementNameResponse>>> getSteelManagementDetailNames(
             @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
             @RequestParam(required = false) String keyword) {
         Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
-                pageRequest.size());
+                pageRequest.size(), sortRequest.sort());
         Slice<SteelManagementNameResponse> slice = steelManagementService.getSteelManagementNames(keyword, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(
