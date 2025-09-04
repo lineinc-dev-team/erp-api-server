@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum DailyReportStatus {
     PENDING("대기"),
-    COMPLETED("마감");
+    COMPLETED("마감"),
+    AUTO_COMPLETED("자동마감");
 
     private final String label;
 

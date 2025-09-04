@@ -77,10 +77,18 @@ public class DailyReport extends BaseEntity {
     private List<DailyReportFile> files = new ArrayList<>(); // 현장 사진 등록 목록
 
     /**
-     * 출역일보를 마감 처리합니다.
+     * 출역일보를 수동 마감 처리합니다.
      */
     public void complete() {
         this.status = DailyReportStatus.COMPLETED;
+        this.completedAt = OffsetDateTime.now(AppConstants.KOREA_ZONE);
+    }
+
+    /**
+     * 출역일보를 자동 마감 처리합니다.
+     */
+    public void autoComplete() {
+        this.status = DailyReportStatus.AUTO_COMPLETED;
         this.completedAt = OffsetDateTime.now(AppConstants.KOREA_ZONE);
     }
 }

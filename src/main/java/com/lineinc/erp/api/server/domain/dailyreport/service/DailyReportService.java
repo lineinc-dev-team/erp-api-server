@@ -920,7 +920,7 @@ public class DailyReportService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
-        // 마감 처리
+        // 수동 마감 처리
         dailyReport.complete();
         dailyReportRepository.save(dailyReport);
     }
