@@ -164,4 +164,25 @@ public class OutsourcingCompany extends BaseEntity {
         java.util.Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         syncTransientFields();
     }
+
+    /**
+     * 관리비에서 사용하는 기본 정보를 업데이트합니다.
+     */
+    public void updateBasicInfo(String name, String businessNumber, String ceoName,
+            String bankName, String accountNumber, String accountHolder, String memo) {
+        if (name != null)
+            this.name = name;
+        if (businessNumber != null)
+            this.businessNumber = businessNumber;
+        if (ceoName != null)
+            this.ceoName = ceoName;
+        if (bankName != null)
+            this.bankName = bankName;
+        if (accountNumber != null)
+            this.accountNumber = accountNumber;
+        if (accountHolder != null)
+            this.accountHolder = accountHolder;
+        if (memo != null)
+            this.memo = memo;
+    }
 }

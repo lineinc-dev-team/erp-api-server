@@ -30,7 +30,6 @@ import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompa
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyBasicInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
@@ -132,30 +131,16 @@ public class ManagementCostService {
                     .getOutsourcingCompanyByIdOrThrow(outsourcingCompanyId);
 
             if (outsourcingCompanyInfo != null) {
-                // 외주업체 수정 API 호출하여 Javers 스냅샷 생성
-                OutsourcingCompanyUpdateRequest updateRequest = new OutsourcingCompanyUpdateRequest(
+                // 외주업체 기본 정보 직접 업데이트
+                outsourcingCompany.updateBasicInfo(
                         outsourcingCompanyInfo.name(),
                         outsourcingCompanyInfo.businessNumber(),
-                        null, // typeDescription
                         outsourcingCompanyInfo.ceoName(),
-                        null, // address
-                        null, // detailAddress
-                        null, // landlineNumber
-                        null, // phoneNumber
-                        null, // email
-                        null, // isActive
-                        null, // defaultDeductions
-                        null, // defaultDeductionsDescription
                         outsourcingCompanyInfo.bankName(),
                         outsourcingCompanyInfo.accountNumber(),
                         outsourcingCompanyInfo.accountHolder(),
-                        outsourcingCompanyInfo.memo(),
-                        null, // contacts
-                        null, // files
-                        null // changeHistories
-                );
-                outsourcingCompanyService.updateOutsourcingCompany(outsourcingCompanyId,
-                        updateRequest);
+                        outsourcingCompanyInfo.memo());
+                outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
             }
         } else if (outsourcingCompanyInfo != null) {
             // 신규 외주업체 생성
