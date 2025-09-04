@@ -43,142 +43,69 @@ jobs:
       - name: 📦 JAR 파일 EC2로 전송
         run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
-      - name: 🚀 EC2 포트 기반 무중단 배포
+      - name: 🚀 EC2 무중단 배포
         run: |
           ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
             set -euo pipefail
-            
-            echo "🚀 포트 기반 무중단 배포 시작"
-            
-            # JAR 파일 교체
+
+            echo "🚀 무중단 배포 시작"
+
+            # JAR 교체
             mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
-            
-            # JAR 파일 존재 확인
             if [ ! -f "/home/ubuntu/app-latest.jar" ]; then
-              echo "❌ JAR 파일이 없습니다: /home/ubuntu/app-latest.jar"
+              echo "❌ JAR 파일 없음"
               exit 1
             fi
-            echo "✅ JAR 파일 준비 완료: /home/ubuntu/app-latest.jar"
-            
-            # 현재 활성 포트 확인 (Nginx upstream에서)
-            CURRENT_PORT=$(sudo grep "server 127.0.0.1:" /etc/nginx/sites-available/erp.conf | grep -oP '127.0.0.1:\K[0-9]+' | head -n 1)
-            
-            # 새 포트 결정
-            if [ "$CURRENT_PORT" = "8080" ]; then
-              NEW_PORT="8081"
-            elif [ "$CURRENT_PORT" = "8081" ]; then
-              NEW_PORT="8080"
+            echo "✅ JAR 준비 완료"
+
+            # 새 포트 선택 (현재 떠있는 포트 반대편)
+            if ss -tlnp | grep -q ":8080[[:space:]]"; then
+              NEW_PORT=8081
+              OLD_PORT=8080
             else
-              echo "❌ 현재 활성 포트를 확인할 수 없습니다: $CURRENT_PORT"
-              echo "▶ 기본값으로 8081로 전환"
-              NEW_PORT="8081"
-              CURRENT_PORT="8080"
+              NEW_PORT=8080
+              OLD_PORT=8081
             fi
-            
+
             NEW_APP="app-${NEW_PORT}"
-            OLD_APP="app-${CURRENT_PORT}"
-            
-            echo "▶ 포트 전환: $CURRENT_PORT → $NEW_PORT"
-            echo "▶ 새 앱: $NEW_APP, 이전 앱: $OLD_APP"
-            
-            # 새 앱 시작/재시작
+            OLD_APP="app-${OLD_PORT}"
+
+            echo "▶ 새 포트: $NEW_PORT, 이전 포트: $OLD_PORT"
+
+            # 새 앱 실행
             if pm2 list | grep -q "$NEW_APP"; then
-              echo "▶ 기존 $NEW_APP 프로세스 재시작 (새 JAR 적용)"
+              echo "▶ $NEW_APP 재시작"
               pm2 restart "$NEW_APP"
             else
-              echo "▶ 새 $NEW_APP 프로세스 시작"
+              echo "▶ $NEW_APP 시작"
               pm2 start ecosystem.config.js --only "$NEW_APP"
             fi
-            
-            # 새 앱 준비 대기
-            echo "▶ 새 앱 준비 대기 (포트: $NEW_PORT)"
-            
-            # 1단계: 포트 열림 확인
-            echo "▶ 1단계: 포트 열림 확인..."
+
+            # 새 앱 포트 오픈 대기
             for i in {1..20}; do
-              echo "▶ 포트 확인 시도 $i/20..."
-              
-              # 현재 열린 포트 목록 출력
-              echo "▶ 현재 열린 포트 목록:"
-              ss -tlnp | grep LISTEN || echo "열린 포트 없음"
-              
-              # 특정 포트 상태 확인
               if ss -tlnp | grep -q ":$NEW_PORT[[:space:]]"; then
-                echo "✅ 포트 $NEW_PORT에서 프로세스 확인됨"
-                echo "▶ 포트 $NEW_PORT 상세 정보:"
-                ss -tlnp | grep ":$NEW_PORT[[:space:]]"
+                echo "✅ 포트 $NEW_PORT 열림"
                 break
-              else
-                echo "⚠️ 포트 $NEW_PORT에서 프로세스 없음"
               fi
-              
-              if [ $i -eq 20 ]; then
-                echo "❌ 포트 $NEW_PORT에서 프로세스가 열리지 않음"
-                echo "▶ PM2 상태:"
-                pm2 list
-                echo "▶ PM2 로그 (마지막 20줄):"
-                pm2 logs "$NEW_APP" --lines 20
-                exit 1
-              fi
-              
+              [ $i -eq 20 ] && { echo "❌ 포트 안 열림"; pm2 logs "$NEW_APP" --lines 20; exit 1; }
               sleep 3
             done
-            
-            # 2단계: Spring Boot 완전 시작 대기
-            echo "▶ 2단계: Spring Boot 완전 시작 대기..."
+
+            # 헬스체크 대기
             for i in {1..20}; do
-              echo "▶ 헬스체크 시도 $i/20..."
-              
-              if curl -s --max-time 10 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 새 앱 준비 완료 (헬스체크 성공)"
+              if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 새 앱 준비 완료"
                 break
               fi
-              
-              if [ $i -eq 20 ]; then
-                echo "❌ 새 앱 시작 실패 (헬스체크 타임아웃)"
-                echo "▶ PM2 상태:"
-                pm2 list
-                echo "▶ PM2 로그 (마지막 20줄):"
-                pm2 logs "$NEW_APP" --lines 20
-                exit 1
-              fi
-              
+              [ $i -eq 20 ] && { echo "❌ 헬스체크 실패"; pm2 logs "$NEW_APP" --lines 20; exit 1; }
               sleep 3
             done
-            
-            # 포트 기반 전환: Nginx upstream을 새 포트로 변경
-            echo "▶ 포트 기반 전환: Nginx upstream을 $NEW_PORT로 변경"
-            
-            # Nginx 설정 백업
-            sudo cp /etc/nginx/sites-available/erp.conf /etc/nginx/sites-available/erp.conf.backup
-            
-            # 기존 Nginx 설정에서 포트만 변경
-            sudo sed -i "s/server 127.0.0.1:[0-9]\+/server 127.0.0.1:$NEW_PORT/g" /etc/nginx/sites-available/erp.conf
-            
-            # Nginx 설정 테스트 및 reload
-            sudo nginx -t && sudo nginx -s reload
-            echo "✅ Nginx upstream 전환 완료 (포트: $NEW_PORT)"
-            
-            # 전환 확인
-            sleep 2
-            if curl -s --max-time 5 "http://localhost/actuator/health" | grep -q '"status":"UP"'; then
-              echo "✅ 새 앱으로 전환 완료"
-              
-              # 이전 앱 종료 (포트 기반 전환의 장점!)
-              echo "▶ 이전 앱 $OLD_APP 종료"
-              sleep 10
-              pm2 delete "$OLD_APP" 2>/dev/null || true
-              
-              # PM2 상태 저장
-              pm2 save --force
-              
-              echo "✅ 포트 기반 무중단 배포 완료! (Bad Gateway 0초)"
-            else
-              echo "❌ 전환 실패, 롤백"
-              # Nginx 설정 롤백
-              sudo cp /etc/nginx/sites-available/erp.conf.backup /etc/nginx/sites-available/erp.conf
-              sudo nginx -s reload
-              echo "✅ 롤백 완료 (이전 설정으로 복구)"
-              exit 1
-            fi
+
+            # 이전 앱 종료
+            echo "▶ 이전 앱 $OLD_APP 종료"
+            pm2 delete "$OLD_APP" 2>/dev/null || true
+
+            # 상태 저장
+            pm2 save --force
+            echo "✅ 무중단 배포 완료"
           EOF
