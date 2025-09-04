@@ -144,8 +144,6 @@ public class MaterialManagement extends BaseEntity {
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
 
-        Optional.ofNullable(request.inputType())
-                .ifPresent(value -> this.inputType = value);
         Optional.ofNullable(request.inputTypeDescription())
                 .ifPresent(value -> this.inputTypeDescription = value);
         Optional.ofNullable(request.deliveryDate())

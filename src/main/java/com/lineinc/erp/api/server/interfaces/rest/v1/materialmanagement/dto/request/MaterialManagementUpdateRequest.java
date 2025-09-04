@@ -3,8 +3,6 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.req
 import java.time.LocalDate;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -18,8 +16,6 @@ public record MaterialManagementUpdateRequest(
         @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
 
         @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
-
-        @Schema(description = "투입 구분", example = "MAJOR_PURCHASE") @NotNull MaterialManagementInputType inputType,
 
         @Schema(description = "투입 구분 상세", example = "외주사 납품") String inputTypeDescription,
 
