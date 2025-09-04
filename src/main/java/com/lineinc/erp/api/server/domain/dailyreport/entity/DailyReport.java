@@ -16,6 +16,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -47,6 +49,9 @@ public class DailyReport extends BaseEntity {
     @Builder.Default
     private DailyReportStatus status = DailyReportStatus.PENDING; // 출역일보 상태
 
+    @Column
+    private OffsetDateTime completedAt; // 마감 일시
+
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<DailyReportEmployee> employees = new ArrayList<>(); // 출역일보 직원 목록
@@ -76,5 +81,6 @@ public class DailyReport extends BaseEntity {
      */
     public void complete() {
         this.status = DailyReportStatus.COMPLETED;
+        this.completedAt = OffsetDateTime.now(AppConstants.KOREA_ZONE);
     }
 }

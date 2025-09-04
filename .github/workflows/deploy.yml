@@ -166,6 +166,7 @@ jobs:
               
               # 이전 앱 종료 (포트 기반 전환의 장점!)
               echo "▶ 이전 앱 $OLD_APP 종료"
+              sleep 10
               pm2 delete "$OLD_APP" 2>/dev/null || true
               
               # PM2 상태 저장
