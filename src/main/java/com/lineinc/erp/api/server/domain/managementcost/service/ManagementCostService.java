@@ -417,8 +417,8 @@ public class ManagementCostService {
     /**
      * 인력명 키워드 검색
      */
-    public Slice<LaborNameResponse> getLaborNames(String keyword, LaborType type, Pageable pageable) {
-        return laborService.getLaborNames(keyword, type, pageable);
+    public Slice<LaborNameResponse> getLaborNames(String keyword, List<LaborType> types, Pageable pageable) {
+        return laborService.getLaborNames(keyword, types, pageable);
     }
 
     /**
