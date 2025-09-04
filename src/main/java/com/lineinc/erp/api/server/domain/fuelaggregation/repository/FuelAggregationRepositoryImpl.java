@@ -96,6 +96,7 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
 
     private BooleanBuilder buildCondition(FuelAggregationListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(fuelAggregation.deleted.eq(false));
 
         if (StringUtils.hasText(request.siteName())) {
             builder.and(site.name.containsIgnoreCase(request.siteName().trim()));
