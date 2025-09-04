@@ -17,7 +17,7 @@ public record ManagementCostCreateRequest(
 
         @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
 
-        @Schema(description = "외주 업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
+        @Schema(description = "외주 업체 ID", example = "1") Long outsourcingCompanyId,
 
         @Schema(description = "관리비 항목 구분", example = "DEPOSIT") @NotNull ItemType itemType,
 

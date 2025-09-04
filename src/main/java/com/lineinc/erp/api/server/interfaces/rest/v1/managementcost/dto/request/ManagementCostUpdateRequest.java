@@ -15,7 +15,7 @@ public record ManagementCostUpdateRequest(
 
         @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
 
-        @Schema(description = "외주 업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
+        @Schema(description = "외주 업체 ID", example = "1") Long outsourcingCompanyId,
 
         @Schema(description = "관리비 항목 설명", example = "6월 전기요금") @NotNull String itemTypeDescription,
 
