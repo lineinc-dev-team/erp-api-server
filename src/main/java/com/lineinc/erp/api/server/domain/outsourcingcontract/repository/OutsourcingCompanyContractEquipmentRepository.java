@@ -20,7 +20,7 @@ public interface OutsourcingCompanyContractEquipmentRepository
      * 외주업체 계약 ID로 장비 정보를 페이징하여 조회합니다.
      */
     @Query("SELECT e FROM OutsourcingCompanyContractEquipment e " +
-            "WHERE e.outsourcingCompanyContract.id = :contractId")
+            "WHERE e.outsourcingCompanyContract.id = :contractId AND e.deleted = false")
     Page<OutsourcingCompanyContractEquipment> findByOutsourcingCompanyContractId(
             @Param("contractId") Long contractId,
             Pageable pageable);
@@ -29,7 +29,7 @@ public interface OutsourcingCompanyContractEquipmentRepository
      * 외주업체 계약 ID 목록으로 장비 정보를 페이징하여 조회합니다.
      */
     @Query("SELECT e FROM OutsourcingCompanyContractEquipment e " +
-            "WHERE e.outsourcingCompanyContract.id IN :contractIds")
+            "WHERE e.outsourcingCompanyContract.id IN :contractIds AND e.deleted = false")
     Page<OutsourcingCompanyContractEquipment> findByOutsourcingCompanyContractIdIn(
             @Param("contractIds") List<Long> contractIds,
             Pageable pageable);

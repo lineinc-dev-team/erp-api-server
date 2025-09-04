@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.domain.outsourcingcontract.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
@@ -35,7 +34,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class OutsourcingCompanyContractDriver extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_driver_seq")
