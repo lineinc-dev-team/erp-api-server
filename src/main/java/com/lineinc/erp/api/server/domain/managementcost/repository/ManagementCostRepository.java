@@ -15,13 +15,13 @@ public interface ManagementCostRepository extends JpaRepository<ManagementCost, 
     /**
      * 특정 itemType의 itemDescription 값들을 조회
      */
-    @Query("SELECT DISTINCT mc.itemTypeDescription, mc.id FROM ManagementCost mc WHERE mc.itemType = :itemType AND mc.itemTypeDescription IS NOT NULL")
+    @Query("SELECT DISTINCT mc.itemTypeDescription, mc.id FROM ManagementCost mc WHERE mc.itemType = :itemType AND mc.itemTypeDescription IS NOT NULL AND mc.deleted = false")
     Slice<Object[]> findAllDistinctItemDescriptions(@Param("itemType") ItemType itemType, Pageable pageable);
 
     /**
      * 특정 itemType의 itemDescription 값들을 키워드로 검색
      */
-    @Query("SELECT DISTINCT mc.itemTypeDescription, mc.id FROM ManagementCost mc WHERE mc.itemType = :itemType AND mc.itemTypeDescription IS NOT NULL AND mc.itemTypeDescription LIKE %:keyword%")
+    @Query("SELECT DISTINCT mc.itemTypeDescription, mc.id FROM ManagementCost mc WHERE mc.itemType = :itemType AND mc.itemTypeDescription IS NOT NULL AND mc.itemTypeDescription LIKE %:keyword% AND mc.deleted = false")
     Slice<Object[]> findDistinctItemDescriptionsByKeyword(@Param("itemType") ItemType itemType,
             @Param("keyword") String keyword, Pageable pageable);
 }
