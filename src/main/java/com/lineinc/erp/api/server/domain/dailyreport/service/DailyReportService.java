@@ -56,6 +56,8 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Pageable;
@@ -518,6 +520,10 @@ public class DailyReportService {
 
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        // 출역일보 수정 가능 날짜 검증 (당일까지만)
+        validateDailyReportEditDate(reportDate);
+
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -569,6 +575,10 @@ public class DailyReportService {
 
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        // 출역일보 수정 가능 날짜 검증 (당일까지만)
+        validateDailyReportEditDate(reportDate);
+
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -630,6 +640,10 @@ public class DailyReportService {
 
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        // 출역일보 수정 가능 날짜 검증 (당일까지만)
+        validateDailyReportEditDate(reportDate);
+
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -689,6 +703,10 @@ public class DailyReportService {
 
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        // 출역일보 수정 가능 날짜 검증 (당일까지만)
+        validateDailyReportEditDate(reportDate);
+
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -762,6 +780,10 @@ public class DailyReportService {
 
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        // 출역일보 수정 가능 날짜 검증 (당일까지만)
+        validateDailyReportEditDate(reportDate);
+
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -835,6 +857,10 @@ public class DailyReportService {
 
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        // 출역일보 수정 가능 날짜 검증 (당일까지만)
+        validateDailyReportEditDate(reportDate);
+
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -896,6 +922,23 @@ public class DailyReportService {
         return dailyReportRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+    }
+
+    /**
+     * 출역일보 수정 가능 날짜인지 검증합니다.
+     * 당일까지만 수정 가능합니다.
+     * 
+     * @param reportDate 출역일보 날짜
+     * @throws ResponseStatusException 전날 이전 출역일보를 수정하려고 할 때
+     */
+    private void validateDailyReportEditDate(OffsetDateTime reportDate) {
+        LocalDate reportLocalDate = DateTimeFormatUtils.toKoreaLocalDate(reportDate);
+        LocalDate today = LocalDate.now(AppConstants.KOREA_ZONE);
+
+        if (reportLocalDate.isBefore(today)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.DAILY_REPORT_CANNOT_EDIT_PAST_DATE);
+        }
     }
 
     /**
