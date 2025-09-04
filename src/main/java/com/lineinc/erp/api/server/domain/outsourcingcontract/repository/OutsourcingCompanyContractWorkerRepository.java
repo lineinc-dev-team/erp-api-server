@@ -28,6 +28,10 @@ public interface OutsourcingCompanyContractWorkerRepository
     /**
      * 계약 ID 목록으로 인력 정보를 페이징하여 조회합니다.
      */
-    Page<OutsourcingCompanyContractWorker> findByOutsourcingCompanyContractIdIn(List<Long> contractIds,
+    @Query("SELECT w FROM OutsourcingCompanyContractWorker w " +
+            "WHERE w.outsourcingCompanyContract.id IN :contractIds " +
+            "AND w.deleted = false")
+    Page<OutsourcingCompanyContractWorker> findByOutsourcingCompanyContractIdIn(
+            @Param("contractIds") List<Long> contractIds,
             Pageable pageable);
 }
