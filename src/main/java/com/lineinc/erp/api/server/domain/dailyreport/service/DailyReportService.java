@@ -143,6 +143,12 @@ public class DailyReportService {
                 } else {
                     // 기존 인력 검색
                     labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
+
+                    // 직영/계약직 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
+                    if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.ETC) {
+                        throw new IllegalArgumentException(
+                                ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
+                    }
                 }
 
                 DailyReportDirectContract directContract = DailyReportDirectContract.builder()
@@ -590,6 +596,13 @@ public class DailyReportService {
                 request.directContracts(),
                 (DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo dto) -> {
                     Labor labor = laborService.getLaborByIdOrThrow(dto.laborId());
+
+                    // 직영/계약직 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
+                    if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.ETC) {
+                        throw new IllegalArgumentException(
+                                ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
+                    }
+
                     labor.updatePreviousDailyWage(dto.unitPrice());
 
                     return DailyReportDirectContract.builder()
