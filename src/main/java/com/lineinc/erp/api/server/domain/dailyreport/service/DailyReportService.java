@@ -968,9 +968,7 @@ public class DailyReportService {
                 .name(request.temporaryLaborName())
                 .type(LaborType.DIRECT_CONTRACT)
                 .isTemporary(true)
-                .outsourcingCompany(request.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
-                        : null)
+                .isHeadOffice(true)
                 .dailyWage(request.unitPrice())
                 .build();
 
