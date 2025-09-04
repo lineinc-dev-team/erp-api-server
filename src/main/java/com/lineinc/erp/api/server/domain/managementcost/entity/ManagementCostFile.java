@@ -50,7 +50,7 @@ public class ManagementCostFile extends BaseEntity implements UpdatableFrom<Mana
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @Column
-    @DiffInclude
+    @DiffIgnore
     private String fileUrl;
 
     /**

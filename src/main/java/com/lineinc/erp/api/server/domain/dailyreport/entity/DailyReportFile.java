@@ -51,7 +51,7 @@ public class DailyReportFile extends BaseEntity {
      * S3 또는 외부 스토리지에 저장된 사진의 URL
      */
     @Column
-    @DiffInclude
+    @DiffIgnore
     private String fileUrl;
 
     /**

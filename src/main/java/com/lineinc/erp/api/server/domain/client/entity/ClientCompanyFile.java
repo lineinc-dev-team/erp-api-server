@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.client.entity;
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.client.enums.FileType;
@@ -62,6 +63,7 @@ public class ClientCompanyFile extends BaseEntity {
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
+    @DiffIgnore
     @Column
     private String fileUrl; // S3 경로
 
