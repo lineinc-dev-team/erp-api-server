@@ -91,6 +91,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private boolean isActive = true;
 
+    @Builder.Default
+    @DiffInclude
+    @Column(nullable = false)
+    private boolean isHeadOffice = true; // 본사직원여부
+
     // ===== 연관 관계 =====
     @Builder.Default
     @DiffIgnore
@@ -161,6 +166,7 @@ public class User extends BaseEntity implements UserDetails {
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
+        Optional.ofNullable(request.isHeadOffice()).ifPresent(val -> this.isHeadOffice = val);
 
         Optional.ofNullable(department).ifPresent(val -> this.department = val);
         Optional.ofNullable(grade).ifPresent(val -> this.grade = val);

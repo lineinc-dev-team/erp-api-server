@@ -40,6 +40,8 @@ public record UserInfoResponse(
 
         @Schema(description = "직책", example = "팀장") String position,
 
+        @Schema(description = "본사 여부", example = "true") Boolean isHeadOffice,
+
         @Schema(description = "삭제 여부", example = "false") Boolean deleted,
 
         @Schema(description = "사용자 권한 목록") List<UserResponse.RoleSummaryResponse> roles) {
@@ -60,6 +62,7 @@ public record UserInfoResponse(
                 user.getDepartment() != null ? user.getDepartment().getName() : null,
                 user.getGrade() != null ? user.getGrade().getName() : null,
                 user.getPosition() != null ? user.getPosition().getName() : null,
+                user.isHeadOffice(),
                 user.isDeleted(),
                 user.getUserRoles().stream()
                         .max((ur1, ur2) -> ur1.getCreatedAt().compareTo(ur2.getCreatedAt())) // 가장 최근 것

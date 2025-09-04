@@ -22,6 +22,8 @@ public record CreateUserRequest(
 
         @NotNull @Schema(description = "사용자 활성화 여부", example = "true") boolean isActive,
 
+        @Schema(description = "본사 여부", example = "true") boolean isHeadOffice,
+
         @NotNull @Schema(description = "부서 ID", example = "1") Long departmentId,
 
         @NotNull @Schema(description = "직급 ID", example = "2") Long gradeId,
