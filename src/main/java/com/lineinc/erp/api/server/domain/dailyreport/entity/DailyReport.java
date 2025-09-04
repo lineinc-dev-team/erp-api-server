@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -42,6 +43,10 @@ public class DailyReport extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private WeatherType weather; // 날씨
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private DailyReportStatus status = DailyReportStatus.PENDING; // 출역일보 상태
+
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<DailyReportEmployee> employees = new ArrayList<>(); // 출역일보 직원 목록
@@ -65,4 +70,11 @@ public class DailyReport extends BaseEntity {
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<DailyReportFile> files = new ArrayList<>(); // 현장 사진 등록 목록
+
+    /**
+     * 출역일보를 마감 처리합니다.
+     */
+    public void complete() {
+        this.status = DailyReportStatus.COMPLETED;
+    }
 }

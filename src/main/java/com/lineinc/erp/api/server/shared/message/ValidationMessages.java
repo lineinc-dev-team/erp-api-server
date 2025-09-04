@@ -73,6 +73,7 @@ public final class ValidationMessages {
     public static final String INVALID_LANDLINE = "유효한 유선 전화번호 형식이 아닙니다.";
     public static final String INVALID_PHONE_OR_LANDLINE = "유효한 전화번호 형식(휴대폰 또는 유선전화)이 아닙니다.";
     public static final String INVALID_URL = "유효한 URL 형식이 아닙니다.";
+    public static final String INVALID_DATE_FORMAT = "유효한 날짜 형식이 아닙니다. (YYYY-MM-DD 형식으로 입력해주세요)";
     public static final String INVALID_DOWNLOAD_FIELD = "다운로드할 수 없는 필드입니다: ";
 
     // ===== HTTP 관련 메시지 =====

@@ -907,6 +907,24 @@ public class DailyReportService {
         dailyReportRepository.save(dailyReport);
     }
 
+    @Transactional
+    public void completeDailyReport(DailyReportSearchRequest searchRequest) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+        DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 마감 처리
+        dailyReport.complete();
+        dailyReportRepository.save(dailyReport);
+    }
+
     private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {
         return outsourcingCompanyContractRepository.findById(contractId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,

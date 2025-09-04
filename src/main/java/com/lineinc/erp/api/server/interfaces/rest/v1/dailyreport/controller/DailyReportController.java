@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.dailyreport.service.DailyReportService;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
@@ -24,6 +26,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
@@ -54,6 +57,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "현장, 공정, 인력 등을 찾을 수 없음", content = @Content())
     })
     @PostMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createDailyReport(
             @Valid @RequestBody DailyReportCreateRequest request) {
         dailyReportService.createDailyReport(request);
@@ -67,6 +71,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "현장 또는 공정을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/employees")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportEmployeeResponse>>> searchDailyReportEmployees(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
@@ -87,6 +92,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "출역일보 직원정보를 찾을 수 없음", content = @Content())
     })
     @PatchMapping("/employees")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportEmployee(
             @Valid DailyReportSearchRequest searchRequest,
             @Valid @RequestBody DailyReportEmployeeUpdateRequest request) {
@@ -101,6 +107,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "출역일보 직영/계약직 정보를 찾을 수 없음", content = @Content())
     })
     @PatchMapping("/direct-contracts")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportDirectContract(
             @Valid DailyReportSearchRequest searchRequest,
             @Valid @RequestBody DailyReportDirectContractUpdateRequest request) {
@@ -115,6 +122,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "출역일보 외주 정보를 찾을 수 없음", content = @Content())
     })
     @PatchMapping("/outsourcings")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportOutsourcing(
             @Valid DailyReportSearchRequest searchRequest,
             @Valid @RequestBody DailyReportOutsourcingUpdateRequest request) {
@@ -129,6 +137,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "출역일보 장비 정보를 찾을 수 없음", content = @Content())
     })
     @PatchMapping("/equipments")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportEquipment(
             @Valid DailyReportSearchRequest searchRequest,
             @Valid @RequestBody DailyReportEquipmentUpdateRequest request) {
@@ -143,6 +152,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "출역일보 유류 정보를 찾을 수 없음", content = @Content())
     })
     @PatchMapping("/fuels")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportFuel(
             @Valid DailyReportSearchRequest searchRequest,
             @Valid @RequestBody DailyReportFuelUpdateRequest request) {
@@ -157,6 +167,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "출역일보 파일 정보를 찾을 수 없음", content = @Content())
     })
     @PatchMapping("/files")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportFile(
             @Valid DailyReportSearchRequest searchRequest,
             @Valid @RequestBody DailyReportFileUpdateRequest request) {
@@ -171,6 +182,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "현장 또는 공정을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/direct-contracts")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractResponse>>> searchDailyReportDirectContracts(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
@@ -191,6 +203,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "현장 또는 공정을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/outsourcings")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportOutsourcingResponse>>> searchDailyReportOutsourcings(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
@@ -211,6 +224,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "현장 또는 공정을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/fuels")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportFuelResponse>>> searchDailyReportFuels(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
@@ -231,6 +245,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "현장 또는 공정을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/equipments")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportEquipmentResponse>>> searchDailyReportEquipments(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
@@ -251,6 +266,7 @@ public class DailyReportController {
             @ApiResponse(responseCode = "404", description = "현장 또는 공정을 찾을 수 없음", content = @Content())
     })
     @GetMapping("/files")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportFileResponse>>> searchDailyReportFiles(
             @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest,
@@ -263,4 +279,18 @@ public class DailyReportController {
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
+
+    @Operation(summary = "출역일보 마감", description = "출역일보를 마감 처리합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "마감 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "출역일보를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping("/complete")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.APPROVE)
+    public ResponseEntity<Void> completeDailyReport(@Valid DailyReportSearchRequest searchRequest) {
+        dailyReportService.completeDailyReport(searchRequest);
+        return ResponseEntity.ok().build();
+    }
+
 }
