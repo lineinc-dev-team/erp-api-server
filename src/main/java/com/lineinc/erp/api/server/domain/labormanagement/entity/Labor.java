@@ -274,6 +274,9 @@ public class Labor extends BaseEntity {
         // 외주업체 정보와 본사 인력 여부 업데이트
         Optional.ofNullable(outsourcingCompany).ifPresent(val -> this.outsourcingCompany = val);
         Optional.ofNullable(isHeadOffice).ifPresent(val -> this.isHeadOffice = val);
+
+        // 업데이트가 일어나면 임시 인력해제
+        this.isTemporary = false;
     }
 
     /**
