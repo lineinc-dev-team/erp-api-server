@@ -38,6 +38,8 @@ public record LaborDetailResponse(
         @Schema(description = "비고") String memo,
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt,
+        @Schema(description = "근속일수") Long tenureDays,
+        @Schema(description = "퇴직금 발생 요건 여부", example = "true") Boolean isSeverancePayEligible,
         @Schema(description = "첨부파일 목록") List<LaborFileResponse> files) {
 
     public static LaborDetailResponse from(Labor labor) {
@@ -71,6 +73,8 @@ public record LaborDetailResponse(
                 labor.getMemo(),
                 labor.getCreatedAt(),
                 labor.getUpdatedAt(),
+                labor.getTenureDays(),
+                labor.getIsSeverancePayEligible(),
                 fileResponses
 
         );
