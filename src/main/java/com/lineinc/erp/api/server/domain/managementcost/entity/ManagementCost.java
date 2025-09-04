@@ -118,9 +118,6 @@ public class ManagementCost extends BaseEntity {
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
 
-        if (request.itemType() != null) {
-            this.itemType = request.itemType();
-        }
         if (request.itemTypeDescription() != null) {
             this.itemTypeDescription = request.itemTypeDescription();
         }
