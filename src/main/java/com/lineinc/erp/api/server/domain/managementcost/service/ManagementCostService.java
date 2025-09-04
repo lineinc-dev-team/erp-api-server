@@ -126,12 +126,12 @@ public class ManagementCostService {
         OutsourcingCompany outsourcingCompany = null;
 
         if (outsourcingCompanyId != null) {
-            // 기존 외주업체 수정
+            // 기존 외주업체 조회
             outsourcingCompany = outsourcingCompanyService
                     .getOutsourcingCompanyByIdOrThrow(outsourcingCompanyId);
 
             if (outsourcingCompanyInfo != null) {
-                // 직접 엔티티 수정하여 Javers 스냅샷 생성 방지
+                // 외주업체 수정 API 호출하여 Javers 스냅샷 생성
                 OutsourcingCompanyUpdateRequest updateRequest = new OutsourcingCompanyUpdateRequest(
                         outsourcingCompanyInfo.name(),
                         outsourcingCompanyInfo.businessNumber(),
@@ -153,8 +153,8 @@ public class ManagementCostService {
                         null, // files
                         null // changeHistories
                 );
-                outsourcingCompany.updateFrom(updateRequest);
-                outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
+                outsourcingCompanyService.updateOutsourcingCompany(outsourcingCompanyId,
+                        updateRequest);
             }
         } else if (outsourcingCompanyInfo != null) {
             // 신규 외주업체 생성
