@@ -91,6 +91,15 @@ public class TenureDaysBatchService implements BatchService {
 
         if (newTenureDays != null && !newTenureDays.equals(labor.getTenureDays())) {
             laborRepository.updateTenureDays(labor.getId(), newTenureDays);
+
+            // 근속일수가 설정된 기준일 이상이면 퇴직금 발생 예정 (알림용)
+            if (newTenureDays >= AppConstants.SEVERANCE_PAY_NOTIFICATION_DAYS
+                    && !Boolean.TRUE.equals(labor.getIsSeverancePayEligible())) {
+                labor.setIsSeverancePayEligible(true);
+                laborRepository.save(labor);
+                log.info("인력 {} - 퇴직금 발생 예정 알림 (근속일수: {}일, 6개월 경과)", labor.getName(), newTenureDays);
+            }
+
             log.info("인력 {} - 근속일수: {} → {}", labor.getName(), labor.getTenureDays(),
                     newTenureDays);
         }

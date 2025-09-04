@@ -86,17 +86,4 @@ public interface LaborRepository extends JpaRepository<Labor, Long>, LaborReposi
     List<Labor> findEligibleLaborsForTenureDaysCalculation(@Param("type1") LaborType type1,
             @Param("type2") LaborType type2);
 
-    /**
-     * 퇴직금 산정을 위해 유효한 인력을 조회합니다.
-     * 조건: 삭제되지 않음, 지정된 type, 첫 근무일 존재, 퇴직금 기준일 존재
-     */
-    @Query("""
-            SELECT l FROM Labor l
-            WHERE l.deleted = false
-              AND (l.type = :type1 OR l.type = :type2)
-              AND l.firstWorkDate IS NOT NULL
-              AND l.severancePayEligibilityDate IS NOT NULL
-            """)
-    List<Labor> findEligibleLaborsForSeverancePayCalculation(@Param("type1") LaborType type1,
-            @Param("type2") LaborType type2);
 }

@@ -152,9 +152,7 @@ public class DailyReportService {
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
 
                 if (labor.getFirstWorkDate() == null) {
-                    OffsetDateTime firstWorkDate = OffsetDateTime.now(AppConstants.KOREA_ZONE);
-                    labor.setFirstWorkDate(firstWorkDate);
-                    labor.setSeverancePayEligibilityDate(firstWorkDate);
+                    labor.setFirstWorkDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
                 }
 
                 dailyReport.getDirectContracts().add(directContract);

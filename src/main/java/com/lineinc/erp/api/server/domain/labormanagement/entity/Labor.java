@@ -181,13 +181,6 @@ public class Labor extends BaseEntity {
     private OffsetDateTime firstWorkDate;
 
     /**
-     * 퇴직금 발생 요건 기준일
-     */
-    @DiffInclude
-    @Column
-    private OffsetDateTime severancePayEligibilityDate;
-
-    /**
      * 외주업체 연결 (용역, 현장계약직인 경우)
      */
     @DiffIgnore
@@ -298,13 +291,6 @@ public class Labor extends BaseEntity {
     }
 
     /**
-     * 퇴직금 발생 요건 기준일을 설정합니다.
-     */
-    public void setSeverancePayEligibilityDate(OffsetDateTime severancePayEligibilityDate) {
-        this.severancePayEligibilityDate = severancePayEligibilityDate;
-    }
-
-    /**
      * 퇴직금 발생 여부를 설정합니다.
      */
     public void setIsSeverancePayEligible(Boolean isSeverancePayEligible) {
@@ -367,10 +353,6 @@ public class Labor extends BaseEntity {
     @Transient
     @DiffInclude
     private String resignationDateFormat;
-
-    @Transient
-    @DiffInclude
-    private String severancePayEligibilityDateFormat;
 
     /**
      * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
