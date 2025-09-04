@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureDaysBatchService;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchController {
 
     private final TenureDaysBatchService tenureDaysBatchService;
+    private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
 
     /**
      * 근속일수 업데이트 배치를 수동으로 실행합니다.
@@ -31,7 +33,7 @@ public class BatchController {
      * @return 배치 실행 결과
      */
     @PostMapping("/tenure-days")
-    @Operation(summary = "근속일수 업데이트 배치 실행", description = "직영/계약직, 기타 인력의 근속일수를 계산하고 업데이트합니다. (관리자만 실행 가능)")
+    @Operation(summary = "근속일수 업데이트 배치 실행", description = "직영/계약직, 기타 인력의 근속일수를 계산하고 업데이트합니다.")
     public ResponseEntity<String> runTenureDaysBatch() {
         try {
             log.info("근속일수 업데이트 배치 수동 실행 시작");
@@ -41,6 +43,27 @@ public class BatchController {
             return ResponseEntity.ok(message);
         } catch (Exception e) {
             log.error("근속일수 업데이트 배치 실행 중 오류 발생", e);
+            return ResponseEntity.status(500)
+                    .body("배치 실행 실패: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 출역일보 자동 마감 배치를 수동으로 실행합니다.
+     * 
+     * @return 배치 실행 결과
+     */
+    @PostMapping("/daily-report-auto-complete")
+    @Operation(summary = "출역일보 자동 마감 배치 실행", description = "전날의 PENDING 상태 출역일보를 AUTO_COMPLETED로 변경합니다.")
+    public ResponseEntity<String> runDailyReportAutoCompleteBatch() {
+        try {
+            log.info("출역일보 자동 마감 배치 수동 실행 시작");
+            dailyReportAutoCompleteBatchService.execute();
+            String message = "출역일보 자동 마감 배치 완료";
+            log.info(message);
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+            log.error("출역일보 자동 마감 배치 실행 중 오류 발생", e);
             return ResponseEntity.status(500)
                     .body("배치 실행 실패: " + e.getMessage());
         }

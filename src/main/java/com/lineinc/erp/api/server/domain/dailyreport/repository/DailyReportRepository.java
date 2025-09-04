@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
@@ -98,4 +99,16 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     Double calculateLastMonthWorkHours(@Param("laborId") Long laborId,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
+
+    /**
+     * 특정 날짜 범위와 상태로 출역일보를 조회합니다.
+     * 자동 마감 배치에서 사용됩니다.
+     */
+    @Query("SELECT dr FROM DailyReport dr " +
+            "WHERE dr.reportDate >= :startDate " +
+            "AND dr.reportDate <= :endDate " +
+            "AND dr.status = :status")
+    List<DailyReport> findByReportDateBetweenAndStatus(@Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("status") DailyReportStatus status);
 }
