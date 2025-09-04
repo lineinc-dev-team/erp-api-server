@@ -24,6 +24,7 @@ import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChan
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyBasicInfoRequest;
@@ -161,6 +162,7 @@ public class ManagementCostService {
             outsourcingCompany = OutsourcingCompany.builder()
                     .name(outsourcingCompanyInfo.name())
                     .businessNumber(outsourcingCompanyInfo.businessNumber())
+                    .type(OutsourcingCompanyType.ETC)
                     .ceoName(outsourcingCompanyInfo.ceoName())
                     .bankName(outsourcingCompanyInfo.bankName())
                     .accountNumber(outsourcingCompanyInfo.accountNumber())

@@ -110,6 +110,12 @@ public class DailyReportService {
             for (DailyReportEmployeeCreateRequest employeeRequest : request.employees()) {
                 Labor labor = laborService.getLaborByIdOrThrow(employeeRequest.laborId());
 
+                // 정규직원만 직원 출역 정보에 추가 가능
+                if (labor.getType() != LaborType.REGULAR_EMPLOYEE) {
+                    throw new IllegalArgumentException(
+                            ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
+                }
+
                 DailyReportEmployee employee = DailyReportEmployee.builder()
                         .dailyReport(dailyReport)
                         .labor(labor)
@@ -516,6 +522,13 @@ public class DailyReportService {
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 정규직원만 직원 출역 정보에 추가 가능
+        if (request.employees().stream().anyMatch(employee -> employee.laborId() != null
+                && laborService.getLaborByIdOrThrow(employee.laborId()).getType() != LaborType.REGULAR_EMPLOYEE)) {
+            throw new IllegalArgumentException(
+                    ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
+        }
 
         // EntitySyncUtils.syncList를 사용하여 직원정보 동기화
         EntitySyncUtils.syncList(

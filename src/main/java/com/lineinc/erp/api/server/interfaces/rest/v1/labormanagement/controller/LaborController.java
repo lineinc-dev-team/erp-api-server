@@ -228,9 +228,10 @@ public class LaborController {
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
             @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) LaborType type) {
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size());
+        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
         Slice<LaborNameResponse> slice = laborService.getLaborNames(keyword, type, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(

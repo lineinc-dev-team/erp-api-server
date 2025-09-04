@@ -64,6 +64,7 @@ public final class ValidationMessages {
     // ===== 출역일보 관련 메시지 =====
     public static final String DAILY_REPORT_NOT_FOUND = "출역일보를 찾을 수 없습니다.";
     public static final String DAILY_REPORT_ALREADY_EXISTS = "같은 날짜, 현장, 공정에 대한 출역일보가 이미 존재합니다.";
+    public static final String DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR = "직원 출역 정보에는 정규직원만 추가할 수 있습니다.";
 
     // ===== 입력값 검증 관련 메시지 =====
     public static final String INVALID_PHONE = "유효한 휴대폰 번호 형식이 아닙니다.";
