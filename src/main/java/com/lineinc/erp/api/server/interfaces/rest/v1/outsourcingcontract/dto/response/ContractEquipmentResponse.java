@@ -43,14 +43,16 @@ public record ContractEquipmentResponse(
             @Schema(description = "장비 ID", example = "1") Long id,
             @Schema(description = "규격", example = "25톤 크레인") String specification,
             @Schema(description = "차량번호", example = "12가3456") String vehicleNumber,
-            @Schema(description = "카테고리", example = "크레인") String category) {
+            @Schema(description = "카테고리", example = "크레인") String category,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
         public static ContractEquipmentSimpleResponse from(OutsourcingCompanyContractEquipment equipment) {
             return new ContractEquipmentSimpleResponse(
                     equipment.getId(),
                     equipment.getSpecification(),
                     equipment.getVehicleNumber(),
-                    equipment.getCategory());
+                    equipment.getCategory(),
+                    equipment.isDeleted());
 
         }
     }

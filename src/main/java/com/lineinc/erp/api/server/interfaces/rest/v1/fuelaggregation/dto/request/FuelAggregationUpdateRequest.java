@@ -7,34 +7,36 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "유류집계 수정 요청")
 public record FuelAggregationUpdateRequest(
-        @Schema(description = "현장 ID", example = "1") Long siteId,
+        @Schema(description = "현장 ID", example = "1") @NotNull Long siteId,
 
-        @Schema(description = "공정 ID", example = "1") Long siteProcessId,
+        @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
 
-        @Schema(description = "일자", example = "2025-07-28") LocalDate date,
+        @Schema(description = "일자", example = "2025-07-28") @NotNull LocalDate date,
 
-        @Schema(description = "날씨", example = "SUNNY") WeatherType weather,
+        @Schema(description = "날씨", example = "SUNNY") @NotNull WeatherType weather,
 
-        @Schema(description = "유류정보 수정 목록") List<FuelInfoUpdateRequest> fuelInfos,
+        @Schema(description = "유류정보 수정 목록") @Valid List<FuelInfoUpdateRequest> fuelInfos,
 
-        @Schema(description = "수정 이력 리스트") List<ChangeHistoryRequest> changeHistories) {
+        @Schema(description = "수정 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
 
     @Schema(description = "유류정보 수정 요청")
     public record FuelInfoUpdateRequest(
-            @Schema(description = "유류정보 ID (수정 시)", example = "1") Long id,
+            @Schema(description = "유류정보 ID (수정 시)", example = "1") @NotNull Long id,
 
-            @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
+            @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
 
-            @Schema(description = "기사 ID", example = "1") Long driverId,
+            @Schema(description = "기사 ID", example = "1") @NotNull Long driverId,
 
-            @Schema(description = "장비 ID", example = "1") Long equipmentId,
+            @Schema(description = "장비 ID", example = "1") @NotNull Long equipmentId,
 
-            @Schema(description = "유종", example = "DIESEL") FuelType fuelType,
+            @Schema(description = "유종", example = "DIESEL") @NotNull FuelType fuelType,
 
-            @Schema(description = "주유량 (리터)", example = "50") Long fuelAmount,
+            @Schema(description = "주유량 (리터)", example = "50") @NotNull Long fuelAmount,
 
             @Schema(description = "비고", example = "오전 주유") String memo) {
     }
