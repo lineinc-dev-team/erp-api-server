@@ -81,6 +81,8 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
     private BooleanBuilder buildCondition(ManagementCostListRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
 
+        builder.and(managementCost.deleted.eq(false));
+
         if (StringUtils.hasText(request.siteName())) {
             builder.and(site.name.containsIgnoreCase(request.siteName().trim()));
         }

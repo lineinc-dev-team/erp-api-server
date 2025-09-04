@@ -13,7 +13,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import jakarta.persistence.Transient;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class ManagementCost extends BaseEntity {
 
     @Id
