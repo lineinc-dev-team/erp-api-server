@@ -43,6 +43,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -235,7 +236,7 @@ public class UserService {
     public void updateLastLoginAt(Long userId) {
         User user = usersRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        user.updateLastLoginAt(); // 이건 쿼리 나감
+        user.setLastLoginAt(OffsetDateTime.now());
     }
 
     @Transactional(readOnly = true)

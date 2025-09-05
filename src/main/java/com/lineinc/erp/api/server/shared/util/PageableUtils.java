@@ -59,18 +59,16 @@ public class PageableUtils {
 
     public static OrderSpecifier<?>[] toOrderSpecifiers(
             Pageable pageable,
-            Map<String, ComparableExpressionBase<?>> fieldMapping
-    ) {
+            Map<String, ComparableExpressionBase<?>> fieldMapping) {
         if (pageable.getSort().isEmpty()) {
-            return new OrderSpecifier[0];  // 기본 정렬 없이 빈 배열 반환
+            return new OrderSpecifier[0]; // 기본 정렬 없이 빈 배열 반환
         }
         return toOrderSpecifiers(pageable.getSort(), fieldMapping);
     }
 
     public static OrderSpecifier<?>[] toOrderSpecifiers(
             Sort sort,
-            Map<String, ComparableExpressionBase<?>> fieldMapping
-    ) {
+            Map<String, ComparableExpressionBase<?>> fieldMapping) {
         if (sort == null || sort.isEmpty()) {
             return new OrderSpecifier[0];
         }
@@ -81,7 +79,7 @@ public class PageableUtils {
                     ComparableExpressionBase<?> path = fieldMapping.get(order.getProperty());
 
                     if (path == null) {
-                        return null;  // 매핑 안 된 필드는 무시
+                        return null; // 매핑 안 된 필드는 무시
                     }
 
                     return new OrderSpecifier<>(direction, path);

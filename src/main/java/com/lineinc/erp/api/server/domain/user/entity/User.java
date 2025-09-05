@@ -10,7 +10,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.javers.core.metamodel.annotation.DiffInclude;
-import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -32,7 +31,6 @@ public class User extends BaseEntity implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    // ===== 기본 정보 =====
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
@@ -52,7 +50,6 @@ public class User extends BaseEntity implements UserDetails {
     @DiffInclude
     private String email;
 
-    // ===== 연락처 정보 =====
     @Column
     @DiffInclude
     private String landlineNumber;
@@ -61,53 +58,45 @@ public class User extends BaseEntity implements UserDetails {
     @DiffInclude
     private String phoneNumber;
 
-    // ===== 조직 정보 =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
-    @DiffIgnore
     private Department department;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_id")
-    @DiffIgnore
     private Grade grade;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id")
-    @DiffIgnore
     private Position position;
 
-    // ===== 상태 및 설정 =====
     @Column
+    @Setter
     private OffsetDateTime lastLoginAt;
 
-    @Setter
     @Builder.Default
     @Column(nullable = false)
+    @Setter
     private boolean requirePasswordReset = true;
 
     @Builder.Default
-    @DiffInclude
     @Column(nullable = false)
+    @DiffInclude
     private boolean isActive = true;
 
     @Builder.Default
-    @DiffInclude
     @Column(nullable = false)
-    private boolean isHeadOffice = true; // 본사직원여부
+    @DiffInclude
+    private boolean isHeadOffice = true;
 
-    // ===== 연관 관계 =====
     @Builder.Default
-    @DiffIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> userRoles = new HashSet<>();
 
-    // ===== 메모 =====
-    @DiffInclude
     @Column(columnDefinition = "TEXT")
+    @DiffInclude
     private String memo;
 
-    // ===== Transient 필드 (화면 표시용) =====
     @Transient
     @DiffInclude
     private String departmentName;
@@ -120,7 +109,6 @@ public class User extends BaseEntity implements UserDetails {
     @DiffInclude
     private String positionName;
 
-    // ===== UserDetails 구현 =====
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -136,14 +124,9 @@ public class User extends BaseEntity implements UserDetails {
         return this.passwordHash;
     }
 
-    // ===== 핵심 비즈니스 메서드 =====
     public void updatePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
         this.requirePasswordReset = false;
-    }
-
-    public void updateLastLoginAt() {
-        this.lastLoginAt = OffsetDateTime.now();
     }
 
     public void syncTransientFields() {
@@ -167,7 +150,6 @@ public class User extends BaseEntity implements UserDetails {
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
         Optional.ofNullable(request.isHeadOffice()).ifPresent(val -> this.isHeadOffice = val);
-
         Optional.ofNullable(department).ifPresent(val -> this.department = val);
         Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
         Optional.ofNullable(position).ifPresent(val -> this.position = val);
