@@ -29,14 +29,14 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "name"),
+        @Index(columnList = "name"), // 품명 검색 최적화
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class SteelManagementDetail extends BaseEntity {
+public class SteelManagementDetail extends BaseEntity implements UpdatableFrom<SteelManagementDetailUpdateRequest> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "steel_management_detail_seq")
@@ -122,6 +122,7 @@ public class SteelManagementDetail extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    @Override
     public void updateFrom(SteelManagementDetailUpdateRequest request) {
         Optional.ofNullable(request.standard()).ifPresent(val -> this.standard = val);
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
