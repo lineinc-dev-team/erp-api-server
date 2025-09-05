@@ -85,12 +85,39 @@ public class JaversUtils {
         return diff.getChanges().stream()
                 .filter(c -> c instanceof ValueChange)
                 .map(c -> (ValueChange) c)
+                .filter(vc -> !isSystemOnlyChange(vc)) // 시스템 전용 변경 제외
                 .map(vc -> Map.of(
                         "property", vc.getPropertyName(),
                         "before", toJsonSafe(javers, vc.getLeft()),
                         "after", toJsonSafe(javers, vc.getRight()),
                         "type", "수정"))
                 .collect(Collectors.toList());
+    }
+
+    // 삭제 전용 변경 감지
+    public static boolean isDeletedChange(Diff diff) {
+        return diff.getChanges().stream()
+                .filter(c -> c instanceof ValueChange)
+                .map(c -> (ValueChange) c)
+                .anyMatch(vc -> "deleted".equals(vc.getPropertyName()) &&
+                        Boolean.TRUE.equals(vc.getRight()));
+    }
+
+    // 시스템 전용 변경인지 확인 (일반 수정 이력에서 제외)
+    private static boolean isSystemOnlyChange(ValueChange vc) {
+        String propertyName = vc.getPropertyName();
+
+        // deleted 필드는 삭제 시에만 추적하고, 일반 수정에서는 제외
+        if ("deleted".equals(propertyName)) {
+            return true;
+        }
+
+        // deletedAt도 시스템 필드이므로 제외
+        if ("deletedAt".equals(propertyName)) {
+            return true;
+        }
+
+        return false;
     }
 
     public static Map<String, String> extractAddedEntityChange(Javers javers, Object newEntity) {
