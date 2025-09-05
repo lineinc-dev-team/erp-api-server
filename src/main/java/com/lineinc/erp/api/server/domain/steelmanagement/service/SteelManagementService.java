@@ -25,7 +25,7 @@ import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementChangeHistory;
-import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeType;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeHistoryType;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementDetailRepository;
@@ -295,7 +295,7 @@ public class SteelManagementService {
             String otherChangesJson = javers.getJsonConverter().toJson(otherChanges);
             SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
                     .steelManagement(steelManagement)
-                    .type(SteelManagementChangeType.BASIC)
+                    .type(SteelManagementChangeHistoryType.BASIC)
                     .changes(otherChangesJson)
                     .build();
             steelManagementChangeHistoryRepository.save(changeHistory);
@@ -306,7 +306,7 @@ public class SteelManagementService {
             String outsourcingChangesJson = javers.getJsonConverter().toJson(outsourcingChanges);
             SteelManagementChangeHistory outsourcingChangeHistory = SteelManagementChangeHistory.builder()
                     .steelManagement(steelManagement)
-                    .type(SteelManagementChangeType.OUTSOURCING_COMPANY)
+                    .type(SteelManagementChangeHistoryType.OUTSOURCING_COMPANY)
                     .changes(outsourcingChangesJson)
                     .build();
             steelManagementChangeHistoryRepository.save(outsourcingChangeHistory);

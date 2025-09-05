@@ -4,7 +4,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeType;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeHistoryType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,7 +42,7 @@ public class SteelManagementChangeHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private SteelManagementChangeType type;
+    private SteelManagementChangeHistoryType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")

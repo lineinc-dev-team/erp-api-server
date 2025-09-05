@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementChangeHistory;
-import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeType;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeHistoryType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -24,7 +24,7 @@ public record SteelManagementChangeHistoryResponse(
 
         @Schema(description = "변경 유형", example = "기본정보") String type,
 
-        @Schema(description = "변경 유형 코드", example = "BASIC") SteelManagementChangeType typeCode) {
+        @Schema(description = "변경 유형 코드", example = "BASIC") SteelManagementChangeHistoryType typeCode) {
 
     public static SteelManagementChangeHistoryResponse from(SteelManagementChangeHistory history) {
         return new SteelManagementChangeHistoryResponse(

@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.domain.steelmanagement.enums;
 import lombok.Getter;
 
 @Getter
-public enum SteelManagementChangeType {
+public enum SteelManagementChangeHistoryType {
     BASIC("기본정보"),
     DETAIL("품목상세"),
     ATTACHMENT("첨부파일"),
@@ -11,7 +11,7 @@ public enum SteelManagementChangeType {
 
     private final String label;
 
-    SteelManagementChangeType(String label) {
+    SteelManagementChangeHistoryType(String label) {
         this.label = label;
     }
 }

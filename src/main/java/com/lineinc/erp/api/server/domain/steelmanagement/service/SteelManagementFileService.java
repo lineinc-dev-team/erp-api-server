@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
-import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeType;
+import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeHistoryType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementFileRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementFileCreateRequest;
@@ -108,7 +108,7 @@ public class SteelManagementFileService {
             String json = javers.getJsonConverter().toJson(allChanges);
             SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
                     .steelManagement(steelManagement)
-                    .type(SteelManagementChangeType.ATTACHMENT)
+                    .type(SteelManagementChangeHistoryType.ATTACHMENT)
                     .changes(json)
                     .build();
             steelManagementChangeHistoryRepository.save(changeHistory);
