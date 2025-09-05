@@ -23,8 +23,7 @@ public class WebFilterConfig {
         FilterRegistrationBean<RateLimitingFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(rateLimitingFilter);
         registration.addUrlPatterns("/api/*"); // API 경로에만 적용
-        registration.setOrder(1); // 가장 먼저 실행
-        registration.setName("rateLimitingFilter");
+        registration.setOrder(0); // 가장 먼저 실행
         return registration;
     }
 }
