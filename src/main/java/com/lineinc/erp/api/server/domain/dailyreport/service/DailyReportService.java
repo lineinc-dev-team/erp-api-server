@@ -750,7 +750,7 @@ public class DailyReportService {
         // EntitySyncUtils.syncList를 사용하여 장비 정보 동기화
         EntitySyncUtils.syncList(
                 dailyReport.getOutsourcingEquipments(),
-                request.equipments(),
+                request.outsourcingEquipments(),
                 (DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo dto) -> {
                     return DailyReportOutsourcingEquipment.builder()
                             .dailyReport(dailyReport)
@@ -773,7 +773,7 @@ public class DailyReportService {
 
         // outsourcingCompany, outsourcingCompanyContractDriver,
         // outsourcingCompanyContractEquipment 업데이트를 위해 추가 처리 (한 번만 반복)
-        for (DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo equipmentInfo : request.equipments()) {
+        for (DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo equipmentInfo : request.outsourcingEquipments()) {
             if (equipmentInfo.id() != null) { // ID가 있는 것만 처리
                 final OutsourcingCompany outsourcingCompany = equipmentInfo.outsourcingCompanyId() != null
                         ? outsourcingCompanyService

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Schema(description = "출역일보 장비 수정 요청")
 public record DailyReportEquipmentUpdateRequest(
-        @Schema(description = "수정할 장비 정보 목록") List<@Valid EquipmentUpdateInfo> equipments) {
+        @Schema(description = "수정할 장비 정보 목록") List<@Valid EquipmentUpdateInfo> outsourcingEquipments) {
 
     @Schema(description = "장비 정보 수정 내용")
     public record EquipmentUpdateInfo(
