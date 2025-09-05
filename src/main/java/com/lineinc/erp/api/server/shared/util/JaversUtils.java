@@ -85,12 +85,33 @@ public class JaversUtils {
         return diff.getChanges().stream()
                 .filter(c -> c instanceof ValueChange)
                 .map(c -> (ValueChange) c)
-                .filter(vc -> !isSystemOnlyChange(vc)) // 시스템 전용 변경 제외
-                .map(vc -> Map.of(
-                        "property", vc.getPropertyName(),
-                        "before", toJsonSafe(javers, vc.getLeft()),
-                        "after", toJsonSafe(javers, vc.getRight()),
-                        "type", "수정"))
+                .map(vc -> {
+                    // 삭제 변경 처리 (deleted: false -> true)
+                    if ("deleted".equals(vc.getPropertyName())
+                            && Boolean.FALSE.equals(vc.getLeft())
+                            && Boolean.TRUE.equals(vc.getRight())) {
+                        String beforeValue = formatDeletedContactName(vc.getAffectedObject());
+
+                        return Map.of(
+                                "property", "null",
+                                "before", beforeValue,
+                                "after", "null",
+                                "type", "삭제");
+                    }
+
+                    // 시스템 전용 변경은 제외
+                    if (isSystemOnlyChange(vc)) {
+                        return null;
+                    }
+
+                    // 일반 수정 변경
+                    return Map.of(
+                            "property", vc.getPropertyName(),
+                            "before", toJsonSafe(javers, vc.getLeft()),
+                            "after", toJsonSafe(javers, vc.getRight()),
+                            "type", "수정");
+                })
+                .filter(change -> change != null) // null 제외
                 .collect(Collectors.toList());
     }
 
@@ -153,6 +174,23 @@ public class JaversUtils {
         if (obj instanceof String || obj instanceof Number || obj instanceof Boolean || obj instanceof Character)
             return obj.toString();
         return javers.getJsonConverter().toJson(unproxyRecursive(obj));
+    }
+
+    private static String formatDeletedContactName(Object affectedObject) {
+        if (affectedObject instanceof Optional<?> optional) {
+            affectedObject = optional.orElse(null);
+        }
+
+        if (affectedObject == null) {
+            return "항목";
+        }
+
+        String entityName = extractEntityName(affectedObject);
+        if (entityName != null) {
+            return entityName;
+        }
+
+        return "항목";
     }
 
     // ================== Hibernate Proxy 제거 + 순환참조 방지 ==================
