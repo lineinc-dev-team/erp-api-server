@@ -16,7 +16,6 @@ import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementTy
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,6 +49,7 @@ public class SteelManagement extends BaseEntity {
     @SequenceGenerator(name = "steel_management_seq", sequenceName = "steel_management_seq", allocationSize = 1)
     private Long id;
 
+    // ===== 연관관계 (변경 추적 제외) =====
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id")
@@ -66,15 +66,16 @@ public class SteelManagement extends BaseEntity {
     private OutsourcingCompany outsourcingCompany;
 
     @DiffIgnore
-    @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "steelManagement")
     @Builder.Default
     private List<SteelManagementFile> files = new ArrayList<>();
 
     @DiffIgnore
-    @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "steelManagement")
     @Builder.Default
     private List<SteelManagementDetail> details = new ArrayList<>();
 
+    // ===== 시스템/상태 정보 (변경 추적 제외) =====
     @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Setter
@@ -124,6 +125,7 @@ public class SteelManagement extends BaseEntity {
     @Column
     private OffsetDateTime releaseDate;
 
+    // ===== 비즈니스 정보 (변경 추적 대상) =====
     /**
      * 용도
      */
@@ -138,6 +140,7 @@ public class SteelManagement extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    // ===== 화면 표시용 필드 (변경 추적 대상) =====
     @Transient
     @DiffInclude
     private String siteName;

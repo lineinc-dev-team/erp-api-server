@@ -19,5 +19,7 @@
     "editor.useTabStops": false, // 탭 정지점 사용 안함 
     // Java 전용 들여쓰기 설정
     "java.format.settings.url": "", // 사용자 정의 포맷팅 설정 URL (비어있음)
-    "java.format.settings.profile": "GoogleStyle" // Google Java 스타일 가이드 사용
+    "java.format.settings.profile": "GoogleStyle", // Google Java 스타일 가이드 사용
+    // Java import 자동 숨기기 설정
+    "editor.foldingImportsByDefault": true // 파일 열 때 import 자동 접기
 }
