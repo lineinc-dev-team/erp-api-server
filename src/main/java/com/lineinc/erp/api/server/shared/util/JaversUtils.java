@@ -143,9 +143,15 @@ public class JaversUtils {
             entity = Hibernate.unproxy(proxy);
         }
 
+        // 이미 초기화된 필드만 처리 (Lazy Loading 방지)
         for (Field field : entity.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
+                // Hibernate 프록시나 PersistentCollection인 경우 초기화 여부 확인
+                if (isHibernateLazyField(entity, field)) {
+                    continue; // 초기화되지 않은 Lazy 필드는 건드리지 않음
+                }
+
                 Object value = field.get(entity);
                 if (value == null || visited.contains(value))
                     continue;
@@ -164,9 +170,32 @@ public class JaversUtils {
                     field.set(entity, unproxiedValue);
                 }
             } catch (Exception ignored) {
+                // 접근 실패한 필드는 무시 (Lazy Loading 에러 등)
             }
         }
 
         return entity;
+    }
+
+    // Hibernate Lazy 필드 초기화 여부 확인
+    private static boolean isHibernateLazyField(Object entity, Field field) {
+        try {
+            Object value = field.get(entity);
+
+            // PersistentCollection 체크 (OneToMany, ManyToMany 등)
+            if (value != null && value.getClass().getName().contains("PersistentCollection")) {
+                return !Hibernate.isInitialized(value);
+            }
+
+            // HibernateProxy 체크 (ManyToOne, OneToOne 등)
+            if (value instanceof HibernateProxy) {
+                return !Hibernate.isInitialized(value);
+            }
+
+            return false;
+        } catch (Exception e) {
+            // 접근 불가능한 필드는 Lazy로 간주
+            return true;
+        }
     }
 }
