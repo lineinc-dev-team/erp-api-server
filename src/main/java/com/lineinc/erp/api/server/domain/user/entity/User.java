@@ -9,6 +9,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.UpdateUser
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import java.util.*;
         @Index(columnList = "username"),
         @Index(columnList = "email"),
         @Index(columnList = "created_at"),
+        @Index(columnList = "updated_at"),
         @Index(columnList = "last_login_at")
 })
 @Getter
@@ -36,15 +38,10 @@ public class User extends BaseEntity implements UserDetails {
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false)
-    private String loginId;
-
+    // ===== 기본 계정 정보 (변경 추적 대상) =====
     @Column
     @DiffInclude
     private String username;
-
-    @Column
-    private String passwordHash;
 
     @Column
     @DiffInclude
@@ -58,26 +55,9 @@ public class User extends BaseEntity implements UserDetails {
     @DiffInclude
     private String phoneNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "grade_id")
-    private Grade grade;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position_id")
-    private Position position;
-
-    @Column
-    @Setter
-    private OffsetDateTime lastLoginAt;
-
-    @Builder.Default
-    @Column(nullable = false)
-    @Setter
-    private boolean requirePasswordReset = true;
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String memo;
 
     @Builder.Default
     @Column(nullable = false)
@@ -89,14 +69,47 @@ public class User extends BaseEntity implements UserDetails {
     @DiffInclude
     private boolean isHeadOffice = true;
 
+    // ===== 보안/시스템 정보 (변경 추적 제외) =====
+    @Column(nullable = false)
+    @DiffIgnore
+    private String loginId;
+
+    @Column
+    @DiffIgnore
+    private String passwordHash;
+
+    @Column
+    @Setter
+    @DiffIgnore
+    private OffsetDateTime lastLoginAt;
+
+    @Builder.Default
+    @Column(nullable = false)
+    @Setter
+    private boolean requirePasswordReset = true;
+
+    // ===== 조직 정보 (변경 추적 제외) =====
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    @DiffIgnore
+    private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grade_id")
+    @DiffIgnore
+    private Grade grade;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position_id")
+    @DiffIgnore
+    private Position position;
+
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @DiffIgnore
     private Set<UserRole> userRoles = new HashSet<>();
 
-    @Column(columnDefinition = "TEXT")
-    @DiffInclude
-    private String memo;
-
+    // ===== 화면 표시용 필드 (변경 추적 대상) =====
     @Transient
     @DiffInclude
     private String departmentName;

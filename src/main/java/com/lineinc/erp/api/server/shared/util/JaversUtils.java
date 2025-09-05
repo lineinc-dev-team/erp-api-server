@@ -1,8 +1,7 @@
 package com.lineinc.erp.api.server.shared.util;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -72,7 +71,6 @@ public class JaversUtils {
     // ================== Snapshot ==================
     public static <T> T createSnapshot(Javers javers, T entity, Class<T> clazz) {
         try {
-            // Hibernate Proxy 제거 + Lazy 초기화
             Object unproxied = unproxyRecursive(entity);
             String json = javers.getJsonConverter().toJson(unproxied);
             return javers.getJsonConverter().fromJson(json, clazz);
@@ -130,30 +128,40 @@ public class JaversUtils {
         return javers.getJsonConverter().toJson(unproxyRecursive(obj));
     }
 
-    // ================== Hibernate Proxy 제거 ==================
+    // ================== Hibernate Proxy 제거 + 순환참조 방지 ==================
     private static Object unproxyRecursive(Object entity) {
-        if (entity == null)
-            return null;
+        Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        return unproxyRecursive(entity, visited);
+    }
 
-        // Hibernate Proxy 제거
+    private static Object unproxyRecursive(Object entity, Set<Object> visited) {
+        if (entity == null || visited.contains(entity))
+            return entity;
+        visited.add(entity);
+
         if (entity instanceof HibernateProxy proxy) {
             entity = Hibernate.unproxy(proxy);
         }
 
-        // 모든 필드 재귀적으로 unproxy
         for (Field field : entity.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
                 Object value = field.get(entity);
-                if (value != null) {
-                    if (value instanceof Iterable<?> iterable) {
-                        for (Object item : iterable) {
-                            unproxyRecursive(item);
-                        }
-                    } else if (!field.getType().isPrimitive() && !field.getType().getName().startsWith("java.")) {
-                        Object unproxiedValue = unproxyRecursive(value);
-                        field.set(entity, unproxiedValue);
+                if (value == null || visited.contains(value))
+                    continue;
+
+                if (value instanceof Iterable<?> iterable) {
+                    for (Object item : iterable) {
+                        unproxyRecursive(item, visited);
                     }
+                } else if (value instanceof Map<?, ?> map) {
+                    for (Map.Entry<?, ?> entry : map.entrySet()) {
+                        unproxyRecursive(entry.getKey(), visited);
+                        unproxyRecursive(entry.getValue(), visited);
+                    }
+                } else if (!field.getType().isPrimitive() && !field.getType().getName().startsWith("java.")) {
+                    Object unproxiedValue = unproxyRecursive(value, visited);
+                    field.set(entity, unproxiedValue);
                 }
             } catch (Exception ignored) {
             }
