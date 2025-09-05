@@ -36,7 +36,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class SteelManagementDetail extends BaseEntity implements UpdatableFrom<SteelManagementDetailUpdateRequest> {
+public class SteelManagementDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "steel_management_detail_seq")
@@ -122,7 +122,6 @@ public class SteelManagementDetail extends BaseEntity implements UpdatableFrom<S
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    @Override
     public void updateFrom(SteelManagementDetailUpdateRequest request) {
         Optional.ofNullable(request.standard()).ifPresent(val -> this.standard = val);
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);

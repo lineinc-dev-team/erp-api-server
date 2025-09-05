@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class SteelManagementFile extends BaseEntity implements UpdatableFrom<SteelManagementFileUpdateRequest> {
+public class SteelManagementFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "steel_management_file_seq")
@@ -74,7 +74,6 @@ public class SteelManagementFile extends BaseEntity implements UpdatableFrom<Ste
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고 / 메모
 
-    @Override
     public void updateFrom(SteelManagementFileUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
