@@ -25,12 +25,11 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            build/
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle-wrapper.properties', '**/settings.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: 🧱 Gradle로 JAR 빌드
+      - name: 🧱 Gradle로 JAR 빌드 (테스트 생략)
         run: ./gradlew bootJar --no-daemon --parallel -x test
 
       - name: 🔐 SSH 키 설정
@@ -41,7 +40,8 @@ jobs:
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: 📦 JAR 파일 EC2로 전송
-        run: rsync -avz --progress build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
+        run: |
+          rsync -az build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
 
       - name: 🚀 EC2 무중단 배포
         run: |
@@ -52,57 +52,45 @@ jobs:
 
             # JAR 교체
             mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
-            if [ ! -f "/home/ubuntu/app-latest.jar" ]; then
-              echo "❌ JAR 파일 없음"
-              exit 1
-            fi
-            echo "✅ JAR 준비 완료"
+            [ -f "/home/ubuntu/app-latest.jar" ] || { echo "❌ JAR 없음"; exit 1; }
 
-            # 새 포트 선택 (현재 떠있는 포트 반대편)
+            # 새/이전 포트 결정
             if ss -tlnp | grep -q ":8080[[:space:]]"; then
-              NEW_PORT=8081
-              OLD_PORT=8080
+              NEW_PORT=8081; OLD_PORT=8080
             else
-              NEW_PORT=8080
-              OLD_PORT=8081
+              NEW_PORT=8080; OLD_PORT=8081
             fi
 
             NEW_APP="app-${NEW_PORT}"
             OLD_APP="app-${OLD_PORT}"
-
             echo "▶ 새 포트: $NEW_PORT, 이전 포트: $OLD_PORT"
 
-            # 새 앱 실행
+            # 새 앱 시작
             if pm2 list | grep -q "$NEW_APP"; then
-              echo "▶ $NEW_APP 재시작"
               pm2 restart "$NEW_APP"
             else
-              echo "▶ $NEW_APP 시작"
               pm2 start ecosystem.config.js --only "$NEW_APP"
             fi
 
-            # 새 앱 포트 오픈 대기
-            for i in {1..20}; do
+            # 포트 오픈 대기 (최대 30초)
+            for i in {1..10}; do
               if ss -tlnp | grep -q ":$NEW_PORT[[:space:]]"; then
-                echo "✅ 포트 $NEW_PORT 열림"
-                break
+                echo "✅ 포트 $NEW_PORT 열림"; break
               fi
-              [ $i -eq 20 ] && { echo "❌ 포트 안 열림"; pm2 logs "$NEW_APP" --lines 20; exit 1; }
               sleep 3
+              [ $i -eq 10 ] && { echo "❌ 포트 열림 실패"; pm2 logs "$NEW_APP" --lines 10; exit 1; }
             done
 
-            # 헬스체크 대기
-            for i in {1..20}; do
-              if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 새 앱 준비 완료"
-                break
+            # 헬스체크 대기 (최대 30초)
+            for i in {1..10}; do
+              if curl -s --max-time 3 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
+                echo "✅ 새 앱 준비 완료"; break
               fi
-              [ $i -eq 20 ] && { echo "❌ 헬스체크 실패"; pm2 logs "$NEW_APP" --lines 20; exit 1; }
               sleep 3
+              [ $i -eq 10 ] && { echo "❌ 헬스체크 실패"; pm2 logs "$NEW_APP" --lines 10; exit 1; }
             done
 
             # 이전 앱 종료
-            echo "▶ 이전 앱 $OLD_APP 종료"
             pm2 delete "$OLD_APP" 2>/dev/null || true
 
             # 상태 저장
