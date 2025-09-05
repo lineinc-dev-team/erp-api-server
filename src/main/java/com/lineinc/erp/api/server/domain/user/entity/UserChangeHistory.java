@@ -10,9 +10,8 @@ import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "type"),
         @Index(columnList = "created_at"),
-        @Index(columnList = "user_id,created_at")
+        @Index(columnList = "updated_at")
 })
 @Getter
 @NoArgsConstructor

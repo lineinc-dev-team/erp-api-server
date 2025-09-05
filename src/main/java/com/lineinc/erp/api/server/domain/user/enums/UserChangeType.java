@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.domain.user.enums;
 
-
 import lombok.Getter;
 
 @Getter
