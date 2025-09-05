@@ -34,8 +34,12 @@ public interface OutsourcingCompanyContractEquipmentRepository
             @Param("contractIds") List<Long> contractIds,
             Pageable pageable);
 
+    @Query("SELECT e FROM OutsourcingCompanyContractEquipment e WHERE e.deleted = false")
     Slice<OutsourcingCompanyContractEquipment> findAllBy(Pageable pageable);
 
-    Slice<OutsourcingCompanyContractEquipment> findByVehicleNumberContainingIgnoreCase(String vehicleNumber,
+    @Query("SELECT e FROM OutsourcingCompanyContractEquipment e " +
+            "WHERE e.vehicleNumber LIKE %:vehicleNumber% AND e.deleted = false")
+    Slice<OutsourcingCompanyContractEquipment> findByVehicleNumberContainingIgnoreCase(
+            @Param("vehicleNumber") String vehicleNumber,
             Pageable pageable);
 }
