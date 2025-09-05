@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementTy
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -66,12 +67,12 @@ public class SteelManagement extends BaseEntity {
     private OutsourcingCompany outsourcingCompany;
 
     @DiffIgnore
-    @OneToMany(mappedBy = "steelManagement")
+    @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SteelManagementFile> files = new ArrayList<>();
 
     @DiffIgnore
-    @OneToMany(mappedBy = "steelManagement")
+    @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SteelManagementDetail> details = new ArrayList<>();
 
@@ -183,16 +184,9 @@ public class SteelManagement extends BaseEntity {
 
     public void updateFrom(SteelManagementUpdateRequest request, Site site, SiteProcess siteProcess,
             OutsourcingCompany outsourcingCompany) {
-        if (site != null) {
-            this.site = site;
-        }
-        if (siteProcess != null) {
-            this.siteProcess = siteProcess;
-        }
-        if (outsourcingCompany != null) {
-            this.outsourcingCompany = outsourcingCompany;
-        }
-
+        Optional.ofNullable(site).ifPresent(val -> this.site = val);
+        Optional.ofNullable(siteProcess).ifPresent(val -> this.siteProcess = val);
+        Optional.ofNullable(outsourcingCompany).ifPresent(val -> this.outsourcingCompany = val);
         Optional.ofNullable(request.usage()).ifPresent(val -> this.usage = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.startDate())
