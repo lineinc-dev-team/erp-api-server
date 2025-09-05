@@ -15,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -130,7 +131,21 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_ACCEPTABLE, ValidationMessages.NOT_ACCEPTABLE, List.of());
     }
 
-    // 4. 자원/경로 관련
+    // 4. HTTP 메소드 관련
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        log.warn("HttpRequestMethodNotSupportedException: {} 메소드는 지원되지 않습니다. 지원되는 메소드: {}",
+                ex.getMethod(), ex.getSupportedMethods(), ex);
+
+        String supportedMethods = ex.getSupportedMethods() != null ? String.join(", ", ex.getSupportedMethods())
+                : "확인 필요";
+        String message = String.format("'%s' 메소드는 지원되지 않습니다. 지원되는 메소드: %s",
+                ex.getMethod(), supportedMethods);
+
+        return buildErrorResponse(HttpStatus.METHOD_NOT_ALLOWED, message, List.of());
+    }
+
+    // 5. 자원/경로 관련
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException ex) {
         log.warn("NoResourceFoundException: {}", ex.getMessage(), ex);
@@ -145,18 +160,30 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(status != null ? status : HttpStatus.INTERNAL_SERVER_ERROR, message, List.of());
     }
 
-    // 5. 데이터 액세스 관련
+    // 6. 데이터 액세스 관련
     @ExceptionHandler({ PropertyReferenceException.class, InvalidDataAccessApiUsageException.class })
     public ResponseEntity<ErrorResponse> handleInvalidDataAccess(Exception ex) {
         log.warn("InvalidDataAccessException: {}", ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.INVALID_PROPERTY_REFERENCE, List.of());
     }
 
-    // 6. IO 및 기타
+    // 7. IO 및 기타
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
         log.error("IOException: {}", ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ValidationMessages.FILE_PROCESS_ERROR, List.of());
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
+        log.warn("NullPointerException: {}", ex.getMessage(), ex);
+
+        // 요청 데이터가 null인 경우
+        if (ex.getMessage() != null && ex.getMessage().contains("because the return value of")) {
+            return buildErrorResponse(HttpStatus.BAD_REQUEST, "필수 요청 데이터가 누락되었습니다.", List.of());
+        }
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 필수 데이터를 확인해주세요.", List.of());
     }
 
     @ExceptionHandler(RuntimeException.class)
