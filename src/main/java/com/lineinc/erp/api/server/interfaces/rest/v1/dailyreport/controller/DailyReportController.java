@@ -20,6 +20,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
@@ -62,6 +63,20 @@ public class DailyReportController {
             @Valid @RequestBody DailyReportCreateRequest request) {
         dailyReportService.createDailyReport(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 상세 조회", description = "출역일보의 모든 정보를 통합 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "출역일보를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/detail")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<DailyReportDetailResponse>> getDailyReportDetail(
+            @Valid DailyReportSearchRequest request) {
+        DailyReportDetailResponse response = dailyReportService.getDailyReportDetail(request);
+        return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
     @Operation(summary = "출역일보 직원정보 조회", description = "출역일보 직원정보를 조회합니다.")
