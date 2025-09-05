@@ -25,10 +25,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,6 +41,12 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "created_at"),
+        @Index(columnList = "updated_at"),
+        @Index(columnList = "start_date"),
+        @Index(columnList = "end_date"),
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
