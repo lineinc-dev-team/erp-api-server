@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "user_id,role_id")
+        @Index(columnList = "user_id,role_id"), // 사용자별 역할 조회 최적화
 })
 @Getter
 @NoArgsConstructor
@@ -19,11 +19,11 @@ public class UserRole extends BaseEntity {
     @SequenceGenerator(name = "users_roles_seq", sequenceName = "users_roles_seq", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 

@@ -37,5 +37,5 @@ public class UserChangeHistory extends BaseEntity {
 
     @Setter
     @Column(columnDefinition = "TEXT")
-    private String memo; // 선택적 변경 사유, 비고 등
+    private String memo;
 }
