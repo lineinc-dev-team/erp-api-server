@@ -23,14 +23,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DailyReportAutoCompleteBatchService {
+public class DailyReportAutoCompleteBatchService implements BatchService {
 
     private final DailyReportRepository dailyReportRepository;
+
+    @Override
+    public String getBatchName() {
+        return "출역일보 자동 마감 배치";
+    }
 
     /**
      * 출역일보 자동 마감 배치를 실행합니다.
      * 전날 날짜의 PENDING 상태 출역일보들을 모두 AUTO_COMPLETED로 변경합니다.
      */
+    @Override
     @Transactional
     public void execute() {
         log.info("출역일보 자동 마감 배치 시작");

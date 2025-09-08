@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
 import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.BatchService;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureDaysBatchService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchScheduler {
 
     private final TenureDaysBatchService tenureDaysBatchService;
+    private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
     private final BatchExecutionHistoryRepository batchExecutionHistoryRepository;
 
     /**
@@ -31,6 +33,15 @@ public class BatchScheduler {
     @Scheduled(cron = "0 0 1 * * ?", zone = "Asia/Seoul")
     public void updateTenureDays() {
         executeBatchWithHistory(tenureDaysBatchService);
+    }
+
+    /**
+     * 매일 새벽 00시 1분에 출역일보 자동 마감 배치 실행
+     * Cron 표현식: "0 1 0 * * ?" (한국시간 새벽 00시 1분)
+     */
+    @Scheduled(cron = "0 1 0 * * ?", zone = "Asia/Seoul")
+    public void autoCompleteDailyReports() {
+        executeBatchWithHistory(dailyReportAutoCompleteBatchService);
     }
 
     /**
