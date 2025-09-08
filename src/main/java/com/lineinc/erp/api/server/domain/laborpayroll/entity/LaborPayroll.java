@@ -3,18 +3,11 @@ package com.lineinc.erp.api.server.domain.laborpayroll.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.javers.core.metamodel.annotation.DiffInclude;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -288,7 +281,7 @@ public class LaborPayroll extends BaseEntity {
     }
 
     /**
-     * 총 근무일수 계산 및 설정
+     * 총 근무일수 계산 및 설정 (엑셀 수식과 동일: 근무시간이 있으면 1일로 계산)
      */
     public void calculateTotalWorkDays() {
         BigDecimal total = BigDecimal.ZERO;
@@ -318,12 +311,7 @@ public class LaborPayroll extends BaseEntity {
 
         // 공제액 계산
         if (totalLaborCost != null) {
-            this.incomeTax = totalLaborCost.multiply(new BigDecimal("0.033"));
-            this.employmentInsurance = totalLaborCost.multiply(new BigDecimal("0.009"));
-            this.healthInsurance = totalLaborCost.multiply(new BigDecimal("0.03545"));
-            this.nationalPension = totalLaborCost.multiply(new BigDecimal("0.045"));
-            this.localTax = incomeTax.multiply(new BigDecimal("0.1"));
-            this.longTermCareInsurance = healthInsurance.multiply(new BigDecimal("0.1281"));
+            calculateDeductions();
 
             // 차감지급액 계산 (총 노무비 - 모든 공제액)
             BigDecimal totalDeductions = incomeTax
@@ -334,6 +322,187 @@ public class LaborPayroll extends BaseEntity {
                     .add(longTermCareInsurance);
 
             this.netPayment = totalLaborCost.subtract(totalDeductions);
+        }
+    }
+
+    /**
+     * 공제액 계산 (엑셀 수식 기준)
+     */
+    private void calculateDeductions() {
+        // 해당 월 첫째 날 근무 여부 확인
+        boolean workedOnFirstDay = day01Hours != null && day01Hours > 0.0;
+
+        // 주민번호로 나이 계산
+        int age = calculateAge();
+
+        // 국민연금 상한액 (2025년 기준)
+        BigDecimal pensionCeiling = new BigDecimal("6370000");
+        BigDecimal pensionMaxAmount = new BigDecimal("286650");
+
+        // 소득세 계산: 복잡한 엑셀 수식 구현
+        BigDecimal calculatedIncomeTax = calculateIncomeTax(workedOnFirstDay);
+
+        // 소득세 1000원 미만은 0으로 처리 (엑셀 수식: =IF(AN6<1000, 0, AN6))
+        if (calculatedIncomeTax.compareTo(new BigDecimal("1000")) < 0) {
+            this.incomeTax = BigDecimal.ZERO;
+        } else {
+            this.incomeTax = calculatedIncomeTax;
+        }
+
+        // 주민세: ROUNDDOWN(소득세 × 10%, -1) && 첫째날 근무해야 함
+        if (!workedOnFirstDay) {
+            this.localTax = BigDecimal.ZERO;
+        } else {
+            BigDecimal tax = incomeTax.multiply(new BigDecimal("0.1"));
+            this.localTax = roundDown(tax, -1);
+        }
+
+        // 고용보험 (엑셀 수식):
+        // =IFERROR(IF(AND($AM6<65),ROUNDDOWN(ROUNDDOWN(AA6*0.9%,-1),IF((AM6<65),0)),0),0)
+        // $AM6: 만나이, AA6: 노무비 총액 - 첫째날 근무해야 고용보험 적용
+        if (age < 65 && workedOnFirstDay) {
+            BigDecimal insurance = totalLaborCost.multiply(new BigDecimal("0.009"));
+            this.employmentInsurance = roundDown(insurance, -1);
+        } else {
+            this.employmentInsurance = BigDecimal.ZERO;
+        }
+
+        // 건강보험: IF(총근무일수 >= 8, ROUNDDOWN(총노무비 × 3.545%, -1), 0)
+        if (totalWorkDays.compareTo(new BigDecimal("8")) >= 0) {
+            BigDecimal insurance = totalLaborCost.multiply(new BigDecimal("0.03545"));
+            this.healthInsurance = roundDown(insurance, -1);
+        } else {
+            this.healthInsurance = BigDecimal.ZERO;
+        }
+
+        // 국민연금: 복잡한 조건
+        if (age < 60 && (totalWorkDays.compareTo(new BigDecimal("8")) >= 0
+                || totalLaborCost.compareTo(new BigDecimal("2200000")) >= 0)) {
+            if (totalLaborCost.compareTo(pensionCeiling) <= 0) {
+                // 상한액 이하: ROUNDDOWN(ROUNDDOWN(총노무비, -3) × 4.5%, -1)
+                BigDecimal roundedCost = roundDown(totalLaborCost, -3);
+                BigDecimal pension = roundedCost.multiply(new BigDecimal("0.045"));
+                this.nationalPension = roundDown(pension, -1);
+            } else {
+                // 상한액 초과: 고정액
+                this.nationalPension = pensionMaxAmount;
+            }
+        } else {
+            this.nationalPension = BigDecimal.ZERO;
+        }
+
+        // 장기요양보험료 (엑셀 수식): IF(Z6>=8,ROUNDDOWN(AD6*0.9182%/7.09%,-1),0)
+        // Z6: 총 일수, AD6: 건강보험료
+        if (totalWorkDays.compareTo(new BigDecimal("8")) >= 0) {
+            // 건강보험료 * (0.9182% / 7.09%) 계산
+            BigDecimal rate = new BigDecimal("0.009182").divide(new BigDecimal("0.0709"), 10,
+                    java.math.RoundingMode.HALF_UP);
+            BigDecimal insurance = healthInsurance.multiply(rate);
+            this.longTermCareInsurance = roundDown(insurance, -1);
+        } else {
+            this.longTermCareInsurance = BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * 생년월일 계산 (엑셀 수식과 동일)
+     * 엑셀:
+     * =IF(OR(MID(AK6,8,1)="1",MID(AK6,8,1)="2",MID(AK6,8,1)="5",MID(AK6,8,1)="6"),19&TEXT(LEFT(AK6,6),"00-00-00"),20&TEXT(LEFT(AK6,6),"00-00-00"))
+     * AK6: 주민번호 (000000-0000000 형식)
+     */
+    private LocalDate calculateBirthDate() {
+        if (labor == null || labor.getResidentNumber() == null || labor.getResidentNumber().length() < 13) {
+            return LocalDate.of(1989, 1, 1); // 기본값
+        }
+
+        try {
+            String residentNumber = labor.getResidentNumber().replace("-", "");
+            if (residentNumber.length() < 13) {
+                return LocalDate.of(1989, 1, 1); // 기본값
+            }
+
+            // 생년월일 추출 (처음 6자리)
+            String yymmdd = residentNumber.substring(0, 6);
+            int yy = Integer.parseInt(yymmdd.substring(0, 2));
+            int mm = Integer.parseInt(yymmdd.substring(2, 4));
+            int dd = Integer.parseInt(yymmdd.substring(4, 6));
+
+            // 유효하지 않은 월/일 체크
+            if (mm < 1 || mm > 12 || dd < 1 || dd > 31) {
+                return LocalDate.of(1989, 1, 1); // 기본값
+            }
+
+            // 성별코드 (8번째 자리, 인덱스 7)
+            String genderCode = residentNumber.substring(7, 8);
+
+            // 엑셀 수식과 동일한 로직: 1,2,5,6이면 1900년대, 아니면 2000년대
+            int fullYear;
+            if ("1".equals(genderCode) || "2".equals(genderCode) ||
+                    "5".equals(genderCode) || "6".equals(genderCode)) {
+                fullYear = 1900 + yy;
+            } else {
+                fullYear = 2000 + yy;
+            }
+
+            // LocalDate 생성 시 예외 처리
+            return LocalDate.of(fullYear, mm, dd);
+
+        } catch (Exception e) {
+            // 주민번호 파싱 오류 시 기본값 반환
+            return LocalDate.of(1989, 1, 1);
+        }
+    }
+
+    /**
+     * 만나이 계산 (엑셀 수식과 동일: INT((TODAY()-생년월일)/365.25))
+     */
+    private int calculateAge() {
+        LocalDate birthDate = calculateBirthDate();
+        LocalDate today = LocalDate.now();
+
+        // 엑셀 수식과 동일한 방식으로 나이 계산: INT((TODAY()-생년월일)/365.25)
+        long daysDifference = java.time.temporal.ChronoUnit.DAYS.between(birthDate, today);
+        int age = (int) (daysDifference / 365.25);
+
+        return age;
+    }
+
+    /**
+     * 소득세 계산 (엑셀 수식과 동일)
+     * AO6: =ROUNDDOWN(IF($H6*I6>150000,($H6*I6-150000)*6%*45%,0),0)
+     * H6: 일당, I6: 해당일에 공수 (여기서는 총 노무비 사용)
+     */
+    private BigDecimal calculateIncomeTax(boolean workedOnFirstDay) {
+        if (totalLaborCost == null || !workedOnFirstDay) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal threshold = new BigDecimal("150000");
+
+        if (totalLaborCost.compareTo(threshold) > 0) {
+            // (총노무비 - 150000) * 6% * 45%
+            BigDecimal exceededAmount = totalLaborCost.subtract(threshold);
+            BigDecimal tax = exceededAmount
+                    .multiply(new BigDecimal("0.06"))
+                    .multiply(new BigDecimal("0.45"));
+            return roundDown(tax, 0);
+        } else {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * ROUNDDOWN 함수 구현
+     * 
+     * @param value  반올림할 값
+     * @param digits 자릿수 (-1: 10의 자리, -2: 100의 자리)
+     */
+    private BigDecimal roundDown(BigDecimal value, int digits) {
+        if (digits >= 0) {
+            return value.setScale(digits, java.math.RoundingMode.DOWN);
+        } else {
+            BigDecimal divisor = BigDecimal.TEN.pow(-digits);
+            return value.divide(divisor, 0, java.math.RoundingMode.DOWN).multiply(divisor);
         }
     }
 }
