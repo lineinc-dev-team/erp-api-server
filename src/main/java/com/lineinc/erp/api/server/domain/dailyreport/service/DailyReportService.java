@@ -168,6 +168,7 @@ public class DailyReportService {
 
                 if (labor.getFirstWorkDate() == null) {
                     labor.setFirstWorkDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
                 }
 
                 dailyReport.getDirectContracts().add(directContract);

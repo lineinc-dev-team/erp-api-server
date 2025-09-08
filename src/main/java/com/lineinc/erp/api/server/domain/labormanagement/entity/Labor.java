@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -164,6 +165,7 @@ public class Labor extends BaseEntity {
      */
     @DiffIgnore
     @Column
+    @Setter
     private OffsetDateTime hireDate;
 
     /**
