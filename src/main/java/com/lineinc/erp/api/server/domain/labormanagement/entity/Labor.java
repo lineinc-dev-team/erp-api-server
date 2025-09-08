@@ -129,6 +129,7 @@ public class Labor extends BaseEntity {
     @DiffIgnore
     @Column
     @Builder.Default
+    @Setter
     private Long tenureDays = 0L;
 
     /**
@@ -137,6 +138,7 @@ public class Labor extends BaseEntity {
     @DiffInclude
     @Column
     @Builder.Default
+    @Setter
     private Boolean isSeverancePayEligible = false;
 
     /**
@@ -290,13 +292,6 @@ public class Labor extends BaseEntity {
      */
     public void setFirstWorkDate(OffsetDateTime firstWorkDate) {
         this.firstWorkDate = firstWorkDate;
-    }
-
-    /**
-     * 퇴직금 발생 여부를 설정합니다.
-     */
-    public void setIsSeverancePayEligible(Boolean isSeverancePayEligible) {
-        this.isSeverancePayEligible = isSeverancePayEligible;
     }
 
     /**

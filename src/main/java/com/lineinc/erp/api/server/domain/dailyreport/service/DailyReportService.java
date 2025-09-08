@@ -125,6 +125,11 @@ public class DailyReportService {
                     labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
                 }
 
+                if (labor.getHireDate() == null) {
+                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setResignationDate(null);
+                }
+
                 DailyReportEmployee employee = DailyReportEmployee.builder()
                         .dailyReport(dailyReport)
                         .labor(labor)
@@ -174,6 +179,11 @@ public class DailyReportService {
                 if (labor.getFirstWorkDate() == null) {
                     labor.setFirstWorkDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
                     labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                }
+
+                if (labor.getHireDate() == null) {
+                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setResignationDate(null);
                 }
 
                 dailyReport.getDirectContracts().add(directContract);

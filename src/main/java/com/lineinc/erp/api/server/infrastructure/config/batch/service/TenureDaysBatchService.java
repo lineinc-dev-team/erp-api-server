@@ -114,6 +114,9 @@ public class TenureDaysBatchService implements BatchService {
 
             // 퇴사일이 없는 경우에만 설정 (중복 처리 방지)
             if (labor.getResignationDate() == null) {
+                labor.setHireDate(null);
+                labor.setTenureDays(0L);
+                labor.setIsSeverancePayEligible(false);
                 labor.setResignationDate(DateTimeFormatUtils.toOffsetDateTime(fortyFiveDaysAgo));
                 laborRepository.save(labor);
                 log.info("인력 {} - 45일 이내 출근 기록 없음으로 퇴사일 지정: {}",
