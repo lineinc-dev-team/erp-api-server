@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.dailyreport.service;
 import java.time.OffsetDateTime;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,6 +15,7 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
@@ -33,6 +35,9 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeCreateRequest;
@@ -85,6 +90,7 @@ public class DailyReportService {
     private final OutsourcingCompanyContractWorkerRepository outsourcingCompanyContractWorkerRepository;
     private final OutsourcingCompanyContractDriverRepository outsourcingCompanyContractDriverRepository;
     private final OutsourcingCompanyContractEquipmentRepository outsourcingCompanyContractEquipmentRepository;
+    private final UserService userService;
 
     @Transactional
     public void createDailyReport(DailyReportCreateRequest request) {
@@ -549,13 +555,13 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        // 출역일보 수정 가능 날짜 검증 (당일까지만)
-        validateDailyReportEditDate(reportDate);
-
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
 
         // 정규직원만 직원 출역 정보에 추가 가능
         if (request.employees().stream().anyMatch(employee -> employee.laborId() != null
@@ -604,13 +610,13 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        // 출역일보 수정 가능 날짜 검증 (당일까지만)
-        validateDailyReportEditDate(reportDate);
-
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 직영/계약직 정보 동기화
         EntitySyncUtils.syncList(
@@ -676,13 +682,13 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        // 출역일보 수정 가능 날짜 검증 (당일까지만)
-        validateDailyReportEditDate(reportDate);
-
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 외주 정보 동기화
         EntitySyncUtils.syncList(
@@ -739,13 +745,13 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        // 출역일보 수정 가능 날짜 검증 (당일까지만)
-        validateDailyReportEditDate(reportDate);
-
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 장비 정보 동기화
         EntitySyncUtils.syncList(
@@ -816,13 +822,13 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        // 출역일보 수정 가능 날짜 검증 (당일까지만)
-        validateDailyReportEditDate(reportDate);
-
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 유류 정보 동기화
         EntitySyncUtils.syncList(
@@ -893,13 +899,13 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        // 출역일보 수정 가능 날짜 검증 (당일까지만)
-        validateDailyReportEditDate(reportDate);
-
         DailyReport dailyReport = dailyReportRepository
                 .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 파일 정보 동기화
         EntitySyncUtils.syncList(
@@ -942,6 +948,9 @@ public class DailyReportService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
+
         // 수동 마감 처리
         dailyReport.complete();
         dailyReportRepository.save(dailyReport);
@@ -978,19 +987,28 @@ public class DailyReportService {
     }
 
     /**
-     * 출역일보 수정 가능 날짜인지 검증합니다.
-     * 당일까지만 수정 가능합니다.
+     * 출역일보 수정 권한을 검증합니다.
+     * - 본사 직원(isHeadOffice=true): 언제든 수정 가능
+     * - 현장 직원(isHeadOffice=false): PENDING 상태인 경우에만 수정 가능
      * 
-     * @param reportDate 출역일보 날짜
-     * @throws ResponseStatusException 전날 이전 출역일보를 수정하려고 할 때
+     * @param dailyReport 출역일보
+     * @throws ResponseStatusException 수정 권한이 없을 때
      */
-    private void validateDailyReportEditDate(OffsetDateTime reportDate) {
-        LocalDate reportLocalDate = DateTimeFormatUtils.toKoreaLocalDate(reportDate);
-        LocalDate today = LocalDate.now(AppConstants.KOREA_ZONE);
+    private void validateDailyReportEditPermission(DailyReport dailyReport) {
+        // 현재 사용자 정보 조회
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        User currentUser = userService.getUserEntity(userDetails.getUserId());
 
-        if (reportLocalDate.isBefore(today)) {
+        // 본사 직원인 경우 언제든 수정 가능
+        if (currentUser.isHeadOffice()) {
+            return;
+        }
+
+        // 현장 직원인 경우 PENDING 상태가 아니면 수정 불가
+        if (dailyReport.getStatus() != DailyReportStatus.PENDING) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    ValidationMessages.DAILY_REPORT_CANNOT_EDIT_PAST_DATE);
+                    ValidationMessages.DAILY_REPORT_EDIT_NOT_ALLOWED);
         }
     }
 

@@ -22,7 +22,8 @@ public class UsersSeeder {
 
     public void seed() {
         Optional<User> existingAdmin = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
-        if (existingAdmin.isPresent()) return;
+        if (existingAdmin.isPresent())
+            return;
 
         User admin = User.builder()
                 .loginId(AppConstants.ADMIN_LOGIN_ID)
@@ -30,6 +31,7 @@ public class UsersSeeder {
                 .email(AppConstants.ADMIN_EMAIL)
                 .passwordHash(passwordEncoder.encode(adminPassword))
                 .requirePasswordReset(false)
+                .isHeadOffice(true)
                 .createdBy(AppConstants.SYSTEM_NAME)
                 .updatedBy(AppConstants.SYSTEM_NAME)
                 .build();
