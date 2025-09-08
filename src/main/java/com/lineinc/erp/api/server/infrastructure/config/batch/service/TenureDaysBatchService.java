@@ -143,6 +143,7 @@ public class TenureDaysBatchService implements BatchService {
                 DateTimeFormatUtils.toUtcEndOfDay(lastMonthEnd));
         if (lastMonthWorkDays == null || lastMonthWorkDays < 7.5) {
             // 근속일수와 퇴직금 발생 여부 초기화 (단, 퇴사 처리는 하지 않음)
+
             labor.setTenureDays(0L);
             labor.setIsSeverancePayEligible(false);
             laborRepository.save(labor);
