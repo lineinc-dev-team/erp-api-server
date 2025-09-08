@@ -19,6 +19,9 @@ import java.util.List;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "reportDate"),
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
