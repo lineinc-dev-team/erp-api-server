@@ -21,8 +21,6 @@ public record LaborUpdateRequest(
         @Schema(description = "은행명", example = "신한은행") String bankName,
         @Schema(description = "계좌번호", example = "123-456-789012") String accountNumber,
         @Schema(description = "예금주", example = "홍길동") String accountHolder,
-        @Schema(description = "입사일", example = "2024-01-01") LocalDate hireDate,
-        @Schema(description = "퇴사일", example = "2024-12-31") LocalDate resignationDate,
         @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "주소", example = "서울시 강남구") String address,
         @Schema(description = "상세주소", example = "역삼동 123-45") String detailAddress,

@@ -47,9 +47,5 @@ public record LaborCreateRequest(
 
         @NotBlank @Schema(description = "예금주", example = "홍길동") String accountHolder,
 
-        @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "입사일", example = "2024-01-01") LocalDate hireDate,
-
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "퇴사일", example = "2024-12-31") LocalDate resignationDate,
-
         @Schema(description = "첨부파일 목록") @Valid List<LaborFileCreateRequest> files) {
 }

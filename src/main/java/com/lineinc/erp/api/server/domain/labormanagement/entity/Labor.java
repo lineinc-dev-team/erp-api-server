@@ -262,10 +262,6 @@ public class Labor extends BaseEntity {
         Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
         Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
         Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
-        Optional.ofNullable(request.hireDate())
-                .ifPresent(val -> this.hireDate = DateTimeFormatUtils.toOffsetDateTime(val));
-        Optional.ofNullable(request.resignationDate())
-                .ifPresent(val -> this.resignationDate = DateTimeFormatUtils.toOffsetDateTime(val));
         Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
         Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);

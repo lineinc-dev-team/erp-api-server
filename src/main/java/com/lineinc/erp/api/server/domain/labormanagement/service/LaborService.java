@@ -90,8 +90,6 @@ public class LaborService {
                 .bankName(request.bankName())
                 .accountNumber(request.accountNumber())
                 .accountHolder(request.accountHolder())
-                .hireDate(DateTimeFormatUtils.toOffsetDateTime(request.hireDate()))
-                .resignationDate(DateTimeFormatUtils.toOffsetDateTime(request.resignationDate()))
                 .outsourcingCompany(outsourcingCompany)
                 .name(request.name())
                 .residentNumber(request.residentNumber())
