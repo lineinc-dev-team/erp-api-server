@@ -108,9 +108,17 @@ public class TenureDaysBatchService implements BatchService {
     private Long calculateTenureDays(Labor labor, LocalDate fortyFiveDaysAgo,
             LocalDate lastMonthStart, LocalDate lastMonthEnd) {
 
-        // 1. 45일 이내 출근 기록 없음 → 0
+        // 1. 45일 이내 출근 기록 없음 → 퇴사일 지정 및 근속일수 0
         if (!dailyReportRepository.hasWorkRecordSince(labor.getId(),
                 DateTimeFormatUtils.toUtcStartOfDay(fortyFiveDaysAgo))) {
+
+            // 퇴사일이 없는 경우에만 설정 (중복 처리 방지)
+            if (labor.getResignationDate() == null) {
+                labor.setResignationDate(DateTimeFormatUtils.toOffsetDateTime(fortyFiveDaysAgo));
+                laborRepository.save(labor);
+                log.info("인력 {} - 45일 이내 출근 기록 없음으로 퇴사일 지정: {}",
+                        labor.getName(), fortyFiveDaysAgo);
+            }
             return 0L;
         }
 

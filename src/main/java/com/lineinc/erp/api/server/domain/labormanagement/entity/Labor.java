@@ -173,6 +173,7 @@ public class Labor extends BaseEntity {
      */
     @DiffIgnore
     @Column
+    @Setter
     private OffsetDateTime resignationDate;
 
     /**
