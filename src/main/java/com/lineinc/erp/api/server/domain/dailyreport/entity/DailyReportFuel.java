@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest.FuelUpdateInfo;
@@ -64,7 +63,6 @@ public class DailyReportFuel extends BaseEntity {
     }
 
     public void setEntities(OutsourcingCompany outsourcingCompany,
-            OutsourcingCompanyContract outsourcingCompanyContract,
             OutsourcingCompanyContractDriver outsourcingCompanyContractDriver,
             OutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment) {
         this.outsourcingCompany = outsourcingCompany;

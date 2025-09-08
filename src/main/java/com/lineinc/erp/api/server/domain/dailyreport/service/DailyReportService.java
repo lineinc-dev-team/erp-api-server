@@ -23,13 +23,11 @@ import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
 import com.lineinc.erp.api.server.domain.labormanagement.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.OutsourcingCompanyContractDriverRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.OutsourcingCompanyContractEquipmentRepository;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.OutsourcingCompanyContractRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.OutsourcingCompanyContractWorkerRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -84,7 +82,6 @@ public class DailyReportService {
     private final LaborService laborService;
     private final LaborRepository laborRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
-    private final OutsourcingCompanyContractRepository outsourcingCompanyContractRepository;
     private final OutsourcingCompanyContractWorkerRepository outsourcingCompanyContractWorkerRepository;
     private final OutsourcingCompanyContractDriverRepository outsourcingCompanyContractDriverRepository;
     private final OutsourcingCompanyContractEquipmentRepository outsourcingCompanyContractEquipmentRepository;
@@ -880,7 +877,7 @@ public class DailyReportService {
                         .findFirst()
                         .ifPresent(fuel -> {
                             fuel.updateFrom(fuelInfo);
-                            fuel.setEntities(outsourcingCompany, null, outsourcingCompanyContractDriver,
+                            fuel.setEntities(outsourcingCompany, outsourcingCompanyContractDriver,
                                     outsourcingCompanyContractEquipment);
                         });
             }
@@ -954,12 +951,6 @@ public class DailyReportService {
         // 수동 마감 처리
         dailyReport.complete();
         dailyReportRepository.save(dailyReport);
-    }
-
-    private OutsourcingCompanyContract getOutsourcingCompanyContractByIdOrThrow(Long contractId) {
-        return outsourcingCompanyContractRepository.findById(contractId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
     }
 
     private OutsourcingCompanyContractWorker getOutsourcingCompanyContractWorkerByIdOrThrow(Long workerId) {
