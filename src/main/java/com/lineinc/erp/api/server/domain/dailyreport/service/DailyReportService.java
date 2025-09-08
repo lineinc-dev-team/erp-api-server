@@ -120,6 +120,11 @@ public class DailyReportService {
                             ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
                 }
 
+                if (labor.getFirstWorkDate() == null) {
+                    labor.setFirstWorkDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                }
+
                 DailyReportEmployee employee = DailyReportEmployee.builder()
                         .dailyReport(dailyReport)
                         .labor(labor)
