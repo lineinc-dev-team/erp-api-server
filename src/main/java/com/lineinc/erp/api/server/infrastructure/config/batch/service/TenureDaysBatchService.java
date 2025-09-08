@@ -80,9 +80,16 @@ public class TenureDaysBatchService implements BatchService {
         // 지난달 마지막일 (지난달 근로시간 계산 종료점)
         LocalDate lastMonthEnd = now.withDayOfMonth(1).minusDays(1);
 
+        // 직영/계약직, 기타 - 근속일수 계산 + 퇴사 처리
         laborRepository.findEligibleLaborsForTenureDaysCalculation(LaborType.DIRECT_CONTRACT, LaborType.ETC).stream()
                 .forEach(labor -> updateLaborTenureDays(labor, fortyFiveDaysAgo,
                         lastMonthStart, lastMonthEnd));
+
+        // 정직원 - 퇴사 처리만 (근속일수 계산 제외)
+        laborRepository
+                .findEligibleLaborsForTenureDaysCalculation(LaborType.REGULAR_EMPLOYEE, LaborType.REGULAR_EMPLOYEE)
+                .stream()
+                .forEach(labor -> checkResignationOnly(labor, fortyFiveDaysAgo));
     }
 
     private void updateLaborTenureDays(Labor labor, LocalDate fortyFiveDaysAgo,
@@ -112,16 +119,14 @@ public class TenureDaysBatchService implements BatchService {
         if (!dailyReportRepository.hasWorkRecordSince(labor.getId(),
                 DateTimeFormatUtils.toUtcStartOfDay(fortyFiveDaysAgo))) {
 
-            // 퇴사일이 없는 경우에만 설정 (중복 처리 방지)
-            if (labor.getResignationDate() == null) {
-                labor.setHireDate(null);
-                labor.setTenureDays(0L);
-                labor.setIsSeverancePayEligible(false);
-                labor.setResignationDate(DateTimeFormatUtils.toOffsetDateTime(fortyFiveDaysAgo));
-                laborRepository.save(labor);
-                log.info("인력 {} - 45일 이내 출근 기록 없음으로 퇴사일 지정: {}",
-                        labor.getName(), fortyFiveDaysAgo);
-            }
+            // 공통 퇴사 처리 로직 사용
+            processResignation(labor, fortyFiveDaysAgo);
+
+            // 직영/계약직, 기타는 추가로 근속일수와 퇴직금 발생 여부 초기화
+            labor.setTenureDays(0L);
+            labor.setIsSeverancePayEligible(false);
+            laborRepository.save(labor);
+
             return 0L;
         }
 
@@ -137,10 +142,39 @@ public class TenureDaysBatchService implements BatchService {
                 DateTimeFormatUtils.toUtcStartOfDay(lastMonthStart),
                 DateTimeFormatUtils.toUtcEndOfDay(lastMonthEnd));
         if (lastMonthWorkDays == null || lastMonthWorkDays < 7.5) {
+            // 근속일수와 퇴직금 발생 여부 초기화 (단, 퇴사 처리는 하지 않음)
+            labor.setTenureDays(0L);
+            labor.setIsSeverancePayEligible(false);
+            laborRepository.save(labor);
             return 0L;
         }
 
         // 4. 조건 만족 시 근속일수 +1
         return labor.getTenureDays() == null ? 1L : labor.getTenureDays() + 1;
+    }
+
+    /**
+     * 정직원 퇴사 처리 전용 메서드 (근속일수 계산 제외)
+     */
+    private void checkResignationOnly(Labor labor, LocalDate fortyFiveDaysAgo) {
+        // 45일 이내 출근 기록이 없는 경우 퇴사 처리
+        if (!dailyReportRepository.hasWorkRecordSince(labor.getId(),
+                DateTimeFormatUtils.toUtcStartOfDay(fortyFiveDaysAgo))) {
+            processResignation(labor, fortyFiveDaysAgo);
+        }
+    }
+
+    /**
+     * 공통 퇴사 처리 로직 (입사일, 첫 근무일 초기화 및 퇴사일 지정)
+     */
+    private void processResignation(Labor labor, LocalDate fortyFiveDaysAgo) {
+        // 퇴사일이 없는 경우에만 설정 (중복 처리 방지)
+        if (labor.getResignationDate() == null) {
+            labor.setHireDate(null);
+            labor.setResignationDate(DateTimeFormatUtils.toOffsetDateTime(fortyFiveDaysAgo));
+            laborRepository.save(labor);
+            log.info("인력 {} - 45일 이내 출근 기록 없음으로 퇴사일 지정: {}",
+                    labor.getName(), fortyFiveDaysAgo);
+        }
     }
 }
