@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.laborpayroll.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.YearMonth;
 
 import org.javers.core.metamodel.annotation.DiffInclude;
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -59,106 +58,106 @@ public class LaborPayroll extends BaseEntity {
     private Labor labor;
 
     // 기본 정보
-    @Column
-    private YearMonth yearMonth; // 해당 년월
+    @Column(length = 7)
+    private String yearMonth; // 해당 년월 (YYYY-MM 형식)
 
     // 일당
-    @Column(precision = 10, scale = 2)
-    private BigDecimal dailyWage;
+    @Column
+    private Integer dailyWage;
 
     // 1일~31일까지의 공수 (근무시간)
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day01Hours;
+    @Column
+    private Double day01Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day02Hours;
+    @Column
+    private Double day02Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day03Hours;
+    @Column
+    private Double day03Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day04Hours;
+    @Column
+    private Double day04Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day05Hours;
+    @Column
+    private Double day05Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day06Hours;
+    @Column
+    private Double day06Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day07Hours;
+    @Column
+    private Double day07Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day08Hours;
+    @Column
+    private Double day08Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day09Hours;
+    @Column
+    private Double day09Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day10Hours;
+    @Column
+    private Double day10Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day11Hours;
+    @Column
+    private Double day11Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day12Hours;
+    @Column
+    private Double day12Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day13Hours;
+    @Column
+    private Double day13Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day14Hours;
+    @Column
+    private Double day14Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day15Hours;
+    @Column
+    private Double day15Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day16Hours;
+    @Column
+    private Double day16Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day17Hours;
+    @Column
+    private Double day17Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day18Hours;
+    @Column
+    private Double day18Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day19Hours;
+    @Column
+    private Double day19Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day20Hours;
+    @Column
+    private Double day20Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day21Hours;
+    @Column
+    private Double day21Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day22Hours;
+    @Column
+    private Double day22Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day23Hours;
+    @Column
+    private Double day23Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day24Hours;
+    @Column
+    private Double day24Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day25Hours;
+    @Column
+    private Double day25Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day26Hours;
+    @Column
+    private Double day26Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day27Hours;
+    @Column
+    private Double day27Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day28Hours;
+    @Column
+    private Double day28Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day29Hours;
+    @Column
+    private Double day29Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day30Hours;
+    @Column
+    private Double day30Hours;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal day31Hours;
+    @Column
+    private Double day31Hours;
 
     // 계산된 값들
     @Column(precision = 8, scale = 2)
@@ -198,7 +197,7 @@ public class LaborPayroll extends BaseEntity {
     /**
      * 특정 일의 근무시간을 가져오는 메서드
      */
-    public BigDecimal getDayHours(int day) {
+    public Double getDayHours(int day) {
         return switch (day) {
             case 1 -> day01Hours;
             case 2 -> day02Hours;
@@ -231,14 +230,14 @@ public class LaborPayroll extends BaseEntity {
             case 29 -> day29Hours;
             case 30 -> day30Hours;
             case 31 -> day31Hours;
-            default -> BigDecimal.ZERO;
+            default -> 0.0;
         };
     }
 
     /**
      * 특정 일의 근무시간을 설정하는 메서드
      */
-    public void setDayHours(int day, BigDecimal hours) {
+    public void setDayHours(int day, Double hours) {
         switch (day) {
             case 1 -> this.day01Hours = hours;
             case 2 -> this.day02Hours = hours;
@@ -280,9 +279,9 @@ public class LaborPayroll extends BaseEntity {
     public void calculateTotalWorkHours() {
         BigDecimal total = BigDecimal.ZERO;
         for (int i = 1; i <= 31; i++) {
-            BigDecimal dayHours = getDayHours(i);
-            if (dayHours != null) {
-                total = total.add(dayHours);
+            Double dayHours = getDayHours(i);
+            if (dayHours != null && dayHours > 0.0) {
+                total = total.add(BigDecimal.valueOf(dayHours));
             }
         }
         this.totalWorkHours = total;
@@ -294,8 +293,8 @@ public class LaborPayroll extends BaseEntity {
     public void calculateTotalWorkDays() {
         BigDecimal total = BigDecimal.ZERO;
         for (int i = 1; i <= 31; i++) {
-            BigDecimal dayHours = getDayHours(i);
-            if (dayHours != null && dayHours.compareTo(BigDecimal.ZERO) > 0) {
+            Double dayHours = getDayHours(i);
+            if (dayHours != null && dayHours > 0.0) {
                 total = total.add(BigDecimal.ONE);
             }
         }
@@ -312,7 +311,7 @@ public class LaborPayroll extends BaseEntity {
 
         // 총 노무비 계산 (일당 기준)
         if (dailyWage != null && totalWorkDays != null) {
-            this.totalLaborCost = dailyWage.multiply(totalWorkDays);
+            this.totalLaborCost = BigDecimal.valueOf(dailyWage).multiply(totalWorkDays);
         } else {
             this.totalLaborCost = BigDecimal.ZERO;
         }

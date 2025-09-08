@@ -111,4 +111,19 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     List<DailyReport> findByReportDateBetweenAndStatus(@Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate,
             @Param("status") DailyReportStatus status);
+
+    /**
+     * 특정 현장, 공정, 날짜 범위로 출역일보를 조회합니다.
+     * 노무비 명세서 동기화에서 사용됩니다.
+     */
+    @Query("SELECT dr FROM DailyReport dr " +
+            "WHERE dr.site = :site " +
+            "AND dr.siteProcess = :siteProcess " +
+            "AND dr.reportDate >= :startDate " +
+            "AND dr.reportDate <= :endDate " +
+            "ORDER BY dr.reportDate ASC")
+    List<DailyReport> findBySiteAndSiteProcessAndReportDateBetween(@Param("site") Site site,
+            @Param("siteProcess") SiteProcess siteProcess,
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate);
 }

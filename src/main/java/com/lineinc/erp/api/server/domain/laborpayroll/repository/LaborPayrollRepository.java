@@ -1,6 +1,11 @@
 package com.lineinc.erp.api.server.domain.laborpayroll.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
@@ -11,4 +16,31 @@ import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 @Repository
 public interface LaborPayrollRepository extends JpaRepository<LaborPayroll, Long> {
 
+    /**
+     * 특정 인력과 년월의 노무비 명세서 조회
+     */
+    Optional<LaborPayroll> findByLaborIdAndYearMonth(Long laborId, String yearMonth);
+
+    /**
+     * 특정 년월의 모든 노무비 명세서 조회
+     */
+    List<LaborPayroll> findByYearMonth(String yearMonth);
+
+    /**
+     * 특정 인력의 노무비 명세서 조회 (년월 범위)
+     */
+    @Query("""
+            SELECT lp FROM LaborPayroll lp
+            WHERE lp.labor.id = :laborId
+            AND lp.yearMonth BETWEEN :startYearMonth AND :endYearMonth
+            ORDER BY lp.yearMonth
+            """)
+    List<LaborPayroll> findByLaborIdAndYearMonthBetween(@Param("laborId") Long laborId,
+            @Param("startYearMonth") String startYearMonth,
+            @Param("endYearMonth") String endYearMonth);
+
+    /**
+     * 특정 인력의 특정 년월 데이터 삭제
+     */
+    void deleteByLaborIdAndYearMonth(Long laborId, String yearMonth);
 }

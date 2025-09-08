@@ -37,6 +37,9 @@ public class DailyReportEmployee extends BaseEntity {
     private String workContent; // 작업내용
 
     @Column
+    private Long unitPrice; // 단가
+
+    @Column
     private Double workQuantity; // 공수
 
     @Column(columnDefinition = "TEXT")

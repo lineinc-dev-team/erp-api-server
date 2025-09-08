@@ -35,6 +35,7 @@ import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollSyncService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractCreateRequest;
@@ -85,6 +86,7 @@ public class DailyReportService {
     private final OutsourcingCompanyContractDriverRepository outsourcingCompanyContractDriverRepository;
     private final OutsourcingCompanyContractEquipmentRepository outsourcingCompanyContractEquipmentRepository;
     private final UserService userService;
+    private final LaborPayrollSyncService laborPayrollSyncService;
 
     @Transactional
     public void createDailyReport(DailyReportCreateRequest request) {
@@ -134,6 +136,7 @@ public class DailyReportService {
                         .labor(labor)
                         .workContent(employeeRequest.workContent())
                         .workQuantity(employeeRequest.workQuantity())
+                        .unitPrice(labor.getDailyWage())
                         .memo(employeeRequest.memo())
                         .build();
 
@@ -296,7 +299,10 @@ public class DailyReportService {
             }
         }
 
-        dailyReportRepository.save(dailyReport);
+        DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
+
+        // 노무비 명세서 동기화
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
     }
 
     public DailyReport getDailyReportById(Long id) {
@@ -610,7 +616,10 @@ public class DailyReportService {
             }
         }
 
-        dailyReportRepository.save(dailyReport);
+        DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
+
+        // 노무비 명세서 동기화
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
     }
 
     @Transactional
@@ -682,7 +691,10 @@ public class DailyReportService {
             }
         }
 
-        dailyReportRepository.save(dailyReport);
+        DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
+
+        // 노무비 명세서 동기화
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
     }
 
     @Transactional
