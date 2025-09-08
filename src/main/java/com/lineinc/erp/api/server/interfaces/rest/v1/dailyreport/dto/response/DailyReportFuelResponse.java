@@ -35,11 +35,9 @@ public record DailyReportFuelResponse(
                 fuel.getFuelType(),
                 fuel.getFuelAmount(),
                 fuel.getMemo(),
-                fuel.getOutsourcingCompanyContract() != null
-                        && fuel.getOutsourcingCompanyContract().getOutsourcingCompany() != null
-                                ? CompanySimpleResponse
-                                        .from(fuel.getOutsourcingCompanyContract().getOutsourcingCompany())
-                                : null,
+                fuel.getOutsourcingCompany() != null
+                        ? CompanySimpleResponse.from(fuel.getOutsourcingCompany())
+                        : null,
                 fuel.getOutsourcingCompanyContractDriver() != null
                         ? ContractDriverSimpleResponse.from(fuel.getOutsourcingCompanyContractDriver())
                         : null,

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "유류 출역일보 등록 요청")
 public record DailyReportFuelCreateRequest(
-        @Schema(description = "외주업체계약 ID", example = "1") @NotNull Long outsourcingCompanyContractId,
+        @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
         @Schema(description = "외주업체계약 기사 ID", example = "1") @NotNull Long outsourcingCompanyContractDriverId,
         @Schema(description = "외주업체계약 장비 ID", example = "1") @NotNull Long outsourcingCompanyContractEquipmentId,
         @Schema(description = "유종", example = "경유") @NotBlank String fuelType,

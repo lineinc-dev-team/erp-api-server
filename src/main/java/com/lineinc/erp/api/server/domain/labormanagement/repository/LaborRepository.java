@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -16,6 +17,12 @@ import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 
 @Repository
 public interface LaborRepository extends JpaRepository<Labor, Long>, LaborRepositoryCustom {
+
+    /**
+     * ID로 노무 조회 (삭제되지 않은 것만)
+     */
+    @Query("SELECT l FROM Labor l WHERE l.id = :id AND l.deleted = false")
+    Optional<Labor> findByIdAndNotDeleted(@Param("id") Long id);
 
     /**
      * 주민등록번호로 중복 체크 (삭제되지 않은 인력 중에서)

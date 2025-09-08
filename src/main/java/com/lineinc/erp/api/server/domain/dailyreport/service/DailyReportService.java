@@ -237,8 +237,8 @@ public class DailyReportService {
         // 유류 출역 정보 추가
         if (request.fuels() != null) {
             for (DailyReportFuelCreateRequest fuelRequest : request.fuels()) {
-                OutsourcingCompanyContract contract = getOutsourcingCompanyContractByIdOrThrow(
-                        fuelRequest.outsourcingCompanyContractId());
+                OutsourcingCompany company = outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(
+                        fuelRequest.outsourcingCompanyId());
 
                 OutsourcingCompanyContractDriver driver = null;
                 if (fuelRequest.outsourcingCompanyContractDriverId() != null) {
@@ -254,7 +254,7 @@ public class DailyReportService {
 
                 DailyReportFuel fuel = DailyReportFuel.builder()
                         .dailyReport(dailyReport)
-                        .outsourcingCompanyContract(contract)
+                        .outsourcingCompany(company)
                         .outsourcingCompanyContractDriver(driver)
                         .outsourcingCompanyContractEquipment(equipment)
                         .fuelType(fuelRequest.fuelType())
@@ -835,8 +835,9 @@ public class DailyReportService {
                 (DailyReportFuelUpdateRequest.FuelUpdateInfo dto) -> {
                     return DailyReportFuel.builder()
                             .dailyReport(dailyReport)
-                            .outsourcingCompanyContract(dto.outsourcingCompanyContractId() != null
-                                    ? getOutsourcingCompanyContractByIdOrThrow(dto.outsourcingCompanyContractId())
+                            .outsourcingCompany(dto.outsourcingCompanyId() != null
+                                    ? outsourcingCompanyService
+                                            .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
                                     : null)
                             .outsourcingCompanyContractDriver(dto.outsourcingCompanyContractDriverId() != null
                                     ? getOutsourcingCompanyContractDriverByIdOrThrow(
@@ -856,9 +857,10 @@ public class DailyReportService {
         // outsourcingCompanyContractEquipment 업데이트를 위해 추가 처리 (한 번만 반복)
         for (DailyReportFuelUpdateRequest.FuelUpdateInfo fuelInfo : request.fuels()) {
             if (fuelInfo.id() != null) { // ID가 있는 것만 처리
-                final OutsourcingCompanyContract outsourcingCompanyContract = fuelInfo
-                        .outsourcingCompanyContractId() != null
-                                ? getOutsourcingCompanyContractByIdOrThrow(fuelInfo.outsourcingCompanyContractId())
+                final OutsourcingCompany outsourcingCompany = fuelInfo
+                        .outsourcingCompanyId() != null
+                                ? outsourcingCompanyService
+                                        .getOutsourcingCompanyByIdOrThrow(fuelInfo.outsourcingCompanyId())
                                 : null;
                 final OutsourcingCompanyContractDriver outsourcingCompanyContractDriver = fuelInfo
                         .outsourcingCompanyContractDriverId() != null
@@ -878,7 +880,7 @@ public class DailyReportService {
                         .findFirst()
                         .ifPresent(fuel -> {
                             fuel.updateFrom(fuelInfo);
-                            fuel.setEntities(outsourcingCompanyContract, outsourcingCompanyContractDriver,
+                            fuel.setEntities(outsourcingCompany, null, outsourcingCompanyContractDriver,
                                     outsourcingCompanyContractEquipment);
                         });
             }

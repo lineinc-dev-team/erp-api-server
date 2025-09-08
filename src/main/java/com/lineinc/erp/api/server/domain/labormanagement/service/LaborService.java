@@ -357,7 +357,7 @@ public class LaborService {
         if (id != null && id == -1L) {
             return null;
         }
-        return laborRepository.findById(id)
+        return laborRepository.findByIdAndNotDeleted(id)
                 .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.LABOR_NOT_FOUND));
     }
 

@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
@@ -33,8 +34,8 @@ public class DailyReportFuel extends BaseEntity {
     private DailyReport dailyReport; // 출역일보
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_id")
-    private OutsourcingCompanyContract outsourcingCompanyContract; // 외주업체계약
+    @JoinColumn(name = "outsourcing_company_id")
+    private OutsourcingCompany outsourcingCompany; // 외주업체
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_company_contract_driver_id")
@@ -62,10 +63,11 @@ public class DailyReportFuel extends BaseEntity {
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 
-    public void setEntities(OutsourcingCompanyContract outsourcingCompanyContract,
+    public void setEntities(OutsourcingCompany outsourcingCompany,
+            OutsourcingCompanyContract outsourcingCompanyContract,
             OutsourcingCompanyContractDriver outsourcingCompanyContractDriver,
             OutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment) {
-        this.outsourcingCompanyContract = outsourcingCompanyContract;
+        this.outsourcingCompany = outsourcingCompany;
         this.outsourcingCompanyContractDriver = outsourcingCompanyContractDriver;
         this.outsourcingCompanyContractEquipment = outsourcingCompanyContractEquipment;
     }
