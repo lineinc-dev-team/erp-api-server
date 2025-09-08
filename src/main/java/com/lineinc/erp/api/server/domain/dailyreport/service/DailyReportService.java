@@ -55,7 +55,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -121,12 +120,12 @@ public class DailyReportService {
                 }
 
                 if (labor.getFirstWorkDate() == null) {
-                    labor.setFirstWorkDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
-                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setFirstWorkDate(reportDate);
+                    labor.setHireDate(reportDate);
                 }
 
                 if (labor.getHireDate() == null) {
-                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setHireDate(reportDate);
                     labor.setResignationDate(null);
                 }
 
@@ -145,8 +144,10 @@ public class DailyReportService {
         // 직영/계약직 출역 정보 추가
         if (request.directContracts() != null) {
             for (DailyReportDirectContractCreateRequest directContractRequest : request.directContracts()) {
-                OutsourcingCompany company = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(directContractRequest.outsourcingCompanyId());
+                OutsourcingCompany company = directContractRequest.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(directContractRequest.outsourcingCompanyId())
+                        : null;
 
                 Labor labor;
                 // 임시 인력인 경우 새로운 인력을 생성
@@ -177,12 +178,12 @@ public class DailyReportService {
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
 
                 if (labor.getFirstWorkDate() == null) {
-                    labor.setFirstWorkDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
-                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setFirstWorkDate(reportDate);
+                    labor.setHireDate(reportDate);
                 }
 
                 if (labor.getHireDate() == null) {
-                    labor.setHireDate(OffsetDateTime.now(AppConstants.KOREA_ZONE));
+                    labor.setHireDate(reportDate);
                     labor.setResignationDate(null);
                 }
 
@@ -250,8 +251,9 @@ public class DailyReportService {
         // 유류 출역 정보 추가
         if (request.fuels() != null) {
             for (DailyReportFuelCreateRequest fuelRequest : request.fuels()) {
-                OutsourcingCompany company = outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(
-                        fuelRequest.outsourcingCompanyId());
+                OutsourcingCompany company = fuelRequest.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(fuelRequest.outsourcingCompanyId())
+                        : null;
 
                 OutsourcingCompanyContractDriver driver = null;
                 if (fuelRequest.outsourcingCompanyContractDriverId() != null) {
