@@ -73,7 +73,7 @@ public class LaborPayrollSyncService {
      * 해당 월의 기존 노무비 명세서 모두 삭제
      */
     private void deleteExistingPayrolls(String yearMonth) {
-        List<LaborPayroll> existingPayrolls = laborPayrollRepository.findByYearMonthAndLaborType(yearMonth, null);
+        List<LaborPayroll> existingPayrolls = laborPayrollRepository.findByYearMonth(yearMonth);
         if (!existingPayrolls.isEmpty()) {
             laborPayrollRepository.deleteAll(existingPayrolls);
             log.info("기존 노무비 명세서 {}건 삭제: {}", existingPayrolls.size(), yearMonth);
@@ -144,8 +144,8 @@ public class LaborPayrollSyncService {
         Long laborId = employee.getLabor().getId();
         Long unitPrice = employee.getUnitPrice(); // 출역일보의 단가 사용
 
-        // 인력ID와 단가 조합으로 키 생성
-        String dataKey = generateDataKey(laborId, unitPrice);
+        // 현장, 공정, 인력ID, 단가 조합으로 키 생성
+        String dataKey = generateDataKey(site.getId(), siteProcess.getId(), laborId, unitPrice);
 
         LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
                 _k -> new LaborPayrollData(employee.getLabor(), yearMonth, unitPrice, site, siteProcess));
@@ -164,8 +164,8 @@ public class LaborPayrollSyncService {
         Long laborId = directContract.getLabor().getId();
         Long unitPrice = directContract.getUnitPrice(); // 출역일보의 단가 사용
 
-        // 인력ID와 단가 조합으로 키 생성
-        String dataKey = generateDataKey(laborId, unitPrice);
+        // 현장, 공정, 인력ID, 단가 조합으로 키 생성
+        String dataKey = generateDataKey(site.getId(), siteProcess.getId(), laborId, unitPrice);
 
         LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
                 _k -> new LaborPayrollData(directContract.getLabor(), yearMonth, unitPrice, site, siteProcess));
@@ -201,10 +201,10 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 인력ID와 단가 조합으로 데이터 키 생성
+     * 현장, 공정, 인력ID, 단가 조합으로 데이터 키 생성
      */
-    private String generateDataKey(Long laborId, Long unitPrice) {
-        return laborId + "_" + (unitPrice != null ? unitPrice : 0L);
+    private String generateDataKey(Long siteId, Long siteProcessId, Long laborId, Long unitPrice) {
+        return siteId + "_" + siteProcessId + "_" + laborId + "_" + (unitPrice != null ? unitPrice : 0L);
     }
 
     /**
@@ -385,7 +385,13 @@ public class LaborPayrollSyncService {
         }
 
         public void setDayHours(int day, Double hours) {
-            dailyHours.put(day, hours);
+            // 같은 날에 이미 근무시간이 있으면 합산
+            Double existingHours = dailyHours.get(day);
+            if (existingHours != null) {
+                dailyHours.put(day, existingHours + (hours != null ? hours : 0.0));
+            } else {
+                dailyHours.put(day, hours != null ? hours : 0.0);
+            }
         }
 
         public Double getDayHours(int day) {
