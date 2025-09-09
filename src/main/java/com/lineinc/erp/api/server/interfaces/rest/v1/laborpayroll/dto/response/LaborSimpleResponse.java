@@ -22,6 +22,7 @@ public record LaborSimpleResponse(
         @Schema(description = "주소") String address,
         @Schema(description = "계좌번호") String accountNumber,
         @Schema(description = "계좌명") String accountHolder,
+        @Schema(description = "은행명") String bankName,
         @Schema(description = "소속 업체") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "본사여부") Boolean isHeadOffice,
         @Schema(description = "공종") String workType,
@@ -43,6 +44,7 @@ public record LaborSimpleResponse(
                 labor.getAddress(),
                 labor.getAccountNumber(),
                 labor.getAccountHolder(),
+                labor.getBankName(),
                 labor.getOutsourcingCompany() != null ? CompanySimpleResponse.from(labor.getOutsourcingCompany())
                         : null,
                 labor.getIsHeadOffice(),
