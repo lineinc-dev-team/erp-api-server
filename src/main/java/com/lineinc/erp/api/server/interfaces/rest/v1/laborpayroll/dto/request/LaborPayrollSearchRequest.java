@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request;
 
-import java.time.LocalDate;
-
 import org.springdoc.core.annotations.ParameterObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -10,5 +8,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record LaborPayrollSearchRequest(
         @Schema(description = "현장 ID", example = "1") Long siteId,
         @Schema(description = "공정 ID", example = "1") Long siteProcessId,
-        @Schema(description = "조회 년월 (YYYY-MM)", example = "2024-01") LocalDate yearMonth) {
+        @Schema(description = "조회 년월 (YYYY-MM)", example = "2024-01") String yearMonth) {
 }

@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,8 +52,18 @@ public class LaborPayroll extends BaseEntity {
     @JoinColumn(name = "labor_id")
     private Labor labor;
 
+    // 현장 정보
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id")
+    private Site site;
+
+    // 공정 정보
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_process_id")
+    private SiteProcess siteProcess;
+
     // 기본 정보
-    @Column(length = 7)
+    @Column
     private String yearMonth; // 해당 년월 (YYYY-MM 형식)
 
     // 일당
@@ -180,6 +192,9 @@ public class LaborPayroll extends BaseEntity {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal longTermCareInsurance; // 장기요양보험료
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal totalDeductions; // 총 공제액
 
     @Column(precision = 12, scale = 2)
     private BigDecimal netPayment; // 차감지급액
@@ -313,15 +328,16 @@ public class LaborPayroll extends BaseEntity {
         if (totalLaborCost != null) {
             calculateDeductions();
 
-            // 차감지급액 계산 (총 노무비 - 모든 공제액)
-            BigDecimal totalDeductions = incomeTax
+            // 총 공제액 계산 및 저장
+            this.totalDeductions = incomeTax
                     .add(employmentInsurance)
                     .add(healthInsurance)
                     .add(localTax)
                     .add(nationalPension)
                     .add(longTermCareInsurance);
 
-            this.netPayment = totalLaborCost.subtract(totalDeductions);
+            // 차감지급액 계산 (총 노무비 - 총 공제액)
+            this.netPayment = totalLaborCost.subtract(this.totalDeductions);
         }
     }
 
@@ -359,8 +375,8 @@ public class LaborPayroll extends BaseEntity {
 
         // 고용보험 (엑셀 수식):
         // =IFERROR(IF(AND($AM6<65),ROUNDDOWN(ROUNDDOWN(AA6*0.9%,-1),IF((AM6<65),0)),0),0)
-        // $AM6: 만나이, AA6: 노무비 총액 - 첫째날 근무해야 고용보험 적용
-        if (age < 65 && workedOnFirstDay) {
+        // $AM6: 만나이, AA6: 노무비 총액 - 65세 미만이면 고용보험 적용
+        if (age < 65) {
             BigDecimal insurance = totalLaborCost.multiply(new BigDecimal("0.009"));
             this.employmentInsurance = roundDown(insurance, -1);
         } else {

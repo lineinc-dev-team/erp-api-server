@@ -9,15 +9,23 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
+import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
+import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LaborPayrollSyncService {
 
     private final LaborPayrollRepository laborPayrollRepository;
+    private final LaborPayrollSummaryRepository laborPayrollSummaryRepository;
     private final DailyReportRepository dailyReportRepository;
 
     /**
@@ -54,7 +63,10 @@ public class LaborPayrollSyncService {
         // 3. 인력별로 노무비 명세서 재생성
         rebuildPayrollsForMonth(monthlyReports, yearMonth);
 
-        log.info("노무비 명세서 동기화 완료: 출역일보 ID={}", dailyReport.getId());
+        // 4. 집계 테이블 동기화
+        rebuildSummaryForSiteProcess(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
+
+        log.info("노무비 명세서 및 집계 테이블 동기화 완료: 출역일보 ID={}", dailyReport.getId());
     }
 
     /**
@@ -105,12 +117,14 @@ public class LaborPayrollSyncService {
 
             // 정직원 처리
             for (DailyReportEmployee employee : dailyReport.getEmployees()) {
-                processEmployeeData(laborDataMap, employee, dayOfMonth, yearMonth);
+                processEmployeeData(laborDataMap, employee, dayOfMonth, yearMonth,
+                        dailyReport.getSite(), dailyReport.getSiteProcess());
             }
 
             // 직영/계약직 처리
             for (DailyReportDirectContract directContract : dailyReport.getDirectContracts()) {
-                processDirectContractData(laborDataMap, directContract, dayOfMonth, yearMonth);
+                processDirectContractData(laborDataMap, directContract, dayOfMonth, yearMonth,
+                        dailyReport.getSite(), dailyReport.getSiteProcess());
             }
         }
 
@@ -126,7 +140,7 @@ public class LaborPayrollSyncService {
      * 정직원 데이터 처리
      */
     private void processEmployeeData(Map<String, LaborPayrollData> laborDataMap,
-            DailyReportEmployee employee, int dayOfMonth, String yearMonth) {
+            DailyReportEmployee employee, int dayOfMonth, String yearMonth, Site site, SiteProcess siteProcess) {
         Long laborId = employee.getLabor().getId();
         Long unitPrice = employee.getUnitPrice(); // 출역일보의 단가 사용
 
@@ -134,7 +148,7 @@ public class LaborPayrollSyncService {
         String dataKey = generateDataKey(laborId, unitPrice);
 
         LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
-                _k -> new LaborPayrollData(employee.getLabor(), yearMonth, unitPrice));
+                _k -> new LaborPayrollData(employee.getLabor(), yearMonth, unitPrice, site, siteProcess));
 
         // 근무시간 설정
         Double workHours = employee.getWorkQuantity();
@@ -145,7 +159,8 @@ public class LaborPayrollSyncService {
      * 직영/계약직 데이터 처리
      */
     private void processDirectContractData(Map<String, LaborPayrollData> laborDataMap,
-            DailyReportDirectContract directContract, int dayOfMonth, String yearMonth) {
+            DailyReportDirectContract directContract, int dayOfMonth, String yearMonth, Site site,
+            SiteProcess siteProcess) {
         Long laborId = directContract.getLabor().getId();
         Long unitPrice = directContract.getUnitPrice(); // 출역일보의 단가 사용
 
@@ -153,7 +168,7 @@ public class LaborPayrollSyncService {
         String dataKey = generateDataKey(laborId, unitPrice);
 
         LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
-                _k -> new LaborPayrollData(directContract.getLabor(), yearMonth, unitPrice));
+                _k -> new LaborPayrollData(directContract.getLabor(), yearMonth, unitPrice, site, siteProcess));
 
         // 근무시간 설정
         Double workHours = directContract.getWorkQuantity();
@@ -166,6 +181,8 @@ public class LaborPayrollSyncService {
     private void createLaborPayroll(LaborPayrollData laborData) {
         LaborPayroll.LaborPayrollBuilder builder = LaborPayroll.builder()
                 .labor(laborData.getLabor())
+                .site(laborData.getSite())
+                .siteProcess(laborData.getSiteProcess())
                 .yearMonth(laborData.getYearMonth())
                 .dailyWage(laborData.getDailyWage())
                 .memo(null);
@@ -232,16 +249,135 @@ public class LaborPayrollSyncService {
     }
 
     /**
+     * 특정 현장/공정의 집계 테이블 업데이트 (Upsert)
+     */
+    private void rebuildSummaryForSiteProcess(Site site, SiteProcess siteProcess, String yearMonth) {
+        // 1. 해당 현장/공정의 노무비 명세서 조회
+        List<LaborPayroll> payrolls = laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(
+                site, siteProcess, yearMonth);
+
+        if (payrolls.isEmpty()) {
+            // 노무비 명세서가 없으면 집계 데이터도 삭제
+            laborPayrollSummaryRepository.deleteBySiteAndSiteProcessAndYearMonth(site, siteProcess, yearMonth);
+            log.info("노무비 명세서가 없어 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
+                    site.getName(), siteProcess.getName(), yearMonth);
+            return;
+        }
+
+        // 2. 기존 집계 데이터 조회
+        var existingSummary = laborPayrollSummaryRepository.findBySiteAndSiteProcessAndYearMonth(
+                site, siteProcess, yearMonth);
+
+        // 3. 집계 데이터 계산
+        var calculatedData = calculateSummaryData(payrolls);
+
+        LaborPayrollSummary summary;
+        if (existingSummary.isPresent()) {
+            // 4-1. 기존 데이터가 있으면 업데이트
+            summary = existingSummary.get();
+            summary.updateSummary(
+                    calculatedData.regularEmployeeCount(),
+                    calculatedData.directContractCount(),
+                    calculatedData.etcCount(),
+                    calculatedData.totalLaborCost(),
+                    calculatedData.totalDeductions(),
+                    calculatedData.totalNetPayment());
+            log.info("집계 테이블 업데이트: 현장={}, 공정={}, 년월={}",
+                    site.getName(), siteProcess.getName(), yearMonth);
+        } else {
+            // 4-2. 기존 데이터가 없으면 새로 생성
+            summary = LaborPayrollSummary.builder()
+                    .site(site)
+                    .siteProcess(siteProcess)
+                    .yearMonth(yearMonth)
+                    .regularEmployeeCount(calculatedData.regularEmployeeCount())
+                    .directContractCount(calculatedData.directContractCount())
+                    .etcCount(calculatedData.etcCount())
+                    .totalLaborCost(calculatedData.totalLaborCost())
+                    .totalDeductions(calculatedData.totalDeductions())
+                    .totalNetPayment(calculatedData.totalNetPayment())
+                    .build();
+            log.info("집계 테이블 생성: 현장={}, 공정={}, 년월={}",
+                    site.getName(), siteProcess.getName(), yearMonth);
+        }
+
+        // 5. 집계 데이터 저장
+        laborPayrollSummaryRepository.save(summary);
+    }
+
+    /**
+     * 노무비 명세서 목록으로부터 집계 데이터 계산
+     */
+    private SummaryData calculateSummaryData(List<LaborPayroll> payrolls) {
+        // 인력 타입별 고유 인력 수 집계
+        Map<LaborType, Long> laborTypeCount = payrolls.stream()
+                .collect(Collectors.groupingBy(
+                        payroll -> payroll.getLabor().getType(),
+                        Collectors.mapping(
+                                payroll -> payroll.getLabor().getId(),
+                                Collectors.toSet())))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> (long) entry.getValue().size()));
+
+        // 금액 집계
+        BigDecimal totalLaborCost = payrolls.stream()
+                .map(LaborPayroll::getTotalLaborCost)
+                .filter(cost -> cost != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalDeductions = payrolls.stream()
+                .map(LaborPayroll::getTotalDeductions)
+                .filter(deductions -> deductions != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalNetPayment = payrolls.stream()
+                .map(LaborPayroll::getNetPayment)
+                .filter(payment -> payment != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 집계 데이터 반환
+        Integer regularEmployeeCount = laborTypeCount.getOrDefault(LaborType.REGULAR_EMPLOYEE, 0L).intValue();
+        Integer directContractCount = laborTypeCount.getOrDefault(LaborType.DIRECT_CONTRACT, 0L).intValue();
+        Integer etcCount = laborTypeCount.getOrDefault(LaborType.ETC, 0L).intValue();
+
+        return new SummaryData(
+                regularEmployeeCount,
+                directContractCount,
+                etcCount,
+                totalLaborCost,
+                totalDeductions,
+                totalNetPayment);
+    }
+
+    /**
+     * 집계 데이터를 담는 레코드
+     */
+    private record SummaryData(
+            Integer regularEmployeeCount,
+            Integer directContractCount,
+            Integer etcCount,
+            BigDecimal totalLaborCost,
+            BigDecimal totalDeductions,
+            BigDecimal totalNetPayment) {
+    }
+
+    /**
      * 인력별 노무비 데이터를 임시로 저장하는 클래스
      */
     private static class LaborPayrollData {
         private final Labor labor;
+        private final Site site;
+        private final SiteProcess siteProcess;
         private final String yearMonth;
         private final Integer dailyWage;
         private final Map<Integer, Double> dailyHours = new HashMap<>();
 
-        public LaborPayrollData(Labor labor, String yearMonth, Long unitPrice) {
+        public LaborPayrollData(Labor labor, String yearMonth, Long unitPrice, Site site, SiteProcess siteProcess) {
             this.labor = labor;
+            this.site = site;
+            this.siteProcess = siteProcess;
             this.yearMonth = yearMonth;
             this.dailyWage = unitPrice != null ? unitPrice.intValue() : 0;
         }
@@ -257,6 +393,14 @@ public class LaborPayrollSyncService {
         // Getters
         public Labor getLabor() {
             return labor;
+        }
+
+        public Site getSite() {
+            return site;
+        }
+
+        public SiteProcess getSiteProcess() {
+            return siteProcess;
         }
 
         public String getYearMonth() {
