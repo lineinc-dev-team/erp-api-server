@@ -73,7 +73,7 @@ public class LaborPayrollSyncService {
      * 해당 월의 기존 노무비 명세서 모두 삭제
      */
     private void deleteExistingPayrolls(String yearMonth) {
-        List<LaborPayroll> existingPayrolls = laborPayrollRepository.findByYearMonth(yearMonth);
+        List<LaborPayroll> existingPayrolls = laborPayrollRepository.findByYearMonthAndLaborType(yearMonth, null);
         if (!existingPayrolls.isEmpty()) {
             laborPayrollRepository.deleteAll(existingPayrolls);
             log.info("기존 노무비 명세서 {}건 삭제: {}", existingPayrolls.size(), yearMonth);

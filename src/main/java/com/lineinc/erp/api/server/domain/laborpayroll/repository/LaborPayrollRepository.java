@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -27,6 +28,11 @@ public interface LaborPayrollRepository extends JpaRepository<LaborPayroll, Long
      * 특정 년월의 모든 노무비 명세서 조회
      */
     List<LaborPayroll> findByYearMonth(String yearMonth);
+
+    /**
+     * 특정 년월과 노무인력 타입의 노무비 명세서 조회
+     */
+    List<LaborPayroll> findByYearMonthAndLaborType(String yearMonth, LaborType type);
 
     /**
      * 특정 인력의 노무비 명세서 조회 (년월 범위)

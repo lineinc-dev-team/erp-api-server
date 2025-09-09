@@ -5,12 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
@@ -108,8 +110,9 @@ public class LaborPayrollController {
     @GetMapping("/{yearMonth}/details")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborPayrollDetailResponse>>> getLaborPayrollDetails(
-            @Parameter(description = "조회 년월 (YYYY-MM)") @PathVariable String yearMonth) {
-        List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(yearMonth);
+            @Parameter(description = "조회 년월 (YYYY-MM)") @PathVariable String yearMonth,
+            @Parameter(description = "노무인력 타입") @RequestParam(required = false) LaborType type) {
+        List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(yearMonth, type);
         return ResponseEntity.ok(SuccessResponse.of(result));
     }
 }

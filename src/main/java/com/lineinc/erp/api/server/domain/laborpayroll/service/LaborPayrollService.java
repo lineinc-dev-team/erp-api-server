@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
@@ -127,10 +128,19 @@ public class LaborPayrollService {
     /**
      * 노무명세서 상세 조회
      * 특정 년월의 모든 노무명세서 상세 정보를 조회
+     * type이 null이면 전체 조회, 아니면 해당 타입만 조회
      */
     @Transactional(readOnly = true)
-    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(String yearMonth) {
-        List<LaborPayroll> laborPayrolls = laborPayrollRepository.findByYearMonth(yearMonth);
+    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(String yearMonth, LaborType type) {
+        List<LaborPayroll> laborPayrolls;
+
+        if (type == null) {
+            // type이 null이면 전체 조회
+            laborPayrolls = laborPayrollRepository.findByYearMonth(yearMonth);
+        } else {
+            // type이 지정되면 해당 타입만 조회
+            laborPayrolls = laborPayrollRepository.findByYearMonthAndLaborType(yearMonth, type);
+        }
 
         return laborPayrolls.stream()
                 .map(LaborPayrollDetailResponse::from)
