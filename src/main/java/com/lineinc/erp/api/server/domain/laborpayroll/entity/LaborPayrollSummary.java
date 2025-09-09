@@ -2,6 +2,9 @@ package com.lineinc.erp.api.server.domain.laborpayroll.entity;
 
 import java.math.BigDecimal;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -21,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -47,11 +51,13 @@ public class LaborPayrollSummary extends BaseEntity {
     private Long id;
 
     // 현장 정보
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id", nullable = false)
     private Site site;
 
     // 공정 정보
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_process_id", nullable = false)
     private SiteProcess siteProcess;
@@ -81,7 +87,9 @@ public class LaborPayrollSummary extends BaseEntity {
     private BigDecimal totalNetPayment; // 총 차감지급액
 
     // 비고
+    @Setter
     @Column(columnDefinition = "TEXT")
+    @DiffInclude
     private String memo; // 비고
 
     /**
@@ -102,6 +110,13 @@ public class LaborPayrollSummary extends BaseEntity {
         this.totalLaborCost = totalLaborCost;
         this.totalDeductions = totalDeductions;
         this.totalNetPayment = totalNetPayment;
+        this.memo = memo;
+    }
+
+    /**
+     * memo 필드만 업데이트
+     */
+    public void updateMemo(String memo) {
         this.memo = memo;
     }
 }

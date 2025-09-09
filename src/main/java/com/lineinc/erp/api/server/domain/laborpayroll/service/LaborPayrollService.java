@@ -1,9 +1,12 @@
 package com.lineinc.erp.api.server.domain.laborpayroll.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,9 +18,13 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
+import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollChangeHistory;
+import com.lineinc.erp.api.server.domain.laborpayroll.enums.LaborPayrollChangeType;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
+import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
@@ -26,6 +33,7 @@ import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +48,8 @@ public class LaborPayrollService {
 
     private final LaborPayrollSummaryRepository laborPayrollSummaryRepository;
     private final LaborPayrollRepository laborPayrollRepository;
+    private final LaborPayrollChangeHistoryRepository laborPayrollChangeHistoryRepository;
+    private final Javers javers;
 
     /**
      * 노무명세서 월별 집계 목록 조회 (페이징)
@@ -161,6 +171,37 @@ public class LaborPayrollService {
                         ValidationMessages.LABOR_PAYROLL_SUMMARY_NOT_FOUND));
 
         return LaborPayrollSummaryResponse.from(summary);
+    }
+
+    /**
+     * 노무명세서 집계 테이블 memo 수정
+     * 집계 테이블의 비고 필드만 수정 가능
+     */
+    @Transactional
+    public void updateLaborPayrollSummary(Long id, LaborPayrollSummaryUpdateRequest request) {
+        LaborPayrollSummary summary = laborPayrollSummaryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.LABOR_PAYROLL_SUMMARY_NOT_FOUND));
+
+        // 변경 전 스냅샷 생성
+        LaborPayrollSummary oldSnapshot = JaversUtils.createSnapshot(javers, summary, LaborPayrollSummary.class);
+
+        // memo 필드 수정
+        summary.setMemo(request.memo());
+        laborPayrollSummaryRepository.save(summary);
+
+        // 변경 이력 저장
+        Diff diff = javers.compare(oldSnapshot, summary);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
+                    .type(LaborPayrollChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            laborPayrollChangeHistoryRepository.save(changeHistory);
+        }
     }
 
 }

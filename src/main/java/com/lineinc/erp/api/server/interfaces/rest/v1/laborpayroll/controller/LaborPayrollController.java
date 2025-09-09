@@ -3,7 +3,9 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +20,7 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDownloadRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -35,6 +38,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -131,5 +135,23 @@ public class LaborPayrollController {
             @Parameter(description = "집계 ID") @PathVariable Long id) {
         LaborPayrollSummaryResponse result = laborPayrollService.getLaborPayrollSummaryDetail(id);
         return ResponseEntity.ok(SuccessResponse.of(result));
+    }
+
+    /**
+     * 노무명세서 집계 테이블 수정
+     */
+    @Operation(summary = "노무명세서 집계 테이블 수정", description = "노무명세서 집계 테이블을 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 집계 데이터를 찾을 수 없음", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @PatchMapping("/summary/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateLaborPayrollSummary(
+            @Parameter(description = "집계 ID") @PathVariable Long id,
+            @Parameter(description = "수정 요청") @Valid @RequestBody LaborPayrollSummaryUpdateRequest request) {
+        laborPayrollService.updateLaborPayrollSummary(id, request);
+        return ResponseEntity.ok().build();
     }
 }
