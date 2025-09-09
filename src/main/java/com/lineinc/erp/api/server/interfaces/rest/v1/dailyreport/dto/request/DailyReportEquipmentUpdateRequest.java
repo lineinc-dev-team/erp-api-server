@@ -13,7 +13,7 @@ public record DailyReportEquipmentUpdateRequest(
 
     @Schema(description = "장비 정보 수정 내용")
     public record EquipmentUpdateInfo(
-            @Schema(description = "ID", example = "1") @NotNull Long id,
+            @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
             @Schema(description = "외주업체계약 기사 ID", example = "1") @NotNull Long outsourcingCompanyContractDriverId,
             @Schema(description = "외주업체계약 장비 ID", example = "1") @NotNull Long outsourcingCompanyContractEquipmentId,

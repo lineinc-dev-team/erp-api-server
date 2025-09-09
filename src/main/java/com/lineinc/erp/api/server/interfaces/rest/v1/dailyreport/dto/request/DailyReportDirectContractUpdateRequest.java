@@ -13,7 +13,7 @@ public record DailyReportDirectContractUpdateRequest(
 
     @Schema(description = "직영/계약직 정보 수정 내용")
     public record DirectContractUpdateInfo(
-            @Schema(description = "ID", example = "1") @NotNull Long id,
+            @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
             @Schema(description = "노무인력 ID", example = "1") Long laborId,
             @Schema(description = "직종", example = "토목공") @NotBlank String position,

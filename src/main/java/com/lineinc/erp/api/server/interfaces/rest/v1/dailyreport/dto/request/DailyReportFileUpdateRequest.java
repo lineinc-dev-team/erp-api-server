@@ -13,7 +13,7 @@ public record DailyReportFileUpdateRequest(
 
     @Schema(description = "파일 정보 수정 내용")
     public record FileUpdateInfo(
-            @Schema(description = "ID", example = "1") @NotNull Long id,
+            @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "파일 URL", example = "https://example.com/files/report.pdf") String fileUrl,
             @Schema(description = "원본 파일명", example = "출역일보_20240115.pdf") String originalFileName,
             @Schema(description = "파일 설명", example = "현장 사진") @NotBlank String description,

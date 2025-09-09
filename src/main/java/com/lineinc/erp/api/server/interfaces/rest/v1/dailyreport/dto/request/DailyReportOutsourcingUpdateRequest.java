@@ -13,7 +13,7 @@ public record DailyReportOutsourcingUpdateRequest(
 
     @Schema(description = "외주 정보 수정 내용")
     public record OutsourcingUpdateInfo(
-            @Schema(description = "ID", example = "1") @NotNull Long id,
+            @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
             @Schema(description = "외주업체계약 인력 ID", example = "1") @NotNull Long outsourcingCompanyContractWorkerId,
             @Schema(description = "구분값", example = "토목공사") @NotBlank String category,

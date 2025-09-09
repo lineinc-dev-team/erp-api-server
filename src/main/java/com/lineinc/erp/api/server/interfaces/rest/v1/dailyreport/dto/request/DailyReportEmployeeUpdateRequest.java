@@ -13,7 +13,7 @@ public record DailyReportEmployeeUpdateRequest(
 
     @Schema(description = "직원정보 수정 내용")
     public record EmployeeUpdateInfo(
-            @Schema(description = "ID", example = "1") @NotNull Long id,
+            @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "노무인력 ID", example = "1") @NotNull Long laborId,
             @Schema(description = "작업내용", example = "기초공사") @NotBlank String workContent,
             @Schema(description = "공수", example = "1.0") @NotNull Double workQuantity,
