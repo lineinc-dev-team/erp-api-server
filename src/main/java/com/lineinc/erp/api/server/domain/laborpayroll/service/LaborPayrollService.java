@@ -7,8 +7,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
@@ -50,8 +52,8 @@ public class LaborPayrollService {
 
         // 집계 테이블에서 조건에 맞는 데이터 조회
         Page<LaborPayrollSummary> summaryPage = laborPayrollSummaryRepository.findBySearchCondition(
-                request.siteId(),
-                request.siteProcessId(),
+                request.siteName(),
+                request.processName(),
                 request.yearMonth(),
                 pageable);
 
@@ -70,7 +72,7 @@ public class LaborPayrollService {
     @Transactional(readOnly = true)
     public Workbook downloadExcel(LaborPayrollSearchRequest request, Sort sort, List<String> fields) {
         List<LaborPayrollSummaryResponse> responses = laborPayrollSummaryRepository
-                .findAllWithoutPaging(request.siteId(), request.siteProcessId(), request.yearMonth(), sort)
+                .findAllWithoutPaging(request.siteName(), request.processName(), request.yearMonth(), sort)
                 .stream()
                 .map(LaborPayrollSummaryResponse::from)
                 .toList();
@@ -145,6 +147,18 @@ public class LaborPayrollService {
         return laborPayrolls.stream()
                 .map(LaborPayrollDetailResponse::from)
                 .toList();
+    }
+
+    /**
+     * 노무명세서 집계 상세 조회
+     * 특정 집계 ID의 상세 정보를 조회
+     */
+    @Transactional(readOnly = true)
+    public LaborPayrollSummaryResponse getLaborPayrollSummaryDetail(Long id) {
+        LaborPayrollSummary summary = laborPayrollSummaryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 집계 데이터를 찾을 수 없습니다."));
+
+        return LaborPayrollSummaryResponse.from(summary);
     }
 
 }

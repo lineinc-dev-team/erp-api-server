@@ -50,10 +50,10 @@ public class LaborPayrollController {
     private final LaborPayrollService laborPayrollService;
 
     /**
-     * 노무명세서 월별 목록 조회
+     * 노무명세서 목록 조회
      * 현장별, 공정별, 월별로 그룹핑된 노무비 통계 정보 조회
      */
-    @Operation(summary = "노무명세서 월별 목록 조회", description = "월별로 그룹핑된 노무명세서 목록을 조회합니다.")
+    @Operation(summary = "노무명세서 목록 조회", description = "월별로 그룹핑된 노무명세서 목록을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
@@ -115,4 +115,26 @@ public class LaborPayrollController {
         List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(yearMonth, type);
         return ResponseEntity.ok(SuccessResponse.of(result));
     }
+
+    // /**
+    // * 노무명세서 집계 상세 조회
+    // * 특정 현장/공정/년월의 집계 데이터를 상세하게 조회
+    // */
+    // @Operation(summary = "노무명세서 집계 상세 조회", description = "특정 현장/공정/년월의 노무명세서 집계
+    // 데이터를 상세하게 조회합니다.")
+    // @ApiResponses({
+    // @ApiResponse(responseCode = "200", description = "조회 성공"),
+    // @ApiResponse(responseCode = "404", description = "해당 집계 데이터를 찾을 수 없음",
+    // content = @Content())
+    // })
+    // @GetMapping("/summary/{id}")
+    // @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action =
+    // PermissionAction.VIEW)
+    // public ResponseEntity<SuccessResponse<LaborPayrollSummaryResponse>>
+    // getLaborPayrollSummaryDetail(
+    // @Parameter(description = "집계 ID") @PathVariable Long id) {
+    // LaborPayrollSummaryResponse result =
+    // laborPayrollService.getLaborPayrollSummaryDetail(id);
+    // return ResponseEntity.ok(SuccessResponse.of(result));
+    // }
 }

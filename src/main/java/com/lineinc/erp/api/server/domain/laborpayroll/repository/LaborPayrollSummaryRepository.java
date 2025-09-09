@@ -35,13 +35,13 @@ public interface LaborPayrollSummaryRepository extends JpaRepository<LaborPayrol
             SELECT lps FROM LaborPayrollSummary lps
             JOIN FETCH lps.site s
             JOIN FETCH lps.siteProcess sp
-            WHERE (:siteId IS NULL OR lps.site.id = :siteId)
-            AND (:siteProcessId IS NULL OR lps.siteProcess.id = :siteProcessId)
+            WHERE (:siteName IS NULL OR lps.site.name LIKE %:siteName%)
+            AND (:processName IS NULL OR lps.siteProcess.name LIKE %:processName%)
             AND (:yearMonth IS NULL OR lps.yearMonth = :yearMonth)
             """)
     Page<LaborPayrollSummary> findBySearchCondition(
-            @Param("siteId") Long siteId,
-            @Param("siteProcessId") Long siteProcessId,
+            @Param("siteName") String siteName,
+            @Param("processName") String processName,
             @Param("yearMonth") String yearMonth,
             Pageable pageable);
 
@@ -62,13 +62,13 @@ public interface LaborPayrollSummaryRepository extends JpaRepository<LaborPayrol
             SELECT lps FROM LaborPayrollSummary lps
             JOIN FETCH lps.site s
             JOIN FETCH lps.siteProcess sp
-            WHERE (:siteId IS NULL OR lps.site.id = :siteId)
-            AND (:siteProcessId IS NULL OR lps.siteProcess.id = :siteProcessId)
+            WHERE (:siteName IS NULL OR lps.site.name LIKE %:siteName%)
+            AND (:processName IS NULL OR lps.siteProcess.name LIKE %:processName%)
             AND (:yearMonth IS NULL OR lps.yearMonth = :yearMonth)
             """)
     List<LaborPayrollSummary> findAllWithoutPaging(
-            @Param("siteId") Long siteId,
-            @Param("siteProcessId") Long siteProcessId,
+            @Param("siteName") String siteName,
+            @Param("processName") String processName,
             @Param("yearMonth") String yearMonth,
             Sort sort);
 
@@ -76,6 +76,6 @@ public interface LaborPayrollSummaryRepository extends JpaRepository<LaborPayrol
      * 조건에 따른 집계 데이터 전체 조회 (페이징 없음) - Request 객체 사용
      */
     default List<LaborPayrollSummary> findAllWithoutPaging(LaborPayrollSearchRequest request, Sort sort) {
-        return findAllWithoutPaging(request.siteId(), request.siteProcessId(), request.yearMonth(), sort);
+        return findAllWithoutPaging(request.siteName(), request.processName(), request.yearMonth(), sort);
     }
 }
