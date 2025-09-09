@@ -7,18 +7,17 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDetailSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
@@ -108,19 +107,19 @@ public class LaborPayrollController {
 
     /**
      * 노무명세서 상세 조회
-     * 특정 년월의 모든 노무명세서 상세 정보를 조회
+     * 현장, 공정, 년월, 노무인력 타입, 일자로 필터링하여 조회
      */
-    @Operation(summary = "노무명세서 상세 조회", description = "특정 년월의 모든 노무명세서 상세 정보를 조회합니다.")
+    @Operation(summary = "노무명세서 상세 조회", description = "현장, 공정, 년월, 노무인력 타입, 일자로 필터링하여 노무명세서 상세 정보를 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 년월의 노무명세서를 찾을 수 없음", content = @Content())
+            @ApiResponse(responseCode = "404", description = "해당 조건의 노무명세서를 찾을 수 없음", content = @Content())
     })
-    @GetMapping("/{yearMonth}/details")
+    @GetMapping("/details")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborPayrollDetailResponse>>> getLaborPayrollDetails(
-            @Parameter(description = "조회 년월 (YYYY-MM)") @PathVariable String yearMonth,
-            @Parameter(description = "노무인력 타입") @RequestParam(required = false) LaborType type) {
-        List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(yearMonth, type);
+            @Parameter(description = "조회 조건") @ModelAttribute LaborPayrollDetailSearchRequest request) {
+        List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(
+                request.siteId(), request.processId(), request.yearMonth());
         return ResponseEntity.ok(SuccessResponse.of(result));
     }
 

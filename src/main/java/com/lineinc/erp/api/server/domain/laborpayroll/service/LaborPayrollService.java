@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollChangeHistory;
@@ -34,8 +33,6 @@ import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
-import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
-import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
@@ -145,20 +142,12 @@ public class LaborPayrollService {
 
     /**
      * 노무명세서 상세 조회
-     * 특정 년월의 모든 노무명세서 상세 정보를 조회
-     * type이 null이면 전체 조회, 아니면 해당 타입만 조회
+     * 현장 ID, 공정 ID, 년월로 필터링하여 노무명세서 상세 정보를 조회
      */
     @Transactional(readOnly = true)
-    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(String yearMonth, LaborType type) {
-        List<LaborPayroll> laborPayrolls;
-
-        if (type == null) {
-            // type이 null이면 전체 조회
-            laborPayrolls = laborPayrollRepository.findByYearMonth(yearMonth);
-        } else {
-            // type이 지정되면 해당 타입만 조회
-            laborPayrolls = laborPayrollRepository.findByYearMonthAndLaborType(yearMonth, type);
-        }
+    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(Long siteId, Long siteProcessId, String yearMonth) {
+        List<LaborPayroll> laborPayrolls = laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonth(siteId,
+                siteProcessId, yearMonth);
 
         return laborPayrolls.stream()
                 .map(LaborPayrollDetailResponse::from)
