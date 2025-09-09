@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse.SiteProcessSimpleResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse.SiteSimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
