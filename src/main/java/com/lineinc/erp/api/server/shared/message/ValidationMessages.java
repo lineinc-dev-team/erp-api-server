@@ -68,6 +68,7 @@ public final class ValidationMessages {
     public static final String DAILY_REPORT_ALREADY_EXISTS = "같은 날짜, 현장, 공정에 대한 출역일보가 이미 존재합니다.";
     public static final String DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR = "직원 출역 정보에는 정규직원만 추가할 수 있습니다.";
     public static final String DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE = "직영/계약직 출역 정보에는 직영/계약직 또는 기타 인력만 추가할 수 있습니다.";
+    public static final String DAILY_REPORT_LABOR_ALREADY_EXISTS = "해당 날짜에 이미 출근한 인력입니다.";
     public static final String DAILY_REPORT_CANNOT_EDIT_PAST_DATE = "당일까지만 출역일보를 수정할 수 있습니다.";
     public static final String DAILY_REPORT_EDIT_NOT_ALLOWED = "출역일보 수정 기한이 지났거나 권한이 없습니다.";
 

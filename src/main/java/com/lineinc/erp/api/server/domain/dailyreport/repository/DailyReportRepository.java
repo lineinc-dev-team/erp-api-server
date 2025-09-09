@@ -126,4 +126,26 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
+
+    /**
+     * 같은 날짜에 특정 직원이 이미 출근했는지 확인합니다. (모든 현장/공정 포함)
+     */
+    @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
+            "JOIN dr.employees e " +
+            "WHERE dr.reportDate = :reportDate " +
+            "AND e.labor.id = :laborId")
+    boolean existsByReportDateAndEmployeesLaborId(
+            @Param("reportDate") OffsetDateTime reportDate,
+            @Param("laborId") Long laborId);
+
+    /**
+     * 같은 날짜에 특정 직영/계약직 인력이 이미 출근했는지 확인합니다. (모든 현장/공정 포함)
+     */
+    @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
+            "JOIN dr.directContracts dc " +
+            "WHERE dr.reportDate = :reportDate " +
+            "AND dc.labor.id = :laborId")
+    boolean existsByReportDateAndDirectContractsLaborId(
+            @Param("reportDate") OffsetDateTime reportDate,
+            @Param("laborId") Long laborId);
 }

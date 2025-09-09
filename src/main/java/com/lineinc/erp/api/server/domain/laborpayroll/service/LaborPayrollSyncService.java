@@ -256,17 +256,19 @@ public class LaborPayrollSyncService {
         List<LaborPayroll> payrolls = laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(
                 site, siteProcess, yearMonth);
 
-        if (payrolls.isEmpty()) {
-            // 노무비 명세서가 없으면 집계 데이터도 삭제
-            laborPayrollSummaryRepository.deleteBySiteAndSiteProcessAndYearMonth(site, siteProcess, yearMonth);
-            log.info("노무비 명세서가 없어 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
-                    site.getName(), siteProcess.getName(), yearMonth);
-            return;
-        }
-
         // 2. 기존 집계 데이터 조회
         var existingSummary = laborPayrollSummaryRepository.findBySiteAndSiteProcessAndYearMonth(
                 site, siteProcess, yearMonth);
+
+        if (payrolls.isEmpty()) {
+            // 노무비 명세서가 없으면 기존 집계 데이터 삭제
+            if (existingSummary.isPresent()) {
+                laborPayrollSummaryRepository.delete(existingSummary.get());
+                log.info("노무비 명세서가 없어 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
+                        site.getName(), siteProcess.getName(), yearMonth);
+            }
+            return;
+        }
 
         // 3. 집계 데이터 계산
         var calculatedData = calculateSummaryData(payrolls);
