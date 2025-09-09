@@ -76,6 +76,14 @@ public class UserService {
         user.updatePassword(encodedPassword);
         user.setRequirePasswordReset(true);
         usersRepository.save(user);
+
+        // 비밀번호 초기화 변경 이력 기록
+        UserChangeHistory changeHistory = UserChangeHistory.builder()
+                .user(user)
+                .type(UserChangeType.BASIC)
+                .description(ValidationMessages.PASSWORD_RESET)
+                .build();
+        userChangeHistoryRepository.save(changeHistory);
     }
 
     @Transactional(readOnly = true)

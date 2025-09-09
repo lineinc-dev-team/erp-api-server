@@ -32,8 +32,11 @@ public class UserChangeHistory extends BaseEntity {
     private UserChangeType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String changes;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Setter
     @Column(columnDefinition = "TEXT")
