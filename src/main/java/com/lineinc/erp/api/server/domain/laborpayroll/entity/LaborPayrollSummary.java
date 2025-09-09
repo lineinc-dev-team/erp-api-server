@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.domain.laborpayroll.entity;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
