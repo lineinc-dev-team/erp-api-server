@@ -24,6 +24,7 @@ import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
@@ -156,7 +157,8 @@ public class LaborPayrollService {
     @Transactional(readOnly = true)
     public LaborPayrollSummaryResponse getLaborPayrollSummaryDetail(Long id) {
         LaborPayrollSummary summary = laborPayrollSummaryRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 집계 데이터를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.LABOR_PAYROLL_SUMMARY_NOT_FOUND));
 
         return LaborPayrollSummaryResponse.from(summary);
     }

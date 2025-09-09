@@ -18,8 +18,6 @@ public record LaborPayrollDetailResponse(
 
         // 인력 정보
         @Schema(description = "노무인력 정보") LaborSimpleResponse labor,
-        @Schema(description = "현장 정보") SiteSimpleResponse site,
-        @Schema(description = "공정 정보") SiteProcessSimpleResponse siteProcess,
 
         // 일당 및 근무 정보
         @Schema(description = "일당") Integer dailyWage,
@@ -83,9 +81,6 @@ public record LaborPayrollDetailResponse(
 
                 // 노무인력 정보
                 laborPayroll.getLabor() != null ? LaborSimpleResponse.from(laborPayroll.getLabor()) : null,
-                laborPayroll.getSite() != null ? SiteSimpleResponse.from(laborPayroll.getSite()) : null,
-                laborPayroll.getSiteProcess() != null ? SiteProcessSimpleResponse.from(laborPayroll.getSiteProcess())
-                        : null,
 
                 // 일당 및 근무 정보
                 laborPayroll.getDailyWage(),
