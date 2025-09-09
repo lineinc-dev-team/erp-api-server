@@ -119,7 +119,7 @@ public class LaborPayrollController {
     public ResponseEntity<SuccessResponse<List<LaborPayrollDetailResponse>>> getLaborPayrollDetails(
             @Parameter(description = "조회 조건") @ModelAttribute LaborPayrollDetailSearchRequest request) {
         List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(
-                request.siteId(), request.processId(), request.yearMonth());
+                request.siteId(), request.processId(), request.yearMonth(), request.type());
         return ResponseEntity.ok(SuccessResponse.of(result));
     }
 

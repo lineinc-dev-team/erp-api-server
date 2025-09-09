@@ -49,6 +49,22 @@ public interface LaborPayrollRepository extends JpaRepository<LaborPayroll, Long
             @Param("yearMonth") String yearMonth);
 
     /**
+     * 현장, 공정, 년월, 노무인력 타입으로 노무비 명세서 조회
+     */
+    @Query("""
+            SELECT lp FROM LaborPayroll lp
+            WHERE lp.site.id = :siteId
+            AND lp.siteProcess.id = :siteProcessId
+            AND lp.yearMonth = :yearMonth
+            AND lp.labor.type = :type
+            """)
+    List<LaborPayroll> findBySiteIdAndSiteProcessIdAndYearMonthAndLaborType(
+            @Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId,
+            @Param("yearMonth") String yearMonth,
+            @Param("type") LaborType type);
+
+    /**
      * 특정 인력의 노무비 명세서 조회 (년월 범위)
      */
     @Query("""

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollChangeHistory;
@@ -142,12 +143,22 @@ public class LaborPayrollService {
 
     /**
      * 노무명세서 상세 조회
-     * 현장 ID, 공정 ID, 년월로 필터링하여 노무명세서 상세 정보를 조회
+     * 현장 ID, 공정 ID, 년월, 노무인력 타입으로 필터링하여 노무명세서 상세 정보를 조회
      */
     @Transactional(readOnly = true)
-    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(Long siteId, Long siteProcessId, String yearMonth) {
-        List<LaborPayroll> laborPayrolls = laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonth(siteId,
-                siteProcessId, yearMonth);
+    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(Long siteId, Long siteProcessId, String yearMonth,
+            LaborType type) {
+        List<LaborPayroll> laborPayrolls;
+
+        if (type == null) {
+            // type이 null이면 전체 조회
+            laborPayrolls = laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonth(siteId, siteProcessId,
+                    yearMonth);
+        } else {
+            // type이 지정되면 해당 타입만 조회
+            laborPayrolls = laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonthAndLaborType(siteId,
+                    siteProcessId, yearMonth, type);
+        }
 
         return laborPayrolls.stream()
                 .map(LaborPayrollDetailResponse::from)
