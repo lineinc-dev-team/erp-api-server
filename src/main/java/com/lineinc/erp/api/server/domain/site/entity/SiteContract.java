@@ -46,7 +46,7 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
     @DiffInclude
     private Long amount; // 계약금액
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @DiffInclude
     private String memo; // 비고
 
