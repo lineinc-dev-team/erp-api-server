@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +17,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -92,5 +94,22 @@ public class LaborPayrollController {
                 parsed)) {
             workbook.write(response.getOutputStream());
         }
+    }
+
+    /**
+     * 노무명세서 상세 조회
+     * 특정 년월의 모든 노무명세서 상세 정보를 조회
+     */
+    @Operation(summary = "노무명세서 상세 조회", description = "특정 년월의 모든 노무명세서 상세 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 년월의 노무명세서를 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{yearMonth}/details")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<LaborPayrollDetailResponse>>> getLaborPayrollDetails(
+            @Parameter(description = "조회 년월 (YYYY-MM)") @PathVariable String yearMonth) {
+        List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(yearMonth);
+        return ResponseEntity.ok(SuccessResponse.of(result));
     }
 }

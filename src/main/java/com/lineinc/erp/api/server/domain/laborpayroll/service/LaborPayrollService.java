@@ -10,10 +10,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
+import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
@@ -32,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class LaborPayrollService {
 
     private final LaborPayrollSummaryRepository laborPayrollSummaryRepository;
+    private final LaborPayrollRepository laborPayrollRepository;
 
     /**
      * 노무명세서 월별 집계 목록 조회 (페이징)
@@ -118,6 +122,19 @@ public class LaborPayrollService {
             case "memo" -> response.memo() != null ? response.memo() : "";
             default -> "";
         };
+    }
+
+    /**
+     * 노무명세서 상세 조회
+     * 특정 년월의 모든 노무명세서 상세 정보를 조회
+     */
+    @Transactional(readOnly = true)
+    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(String yearMonth) {
+        List<LaborPayroll> laborPayrolls = laborPayrollRepository.findByYearMonth(yearMonth);
+
+        return laborPayrolls.stream()
+                .map(LaborPayrollDetailResponse::from)
+                .toList();
     }
 
 }
