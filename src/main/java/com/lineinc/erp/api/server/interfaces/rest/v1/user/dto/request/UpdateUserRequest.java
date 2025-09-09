@@ -18,7 +18,7 @@ public record UpdateUserRequest(
 
         @MultiConstraint(type = ValidatorType.PHONE) @Schema(description = "개인 휴대폰", example = "010-1234-5678") @NotBlank String phoneNumber,
 
-        @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER) @Schema(description = "전화번호", example = "02-123-4567") @NotBlank String landlineNumber,
+        @MultiConstraint(type = ValidatorType.LANDLINE_NUMBER) @Schema(description = "전화번호", example = "02-123-4567") String landlineNumber,
 
         @Schema(description = "사용자 활성화 여부", example = "true") @NotNull Boolean isActive,
 
