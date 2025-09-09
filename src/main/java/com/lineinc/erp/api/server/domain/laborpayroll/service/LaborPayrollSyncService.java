@@ -46,18 +46,19 @@ public class LaborPayrollSyncService {
 
     /**
      * 출역일보 생성/수정 시 노무비 명세서 동기화
-     * 해당 월의 모든 데이터를 삭제하고 다시 생성
+     * 해당 현장/공정의 해당 월 데이터만 삭제하고 다시 생성
      */
     public void syncLaborPayrollFromDailyReport(DailyReport dailyReport) {
         LocalDate reportDate = DateTimeFormatUtils.toKoreaLocalDate(dailyReport.getReportDate());
         String yearMonth = String.format("%04d-%02d", reportDate.getYear(), reportDate.getMonthValue());
 
-        log.info("해당 월({}) 노무비 명세서 전체 재생성", yearMonth);
+        log.info("해당 현장/공정({}/{})의 {}월 노무비 명세서 재생성",
+                dailyReport.getSite().getName(), dailyReport.getSiteProcess().getName(), yearMonth);
 
-        // 1. 해당 월의 기존 노무비 명세서 모두 삭제
-        deleteExistingPayrolls(yearMonth);
+        // 1. 해당 현장/공정의 해당 월 기존 노무비 명세서 삭제
+        deleteExistingPayrollsForSiteProcess(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
 
-        // 2. 해당 월의 모든 출역일보 조회
+        // 2. 해당 현장/공정의 해당 월 출역일보 조회
         List<DailyReport> monthlyReports = getDailyReportsForMonth(dailyReport, yearMonth);
 
         // 3. 인력별로 노무비 명세서 재생성
@@ -70,13 +71,15 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 해당 월의 기존 노무비 명세서 모두 삭제
+     * 해당 현장/공정의 해당 월 기존 노무비 명세서 삭제
      */
-    private void deleteExistingPayrolls(String yearMonth) {
-        List<LaborPayroll> existingPayrolls = laborPayrollRepository.findByYearMonth(yearMonth);
+    private void deleteExistingPayrollsForSiteProcess(Site site, SiteProcess siteProcess, String yearMonth) {
+        List<LaborPayroll> existingPayrolls = laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(
+                site, siteProcess, yearMonth);
         if (!existingPayrolls.isEmpty()) {
             laborPayrollRepository.deleteAll(existingPayrolls);
-            log.info("기존 노무비 명세서 {}건 삭제: {}", existingPayrolls.size(), yearMonth);
+            log.info("기존 노무비 명세서 {}건 삭제: 현장={}, 공정={}, 년월={}",
+                    existingPayrolls.size(), site.getName(), siteProcess.getName(), yearMonth);
         }
     }
 
