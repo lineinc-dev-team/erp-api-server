@@ -81,6 +81,10 @@ public class LaborPayrollSummary extends BaseEntity {
     @Column(precision = 15, scale = 2)
     private BigDecimal totalNetPayment; // 총 차감지급액
 
+    // 비고
+    @Column(columnDefinition = "TEXT")
+    private String memo; // 비고
+
     /**
      * 집계 데이터 업데이트
      */
@@ -90,7 +94,8 @@ public class LaborPayrollSummary extends BaseEntity {
             Integer etcCount,
             BigDecimal totalLaborCost,
             BigDecimal totalDeductions,
-            BigDecimal totalNetPayment) {
+            BigDecimal totalNetPayment,
+            String memo) {
 
         this.regularEmployeeCount = regularEmployeeCount;
         this.directContractCount = directContractCount;
@@ -98,6 +103,6 @@ public class LaborPayrollSummary extends BaseEntity {
         this.totalLaborCost = totalLaborCost;
         this.totalDeductions = totalDeductions;
         this.totalNetPayment = totalNetPayment;
-
+        this.memo = memo;
     }
 }

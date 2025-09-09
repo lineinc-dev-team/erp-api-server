@@ -24,6 +24,7 @@ public record LaborPayrollSummaryResponse(
         @Schema(description = "노무비 합계") BigDecimal totalLaborCost,
         @Schema(description = "공제금 합계") BigDecimal totalDeductions,
         @Schema(description = "차감지급 합계") BigDecimal totalNetPayment,
+        @Schema(description = "비고") String memo,
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt) {
 
@@ -42,6 +43,7 @@ public record LaborPayrollSummaryResponse(
                 summary.getTotalLaborCost(),
                 summary.getTotalDeductions(),
                 summary.getTotalNetPayment(),
+                summary.getMemo(),
                 summary.getCreatedAt(),
                 summary.getUpdatedAt());
     }

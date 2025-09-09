@@ -281,7 +281,8 @@ public class LaborPayrollSyncService {
                     calculatedData.etcCount(),
                     calculatedData.totalLaborCost(),
                     calculatedData.totalDeductions(),
-                    calculatedData.totalNetPayment());
+                    calculatedData.totalNetPayment(),
+                    null); // 비고는 기본적으로 null
             log.info("집계 테이블 업데이트: 현장={}, 공정={}, 년월={}",
                     site.getName(), siteProcess.getName(), yearMonth);
         } else {
@@ -296,6 +297,7 @@ public class LaborPayrollSyncService {
                     .totalLaborCost(calculatedData.totalLaborCost())
                     .totalDeductions(calculatedData.totalDeductions())
                     .totalNetPayment(calculatedData.totalNetPayment())
+                    .memo(null) // 비고는 기본적으로 null
                     .build();
             log.info("집계 테이블 생성: 현장={}, 공정={}, 년월={}",
                     site.getName(), siteProcess.getName(), yearMonth);
