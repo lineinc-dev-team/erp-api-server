@@ -3,8 +3,10 @@ package com.lineinc.erp.api.server.domain.laborpayroll.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -53,6 +56,68 @@ public class LaborPayrollService {
                 .collect(Collectors.toList());
 
         return new PagingResponse<>(PagingInfo.from(summaryPage), responseList);
+    }
+
+    /**
+     * 노무명세서 엑셀 다운로드
+     * 검색 조건에 맞는 노무명세서 목록을 엑셀로 내보내기
+     */
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(LaborPayrollSearchRequest request, Sort sort, List<String> fields) {
+        List<LaborPayrollSummaryResponse> responses = laborPayrollSummaryRepository
+                .findAllWithoutPaging(request.siteId(), request.siteProcessId(), request.yearMonth(), sort)
+                .stream()
+                .map(LaborPayrollSummaryResponse::from)
+                .toList();
+
+        return ExcelExportUtils.generateWorkbook(
+                responses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue);
+    }
+
+    /**
+     * 엑셀 헤더명 매핑
+     */
+    private String getExcelHeaderName(String field) {
+        return switch (field) {
+            case "id" -> "No.";
+            case "siteName" -> "현장명";
+            case "processName" -> "공정명";
+            case "regularEmployeeCount" -> "정직원 수";
+            case "directContractCount" -> "직영/계약직 수";
+            case "etcCount" -> "기타 수";
+            case "totalLaborCost" -> "노무비 합계";
+            case "totalDeductions" -> "공제금 합계";
+            case "totalNetPayment" -> "차감지급 합계";
+            case "memo" -> "비고";
+            default -> null;
+        };
+    }
+
+    /**
+     * 엑셀 셀 값 추출
+     */
+    private String getExcelCellValue(LaborPayrollSummaryResponse response, String field) {
+        return switch (field) {
+            case "id" -> response.id() != null ? response.id().toString() : "";
+            case "siteName" -> response.site() != null ? response.site().name() : "";
+            case "processName" -> response.siteProcess() != null ? response.siteProcess().name() : "";
+            case "regularEmployeeCount" ->
+                response.regularEmployeeCount() != null ? response.regularEmployeeCount().toString() : "";
+            case "directContractCount" ->
+                response.directContractCount() != null ? response.directContractCount().toString() : "";
+            case "etcCount" -> response.etcCount() != null ? response.etcCount().toString() : "";
+            case "totalLaborCost" ->
+                response.totalLaborCost() != null ? response.totalLaborCost().toBigInteger().toString() : "";
+            case "totalDeductions" ->
+                response.totalDeductions() != null ? response.totalDeductions().toBigInteger().toString() : "";
+            case "totalNetPayment" ->
+                response.totalNetPayment() != null ? response.totalNetPayment().toBigInteger().toString() : "";
+            case "memo" -> response.memo() != null ? response.memo() : "";
+            default -> "";
+        };
     }
 
 }

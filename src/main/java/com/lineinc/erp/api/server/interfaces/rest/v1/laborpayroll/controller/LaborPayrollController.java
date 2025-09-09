@@ -6,16 +6,24 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
 import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Workbook;
 
 /**
  * 노무명세서 관리 API Controller
@@ -55,5 +64,33 @@ public class LaborPayrollController {
         PagingResponse<LaborPayrollSummaryResponse> result = laborPayrollService
                 .getLaborPayrollMonthlyList(request, pageRequest, sortRequest);
         return ResponseEntity.ok(SuccessResponse.of(result));
+    }
+
+    /**
+     * 노무명세서 엑셀 다운로드
+     * 검색 조건에 맞는 노무명세서 목록을 엑셀 파일로 다운로드
+     */
+    @Operation(summary = "노무명세서 엑셀 다운로드", description = "검색 조건에 맞는 노무명세서 목록을 엑셀 파일로 다운로드합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
+    public void downloadLaborPayrollExcel(
+            @Parameter(description = "정렬 정보") @ModelAttribute SortRequest sortRequest,
+            @Parameter(description = "조회 조건") @ModelAttribute LaborPayrollSearchRequest request,
+            @Parameter(description = "다운로드 필드") @ModelAttribute LaborPayrollDownloadRequest downloadRequest,
+            HttpServletResponse response) throws IOException {
+        List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, LaborPayrollDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "노무명세서 목록.xlsx");
+
+        try (Workbook workbook = laborPayrollService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed)) {
+            workbook.write(response.getOutputStream());
+        }
     }
 }
