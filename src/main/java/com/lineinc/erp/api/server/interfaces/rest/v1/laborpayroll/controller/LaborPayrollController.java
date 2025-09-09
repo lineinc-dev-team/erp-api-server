@@ -24,10 +24,13 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.La
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollChangeHistoryResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
+import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
@@ -172,5 +175,28 @@ public class LaborPayrollController {
             @Parameter(description = "수정 요청") @Valid @RequestBody LaborPayrollUpdateRequest request) {
         laborPayrollService.updateLaborPayroll(id, request);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 노무명세서 변경이력 조회
+     */
+    @Operation(summary = "노무명세서 변경이력 조회", description = "특정 노무명세서 집계와 관련된 변경이력을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/summary/{id}/change-histories")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<LaborPayrollChangeHistoryResponse>>> getLaborPayrollChangeHistories(
+            @Parameter(description = "노무명세서 집계 ID") @PathVariable Long id,
+            @Parameter(description = "페이징 정보") @ModelAttribute PageRequest pageRequest,
+            @Parameter(description = "정렬 정보") @ModelAttribute SortRequest sortRequest) {
+
+        var slice = laborPayrollService.getLaborPayrollChangeHistories(
+                id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 }

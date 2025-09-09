@@ -9,6 +9,7 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,10 +29,13 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.La
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollChangeHistoryResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
+import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
@@ -200,6 +204,7 @@ public class LaborPayrollService {
             LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
                     .type(LaborPayrollChangeType.BASIC)
                     .changes(changesJson)
+                    .laborPayrollSummary(summary)
                     .build();
             laborPayrollChangeHistoryRepository.save(changeHistory);
         }
@@ -229,12 +234,33 @@ public class LaborPayrollService {
         String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
+            // 해당하는 LaborPayrollSummary 찾기
+            LaborPayrollSummary summary = laborPayrollSummaryRepository
+                    .findBySiteAndSiteProcessAndYearMonth(
+                            laborPayroll.getSite(),
+                            laborPayroll.getSiteProcess(),
+                            laborPayroll.getYearMonth())
+                    .orElse(null);
+
             LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
                     .type(LaborPayrollChangeType.LABOR_PAYROLL)
                     .changes(changesJson)
+                    .laborPayrollSummary(summary)
                     .build();
             laborPayrollChangeHistoryRepository.save(changeHistory);
         }
+    }
+
+    /**
+     * 노무명세서 변경이력 조회
+     * 특정 노무명세서 집계와 관련된 변경이력을 조회
+     */
+    @Transactional(readOnly = true)
+    public Slice<LaborPayrollChangeHistoryResponse> getLaborPayrollChangeHistories(
+            Long laborPayrollSummaryId, Pageable pageable) {
+        Slice<LaborPayrollChangeHistory> changeHistories = laborPayrollChangeHistoryRepository
+                .findBySummaryId(laborPayrollSummaryId, pageable);
+        return changeHistories.map(LaborPayrollChangeHistoryResponse::from);
     }
 
 }
