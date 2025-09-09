@@ -104,11 +104,20 @@ public class JaversUtils {
                         return null;
                     }
 
+                    // before와 after 값이 실제로 다른지 확인
+                    String beforeValue = toJsonSafe(javers, vc.getLeft());
+                    String afterValue = toJsonSafe(javers, vc.getRight());
+
+                    // 값이 동일하면 변경 이력에 포함하지 않음
+                    if (beforeValue.equals(afterValue)) {
+                        return null;
+                    }
+
                     // 일반 수정 변경
                     return Map.of(
                             "property", vc.getPropertyName(),
-                            "before", toJsonSafe(javers, vc.getLeft()),
-                            "after", toJsonSafe(javers, vc.getRight()),
+                            "before", beforeValue,
+                            "after", afterValue,
                             "type", "수정");
                 })
                 .filter(change -> change != null) // null 제외
@@ -171,8 +180,15 @@ public class JaversUtils {
     private static String toJsonSafe(Javers javers, Object obj) {
         if (obj == null)
             return "";
-        if (obj instanceof String || obj instanceof Number || obj instanceof Boolean || obj instanceof Character)
+        if (obj instanceof String || obj instanceof Boolean || obj instanceof Character)
             return obj.toString();
+        if (obj instanceof Number) {
+            // BigDecimal의 경우 소수점 자릿수를 정규화하여 동일한 값 비교 가능하도록 함
+            if (obj instanceof java.math.BigDecimal) {
+                return ((java.math.BigDecimal) obj).stripTrailingZeros().toPlainString();
+            }
+            return obj.toString();
+        }
         return javers.getJsonConverter().toJson(unproxyRecursive(obj));
     }
 

@@ -21,6 +21,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -152,6 +153,24 @@ public class LaborPayrollController {
             @Parameter(description = "집계 ID") @PathVariable Long id,
             @Parameter(description = "수정 요청") @Valid @RequestBody LaborPayrollSummaryUpdateRequest request) {
         laborPayrollService.updateLaborPayrollSummary(id, request);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 노무명세서 수정
+     */
+    @Operation(summary = "노무명세서 수정", description = "개별 노무명세서를 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 노무명세서를 찾을 수 없음", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateLaborPayroll(
+            @Parameter(description = "노무명세서 ID") @PathVariable Long id,
+            @Parameter(description = "수정 요청") @Valid @RequestBody LaborPayrollUpdateRequest request) {
+        laborPayrollService.updateLaborPayroll(id, request);
         return ResponseEntity.ok().build();
     }
 }

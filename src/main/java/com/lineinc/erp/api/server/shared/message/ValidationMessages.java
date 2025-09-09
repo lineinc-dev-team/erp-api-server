@@ -51,6 +51,7 @@ public final class ValidationMessages {
     public static final String TEMPORARY_LABOR_NAME_REQUIRED = "임시 인력 등록시 이름은 필수입니다.";
     public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 반드시 한 명이어야 합니다.";
     public static final String LABOR_PAYROLL_SUMMARY_NOT_FOUND = "존재하지 않는 노무명세서 집계입니다.";
+    public static final String LABOR_PAYROLL_NOT_FOUND = "존재하지 않는 노무명세서입니다.";
 
     // ===== 강재/자재 관련 메시지 =====
     public static final String STEEL_MANAGEMENT_NOT_FOUND = "강재 관리를 찾을 수 없습니다.";

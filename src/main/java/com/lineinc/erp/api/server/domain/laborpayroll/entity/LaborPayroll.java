@@ -3,10 +3,14 @@ package com.lineinc.erp.api.server.domain.laborpayroll.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -30,13 +35,14 @@ import lombok.experimental.SuperBuilder;
  * 월별 인력별 근무 내역 및 급여 정보를 저장
  */
 @Entity
-@Table(name = "labor_payroll", indexes = {
+@Table(indexes = {
         @Index(columnList = "year_month"),
         @Index(columnList = "labor_id, year_month"),
         @Index(columnList = "created_at"),
         @Index(columnList = "updated_at")
 })
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
@@ -48,16 +54,19 @@ public class LaborPayroll extends BaseEntity {
     private Long id;
 
     // 인력 정보
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "labor_id")
     private Labor labor;
 
     // 현장 정보
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id")
     private Site site;
 
     // 공정 정보
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_process_id")
     private SiteProcess siteProcess;
@@ -72,134 +81,177 @@ public class LaborPayroll extends BaseEntity {
 
     // 1일~31일까지의 공수 (근무시간)
     @Column
+    @DiffInclude
     private Double day01Hours;
 
     @Column
+    @DiffInclude
     private Double day02Hours;
 
     @Column
+    @DiffInclude
     private Double day03Hours;
 
     @Column
+    @DiffInclude
     private Double day04Hours;
 
     @Column
+    @DiffInclude
     private Double day05Hours;
 
     @Column
+    @DiffInclude
     private Double day06Hours;
 
     @Column
+    @DiffInclude
     private Double day07Hours;
 
     @Column
+    @DiffInclude
     private Double day08Hours;
 
     @Column
+    @DiffInclude
     private Double day09Hours;
 
     @Column
+    @DiffInclude
     private Double day10Hours;
 
     @Column
+    @DiffInclude
     private Double day11Hours;
 
     @Column
+    @DiffInclude
     private Double day12Hours;
 
     @Column
+    @DiffInclude
     private Double day13Hours;
 
     @Column
+    @DiffInclude
     private Double day14Hours;
 
     @Column
+    @DiffInclude
     private Double day15Hours;
 
     @Column
+    @DiffInclude
     private Double day16Hours;
 
     @Column
+    @DiffInclude
     private Double day17Hours;
 
     @Column
+    @DiffInclude
     private Double day18Hours;
 
     @Column
+    @DiffInclude
     private Double day19Hours;
 
     @Column
+    @DiffInclude
     private Double day20Hours;
 
     @Column
+    @DiffInclude
     private Double day21Hours;
 
     @Column
+    @DiffInclude
     private Double day22Hours;
 
     @Column
+    @DiffInclude
     private Double day23Hours;
 
     @Column
+    @DiffInclude
     private Double day24Hours;
 
     @Column
+    @DiffInclude
     private Double day25Hours;
 
     @Column
+    @DiffInclude
     private Double day26Hours;
 
     @Column
+    @DiffInclude
     private Double day27Hours;
 
     @Column
+    @DiffInclude
     private Double day28Hours;
 
     @Column
+    @DiffInclude
     private Double day29Hours;
 
     @Column
+    @DiffInclude
     private Double day30Hours;
 
     @Column
+    @DiffInclude
     private Double day31Hours;
 
     // 계산된 값들
     @Column(precision = 8, scale = 2)
+    @DiffInclude
     private BigDecimal totalWorkHours; // 총 근무시간
 
     @Column(precision = 6, scale = 2)
+    @DiffInclude
     private BigDecimal totalWorkDays; // 총 근무일수
 
     @Column(precision = 12, scale = 2)
+    @DiffInclude
     private BigDecimal totalLaborCost; // 총 노무비
 
     // 공제 항목들
     @Column(precision = 10, scale = 2)
+    @DiffInclude
     private BigDecimal incomeTax; // 소득세
 
     @Column(precision = 10, scale = 2)
+    @DiffInclude
     private BigDecimal employmentInsurance; // 고용보험료
 
     @Column(precision = 10, scale = 2)
+    @DiffInclude
     private BigDecimal healthInsurance; // 건강보험료
 
     @Column(precision = 10, scale = 2)
+    @DiffInclude
     private BigDecimal localTax; // 주민세
 
     @Column(precision = 10, scale = 2)
+    @DiffInclude
     private BigDecimal nationalPension; // 국민연금
 
     @Column(precision = 10, scale = 2)
+    @DiffInclude
     private BigDecimal longTermCareInsurance; // 장기요양보험료
 
     @Column(precision = 12, scale = 2)
+    @DiffInclude
     private BigDecimal totalDeductions; // 총 공제액
 
     @Column(precision = 12, scale = 2)
+    @DiffInclude
     private BigDecimal netPayment; // 차감지급액
 
     @Column(columnDefinition = "TEXT")
+    @DiffInclude
     private String memo; // 비고
 
     /**
@@ -520,5 +572,105 @@ public class LaborPayroll extends BaseEntity {
             BigDecimal divisor = BigDecimal.TEN.pow(-digits);
             return value.divide(divisor, 0, java.math.RoundingMode.DOWN).multiply(divisor);
         }
+    }
+
+    /**
+     * 노무명세서 수정 요청으로부터 필드 업데이트
+     * 변경 이력 저장은 서비스 레이어에서 처리
+     */
+    public void updateFrom(LaborPayrollUpdateRequest request) {
+        // 1일~31일 공수 업데이트
+        if (request.day01Hours() != null)
+            this.day01Hours = request.day01Hours();
+        if (request.day02Hours() != null)
+            this.day02Hours = request.day02Hours();
+        if (request.day03Hours() != null)
+            this.day03Hours = request.day03Hours();
+        if (request.day04Hours() != null)
+            this.day04Hours = request.day04Hours();
+        if (request.day05Hours() != null)
+            this.day05Hours = request.day05Hours();
+        if (request.day06Hours() != null)
+            this.day06Hours = request.day06Hours();
+        if (request.day07Hours() != null)
+            this.day07Hours = request.day07Hours();
+        if (request.day08Hours() != null)
+            this.day08Hours = request.day08Hours();
+        if (request.day09Hours() != null)
+            this.day09Hours = request.day09Hours();
+        if (request.day10Hours() != null)
+            this.day10Hours = request.day10Hours();
+        if (request.day11Hours() != null)
+            this.day11Hours = request.day11Hours();
+        if (request.day12Hours() != null)
+            this.day12Hours = request.day12Hours();
+        if (request.day13Hours() != null)
+            this.day13Hours = request.day13Hours();
+        if (request.day14Hours() != null)
+            this.day14Hours = request.day14Hours();
+        if (request.day15Hours() != null)
+            this.day15Hours = request.day15Hours();
+        if (request.day16Hours() != null)
+            this.day16Hours = request.day16Hours();
+        if (request.day17Hours() != null)
+            this.day17Hours = request.day17Hours();
+        if (request.day18Hours() != null)
+            this.day18Hours = request.day18Hours();
+        if (request.day19Hours() != null)
+            this.day19Hours = request.day19Hours();
+        if (request.day20Hours() != null)
+            this.day20Hours = request.day20Hours();
+        if (request.day21Hours() != null)
+            this.day21Hours = request.day21Hours();
+        if (request.day22Hours() != null)
+            this.day22Hours = request.day22Hours();
+        if (request.day23Hours() != null)
+            this.day23Hours = request.day23Hours();
+        if (request.day24Hours() != null)
+            this.day24Hours = request.day24Hours();
+        if (request.day25Hours() != null)
+            this.day25Hours = request.day25Hours();
+        if (request.day26Hours() != null)
+            this.day26Hours = request.day26Hours();
+        if (request.day27Hours() != null)
+            this.day27Hours = request.day27Hours();
+        if (request.day28Hours() != null)
+            this.day28Hours = request.day28Hours();
+        if (request.day29Hours() != null)
+            this.day29Hours = request.day29Hours();
+        if (request.day30Hours() != null)
+            this.day30Hours = request.day30Hours();
+        if (request.day31Hours() != null)
+            this.day31Hours = request.day31Hours();
+
+        // 계산된 값들 업데이트
+        if (request.totalWorkHours() != null)
+            this.totalWorkHours = request.totalWorkHours();
+        if (request.totalWorkDays() != null)
+            this.totalWorkDays = request.totalWorkDays();
+        if (request.totalLaborCost() != null)
+            this.totalLaborCost = request.totalLaborCost();
+
+        // 공제 항목들 업데이트
+        if (request.incomeTax() != null)
+            this.incomeTax = request.incomeTax();
+        if (request.employmentInsurance() != null)
+            this.employmentInsurance = request.employmentInsurance();
+        if (request.healthInsurance() != null)
+            this.healthInsurance = request.healthInsurance();
+        if (request.localTax() != null)
+            this.localTax = request.localTax();
+        if (request.nationalPension() != null)
+            this.nationalPension = request.nationalPension();
+        if (request.longTermCareInsurance() != null)
+            this.longTermCareInsurance = request.longTermCareInsurance();
+        if (request.totalDeductions() != null)
+            this.totalDeductions = request.totalDeductions();
+        if (request.netPayment() != null)
+            this.netPayment = request.netPayment();
+
+        // 비고 업데이트
+        if (request.memo() != null)
+            this.memo = request.memo();
     }
 }

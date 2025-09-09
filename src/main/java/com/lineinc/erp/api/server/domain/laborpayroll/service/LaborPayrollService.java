@@ -25,6 +25,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSum
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
@@ -198,6 +199,38 @@ public class LaborPayrollService {
         if (!simpleChanges.isEmpty()) {
             LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
                     .type(LaborPayrollChangeType.BASIC)
+                    .changes(changesJson)
+                    .build();
+            laborPayrollChangeHistoryRepository.save(changeHistory);
+        }
+    }
+
+    /**
+     * 노무명세서 수정
+     * 개별 노무명세서의 모든 필드 수정 가능
+     */
+    @Transactional
+    public void updateLaborPayroll(Long id, LaborPayrollUpdateRequest request) {
+        LaborPayroll laborPayroll = laborPayrollRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.LABOR_PAYROLL_NOT_FOUND));
+
+        // 변경 전 스냅샷 생성
+        LaborPayroll oldSnapshot = JaversUtils.createSnapshot(javers, laborPayroll, LaborPayroll.class);
+
+        // 엔티티의 updateFrom 메서드로 필드 업데이트
+        laborPayroll.updateFrom(request);
+
+        laborPayrollRepository.save(laborPayroll);
+
+        // 변경 이력 저장
+        Diff diff = javers.compare(oldSnapshot, laborPayroll);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
+                    .type(LaborPayrollChangeType.LABOR_PAYROLL)
                     .changes(changesJson)
                     .build();
             laborPayrollChangeHistoryRepository.save(changeHistory);
