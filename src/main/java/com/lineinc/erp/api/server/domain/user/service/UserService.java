@@ -5,20 +5,18 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.FormatUtils;
-import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
-import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
-import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
-import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
 import org.javers.core.Javers;
-import org.javers.core.diff.Diff;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import org.springframework.beans.factory.annotation.Value;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
+import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
+import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
+import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.request.PasswordChangeRequest;
@@ -47,6 +45,7 @@ import org.springframework.data.domain.Slice;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 사용자 관련 비즈니스 로직을 처리하는 서비스
@@ -168,7 +167,6 @@ public class UserService {
     @Transactional
     public void deleteUsersByIds(BulkDeleteUsersRequest request) {
         List<User> users = usersRepository.findAllById(request.userIds());
-
         if (request.userIds().size() != users.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND);
         }
@@ -178,48 +176,35 @@ public class UserService {
 
     @Transactional
     public void updateUser(Long id, UpdateUserRequest request) {
-        User oldUser = usersRepository.findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
+        User user = getUserByIdOrThrow(id);
+        user.syncTransientFields();
+        User oldUserSnapshot = JaversUtils.createSnapshot(javers, user, User.class);
 
-        // 스냅샷 생성 전에 transient 필드 동기화 (현재 상태 기준)
-        oldUser.syncTransientFields();
-        User oldUserSnapshot = JaversUtils.createSnapshot(javers, oldUser, User.class);
-
-        // DB에서 실제 엔티티 조회
-        Department department = request.departmentId() != null
-                ? departmentRepository.findById(request.departmentId()).orElse(null)
-                : null;
-        Grade grade = request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null;
-        Position position = request.positionId() != null
-                ? positionRepository.findById(request.positionId()).orElse(null)
-                : null;
+        Department department = departmentRepository.findById(request.departmentId()).orElse(null);
+        Grade grade = gradeRepository.findById(request.gradeId()).orElse(null);
+        Position position = positionRepository.findById(request.positionId()).orElse(null);
 
         // 사용자 정보 업데이트
-        oldUser.updateFrom(request, department, grade, position);
-        usersRepository.save(oldUser);
+        user.updateFrom(request, department, grade, position);
+        usersRepository.save(user);
 
-        Diff diff = javers.compare(oldUserSnapshot, oldUser);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers,
+                javers.compare(oldUserSnapshot, user));
+
         if (!simpleChanges.isEmpty()) {
             UserChangeHistory changeHistory = UserChangeHistory.builder()
-                    .user(oldUser)
+                    .user(user)
                     .type(UserChangeHistoryType.BASIC)
-                    .changes(changesJson)
+                    .changes(javers.getJsonConverter().toJson(simpleChanges))
                     .build();
             userChangeHistoryRepository.save(changeHistory);
         }
 
-        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (UpdateUserRequest.ChangeHistoryRequest changeHistoryRequest : request.changeHistories()) {
-                userChangeHistoryRepository.findById(changeHistoryRequest.id())
-                        .filter(hist -> hist.getUser().getId().equals(oldUser.getId()))
-                        .ifPresent(hist -> {
-                            hist.setMemo(changeHistoryRequest.memo());
-                        });
-            }
-        }
+        // 변경 이력 메모 업데이트
+        Optional.ofNullable(request.changeHistories())
+                .ifPresent(histories -> histories
+                        .forEach(historyRequest -> userChangeHistoryRepository.findById(historyRequest.id())
+                                .ifPresent(hist -> hist.setMemo(historyRequest.memo()))));
     }
 
     @Transactional(readOnly = true)
