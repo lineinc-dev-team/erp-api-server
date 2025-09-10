@@ -27,6 +27,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollCha
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollChangeHistoryResponse;
@@ -261,6 +262,20 @@ public class LaborPayrollService {
         Slice<LaborPayrollChangeHistory> changeHistories = laborPayrollChangeHistoryRepository
                 .findBySummaryId(laborPayrollSummaryId, pageable);
         return changeHistories.map(LaborPayrollChangeHistoryResponse::from);
+    }
+
+    /**
+     * 노무명세서 변경이력 수정
+     */
+    @Transactional
+    public void updateLaborPayrollChangeHistory(Long changeHistoryId, LaborPayrollChangeHistoryUpdateRequest request) {
+        LaborPayrollChangeHistory changeHistory = laborPayrollChangeHistoryRepository.findById(changeHistoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.CHANGE_HISTORY_NOT_FOUND));
+
+        // memo 필드 수정
+        changeHistory.setMemo(request.memo());
+        laborPayrollChangeHistoryRepository.save(changeHistory);
     }
 
 }

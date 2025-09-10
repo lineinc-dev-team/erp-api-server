@@ -21,6 +21,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.La
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollChangeHistoryResponse;
@@ -197,5 +198,23 @@ public class LaborPayrollController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    /**
+     * 노무명세서 변경이력 수정
+     */
+    @Operation(summary = "노무명세서 변경이력 수정", description = "특정 변경이력의 메모를 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 변경이력을 찾을 수 없음", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @PatchMapping("/change-histories/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateLaborPayrollChangeHistory(
+            @Parameter(description = "변경이력 ID") @PathVariable Long id,
+            @Parameter(description = "수정 요청") @Valid @RequestBody LaborPayrollChangeHistoryUpdateRequest request) {
+        laborPayrollService.updateLaborPayrollChangeHistory(id, request);
+        return ResponseEntity.ok().build();
     }
 }
