@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureDaysBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,29 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "배치 관리", description = "배치 작업 실행 및 관리 API")
 public class BatchController {
 
-    private final TenureDaysBatchService tenureDaysBatchService;
     private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
-
-    /**
-     * 근속일수 업데이트 배치를 수동으로 실행합니다.
-     * 
-     * @return 배치 실행 결과
-     */
-    @PostMapping("/tenure-days")
-    @Operation(summary = "근속일수 업데이트 배치 실행", description = "직영/계약직, 기타 인력의 근속일수를 계산하고 업데이트합니다.")
-    public ResponseEntity<String> runTenureDaysBatch() {
-        try {
-            log.info("근속일수 업데이트 배치 수동 실행 시작");
-            tenureDaysBatchService.execute();
-            String message = "근속일수 업데이트 배치 완료";
-            log.info(message);
-            return ResponseEntity.ok(message);
-        } catch (Exception e) {
-            log.error("근속일수 업데이트 배치 실행 중 오류 발생", e);
-            return ResponseEntity.status(500)
-                    .body("배치 실행 실패: " + e.getMessage());
-        }
-    }
 
     /**
      * 출역일보 자동 마감 배치를 수동으로 실행합니다.

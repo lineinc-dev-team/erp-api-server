@@ -121,16 +121,6 @@ public class DailyReportService {
                             ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
                 }
 
-                if (labor.getFirstWorkDate() == null) {
-                    labor.setFirstWorkDate(reportDate);
-                    labor.setHireDate(reportDate);
-                }
-
-                if (labor.getHireDate() == null) {
-                    labor.setHireDate(reportDate);
-                    labor.setResignationDate(null);
-                }
-
                 DailyReportEmployee employee = DailyReportEmployee.builder()
                         .dailyReport(dailyReport)
                         .labor(labor)
@@ -180,16 +170,6 @@ public class DailyReportService {
                         .build();
 
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
-
-                if (labor.getFirstWorkDate() == null) {
-                    labor.setFirstWorkDate(reportDate);
-                    labor.setHireDate(reportDate);
-                }
-
-                if (labor.getHireDate() == null) {
-                    labor.setHireDate(reportDate);
-                    labor.setResignationDate(null);
-                }
 
                 dailyReport.getDirectContracts().add(directContract);
             }
