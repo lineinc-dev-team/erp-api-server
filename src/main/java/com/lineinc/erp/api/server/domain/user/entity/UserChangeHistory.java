@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.user.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.user.enums.UserChangeType;
+import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -29,7 +29,7 @@ public class UserChangeHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserChangeType type;
+    private UserChangeHistoryType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

@@ -9,7 +9,7 @@ import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
-import com.lineinc.erp.api.server.domain.user.enums.UserChangeType;
+import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
@@ -80,7 +80,7 @@ public class UserService {
         // 비밀번호 초기화 변경 이력 기록
         UserChangeHistory changeHistory = UserChangeHistory.builder()
                 .user(user)
-                .type(UserChangeType.BASIC)
+                .type(UserChangeHistoryType.BASIC)
                 .description(ValidationMessages.PASSWORD_RESET)
                 .build();
         userChangeHistoryRepository.save(changeHistory);
@@ -207,7 +207,7 @@ public class UserService {
         if (!simpleChanges.isEmpty()) {
             UserChangeHistory changeHistory = UserChangeHistory.builder()
                     .user(oldUser)
-                    .type(UserChangeType.BASIC)
+                    .type(UserChangeHistoryType.BASIC)
                     .changes(changesJson)
                     .build();
             userChangeHistoryRepository.save(changeHistory);
