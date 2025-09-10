@@ -27,7 +27,7 @@ public class RateLimitService {
      */
     public Bucket resolveBucket(String userId, int limit, int durationSeconds) {
         // userBuckets 맵에 userId 키가 없으면 새 버킷을 생성하여 저장하고, 있으면 기존 버킷을 반환
-        return userBuckets.computeIfAbsent(userId, id -> createNewBucket(limit, durationSeconds));
+        return userBuckets.computeIfAbsent(userId, _ -> createNewBucket(limit, durationSeconds));
     }
 
     /**
@@ -44,8 +44,7 @@ public class RateLimitService {
         // durationSeconds 초마다 limit 토큰을 한번에 재충전하는 규칙 생성
         Bandwidth limitBandwidth = Bandwidth.classic(
                 limit,
-                Refill.intervally(limit, Duration.ofSeconds(durationSeconds))
-        );
+                Refill.intervally(limit, Duration.ofSeconds(durationSeconds)));
 
         // 위의 Bandwidth 규칙을 가진 Bucket 생성 후 반환
         return Bucket.builder()

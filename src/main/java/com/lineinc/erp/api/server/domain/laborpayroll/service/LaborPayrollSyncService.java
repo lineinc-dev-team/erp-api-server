@@ -151,7 +151,7 @@ public class LaborPayrollSyncService {
         String dataKey = generateDataKey(site.getId(), siteProcess.getId(), laborId, unitPrice);
 
         LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
-                _k -> new LaborPayrollData(employee.getLabor(), yearMonth, unitPrice, site, siteProcess));
+                _ -> new LaborPayrollData(employee.getLabor(), yearMonth, unitPrice, site, siteProcess));
 
         // 근무시간 설정
         Double workHours = employee.getWorkQuantity();
@@ -171,7 +171,7 @@ public class LaborPayrollSyncService {
         String dataKey = generateDataKey(site.getId(), siteProcess.getId(), laborId, unitPrice);
 
         LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
-                _k -> new LaborPayrollData(directContract.getLabor(), yearMonth, unitPrice, site, siteProcess));
+                _ -> new LaborPayrollData(directContract.getLabor(), yearMonth, unitPrice, site, siteProcess));
 
         // 근무시간 설정
         Double workHours = directContract.getWorkQuantity();
