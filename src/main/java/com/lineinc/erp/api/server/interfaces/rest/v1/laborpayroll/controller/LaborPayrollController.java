@@ -162,18 +162,17 @@ public class LaborPayrollController {
     /**
      * 노무명세서 수정
      */
-    @Operation(summary = "노무명세서 수정", description = "개별 노무명세서를 수정합니다.")
+    @Operation(summary = "노무명세서 수정", description = "노무명세서들을 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "404", description = "해당 노무명세서를 찾을 수 없음", content = @Content()),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
-    @PatchMapping("/{id}")
+    @PatchMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateLaborPayroll(
-            @Parameter(description = "노무명세서 ID") @PathVariable Long id,
+    public ResponseEntity<Void> updateLaborPayrolls(
             @Parameter(description = "수정 요청") @Valid @RequestBody LaborPayrollUpdateRequest request) {
-        laborPayrollService.updateLaborPayroll(id, request);
+        laborPayrollService.updateLaborPayrolls(request);
         return ResponseEntity.ok().build();
     }
 

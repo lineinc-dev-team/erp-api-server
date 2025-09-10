@@ -27,6 +27,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollCha
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSummaryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollInfo;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
@@ -217,7 +218,7 @@ public class LaborPayrollService {
      * 개별 노무명세서의 모든 필드 수정 가능
      */
     @Transactional
-    public void updateLaborPayroll(Long id, LaborPayrollUpdateRequest request) {
+    public void updateLaborPayroll(Long id, LaborPayrollInfo info) {
         LaborPayroll laborPayroll = laborPayrollRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.LABOR_PAYROLL_NOT_FOUND));
@@ -226,7 +227,7 @@ public class LaborPayrollService {
         LaborPayroll oldSnapshot = JaversUtils.createSnapshot(javers, laborPayroll, LaborPayroll.class);
 
         // 엔티티의 updateFrom 메서드로 필드 업데이트
-        laborPayroll.updateFrom(request);
+        laborPayroll.updateFrom(info);
 
         laborPayrollRepository.save(laborPayroll);
 
@@ -250,6 +251,53 @@ public class LaborPayrollService {
                     .laborPayrollSummary(summary)
                     .build();
             laborPayrollChangeHistoryRepository.save(changeHistory);
+        }
+    }
+
+    /**
+     * 노무명세서들 수정
+     * 여러 노무명세서를 한 번에 수정
+     */
+    @Transactional
+    public void updateLaborPayrolls(LaborPayrollUpdateRequest request) {
+        if (request.laborPayrollInfos() == null || request.laborPayrollInfos().isEmpty()) {
+            return;
+        }
+
+        for (var laborPayrollInfo : request.laborPayrollInfos()) {
+            LaborPayroll laborPayroll = laborPayrollRepository.findById(laborPayrollInfo.id())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            ValidationMessages.LABOR_PAYROLL_NOT_FOUND));
+
+            // 변경 전 스냅샷 생성
+            LaborPayroll oldSnapshot = JaversUtils.createSnapshot(javers, laborPayroll, LaborPayroll.class);
+
+            // 엔티티의 updateFrom 메서드로 필드 업데이트
+            laborPayroll.updateFrom(laborPayrollInfo);
+
+            laborPayrollRepository.save(laborPayroll);
+
+            // 변경 이력 저장
+            Diff diff = javers.compare(oldSnapshot, laborPayroll);
+            List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+            String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+            if (!simpleChanges.isEmpty()) {
+                // 해당하는 LaborPayrollSummary 찾기
+                LaborPayrollSummary summary = laborPayrollSummaryRepository
+                        .findBySiteAndSiteProcessAndYearMonth(
+                                laborPayroll.getSite(),
+                                laborPayroll.getSiteProcess(),
+                                laborPayroll.getYearMonth())
+                        .orElse(null);
+
+                LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
+                        .type(LaborPayrollChangeType.LABOR_PAYROLL)
+                        .changes(changesJson)
+                        .laborPayrollSummary(summary)
+                        .build();
+                laborPayrollChangeHistoryRepository.save(changeHistory);
+            }
         }
     }
 

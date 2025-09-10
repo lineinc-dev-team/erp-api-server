@@ -10,7 +10,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollInfo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -77,6 +77,7 @@ public class LaborPayroll extends BaseEntity {
 
     // 일당
     @Column
+    @DiffInclude
     private Integer dailyWage;
 
     // 1일~31일까지의 공수 (근무시간)
@@ -575,102 +576,105 @@ public class LaborPayroll extends BaseEntity {
     }
 
     /**
-     * 노무명세서 수정 요청으로부터 필드 업데이트
-     * 변경 이력 저장은 서비스 레이어에서 처리
+     * LaborPayrollInfo로부터 업데이트
      */
-    public void updateFrom(LaborPayrollUpdateRequest request) {
+    public void updateFrom(LaborPayrollInfo info) {
         // 1일~31일 공수 업데이트
-        if (request.day01Hours() != null)
-            this.day01Hours = request.day01Hours();
-        if (request.day02Hours() != null)
-            this.day02Hours = request.day02Hours();
-        if (request.day03Hours() != null)
-            this.day03Hours = request.day03Hours();
-        if (request.day04Hours() != null)
-            this.day04Hours = request.day04Hours();
-        if (request.day05Hours() != null)
-            this.day05Hours = request.day05Hours();
-        if (request.day06Hours() != null)
-            this.day06Hours = request.day06Hours();
-        if (request.day07Hours() != null)
-            this.day07Hours = request.day07Hours();
-        if (request.day08Hours() != null)
-            this.day08Hours = request.day08Hours();
-        if (request.day09Hours() != null)
-            this.day09Hours = request.day09Hours();
-        if (request.day10Hours() != null)
-            this.day10Hours = request.day10Hours();
-        if (request.day11Hours() != null)
-            this.day11Hours = request.day11Hours();
-        if (request.day12Hours() != null)
-            this.day12Hours = request.day12Hours();
-        if (request.day13Hours() != null)
-            this.day13Hours = request.day13Hours();
-        if (request.day14Hours() != null)
-            this.day14Hours = request.day14Hours();
-        if (request.day15Hours() != null)
-            this.day15Hours = request.day15Hours();
-        if (request.day16Hours() != null)
-            this.day16Hours = request.day16Hours();
-        if (request.day17Hours() != null)
-            this.day17Hours = request.day17Hours();
-        if (request.day18Hours() != null)
-            this.day18Hours = request.day18Hours();
-        if (request.day19Hours() != null)
-            this.day19Hours = request.day19Hours();
-        if (request.day20Hours() != null)
-            this.day20Hours = request.day20Hours();
-        if (request.day21Hours() != null)
-            this.day21Hours = request.day21Hours();
-        if (request.day22Hours() != null)
-            this.day22Hours = request.day22Hours();
-        if (request.day23Hours() != null)
-            this.day23Hours = request.day23Hours();
-        if (request.day24Hours() != null)
-            this.day24Hours = request.day24Hours();
-        if (request.day25Hours() != null)
-            this.day25Hours = request.day25Hours();
-        if (request.day26Hours() != null)
-            this.day26Hours = request.day26Hours();
-        if (request.day27Hours() != null)
-            this.day27Hours = request.day27Hours();
-        if (request.day28Hours() != null)
-            this.day28Hours = request.day28Hours();
-        if (request.day29Hours() != null)
-            this.day29Hours = request.day29Hours();
-        if (request.day30Hours() != null)
-            this.day30Hours = request.day30Hours();
-        if (request.day31Hours() != null)
-            this.day31Hours = request.day31Hours();
+        if (info.day01Hours() != null)
+            this.day01Hours = info.day01Hours();
+        if (info.day02Hours() != null)
+            this.day02Hours = info.day02Hours();
+        if (info.day03Hours() != null)
+            this.day03Hours = info.day03Hours();
+        if (info.day04Hours() != null)
+            this.day04Hours = info.day04Hours();
+        if (info.day05Hours() != null)
+            this.day05Hours = info.day05Hours();
+        if (info.day06Hours() != null)
+            this.day06Hours = info.day06Hours();
+        if (info.day07Hours() != null)
+            this.day07Hours = info.day07Hours();
+        if (info.day08Hours() != null)
+            this.day08Hours = info.day08Hours();
+        if (info.day09Hours() != null)
+            this.day09Hours = info.day09Hours();
+        if (info.day10Hours() != null)
+            this.day10Hours = info.day10Hours();
+        if (info.day11Hours() != null)
+            this.day11Hours = info.day11Hours();
+        if (info.day12Hours() != null)
+            this.day12Hours = info.day12Hours();
+        if (info.day13Hours() != null)
+            this.day13Hours = info.day13Hours();
+        if (info.day14Hours() != null)
+            this.day14Hours = info.day14Hours();
+        if (info.day15Hours() != null)
+            this.day15Hours = info.day15Hours();
+        if (info.day16Hours() != null)
+            this.day16Hours = info.day16Hours();
+        if (info.day17Hours() != null)
+            this.day17Hours = info.day17Hours();
+        if (info.day18Hours() != null)
+            this.day18Hours = info.day18Hours();
+        if (info.day19Hours() != null)
+            this.day19Hours = info.day19Hours();
+        if (info.day20Hours() != null)
+            this.day20Hours = info.day20Hours();
+        if (info.day21Hours() != null)
+            this.day21Hours = info.day21Hours();
+        if (info.day22Hours() != null)
+            this.day22Hours = info.day22Hours();
+        if (info.day23Hours() != null)
+            this.day23Hours = info.day23Hours();
+        if (info.day24Hours() != null)
+            this.day24Hours = info.day24Hours();
+        if (info.day25Hours() != null)
+            this.day25Hours = info.day25Hours();
+        if (info.day26Hours() != null)
+            this.day26Hours = info.day26Hours();
+        if (info.day27Hours() != null)
+            this.day27Hours = info.day27Hours();
+        if (info.day28Hours() != null)
+            this.day28Hours = info.day28Hours();
+        if (info.day29Hours() != null)
+            this.day29Hours = info.day29Hours();
+        if (info.day30Hours() != null)
+            this.day30Hours = info.day30Hours();
+        if (info.day31Hours() != null)
+            this.day31Hours = info.day31Hours();
+
+        // 일당 업데이트
+        if (info.dailyWage() != null)
+            this.dailyWage = info.dailyWage().intValue();
 
         // 계산된 값들 업데이트
-        if (request.totalWorkHours() != null)
-            this.totalWorkHours = request.totalWorkHours();
-        if (request.totalWorkDays() != null)
-            this.totalWorkDays = request.totalWorkDays();
-        if (request.totalLaborCost() != null)
-            this.totalLaborCost = request.totalLaborCost();
+        if (info.totalWorkHours() != null)
+            this.totalWorkHours = info.totalWorkHours();
+        if (info.totalWorkDays() != null)
+            this.totalWorkDays = info.totalWorkDays();
+        if (info.totalLaborCost() != null)
+            this.totalLaborCost = info.totalLaborCost();
 
         // 공제 항목들 업데이트
-        if (request.incomeTax() != null)
-            this.incomeTax = request.incomeTax();
-        if (request.employmentInsurance() != null)
-            this.employmentInsurance = request.employmentInsurance();
-        if (request.healthInsurance() != null)
-            this.healthInsurance = request.healthInsurance();
-        if (request.localTax() != null)
-            this.localTax = request.localTax();
-        if (request.nationalPension() != null)
-            this.nationalPension = request.nationalPension();
-        if (request.longTermCareInsurance() != null)
-            this.longTermCareInsurance = request.longTermCareInsurance();
-        if (request.totalDeductions() != null)
-            this.totalDeductions = request.totalDeductions();
-        if (request.netPayment() != null)
-            this.netPayment = request.netPayment();
+        if (info.incomeTax() != null)
+            this.incomeTax = info.incomeTax();
+        if (info.employmentInsurance() != null)
+            this.employmentInsurance = info.employmentInsurance();
+        if (info.healthInsurance() != null)
+            this.healthInsurance = info.healthInsurance();
+        if (info.localTax() != null)
+            this.localTax = info.localTax();
+        if (info.nationalPension() != null)
+            this.nationalPension = info.nationalPension();
+        if (info.longTermCareInsurance() != null)
+            this.longTermCareInsurance = info.longTermCareInsurance();
+        if (info.totalDeductions() != null)
+            this.totalDeductions = info.totalDeductions();
+        if (info.netPayment() != null)
+            this.netPayment = info.netPayment();
 
         // 비고 업데이트
-        if (request.memo() != null)
-            this.memo = request.memo();
+        if (info.memo() != null)
+            this.memo = info.memo();
     }
 }
