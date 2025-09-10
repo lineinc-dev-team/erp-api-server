@@ -370,9 +370,9 @@ public class LaborPayroll extends BaseEntity {
         calculateTotalWorkHours();
         calculateTotalWorkDays();
 
-        // 총 노무비 계산 (일당 기준)
-        if (dailyWage != null && totalWorkDays != null) {
-            this.totalLaborCost = BigDecimal.valueOf(dailyWage).multiply(totalWorkDays);
+        // 총 노무비 계산 (공수 × 일당 기준)
+        if (dailyWage != null && totalWorkHours != null) {
+            this.totalLaborCost = BigDecimal.valueOf(dailyWage).multiply(totalWorkHours);
         } else {
             this.totalLaborCost = BigDecimal.ZERO;
         }
