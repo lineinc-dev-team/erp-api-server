@@ -20,6 +20,11 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 public interface LaborPayrollRepository extends JpaRepository<LaborPayroll, Long> {
 
     /**
+     * 특정 인력의 모든 노무비 명세서 조회 (연월 기준 내림차순)
+     */
+    List<LaborPayroll> findByLaborIdOrderByYearMonthDesc(Long laborId);
+
+    /**
      * 특정 인력과 년월의 노무비 명세서 조회
      */
     Optional<LaborPayroll> findByLaborIdAndYearMonth(Long laborId, String yearMonth);

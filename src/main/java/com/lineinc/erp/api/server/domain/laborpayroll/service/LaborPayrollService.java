@@ -31,6 +31,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.La
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollSummaryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollHistoryResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
@@ -276,6 +277,19 @@ public class LaborPayrollService {
         // memo 필드 수정
         changeHistory.setMemo(request.memo());
         laborPayrollChangeHistoryRepository.save(changeHistory);
+    }
+
+    /**
+     * 노무인력 ID로 명세서 이력 조회
+     * 특정 노무인력의 모든 명세서를 조회 (연월, 현장, 공정 정보 포함)
+     */
+    @Transactional(readOnly = true)
+    public List<LaborPayrollHistoryResponse> getLaborPayrollsByLaborId(Long laborId) {
+        List<LaborPayroll> laborPayrolls = laborPayrollRepository.findByLaborIdOrderByYearMonthDesc(laborId);
+
+        return laborPayrolls.stream()
+                .map(LaborPayrollHistoryResponse::from)
+                .toList();
     }
 
 }

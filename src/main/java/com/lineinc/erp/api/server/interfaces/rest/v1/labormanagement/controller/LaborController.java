@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
+import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborCreateRequest;
@@ -57,6 +58,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollHistoryResponse;
 import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
@@ -66,6 +68,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 public class LaborController {
 
     private final LaborService laborService;
+    private final LaborPayrollService laborPayrollService;
 
     @Operation(summary = "노무 인력정보 등록", description = "노무 인력정보를 등록합니다")
     @ApiResponses(value = {
@@ -236,5 +239,17 @@ public class LaborController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "노무인력 명세서 이력 조회", description = "특정 노무인력의 명세서 이력을 조회합니다. (연월, 현장, 공정 정보 포함)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "노무인력을 찾을 수 없음", content = @Content())
+    })
+    @GetMapping("/{id}/payrolls")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<LaborPayrollHistoryResponse>>> getLaborPayrolls(@PathVariable Long id) {
+        List<LaborPayrollHistoryResponse> payrolls = laborPayrollService.getLaborPayrollsByLaborId(id);
+        return ResponseEntity.ok(SuccessResponse.of(payrolls));
     }
 }
