@@ -121,12 +121,6 @@ public class DailyReportService {
                             ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
                 }
 
-                // 같은 일자에 해당 인력이 이미 출근했는지 체크 (모든 현장/공정 포함)
-                if (dailyReportRepository.existsByReportDateAndEmployeesLaborId(reportDate, labor.getId())) {
-                    throw new IllegalArgumentException(
-                            ValidationMessages.DAILY_REPORT_LABOR_ALREADY_EXISTS);
-                }
-
                 if (labor.getFirstWorkDate() == null) {
                     labor.setFirstWorkDate(reportDate);
                     labor.setHireDate(reportDate);
@@ -172,11 +166,6 @@ public class DailyReportService {
                                 ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
                     }
 
-                    // 같은 일자에 해당 인력이 이미 출근했는지 체크 (모든 현장/공정 포함)
-                    if (dailyReportRepository.existsByReportDateAndDirectContractsLaborId(reportDate, labor.getId())) {
-                        throw new IllegalArgumentException(
-                                ValidationMessages.DAILY_REPORT_LABOR_ALREADY_EXISTS);
-                    }
                 }
 
                 DailyReportDirectContract directContract = DailyReportDirectContract.builder()
@@ -601,19 +590,6 @@ public class DailyReportService {
                     ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
         }
 
-        // 같은 일자에 해당 인력이 이미 출근했는지 체크 (기존 데이터 제외, 모든 현장/공정 포함)
-        for (DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo employee : request.employees()) {
-            if (employee.laborId() != null) {
-                // 기존 데이터가 아닌 새로운 데이터만 체크
-                if (employee.id() == null) {
-                    if (dailyReportRepository.existsByReportDateAndEmployeesLaborId(reportDate, employee.laborId())) {
-                        throw new IllegalArgumentException(
-                                ValidationMessages.DAILY_REPORT_LABOR_ALREADY_EXISTS);
-                    }
-                }
-            }
-        }
-
         // EntitySyncUtils.syncList를 사용하여 직원정보 동기화
         EntitySyncUtils.syncList(
                 dailyReport.getEmployees(),
@@ -664,21 +640,6 @@ public class DailyReportService {
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
-
-        // 같은 일자에 해당 인력이 이미 출근했는지 체크 (기존 데이터 제외)
-        for (DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo directContract : request
-                .directContracts()) {
-            if (directContract.laborId() != null) {
-                // 기존 데이터가 아닌 새로운 데이터만 체크
-                if (directContract.id() == null) {
-                    if (dailyReportRepository.existsByReportDateAndDirectContractsLaborId(reportDate,
-                            directContract.laborId())) {
-                        throw new IllegalArgumentException(
-                                ValidationMessages.DAILY_REPORT_LABOR_ALREADY_EXISTS);
-                    }
-                }
-            }
-        }
 
         // EntitySyncUtils.syncList를 사용하여 직영/계약직 정보 동기화
         EntitySyncUtils.syncList(
