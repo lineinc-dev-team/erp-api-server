@@ -9,5 +9,13 @@ import org.springframework.data.domain.Slice;
 
 @Repository
 public interface UserChangeHistoryRepository extends JpaRepository<UserChangeHistory, Long> {
+
+    /**
+     * 특정 사용자의 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param user     사용자 엔티티
+     * @param pageable 페이징 정보
+     * @return 사용자 변경 이력 목록
+     */
     Slice<UserChangeHistory> findByUser(User user, Pageable pageable);
 }
