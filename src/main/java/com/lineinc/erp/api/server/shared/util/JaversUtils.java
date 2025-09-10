@@ -24,7 +24,6 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
-import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.managementcost.entity.*;
 
 import lombok.extern.slf4j.Slf4j;
