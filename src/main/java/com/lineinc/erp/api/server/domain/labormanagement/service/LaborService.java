@@ -285,6 +285,7 @@ public class LaborService {
             case "hireDate" -> "입사일";
             case "resignationDate" -> "퇴사일";
             case "tenureDays" -> "근속일수";
+            case "tenureMonths" -> "근속기간";
             case "isSeverancePayEligible" -> "퇴직금 발생 요건 여부";
             case "hasBankbook" -> "통장사본";
             case "hasIdCard" -> "신분증사본";
@@ -335,6 +336,7 @@ public class LaborService {
                     ? DateTimeFormatUtils.formatKoreaLocalDate(labor.resignationDate())
                     : "";
             case "tenureDays" -> labor.tenureDays() != null ? labor.tenureDays().toString() : "";
+            case "tenureMonths" -> labor.tenureMonths() != null ? labor.tenureMonths() + "개월" : "";
             case "isSeverancePayEligible" ->
                 labor.isSeverancePayEligible() != null ? (labor.isSeverancePayEligible() ? "Y" : "N") : "";
             case "hasBankbook" -> labor.hasBankbook() != null ? (labor.hasBankbook() ? "Y" : "N") : "";

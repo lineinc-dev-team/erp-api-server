@@ -10,10 +10,10 @@ import jakarta.validation.constraints.NotBlank;
 @ParameterObject
 @Schema(description = "인력정보 엑셀 다운로드 요청")
 public record LaborDownloadRequest(
-        @NotBlank @Schema(description = "허용 필드: id, type, name, residentNumber, outsourcingCompanyName, workType, mainWork, phoneNumber, dailyWage, accountNumber, hireDate, resignationDate, tenureDays, isSeverancePayEligible, hasBankbook, hasIdCard, hasSignatureImage, hasFile", example = "id, name, type") String fields) {
+        @NotBlank @Schema(description = "허용 필드: id, type, name, residentNumber, outsourcingCompanyName, workType, mainWork, phoneNumber, dailyWage, accountNumber, hireDate, resignationDate, tenureDays, tenureMonths, isSeverancePayEligible, hasBankbook, hasIdCard, hasSignatureImage, hasFile", example = "id, name, type") String fields) {
     public static final List<String> ALLOWED_FIELDS = List.of(
             "id", "type", "name", "residentNumber", "outsourcingCompanyName", "workType", "mainWork",
-            "phoneNumber", "dailyWage", "accountNumber", "hireDate", "resignationDate", "tenureDays",
+            "phoneNumber", "dailyWage", "accountNumber", "hireDate", "resignationDate", "tenureDays", "tenureMonths",
             "isSeverancePayEligible", "hasBankbook", "hasIdCard",
             "hasSignatureImage", "hasFile");
 }

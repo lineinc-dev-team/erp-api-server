@@ -39,6 +39,7 @@ public record LaborDetailResponse(
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt,
         @Schema(description = "근속일수") Long tenureDays,
+        @Schema(description = "근속개월") Integer tenureMonths,
         @Schema(description = "퇴직금 발생 요건 여부", example = "true") Boolean isSeverancePayEligible,
         @Schema(description = "첨부파일 목록") List<LaborFileResponse> files) {
 
@@ -74,6 +75,7 @@ public record LaborDetailResponse(
                 labor.getCreatedAt(),
                 labor.getUpdatedAt(),
                 labor.getTenureDays(),
+                labor.getTenureMonths(),
                 labor.getIsSeverancePayEligible(),
                 fileResponses
 
