@@ -67,7 +67,7 @@ public class User extends BaseEntity implements UserDetails {
     @Builder.Default
     @Column(nullable = false)
     @DiffInclude
-    private boolean isHeadOffice = true;
+    private boolean isHeadOffice = false;
 
     // ===== 보안/시스템 정보 (변경 추적 제외) =====
     @Column(nullable = false)
