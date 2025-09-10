@@ -133,6 +133,15 @@ public class Labor extends BaseEntity {
     private Long tenureDays = 0L;
 
     /**
+     * 근속개월
+     */
+    @DiffIgnore
+    @Column
+    @Builder.Default
+    @Setter
+    private Integer tenureMonths = 0;
+
+    /**
      * 퇴직금 발생 여부
      */
     @DiffInclude
