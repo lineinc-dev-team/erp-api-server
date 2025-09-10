@@ -47,37 +47,36 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 사용자 관련 비즈니스 로직을 처리하는 서비스
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
 
+    // Repository 의존성
     private final UserRepository usersRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserChangeHistoryRepository userChangeHistoryRepository;
     private final DepartmentRepository departmentRepository;
     private final GradeRepository gradeRepository;
     private final PositionRepository positionRepository;
-    private final Javers javers;
-    private final UserChangeHistoryRepository userChangeHistoryRepository;
 
+    // 기타 의존성
+    private final PasswordEncoder passwordEncoder;
+    private final Javers javers;
+
+    // 설정값
     @Value("${USER_DEFAULT_PASSWORD:line1234}")
     private String defaultPassword;
-
-    @Transactional(readOnly = true)
-    public User getUserByLoginIdOrThrow(String loginId) {
-        return usersRepository.findByLoginIdAndDeletedFalse(loginId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
 
     @Transactional
     public void resetPassword(long id) {
         User user = getUserByIdOrThrow(id);
         String encodedPassword = passwordEncoder.encode(defaultPassword);
-        user.updatePassword(encodedPassword);
-        user.setRequirePasswordReset(true);
+        user.resetPassword(encodedPassword);
         usersRepository.save(user);
 
-        // 비밀번호 초기화 변경 이력 기록
         UserChangeHistory changeHistory = UserChangeHistory.builder()
                 .user(user)
                 .type(UserChangeHistoryType.BASIC)

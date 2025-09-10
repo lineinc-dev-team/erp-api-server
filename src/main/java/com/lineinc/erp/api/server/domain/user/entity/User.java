@@ -75,6 +75,7 @@ public class User extends BaseEntity implements UserDetails {
     private String loginId;
 
     @Column
+    @Setter
     @DiffIgnore
     private String passwordHash;
 
@@ -140,6 +141,11 @@ public class User extends BaseEntity implements UserDetails {
     public void updatePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
         this.requirePasswordReset = false;
+    }
+
+    public void resetPassword(String newPasswordHash) {
+        this.passwordHash = newPasswordHash;
+        this.requirePasswordReset = true;
     }
 
     public void syncTransientFields() {
