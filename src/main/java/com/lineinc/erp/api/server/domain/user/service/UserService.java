@@ -168,13 +168,11 @@ public class UserService {
     @Transactional
     public void deleteUsersByIds(BulkDeleteUsersRequest request) {
         List<User> users = usersRepository.findAllById(request.userIds());
+
         if (request.userIds().size() != users.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND);
         }
-        users.forEach(user -> {
-            user.markAsDeleted();
-            user.getUserRoles().forEach(UserRole::markAsDeleted);
-        });
+        users.forEach(User::markAsDeletedWithRoles);
         usersRepository.saveAll(users);
     }
 

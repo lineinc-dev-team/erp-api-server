@@ -148,6 +148,13 @@ public class User extends BaseEntity implements UserDetails {
         this.requirePasswordReset = true;
     }
 
+    public void markAsDeletedWithRoles() {
+        this.markAsDeleted();
+        if (this.userRoles != null) {
+            this.userRoles.forEach(UserRole::markAsDeleted);
+        }
+    }
+
     public void syncTransientFields() {
         this.departmentName = Optional.ofNullable(this.department)
                 .map(Department::getName)
