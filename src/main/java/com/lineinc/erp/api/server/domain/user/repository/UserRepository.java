@@ -14,10 +14,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 
-    Optional<User> findByLoginId(String loginId);
+    Optional<User> findByLoginIdAndDeletedFalse(String loginId);
 
-    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.loginId = :loginId AND u.deleted = false")
-    boolean existsByLoginId(@Param("loginId") String loginId);
+    boolean existsByLoginIdAndDeletedFalse(String loginId);
 
     @Query("SELECT u FROM User u WHERE u.deleted = false AND LOWER(u.username) != :excludeUsername AND (:keyword IS NULL OR :keyword = '' OR u.username LIKE %:keyword%) AND (:hasRole IS NULL OR (CASE WHEN :hasRole = true THEN EXISTS (SELECT 1 FROM u.userRoles ur WHERE ur.deleted = false AND ur.role.deleted = false) ELSE NOT EXISTS (SELECT 1 FROM u.userRoles ur WHERE ur.deleted = false AND ur.role.deleted = false) END))")
     Slice<User> findAllByKeywordAndExcludeUsername(@Param("keyword") String keyword,

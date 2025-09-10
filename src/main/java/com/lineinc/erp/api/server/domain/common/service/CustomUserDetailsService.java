@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByLoginId(username)
+        User user = userRepository.findByLoginIdAndDeletedFalse(username)
                 .orElseThrow(() -> new BadCredentialsException(ValidationMessages.USER_NOT_FOUND));
         return new CustomUserDetails(user.getId(), user.getLoginId(), user.getPasswordHash(), user.isActive(),
                 user.isDeleted());

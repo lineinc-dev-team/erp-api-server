@@ -21,7 +21,7 @@ public class UsersSeeder {
     private final PasswordEncoder passwordEncoder;
 
     public void seed() {
-        Optional<User> existingAdmin = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
+        Optional<User> existingAdmin = usersRepository.findByLoginIdAndDeletedFalse(AppConstants.ADMIN_LOGIN_ID);
         if (existingAdmin.isPresent())
             return;
 

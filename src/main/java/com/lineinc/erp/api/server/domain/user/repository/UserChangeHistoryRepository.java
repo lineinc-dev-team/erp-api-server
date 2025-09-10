@@ -9,7 +9,5 @@ import org.springframework.data.domain.Slice;
 
 @Repository
 public interface UserChangeHistoryRepository extends JpaRepository<UserChangeHistory, Long> {
-
     Slice<UserChangeHistory> findByUser(User user, Pageable pageable);
-
 }

@@ -22,7 +22,7 @@ public class UsersRolesSeeder {
 
     @Transactional
     public void seed() {
-        Optional<User> adminUserOpt = usersRepository.findByLoginId(AppConstants.ADMIN_LOGIN_ID);
+        Optional<User> adminUserOpt = usersRepository.findByLoginIdAndDeletedFalse(AppConstants.ADMIN_LOGIN_ID);
         Optional<Role> adminRoleOpt = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME);
 
         if (adminUserOpt.isPresent() && adminRoleOpt.isPresent()) {

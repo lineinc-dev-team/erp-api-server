@@ -65,7 +65,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getUserByLoginIdOrThrow(String loginId) {
-        return usersRepository.findByLoginId(loginId)
+        return usersRepository.findByLoginIdAndDeletedFalse(loginId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -93,7 +93,7 @@ public class UserService {
 
     @Transactional
     public void createUser(CreateUserRequest request) {
-        if (usersRepository.existsByLoginId(request.loginId())) {
+        if (usersRepository.existsByLoginIdAndDeletedFalse(request.loginId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.LOGIN_ID_ALREADY_EXISTS);
         }
 
