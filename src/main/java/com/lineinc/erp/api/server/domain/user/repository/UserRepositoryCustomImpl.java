@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.SearchUserRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;
@@ -100,7 +101,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         BooleanBuilder builder = new BooleanBuilder();
 
         // 기본 조건: 관리자 제외, 삭제되지 않은 사용자
-        builder.and(user.id.ne(1L));
+        builder.and(user.loginId.ne(AppConstants.ADMIN_LOGIN_ID));
         builder.and(user.deleted.eq(false));
 
         // 사용자명 검색
