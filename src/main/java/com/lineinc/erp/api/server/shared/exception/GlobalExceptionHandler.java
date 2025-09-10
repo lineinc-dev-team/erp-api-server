@@ -5,6 +5,7 @@ import com.lineinc.erp.api.server.shared.dto.response.ErrorResponse;
 import com.lineinc.erp.api.server.shared.dto.response.FieldErrorDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -165,6 +166,31 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidDataAccess(Exception ex) {
         log.warn("InvalidDataAccessException: {}", ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.INVALID_PROPERTY_REFERENCE, List.of());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("DataIntegrityViolationException: {}", ex.getMessage(), ex);
+
+        String message = ex.getMessage();
+        String userFriendlyMessage;
+
+        // 외래키 제약조건 위반인 경우
+        if (message != null && message.contains("violates foreign key constraint")) {
+            if (message.contains("Key (department_id)=")) {
+                userFriendlyMessage = "존재하지 않는 부서입니다. 올바른 부서를 선택해주세요.";
+            } else if (message.contains("Key (grade_id)=")) {
+                userFriendlyMessage = "존재하지 않는 직급입니다. 올바른 직급을 선택해주세요.";
+            } else if (message.contains("Key (position_id)=")) {
+                userFriendlyMessage = "존재하지 않는 직책입니다. 올바른 직책을 선택해주세요.";
+            } else {
+                userFriendlyMessage = "참조하는 데이터가 존재하지 않습니다. 올바른 데이터를 선택해주세요.";
+            }
+        } else {
+            userFriendlyMessage = "데이터 무결성 제약조건 위반입니다. 입력 데이터를 확인해주세요.";
+        }
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, userFriendlyMessage, List.of());
     }
 
     // 7. IO 및 기타

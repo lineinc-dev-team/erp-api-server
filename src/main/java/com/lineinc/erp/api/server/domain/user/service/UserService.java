@@ -99,15 +99,15 @@ public class UserService {
         User user = User.builder()
                 .username(request.username())
                 .loginId(request.loginId())
-                .department(
-                        request.departmentId() != null ? Department.builder().id(request.departmentId()).build() : null)
-                .grade(request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null)
-                .position(request.positionId() != null ? Position.builder().id(request.positionId()).build() : null)
+                .department(Department.builder().id(request.departmentId()).build())
+                .grade(Grade.builder().id(request.gradeId()).build())
+                .position(Position.builder().id(request.positionId()).build())
                 .passwordHash(passwordEncoder.encode(defaultPassword))
                 .phoneNumber(request.phoneNumber())
                 .landlineNumber(request.landlineNumber())
                 .email(request.email())
                 .isActive(request.isActive())
+                .isHeadOffice(request.isHeadOffice())
                 .memo(request.memo())
                 .build();
 
