@@ -295,6 +295,7 @@ public class LaborPayrollService {
                         .type(LaborPayrollChangeType.LABOR_PAYROLL)
                         .changes(changesJson)
                         .laborPayrollSummary(summary)
+                        .description(generateLaborDescription(laborPayroll))
                         .build();
                 laborPayrollChangeHistoryRepository.save(changeHistory);
             }
@@ -338,6 +339,26 @@ public class LaborPayrollService {
         return laborPayrolls.stream()
                 .map(LaborPayrollHistoryResponse::from)
                 .toList();
+    }
+
+    /**
+     * 노무명세서의 인력 이름과 단가 정보를 생성합니다.
+     * 
+     * @param laborPayroll 노무명세서
+     * @return 인력 이름과 단가 정보 문자열
+     */
+    private String generateLaborDescription(LaborPayroll laborPayroll) {
+        if (laborPayroll.getLabor() != null) {
+            String name = laborPayroll.getLabor().getName();
+            Integer dailyWage = laborPayroll.getDailyWage();
+
+            if (dailyWage != null) {
+                String formattedWage = String.format("%,d", dailyWage);
+                return String.format("%s(%s원)", name, formattedWage);
+            }
+            return name;
+        }
+        return "인력 정보 없음";
     }
 
 }

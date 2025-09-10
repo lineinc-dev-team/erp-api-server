@@ -35,7 +35,7 @@ public class UserChangeHistory extends BaseEntity {
     @Column(columnDefinition = "jsonb")
     private String changes;
 
-    @Column(columnDefinition = "TEXT")
+    @Column
     private String description;
 
     @Setter

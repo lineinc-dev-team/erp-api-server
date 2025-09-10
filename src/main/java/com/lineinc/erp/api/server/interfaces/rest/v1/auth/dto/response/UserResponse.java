@@ -83,11 +83,8 @@ public record UserResponse(
     @Schema(description = "간단한 유저 응답")
     public static record UserSimpleResponse(
             @Schema(description = "사용자 ID", example = "123") Long id,
-
             @Schema(description = "로그인 ID", example = "admin01") String loginId,
-
             @Schema(description = "사용자 이름", example = "홍길동") String username,
-
             @Schema(description = "사용자 부서", example = "개발팀") String department,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static UserSimpleResponse from(User user) {

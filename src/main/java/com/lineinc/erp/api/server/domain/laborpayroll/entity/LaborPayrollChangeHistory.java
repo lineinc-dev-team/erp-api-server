@@ -59,6 +59,9 @@ public class LaborPayrollChangeHistory extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
+    @Column
+    private String description;
+
     // 노무명세서 집계 테이블과의 연관관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "labor_payroll_summary_id")

@@ -123,13 +123,6 @@ public class JaversUtils {
                         affectedObject = optional.orElse(null);
                     }
 
-                    if (isLaborPayrollEntity(affectedObject)) {
-                        String laborNameWithWage = extractLaborNameWithDailyWage(affectedObject);
-                        if (laborNameWithWage != null) {
-                            propertyName = laborNameWithWage + " - " + propertyName;
-                        }
-                    }
-
                     return Map.of(
                             "property", propertyName,
                             "before", beforeValue,
@@ -190,38 +183,6 @@ public class JaversUtils {
                 log.warn("엔티티 이름 추출 실패: {}", entity.getClass().getSimpleName(), e);
             }
         }
-        return null;
-    }
-
-    // 노무명세서 엔티티인지 확인
-    private static boolean isLaborPayrollEntity(Object entity) {
-        if (entity == null)
-            return false;
-        return entity.getClass().getSimpleName().equals("LaborPayroll");
-    }
-
-    // 노무명세서에서 인력 이름과 일당 추출
-    private static String extractLaborNameWithDailyWage(Object entity) {
-        if (entity == null)
-            return null;
-
-        try {
-            // LaborPayroll 엔티티로 캐스팅하여 안전하게 접근
-            if (entity instanceof LaborPayroll laborPayroll) {
-                if (laborPayroll.getLabor() != null) {
-                    String name = laborPayroll.getLabor().getName();
-                    Integer dailyWage = laborPayroll.getDailyWage();
-                    if (dailyWage != null) {
-                        String formattedWage = String.format("%,d", dailyWage);
-                        return name + "(" + formattedWage + "원)";
-                    }
-                    return name;
-                }
-            }
-        } catch (Exception e) {
-            log.warn("인력 이름 추출 실패: {}", entity.getClass().getSimpleName(), e);
-        }
-
         return null;
     }
 
