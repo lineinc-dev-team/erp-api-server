@@ -28,7 +28,6 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners(AuditingEntityListener.class) // JPA Auditing 기능 활성화: 생성자/수정자, 생성일/수정일 자동 기록
 @NoArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public abstract class BaseEntity {
 
     /**
@@ -52,7 +51,6 @@ public abstract class BaseEntity {
      * 생성자 정보 자동 저장 필드
      * - 생성자(작성자) ID 또는 이름 등을 자동 저장
      * - 변경 불가(updatable = false)
-     * - 이 기능을 사용하려면 AuditorAware 구현체 등록 필요
      */
     @CreatedBy
     @Column(updatable = false)
@@ -61,9 +59,9 @@ public abstract class BaseEntity {
     /**
      * 수정자 정보 자동 저장 필드
      * - 마지막으로 수정한 사용자 ID 또는 이름 등을 자동 저장
-     * - AuditorAware 구현체에 의해 설정됨
      */
     @LastModifiedBy
+    @Column
     private String updatedBy;
 
     /**
