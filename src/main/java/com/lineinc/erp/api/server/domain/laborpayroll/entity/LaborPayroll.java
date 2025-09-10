@@ -419,7 +419,7 @@ public class LaborPayroll extends BaseEntity {
         }
 
         // 주민세: ROUNDDOWN(소득세 × 10%, -1) && 첫째날 근무해야 함
-        if (!workedOnFirstDay) {
+        if (!workedOnFirstDay || incomeTax.compareTo(BigDecimal.ZERO) == 0) {
             this.localTax = BigDecimal.ZERO;
         } else {
             BigDecimal tax = incomeTax.multiply(new BigDecimal("0.1"));
@@ -538,26 +538,39 @@ public class LaborPayroll extends BaseEntity {
 
     /**
      * 소득세 계산 (엑셀 수식과 동일)
+     * AN6: =ROUNDDOWN(SUM(AO6:BD7),-1)
      * AO6: =ROUNDDOWN(IF($H6*I6>150000,($H6*I6-150000)*6%*45%,0),0)
-     * H6: 일당, I6: 해당일에 공수 (여기서는 총 노무비 사용)
+     * H6: 일당, I6: 해당일에 공수
+     * 각 일별로 계산한 후 합계를 구함
      */
     private BigDecimal calculateIncomeTax(boolean workedOnFirstDay) {
-        if (totalLaborCost == null || !workedOnFirstDay) {
+        if (dailyWage == null || !workedOnFirstDay) {
             return BigDecimal.ZERO;
         }
 
+        BigDecimal totalTax = BigDecimal.ZERO;
         BigDecimal threshold = new BigDecimal("150000");
 
-        if (totalLaborCost.compareTo(threshold) > 0) {
-            // (총노무비 - 150000) * 6% * 45%
-            BigDecimal exceededAmount = totalLaborCost.subtract(threshold);
-            BigDecimal tax = exceededAmount
-                    .multiply(new BigDecimal("0.06"))
-                    .multiply(new BigDecimal("0.45"));
-            return roundDown(tax, 0);
-        } else {
-            return BigDecimal.ZERO;
+        // 각 일별로 소득세 계산
+        for (int day = 1; day <= 31; day++) {
+            Double dayHours = getDayHours(day);
+            if (dayHours != null && dayHours > 0.0) {
+                // 일당 × 해당일 공수
+                BigDecimal dailyAmount = BigDecimal.valueOf(dailyWage).multiply(BigDecimal.valueOf(dayHours));
+
+                if (dailyAmount.compareTo(threshold) > 0) {
+                    // (일당×공수 - 150000) * 6% * 45%
+                    BigDecimal exceededAmount = dailyAmount.subtract(threshold);
+                    BigDecimal dailyTax = exceededAmount
+                            .multiply(new BigDecimal("0.06"))
+                            .multiply(new BigDecimal("0.45"));
+                    totalTax = totalTax.add(roundDown(dailyTax, 0));
+                }
+            }
         }
+
+        // ROUNDDOWN(SUM, -1) 적용
+        return roundDown(totalTax, -1);
     }
 
     /**
