@@ -36,10 +36,10 @@ public class BatchScheduler {
     }
 
     /**
-     * 매월 2일 새벽 00시 2분에 근속기간 계산 배치 실행
-     * Cron 표현식: "0 2 0 2 * ?" (한국시간 매월 2일 새벽 00시 2분)
+     * 매월 2일 새벽 00시 10분에 근속기간 계산 배치 실행
+     * Cron 표현식: "0 10 0 2 * ?" (한국시간 매월 2일 새벽 00시 10분)
      */
-    @Scheduled(cron = "0 2 0 2 * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 10 0 2 * ?", zone = "Asia/Seoul")
     public void calculateTenure() {
         executeBatchWithHistory(tenureCalculationBatchService);
     }
