@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureCalculationBatchService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchController {
 
     private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
+    private final TenureCalculationBatchService tenureCalculationBatchService;
 
     /**
      * 출역일보 자동 마감 배치를 수동으로 실행합니다.
@@ -41,6 +43,27 @@ public class BatchController {
             return ResponseEntity.ok(message);
         } catch (Exception e) {
             log.error("출역일보 자동 마감 배치 실행 중 오류 발생", e);
+            return ResponseEntity.status(500)
+                    .body("배치 실행 실패: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 근속기간 계산 배치를 수동으로 실행합니다.
+     * 
+     * @return 배치 실행 결과
+     */
+    @PostMapping("/tenure-calculation")
+    @Operation(summary = "근속기간 계산 배치 실행", description = "전월 노무비명세서 데이터를 기반으로 각 인력의 근속기간을 계산하고 업데이트합니다.")
+    public ResponseEntity<String> runTenureCalculationBatch() {
+        try {
+            log.info("근속기간 계산 배치 수동 실행 시작");
+            tenureCalculationBatchService.execute();
+            String message = "근속기간 계산 배치 완료";
+            log.info(message);
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+            log.error("근속기간 계산 배치 실행 중 오류 발생", e);
             return ResponseEntity.status(500)
                     .body("배치 실행 실패: " + e.getMessage());
         }
