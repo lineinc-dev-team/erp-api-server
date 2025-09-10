@@ -83,9 +83,14 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
                 JOIN r.permissions rp
                 JOIN rp.permission p
                 JOIN p.menu m
-                WHERE u.id = :userId AND m.name = :menuName AND p.action = :action
+                WHERE u.id = :userId
+                AND m.name = :menuName
+                AND p.action = :action
+                AND ur.deleted = false
+                AND r.deleted = false
             )
             """)
     boolean hasPermission(@Param("userId") Long userId, @Param("menuName") String menuName,
             @Param("action") PermissionAction action);
+
 }
