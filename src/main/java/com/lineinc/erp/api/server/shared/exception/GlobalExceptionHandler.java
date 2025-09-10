@@ -109,7 +109,7 @@ public class GlobalExceptionHandler {
 
         String message;
         if (ex.getValue() != null && "NaN".equals(ex.getValue().toString())) {
-            message = "잘못된 숫자 형식입니다. 숫자를 입력해주세요.";
+            message = ValidationMessages.DEFAULT_INVALID_INPUT;
         } else {
             message = String.format("파라미터 '%s'의 값 '%s'을(를) 올바른 형식으로 변환할 수 없습니다.",
                     ex.getName(), ex.getValue());
@@ -178,16 +178,16 @@ public class GlobalExceptionHandler {
         // 외래키 제약조건 위반인 경우
         if (message != null && message.contains("violates foreign key constraint")) {
             if (message.contains("Key (department_id)=")) {
-                userFriendlyMessage = "존재하지 않는 부서입니다. 올바른 부서를 선택해주세요.";
+                userFriendlyMessage = ValidationMessages.DEPARTMENT_NOT_FOUND;
             } else if (message.contains("Key (grade_id)=")) {
-                userFriendlyMessage = "존재하지 않는 직급입니다. 올바른 직급을 선택해주세요.";
+                userFriendlyMessage = ValidationMessages.GRADE_NOT_FOUND;
             } else if (message.contains("Key (position_id)=")) {
-                userFriendlyMessage = "존재하지 않는 직책입니다. 올바른 직책을 선택해주세요.";
+                userFriendlyMessage = ValidationMessages.POSITION_NOT_FOUND;
             } else {
-                userFriendlyMessage = "참조하는 데이터가 존재하지 않습니다. 올바른 데이터를 선택해주세요.";
+                userFriendlyMessage = ValidationMessages.DEFAULT_INVALID_INPUT;
             }
         } else {
-            userFriendlyMessage = "데이터 무결성 제약조건 위반입니다. 입력 데이터를 확인해주세요.";
+            userFriendlyMessage = ValidationMessages.DEFAULT_INVALID_INPUT;
         }
 
         return buildErrorResponse(HttpStatus.BAD_REQUEST, userFriendlyMessage, List.of());
@@ -206,10 +206,10 @@ public class GlobalExceptionHandler {
 
         // 요청 데이터가 null인 경우
         if (ex.getMessage() != null && ex.getMessage().contains("because the return value of")) {
-            return buildErrorResponse(HttpStatus.BAD_REQUEST, "필수 요청 데이터가 누락되었습니다.", List.of());
+            return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.DEFAULT_INVALID_INPUT, List.of());
         }
 
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 필수 데이터를 확인해주세요.", List.of());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.DEFAULT_INVALID_INPUT, List.of());
     }
 
     @ExceptionHandler(RuntimeException.class)

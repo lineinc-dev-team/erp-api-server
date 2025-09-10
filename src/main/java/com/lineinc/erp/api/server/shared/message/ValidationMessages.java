@@ -27,6 +27,9 @@ public final class ValidationMessages {
     public static final String LOGIN_ID_ALREADY_EXISTS = "이미 사용 중인 로그인 아이디 입니다.";
     public static final String PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다.";
     public static final String PASSWORD_RESET = "비밀번호가 초기화되었습니다.";
+    public static final String DEPARTMENT_NOT_FOUND = "존재하지 않는 부서입니다.";
+    public static final String GRADE_NOT_FOUND = "존재하지 않는 직급입니다.";
+    public static final String POSITION_NOT_FOUND = "존재하지 않는 직책입니다.";
 
     // ===== 발주처/현장 관련 메시지 =====
     public static final String CLIENT_COMPANY_NOT_FOUND = "존재하지 않는 발주처입니다.";
