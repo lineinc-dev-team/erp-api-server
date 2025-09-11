@@ -1,16 +1,13 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +17,7 @@ import java.util.Optional;
 @Table(indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "businessNumber"),
-        @Index(columnList = "paymentMethod"),
+        @Index(columnList = "ceoName"),
         @Index(columnList = "email"),
         @Index(columnList = "createdAt"),
         @Index(columnList = "phoneNumber")
@@ -136,7 +133,7 @@ public class ClientCompany extends BaseEntity {
         this.paymentMethodName = this.paymentMethod != null ? this.paymentMethod.getDisplayName() : null;
     }
 
-    public void updateFrom(ClientCompanyUpdateRequest request, UserRepository userRepository) {
+    public void updateFrom(ClientCompanyUpdateRequest request, User user) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
         Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
@@ -149,14 +146,7 @@ public class ClientCompany extends BaseEntity {
         Optional.ofNullable(request.paymentPeriod()).ifPresent(val -> this.paymentPeriod = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-
-        if (request.userId() != null) {
-            User user = userRepository.findById(request.userId())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            org.springframework.http.HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
-            this.setUser(user);
-            this.userName = user.getUsername();
-        }
+        Optional.ofNullable(user).ifPresent(val -> this.user = val);
         syncTransientFields();
     }
 

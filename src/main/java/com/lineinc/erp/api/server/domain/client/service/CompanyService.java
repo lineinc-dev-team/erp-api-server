@@ -120,8 +120,7 @@ public class CompanyService {
 
         clientCompany.syncTransientFields();
         ClientCompany oldSnapshot = JaversUtils.createSnapshot(javers, clientCompany, ClientCompany.class);
-
-        clientCompany.updateFrom(request, userRepository);
+        clientCompany.updateFrom(request, userService.getUserByIdOrThrow(request.userId()));
         companyRepository.save(clientCompany);
 
         Diff diff = javers.compare(oldSnapshot, clientCompany);
