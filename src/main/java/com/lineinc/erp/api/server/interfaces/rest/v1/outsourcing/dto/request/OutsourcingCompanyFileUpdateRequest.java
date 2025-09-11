@@ -4,15 +4,14 @@ import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyFil
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "외주업체 첨부파일 수정 요청")
 public record OutsourcingCompanyFileUpdateRequest(
-        @Schema(description = "파일 ID", example = "123") @NotNull Long id,
+        @Schema(description = "파일 ID", example = "123") Long id,
 
         @Schema(description = "문서명", example = "사업자등록증") @NotBlank String name,
 
-        @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/bucket/path/to/file.pdf") @NotBlank String fileUrl,
+        @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/bucket/path/to/file.pdf") String fileUrl,
 
         @Schema(description = "파일 타입", example = "BUSINESS_LICENSE") OutsourcingCompanyFileType type,
 

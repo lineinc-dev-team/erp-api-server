@@ -24,7 +24,7 @@ public record OutsourcingCompanyUpdateRequest(
 
         @Schema(description = "전화번호", example = "02-123-4567") @NotBlank String landlineNumber,
 
-        @Schema(description = "휴대폰번호", example = "010-1234-5678") @NotBlank String phoneNumber,
+        @Schema(description = "휴대폰번호", example = "010-1234-5678") String phoneNumber,
 
         @Schema(description = "이메일", example = "ceo@outsourcing.com") @Email @NotBlank String email,
 
