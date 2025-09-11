@@ -11,7 +11,6 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Getter
 @Table(indexes = {
-        @Index(columnList = "type"),
         @Index(columnList = "created_at")
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

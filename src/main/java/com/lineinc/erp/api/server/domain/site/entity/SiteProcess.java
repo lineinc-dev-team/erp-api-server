@@ -20,7 +20,6 @@ import java.util.Optional;
 @SuperBuilder
 @Table(indexes = {
         @Index(columnList = "name"),
-        @Index(columnList = "status"),
         @Index(columnList = "created_at")
 })
 public class SiteProcess extends BaseEntity {
