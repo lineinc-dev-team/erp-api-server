@@ -131,13 +131,13 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         }
 
         if (request.createdStartDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
-            builder.and(clientCompany.createdAt.goe(dateRange[0]));
+            OffsetDateTime startOfDay = DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate());
+            builder.and(clientCompany.createdAt.goe(startOfDay));
         }
 
         if (request.createdEndDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
-            builder.and(clientCompany.createdAt.lt(dateRange[1]));
+            OffsetDateTime endOfDay = DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate());
+            builder.and(clientCompany.createdAt.lt(endOfDay));
         }
 
         return builder;
