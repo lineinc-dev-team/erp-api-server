@@ -33,11 +33,13 @@ public record RolesResponse(
         // 전체 권한이 있으면 현장/공정 정보는 빈 배열로 반환
         boolean hasGlobalAccess = role.isHasGlobalSiteProcessAccess();
 
+        
         List<SiteResponse.SiteSimpleResponse> sites = hasGlobalAccess ? List.of()
                 : (role.getSiteProcesses() == null ? List.of()
                         : role.getSiteProcesses().stream()
                                 .map(RoleSiteProcess::getSite)
                                 .filter(Objects::nonNull)
+                                .filter(site -> !site.isDeleted()) // 삭제된 현장 제외
                                 .distinct()
                                 .map(SiteResponse.SiteSimpleResponse::from)
                                 .toList());
@@ -47,6 +49,7 @@ public record RolesResponse(
                         : role.getSiteProcesses().stream()
                                 .map(RoleSiteProcess::getProcess)
                                 .filter(Objects::nonNull)
+                                .filter(process -> !process.isDeleted()) // 삭제된 공정 제외
                                 .distinct()
                                 .map(SiteProcessResponse.SiteProcessSimpleResponse::from)
                                 .toList());
