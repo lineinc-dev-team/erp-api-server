@@ -37,7 +37,7 @@ public class RoleSiteProcess extends BaseEntity implements Serializable {
     @JoinColumn(name = "site_id")
     private Site site;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "process_id")
     private SiteProcess process;
 }

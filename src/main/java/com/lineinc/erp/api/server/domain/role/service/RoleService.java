@@ -59,13 +59,13 @@ public class RoleService {
 
     @Transactional(readOnly = true)
     public Page<RoleSummaryResponse> searchRolesByName(String keyword, Pageable pageable) {
-        Page<Role> roles = roleRepository.findByNameContainingIgnoreCaseAndDeletedFalseAndIdNot(keyword, pageable);
+        Page<Role> roles = roleRepository.searchRoles(keyword, pageable);
         return roles.map(role -> new RoleSummaryResponse(role.getId(), role.getName(), role.isDeleted()));
     }
 
     @Transactional(readOnly = true)
     public RolesResponse getRoleById(Long roleId) {
-        Role role = roleRepository.findWithPermissionsAndActiveSiteProcessesById(roleId)
+        Role role = roleRepository.findRoleWithDetails(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return RolesResponse.from(role);
@@ -79,7 +79,7 @@ public class RoleService {
 
     @Transactional(readOnly = true)
     public List<MenusPermissionsResponse> getMenusPermissionsById(Long roleId) {
-        Role role = roleRepository.findWithPermissionsAndMenusById(roleId)
+        Role role = roleRepository.findRoleWithPermissions(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // 한 번의 스트림으로 모든 처리 완료 - 성능 최적화
