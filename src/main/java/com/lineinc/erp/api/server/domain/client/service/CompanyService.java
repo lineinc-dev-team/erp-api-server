@@ -167,6 +167,7 @@ public class CompanyService {
             case "id" -> "No.";
             case "businessNumber" -> "사업자등록번호";
             case "name" -> "발주처명";
+            case "email" -> "이메일";
             case "ceoName" -> "대표자명";
             case "address" -> "본사 주소";
             case "phoneNumber" -> "개인 휴대폰";
@@ -193,6 +194,7 @@ public class CompanyService {
             case "id" -> String.valueOf(company.id());
             case "businessNumber" -> company.businessNumber();
             case "name" -> company.name();
+            case "email" -> company.email();
             case "ceoName" -> company.ceoName();
             case "address" -> company.address() + " " + company.detailAddress();
             case "phoneNumber" -> company.phoneNumber();

@@ -9,17 +9,10 @@ import java.util.List;
 @ParameterObject
 @Schema(description = "발주처 엑셀 다운로드 요청")
 public record ClientCompanyDownloadRequest(
-        @NotBlank
-        @Schema(
-                description = "허용 필드: id, businessNumber, name, ceoName, address, phoneNumber, landlineNumber, contactName, contactPositionAndDepartment, contactLandlineNumberAndEmail, userName, isActive, createdAtAndUpdatedAt, hasFile, memo",
-                example = "id,businessNumber,isActive"
-        )
-        String fields
-) {
+        @NotBlank @Schema(description = "허용 필드: id, businessNumber, name, email, ceoName, address, phoneNumber, landlineNumber, contactName, contactPositionAndDepartment, contactLandlineNumberAndEmail, userName, isActive, createdAtAndUpdatedAt, hasFile, memo", example = "id,businessNumber,isActive") String fields) {
     public static final List<String> ALLOWED_FIELDS = List.of(
-            "id", "businessNumber", "name", "ceoName", "address",
+            "id", "businessNumber", "name", "email", "ceoName", "address",
             "phoneNumber", "landlineNumber", "contactName", "contactPositionAndDepartment",
             "contactLandlineNumberAndEmail", "userName", "isActive", "createdAtAndUpdatedAt",
-            "hasFile", "memo"
-    );
+            "hasFile", "memo");
 }
