@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
-import com.lineinc.erp.api.server.domain.client.service.CompanyService;
-import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteRequest;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
@@ -135,35 +133,21 @@ public class Site extends BaseEntity {
         this.endedAtFormat = this.endedAt != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.endedAt) : null;
     }
 
-    public void updateFrom(UpdateSiteRequest request, UserService userService, CompanyService companyService) {
+    public void updateFrom(UpdateSiteRequest request, User user, ClientCompany clientCompany) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
         Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
         Optional.ofNullable(request.city()).ifPresent(val -> this.city = val);
         Optional.ofNullable(request.district()).ifPresent(val -> this.district = val);
         Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
-        Optional.ofNullable(request.startedAt())
-                .map(DateTimeFormatUtils::toOffsetDateTime)
+        Optional.ofNullable(request.startedAt()).map(DateTimeFormatUtils::toOffsetDateTime)
                 .ifPresent(val -> this.startedAt = val);
-        Optional.ofNullable(request.endedAt())
-                .map(DateTimeFormatUtils::toOffsetDateTime)
+        Optional.ofNullable(request.endedAt()).map(DateTimeFormatUtils::toOffsetDateTime)
                 .ifPresent(val -> this.endedAt = val);
         Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(request.userId())
-                .map(userService::getUserByIdOrThrow)
-                .ifPresent(this::changeUser);
-        Optional.ofNullable(request.clientCompanyId())
-                .map(companyService::getClientCompanyByIdOrThrow)
-                .ifPresent(this::changeClientCompany);
+        Optional.ofNullable(user).ifPresent(val -> this.user = val);
+        Optional.ofNullable(clientCompany).ifPresent(val -> this.clientCompany = val);
         syncTransientFields();
-    }
-
-    public void changeUser(User user) {
-        this.user = user;
-    }
-
-    public void changeClientCompany(ClientCompany clientCompany) {
-        this.clientCompany = clientCompany;
     }
 }

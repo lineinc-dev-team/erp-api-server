@@ -214,7 +214,8 @@ public class SiteService {
         site.syncTransientFields();
         Site oldSnapshot = JaversUtils.createSnapshot(javers, site, Site.class);
 
-        site.updateFrom(request, userService, companyService);
+        site.updateFrom(request, userService.getUserByIdOrThrow(request.userId()),
+                companyService.getClientCompanyByIdOrThrow(request.clientCompanyId()));
         siteRepository.save(site);
 
         Diff diff = javers.compare(oldSnapshot, site);
