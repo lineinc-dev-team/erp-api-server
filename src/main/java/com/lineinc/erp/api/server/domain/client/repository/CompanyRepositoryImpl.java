@@ -114,8 +114,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         }
         if (StringUtils.hasText(request.email())) {
             builder.and(
-                    clientCompany.contacts.any().email.containsIgnoreCase(request.email().trim())
-                            .and(clientCompany.contacts.any().isMain.isTrue()));
+                    clientCompany.email.containsIgnoreCase(request.email().trim()));
         }
         if (StringUtils.hasText(request.phoneNumber())) {
             builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
