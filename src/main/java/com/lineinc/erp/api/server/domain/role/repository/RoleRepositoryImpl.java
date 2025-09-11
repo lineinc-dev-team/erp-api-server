@@ -154,26 +154,29 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                 .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
                 .leftJoin(roleSiteProcess.site, site).fetchJoin()
                 .leftJoin(roleSiteProcess.process, process).fetchJoin()
-                .where(role.id.in(roleIds)
-                        .and(role.deleted.eq(false))
-                        .and(site.deleted.eq(false).or(site.isNull()))
-                        .and(process.deleted.eq(false).or(process.isNull())))
+                .where(role.id.in(roleIds).and(role.deleted.eq(false)))
                 .orderBy(orders)
                 .fetch();
     }
 
     private long fetchTotalCount(QRole role, QUser user, BooleanExpression whereCondition) {
-        Long totalCount = queryFactory
-                .select(role.countDistinct())
-                .from(role)
-                .leftJoin(role.userRoles, QUserRole.userRole)
-                .leftJoin(QUserRole.userRole.user, user)
-                .leftJoin(role.siteProcesses, QRoleSiteProcess.roleSiteProcess)
-                .leftJoin(QRoleSiteProcess.roleSiteProcess.site, QSite.site)
-                .where(whereCondition)
-                .fetchOne();
-
-        return Objects.requireNonNullElse(totalCount, 0L);
+        // 사용자 검색 조건이 있으면 사용자 조인, 없으면 롤만 조회
+        if (whereCondition.toString().contains("user")) {
+            return queryFactory
+                    .select(role.countDistinct())
+                    .from(role)
+                    .leftJoin(role.userRoles, QUserRole.userRole)
+                    .leftJoin(QUserRole.userRole.user, user)
+                    .where(whereCondition)
+                    .fetchOne();
+        } else {
+            // 사용자 검색 조건이 없으면 롤만 조회
+            return queryFactory
+                    .select(role.count())
+                    .from(role)
+                    .where(whereCondition)
+                    .fetchOne();
+        }
     }
 
     private List<RoleUserListResponse> fetchUsersByRole(QUser user, QRole role, QUserRole userRole,
