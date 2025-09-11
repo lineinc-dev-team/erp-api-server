@@ -145,7 +145,8 @@ public class DailyReportService {
                 Labor labor;
                 // 임시 인력인 경우 새로운 인력을 생성
                 if (Boolean.TRUE.equals(directContractRequest.isTemporary())) {
-                    labor = createTemporaryLabor(directContractRequest);
+                    labor = createTemporaryLabor(directContractRequest.temporaryLaborName(),
+                            directContractRequest.unitPrice());
                 } else {
                     // 기존 인력 검색
                     labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
@@ -626,20 +627,30 @@ public class DailyReportService {
                 dailyReport.getDirectContracts(),
                 request.directContracts(),
                 (DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo dto) -> {
-                    Labor labor = laborService.getLaborByIdOrThrow(dto.laborId());
+                    Labor labor;
+                    // 임시 인력인 경우 새로운 인력을 생성
+                    if (Boolean.TRUE.equals(dto.isTemporary())) {
+                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice());
+                    } else {
+                        // 기존 인력 검색
+                        labor = laborService.getLaborByIdOrThrow(dto.laborId());
 
-                    // 직영/계약직 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
-                    if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.ETC) {
-                        throw new IllegalArgumentException(
-                                ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
+                        // 직영/계약직 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
+                        if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.ETC) {
+                            throw new IllegalArgumentException(
+                                    ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
+                        }
+
+                        labor.updatePreviousDailyWage(dto.unitPrice());
                     }
 
-                    labor.updatePreviousDailyWage(dto.unitPrice());
+                    OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
+                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                            : null;
 
                     return DailyReportDirectContract.builder()
                             .dailyReport(dailyReport)
-                            .outsourcingCompany(outsourcingCompanyService
-                                    .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
+                            .outsourcingCompany(outsourcingCompany)
                             .labor(labor)
                             .position(dto.position())
                             .workContent(dto.workContent())
@@ -1015,21 +1026,21 @@ public class DailyReportService {
     }
 
     /**
-     * 임시 인력을 생성합니다.
+     * 임시 인력 생성 메서드
      */
-    private Labor createTemporaryLabor(DailyReportDirectContractCreateRequest request) {
+    private Labor createTemporaryLabor(String temporaryLaborName, Long unitPrice) {
         // 임시 인력 이름이 필수
-        if (request.temporaryLaborName() == null || request.temporaryLaborName().trim().isEmpty()) {
+        if (temporaryLaborName == null || temporaryLaborName.trim().isEmpty()) {
             throw new IllegalArgumentException(ValidationMessages.TEMPORARY_LABOR_NAME_REQUIRED);
         }
 
         // 임시 인력 생성
         Labor temporaryLabor = Labor.builder()
-                .name(request.temporaryLaborName())
+                .name(temporaryLaborName)
                 .type(LaborType.DIRECT_CONTRACT)
                 .isTemporary(true)
                 .isHeadOffice(true)
-                .dailyWage(request.unitPrice())
+                .dailyWage(unitPrice)
                 .build();
 
         return laborRepository.save(temporaryLabor);
