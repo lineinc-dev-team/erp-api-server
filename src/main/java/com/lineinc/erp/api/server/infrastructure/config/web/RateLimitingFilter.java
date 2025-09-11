@@ -17,7 +17,7 @@ import java.io.IOException;
 
 /**
  * Rate Limiting 필터
- * - 로그인된 사용자: 사용자별 제한 (1분당 200개)
+ * - 로그인된 사용자: 사용자별 제한 (1분당 300개)
  * - 비로그인 사용자: IP별 제한 (1분당 50개)
  * - 과도한 요청 시 429 Too Many Requests 응답
  */
@@ -29,7 +29,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private final RateLimitService rateLimitService;
 
     // Rate Limiting 설정
-    private static final int AUTHENTICATED_REQUESTS_PER_MINUTE = 200; // 로그인 사용자: 1분당 최대 요청 수
+    private static final int AUTHENTICATED_REQUESTS_PER_MINUTE = 300; // 로그인 사용자: 1분당 최대 요청 수
     private static final int ANONYMOUS_REQUESTS_PER_MINUTE = 50; // 비로그인 사용자: 1분당 최대 요청 수
     private static final int TIME_WINDOW_SECONDS = 60; // 시간 윈도우 (초)
 
