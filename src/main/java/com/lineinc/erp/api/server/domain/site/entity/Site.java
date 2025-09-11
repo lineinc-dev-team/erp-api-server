@@ -27,7 +27,9 @@ import java.util.List;
         @Index(columnList = "district"),
         @Index(columnList = "type"),
         @Index(columnList = "started_at"),
-        @Index(columnList = "ended_at")
+        @Index(columnList = "ended_at"),
+        @Index(columnList = "created_at"),
+        @Index(columnList = "created_by"),
 })
 @Entity
 @Getter
