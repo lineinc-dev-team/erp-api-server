@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
@@ -23,6 +24,8 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 @SuperBuilder
 @Table(indexes = {
         @Index(columnList = "name"),
+        @Index(columnList = "ceo_name"),
+        @Index(columnList = "email"),
         @Index(columnList = "business_number"),
         @Index(columnList = "type"),
         @Index(columnList = "landline_number"),
@@ -145,44 +148,37 @@ public class OutsourcingCompany extends BaseEntity {
     }
 
     public void updateFrom(OutsourcingCompanyUpdateRequest request) {
-        java.util.Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        java.util.Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
-        java.util.Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
-        java.util.Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
-        java.util.Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
-        java.util.Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
-        java.util.Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
-        java.util.Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
-        java.util.Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
-        java.util.Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-        java.util.Optional.ofNullable(request.defaultDeductions()).ifPresent(val -> this.defaultDeductions = val);
-        java.util.Optional.ofNullable(request.defaultDeductionsDescription())
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
+        Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
+        Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
+        Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
+        Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
+        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
+        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
+        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
+        Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
+        Optional.ofNullable(request.defaultDeductions()).ifPresent(val -> this.defaultDeductions = val);
+        Optional.ofNullable(request.defaultDeductionsDescription())
                 .ifPresent(val -> this.defaultDeductionsDescription = val);
-        java.util.Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
-        java.util.Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
-        java.util.Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
-        java.util.Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
+        Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
+        Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         syncTransientFields();
     }
 
     /**
-     * 관리비에서 사용하는 기본 정보를 업데이트합니다.
+     * 외주업체 기본 정보를 업데이트합니다.
      */
-    public void updateBasicInfo(String name, String businessNumber, String ceoName,
+    public void updateOutsourcingCompanyInfo(String name, String businessNumber, String ceoName,
             String bankName, String accountNumber, String accountHolder, String memo) {
-        if (name != null)
-            this.name = name;
-        if (businessNumber != null)
-            this.businessNumber = businessNumber;
-        if (ceoName != null)
-            this.ceoName = ceoName;
-        if (bankName != null)
-            this.bankName = bankName;
-        if (accountNumber != null)
-            this.accountNumber = accountNumber;
-        if (accountHolder != null)
-            this.accountHolder = accountHolder;
-        if (memo != null)
-            this.memo = memo;
+        Optional.ofNullable(name).ifPresent(val -> this.name = val);
+        Optional.ofNullable(businessNumber).ifPresent(val -> this.businessNumber = val);
+        Optional.ofNullable(ceoName).ifPresent(val -> this.ceoName = val);
+        Optional.ofNullable(bankName).ifPresent(val -> this.bankName = val);
+        Optional.ofNullable(accountNumber).ifPresent(val -> this.accountNumber = val);
+        Optional.ofNullable(accountHolder).ifPresent(val -> this.accountHolder = val);
+        Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
     }
 }

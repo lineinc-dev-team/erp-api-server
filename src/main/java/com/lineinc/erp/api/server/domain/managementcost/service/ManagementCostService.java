@@ -132,7 +132,7 @@ public class ManagementCostService {
 
             if (outsourcingCompanyInfo != null) {
                 // 외주업체 기본 정보 직접 업데이트
-                outsourcingCompany.updateBasicInfo(
+                outsourcingCompany.updateOutsourcingCompanyInfo(
                         outsourcingCompanyInfo.name(),
                         outsourcingCompanyInfo.businessNumber(),
                         outsourcingCompanyInfo.ceoName(),

@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.outsourcing.repository;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyC
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
@@ -131,22 +133,13 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
         }
 
         if (request.createdStartDate() != null) {
-            // atOffset(AppConstants.KOREA_ZONE_OFFSET)는 LocalDateTime → OffsetDateTime 변환
-            // (KST 기준)
-            // goe는 Greater or Equal의 약자로 '이상' 조건을 뜻함
-            builder.and(outsourcingCompany.createdAt.goe(
-                    request.createdStartDate()
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
+            builder.and(outsourcingCompany.createdAt.goe(dateRange[0]));
         }
 
         if (request.createdEndDate() != null) {
-            // lt는 Less Than의 약자로 '미만' 조건을 뜻함
-            builder.and(outsourcingCompany.createdAt.lt(
-                    request.createdEndDate()
-                            .plusDays(1) // endDate에 하루 더해 다음 날 00시로 만듦 (범위 포함 위해)
-                            .atStartOfDay()
-                            .atOffset(AppConstants.KOREA_ZONE_OFFSET)));
+            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
+            builder.and(outsourcingCompany.createdAt.lt(dateRange[1]));
         }
 
         return builder;
