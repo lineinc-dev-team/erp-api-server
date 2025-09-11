@@ -61,6 +61,7 @@ public record ClientCompanyResponse(
                                 .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty()),
                 clientCompany.getMemo(),
                 clientCompany.getContacts().stream()
+                        .filter(contact -> contact.getIsMain())
                         .map(ClientCompanyContactResponse::from)
                         .collect(Collectors.toList()),
                 clientCompany.getUser() != null ? UserResponse.UserSimpleResponse.from(clientCompany.getUser()) : null);
