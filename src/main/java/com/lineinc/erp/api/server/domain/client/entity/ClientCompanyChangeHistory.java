@@ -11,7 +11,6 @@ import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "type"),
         @Index(columnList = "createdAt"),
 })
 @Getter
