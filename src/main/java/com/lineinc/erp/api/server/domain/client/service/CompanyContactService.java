@@ -4,7 +4,7 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactCreateRequest;
@@ -130,7 +130,7 @@ public class CompanyContactService {
             String json = javers.getJsonConverter().toJson(allChanges);
             ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .type(ChangeType.CONTACT)
+                    .type(ClientCompanyChangeHistoryChangeType.CONTACT)
                     .changes(json)
                     .build();
             companyChangeHistoryRepository.save(history);

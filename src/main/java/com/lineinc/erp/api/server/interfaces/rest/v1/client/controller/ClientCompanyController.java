@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.client.enums.FileType;
-import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
@@ -179,7 +179,7 @@ public class ClientCompanyController {
     @Operation(summary = "결제 수단 목록 조회", description = "결제 수단 목록을 반환합니다")
     @GetMapping("/payment-methods")
     public ResponseEntity<SuccessResponse<List<ClientCompanyPaymentMethodResponse>>> getPaymentMethods() {
-        List<ClientCompanyPaymentMethodResponse> responseList = Arrays.stream(PaymentMethod.values())
+        List<ClientCompanyPaymentMethodResponse> responseList = Arrays.stream(ClientCompanyPaymentMethod.values())
                 .map(pm -> new ClientCompanyPaymentMethodResponse(
                         pm.name(), pm.getDisplayName()))
                 .collect(Collectors.toList());
@@ -189,7 +189,7 @@ public class ClientCompanyController {
     @Operation(summary = "발주처 파일 타입 목록 조회", description = "발주처 파일 타입 목록을 반환합니다")
     @GetMapping("/file-types")
     public ResponseEntity<SuccessResponse<List<ClientCompanyFileTypeResponse>>> getFileTypes() {
-        List<ClientCompanyFileTypeResponse> responseList = Arrays.stream(FileType.values())
+        List<ClientCompanyFileTypeResponse> responseList = Arrays.stream(ClientCompanyFileType.values())
                 .map(ClientCompanyFileTypeResponse::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(SuccessResponse.of(responseList));

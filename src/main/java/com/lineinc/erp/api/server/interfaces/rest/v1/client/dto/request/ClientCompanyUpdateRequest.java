@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request;
 
 import com.lineinc.erp.api.server.shared.validation.MultiConstraint;
 import com.lineinc.erp.api.server.shared.validation.ValidatorType;
-import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -28,7 +28,7 @@ public record ClientCompanyUpdateRequest(
 
         @Email @Schema(description = "이메일", example = "example@samsung.com") @NotBlank String email,
 
-        @Schema(description = "결제 방식", example = "CASH") @NotNull PaymentMethod paymentMethod,
+        @Schema(description = "결제 방식", example = "CASH") @NotNull ClientCompanyPaymentMethod paymentMethod,
 
         @Schema(description = "결제 유예 기간", example = "2") @NotBlank String paymentPeriod,
 

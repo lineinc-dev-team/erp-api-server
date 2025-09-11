@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
@@ -71,7 +71,7 @@ public class ClientCompany extends BaseEntity {
     @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
-    private PaymentMethod paymentMethod;
+    private ClientCompanyPaymentMethod paymentMethod;
 
     /**
      * 결제 유예 기간

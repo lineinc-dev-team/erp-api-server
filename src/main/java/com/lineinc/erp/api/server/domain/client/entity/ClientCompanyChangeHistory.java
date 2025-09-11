@@ -1,12 +1,11 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 @Entity
@@ -17,7 +16,6 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class ClientCompanyChangeHistory extends BaseEntity {
 
     @Id
@@ -31,7 +29,7 @@ public class ClientCompanyChangeHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private ChangeType type;
+    private ClientCompanyChangeHistoryChangeType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")

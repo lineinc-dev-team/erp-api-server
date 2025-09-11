@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
@@ -128,7 +128,7 @@ public class CompanyService {
         if (!simpleChanges.isEmpty()) {
             ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .type(ChangeType.BASIC)
+                    .type(ClientCompanyChangeHistoryChangeType.BASIC)
                     .changes(changesJson)
                     .build();
             companyChangeHistoryRepository.save(changeHistory);

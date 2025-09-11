@@ -6,7 +6,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
-import com.lineinc.erp.api.server.domain.client.enums.FileType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 
@@ -79,7 +79,7 @@ public class ClientCompanyFile extends BaseEntity {
      */
     @Enumerated(EnumType.STRING)
     @Column
-    private FileType type;
+    private ClientCompanyFileType type;
 
     /**
      * 파일에 대한 비고 또는 설명

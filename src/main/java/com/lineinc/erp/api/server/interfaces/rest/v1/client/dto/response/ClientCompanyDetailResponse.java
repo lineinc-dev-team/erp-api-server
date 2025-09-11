@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.enums.PaymentMethod;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -32,7 +32,7 @@ public record ClientCompanyDetailResponse(
 
         @Schema(description = "결제 방식", example = "현금") String paymentMethod,
 
-        @Schema(description = "결제 방식 코드", example = "CASH") PaymentMethod paymentMethodCode,
+        @Schema(description = "결제 방식 코드", example = "CASH") ClientCompanyPaymentMethod paymentMethodCode,
 
         @Schema(description = "결제 유예 기간", example = "2") String paymentPeriod,
 

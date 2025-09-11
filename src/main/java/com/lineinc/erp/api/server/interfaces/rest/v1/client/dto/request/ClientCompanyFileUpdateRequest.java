@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request;
 
-import com.lineinc.erp.api.server.domain.client.enums.FileType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
 import com.lineinc.erp.api.server.shared.validation.MultiConstraint;
 import com.lineinc.erp.api.server.shared.validation.ValidatorType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +16,7 @@ public record ClientCompanyFileUpdateRequest(
 
         @Schema(description = "원본 파일명", example = "contract_2024.pdf") String originalFileName,
 
-        @Schema(description = "파일 타입", example = "BUSINESS_LICENSE") @NotNull FileType type,
+        @Schema(description = "파일 타입", example = "BUSINESS_LICENSE") @NotNull ClientCompanyFileType type,
 
         @Schema(description = "파일에 대한 메모", example = "계약서 사본") String memo) {
 }

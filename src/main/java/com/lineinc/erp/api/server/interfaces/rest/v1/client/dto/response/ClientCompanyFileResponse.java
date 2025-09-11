@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
-import com.lineinc.erp.api.server.domain.client.enums.FileType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
 
 @Schema(description = "발주처 파일 정보 응답")
 public record ClientCompanyFileResponse(
@@ -20,7 +20,7 @@ public record ClientCompanyFileResponse(
 
         @Schema(description = "파일 타입", example = "사업자등록증") String type,
 
-        @Schema(description = "파일 타입 코드", example = "BUSINESS_LICENSE") FileType typeCode,
+        @Schema(description = "파일 타입 코드", example = "BUSINESS_LICENSE") ClientCompanyFileType typeCode,
 
         @Schema(description = "비고", example = "2023년 변경된 사업자등록증") String memo,
 

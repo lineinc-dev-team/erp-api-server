@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.domain.client.service;
 
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 
 import org.javers.core.Javers;
@@ -97,7 +97,7 @@ public class CompanyFileService {
             String json = javers.getJsonConverter().toJson(allChanges);
             ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
-                    .type(ChangeType.ATTACHMENT)
+                    .type(ClientCompanyChangeHistoryChangeType.ATTACHMENT)
                     .changes(json)
                     .build();
             companyChangeHistoryRepository.save(history);
