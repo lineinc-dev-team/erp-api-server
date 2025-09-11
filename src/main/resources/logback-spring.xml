@@ -32,10 +32,10 @@
             <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 개별 파일 최대 크기: 100MB 초과 시 새 파일 생성 -->
             <maxFileSize>100MB</maxFileSize>
-            <!-- 보관 기간: 30일간 보관 -->
-            <maxHistory>30</maxHistory>
-            <!-- 전체 로그 파일 크기 제한: 5GB 초과 시 오래된 파일 자동 삭제 -->
-            <totalSizeCap>5GB</totalSizeCap>
+            <!-- 보관 기간: 7일간 보관 -->
+            <maxHistory>7</maxHistory>
+            <!-- 전체 로그 파일 크기 제한: 1GB 초과 시 오래된 파일 자동 삭제 -->
+            <totalSizeCap>1GB</totalSizeCap>
             <!-- 애플리케이션 시작 시 오래된 로그 파일 정리 -->
             <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
@@ -59,9 +59,9 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <!-- 에러 로그는 전체 크기를 2GB로 제한 -->
-            <totalSizeCap>2GB</totalSizeCap>
+            <maxHistory>7</maxHistory>
+            <!-- 에러 로그는 전체 크기를 500MB로 제한 -->
+            <totalSizeCap>500MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
