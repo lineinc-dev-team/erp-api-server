@@ -42,8 +42,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.TypeDescriptionResponse;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,11 +56,9 @@ import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.web.bind.annotation.PathVariable;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollHistoryResponse;
 import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
