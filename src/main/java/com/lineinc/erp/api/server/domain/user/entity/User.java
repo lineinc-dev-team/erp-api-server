@@ -155,6 +155,18 @@ public class User extends BaseEntity implements UserDetails {
         }
     }
 
+    public boolean hasRoles() {
+        return this.userRoles != null && !this.userRoles.isEmpty();
+    }
+
+    public boolean hasGlobalSiteProcessAccess() {
+        if (!hasRoles()) {
+            return false;
+        }
+        return this.userRoles.stream()
+                .anyMatch(role -> role.getRole().isHasGlobalSiteProcessAccess());
+    }
+
     public void syncTransientFields() {
         this.departmentName = Optional.ofNullable(this.department)
                 .map(Department::getName)
