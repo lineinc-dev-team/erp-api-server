@@ -160,6 +160,7 @@ public class LaborService {
                 labor.getDailyWage(),
                 labor.getPreviousDailyWage(),
                 labor.getType().getLabel(),
+                labor.getIsTemporary(),
                 labor.getType()));
     }
 

@@ -12,6 +12,7 @@ public record LaborNameResponse(
         @Schema(description = "기준일당", example = "100000") Long dailyWage,
         @Schema(description = "이전단가", example = "95000") Long previousDailyWage,
         @Schema(description = "노무인력 유형", example = "정직원") String type,
+        @Schema(description = "임시 인력 여부", example = "false") Boolean isTemporary,
         @Schema(description = "노무인력 유형 코드", example = "REGULAR_EMPLOYEE") LaborType typeCode) {
 
     public static LaborNameResponse from(Labor labor) {
@@ -21,6 +22,7 @@ public record LaborNameResponse(
                 labor.getDailyWage(),
                 labor.getPreviousDailyWage(),
                 labor.getType() != null ? labor.getType().getLabel() : null,
+                labor.getIsTemporary(),
                 labor.getType());
     }
 }
