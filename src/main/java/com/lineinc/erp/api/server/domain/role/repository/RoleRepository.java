@@ -62,8 +62,6 @@ public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositor
             LEFT JOIN FETCH rsp.process sp
             WHERE r.id = :roleId
             AND r.deleted = false
-            AND (s.deleted = false OR s IS NULL)
-            AND (sp.deleted = false OR sp IS NULL)
             """)
     Optional<Role> findRoleWithDetails(@Param("roleId") Long roleId);
 

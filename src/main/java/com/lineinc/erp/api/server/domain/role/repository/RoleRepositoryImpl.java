@@ -45,30 +45,23 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
 
     @Override
     public Page<RolesResponse> findAll(UserWithRolesListRequest request, Pageable pageable) {
+        String search = extractSearchTerm(request);
+        boolean hasUserSearch = isValidSearchTerm(search);
+
         QRole role = QRole.role;
         QUser user = QUser.user;
-        QRoleSiteProcess roleSiteProcess = QRoleSiteProcess.roleSiteProcess;
-        QSite site = QSite.site;
-        QSiteProcess process = QSiteProcess.siteProcess;
 
-        String search = extractSearchTerm(request);
         BooleanExpression whereCondition = buildWhereCondition(role, user, search);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        // 1단계: 페이징된 ID 목록 조회
-        List<Long> roleIds = fetchRoleIds(role, user, whereCondition, orders, pageable);
+        // 단일 쿼리로 데이터와 카운트 조회
+        List<Role> content = fetchRolesWithDetails(role, user, whereCondition, orders, pageable, hasUserSearch);
+        long total = fetchTotalCount(role, user, whereCondition, hasUserSearch);
 
-        // 2단계: ID로 상세 정보 조회
-        List<Role> content = fetchRoleDetails(role, user, roleSiteProcess, site, process, roleIds, orders);
-
-        // 3단계: 총 개수 조회
-        long total = fetchTotalCount(role, user, whereCondition);
-
-        List<RolesResponse> responses = content.stream()
-                .map(RolesResponse::from)
-                .toList();
-
-        return new PageImpl<>(responses, pageable, total);
+        return new PageImpl<>(
+                content.stream().map(RolesResponse::from).toList(),
+                pageable,
+                total);
     }
 
     @Override
@@ -85,9 +78,14 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
-    // 헬퍼 메서드들
+    // ===== 헬퍼 메서드들 =====
+
     private String extractSearchTerm(UserWithRolesListRequest request) {
         return request != null ? request.userSearch() : null;
+    }
+
+    private boolean isValidSearchTerm(String search) {
+        return search != null && !search.trim().isEmpty();
     }
 
     private BooleanExpression buildWhereCondition(QRole role, QUser user, String search) {
@@ -117,25 +115,33 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         return baseCondition.and(searchCondition);
     }
 
-    private List<Long> fetchRoleIds(QRole role, QUser user, BooleanExpression whereCondition,
-            OrderSpecifier<?>[] orders, Pageable pageable) {
-        // 검색 조건이 있는 경우에만 user 조인, 없으면 role만 조회
-        if (whereCondition.toString().contains("user")) {
+    private List<Role> fetchRolesWithDetails(QRole role, QUser user, BooleanExpression whereCondition,
+            OrderSpecifier<?>[] orders, Pageable pageable, boolean hasUserSearch) {
+        QRoleSiteProcess roleSiteProcess = QRoleSiteProcess.roleSiteProcess;
+        QSite site = QSite.site;
+        QSiteProcess process = QSiteProcess.siteProcess;
+
+        if (hasUserSearch) {
             return queryFactory
-                    .select(role.id)
-                    .from(role)
-                    .leftJoin(role.userRoles, QUserRole.userRole)
-                    .leftJoin(QUserRole.userRole.user, user)
+                    .selectFrom(role)
+                    .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
+                    .leftJoin(QUserRole.userRole.user, user).fetchJoin()
+                    .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
+                    .leftJoin(roleSiteProcess.site, site).fetchJoin()
+                    .leftJoin(roleSiteProcess.process, process).fetchJoin()
                     .where(whereCondition)
                     .orderBy(orders)
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
                     .fetch();
         } else {
-            // 사용자 검색 조건이 없으면 역할만 조회 (사용자 조인 없이)
             return queryFactory
-                    .select(role.id)
-                    .from(role)
+                    .selectFrom(role)
+                    .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
+                    .leftJoin(QUserRole.userRole.user, user).fetchJoin()
+                    .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
+                    .leftJoin(roleSiteProcess.site, site).fetchJoin()
+                    .leftJoin(roleSiteProcess.process, process).fetchJoin()
                     .where(whereCondition)
                     .orderBy(orders)
                     .offset(pageable.getOffset())
@@ -144,24 +150,8 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
         }
     }
 
-    private List<Role> fetchRoleDetails(QRole role, QUser user, QRoleSiteProcess roleSiteProcess,
-            QSite site, QSiteProcess process, List<Long> roleIds,
-            OrderSpecifier<?>[] orders) {
-        return queryFactory
-                .selectFrom(role)
-                .leftJoin(role.userRoles, QUserRole.userRole).fetchJoin()
-                .leftJoin(QUserRole.userRole.user, user).fetchJoin()
-                .leftJoin(role.siteProcesses, roleSiteProcess).fetchJoin()
-                .leftJoin(roleSiteProcess.site, site).fetchJoin()
-                .leftJoin(roleSiteProcess.process, process).fetchJoin()
-                .where(role.id.in(roleIds).and(role.deleted.eq(false)))
-                .orderBy(orders)
-                .fetch();
-    }
-
-    private long fetchTotalCount(QRole role, QUser user, BooleanExpression whereCondition) {
-        // 사용자 검색 조건이 있으면 사용자 조인, 없으면 롤만 조회
-        if (whereCondition.toString().contains("user")) {
+    private long fetchTotalCount(QRole role, QUser user, BooleanExpression whereCondition, boolean hasUserSearch) {
+        if (hasUserSearch) {
             return queryFactory
                     .select(role.countDistinct())
                     .from(role)
@@ -170,7 +160,6 @@ public class RoleRepositoryImpl implements RoleRepositoryCustom {
                     .where(whereCondition)
                     .fetchOne();
         } else {
-            // 사용자 검색 조건이 없으면 롤만 조회
             return queryFactory
                     .select(role.count())
                     .from(role)
