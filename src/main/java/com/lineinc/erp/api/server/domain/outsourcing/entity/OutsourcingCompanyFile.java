@@ -39,7 +39,6 @@ import lombok.experimental.SuperBuilder;
 @Table(indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "original_file_name"),
-        @Index(columnList = "type"),
         @Index(columnList = "created_at")
 })
 public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<OutsourcingCompanyFileUpdateRequest> {

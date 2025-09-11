@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Schema(description = "외주업체 상세 응답")
+@Schema(description = "외주업체 목록 응답")
 public record CompanyResponse(
         @Schema(description = "ID", example = "1") Long id,
 
@@ -80,6 +80,7 @@ public record CompanyResponse(
                 company.getFiles().stream()
                         .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().isBlank()),
                 company.getContacts().stream()
+                        .filter(contact -> contact.getIsMain())
                         .map(CompanyContactResponse::from)
                         .toList());
 
