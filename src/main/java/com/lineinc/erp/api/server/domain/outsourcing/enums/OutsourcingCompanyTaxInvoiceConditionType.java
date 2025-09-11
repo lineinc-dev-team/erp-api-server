@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.domain.outsourcing.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum OutsourcingCompanyTaxInvoiceConditionType {
     MONTH_END("월말일괄"),
     QUARTERLY("분기"),
@@ -10,7 +12,4 @@ public enum OutsourcingCompanyTaxInvoiceConditionType {
 
     private final String label;
 
-    OutsourcingCompanyTaxInvoiceConditionType(String label) {
-        this.label = label;
-    }
 }
