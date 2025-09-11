@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.domain.site.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum SiteFileType {
     CONTRACT("계약서"),
     DRAWING("현장도면"),
@@ -12,7 +14,4 @@ public enum SiteFileType {
 
     private final String label;
 
-    SiteFileType(String label) {
-        this.label = label;
-    }
 }
