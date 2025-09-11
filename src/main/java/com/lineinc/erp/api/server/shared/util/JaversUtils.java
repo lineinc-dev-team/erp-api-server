@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.shared.util;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -113,14 +115,8 @@ public class JaversUtils {
                         return null;
                     }
 
-                    // 일반 수정 변경
+                    // 수정 변경
                     String propertyName = vc.getPropertyName();
-
-                    // 노무명세서의 경우 인력 이름을 포함하여 표시
-                    Object affectedObject = vc.getAffectedObject();
-                    if (affectedObject instanceof Optional<?> optional) {
-                        affectedObject = optional.orElse(null);
-                    }
 
                     return Map.of(
                             "property", propertyName,
@@ -188,12 +184,17 @@ public class JaversUtils {
     private static String toJsonSafe(Javers javers, Object obj) {
         if (obj == null)
             return "";
-        if (obj instanceof String || obj instanceof Boolean || obj instanceof Character)
+        if (obj instanceof String || obj instanceof Boolean || obj instanceof Character) {
             return obj.toString();
+        }
         if (obj instanceof Number) {
-            // BigDecimal의 경우 소수점 자릿수를 정규화하여 동일한 값 비교 가능하도록 함
-            if (obj instanceof java.math.BigDecimal) {
-                return ((java.math.BigDecimal) obj).stripTrailingZeros().toPlainString();
+            if (obj instanceof BigDecimal) {
+                return ((BigDecimal) obj).stripTrailingZeros().toPlainString();
+            }
+            // 4자리 이상 정수에만 천 단위 구분자 추가
+            double value = ((Number) obj).doubleValue();
+            if (value >= 1000 && value == Math.floor(value)) {
+                return NumberFormat.getNumberInstance().format((long) value);
             }
             return obj.toString();
         }
