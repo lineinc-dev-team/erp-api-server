@@ -3,9 +3,12 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.controller
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.respons
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.WorkTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollHistoryResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -248,8 +252,14 @@ public class LaborController {
     })
     @GetMapping("/{id}/payrolls")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<List<LaborPayrollHistoryResponse>>> getLaborPayrolls(@PathVariable Long id) {
-        List<LaborPayrollHistoryResponse> payrolls = laborPayrollService.getLaborPayrollsByLaborId(id);
-        return ResponseEntity.ok(SuccessResponse.of(payrolls));
+    public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollHistoryResponse>>> getLaborPayrolls(
+            @PathVariable Long id,
+            @ModelAttribute PageRequest pageRequest) {
+
+        Page<LaborPayrollHistoryResponse> page = laborPayrollService.getLaborPayrollsByLaborId(id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 }

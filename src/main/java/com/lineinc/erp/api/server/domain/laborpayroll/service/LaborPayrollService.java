@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -339,6 +340,22 @@ public class LaborPayrollService {
         return laborPayrolls.stream()
                 .map(LaborPayrollHistoryResponse::from)
                 .toList();
+    }
+
+    /**
+     * 노무인력 ID로 명세서 이력 조회 (페이징)
+     * 특정 노무인력의 명세서를 페이징하여 조회 (연월, 현장, 공정 정보 포함)
+     */
+    @Transactional(readOnly = true)
+    public Page<LaborPayrollHistoryResponse> getLaborPayrollsByLaborId(Long laborId, Pageable pageable) {
+        Page<LaborPayroll> laborPayrollsPage = laborPayrollRepository.findByLaborIdOrderByYearMonthDesc(laborId,
+                pageable);
+
+        List<LaborPayrollHistoryResponse> responses = laborPayrollsPage.getContent().stream()
+                .map(LaborPayrollHistoryResponse::from)
+                .toList();
+
+        return new PageImpl<>(responses, pageable, laborPayrollsPage.getTotalElements());
     }
 
     /**

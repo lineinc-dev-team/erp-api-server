@@ -3,6 +3,8 @@ package com.lineinc.erp.api.server.domain.laborpayroll.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,6 +25,11 @@ public interface LaborPayrollRepository extends JpaRepository<LaborPayroll, Long
      * 특정 인력의 모든 노무비 명세서 조회 (연월 기준 내림차순)
      */
     List<LaborPayroll> findByLaborIdOrderByYearMonthDesc(Long laborId);
+
+    /**
+     * 특정 인력의 노무비 명세서 조회 (페이징, 연월 기준 내림차순)
+     */
+    Page<LaborPayroll> findByLaborIdOrderByYearMonthDesc(Long laborId, Pageable pageable);
 
     /**
      * 특정 인력과 년월의 노무비 명세서 조회
