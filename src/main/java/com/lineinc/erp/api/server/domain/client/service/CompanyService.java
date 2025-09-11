@@ -20,7 +20,6 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistor
 import com.lineinc.erp.api.server.domain.client.enums.ChangeType;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
-import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
@@ -47,7 +46,6 @@ public class CompanyService {
     private final UserService userService;
     private final Javers javers;
     private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
-    private final UserRepository userRepository;
 
     @Transactional
     public void createClientCompany(ClientCompanyCreateRequest request) {
