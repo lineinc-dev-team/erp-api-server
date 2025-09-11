@@ -80,20 +80,8 @@ public class SiteProcessService {
     @Transactional(readOnly = true)
     public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(Long siteId, String keyword,
             Pageable pageable) {
-        Slice<SiteProcess> siteProcessesSlice;
-
-        boolean hasKeyword = keyword != null && !keyword.isBlank();
-
-        if (siteId != null) {
-            siteProcessesSlice = hasKeyword
-                    ? siteProcessRepository.findByNameContainingIgnoreCase(keyword, pageable)
-                    : siteProcessRepository.findBySiteId(siteId, pageable);
-        } else {
-            siteProcessesSlice = hasKeyword
-                    ? siteProcessRepository.findByNameContainingIgnoreCase(keyword, pageable)
-                    : siteProcessRepository.findAllBy(pageable);
-        }
-
-        return siteProcessesSlice.map(SiteProcessResponse.SiteProcessSimpleResponse::from);
+        String searchKeyword = (keyword != null && !keyword.isBlank()) ? keyword : null;
+        return siteProcessRepository.findBySiteIdAndKeyword(siteId, searchKeyword, pageable)
+                .map(SiteProcessResponse.SiteProcessSimpleResponse::from);
     }
 }
