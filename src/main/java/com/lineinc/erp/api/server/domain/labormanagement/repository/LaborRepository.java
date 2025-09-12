@@ -51,26 +51,13 @@ public interface LaborRepository extends JpaRepository<Labor, Long>, LaborReposi
             @Param("keyword") String keyword, Pageable pageable);
 
     /**
-     * 모든 인력 정보를 페이지네이션으로 조회
+     * 인력 정보를 페이지네이션으로 조회합니다.
+     * 이름이 제공되면 해당 이름으로 검색하고, 노무인력 유형이 제공되면 해당 유형으로 필터링합니다.
      */
-    Slice<Labor> findAllBy(Pageable pageable);
-
-    /**
-     * 이름으로 키워드 검색하여 인력 정보를 페이지네이션으로 조회
-     */
-    Slice<Labor> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
-    /**
-     * 특정 노무인력 유형으로 인력 정보를 페이지네이션으로 조회
-     */
-    @Query("SELECT l FROM Labor l WHERE l.deleted = false AND (:types IS NULL OR l.type IN :types)")
-    Slice<Labor> findAllByType(@Param("types") List<LaborType> types, Pageable pageable);
-
-    /**
-     * 이름으로 키워드 검색하고 특정 노무인력 유형으로 필터링하여 인력 정보를 페이지네이션으로 조회
-     */
-    @Query("SELECT l FROM Labor l WHERE l.deleted = false AND l.name LIKE %:name% AND (:types IS NULL OR l.type IN :types)")
-    Slice<Labor> findByNameContainingIgnoreCaseAndType(@Param("name") String name,
+    @Query("SELECT l FROM Labor l WHERE l.deleted = false " +
+            "AND (:name IS NULL OR l.name LIKE %:name%) " +
+            "AND (:types IS NULL OR l.type IN :types)")
+    Slice<Labor> findAllByNameAndType(@Param("name") String name,
             @Param("types") List<LaborType> types,
             Pageable pageable);
 

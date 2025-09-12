@@ -146,23 +146,9 @@ public class LaborService {
      * 인력명 키워드 검색 (노무인력 유형별 필터링 포함)
      */
     public Slice<LaborNameResponse> getLaborNames(String keyword, List<LaborType> types, Pageable pageable) {
-        Slice<Labor> laborSlice;
-
-        if (keyword == null || keyword.isBlank()) {
-            laborSlice = laborRepository.findAllByType(types, pageable);
-        } else {
-            laborSlice = laborRepository.findByNameContainingIgnoreCaseAndType(keyword, types, pageable);
-        }
-
-        return laborSlice.map(labor -> new LaborNameResponse(
-                labor.getId(),
-                labor.getName(),
-                labor.getDailyWage(),
-                labor.getPreviousDailyWage(),
-                labor.getType().getLabel(),
-                labor.getIsTemporary(),
-                labor.getIsSeverancePayEligible(),
-                labor.getType()));
+        String searchKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
+        Slice<Labor> laborSlice = laborRepository.findAllByNameAndType(searchKeyword, types, pageable);
+        return laborSlice.map(LaborNameResponse::from);
     }
 
     /**
