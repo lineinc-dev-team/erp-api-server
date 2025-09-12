@@ -34,12 +34,13 @@ public interface OutsourcingCompanyContractEquipmentRepository
             @Param("contractIds") List<Long> contractIds,
             Pageable pageable);
 
-    @Query("SELECT e FROM OutsourcingCompanyContractEquipment e WHERE e.deleted = false")
-    Slice<OutsourcingCompanyContractEquipment> findAllBy(Pageable pageable);
-
+    /**
+     * 삭제되지 않은 장비 정보를 페이징하여 조회합니다.
+     * 차량번호가 제공되면 해당 번호로 검색하고, 제공되지 않으면 모든 데이터를 조회합니다.
+     */
     @Query("SELECT e FROM OutsourcingCompanyContractEquipment e " +
-            "WHERE e.vehicleNumber LIKE %:vehicleNumber% AND e.deleted = false")
-    Slice<OutsourcingCompanyContractEquipment> findByVehicleNumberContainingIgnoreCase(
+            "WHERE (:vehicleNumber IS NULL OR e.vehicleNumber LIKE %:vehicleNumber%) AND e.deleted = false")
+    Slice<OutsourcingCompanyContractEquipment> findAllByVehicleNumber(
             @Param("vehicleNumber") String vehicleNumber,
             Pageable pageable);
 }

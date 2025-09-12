@@ -734,13 +734,9 @@ public class OutsourcingCompanyContractService {
     @Transactional(readOnly = true)
     public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> searchVehicleNumber(String keyword,
             Pageable pageable) {
-        Slice<OutsourcingCompanyContractEquipment> equipmentSlice;
-
-        if (keyword == null || keyword.trim().isEmpty()) {
-            equipmentSlice = equipmentRepository.findAllBy(pageable);
-        } else {
-            equipmentSlice = equipmentRepository.findByVehicleNumberContainingIgnoreCase(keyword.trim(), pageable);
-        }
+        String searchKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        Slice<OutsourcingCompanyContractEquipment> equipmentSlice = equipmentRepository
+                .findAllByVehicleNumber(searchKeyword, pageable);
 
         return equipmentSlice.map(ContractEquipmentResponse.ContractEquipmentSimpleResponse::from);
     }
