@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.service;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -158,20 +160,20 @@ public class MaterialManagementService {
             case "standard" -> materialManagement.detail() != null ? materialManagement.detail().standard() : "";
             case "usage" -> materialManagement.detail() != null ? materialManagement.detail().usage() : "";
             case "quantity" -> materialManagement.detail() != null && materialManagement.detail().quantity() != null
-                    ? materialManagement.detail().quantity().toString()
+                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().quantity())
                     : "";
             case "unitPrice" -> materialManagement.detail() != null && materialManagement.detail().unitPrice() != null
-                    ? materialManagement.detail().unitPrice().toString()
+                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().unitPrice())
                     : "";
             case "supplyPrice" ->
                 materialManagement.detail() != null && materialManagement.detail().supplyPrice() != null
-                        ? materialManagement.detail().supplyPrice().toString()
+                        ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().supplyPrice())
                         : "";
             case "vat" -> materialManagement.detail() != null && materialManagement.detail().vat() != null
-                    ? materialManagement.detail().vat().toString()
+                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().vat())
                     : "";
             case "total" -> materialManagement.detail() != null && materialManagement.detail().total() != null
-                    ? materialManagement.detail().total().toString()
+                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().total())
                     : "";
             case "hasFile" -> materialManagement.hasFile() ? "Y" : "N";
             case "memo" -> materialManagement.memo() != null ? materialManagement.memo() : "";
