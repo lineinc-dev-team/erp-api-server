@@ -273,7 +273,6 @@ public class Labor extends BaseEntity {
      * LaborUpdateRequest DTO로부터 인력정보를 업데이트합니다.
      */
     public void updateFrom(LaborUpdateRequest request, OutsourcingCompany outsourcingCompany, Boolean isHeadOffice) {
-        Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.residentNumber()).ifPresent(val -> this.residentNumber = val);

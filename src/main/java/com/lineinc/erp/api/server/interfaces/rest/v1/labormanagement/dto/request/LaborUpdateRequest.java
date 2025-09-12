@@ -2,14 +2,12 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.reques
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "인력정보 수정 요청")
 public record LaborUpdateRequest(
-        @Schema(description = "노무 구분", example = "ETC") LaborType type,
         @Schema(description = "구분 설명", example = "기술공") String typeDescription,
         @Schema(description = "이름", example = "홍길동") String name,
         @Schema(description = "주민등록번호", example = "860101-1234567") String residentNumber,
