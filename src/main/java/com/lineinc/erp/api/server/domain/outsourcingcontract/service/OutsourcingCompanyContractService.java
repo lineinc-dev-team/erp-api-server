@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractConstruction;
@@ -43,8 +43,8 @@ import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.Outsourc
 import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.OutsourcingCompanyContractWorkerRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
-import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
+import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
+import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.ContractListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractContactCreateRequest;
@@ -89,9 +89,6 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractConstructionRepository constructionRepository;
     private final OutsourcingCompanyContractHistoryRepository contractHistoryRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository contractChangeHistoryRepository;
-    private final SiteRepository siteRepository;
-    private final SiteProcessRepository siteProcessRepository;
-    private final OutsourcingCompanyRepository outsourcingCompanyRepository;
     private final OutsourcingCompanyContractSubEquipmentRepository subEquipmentRepository;
     private final Javers javers;
     private final OutsourcingCompanyContractContactService contractContactService;
@@ -100,6 +97,9 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractEquipmentService contractEquipmentService;
     private final OutsourcingCompanyContractDriverService contractDriverService;
     private final OutsourcingCompanyContractConstructionService contractConstructionService;
+    private final SiteService siteService;
+    private final SiteProcessService siteProcessService;
+    private final OutsourcingCompanyService outsourcingCompanyService;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -148,14 +148,10 @@ public class OutsourcingCompanyContractService {
      * 기본 계약 정보를 생성합니다.
      */
     private OutsourcingCompanyContract createMainContract(OutsourcingCompanyContractCreateRequest request) {
-        Site site = siteRepository.findById(request.siteId())
-                .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.SITE_NOT_FOUND));
-
-        SiteProcess siteProcess = siteProcessRepository.findById(request.siteProcessId())
-                .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_FOUND));
-
-        OutsourcingCompany outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
-                .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
 
         OffsetDateTime contractStartDate = DateTimeFormatUtils.toOffsetDateTime(request.contractStartDate());
         OffsetDateTime contractEndDate = DateTimeFormatUtils.toOffsetDateTime(request.contractEndDate());
@@ -616,8 +612,13 @@ public class OutsourcingCompanyContractService {
         OutsourcingCompanyContract oldSnapshot = JaversUtils.createSnapshot(javers, contract,
                 OutsourcingCompanyContract.class);
 
+        Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+
         // 3. 기본 계약 정보 수정 (updateFrom 메서드 사용)
-        contract.updateFrom(request, siteRepository, siteProcessRepository, outsourcingCompanyRepository);
+        contract.updateFrom(request, site, siteProcess, outsourcingCompany);
 
         // 4. 변경사항 추출 및 변경 히스토리 저장
         Diff diff = javers.compare(oldSnapshot, contract);
@@ -709,11 +710,6 @@ public class OutsourcingCompanyContractService {
      * 외주업체 ID로 계약 ID 목록을 조회합니다.
      */
     private List<Long> getContractIdsByCompany(Long companyId) {
-        // 외주업체가 존재하는지 확인
-        if (!outsourcingCompanyRepository.existsById(companyId)) {
-            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND);
-        }
-
         // 해당 외주업체의 계약 ID들을 조회
         return contractRepository.findByOutsourcingCompanyId(companyId)
                 .stream()

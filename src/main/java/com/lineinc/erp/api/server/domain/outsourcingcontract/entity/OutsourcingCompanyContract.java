@@ -1,25 +1,26 @@
 package com.lineinc.erp.api.server.domain.outsourcingcontract.entity;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.Optional;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyTaxInvoiceConditionType;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractCategoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
-import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractUpdateRequest;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -214,49 +215,30 @@ public class OutsourcingCompanyContract extends BaseEntity {
     /**
      * 외주업체 계약 정보를 수정합니다.
      */
-    public void updateFrom(OutsourcingCompanyContractUpdateRequest request,
-            SiteRepository siteRepository,
-            SiteProcessRepository siteProcessRepository,
-            OutsourcingCompanyRepository outsourcingCompanyRepository) {
+    public void updateFrom(OutsourcingCompanyContractUpdateRequest request, Site site, SiteProcess siteProcess,
+            OutsourcingCompany outsourcingCompany) {
 
         // 현장, 공정, 외주업체 수정
-        if (request.siteId() != null) {
-            com.lineinc.erp.api.server.domain.site.entity.Site site = siteRepository.findById(request.siteId())
-                    .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.SITE_NOT_FOUND));
-            this.site = site;
-        }
-
-        if (request.siteProcessId() != null) {
-            com.lineinc.erp.api.server.domain.site.entity.SiteProcess siteProcess = siteProcessRepository
-                    .findById(request.siteProcessId())
-                    .orElseThrow(() -> new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_FOUND));
-            this.siteProcess = siteProcess;
-        }
-
-        if (request.outsourcingCompanyId() != null) {
-            com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany company = outsourcingCompanyRepository
-                    .findById(request.outsourcingCompanyId())
-                    .orElseThrow(
-                            () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
-            this.outsourcingCompany = company;
-        }
+        this.site = site;
+        this.siteProcess = siteProcess;
+        this.outsourcingCompany = outsourcingCompany;
 
         // 기존 필드들 수정
-        java.util.Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
-        java.util.Optional.ofNullable(request.contractStartDate())
+        Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
+        Optional.ofNullable(request.contractStartDate())
                 .ifPresent(val -> this.contractStartDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
-        java.util.Optional.ofNullable(request.contractEndDate())
+        Optional.ofNullable(request.contractEndDate())
                 .ifPresent(val -> this.contractEndDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
-        java.util.Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
-        java.util.Optional.ofNullable(request.defaultDeductionsType()).ifPresent(val -> this.defaultDeductions = val);
-        java.util.Optional.ofNullable(request.defaultDeductionsDescription())
+        Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
+        Optional.ofNullable(request.defaultDeductionsType()).ifPresent(val -> this.defaultDeductions = val);
+        Optional.ofNullable(request.defaultDeductionsDescription())
                 .ifPresent(val -> this.defaultDeductionsDescription = val);
-        java.util.Optional.ofNullable(request.taxInvoiceCondition()).ifPresent(val -> this.taxInvoiceCondition = val);
-        java.util.Optional.ofNullable(request.taxInvoiceIssueDayOfMonth())
+        Optional.ofNullable(request.taxInvoiceCondition()).ifPresent(val -> this.taxInvoiceCondition = val);
+        Optional.ofNullable(request.taxInvoiceIssueDayOfMonth())
                 .ifPresent(val -> this.taxInvoiceIssueDayOfMonth = val);
-        java.util.Optional.ofNullable(request.category()).ifPresent(val -> this.category = val);
-        java.util.Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);
-        java.util.Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        Optional.ofNullable(request.category()).ifPresent(val -> this.category = val);
+        Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);
+        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
 
         // transient 필드 동기화
         syncTransientFields();
@@ -271,10 +253,10 @@ public class OutsourcingCompanyContract extends BaseEntity {
         this.statusName = this.status != null ? this.status.getLabel() : null;
         this.taxInvoiceConditionName = this.taxInvoiceCondition != null ? this.taxInvoiceCondition.getLabel() : null;
         this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null
-                : java.util.Arrays.stream(this.defaultDeductions.split(","))
+                : Arrays.stream(this.defaultDeductions.split(","))
                         .map(String::trim)
-                        .map(com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(java.util.stream.Collectors.joining(","));
+                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
+                        .collect(Collectors.joining(","));
 
         // 관련 엔티티 이름들 동기화
         this.siteName = this.site != null ? this.site.getName() : null;
