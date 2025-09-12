@@ -161,6 +161,7 @@ public class LaborService {
                 labor.getPreviousDailyWage(),
                 labor.getType().getLabel(),
                 labor.getIsTemporary(),
+                labor.getIsSeverancePayEligible(),
                 labor.getType()));
     }
 
