@@ -11,8 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.labormanagement.entity.QLabor;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.QLaborFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborListResponse;
@@ -31,7 +31,6 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     private final QLabor labor = QLabor.labor;
     private final QOutsourcingCompany outsourcingCompany = QOutsourcingCompany.outsourcingCompany;
-    private final QLaborFile laborFile = QLaborFile.laborFile;
 
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
             "id", QLabor.labor.id,
@@ -48,10 +47,9 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        List<com.lineinc.erp.api.server.domain.labormanagement.entity.Labor> content = queryFactory
+        List<Labor> content = queryFactory
                 .selectFrom(labor)
                 .leftJoin(labor.outsourcingCompany, outsourcingCompany).fetchJoin()
-                .leftJoin(labor.files, laborFile)
                 .where(condition)
                 .orderBy(orders)
                 .offset(pageable.getOffset())
@@ -77,10 +75,9 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
         BooleanBuilder condition = buildCondition(request);
         OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
-        List<com.lineinc.erp.api.server.domain.labormanagement.entity.Labor> content = queryFactory
+        List<Labor> content = queryFactory
                 .selectFrom(labor)
                 .leftJoin(labor.outsourcingCompany, outsourcingCompany).fetchJoin()
-                .leftJoin(labor.files, laborFile)
                 .where(condition)
                 .orderBy(orders)
                 .fetch();
