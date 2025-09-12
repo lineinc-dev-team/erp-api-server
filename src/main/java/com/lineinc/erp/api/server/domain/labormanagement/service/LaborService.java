@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.labormanagement.service;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -303,7 +305,8 @@ public class LaborService {
             case "workType" -> labor.workType() != null ? labor.workType() : "";
             case "mainWork" -> labor.mainWork() != null ? labor.mainWork() : "";
             case "phoneNumber" -> labor.phoneNumber() != null ? labor.phoneNumber() : "";
-            case "dailyWage" -> labor.dailyWage() != null ? labor.dailyWage().toString() : "";
+            case "dailyWage" ->
+                labor.dailyWage() != null ? NumberFormat.getNumberInstance(Locale.KOREA).format(labor.dailyWage()) : "";
             case "accountNumber" -> {
                 String bankName = labor.bankName() != null ? labor.bankName() : "";
                 String accountNumber = labor.accountNumber() != null ? labor.accountNumber() : "";
