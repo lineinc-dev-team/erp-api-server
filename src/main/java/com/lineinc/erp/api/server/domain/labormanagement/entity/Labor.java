@@ -7,7 +7,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.FileType;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborFileType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
@@ -317,7 +317,7 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasFile() {
         return files != null && files.stream()
-                .anyMatch(file -> FileType.BASIC.equals(file.getType()) &&
+                .anyMatch(file -> LaborFileType.BASIC.equals(file.getType()) &&
                         file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
     }
 
@@ -326,7 +326,7 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasBankbook() {
         return files != null && files.stream()
-                .anyMatch(file -> FileType.BANKBOOK.equals(file.getType()) &&
+                .anyMatch(file -> LaborFileType.BANKBOOK.equals(file.getType()) &&
                         file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
     }
 
@@ -335,7 +335,7 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasIdCard() {
         return files != null && files.stream()
-                .anyMatch(file -> FileType.ID_CARD.equals(file.getType()) &&
+                .anyMatch(file -> LaborFileType.ID_CARD.equals(file.getType()) &&
                         file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
     }
 
@@ -344,7 +344,7 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasSignatureImage() {
         return files != null && files.stream()
-                .anyMatch(file -> FileType.SIGNATURE_IMAGE.equals(file.getType()) &&
+                .anyMatch(file -> LaborFileType.SIGNATURE_IMAGE.equals(file.getType()) &&
                         file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
     }
 

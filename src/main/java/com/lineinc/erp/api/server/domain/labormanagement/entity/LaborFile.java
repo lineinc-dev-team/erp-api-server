@@ -5,7 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.FileType;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.request.LaborFileUpdateRequest;
 
 import jakarta.persistence.Column;
@@ -72,7 +72,7 @@ public class LaborFile extends BaseEntity {
     @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
-    private FileType type;
+    private LaborFileType type;
 
     /**
      * 파일에 대한 비고 또는 설명

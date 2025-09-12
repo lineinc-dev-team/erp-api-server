@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.respon
 import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.FileType;
+import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborFileType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -14,7 +14,7 @@ public record LaborFileResponse(
         @Schema(description = "파일 URL") String fileUrl,
         @Schema(description = "원본 파일명") String originalFileName,
         @Schema(description = "파일 타입") String type,
-        @Schema(description = "파일 타입 코드") FileType typeCode,
+        @Schema(description = "파일 타입 코드") LaborFileType typeCode,
         @Schema(description = "메모") String memo,
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt) {
