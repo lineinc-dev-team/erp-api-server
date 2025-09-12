@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum MaterialManagementInputType {
     MAJOR_PURCHASE("주요자재(구매)"),
     MAJOR_LEASE("주요자재(임대)"),
@@ -16,8 +18,4 @@ public enum MaterialManagementInputType {
     DIRECT_INPUT("직접입력");
 
     private final String label;
-
-    MaterialManagementInputType(String label) {
-        this.label = label;
-    }
 }
