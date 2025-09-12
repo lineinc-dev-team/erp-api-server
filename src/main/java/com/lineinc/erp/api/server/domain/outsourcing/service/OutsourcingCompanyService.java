@@ -249,11 +249,8 @@ public class OutsourcingCompanyService {
     public Slice<CompanyResponse.CompanySimpleResponse> searchByName(String name, Pageable pageable) {
         Slice<OutsourcingCompany> companies;
 
-        if (name == null || name.trim().isEmpty()) {
-            companies = outsourcingCompanyRepository.findAllBy(pageable);
-        } else {
-            companies = outsourcingCompanyRepository.findByNameContainingIgnoreCase(name.trim(), pageable);
-        }
+        String searchName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
+        companies = outsourcingCompanyRepository.findByNameAndKeyword(searchName, pageable);
 
         return companies.map(company -> CompanyResponse.CompanySimpleResponse.from(company));
     }
