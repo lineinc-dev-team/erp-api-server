@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.domain.outsourcingcontract.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum OutsourcingCompanyContractChangeType {
 
     BASIC("기본 정보"),
@@ -14,8 +16,4 @@ public enum OutsourcingCompanyContractChangeType {
     CONSTRUCTION("외주공사항목");
 
     private final String label;
-
-    OutsourcingCompanyContractChangeType(String label) {
-        this.label = label;
-    }
 }

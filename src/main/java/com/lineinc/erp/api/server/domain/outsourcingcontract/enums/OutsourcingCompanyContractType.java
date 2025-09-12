@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.domain.outsourcingcontract.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum OutsourcingCompanyContractType {
     SERVICE("용역"),
     EQUIPMENT("장비"),
@@ -10,8 +12,4 @@ public enum OutsourcingCompanyContractType {
     ETC("기타");
 
     private final String label;
-
-    OutsourcingCompanyContractType(String label) {
-        this.label = label;
-    }
 }
