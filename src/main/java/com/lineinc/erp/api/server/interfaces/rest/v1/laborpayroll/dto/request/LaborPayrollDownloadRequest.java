@@ -9,7 +9,7 @@ import java.util.List;
 @ParameterObject
 @Schema(description = "노무명세서 엑셀 다운로드 요청")
 public record LaborPayrollDownloadRequest(
-        @NotBlank @Schema(description = "허용 필드: id, siteName, processName, regularEmployeeCount, directContractCount, etcCount, totalLaborCost, totalDeductions, totalNetPayment, memo", example = "id, siteName, processName, totalLaborCost") String fields) {
+        @NotBlank @Schema(description = "허용 필드: id, siteName, processName, regularEmployeeCount, directContractCount, etcCount, totalLaborCost, totalDeductions, totalNetPayment, yearMonth, memo", example = "id, siteName, processName, totalLaborCost") String fields) {
     public static final List<String> ALLOWED_FIELDS = List.of(
             "id",
             "siteName",
@@ -20,5 +20,6 @@ public record LaborPayrollDownloadRequest(
             "totalLaborCost",
             "totalDeductions",
             "totalNetPayment",
+            "yearMonth",
             "memo");
 }

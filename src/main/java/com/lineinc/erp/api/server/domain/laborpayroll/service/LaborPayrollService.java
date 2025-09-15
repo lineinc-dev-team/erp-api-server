@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.laborpayroll.service;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -116,6 +117,7 @@ public class LaborPayrollService {
             case "totalLaborCost" -> "노무비 합계";
             case "totalDeductions" -> "공제금 합계";
             case "totalNetPayment" -> "차감지급 합계";
+            case "yearMonth" -> "년월";
             case "memo" -> "비고";
             default -> null;
         };
@@ -129,17 +131,43 @@ public class LaborPayrollService {
             case "id" -> response.id() != null ? response.id().toString() : "";
             case "siteName" -> response.site() != null ? response.site().name() : "";
             case "processName" -> response.siteProcess() != null ? response.siteProcess().name() : "";
-            case "regularEmployeeCount" ->
-                response.regularEmployeeCount() != null ? response.regularEmployeeCount().toString() : "";
-            case "directContractCount" ->
-                response.directContractCount() != null ? response.directContractCount().toString() : "";
-            case "etcCount" -> response.etcCount() != null ? response.etcCount().toString() : "";
-            case "totalLaborCost" ->
-                response.totalLaborCost() != null ? response.totalLaborCost().toBigInteger().toString() : "";
-            case "totalDeductions" ->
-                response.totalDeductions() != null ? response.totalDeductions().toBigInteger().toString() : "";
-            case "totalNetPayment" ->
-                response.totalNetPayment() != null ? response.totalNetPayment().toBigInteger().toString() : "";
+            case "regularEmployeeCount" -> {
+                if (response.regularEmployeeCount() != null) {
+                    yield NumberFormat.getNumberInstance().format(response.regularEmployeeCount());
+                }
+                yield "";
+            }
+            case "directContractCount" -> {
+                if (response.directContractCount() != null) {
+                    yield NumberFormat.getNumberInstance().format(response.directContractCount());
+                }
+                yield "";
+            }
+            case "etcCount" -> {
+                if (response.etcCount() != null) {
+                    yield NumberFormat.getNumberInstance().format(response.etcCount());
+                }
+                yield "";
+            }
+            case "totalLaborCost" -> {
+                if (response.totalLaborCost() != null) {
+                    yield NumberFormat.getNumberInstance().format(response.totalLaborCost());
+                }
+                yield "";
+            }
+            case "totalDeductions" -> {
+                if (response.totalDeductions() != null) {
+                    yield NumberFormat.getNumberInstance().format(response.totalDeductions());
+                }
+                yield "";
+            }
+            case "totalNetPayment" -> {
+                if (response.totalNetPayment() != null) {
+                    yield NumberFormat.getNumberInstance().format(response.totalNetPayment());
+                }
+                yield "";
+            }
+            case "yearMonth" -> response.yearMonth() != null ? response.yearMonth() : "";
             case "memo" -> response.memo() != null ? response.memo() : "";
             default -> "";
         };
