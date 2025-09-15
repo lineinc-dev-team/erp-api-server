@@ -23,6 +23,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
@@ -45,35 +46,35 @@ public class LaborPayrollSyncService {
     private final DailyReportRepository dailyReportRepository;
 
     /**
-     * 출역일보 생성/수정 시 노무비 명세서 동기화
-     * 해당 현장/공정의 해당 월 데이터만 삭제하고 다시 생성
+     * 출역일보 변경 시 노무비 명세서 동기화
+     * 해당 현장/공정의 해당 월 데이터를 재생성
      */
     public void syncLaborPayrollFromDailyReport(DailyReport dailyReport) {
         LocalDate reportDate = DateTimeFormatUtils.toKoreaLocalDate(dailyReport.getReportDate());
         String yearMonth = String.format("%04d-%02d", reportDate.getYear(), reportDate.getMonthValue());
 
-        log.info("해당 현장/공정({}/{})의 {}월 노무비 명세서 재생성",
+        log.info("현장/공정({}/{})의 {}월 노무비 명세서 재생성 시작",
                 dailyReport.getSite().getName(), dailyReport.getSiteProcess().getName(), yearMonth);
 
-        // 1. 해당 현장/공정의 해당 월 기존 노무비 명세서 삭제
-        deleteExistingPayrollsForSiteProcess(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
+        // 1. 기존 노무비 명세서 삭제
+        removeExistingPayrolls(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
 
-        // 2. 해당 현장/공정의 해당 월 출역일보 조회
-        List<DailyReport> monthlyReports = getDailyReportsForMonth(dailyReport, yearMonth);
+        // 2. 해당 월 출역일보 조회
+        List<DailyReport> monthlyReports = findMonthlyDailyReports(dailyReport, yearMonth);
 
-        // 3. 인력별로 노무비 명세서 재생성
-        rebuildPayrollsForMonth(monthlyReports, yearMonth);
+        // 3. 노무비 명세서 재생성
+        regeneratePayrollsFromReports(monthlyReports, yearMonth);
 
-        // 4. 집계 테이블 동기화
-        rebuildSummaryForSiteProcess(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
+        // 4. 집계 테이블 업데이트
+        updateSummaryTable(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
 
-        log.info("노무비 명세서 및 집계 테이블 동기화 완료: 출역일보 ID={}", dailyReport.getId());
+        log.info("노무비 명세서 동기화 완료: 출역일보 ID={}", dailyReport.getId());
     }
 
     /**
-     * 해당 현장/공정의 해당 월 기존 노무비 명세서 삭제
+     * 기존 노무비 명세서 삭제
      */
-    private void deleteExistingPayrollsForSiteProcess(Site site, SiteProcess siteProcess, String yearMonth) {
+    private void removeExistingPayrolls(Site site, SiteProcess siteProcess, String yearMonth) {
         List<LaborPayroll> existingPayrolls = laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(
                 site, siteProcess, yearMonth);
         if (!existingPayrolls.isEmpty()) {
@@ -84,9 +85,9 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 해당 월의 모든 출역일보 조회
+     * 해당 월의 출역일보 조회
      */
-    private List<DailyReport> getDailyReportsForMonth(DailyReport triggerReport,
+    private List<DailyReport> findMonthlyDailyReports(DailyReport triggerReport,
             String yearMonth) {
         // 해당 월의 시작일과 끝일 계산
         String[] parts = yearMonth.split("-");
@@ -107,9 +108,9 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 인력별로 노무비 명세서 재생성
+     * 출역일보로부터 노무비 명세서 재생성
      */
-    private void rebuildPayrollsForMonth(List<DailyReport> monthlyReports,
+    private void regeneratePayrollsFromReports(List<DailyReport> monthlyReports,
             String yearMonth) {
         // 인력별, 단가별로 데이터 수집 (동일 인력이라도 단가가 다르면 별도 행으로 분리)
         Map<String, LaborPayrollData> laborDataMap = new HashMap<>();
@@ -144,18 +145,8 @@ public class LaborPayrollSyncService {
      */
     private void processEmployeeData(Map<String, LaborPayrollData> laborDataMap,
             DailyReportEmployee employee, int dayOfMonth, String yearMonth, Site site, SiteProcess siteProcess) {
-        Long laborId = employee.getLabor().getId();
-        Long unitPrice = employee.getUnitPrice(); // 출역일보의 단가 사용
-
-        // 현장, 공정, 인력ID, 단가 조합으로 키 생성
-        String dataKey = generateDataKey(site.getId(), siteProcess.getId(), laborId, unitPrice);
-
-        LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
-                _ -> new LaborPayrollData(employee.getLabor(), yearMonth, unitPrice, site, siteProcess));
-
-        // 근무시간 설정
-        Double workHours = employee.getWorkQuantity();
-        laborData.setDayHours(dayOfMonth, workHours);
+        processLaborData(laborDataMap, employee.getLabor(), employee.getUnitPrice(),
+                employee.getWorkQuantity(), dayOfMonth, yearMonth, site, siteProcess);
     }
 
     /**
@@ -164,18 +155,29 @@ public class LaborPayrollSyncService {
     private void processDirectContractData(Map<String, LaborPayrollData> laborDataMap,
             DailyReportDirectContract directContract, int dayOfMonth, String yearMonth, Site site,
             SiteProcess siteProcess) {
-        Long laborId = directContract.getLabor().getId();
-        Long unitPrice = directContract.getUnitPrice(); // 출역일보의 단가 사용
+        processLaborData(laborDataMap, directContract.getLabor(), directContract.getUnitPrice(),
+                directContract.getWorkQuantity(), dayOfMonth, yearMonth, site, siteProcess);
+    }
+
+    /**
+     * 공통 인력 데이터 처리 로직
+     */
+    private void processLaborData(Map<String, LaborPayrollData> laborDataMap,
+            Labor labor, Long unitPrice, Double workQuantity, int dayOfMonth, String yearMonth,
+            Site site, SiteProcess siteProcess) {
+        Long laborId = labor.getId();
 
         // 현장, 공정, 인력ID, 단가 조합으로 키 생성
         String dataKey = generateDataKey(site.getId(), siteProcess.getId(), laborId, unitPrice);
 
-        LaborPayrollData laborData = laborDataMap.computeIfAbsent(dataKey,
-                _ -> new LaborPayrollData(directContract.getLabor(), yearMonth, unitPrice, site, siteProcess));
-
-        // 근무시간 설정
-        Double workHours = directContract.getWorkQuantity();
-        laborData.setDayHours(dayOfMonth, workHours);
+        // 기존 데이터가 있으면 근무시간 추가, 없으면 새로 생성
+        LaborPayrollData existingData = laborDataMap.get(dataKey);
+        if (existingData != null) {
+            laborDataMap.put(dataKey, existingData.addDayHours(dayOfMonth, workQuantity));
+        } else {
+            LaborPayrollData newData = new LaborPayrollData(labor, yearMonth, unitPrice, site, siteProcess);
+            laborDataMap.put(dataKey, newData.addDayHours(dayOfMonth, workQuantity));
+        }
     }
 
     /**
@@ -183,11 +185,11 @@ public class LaborPayrollSyncService {
      */
     private void createLaborPayroll(LaborPayrollData laborData) {
         LaborPayroll.LaborPayrollBuilder builder = LaborPayroll.builder()
-                .labor(laborData.getLabor())
-                .site(laborData.getSite())
-                .siteProcess(laborData.getSiteProcess())
-                .yearMonth(laborData.getYearMonth())
-                .dailyWage(laborData.getDailyWage())
+                .labor(laborData.labor())
+                .site(laborData.site())
+                .siteProcess(laborData.siteProcess())
+                .yearMonth(laborData.yearMonth())
+                .dailyWage(laborData.dailyWage())
                 .memo(null);
 
         // 일별 근무시간 설정
@@ -212,104 +214,119 @@ public class LaborPayrollSyncService {
 
     /**
      * Builder에 일별 근무시간 설정하는 헬퍼 메서드
+     * 리플렉션을 사용해서 switch문 대신 동적으로 메서드 호출
      */
     private LaborPayroll.LaborPayrollBuilder setBuilderDayHours(LaborPayroll.LaborPayrollBuilder builder,
             int day, Double hours) {
-        return switch (day) {
-            case 1 -> builder.day01Hours(hours);
-            case 2 -> builder.day02Hours(hours);
-            case 3 -> builder.day03Hours(hours);
-            case 4 -> builder.day04Hours(hours);
-            case 5 -> builder.day05Hours(hours);
-            case 6 -> builder.day06Hours(hours);
-            case 7 -> builder.day07Hours(hours);
-            case 8 -> builder.day08Hours(hours);
-            case 9 -> builder.day09Hours(hours);
-            case 10 -> builder.day10Hours(hours);
-            case 11 -> builder.day11Hours(hours);
-            case 12 -> builder.day12Hours(hours);
-            case 13 -> builder.day13Hours(hours);
-            case 14 -> builder.day14Hours(hours);
-            case 15 -> builder.day15Hours(hours);
-            case 16 -> builder.day16Hours(hours);
-            case 17 -> builder.day17Hours(hours);
-            case 18 -> builder.day18Hours(hours);
-            case 19 -> builder.day19Hours(hours);
-            case 20 -> builder.day20Hours(hours);
-            case 21 -> builder.day21Hours(hours);
-            case 22 -> builder.day22Hours(hours);
-            case 23 -> builder.day23Hours(hours);
-            case 24 -> builder.day24Hours(hours);
-            case 25 -> builder.day25Hours(hours);
-            case 26 -> builder.day26Hours(hours);
-            case 27 -> builder.day27Hours(hours);
-            case 28 -> builder.day28Hours(hours);
-            case 29 -> builder.day29Hours(hours);
-            case 30 -> builder.day30Hours(hours);
-            case 31 -> builder.day31Hours(hours);
-            default -> builder;
-        };
+        if (day < 1 || day > 31) {
+            return builder;
+        }
+
+        try {
+            String methodName = String.format("day%02dHours", day);
+            var method = LaborPayroll.LaborPayrollBuilder.class.getMethod(methodName, Double.class);
+            return (LaborPayroll.LaborPayrollBuilder) method.invoke(builder, hours);
+        } catch (Exception e) {
+            log.warn("일별 근무시간 설정 실패: day={}, hours={}", day, hours, e);
+            return builder;
+        }
     }
 
     /**
-     * 특정 현장/공정의 집계 테이블 업데이트 (Upsert)
+     * 집계 테이블 업데이트
      */
-    private void rebuildSummaryForSiteProcess(Site site, SiteProcess siteProcess, String yearMonth) {
-        // 1. 해당 현장/공정의 노무비 명세서 조회
-        List<LaborPayroll> payrolls = laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(
-                site, siteProcess, yearMonth);
-
-        // 2. 기존 집계 데이터 조회
-        var existingSummary = laborPayrollSummaryRepository.findBySiteAndSiteProcessAndYearMonth(
-                site, siteProcess, yearMonth);
+    private void updateSummaryTable(Site site, SiteProcess siteProcess, String yearMonth) {
+        List<LaborPayroll> payrolls = findPayrollsForSummary(site, siteProcess, yearMonth);
+        var existingSummary = findExistingSummary(site, siteProcess, yearMonth);
 
         if (payrolls.isEmpty()) {
-            // 노무비 명세서가 없으면 기존 집계 데이터 삭제
-            if (existingSummary.isPresent()) {
-                laborPayrollSummaryRepository.delete(existingSummary.get());
-                log.info("노무비 명세서가 없어 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
-                        site.getName(), siteProcess.getName(), yearMonth);
-            }
+            deleteSummaryIfExists(existingSummary, site, siteProcess, yearMonth);
             return;
         }
 
-        // 3. 집계 데이터 계산
         var calculatedData = calculateSummaryData(payrolls);
+        LaborPayrollSummary summary = createOrUpdateSummary(existingSummary, site, siteProcess, yearMonth,
+                calculatedData);
+        laborPayrollSummaryRepository.save(summary);
+    }
 
-        LaborPayrollSummary summary;
+    /**
+     * 집계용 노무비 명세서 조회
+     */
+    private List<LaborPayroll> findPayrollsForSummary(Site site, SiteProcess siteProcess, String yearMonth) {
+        return laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(site, siteProcess, yearMonth);
+    }
+
+    /**
+     * 기존 집계 데이터 조회
+     */
+    private Optional<LaborPayrollSummary> findExistingSummary(Site site, SiteProcess siteProcess, String yearMonth) {
+        return laborPayrollSummaryRepository.findBySiteAndSiteProcessAndYearMonth(site, siteProcess, yearMonth);
+    }
+
+    /**
+     * 집계 데이터가 없을 때 기존 데이터 삭제
+     */
+    private void deleteSummaryIfExists(Optional<LaborPayrollSummary> existingSummary, Site site,
+            SiteProcess siteProcess, String yearMonth) {
         if (existingSummary.isPresent()) {
-            // 4-1. 기존 데이터가 있으면 업데이트
-            summary = existingSummary.get();
-            summary.updateSummary(
-                    calculatedData.regularEmployeeCount(),
-                    calculatedData.directContractCount(),
-                    calculatedData.etcCount(),
-                    calculatedData.totalLaborCost(),
-                    calculatedData.totalDeductions(),
-                    calculatedData.totalNetPayment(),
-                    null); // 비고는 기본적으로 null
-            log.info("집계 테이블 업데이트: 현장={}, 공정={}, 년월={}",
-                    site.getName(), siteProcess.getName(), yearMonth);
-        } else {
-            // 4-2. 기존 데이터가 없으면 새로 생성
-            summary = LaborPayrollSummary.builder()
-                    .site(site)
-                    .siteProcess(siteProcess)
-                    .yearMonth(yearMonth)
-                    .regularEmployeeCount(calculatedData.regularEmployeeCount())
-                    .directContractCount(calculatedData.directContractCount())
-                    .etcCount(calculatedData.etcCount())
-                    .totalLaborCost(calculatedData.totalLaborCost())
-                    .totalDeductions(calculatedData.totalDeductions())
-                    .totalNetPayment(calculatedData.totalNetPayment())
-                    .memo(null) // 비고는 기본적으로 null
-                    .build();
-            log.info("집계 테이블 생성: 현장={}, 공정={}, 년월={}",
+            laborPayrollSummaryRepository.delete(existingSummary.get());
+            log.info("노무비 명세서가 없어 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
                     site.getName(), siteProcess.getName(), yearMonth);
         }
+    }
 
-        // 5. 집계 데이터 저장
-        laborPayrollSummaryRepository.save(summary);
+    /**
+     * 집계 데이터 생성 또는 업데이트
+     */
+    private LaborPayrollSummary createOrUpdateSummary(Optional<LaborPayrollSummary> existingSummary, Site site,
+            SiteProcess siteProcess,
+            String yearMonth, SummaryData calculatedData) {
+        if (existingSummary.isPresent()) {
+            return updateExistingSummary(existingSummary.get(), calculatedData, site, siteProcess, yearMonth);
+        } else {
+            return createNewSummary(site, siteProcess, yearMonth, calculatedData);
+        }
+    }
+
+    /**
+     * 기존 집계 데이터 업데이트
+     */
+    private LaborPayrollSummary updateExistingSummary(LaborPayrollSummary summary, SummaryData calculatedData,
+            Site site, SiteProcess siteProcess, String yearMonth) {
+        summary.updateSummary(
+                calculatedData.regularEmployeeCount(),
+                calculatedData.directContractCount(),
+                calculatedData.etcCount(),
+                calculatedData.totalLaborCost(),
+                calculatedData.totalDeductions(),
+                calculatedData.totalNetPayment(),
+                null);
+        log.info("집계 테이블 업데이트: 현장={}, 공정={}, 년월={}",
+                site.getName(), siteProcess.getName(), yearMonth);
+        return summary;
+    }
+
+    /**
+     * 새 집계 데이터 생성
+     */
+    private LaborPayrollSummary createNewSummary(Site site, SiteProcess siteProcess, String yearMonth,
+            SummaryData calculatedData) {
+        LaborPayrollSummary summary = LaborPayrollSummary.builder()
+                .site(site)
+                .siteProcess(siteProcess)
+                .yearMonth(yearMonth)
+                .regularEmployeeCount(calculatedData.regularEmployeeCount())
+                .directContractCount(calculatedData.directContractCount())
+                .etcCount(calculatedData.etcCount())
+                .totalLaborCost(calculatedData.totalLaborCost())
+                .totalDeductions(calculatedData.totalDeductions())
+                .totalNetPayment(calculatedData.totalNetPayment())
+                .memo(null)
+                .build();
+        log.info("집계 테이블 생성: 현장={}, 공정={}, 년월={}",
+                site.getName(), siteProcess.getName(), yearMonth);
+        return summary;
     }
 
     /**
@@ -371,57 +388,37 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 인력별 노무비 데이터를 임시로 저장하는 클래스
+     * 인력별 노무비 데이터를 임시로 저장하는 레코드
+     * 불변 객체로 변경하여 더 안전하고 간단하게 만듦
      */
-    private static class LaborPayrollData {
-        private final Labor labor;
-        private final Site site;
-        private final SiteProcess siteProcess;
-        private final String yearMonth;
-        private final Integer dailyWage;
-        private final Map<Integer, Double> dailyHours = new HashMap<>();
-
+    private record LaborPayrollData(
+            Labor labor,
+            Site site,
+            SiteProcess siteProcess,
+            String yearMonth,
+            Integer dailyWage,
+            Map<Integer, Double> dailyHours) {
         public LaborPayrollData(Labor labor, String yearMonth, Long unitPrice, Site site, SiteProcess siteProcess) {
-            this.labor = labor;
-            this.site = site;
-            this.siteProcess = siteProcess;
-            this.yearMonth = yearMonth;
-            this.dailyWage = unitPrice != null ? unitPrice.intValue() : 0;
+            this(labor, site, siteProcess, yearMonth,
+                    unitPrice != null ? unitPrice.intValue() : 0,
+                    new HashMap<>());
         }
 
-        public void setDayHours(int day, Double hours) {
-            // 같은 날에 이미 근무시간이 있으면 합산
-            Double existingHours = dailyHours.get(day);
-            if (existingHours != null) {
-                dailyHours.put(day, existingHours + (hours != null ? hours : 0.0));
-            } else {
-                dailyHours.put(day, hours != null ? hours : 0.0);
-            }
+        /**
+         * 근무시간 추가 (같은 날에 이미 근무시간이 있으면 합산)
+         */
+        public LaborPayrollData addDayHours(int day, Double hours) {
+            Map<Integer, Double> newDailyHours = new HashMap<>(this.dailyHours);
+            Double existingHours = newDailyHours.get(day);
+            Double newHours = existingHours != null ? existingHours + (hours != null ? hours : 0.0)
+                    : (hours != null ? hours : 0.0);
+            newDailyHours.put(day, newHours);
+
+            return new LaborPayrollData(labor, site, siteProcess, yearMonth, dailyWage, newDailyHours);
         }
 
         public Double getDayHours(int day) {
             return dailyHours.get(day);
-        }
-
-        // Getters
-        public Labor getLabor() {
-            return labor;
-        }
-
-        public Site getSite() {
-            return site;
-        }
-
-        public SiteProcess getSiteProcess() {
-            return siteProcess;
-        }
-
-        public String getYearMonth() {
-            return yearMonth;
-        }
-
-        public Integer getDailyWage() {
-            return dailyWage;
         }
     }
 }
