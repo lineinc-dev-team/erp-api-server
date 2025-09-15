@@ -89,6 +89,10 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
         if (StringUtils.hasText(request.processName())) {
             builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
         }
+        if (StringUtils.hasText(request.outsourcingCompanyName())) {
+            builder.and(
+                    managementCost.outsourcingCompany.name.containsIgnoreCase(request.outsourcingCompanyName().trim()));
+        }
         if (request.itemType() != null) {
             builder.and(managementCost.itemType.eq(request.itemType()));
         }
