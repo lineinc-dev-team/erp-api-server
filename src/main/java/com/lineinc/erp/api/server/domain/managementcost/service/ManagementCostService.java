@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.managementcost.service;
 
+import java.text.NumberFormat;
+
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.SiteService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
@@ -254,7 +256,7 @@ public class ManagementCostService {
             case "outsourcingCompanyBusinessNumber" -> "사업자번호";
             case "outsourcingCompanyCeoName" -> "대표자";
             case "outsourcingCompanyAccountNumber" -> "청구계좌";
-            case "outsourcingCompanyAccountHolder" -> "계좌명";
+            case "outsourcingCompanyAccountHolder" -> "예금주명";
             case "supplyPrice" -> "공급가";
             case "vat" -> "부가세";
             case "total" -> "합계";
@@ -287,9 +289,24 @@ public class ManagementCostService {
             case "outsourcingCompanyAccountHolder" -> managementCost.outsourcingCompany() != null
                     ? managementCost.outsourcingCompany().accountHolder()
                     : "";
-            case "supplyPrice" -> String.valueOf(managementCost.supplyPrice());
-            case "vat" -> String.valueOf(managementCost.vat());
-            case "total" -> String.valueOf(managementCost.total());
+            case "supplyPrice" -> {
+                if (managementCost.supplyPrice() != null) {
+                    yield NumberFormat.getNumberInstance().format(managementCost.supplyPrice());
+                }
+                yield "";
+            }
+            case "vat" -> {
+                if (managementCost.vat() != null) {
+                    yield NumberFormat.getNumberInstance().format(managementCost.vat());
+                }
+                yield "";
+            }
+            case "total" -> {
+                if (managementCost.total() != null) {
+                    yield NumberFormat.getNumberInstance().format(managementCost.total());
+                }
+                yield "";
+            }
             case "hasFile" -> managementCost.hasFile() ? "Y" : "N";
             case "memo" -> managementCost.memo();
             default -> null;

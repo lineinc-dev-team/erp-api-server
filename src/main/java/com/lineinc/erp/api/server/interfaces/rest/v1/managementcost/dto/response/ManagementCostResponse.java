@@ -45,7 +45,9 @@ public record ManagementCostResponse(
                 cost.getItemType().name(),
                 cost.getItemTypeDescription(),
                 cost.getPaymentDate(),
-                cost.getFiles() != null && !cost.getFiles().isEmpty(),
+                cost.getFiles() != null && !cost.getFiles().isEmpty()
+                        && cost.getFiles().stream()
+                                .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().isBlank()),
                 cost.getMemo(),
                 cost.getDetails().stream()
                         .filter(detail -> detail.getSupplyPrice() != null)
