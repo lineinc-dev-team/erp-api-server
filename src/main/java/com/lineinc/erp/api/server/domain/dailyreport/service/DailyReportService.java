@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.dailyreport.service;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -112,6 +114,9 @@ public class DailyReportService {
 
         // 직원 출역 정보 추가
         if (request.employees() != null) {
+            // 중복 laborId 체크
+            validateEmployeeDuplicates(request.employees());
+
             for (DailyReportEmployeeCreateRequest employeeRequest : request.employees()) {
                 Labor labor = laborService.getLaborByIdOrThrow(employeeRequest.laborId());
 
@@ -136,6 +141,9 @@ public class DailyReportService {
 
         // 직영/계약직 출역 정보 추가
         if (request.directContracts() != null) {
+            // 중복 laborId + unitPrice 체크 (임시 인력 제외)
+            validateDirectContractDuplicates(request.directContracts());
+
             for (DailyReportDirectContractCreateRequest directContractRequest : request.directContracts()) {
                 OutsourcingCompany company = directContractRequest.outsourcingCompanyId() != null
                         ? outsourcingCompanyService
@@ -564,6 +572,14 @@ public class DailyReportService {
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
+        // 중복 laborId 체크
+        Set<Long> laborIds = new HashSet<>();
+        for (DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo employee : request.employees()) {
+            if (employee.laborId() != null && !laborIds.add(employee.laborId())) {
+                throw new IllegalArgumentException(ValidationMessages.DAILY_REPORT_EMPLOYEE_DUPLICATE_LABOR_ID);
+            }
+        }
+
         // 정규직원만 직원 출역 정보에 추가 가능
         if (request.employees().stream().anyMatch(employee -> employee.laborId() != null
                 && laborService.getLaborByIdOrThrow(employee.laborId()).getType() != LaborType.REGULAR_EMPLOYEE)) {
@@ -621,6 +637,20 @@ public class DailyReportService {
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
+
+        // 중복 laborId + unitPrice 체크 (임시 인력 제외)
+        Set<String> directContractKeys = new HashSet<>();
+        for (DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo directContract : request
+                .directContracts()) {
+            if (!Boolean.TRUE.equals(directContract.isTemporary()) &&
+                    directContract.laborId() != null) {
+                String key = directContract.laborId() + "_" + directContract.unitPrice();
+                if (!directContractKeys.add(key)) {
+                    throw new IllegalArgumentException(
+                            ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_DUPLICATE_LABOR_ID);
+                }
+            }
+        }
 
         // EntitySyncUtils.syncList를 사용하여 직영/계약직 정보 동기화
         EntitySyncUtils.syncList(
@@ -1045,4 +1075,43 @@ public class DailyReportService {
 
         return laborRepository.save(temporaryLabor);
     }
+
+    /**
+     * 직원 출역 정보 중복 체크
+     */
+    private void validateEmployeeDuplicates(List<? extends DailyReportEmployeeCreateRequest> employees) {
+        if (employees == null || employees.isEmpty()) {
+            return;
+        }
+
+        Set<Long> laborIds = new HashSet<>();
+        for (DailyReportEmployeeCreateRequest employeeRequest : employees) {
+            if (!laborIds.add(employeeRequest.laborId())) {
+                throw new IllegalArgumentException(ValidationMessages.DAILY_REPORT_EMPLOYEE_DUPLICATE_LABOR_ID);
+            }
+        }
+    }
+
+    /**
+     * 직영/계약직 출역 정보 중복 체크
+     */
+    private void validateDirectContractDuplicates(
+            List<? extends DailyReportDirectContractCreateRequest> directContracts) {
+        if (directContracts == null || directContracts.isEmpty()) {
+            return;
+        }
+
+        Set<String> directContractKeys = new HashSet<>();
+        for (DailyReportDirectContractCreateRequest directContractRequest : directContracts) {
+            if (!Boolean.TRUE.equals(directContractRequest.isTemporary()) &&
+                    directContractRequest.laborId() != null) {
+                String key = directContractRequest.laborId() + "_" + directContractRequest.unitPrice();
+                if (!directContractKeys.add(key)) {
+                    throw new IllegalArgumentException(
+                            ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_DUPLICATE_LABOR_ID);
+                }
+            }
+        }
+    }
+
 }

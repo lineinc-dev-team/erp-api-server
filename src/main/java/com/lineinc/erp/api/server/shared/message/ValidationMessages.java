@@ -56,6 +56,8 @@ public final class ValidationMessages {
     public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 반드시 한 명이어야 합니다.";
     public static final String LABOR_PAYROLL_SUMMARY_NOT_FOUND = "존재하지 않는 노무명세서 집계입니다.";
     public static final String LABOR_PAYROLL_NOT_FOUND = "존재하지 않는 노무명세서입니다.";
+    public static final String DAILY_REPORT_EMPLOYEE_DUPLICATE_LABOR_ID = "같은 인력이 중복으로 등록되었습니다.";
+    public static final String DAILY_REPORT_DIRECT_CONTRACT_DUPLICATE_LABOR_ID = "같은 인력에 같은 단가로 중복 등록되었습니다.";
 
     // ===== 강재/자재 관련 메시지 =====
     public static final String STEEL_MANAGEMENT_NOT_FOUND = "강재 관리를 찾을 수 없습니다.";
