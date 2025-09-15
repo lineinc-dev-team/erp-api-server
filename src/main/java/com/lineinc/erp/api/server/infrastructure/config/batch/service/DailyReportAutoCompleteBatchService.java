@@ -34,7 +34,7 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
 
     /**
      * 출역일보 자동 마감 배치를 실행합니다.
-     * 전날 날짜의 PENDING 상태 출역일보들을 모두 AUTO_COMPLETED로 변경합니다.
+     * 오늘 이전 날짜의 모든 PENDING 상태 출역일보들을 AUTO_COMPLETED로 변경합니다.
      */
     @Override
     @Transactional
@@ -42,19 +42,18 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
         log.info("출역일보 자동 마감 배치 시작");
 
         try {
-            // 전날 날짜 계산 (한국 시간 기준)
-            LocalDate yesterday = LocalDate.now(AppConstants.KOREA_ZONE).minusDays(1);
-            OffsetDateTime yesterdayStart = DateTimeFormatUtils.toUtcStartOfDay(yesterday);
-            OffsetDateTime yesterdayEnd = DateTimeFormatUtils.toUtcEndOfDay(yesterday);
+            // 오늘 날짜 계산 (한국 시간 기준)
+            LocalDate today = LocalDate.now(AppConstants.KOREA_ZONE);
+            OffsetDateTime todayStart = DateTimeFormatUtils.toUtcStartOfDay(today);
 
-            log.info("자동 마감 대상 날짜: {}", yesterday);
+            log.info("자동 마감 대상: {} 이전 날짜의 모든 출역일보", today);
 
-            // 전날의 PENDING 상태 출역일보 조회
+            // 오늘 이전의 모든 PENDING 상태 출역일보 조회
             List<DailyReport> pendingReports = dailyReportRepository
-                    .findByReportDateBetweenAndStatus(yesterdayStart, yesterdayEnd, DailyReportStatus.PENDING);
+                    .findByReportDateBeforeAndStatus(todayStart, DailyReportStatus.PENDING);
 
             if (pendingReports.isEmpty()) {
-                log.info("자동 마감할 출역일보가 없습니다. (날짜: {})", yesterday);
+                log.info("자동 마감할 출역일보가 없습니다. (기준일: {})", today);
                 return;
             }
 

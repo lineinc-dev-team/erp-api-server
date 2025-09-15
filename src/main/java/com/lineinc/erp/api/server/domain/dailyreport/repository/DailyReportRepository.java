@@ -113,6 +113,16 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             @Param("status") DailyReportStatus status);
 
     /**
+     * 특정 날짜 이전의 특정 상태 출역일보를 조회합니다.
+     * 자동 마감 배치에서 사용됩니다.
+     */
+    @Query("SELECT dr FROM DailyReport dr " +
+            "WHERE dr.reportDate < :beforeDate " +
+            "AND dr.status = :status")
+    List<DailyReport> findByReportDateBeforeAndStatus(@Param("beforeDate") OffsetDateTime beforeDate,
+            @Param("status") DailyReportStatus status);
+
+    /**
      * 특정 현장, 공정, 날짜 범위로 출역일보를 조회합니다.
      * 노무비 명세서 동기화에서 사용됩니다.
      */
