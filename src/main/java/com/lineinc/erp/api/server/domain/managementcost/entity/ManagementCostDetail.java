@@ -13,6 +13,9 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import java.util.Optional;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "name")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

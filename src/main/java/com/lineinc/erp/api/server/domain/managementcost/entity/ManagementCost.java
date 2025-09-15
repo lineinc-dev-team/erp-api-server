@@ -20,6 +20,10 @@ import java.util.List;
 import jakarta.persistence.Transient;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "payment_date"),
+        @Index(columnList = "created_at")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
