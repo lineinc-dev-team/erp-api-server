@@ -119,6 +119,10 @@ public class FuelInfo extends BaseEntity {
     private Long outsourcingCompanyId;
 
     @Transient
+    @DiffInclude
+    private String vehicleNumber;
+
+    @Transient
     private Long driverId;
 
     @Transient
@@ -132,6 +136,7 @@ public class FuelInfo extends BaseEntity {
         this.driverName = this.driver != null ? this.driver.getName() : null;
         this.equipmentSpecification = this.equipment != null ? this.equipment.getSpecification() : null;
         this.fuelTypeName = this.fuelType != null ? this.fuelType.getLabel() : null;
+        this.vehicleNumber = this.equipment != null ? this.equipment.getVehicleNumber() : null;
     }
 
     public void updateFrom(FuelInfoUpdateRequest request) {
