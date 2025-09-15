@@ -180,5 +180,6 @@ public class OutsourcingCompany extends BaseEntity {
         Optional.ofNullable(accountNumber).ifPresent(val -> this.accountNumber = val);
         Optional.ofNullable(accountHolder).ifPresent(val -> this.accountHolder = val);
         Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
+        syncTransientFields();
     }
 }

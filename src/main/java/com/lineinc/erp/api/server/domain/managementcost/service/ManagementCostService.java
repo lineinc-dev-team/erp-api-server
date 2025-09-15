@@ -25,9 +25,12 @@ import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyBasicInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
@@ -69,6 +72,7 @@ public class ManagementCostService {
     private final ManagementCostKeyMoneyDetailService managementCostKeyMoneyDetailService;
     private final ManagementCostMealFeeDetailService managementCostMealFeeDetailService;
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
+    private final OutsourcingChangeRepository outsourcingChangeRepository;
 
     private final Javers javers;
 
@@ -134,6 +138,10 @@ public class ManagementCostService {
 
             if (outsourcingCompanyInfo != null) {
                 // 외주업체 기본 정보 직접 업데이트
+                outsourcingCompany.syncTransientFields();
+                OutsourcingCompany oldSnapshot = JaversUtils.createSnapshot(javers, outsourcingCompany,
+                        OutsourcingCompany.class);
+
                 outsourcingCompany.updateOutsourcingCompanyInfo(
                         outsourcingCompanyInfo.name(),
                         outsourcingCompanyInfo.businessNumber(),
@@ -143,6 +151,18 @@ public class ManagementCostService {
                         outsourcingCompanyInfo.accountHolder(),
                         outsourcingCompanyInfo.memo());
                 outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
+                Diff diff = javers.compare(oldSnapshot, outsourcingCompany);
+                List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+                String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+
+                if (!simpleChanges.isEmpty()) {
+                    OutsourcingChangeHistory changeHistory = OutsourcingChangeHistory.builder()
+                            .outsourcingCompany(outsourcingCompany)
+                            .type(OutsourcingChangeType.BASIC)
+                            .changes(changesJson)
+                            .build();
+                    outsourcingChangeRepository.save(changeHistory);
+                }
             }
         } else if (outsourcingCompanyInfo != null) {
             // 신규 외주업체 생성
