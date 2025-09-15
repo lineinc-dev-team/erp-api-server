@@ -62,7 +62,7 @@ public class JaversUtils {
                     entity -> ((OutsourcingCompanyContractConstruction) entity).getItem()),
             Map.entry(SteelManagementDetail.class, entity -> ((SteelManagementDetail) entity).getName()),
             Map.entry(SteelManagementFile.class, entity -> ((SteelManagementFile) entity).getOriginalFileName()),
-            Map.entry(FuelInfo.class, entity -> ((FuelInfo) entity).getEquipmentSpecification()),
+            Map.entry(FuelInfo.class, entity -> ((FuelInfo) entity).getOutsourcingCompanyName()),
             Map.entry(LaborFile.class, entity -> ((LaborFile) entity).getName()),
             Map.entry(ManagementCostDetail.class, entity -> ((ManagementCostDetail) entity).getName()),
             Map.entry(ManagementCostKeyMoneyDetail.class,

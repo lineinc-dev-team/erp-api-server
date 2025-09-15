@@ -104,6 +104,7 @@ public class FuelAggregation extends BaseEntity {
      * 유류정보 목록
      */
     @Builder.Default
+    @DiffIgnore
     @OneToMany(mappedBy = "fuelAggregation", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     @Setter
     private List<FuelInfo> fuelInfos = new ArrayList<>();
