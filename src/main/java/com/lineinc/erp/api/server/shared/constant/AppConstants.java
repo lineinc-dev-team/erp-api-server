@@ -93,9 +93,6 @@ public final class AppConstants {
     // 세션 타임아웃 기본값 (초 단위, 예: 1800초 = 30분)
     public static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 1800;
 
-    // 퇴직금 관련 상수
-    public static final int SEVERANCE_PAY_NOTIFICATION_DAYS = 180; // 퇴직금 발생 예정 알림 기준일 (6개월)
-
     private AppConstants() {
     } // 인스턴스화 방지
 }
