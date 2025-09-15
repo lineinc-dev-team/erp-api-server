@@ -13,7 +13,7 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             @Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("reportDate") OffsetDateTime reportDate,
-            @Param("weather") WeatherType weather,
+            @Param("weather") FuelAggregationWeatherType weather,
             Pageable pageable);
 
     /**

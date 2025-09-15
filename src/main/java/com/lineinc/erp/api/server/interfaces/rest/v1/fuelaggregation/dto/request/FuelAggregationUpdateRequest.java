@@ -3,8 +3,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.reques
 import java.time.LocalDate;
 import java.util.List;
 
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -18,7 +18,7 @@ public record FuelAggregationUpdateRequest(
 
         @Schema(description = "일자", example = "2025-07-28") @NotNull LocalDate date,
 
-        @Schema(description = "날씨", example = "SUNNY") @NotNull WeatherType weather,
+        @Schema(description = "날씨", example = "SUNNY") @NotNull FuelAggregationWeatherType weather,
 
         @Schema(description = "유류정보 수정 목록") @Valid List<FuelInfoUpdateRequest> fuelInfos,
 

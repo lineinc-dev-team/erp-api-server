@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
@@ -69,7 +69,7 @@ public class FuelAggregationController {
     @GetMapping("/weather-types")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WeatherTypeResponse>>> getWeatherTypes() {
-        List<WeatherTypeResponse> weatherTypes = Arrays.stream(WeatherType.values())
+        List<WeatherTypeResponse> weatherTypes = Arrays.stream(FuelAggregationWeatherType.values())
                 .map(WeatherTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(weatherTypes));

@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 
@@ -46,7 +46,7 @@ public class DailyReport extends BaseEntity {
     private OffsetDateTime reportDate; // 출역일보 일자
 
     @Enumerated(EnumType.STRING)
-    private WeatherType weather; // 날씨
+    private FuelAggregationWeatherType weather; // 날씨
 
     @Enumerated(EnumType.STRING)
     @Builder.Default

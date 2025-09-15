@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import org.springdoc.core.annotations.ParameterObject;
 
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.WeatherType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -15,5 +15,5 @@ public record DailyReportSearchRequest(
         @Schema(description = "현장 아이디", example = "1") @NotNull Long siteId,
         @Schema(description = "공정 아이디", example = "1") @NotNull Long siteProcessId,
         @Schema(description = "일자", example = "2024-01-15") @NotNull LocalDate reportDate,
-        @Schema(description = "날씨", example = "SUNNY") WeatherType weather) {
+        @Schema(description = "날씨", example = "SUNNY") FuelAggregationWeatherType weather) {
 }
