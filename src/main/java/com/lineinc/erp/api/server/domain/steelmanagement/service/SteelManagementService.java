@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.steelmanagement.service;
 
+import java.text.NumberFormat;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -217,8 +218,12 @@ public class SteelManagementService {
             case "businessNumber" ->
                 steelManagement.outsourcingCompany() != null ? steelManagement.outsourcingCompany().businessNumber()
                         : "";
-            case "totalAmount" ->
-                steelManagement.totalAmount() != null ? String.valueOf(steelManagement.totalAmount()) : "";
+            case "totalAmount" -> {
+                if (steelManagement.totalAmount() != null) {
+                    yield NumberFormat.getNumberInstance().format(steelManagement.totalAmount());
+                }
+                yield "";
+            }
             case "memo" -> steelManagement.memo();
             default -> null;
         };
