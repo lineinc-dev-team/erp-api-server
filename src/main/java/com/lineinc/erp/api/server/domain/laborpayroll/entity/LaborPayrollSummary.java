@@ -34,8 +34,6 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "labor_payroll_summary", indexes = {
         @Index(columnList = "year_month"),
-        @Index(columnList = "site_id, year_month"),
-        @Index(columnList = "site_process_id, year_month"),
         @Index(columnList = "created_at"),
         @Index(columnList = "updated_at")
 })
