@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public record DailyReportEmployeeUpdateRequest(
             @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "노무인력 ID", example = "1") @NotNull Long laborId,
             @Schema(description = "작업내용", example = "기초공사") @NotBlank String workContent,
-            @Schema(description = "공수", example = "1.0") @NotNull Double workQuantity,
+            @Schema(description = "공수", example = "1.0") @NotNull @Positive Double workQuantity,
             @Schema(description = "비고", example = "특별 지시사항") String memo) {
     }
 }
