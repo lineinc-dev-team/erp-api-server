@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.laborpayroll.service;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
@@ -328,6 +329,65 @@ public class LaborPayrollService {
                         .build();
                 laborPayrollChangeHistoryRepository.save(changeHistory);
             }
+        }
+
+        // 노무명세서 수정 후 집계 테이블 업데이트
+        updateSummaryAfterPayrollChanges(request.laborPayrollInfos());
+    }
+
+    /**
+     * 노무명세서 수정 후 집계 테이블 업데이트
+     */
+    private void updateSummaryAfterPayrollChanges(List<LaborPayrollInfo> laborPayrollInfos) {
+        if (laborPayrollInfos.isEmpty()) {
+            return;
+        }
+
+        // 첫 번째 노무명세서 정보로 현장/공정/년월 파악
+        LaborPayrollInfo firstInfo = laborPayrollInfos.get(0);
+        LaborPayroll firstPayroll = laborPayrollRepository.findById(firstInfo.id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.LABOR_PAYROLL_NOT_FOUND));
+
+        // 해당 현장/공정/년월의 모든 노무명세서 조회
+        List<LaborPayroll> allPayrolls = laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(
+                firstPayroll.getSite(),
+                firstPayroll.getSiteProcess(),
+                firstPayroll.getYearMonth());
+
+        // 집계 계산
+        BigDecimal totalLaborCost = allPayrolls.stream()
+                .map(LaborPayroll::getTotalLaborCost)
+                .filter(cost -> cost != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalDeductions = allPayrolls.stream()
+                .map(LaborPayroll::getTotalDeductions)
+                .filter(deductions -> deductions != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalNetPayment = allPayrolls.stream()
+                .map(LaborPayroll::getNetPayment)
+                .filter(payment -> payment != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 집계 테이블 업데이트
+        var existingSummary = laborPayrollSummaryRepository.findBySiteAndSiteProcessAndYearMonth(
+                firstPayroll.getSite(),
+                firstPayroll.getSiteProcess(),
+                firstPayroll.getYearMonth());
+
+        if (existingSummary.isPresent()) {
+            LaborPayrollSummary summary = existingSummary.get();
+            summary.updateSummary(
+                    summary.getRegularEmployeeCount(), // 기존 값 유지
+                    summary.getDirectContractCount(), // 기존 값 유지
+                    summary.getEtcCount(), // 기존 값 유지
+                    totalLaborCost,
+                    totalDeductions,
+                    totalNetPayment,
+                    summary.getMemo()); // 기존 비고 유지
+            laborPayrollSummaryRepository.save(summary);
         }
     }
 
