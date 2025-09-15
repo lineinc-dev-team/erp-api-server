@@ -7,7 +7,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
@@ -82,7 +82,7 @@ public class FuelInfo extends BaseEntity {
     @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
-    private FuelType fuelType;
+    private FuelInfoFuelType fuelType;
 
     /**
      * 주유량 (리터)

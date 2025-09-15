@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.QFuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.QFuelInfo;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.QOutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.QOutsourcingCompanyContractEquipment;
@@ -112,7 +112,7 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
         }
         if (request.fuelTypes() != null && !request.fuelTypes().isEmpty()) {
             BooleanBuilder fuelTypeCondition = new BooleanBuilder();
-            for (FuelType fuelType : request.fuelTypes()) {
+            for (FuelInfoFuelType fuelType : request.fuelTypes()) {
                 fuelTypeCondition.or(fuelInfo.fuelType.eq(fuelType));
             }
             builder.and(fuelTypeCondition);

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -17,7 +17,7 @@ public record FuelAggregationListRequest(
 
         @Schema(description = "공정명", example = "기초공사") String processName,
 
-        @Schema(description = "유종 (다중선택)", example = "[\"DIESEL\", \"GASOLINE\"]") List<FuelType> fuelTypes,
+        @Schema(description = "유종 (다중선택)", example = "[\"DIESEL\", \"GASOLINE\"]") List<FuelInfoFuelType> fuelTypes,
 
         @Schema(description = "업체명", example = "삼성 ENG") String outsourcingCompanyName,
 
