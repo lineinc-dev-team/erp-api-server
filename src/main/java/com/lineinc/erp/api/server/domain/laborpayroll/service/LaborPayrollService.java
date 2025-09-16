@@ -404,6 +404,19 @@ public class LaborPayrollService {
     }
 
     /**
+     * 노무명세서 변경이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<LaborPayrollChangeHistoryResponse> getLaborPayrollChangeHistoriesWithPaging(
+            Long laborPayrollSummaryId, Pageable pageable) {
+        LaborPayrollSummary laborPayrollSummary = getLaborPayrollSummaryByIdOrThrow(laborPayrollSummaryId);
+        Page<LaborPayrollChangeHistory> changeHistoryPage = laborPayrollChangeHistoryRepository
+                .findBySummaryIdWithPaging(laborPayrollSummary, pageable);
+        return changeHistoryPage.map(LaborPayrollChangeHistoryResponse::from);
+    }
+
+    /**
      * 노무명세서 변경이력 수정
      */
     @Transactional
@@ -466,4 +479,10 @@ public class LaborPayrollService {
         return "인력 정보 없음";
     }
 
+    @Transactional(readOnly = true)
+    public LaborPayrollSummary getLaborPayrollSummaryByIdOrThrow(Long laborPayrollSummaryId) {
+        return laborPayrollSummaryRepository.findById(laborPayrollSummaryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.LABOR_PAYROLL_SUMMARY_NOT_FOUND));
+    }
 }
