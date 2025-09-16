@@ -1,0 +1,46 @@
+package com.lineinc.erp.api.server.interfaces.rest.v2.site.controller;
+
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lineinc.erp.api.server.domain.site.service.SiteService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteChangeHistoryResponse;
+import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
+import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v2/sites")
+@RequiredArgsConstructor
+@Tag(name = "현장 관리 V2", description = "현장 관련 V2 API")
+public class SiteV2Controller {
+    private final SiteService siteService;
+
+    @Operation(summary = "현장 변경 이력 조회", description = "특정 현장의 변경 이력을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+    })
+    @GetMapping("/{id}/change-histories")
+    public ResponseEntity<SuccessResponse<PagingResponse<SiteChangeHistoryResponse>>> getSiteChangeHistories(
+            @PathVariable Long id,
+            @Valid PageRequest pageRequest,
+            @Valid SortRequest sortRequest) {
+        Page<SiteChangeHistoryResponse> page = siteService.getSiteChangeHistoriesWithPaging(id,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+}

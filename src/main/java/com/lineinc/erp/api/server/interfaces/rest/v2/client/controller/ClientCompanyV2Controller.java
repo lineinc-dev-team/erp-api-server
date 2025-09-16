@@ -35,7 +35,7 @@ public class ClientCompanyV2Controller {
     private final CompanyService companyService;
 
     @Operation(summary = "발주처 변경 이력 조회", description = "특정 발주처의 변경 히스토리를 조회합니다.")
-    @ApiResponses({ @ApiResponse(responseCode = "200", description = "조회 성공") })
+    @ApiResponses({ @ApiResponse(responseCode = "200", description = "조회 성공"), })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(

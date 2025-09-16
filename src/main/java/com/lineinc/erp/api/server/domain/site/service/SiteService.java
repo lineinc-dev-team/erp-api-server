@@ -267,14 +267,28 @@ public class SiteService {
     @Transactional(readOnly = true)
     public Slice<SiteChangeHistoryResponse> getSiteChangeHistories(Long siteId, Pageable pageable) {
         // 해당 현장 존재 여부 확인 (예외 처리)
-        siteRepository.findById(siteId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+        Site site = getSiteByIdOrThrow(siteId);
 
         // 현장 변경 이력 조회 (페이지 단위)
-        Slice<SiteChangeHistory> historySlice = siteChangeHistoryRepository.findBySiteId(siteId, pageable);
+        Slice<SiteChangeHistory> historySlice = siteChangeHistoryRepository.findBySite(site, pageable);
 
         // 엔티티 -> DTO 변환 후 반환
         return historySlice.map(SiteChangeHistoryResponse::from);
+    }
+
+    /**
+     * 현장 변경 이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<SiteChangeHistoryResponse> getSiteChangeHistoriesWithPaging(Long siteId, Pageable pageable) {
+        // 해당 현장 존재 여부 확인 (예외 처리)
+        Site site = getSiteByIdOrThrow(siteId);
+
+        // 현장 변경 이력 조회 (전체 개수 포함)
+        Page<SiteChangeHistory> historyPage = siteChangeHistoryRepository.findBySiteWithPaging(site, pageable);
+
+        // 엔티티 -> DTO 변환 후 반환
+        return historyPage.map(SiteChangeHistoryResponse::from);
     }
 }
