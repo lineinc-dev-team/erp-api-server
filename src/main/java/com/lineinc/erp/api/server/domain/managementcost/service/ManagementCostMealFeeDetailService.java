@@ -88,15 +88,19 @@ public class ManagementCostMealFeeDetailService {
                             .amount(dto.amount())
                             .memo(dto.memo())
                             .build();
+                    // 새로 생성된 엔티티의 laborId를 명시적으로 설정
+                    detail.updateFrom(dto);
+                    detail.syncTransientFields(); // transient 필드 동기화
                     return detail;
                 });
 
+        // 수정된 항목들의 Labor 엔티티 재설정
         for (ManagementCostMealFeeDetail detail : managementCost.getMealFeeDetails()) {
             if (detail.getLaborId() != null) {
                 Labor labor = laborService.getLaborByIdOrThrow(detail.getLaborId());
                 detail.setEntities(labor);
             } else {
-                // laborId가 null인 경우에도 null로 설정
+                // laborId가 null인 경우 labor도 null로 설정
                 detail.setEntities(null);
             }
         }
