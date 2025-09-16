@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
-import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
