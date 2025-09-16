@@ -36,13 +36,15 @@ public record ContractWorkerResponse(
     public record ContractWorkerSimpleResponse(
             @Schema(description = "인력 ID", example = "1") Long id,
             @Schema(description = "인력명", example = "김철수") String name,
-            @Schema(description = "카테고리", example = "용접공") String category) {
+            @Schema(description = "카테고리", example = "용접공") String category,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
         public static ContractWorkerSimpleResponse from(OutsourcingCompanyContractWorker worker) {
             return new ContractWorkerSimpleResponse(
                     worker.getId(),
                     worker.getName(),
-                    worker.getCategory());
+                    worker.getCategory(),
+                    worker.isDeleted());
         }
     }
 }
