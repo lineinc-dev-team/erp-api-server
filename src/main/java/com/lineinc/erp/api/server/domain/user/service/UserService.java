@@ -267,6 +267,18 @@ public class UserService {
         return historySlice.map(UserChangeHistoryResponse::from);
     }
 
+    /**
+     * 유저 변경 이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithCount(Long userId, Pageable pageable) {
+        User user = getUserByIdOrThrow(userId);
+        Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserWithPaging(user,
+                pageable);
+        return historyPage.map(UserChangeHistoryResponse::from);
+    }
+
     public List<Long> getAccessibleSiteIds(User user) {
         if (!user.hasRoles()) {
             return List.of();
