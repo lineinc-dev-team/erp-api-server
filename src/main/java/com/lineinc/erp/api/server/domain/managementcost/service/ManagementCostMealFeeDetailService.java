@@ -74,7 +74,9 @@ public class ManagementCostMealFeeDetailService {
                 managementCost.getMealFeeDetails(),
                 requests,
                 (ManagementCostMealFeeDetailUpdateRequest dto) -> {
-                    Labor labor = dto.laborId() != null ? laborService.getLaborByIdOrThrow(dto.laborId()) : null;
+                    Labor labor = (dto.laborId() != null && dto.laborId() != -1)
+                            ? laborService.getLaborByIdOrThrow(dto.laborId())
+                            : null;
                     ManagementCostMealFeeDetail detail = ManagementCostMealFeeDetail.builder()
                             .managementCost(managementCost)
                             .workType(dto.workType())
@@ -90,7 +92,7 @@ public class ManagementCostMealFeeDetailService {
                 });
 
         for (ManagementCostMealFeeDetail detail : managementCost.getMealFeeDetails()) {
-            if (detail.getLaborId() == -1) {
+            if (detail.getLaborId() != null && detail.getLaborId() == -1) {
                 detail.setEntities(null);
             } else if (detail.getLaborId() != null) {
                 Labor labor = laborService.getLaborByIdOrThrow(detail.getLaborId());

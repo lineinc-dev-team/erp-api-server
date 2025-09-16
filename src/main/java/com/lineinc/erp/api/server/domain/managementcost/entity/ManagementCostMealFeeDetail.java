@@ -106,8 +106,8 @@ public class ManagementCostMealFeeDetail extends BaseEntity
     }
 
     public void updateFrom(ManagementCostMealFeeDetailUpdateRequest request) {
-        // ID만 저장
-        this.laborId = request.laborId();
+        // ID 저장 (-1이면 null로 변환)
+        this.laborId = (request.laborId() != null && request.laborId() == -1) ? null : request.laborId();
 
         // 직접 업데이트 가능한 필드들
         Optional.ofNullable(request.workType()).ifPresent(val -> this.workType = val);
