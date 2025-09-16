@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.dailyreport.service.DailyReportService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
@@ -62,6 +63,21 @@ public class DailyReportController {
     public ResponseEntity<Void> createDailyReport(
             @Valid @RequestBody DailyReportCreateRequest request) {
         dailyReportService.createDailyReport(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 수정", description = "출역일보 기본 정보를 수정합니다. (현재: 날씨 데이터)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "출역일보 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "출역일보를 찾을 수 없음", content = @Content())
+    })
+    @PatchMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReport(
+            @Valid DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody DailyReportUpdateRequest request) {
+        dailyReportService.updateDailyReport(searchRequest, request);
         return ResponseEntity.ok().build();
     }
 

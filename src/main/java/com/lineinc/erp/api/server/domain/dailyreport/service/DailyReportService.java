@@ -40,6 +40,7 @@ import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollSyncService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileCreateRequest;
@@ -321,6 +322,32 @@ public class DailyReportService {
     }
 
     /**
+     * 출역일보 기본 정보를 수정합니다. (현재: 날씨 데이터)
+     * 
+     * @param searchRequest 조회 요청 파라미터 (현장아이디, 공정아이디, 일자)
+     * @param request       수정 요청 정보
+     */
+    @Transactional
+    public void updateDailyReport(DailyReportSearchRequest searchRequest, DailyReportUpdateRequest request) {
+        // 현장과 공정 조회
+        Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 출역일보 조회
+        DailyReport dailyReport = dailyReportRepository.findBySiteAndSiteProcessAndReportDate(
+                site, siteProcess, DateTimeFormatUtils.toUtcStartOfDay(searchRequest.reportDate()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 현재는 날씨 데이터만 수정
+        if (request.weather() != null) {
+            dailyReport.setWeather(request.weather());
+        }
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    /**
      * 출역일보 직원정보를 슬라이스로 조회합니다.
      * 
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
@@ -338,7 +365,7 @@ public class DailyReportService {
                 .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
                         site, siteProcess,
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        request.weather(), pageable);
+                        null, pageable);
 
         // DailyReport 슬라이스를 DailyReportEmployeeResponse 슬라이스로 변환
         // 각 DailyReport의 직원들을 개별 항목으로 변환
@@ -377,7 +404,7 @@ public class DailyReportService {
                 .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
                         site, siteProcess,
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        request.weather(), pageable);
+                        null, pageable);
 
         // DailyReport 슬라이스를 DailyReportDirectContractResponse 슬라이스로 변환
         // 각 DailyReport의 직영/계약직들을 개별 항목으로 변환
@@ -416,7 +443,7 @@ public class DailyReportService {
                 .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
                         site, siteProcess,
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        request.weather(), pageable);
+                        null, pageable);
 
         // DailyReport 슬라이스를 DailyReportOutsourcingResponse 슬라이스로 변환
         // 각 DailyReport의 외주들을 개별 항목으로 변환
@@ -455,7 +482,7 @@ public class DailyReportService {
                 .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
                         site, siteProcess,
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        request.weather(), pageable);
+                        null, pageable);
 
         // DailyReport 슬라이스를 DailyReportFuelResponse 슬라이스로 변환
         // 각 DailyReport의 유류들을 개별 항목으로 변환
@@ -494,7 +521,7 @@ public class DailyReportService {
                 .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
                         site, siteProcess,
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        request.weather(), pageable);
+                        null, pageable);
 
         // DailyReport 슬라이스를 DailyReportEquipmentResponse 슬라이스로 변환
         // 각 DailyReport의 장비들을 개별 항목으로 변환
@@ -533,7 +560,7 @@ public class DailyReportService {
                 .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
                         site, siteProcess,
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        request.weather(), pageable);
+                        null, pageable);
 
         // DailyReport 슬라이스를 DailyReportFileResponse 슬라이스로 변환
         // 각 DailyReport의 파일들을 개별 항목으로 변환

@@ -43,6 +43,7 @@ public class DailyReport extends BaseEntity {
     private OffsetDateTime reportDate; // 출역일보 일자
 
     @Enumerated(EnumType.STRING)
+    @Setter
     private FuelAggregationWeatherType weather; // 날씨
 
     @Enumerated(EnumType.STRING)
