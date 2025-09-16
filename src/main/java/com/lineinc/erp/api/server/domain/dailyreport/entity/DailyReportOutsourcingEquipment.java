@@ -12,12 +12,15 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Optional;
 
+import org.hibernate.annotations.SQLRestriction;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
 @Builder
+@SQLRestriction("deleted = false")
 public class DailyReportOutsourcingEquipment extends BaseEntity {
 
     @Id
