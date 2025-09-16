@@ -30,7 +30,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyBasicInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
@@ -72,7 +72,7 @@ public class ManagementCostService {
     private final ManagementCostKeyMoneyDetailService managementCostKeyMoneyDetailService;
     private final ManagementCostMealFeeDetailService managementCostMealFeeDetailService;
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
-    private final OutsourcingChangeRepository outsourcingChangeRepository;
+    private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
 
     private final Javers javers;
 
@@ -161,7 +161,7 @@ public class ManagementCostService {
                             .type(OutsourcingChangeType.BASIC)
                             .changes(changesJson)
                             .build();
-                    outsourcingChangeRepository.save(changeHistory);
+                    outsourcingCompanyChangeRepository.save(changeHistory);
                 }
             }
         } else if (outsourcingCompanyInfo != null) {

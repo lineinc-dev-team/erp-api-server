@@ -21,7 +21,7 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
 
@@ -29,7 +29,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 @RequiredArgsConstructor
 public class OutsourcingCompanyFileService {
     private final Javers javers;
-    private final OutsourcingChangeRepository outsourcingChangeRepository;
+    private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
 
     @Transactional
     public void createOutsourcingCompanyFiles(
@@ -105,7 +105,7 @@ public class OutsourcingCompanyFileService {
                     .type(OutsourcingChangeType.ATTACHMENT)
                     .changes(json)
                     .build();
-            outsourcingChangeRepository.save(history);
+            outsourcingCompanyChangeRepository.save(history);
         }
     }
 }

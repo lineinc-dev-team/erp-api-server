@@ -7,7 +7,7 @@ import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHis
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactUpdateRequest;
 
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OutsourcingCompanyContactService {
     private final Javers javers;
-    private final OutsourcingChangeRepository outsourcingChangeRepository;
+    private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
 
     @Transactional
     public void createOutsourcingCompanyContacts(
@@ -118,7 +118,7 @@ public class OutsourcingCompanyContactService {
                     .type(OutsourcingChangeType.CONTACT)
                     .changes(json)
                     .build();
-            outsourcingChangeRepository.save(history);
+            outsourcingCompanyChangeRepository.save(history);
         }
     }
 }

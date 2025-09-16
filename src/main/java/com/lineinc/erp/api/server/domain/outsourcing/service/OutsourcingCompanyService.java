@@ -18,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingChangeRepository;
+import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
@@ -41,7 +41,7 @@ public class OutsourcingCompanyService {
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
     private final OutsourcingCompanyContactService outsourcingCompanyContactService;
     private final OutsourcingCompanyFileService outsourcingCompanyFileService;
-    private final OutsourcingChangeRepository outsourcingChangeRepository;
+    private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
     private final Javers javers;
 
     @Transactional
@@ -123,12 +123,12 @@ public class OutsourcingCompanyService {
                     .type(OutsourcingChangeType.BASIC)
                     .changes(changesJson)
                     .build();
-            outsourcingChangeRepository.save(changeHistory);
+            outsourcingCompanyChangeRepository.save(changeHistory);
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (OutsourcingCompanyUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
-                outsourcingChangeRepository.findById(historyRequest.id())
+                outsourcingCompanyChangeRepository.findById(historyRequest.id())
                         .filter(history -> history.getOutsourcingCompany().getId().equals(company.getId()))
                         .ifPresent(history -> {
                             history.setMemo(historyRequest.memo());
@@ -240,9 +240,28 @@ public class OutsourcingCompanyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        Slice<OutsourcingChangeHistory> histories = outsourcingChangeRepository.findAllByOutsourcingCompany(company,
+        Slice<OutsourcingChangeHistory> histories = outsourcingCompanyChangeRepository.findAllByOutsourcingCompany(
+                company,
                 pageable);
         return histories.map(CompanyChangeHistoryResponse::from);
+    }
+
+    /**
+     * 외주업체 변경 이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistoriesWithPaging(Long id,
+            Pageable pageable) {
+        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
+
+        Page<OutsourcingChangeHistory> historyPage = outsourcingCompanyChangeRepository
+                .findAllByOutsourcingCompanyWithPaging(
+                        company,
+                        pageable);
+        return historyPage.map(CompanyChangeHistoryResponse::from);
     }
 
     @Transactional(readOnly = true)
