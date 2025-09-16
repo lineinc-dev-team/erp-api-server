@@ -10,8 +10,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import org.hibernate.annotations.SQLRestriction;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +24,6 @@ import com.lineinc.erp.api.server.shared.constant.AppConstants;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class DailyReport extends BaseEntity {
 
     @Id

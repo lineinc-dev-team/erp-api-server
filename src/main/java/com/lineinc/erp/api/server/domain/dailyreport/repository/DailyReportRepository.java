@@ -34,7 +34,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      */
     @Query("SELECT dr FROM DailyReport dr WHERE dr.site = :site AND dr.siteProcess = :siteProcess " +
             "AND dr.reportDate = :reportDate " +
-            "AND (:weather IS NULL OR dr.weather = :weather)")
+            "AND (:weather IS NULL OR dr.weather = :weather) " +
+            "AND dr.deleted = false")
     Slice<DailyReport> findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
             @Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
@@ -50,7 +51,9 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             "LEFT JOIN dr.employees e " +
             "LEFT JOIN dr.directContracts dc " +
             "WHERE (e.labor.id = :laborId OR dc.labor.id = :laborId) " +
-            "AND dr.reportDate >= :startDate AND dr.reportDate <= :endDate")
+            "AND dr.reportDate >= :startDate AND dr.reportDate <= :endDate " +
+            "AND dr.deleted = false AND (e.deleted = false OR e IS NULL) " +
+            "AND (dc.deleted = false OR dc IS NULL)")
     List<DailyReport> findByLaborIdAndDateRange(@Param("laborId") Long laborId,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
@@ -61,7 +64,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
             "WHERE dr.site.id = :siteId " +
             "AND dr.siteProcess.id = :siteProcessId " +
-            "AND dr.reportDate = :reportDate")
+            "AND dr.reportDate = :reportDate " +
+            "AND dr.deleted = false")
     boolean existsBySiteAndSiteProcessAndReportDate(@Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
             @Param("reportDate") OffsetDateTime reportDate);
@@ -72,7 +76,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     @Query("SELECT dr FROM DailyReport dr " +
             "WHERE dr.site = :site " +
             "AND dr.siteProcess = :siteProcess " +
-            "AND dr.reportDate = :reportDate")
+            "AND dr.reportDate = :reportDate " +
+            "AND dr.deleted = false")
     Optional<DailyReport> findBySiteAndSiteProcessAndReportDate(@Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("reportDate") OffsetDateTime reportDate);
@@ -84,7 +89,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
             "LEFT JOIN dr.directContracts dc " +
             "WHERE dc.labor.id = :laborId " +
-            "AND dr.reportDate >= :startDate")
+            "AND dr.reportDate >= :startDate " +
+            "AND dr.deleted = false AND dc.deleted = false")
     boolean hasWorkRecordSince(@Param("laborId") Long laborId, @Param("startDate") OffsetDateTime startDate);
 
     /**
@@ -95,7 +101,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             "FROM DailyReport dr " +
             "LEFT JOIN dr.directContracts dc " +
             "WHERE dc.labor.id = :laborId " +
-            "AND dr.reportDate >= :startDate AND dr.reportDate < :endDate")
+            "AND dr.reportDate >= :startDate AND dr.reportDate < :endDate " +
+            "AND dr.deleted = false AND dc.deleted = false")
     Double calculateLastMonthWorkHours(@Param("laborId") Long laborId,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
@@ -107,7 +114,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     @Query("SELECT dr FROM DailyReport dr " +
             "WHERE dr.reportDate >= :startDate " +
             "AND dr.reportDate <= :endDate " +
-            "AND dr.status = :status")
+            "AND dr.status = :status " +
+            "AND dr.deleted = false")
     List<DailyReport> findByReportDateBetweenAndStatus(@Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate,
             @Param("status") DailyReportStatus status);
@@ -118,7 +126,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      */
     @Query("SELECT dr FROM DailyReport dr " +
             "WHERE dr.reportDate < :beforeDate " +
-            "AND dr.status = :status")
+            "AND dr.status = :status " +
+            "AND dr.deleted = false")
     List<DailyReport> findByReportDateBeforeAndStatus(@Param("beforeDate") OffsetDateTime beforeDate,
             @Param("status") DailyReportStatus status);
 
@@ -131,6 +140,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             "AND dr.siteProcess = :siteProcess " +
             "AND dr.reportDate >= :startDate " +
             "AND dr.reportDate <= :endDate " +
+            "AND dr.deleted = false " +
             "ORDER BY dr.reportDate ASC")
     List<DailyReport> findBySiteAndSiteProcessAndReportDateBetween(@Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
@@ -143,7 +153,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
             "JOIN dr.employees e " +
             "WHERE dr.reportDate = :reportDate " +
-            "AND e.labor.id = :laborId")
+            "AND e.labor.id = :laborId " +
+            "AND dr.deleted = false AND e.deleted = false")
     boolean existsByReportDateAndEmployeesLaborId(
             @Param("reportDate") OffsetDateTime reportDate,
             @Param("laborId") Long laborId);
@@ -154,7 +165,8 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
             "JOIN dr.directContracts dc " +
             "WHERE dr.reportDate = :reportDate " +
-            "AND dc.labor.id = :laborId")
+            "AND dc.labor.id = :laborId " +
+            "AND dr.deleted = false AND dc.deleted = false")
     boolean existsByReportDateAndDirectContractsLaborId(
             @Param("reportDate") OffsetDateTime reportDate,
             @Param("laborId") Long laborId);

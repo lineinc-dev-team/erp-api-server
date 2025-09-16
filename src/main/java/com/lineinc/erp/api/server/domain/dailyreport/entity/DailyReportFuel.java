@@ -10,8 +10,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import org.hibernate.annotations.SQLRestriction;
-
 import java.util.Optional;
 
 @Entity
@@ -20,7 +18,6 @@ import java.util.Optional;
 @AllArgsConstructor
 @SuperBuilder
 @Builder
-@SQLRestriction("deleted = false")
 public class DailyReportFuel extends BaseEntity {
 
     @Id

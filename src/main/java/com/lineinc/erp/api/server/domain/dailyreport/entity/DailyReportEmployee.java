@@ -8,8 +8,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import org.hibernate.annotations.SQLRestriction;
-
 import java.util.Optional;
 
 @Entity
@@ -17,7 +15,6 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class DailyReportEmployee extends BaseEntity {
 
     @Id
