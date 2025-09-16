@@ -60,13 +60,15 @@ public class LaborPayrollSyncService {
         removeExistingPayrolls(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
 
         // 2. 해당 월 출역일보 조회
-        List<DailyReport> monthlyReports = findMonthlyDailyReports(dailyReport, yearMonth);
+        List<DailyReport> monthlyReports = findMonthlyDailyReports(dailyReport,
+                yearMonth);
 
         // 3. 노무비 명세서 재생성
         regeneratePayrollsFromReports(monthlyReports, yearMonth);
 
-        // 4. 집계 테이블 업데이트
-        updateSummaryTable(dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth);
+        // // 4. 집계 테이블 업데이트
+        updateSummaryTable(dailyReport.getSite(), dailyReport.getSiteProcess(),
+                yearMonth);
 
         log.info("노무비 명세서 동기화 완료: 출역일보 ID={}", dailyReport.getId());
     }
@@ -119,16 +121,20 @@ public class LaborPayrollSyncService {
             LocalDate reportDate = DateTimeFormatUtils.toKoreaLocalDate(dailyReport.getReportDate());
             int dayOfMonth = reportDate.getDayOfMonth();
 
-            // 정직원 처리
+            // 정직원 처리 (삭제되지 않은 데이터만)
             for (DailyReportEmployee employee : dailyReport.getEmployees()) {
-                processEmployeeData(laborDataMap, employee, dayOfMonth, yearMonth,
-                        dailyReport.getSite(), dailyReport.getSiteProcess());
+                if (!employee.isDeleted()) {
+                    processEmployeeData(laborDataMap, employee, dayOfMonth, yearMonth,
+                            dailyReport.getSite(), dailyReport.getSiteProcess());
+                }
             }
 
-            // 직영/계약직 처리
+            // 직영/계약직 처리 (삭제되지 않은 데이터만)
             for (DailyReportDirectContract directContract : dailyReport.getDirectContracts()) {
-                processDirectContractData(laborDataMap, directContract, dayOfMonth, yearMonth,
-                        dailyReport.getSite(), dailyReport.getSiteProcess());
+                if (!directContract.isDeleted()) {
+                    processDirectContractData(laborDataMap, directContract, dayOfMonth, yearMonth,
+                            dailyReport.getSite(), dailyReport.getSiteProcess());
+                }
             }
         }
 
