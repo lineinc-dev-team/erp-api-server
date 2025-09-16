@@ -444,7 +444,7 @@ public class ManagementCostService {
     }
 
     /**
-     * 관리비 수정이력 조회
+     * 관리비 수정이력 조회 (Slice 방식)
      */
     @Transactional(readOnly = true)
     public Slice<ManagementCostChangeHistoryResponse> getManagementCostChangeHistories(Long managementCostId,
@@ -453,5 +453,19 @@ public class ManagementCostService {
 
         return managementCostChangeHistoryRepository.findAllByManagementCost(managementCost, pageable)
                 .map(ManagementCostChangeHistoryResponse::from);
+    }
+
+    /**
+     * 관리비 수정이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<ManagementCostChangeHistoryResponse> getManagementCostChangeHistoriesWithPaging(Long managementCostId,
+            Pageable pageable) {
+        ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
+
+        Page<ManagementCostChangeHistory> historyPage = managementCostChangeHistoryRepository
+                .findAllByManagementCostWithPaging(managementCost, pageable);
+        return historyPage.map(ManagementCostChangeHistoryResponse::from);
     }
 }
