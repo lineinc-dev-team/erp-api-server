@@ -16,18 +16,14 @@ import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
-import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Page;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborChangeHistoryResponse;
 
