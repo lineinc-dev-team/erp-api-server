@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.interfaces.rest.v2.user.controller;
+package com.lineinc.erp.api.server.interfaces.rest.v2.client.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
-import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.UserChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -27,28 +27,24 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(value = "/api/v2/users")
+@RequestMapping("/api/v2/client-companies")
 @RequiredArgsConstructor
-@Tag(name = "유저 관리 V2", description = "유저 관련 V2 API")
-public class UserV2Controller {
+@Tag(name = "발주처 관리 V2", description = "발주처 관련 V2 API")
+public class ClientCompanyV2Controller {
 
-    private final UserService userService;
+    private final CompanyService companyService;
 
-    @Operation(summary = "유저 변경 이력 조회", description = "특정 유저의 변경 히스토리를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
+    @Operation(summary = "발주처 변경 이력 조회", description = "특정 발주처의 변경 히스토리를 조회합니다.")
+    @ApiResponses({ @ApiResponse(responseCode = "200", description = "조회 성공") })
     @GetMapping("/{id}/change-histories")
-    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<UserChangeHistoryResponse>>> getUserChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
+    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
+            @PathVariable Long id, @Valid PageRequest pageRequest,
             @Valid SortRequest sortRequest) {
-
-        Page<UserChangeHistoryResponse> page = userService.getUserChangeHistoriesWithPaging(
-                id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
-
+        Page<ClientCompanyChangeHistoryResponse> page = companyService.getClientCompanyChangeHistoriesWithPaging(id,
+                PageableUtils.createPageable(pageRequest.page(),
+                        pageRequest.size(),
+                        sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }

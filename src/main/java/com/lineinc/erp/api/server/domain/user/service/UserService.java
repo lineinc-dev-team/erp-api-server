@@ -272,7 +272,7 @@ public class UserService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithCount(Long userId, Pageable pageable) {
+    public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithPaging(Long userId, Pageable pageable) {
         User user = getUserByIdOrThrow(userId);
         Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserWithPaging(user,
                 pageable);
