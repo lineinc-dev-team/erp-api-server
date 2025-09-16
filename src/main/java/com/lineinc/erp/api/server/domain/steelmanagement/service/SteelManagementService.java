@@ -331,4 +331,10 @@ public class SteelManagementService {
         steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details());
         steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files());
     }
+
+    public SteelManagement getSteelManagementByIdOrThrow(Long steelManagementId) {
+        return steelManagementRepository.findById(steelManagementId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+    }
 }
