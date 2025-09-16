@@ -597,6 +597,8 @@ public class DailyReportService {
                             .labor(laborService.getLaborByIdOrThrow(dto.laborId()))
                             .workContent(dto.workContent())
                             .workQuantity(dto.workQuantity())
+                            .unitPrice(laborService.getLaborByIdOrThrow(dto.laborId())
+                                    .getDailyWage())
                             .memo(dto.memo())
                             .build();
                 });
