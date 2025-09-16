@@ -273,4 +273,10 @@ public class MaterialManagementService {
             }
         }
     }
+
+    public MaterialManagement getMaterialManagementByIdOrThrow(Long materialManagementId) {
+        return materialManagementRepository.findById(materialManagementId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
+    }
 }
