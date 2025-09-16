@@ -67,7 +67,19 @@ public class JaversUtils {
             Map.entry(ManagementCostDetail.class, entity -> ((ManagementCostDetail) entity).getName()),
             Map.entry(ManagementCostKeyMoneyDetail.class,
                     entity -> ((ManagementCostKeyMoneyDetail) entity).getAccount()),
-            Map.entry(ManagementCostMealFeeDetail.class, entity -> ((ManagementCostMealFeeDetail) entity).getName()),
+            Map.entry(ManagementCostMealFeeDetail.class, entity -> {
+                ManagementCostMealFeeDetail detail = (ManagementCostMealFeeDetail) entity;
+                String name = detail.getName();
+                if (name != null && !name.trim().isEmpty()) {
+                    return name;
+                }
+                // name이 비어있으면 labor의 name 사용
+                if (detail.getLabor() != null && detail.getLabor().getName() != null
+                        && !detail.getLabor().getName().trim().isEmpty()) {
+                    return detail.getLabor().getName();
+                }
+                return null;
+            }),
             Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getOriginalFileName()));
 
     // ================== Snapshot ==================
@@ -93,6 +105,11 @@ public class JaversUtils {
                             && Boolean.FALSE.equals(vc.getLeft())
                             && Boolean.TRUE.equals(vc.getRight())) {
                         String beforeValue = formatDeletedContactName(vc.getAffectedObject());
+
+                        // 의미있는 식별자가 없으면 히스토리를 생성하지 않음
+                        if (beforeValue == null || beforeValue.trim().isEmpty() || "항목".equals(beforeValue)) {
+                            return null;
+                        }
 
                         return Map.of(
                                 "property", "null",
@@ -156,8 +173,10 @@ public class JaversUtils {
 
     public static Map<String, String> extractAddedEntityChange(Javers javers, Object newEntity) {
         String afterValue = extractEntityName(newEntity);
-        if (afterValue == null)
-            afterValue = toJsonSafe(javers, newEntity);
+        if (afterValue == null || afterValue.trim().isEmpty()) {
+            // 의미있는 식별자가 없으면 히스토리를 생성하지 않음
+            return null;
+        }
 
         return Map.of(
                 "property", "null",

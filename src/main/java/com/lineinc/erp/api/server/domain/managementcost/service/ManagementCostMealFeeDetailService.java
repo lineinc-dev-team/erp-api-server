@@ -117,7 +117,10 @@ public class ManagementCostMealFeeDetailService {
 
         for (ManagementCostMealFeeDetail after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
-                allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
+                Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                if (addedChange != null) {
+                    allChanges.add(addedChange);
+                }
             }
         }
 
