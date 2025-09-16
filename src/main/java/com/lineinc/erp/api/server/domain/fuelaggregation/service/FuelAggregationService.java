@@ -177,12 +177,38 @@ public class FuelAggregationService {
     }
 
     @Transactional(readOnly = true)
+    public FuelAggregation getFuelAggregationByIdOrThrow(Long id) {
+        return fuelAggregationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
+    }
+
+    /**
+     * 유류집계 변경 이력 조회 (Slice 방식)
+     */
+    @Transactional(readOnly = true)
     public Slice<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistories(Long fuelAggregationId,
             Pageable pageable) {
+        FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
 
         Slice<FuelAggregationChangeHistory> histories = fuelAggregationChangeHistoryRepository
-                .findByFuelAggregationId(fuelAggregationId, pageable);
+                .findByFuelAggregation(fuelAggregation, pageable);
         return histories.map(FuelAggregationChangeHistoryResponse::from);
+    }
+
+    /**
+     * 유류집계 변경 이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistoriesWithPaging(
+            Long fuelAggregationId,
+            Pageable pageable) {
+        FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
+
+        Page<FuelAggregationChangeHistory> historyPage = fuelAggregationChangeHistoryRepository
+                .findByFuelAggregationWithPaging(fuelAggregation, pageable);
+        return historyPage.map(FuelAggregationChangeHistoryResponse::from);
     }
 
     @Transactional

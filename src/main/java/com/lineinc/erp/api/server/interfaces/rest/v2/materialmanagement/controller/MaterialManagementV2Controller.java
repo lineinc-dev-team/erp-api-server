@@ -38,7 +38,6 @@ public class MaterialManagementV2Controller {
     @Operation(summary = "자재관리 수정이력 조회", description = "자재관리의 수정이력을 조회합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
