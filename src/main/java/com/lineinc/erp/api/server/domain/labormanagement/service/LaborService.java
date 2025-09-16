@@ -374,4 +374,20 @@ public class LaborService {
         // 엔티티를 DTO로 변환하여 슬라이스 반환
         return historySlice.map(LaborChangeHistoryResponse::from);
     }
+
+    /**
+     * 인력정보 변경 이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<LaborChangeHistoryResponse> getLaborChangeHistoriesWithPaging(Long id, Pageable pageable) {
+        // 인력정보 존재 확인
+        Labor labor = getLaborByIdOrThrow(id);
+
+        // LaborChangeHistory를 labor 기준으로 페이지 조회
+        Page<LaborChangeHistory> historyPage = laborChangeHistoryRepository.findByLaborWithPaging(labor, pageable);
+
+        // 엔티티를 DTO로 변환하여 페이지 반환
+        return historyPage.map(LaborChangeHistoryResponse::from);
+    }
 }
