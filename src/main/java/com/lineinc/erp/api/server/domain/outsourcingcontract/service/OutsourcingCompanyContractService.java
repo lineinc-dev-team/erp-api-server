@@ -58,6 +58,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.req
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
@@ -707,6 +708,20 @@ public class OutsourcingCompanyContractService {
     }
 
     /**
+     * 계약 변경 이력을 전체 개수와 함께 조회
+     * 페이지 네비게이션이 필요한 경우 사용
+     */
+    @Transactional(readOnly = true)
+    public Page<ContractChangeHistoryResponse> getContractChangeHistoriesWithPaging(Long contractId,
+            Pageable pageable) {
+        OutsourcingCompanyContract contract = getContractByIdOrThrow(contractId);
+
+        Page<OutsourcingCompanyContractChangeHistory> historyPage = contractChangeHistoryRepository
+                .findByOutsourcingCompanyContractWithPaging(contract, pageable);
+        return historyPage.map(ContractChangeHistoryResponse::from);
+    }
+
+    /**
      * 외주업체 ID로 계약 ID 목록을 조회합니다.
      */
     private List<Long> getContractIdsByCompany(Long companyId) {
@@ -739,5 +754,12 @@ public class OutsourcingCompanyContractService {
                 .findAllByVehicleNumber(searchKeyword, pageable);
 
         return equipmentSlice.map(ContractEquipmentResponse.ContractEquipmentSimpleResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public OutsourcingCompanyContract getContractByIdOrThrow(Long contractId) {
+        return contractRepository.findById(contractId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
     }
 }
