@@ -90,7 +90,9 @@ public class ManagementCostMealFeeDetailService {
                 });
 
         for (ManagementCostMealFeeDetail detail : managementCost.getMealFeeDetails()) {
-            if (detail.getLaborId() != null) {
+            if (detail.getLaborId() == -1) {
+                detail.setEntities(null);
+            } else if (detail.getLaborId() != null) {
                 Labor labor = laborService.getLaborByIdOrThrow(detail.getLaborId());
                 detail.setEntities(labor);
             }
