@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -9,6 +7,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,65 +29,52 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(indexes = { @Index(columnList = "name"), @Index(columnList = "originalFileName") })
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 @SQLRestriction("deleted = false")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "originalFileName")
+})
 public class ClientCompanyFile extends BaseEntity {
+    private static final String SEQUENCE_NAME = "client_company_file_seq";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_file_seq")
-    @SequenceGenerator(name = "client_company_file_seq", sequenceName = "client_company_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
-    /**
-     * 이 파일이 연결된 발주처 엔티티
-     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_company_id", nullable = false)
+    @JoinColumn(name = AppConstants.CLIENT_COMPANY_ID, nullable = false)
     private ClientCompany clientCompany;
 
-    /**
-     * 문서명 (사용자가 지정하는 파일 이름)
-     */
+    @Column
     @DiffInclude
-    @Column(nullable = false)
     private String name;
 
-    /**
-     * S3 또는 외부 스토리지에 저장된 파일의 URL
-     */
+    @Column
     @DiffIgnore
-    @Column
-    private String fileUrl; // S3 경로
+    private String fileUrl;
 
-    /**
-     * 업로드된 파일의 원본 파일명
-     */
-    @DiffInclude
     @Column
+    @DiffInclude
     private String originalFileName;
 
-    /**
-     * 파일 타입 (사업자등록증, 일반 등)
-     */
-    @Enumerated(EnumType.STRING)
     @Column
+    @Enumerated(EnumType.STRING)
     private ClientCompanyFileType type;
 
-    /**
-     * 파일에 대한 비고 또는 설명
-     */
     @Column(columnDefinition = "TEXT")
-    private String memo; // 비고 / 메모
+    private String memo;
 
     public void updateFrom(final ClientCompanyFileUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
-        Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.name = request.name();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.type = request.type();
+        this.memo = request.memo();
     }
 
 }

@@ -78,6 +78,8 @@ public final class AppConstants {
     // JPA 시퀀스 AllocationSize 관련 상수
     public static final int SEQUENCE_ALLOCATION_DEFAULT = 1;
 
+    public static final String CLIENT_COMPANY_ID = "client_company_id";
+
     private AppConstants() {
     } // 인스턴스화 방지
 }

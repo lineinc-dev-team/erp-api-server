@@ -22,17 +22,19 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(indexes = { @Index(columnList = "createdAt"), })
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @AllArgsConstructor
-@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(columnList = "createdAt")
+})
 public class ClientCompanyChangeHistory extends BaseEntity {
     private static final String SEQUENCE_NAME = "client_company_change_history_seq";
 
@@ -42,18 +44,18 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_company_id", nullable = false)
+    @JoinColumn(name = AppConstants.CLIENT_COMPANY_ID, nullable = false)
     private ClientCompany clientCompany;
 
-    @Enumerated(EnumType.STRING)
     @Column
+    @Enumerated(EnumType.STRING)
     private ClientCompanyChangeHistoryChangeType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String changes;
 
     @Setter
     @Column(columnDefinition = "TEXT")
-    private String memo; // 선택적 변경 사유, 비고 등
+    private String memo;
 }
