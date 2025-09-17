@@ -28,6 +28,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContactResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -45,7 +46,7 @@ public class OutsourcingCompanyService {
     private final Javers javers;
 
     @Transactional
-    public OutsourcingCompany createOutsourcingCompany(OutsourcingCompanyCreateRequest request) {
+    public OutsourcingCompany createOutsourcingCompany(final OutsourcingCompanyCreateRequest request) {
 
         if (outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -53,7 +54,7 @@ public class OutsourcingCompanyService {
         }
 
         // 1. OutsourcingCompany 객체 빌드
-        OutsourcingCompany outsourcingCompany = OutsourcingCompany.builder()
+        final OutsourcingCompany outsourcingCompany = OutsourcingCompany.builder()
                 .name(request.name())
                 .businessNumber(request.businessNumber())
                 .type(request.type())
@@ -80,23 +81,23 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public CompanyDetailResponse getOutsourcingCompanyById(Long id) {
-        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+    public CompanyDetailResponse getOutsourcingCompanyById(final Long id) {
+        final OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
         return CompanyDetailResponse.from(company);
     }
 
     @Transactional(readOnly = true)
-    public OutsourcingCompany getOutsourcingCompanyByIdOrThrow(Long id) {
+    public OutsourcingCompany getOutsourcingCompanyByIdOrThrow(final Long id) {
         return outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
     }
 
     @Transactional
-    public void updateOutsourcingCompany(Long id, OutsourcingCompanyUpdateRequest request) {
-        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+    public void updateOutsourcingCompany(final Long id, final OutsourcingCompanyUpdateRequest request) {
+        final OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
@@ -108,17 +109,17 @@ public class OutsourcingCompanyService {
         }
 
         company.syncTransientFields();
-        OutsourcingCompany oldSnapshot = JaversUtils.createSnapshot(javers, company, OutsourcingCompany.class);
+        final OutsourcingCompany oldSnapshot = JaversUtils.createSnapshot(javers, company, OutsourcingCompany.class);
 
         company.updateFrom(request);
         outsourcingCompanyRepository.save(company);
 
-        Diff diff = javers.compare(oldSnapshot, company);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        final Diff diff = javers.compare(oldSnapshot, company);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            OutsourcingChangeHistory changeHistory = OutsourcingChangeHistory.builder()
+            final OutsourcingChangeHistory changeHistory = OutsourcingChangeHistory.builder()
                     .outsourcingCompany(company)
                     .type(OutsourcingChangeType.BASIC)
                     .changes(changesJson)
@@ -127,7 +128,7 @@ public class OutsourcingCompanyService {
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (OutsourcingCompanyUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+            for (final ChangeHistoryRequest historyRequest : request.changeHistories()) {
                 outsourcingCompanyChangeRepository.findById(historyRequest.id())
                         .filter(history -> history.getOutsourcingCompany().getId().equals(company.getId()))
                         .ifPresent(history -> {
@@ -141,19 +142,20 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CompanyResponse> getAllOutsourcingCompanies(OutsourcingCompanyListRequest request, Pageable pageable) {
+    public Page<CompanyResponse> getAllOutsourcingCompanies(final OutsourcingCompanyListRequest request,
+            final Pageable pageable) {
         return outsourcingCompanyRepository.findAll(request, pageable);
     }
 
     @Transactional
-    public void deleteOutsourcingCompanies(DeleteOutsourcingCompaniesRequest request) {
-        List<OutsourcingCompany> outsourcingCompanies = outsourcingCompanyRepository
+    public void deleteOutsourcingCompanies(final DeleteOutsourcingCompaniesRequest request) {
+        final List<OutsourcingCompany> outsourcingCompanies = outsourcingCompanyRepository
                 .findAllById(request.outsourcingCompanyIds());
         if (outsourcingCompanies.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND);
         }
 
-        for (OutsourcingCompany company : outsourcingCompanies) {
+        for (final OutsourcingCompany company : outsourcingCompanies) {
             company.markAsDeleted();
         }
 
@@ -162,10 +164,10 @@ public class OutsourcingCompanyService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(
-            OutsourcingCompanyListRequest request,
-            Sort sort,
-            List<String> fields) {
-        List<CompanyResponse> companyRespons = outsourcingCompanyRepository.findAllWithoutPaging(request, sort)
+            final OutsourcingCompanyListRequest request,
+            final Sort sort,
+            final List<String> fields) {
+        final List<CompanyResponse> companyRespons = outsourcingCompanyRepository.findAllWithoutPaging(request, sort)
                 .stream()
                 .map(CompanyResponse::from)
                 .toList();
@@ -177,7 +179,7 @@ public class OutsourcingCompanyService {
                 this::getExcelCellValue);
     }
 
-    private String getExcelHeaderName(String field) {
+    private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "id" -> "No.";
             case "name" -> "업체명";
@@ -199,8 +201,8 @@ public class OutsourcingCompanyService {
         };
     }
 
-    private String getExcelCellValue(CompanyResponse company, String field) {
-        var mainContact = company.contacts().stream()
+    private String getExcelCellValue(final CompanyResponse company, final String field) {
+        final var mainContact = company.contacts().stream()
                 .filter(CompanyContactResponse::isMain)
                 .findFirst()
                 .orElse(null);
@@ -212,9 +214,9 @@ public class OutsourcingCompanyService {
             case "type" -> company.type();
             case "ceoName" -> company.ceoName();
             case "address" -> {
-                String address = company.address() != null ? company.address() : "";
-                String detailAddress = company.detailAddress() != null ? company.detailAddress() : "";
-                String fullAddress = (address + " " + detailAddress).trim();
+                final String address = company.address() != null ? company.address() : "";
+                final String detailAddress = company.detailAddress() != null ? company.detailAddress() : "";
+                final String fullAddress = (address + " " + detailAddress).trim();
                 yield fullAddress.isEmpty() ? null : fullAddress;
             }
             case "phoneNumber" -> company.phoneNumber();
@@ -235,14 +237,16 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistories(Long id, Pageable pageable) {
-        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+    public Slice<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistories(final Long id,
+            final Pageable pageable) {
+        final OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        Slice<OutsourcingChangeHistory> histories = outsourcingCompanyChangeRepository.findAllByOutsourcingCompany(
-                company,
-                pageable);
+        final Slice<OutsourcingChangeHistory> histories = outsourcingCompanyChangeRepository
+                .findAllByOutsourcingCompany(
+                        company,
+                        pageable);
         return histories.map(CompanyChangeHistoryResponse::from);
     }
 
@@ -251,13 +255,13 @@ public class OutsourcingCompanyService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistoriesWithPaging(Long id,
-            Pageable pageable) {
-        OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
+    public Page<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistoriesWithPaging(final Long id,
+            final Pageable pageable) {
+        final OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        Page<OutsourcingChangeHistory> historyPage = outsourcingCompanyChangeRepository
+        final Page<OutsourcingChangeHistory> historyPage = outsourcingCompanyChangeRepository
                 .findAllByOutsourcingCompanyWithPaging(
                         company,
                         pageable);
@@ -265,10 +269,10 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<CompanyResponse.CompanySimpleResponse> searchByName(String name, Pageable pageable) {
+    public Slice<CompanyResponse.CompanySimpleResponse> searchByName(final String name, final Pageable pageable) {
         Slice<OutsourcingCompany> companies;
 
-        String searchName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
+        final String searchName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
         companies = outsourcingCompanyRepository.findByNameAndKeyword(searchName, pageable);
 
         return companies.map(company -> CompanyResponse.CompanySimpleResponse.from(company));
@@ -278,8 +282,8 @@ public class OutsourcingCompanyService {
      * 장비 데이터가 존재하는 외주업체 목록을 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Page<CompanyResponse.CompanySimpleResponse> getCompaniesWithEquipment(Pageable pageable) {
-        Page<OutsourcingCompany> page = outsourcingCompanyRepository.findCompaniesWithEquipment(pageable);
+    public Page<CompanyResponse.CompanySimpleResponse> getCompaniesWithEquipment(final Pageable pageable) {
+        final Page<OutsourcingCompany> page = outsourcingCompanyRepository.findCompaniesWithEquipment(pageable);
         return page.map(CompanyResponse.CompanySimpleResponse::from);
     }
 }

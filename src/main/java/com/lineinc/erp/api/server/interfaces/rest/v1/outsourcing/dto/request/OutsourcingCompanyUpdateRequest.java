@@ -2,6 +2,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 
 import java.util.List;
 
+import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -28,9 +30,5 @@ public record OutsourcingCompanyUpdateRequest(
         @Schema(description = "비고") String memo,
         @Schema(description = "담당자 목록") @Valid List<OutsourcingCompanyContactUpdateRequest> contacts,
         @Schema(description = "첨부파일 목록") @Valid List<OutsourcingCompanyFileUpdateRequest> files,
-        @Schema(description = "수정 이력 리스트") @Valid List<OutsourcingCompanyUpdateRequest.ChangeHistoryRequest> changeHistories) {
-    public record ChangeHistoryRequest(
-            @Schema(description = "수정 이력 번호", example = "1") Long id,
-            @Schema(description = "변경 사유 또는 비고", example = "변경에 따른 업데이트") String memo) {
-    }
+        @Schema(description = "수정 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
 }

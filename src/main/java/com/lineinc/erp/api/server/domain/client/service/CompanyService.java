@@ -29,6 +29,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientC
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyContactResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -48,7 +49,7 @@ public class CompanyService {
     private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
 
     @Transactional
-    public void createClientCompany(ClientCompanyCreateRequest request) {
+    public void createClientCompany(final ClientCompanyCreateRequest request) {
 
         if (companyRepository.existsByBusinessNumber(request.businessNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -56,7 +57,7 @@ public class CompanyService {
         }
 
         // 1. ClientCompany 객체 먼저 빌드
-        ClientCompany clientCompany = ClientCompany.builder()
+        final ClientCompany clientCompany = ClientCompany.builder()
                 .name(request.name())
                 .businessNumber(request.businessNumber())
                 .ceoName(request.ceoName())
@@ -81,31 +82,32 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ClientCompanyResponse> getAllClientCompanies(ClientCompanyListRequest request, Pageable pageable) {
+    public Page<ClientCompanyResponse> getAllClientCompanies(final ClientCompanyListRequest request,
+            final Pageable pageable) {
         return companyRepository.findAll(request, pageable);
     }
 
     @Transactional(readOnly = true)
-    public ClientCompany getClientCompanyByIdOrThrow(Long id) {
+    public ClientCompany getClientCompanyByIdOrThrow(final Long id) {
         return companyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.CLIENT_COMPANY_NOT_FOUND));
     }
 
     @Transactional
-    public void deleteClientCompany(Long id) {
-        ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
+    public void deleteClientCompany(final Long id) {
+        final ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
         clientCompany.markAsDeleted();
     }
 
     @Transactional
-    public void deleteClientCompanies(DeleteClientCompaniesRequest request) {
-        List<ClientCompany> clientCompanies = companyRepository.findAllById(request.clientCompanyIds());
+    public void deleteClientCompanies(final DeleteClientCompaniesRequest request) {
+        final List<ClientCompany> clientCompanies = companyRepository.findAllById(request.clientCompanyIds());
         if (clientCompanies.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND);
         }
 
-        for (ClientCompany clientCompany : clientCompanies) {
+        for (final ClientCompany clientCompany : clientCompanies) {
             clientCompany.markAsDeleted();
         }
 
@@ -113,20 +115,20 @@ public class CompanyService {
     }
 
     @Transactional
-    public void updateClientCompany(Long id, ClientCompanyUpdateRequest request) {
-        ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
+    public void updateClientCompany(final Long id, final ClientCompanyUpdateRequest request) {
+        final ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
 
         clientCompany.syncTransientFields();
-        ClientCompany oldSnapshot = JaversUtils.createSnapshot(javers, clientCompany, ClientCompany.class);
+        final ClientCompany oldSnapshot = JaversUtils.createSnapshot(javers, clientCompany, ClientCompany.class);
         clientCompany.updateFrom(request, userService.getUserByIdOrThrow(request.userId()));
         companyRepository.save(clientCompany);
 
-        Diff diff = javers.compare(oldSnapshot, clientCompany);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        final Diff diff = javers.compare(oldSnapshot, clientCompany);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
+            final ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
                     .type(ClientCompanyChangeHistoryChangeType.BASIC)
                     .changes(changesJson)
@@ -135,7 +137,7 @@ public class CompanyService {
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (ClientCompanyUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+            for (final ChangeHistoryRequest historyRequest : request.changeHistories()) {
                 companyChangeHistoryRepository.findById(historyRequest.id())
                         .filter(history -> history.getClientCompany().getId().equals(clientCompany.getId()))
                         .ifPresent(history -> {
@@ -149,8 +151,8 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(ClientCompanyListRequest request, Sort sort, List<String> fields) {
-        List<ClientCompanyResponse> clientCompanyResponses = companyRepository.findAllWithoutPaging(request, sort)
+    public Workbook downloadExcel(final ClientCompanyListRequest request, final Sort sort, final List<String> fields) {
+        final List<ClientCompanyResponse> clientCompanyResponses = companyRepository.findAllWithoutPaging(request, sort)
                 .stream()
                 .map(ClientCompanyResponse::from)
                 .toList();
@@ -162,7 +164,7 @@ public class CompanyService {
                 this::getExcelCellValue);
     }
 
-    private String getExcelHeaderName(String field) {
+    private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "id" -> "No.";
             case "businessNumber" -> "사업자등록번호";
@@ -184,8 +186,8 @@ public class CompanyService {
         };
     }
 
-    private String getExcelCellValue(ClientCompanyResponse company, String field) {
-        ClientCompanyContactResponse mainContact = company.contacts().stream()
+    private String getExcelCellValue(final ClientCompanyResponse company, final String field) {
+        final ClientCompanyContactResponse mainContact = company.contacts().stream()
                 .filter(ClientCompanyContactResponse::isMain)
                 .findFirst()
                 .orElse(null);
@@ -216,14 +218,14 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public ClientCompanyDetailResponse getClientCompanyById(Long id) {
-        ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
+    public ClientCompanyDetailResponse getClientCompanyById(final Long id) {
+        final ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
         return ClientCompanyDetailResponse.from(clientCompany);
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanyResponse.ClientCompanySimpleResponse> searchClientCompanyByName(String keyword,
-            Pageable pageable) {
+    public Slice<ClientCompanyResponse.ClientCompanySimpleResponse> searchClientCompanyByName(final String keyword,
+            final Pageable pageable) {
         Slice<ClientCompany> companySlice;
 
         if (keyword == null || keyword.isBlank()) {
@@ -236,10 +238,10 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(Long clientCompanyId,
-            Pageable pageable) {
-        ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
-        Slice<ClientCompanyChangeHistory> historySlice = companyChangeHistoryRepository
+    public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(final Long clientCompanyId,
+            final Pageable pageable) {
+        final ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
+        final Slice<ClientCompanyChangeHistory> historySlice = companyChangeHistoryRepository
                 .findByClientCompany(clientCompany, pageable);
         return historySlice.map(ClientCompanyChangeHistoryResponse::from);
     }
@@ -249,10 +251,11 @@ public class CompanyService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistoriesWithPaging(Long clientCompanyId,
-            Pageable pageable) {
-        ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
-        Page<ClientCompanyChangeHistory> historyPage = companyChangeHistoryRepository
+    public Page<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistoriesWithPaging(
+            final Long clientCompanyId,
+            final Pageable pageable) {
+        final ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
+        final Page<ClientCompanyChangeHistory> historyPage = companyChangeHistoryRepository
                 .findByClientCompanyWithPaging(clientCompany, pageable);
         return historyPage.map(ClientCompanyChangeHistoryResponse::from);
     }

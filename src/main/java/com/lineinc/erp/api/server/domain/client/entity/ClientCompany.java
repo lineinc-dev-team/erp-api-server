@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.client.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -125,19 +124,19 @@ public class ClientCompany extends BaseEntity {
     }
 
     public void updateFrom(final ClientCompanyUpdateRequest request, final User user) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
-        Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
-        Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
-        Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
-        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
-        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
-        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
-        Optional.ofNullable(request.paymentMethod()).ifPresent(val -> this.paymentMethod = val);
-        Optional.ofNullable(request.paymentPeriod()).ifPresent(val -> this.paymentPeriod = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-        Optional.ofNullable(user).ifPresent(val -> this.user = val);
+        this.name = request.name();
+        this.businessNumber = request.businessNumber();
+        this.ceoName = request.ceoName();
+        this.address = request.address();
+        this.detailAddress = request.detailAddress();
+        this.landlineNumber = request.landlineNumber();
+        this.phoneNumber = request.phoneNumber();
+        this.email = request.email();
+        this.paymentMethod = request.paymentMethod();
+        this.paymentPeriod = request.paymentPeriod();
+        this.memo = request.memo();
+        this.isActive = request.isActive();
+        this.user = user;
         syncTransientFields();
     }
 
