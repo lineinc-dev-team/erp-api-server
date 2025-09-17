@@ -12,6 +12,9 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCo
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -31,6 +34,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @SQLRestriction("deleted = false")
 public class ClientCompanyContact extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * 이 담당자가 속한 발주처 엔티티

@@ -1,23 +1,29 @@
 package com.lineinc.erp.api.server.domain.client.service;
 
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import org.springframework.stereotype.Service;
+
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-import org.javers.core.Javers;
-import org.javers.core.diff.Diff;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +38,12 @@ public class CompanyContactService {
      * @param clientCompany 연락처가 속할 ClientCompany 엔티티
      * @param requests      생성 요청 리스트 (null 또는 빈 리스트면 아무 작업 안 함)
      */
-    public void createClientCompanyContacts(ClientCompany clientCompany,
-            List<ClientCompanyContactCreateRequest> requests) {
+    public void createClientCompanyContacts(final ClientCompany clientCompany,
+            final List<ClientCompanyContactCreateRequest> requests) {
         if (Objects.isNull(requests) || requests.isEmpty())
             return;
 
-        long mainCount = requests.stream().filter(ClientCompanyContactCreateRequest::isMain).count();
+        final long mainCount = requests.stream().filter(ClientCompanyContactCreateRequest::isMain).count();
         if (mainCount != 1) {
             throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
         }
@@ -67,23 +73,23 @@ public class CompanyContactService {
      * @param requests      수정 요청 리스트 (null일 경우 무시)
      */
     @Transactional
-    public void updateClientCompanyContacts(ClientCompany clientCompany,
-            List<ClientCompanyContactUpdateRequest> requests) {
+    public void updateClientCompanyContacts(final ClientCompany clientCompany,
+            final List<ClientCompanyContactUpdateRequest> requests) {
         if (Objects.nonNull(requests) && !requests.isEmpty()) {
-            long mainCount = requests.stream().filter(ClientCompanyContactUpdateRequest::isMain).count();
+            final long mainCount = requests.stream().filter(ClientCompanyContactUpdateRequest::isMain).count();
             if (mainCount != 1) {
                 throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
             }
         }
 
-        List<ClientCompanyContact> beforeContacts = clientCompany.getContacts().stream()
+        final List<ClientCompanyContact> beforeContacts = clientCompany.getContacts().stream()
                 .map(contact -> JaversUtils.createSnapshot(javers, contact, ClientCompanyContact.class))
                 .toList();
 
         EntitySyncUtils.syncList(
                 clientCompany.getContacts(),
                 requests,
-                (ClientCompanyContactUpdateRequest dto) -> ClientCompanyContact.builder()
+                (final ClientCompanyContactUpdateRequest dto) -> ClientCompanyContact.builder()
                         .name(dto.name())
                         .department(dto.department())
                         .isMain(dto.isMain())
@@ -95,40 +101,40 @@ public class CompanyContactService {
                         .clientCompany(clientCompany)
                         .build());
 
-        List<ClientCompanyContact> afterContacts = new ArrayList<>(clientCompany.getContacts());
+        final List<ClientCompanyContact> afterContacts = new ArrayList<>(clientCompany.getContacts());
 
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 연락처
-        Set<Long> beforeIds = beforeContacts.stream()
+        final Set<Long> beforeIds = beforeContacts.stream()
                 .map(ClientCompanyContact::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (ClientCompanyContact after : afterContacts) {
+        for (final ClientCompanyContact after : afterContacts) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
         // 수정된 연락처
-        Map<Long, ClientCompanyContact> afterMap = afterContacts.stream()
+        final Map<Long, ClientCompanyContact> afterMap = afterContacts.stream()
                 .filter(c -> c.getId() != null)
                 .collect(Collectors.toMap(ClientCompanyContact::getId, c -> c));
 
-        for (ClientCompanyContact before : beforeContacts) {
+        for (final ClientCompanyContact before : beforeContacts) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            ClientCompanyContact after = afterMap.get(before.getId());
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final ClientCompanyContact after = afterMap.get(before.getId());
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
         }
 
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
                     .type(ClientCompanyChangeHistoryChangeType.CONTACT)
                     .changes(json)

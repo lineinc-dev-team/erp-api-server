@@ -11,9 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,13 +28,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class) // JPA Auditing 기능 활성화: 생성자/수정자, 생성일/수정일 자동 기록
 public abstract class BaseEntity {
-
-    /**
-     * 기본키 (Primary Key)
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     /**
      * 생성 일시 자동 저장 필드
