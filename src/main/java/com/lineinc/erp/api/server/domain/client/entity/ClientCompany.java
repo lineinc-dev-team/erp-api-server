@@ -77,17 +77,11 @@ public class ClientCompany extends BaseEntity {
     @DiffInclude
     private String email;
 
-    /**
-     * 결제 방식 (현금/어음)
-     */
     @Column
     @DiffIgnore
     @Enumerated(EnumType.STRING)
     private ClientCompanyPaymentMethod paymentMethod;
 
-    /**
-     * 결제 유예 기간
-     */
     @Column
     @DiffIgnore
     private String paymentPeriod;
@@ -142,7 +136,7 @@ public class ClientCompany extends BaseEntity {
      */
     public void syncTransientFields() {
         this.userName = this.user != null ? this.user.getUsername() : null;
-        this.paymentMethodName = this.paymentMethod != null ? this.paymentMethod.getDisplayName() : null;
+        this.paymentMethodName = this.paymentMethod != null ? this.paymentMethod.getLabel() : null;
     }
 
     public void updateFrom(final ClientCompanyUpdateRequest request, final User user) {

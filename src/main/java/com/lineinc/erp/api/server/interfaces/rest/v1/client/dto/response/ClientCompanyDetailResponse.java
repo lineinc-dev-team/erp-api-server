@@ -1,13 +1,14 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
-import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "발주처 정보 상세 응답")
 public record ClientCompanyDetailResponse(
@@ -49,7 +50,7 @@ public record ClientCompanyDetailResponse(
         @Schema(description = "발주처 파일 목록") List<ClientCompanyFileResponse> files,
 
         @Schema(description = "본사 담당자") UserResponse.UserSimpleResponse user) {
-    public static ClientCompanyDetailResponse from(ClientCompany clientCompany) {
+    public static ClientCompanyDetailResponse from(final ClientCompany clientCompany) {
         return new ClientCompanyDetailResponse(
                 clientCompany.getId(),
                 clientCompany.getBusinessNumber(),
@@ -60,7 +61,7 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getLandlineNumber(),
                 clientCompany.getPhoneNumber(),
                 clientCompany.getEmail(),
-                clientCompany.getPaymentMethod().getDisplayName(),
+                clientCompany.getPaymentMethod().getLabel(),
                 clientCompany.getPaymentMethod(),
                 clientCompany.getPaymentPeriod(),
                 clientCompany.isActive(),

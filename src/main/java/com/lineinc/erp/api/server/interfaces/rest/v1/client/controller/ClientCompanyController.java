@@ -70,7 +70,7 @@ public class ClientCompanyController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createClientCompany(
-            @Valid @RequestBody ClientCompanyCreateRequest request) {
+            @Valid @RequestBody final ClientCompanyCreateRequest request) {
         companyService.createClientCompany(request);
         return ResponseEntity.ok().build();
     }
@@ -81,9 +81,9 @@ public class ClientCompanyController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
-            @Valid PageRequest pageRequest, @Valid SortRequest sortRequest,
-            @Valid ClientCompanyListRequest request) {
-        Page<ClientCompanyResponse> page = companyService.getAllClientCompanies(request,
+            @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
+            @Valid final ClientCompanyListRequest request) {
+        final Page<ClientCompanyResponse> page = companyService.getAllClientCompanies(request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
 
@@ -95,9 +95,9 @@ public class ClientCompanyController {
     @ApiResponses({ @ApiResponse(responseCode = "200", description = "검색 성공") })
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyResponse.ClientCompanySimpleResponse>>> searchClientCompanyByName(
-            @Valid SortRequest sortRequest, @Valid PageRequest pageRequest,
-            @RequestParam(required = false) String keyword) {
-        Slice<ClientCompanyResponse.ClientCompanySimpleResponse> slice = companyService
+            @Valid final SortRequest sortRequest, @Valid final PageRequest pageRequest,
+            @RequestParam(required = false) final String keyword) {
+        final Slice<ClientCompanyResponse.ClientCompanySimpleResponse> slice = companyService
                 .searchClientCompanyByName(keyword,
                         PageableUtils.createPageable(pageRequest.page(),
                                 pageRequest.size(),
@@ -113,7 +113,7 @@ public class ClientCompanyController {
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteClientCompanies(
-            @RequestBody DeleteClientCompaniesRequest clientCompanyIds) {
+            @RequestBody final DeleteClientCompaniesRequest clientCompanyIds) {
         companyService.deleteClientCompanies(clientCompanyIds);
         return ResponseEntity.ok().build();
     }
@@ -124,8 +124,8 @@ public class ClientCompanyController {
             @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"), })
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateClientCompany(@PathVariable Long id,
-            @Valid @RequestBody ClientCompanyUpdateRequest request) {
+    public ResponseEntity<Void> updateClientCompany(@PathVariable final Long id,
+            @Valid @RequestBody final ClientCompanyUpdateRequest request) {
         companyService.updateClientCompany(id, request);
         return ResponseEntity.ok().build();
     }
@@ -135,11 +135,11 @@ public class ClientCompanyController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()) })
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public void downloadClientCompaniesExcel(@Valid SortRequest sortRequest,
-            @Valid ClientCompanyListRequest request,
-            @Valid ClientCompanyDownloadRequest companyDownloadRequest,
-            HttpServletResponse response) throws IOException {
-        List<String> parsed = DownloadFieldUtils.parseFields(companyDownloadRequest.fields());
+    public void downloadClientCompaniesExcel(@Valid final SortRequest sortRequest,
+            @Valid final ClientCompanyListRequest request,
+            @Valid final ClientCompanyDownloadRequest companyDownloadRequest,
+            final HttpServletResponse response) throws IOException {
+        final List<String> parsed = DownloadFieldUtils.parseFields(companyDownloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed,
                 ClientCompanyDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
@@ -156,8 +156,8 @@ public class ClientCompanyController {
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<ClientCompanyDetailResponse>> getClientCompanyById(
-            @PathVariable Long id) {
-        ClientCompanyDetailResponse response = companyService.getClientCompanyById(id);
+            @PathVariable final Long id) {
+        final ClientCompanyDetailResponse response = companyService.getClientCompanyById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -166,9 +166,9 @@ public class ClientCompanyController {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
-            @PathVariable Long id, @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Slice<ClientCompanyChangeHistoryResponse> slice = companyService.getClientCompanyChangeHistories(id,
+            @PathVariable final Long id, @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Slice<ClientCompanyChangeHistoryResponse> slice = companyService.getClientCompanyChangeHistories(id,
                 PageableUtils.createPageable(pageRequest.page(),
                         pageRequest.size(),
                         sortRequest.sort()));
@@ -176,20 +176,20 @@ public class ClientCompanyController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "결제 수단 목록 조회", description = "결제 수단 목록을 반환합니다")
+    @Operation(summary = "결제 수단 목록 조회")
     @GetMapping("/payment-methods")
     public ResponseEntity<SuccessResponse<List<ClientCompanyPaymentMethodResponse>>> getPaymentMethods() {
-        List<ClientCompanyPaymentMethodResponse> responseList = Arrays.stream(ClientCompanyPaymentMethod.values())
-                .map(pm -> new ClientCompanyPaymentMethodResponse(
-                        pm.name(), pm.getDisplayName()))
+        final List<ClientCompanyPaymentMethodResponse> paymentMethods = Arrays
+                .stream(ClientCompanyPaymentMethod.values())
+                .map(ClientCompanyPaymentMethodResponse::from)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(SuccessResponse.of(responseList));
+        return ResponseEntity.ok(SuccessResponse.of(paymentMethods));
     }
 
     @Operation(summary = "발주처 파일 타입 목록 조회", description = "발주처 파일 타입 목록을 반환합니다")
     @GetMapping("/file-types")
     public ResponseEntity<SuccessResponse<List<ClientCompanyFileTypeResponse>>> getFileTypes() {
-        List<ClientCompanyFileTypeResponse> responseList = Arrays.stream(ClientCompanyFileType.values())
+        final List<ClientCompanyFileTypeResponse> responseList = Arrays.stream(ClientCompanyFileType.values())
                 .map(ClientCompanyFileTypeResponse::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(SuccessResponse.of(responseList));
