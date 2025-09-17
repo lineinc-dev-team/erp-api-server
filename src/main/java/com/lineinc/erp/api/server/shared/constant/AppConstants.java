@@ -57,16 +57,14 @@ public final class AppConstants {
     public static final String DEPT_SALES = "영업팀";
 
     // 직급 전체 목록
-    public static final List<String> GRADE_NAMES =
-            List.of(GRADE_EMPLOYEE, GRADE_ASSISTANT_MANAGER, GRADE_MANAGER);
+    public static final List<String> GRADE_NAMES = List.of(GRADE_EMPLOYEE, GRADE_ASSISTANT_MANAGER, GRADE_MANAGER);
 
     // 직책 전체 목록
-    public static final List<String> POSITION_NAMES =
-            List.of(POSITION_TEAM_LEADER, POSITION_PART_LEADER, POSITION_HEAD);
+    public static final List<String> POSITION_NAMES = List.of(POSITION_TEAM_LEADER, POSITION_PART_LEADER,
+            POSITION_HEAD);
 
     // 부서 전체 목록
-    public static final List<String> DEPARTMENT_NAMES =
-            List.of(DEPT_SUPPORT, DEPT_DEVELOPMENT, DEPT_SALES);
+    public static final List<String> DEPARTMENT_NAMES = List.of(DEPT_SUPPORT, DEPT_DEVELOPMENT, DEPT_SALES);
 
     // 시간 관련 상수
     public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
@@ -77,5 +75,9 @@ public final class AppConstants {
     // 세션 타임아웃 기본값 (초 단위, 예: 1800초 = 30분)
     public static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 1800;
 
-    private AppConstants() {} // 인스턴스화 방지
+    // JPA 시퀀스 AllocationSize 관련 상수
+    public static final int SEQUENCE_ALLOCATION_DEFAULT = 1;
+
+    private AppConstants() {
+    } // 인스턴스화 방지
 }

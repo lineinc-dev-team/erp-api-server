@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.client.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -10,6 +11,7 @@ import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -40,17 +42,20 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
         @Index(columnList = "name"),
-        @Index(columnList = "businessNumber"),
-        @Index(columnList = "ceoName"),
         @Index(columnList = "email"),
+        @Index(columnList = "ceoName"),
         @Index(columnList = "createdAt"),
-        @Index(columnList = "phoneNumber")
+        @Index(columnList = "phoneNumber"),
+        @Index(columnList = "businessNumber"),
 })
 public class ClientCompany extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "client_company_seq";
+    private static final String MAPPED_BY_CLIENT_COMPANY = "clientCompany";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_seq")
-    @SequenceGenerator(name = "client_company_seq", sequenceName = "client_company_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @Column
@@ -102,12 +107,12 @@ public class ClientCompany extends BaseEntity {
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = MAPPED_BY_CLIENT_COMPANY, cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ClientCompanyContact> contacts = new ArrayList<>();
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = MAPPED_BY_CLIENT_COMPANY, cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ClientCompanyFile> files = new ArrayList<>();
 
     @Column
@@ -128,24 +133,28 @@ public class ClientCompany extends BaseEntity {
     private String paymentMethodName;
 
     public void syncTransientFields() {
-        this.userName = this.user != null ? this.user.getUsername() : null;
-        this.paymentMethodName = this.paymentMethod != null ? this.paymentMethod.getLabel() : null;
+        this.userName = Optional.ofNullable(this.user)
+                .map(User::getUsername)
+                .orElse(null);
+        this.paymentMethodName = Optional.ofNullable(this.paymentMethod)
+                .map(ClientCompanyPaymentMethod::getLabel)
+                .orElse(null);
     }
 
     public void updateFrom(final ClientCompanyUpdateRequest request, final User user) {
+        this.user = user;
         this.name = request.name();
-        this.businessNumber = request.businessNumber();
+        this.memo = request.memo();
+        this.email = request.email();
         this.ceoName = request.ceoName();
         this.address = request.address();
-        this.detailAddress = request.detailAddress();
-        this.landlineNumber = request.landlineNumber();
+        this.isActive = request.isActive();
         this.phoneNumber = request.phoneNumber();
-        this.email = request.email();
         this.paymentMethod = request.paymentMethod();
         this.paymentPeriod = request.paymentPeriod();
-        this.memo = request.memo();
-        this.isActive = request.isActive();
-        this.user = user;
+        this.detailAddress = request.detailAddress();
+        this.landlineNumber = request.landlineNumber();
+        this.businessNumber = request.businessNumber();
         syncTransientFields();
     }
 
