@@ -21,10 +21,10 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "개인 휴대폰", example = "010-1234-5678") @NotBlank String phoneNumber,
         @Schema(description = "이메일", example = "example@samsung.com") @NotBlank @Email String email,
         @Schema(description = "결제 방식", example = "CASH") @NotNull ClientCompanyPaymentMethod paymentMethod,
-        @NotBlank @Schema(description = "결제 유예 기간", example = "2") String paymentPeriod,
+        @Schema(description = "결제 유예 기간", example = "2") @NotBlank String paymentPeriod,
         @Schema(description = "비고 / 메모") String memo,
         @Schema(description = "사용 여부", example = "true") @NotNull Boolean isActive,
         @Schema(description = "본사 담당자 ID", example = "1") @NotNull Long userId,
-        @Valid @Schema(description = "담당자 목록") List<ClientCompanyContactCreateRequest> contacts,
-        @Valid @Schema(description = "파일 목록") List<ClientCompanyFileCreateRequest> files) {
+        @Schema(description = "담당자 목록") @Valid List<ClientCompanyContactCreateRequest> contacts,
+        @Schema(description = "파일 목록") @Valid List<ClientCompanyFileCreateRequest> files) {
 }

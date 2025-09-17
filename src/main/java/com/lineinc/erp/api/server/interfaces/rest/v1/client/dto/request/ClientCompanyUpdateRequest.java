@@ -19,13 +19,13 @@ public record ClientCompanyUpdateRequest(
         @Schema(description = "상세 주소", example = "강남대로 123, 3층") @NotBlank String detailAddress,
         @Schema(description = "전화번호", example = "02-123-5678") @NotBlank String landlineNumber,
         @Schema(description = "개인 휴대폰", example = "010-1234-5678") @NotBlank String phoneNumber,
-        @Email @Schema(description = "이메일", example = "example@samsung.com") @NotBlank String email,
+        @Schema(description = "이메일", example = "example@samsung.com") @NotBlank @Email String email,
         @Schema(description = "결제 방식", example = "CASH") @NotNull ClientCompanyPaymentMethod paymentMethod,
         @Schema(description = "결제 유예 기간", example = "2") @NotBlank String paymentPeriod,
         @Schema(description = "비고 / 메모") String memo,
         @Schema(description = "사용 여부", example = "true") @NotNull Boolean isActive,
         @Schema(description = "본사 담당자 ID", example = "123") @NotNull Long userId,
-        @Valid @Schema(description = "담당자 목록") List<ClientCompanyContactUpdateRequest> contacts,
-        @Valid @Schema(description = "파일 목록") List<ClientCompanyFileUpdateRequest> files,
-        @Valid @Schema(description = "변경 이력 리스트") List<ChangeHistoryRequest> changeHistories) {
+        @Schema(description = "담당자 목록") @Valid List<ClientCompanyContactUpdateRequest> contacts,
+        @Schema(description = "파일 목록") @Valid List<ClientCompanyFileUpdateRequest> files,
+        @Schema(description = "변경 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
 }
