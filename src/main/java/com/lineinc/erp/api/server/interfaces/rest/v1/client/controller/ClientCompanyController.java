@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.client.controller;
 import static com.lineinc.erp.api.server.shared.constant.AppConstants.API_V1_CLIENT_COMPANIES;
 import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_ACCOUNT;
 import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_CLIENT_COMPANY;
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.SWAGGER_TAG_CLIENT_COMPANY;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.SWAGGER_V1_TAG_CLIENT_COMPANY;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -60,7 +60,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(API_V1_CLIENT_COMPANIES)
-@Tag(name = SWAGGER_TAG_CLIENT_COMPANY, description = SWAGGER_TAG_CLIENT_COMPANY)
+@Tag(name = SWAGGER_V1_TAG_CLIENT_COMPANY)
 public class ClientCompanyController extends BaseController {
 
     private final CompanyService companyService;
