@@ -1,12 +1,12 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.time.OffsetDateTime;
 
 @Schema(description = "발주처 변경 이력 응답")
 public record ClientCompanyChangeHistoryResponse(
@@ -25,7 +25,7 @@ public record ClientCompanyChangeHistoryResponse(
         @Schema(description = "변경 유형", example = "기본 정보") String type,
 
         @Schema(description = "변경 유형 코드", example = "CONTACT") ClientCompanyChangeHistoryChangeType typeCode) {
-    public static ClientCompanyChangeHistoryResponse from(ClientCompanyChangeHistory history) {
+    public static ClientCompanyChangeHistoryResponse from(final ClientCompanyChangeHistory history) {
         return new ClientCompanyChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),

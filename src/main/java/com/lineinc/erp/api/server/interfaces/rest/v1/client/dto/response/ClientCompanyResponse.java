@@ -1,12 +1,13 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "발주처 정보 응답")
 public record ClientCompanyResponse(
@@ -42,7 +43,7 @@ public record ClientCompanyResponse(
         @Schema(description = "발주처 담당자 목록") List<ClientCompanyContactResponse> contacts,
 
         @Schema(description = "본사 담당자") UserResponse.UserSimpleResponse user) {
-    public static ClientCompanyResponse from(ClientCompany clientCompany) {
+    public static ClientCompanyResponse from(final ClientCompany clientCompany) {
         return new ClientCompanyResponse(
                 clientCompany.getId(),
                 clientCompany.getBusinessNumber(),
@@ -73,7 +74,7 @@ public record ClientCompanyResponse(
             @Schema(description = "발주처 이름", example = "삼성건설") String name,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
-        public static ClientCompanySimpleResponse from(ClientCompany clientCompany) {
+        public static ClientCompanySimpleResponse from(final ClientCompany clientCompany) {
             return new ClientCompanySimpleResponse(clientCompany.getId(), clientCompany.getName(),
                     clientCompany.isDeleted());
         }

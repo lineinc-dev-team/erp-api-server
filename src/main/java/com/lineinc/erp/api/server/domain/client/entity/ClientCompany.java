@@ -88,39 +88,27 @@ public class ClientCompany extends BaseEntity {
 
     @Setter
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn
     @DiffIgnore
     private User user; // 본사 담당자
 
-    /**
-     * 발주처 담당자 목록
-     */
-    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     @DiffIgnore
+    @Builder.Default
+    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ClientCompanyContact> contacts = new ArrayList<>();
 
-    /**
-     * 발주처 관련 첨부파일 목록
-     */
-    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     @DiffIgnore
+    @Builder.Default
+    @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ClientCompanyFile> files = new ArrayList<>();
 
-    /**
-     * 사용 여부
-     */
-    @Column(nullable = false)
-    @Builder.Default
+    @Column
     @DiffInclude
+    @Builder.Default
     private boolean isActive = true;
 
-    /**
-     * 비고 / 메모
-     */
-    @Column(columnDefinition = "TEXT")
     @DiffInclude
+    @Column(columnDefinition = "TEXT")
     private String memo;
 
     @Transient
@@ -131,9 +119,6 @@ public class ClientCompany extends BaseEntity {
     @DiffInclude
     private String paymentMethodName;
 
-    /**
-     * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
-     */
     public void syncTransientFields() {
         this.userName = this.user != null ? this.user.getUsername() : null;
         this.paymentMethodName = this.paymentMethod != null ? this.paymentMethod.getLabel() : null;

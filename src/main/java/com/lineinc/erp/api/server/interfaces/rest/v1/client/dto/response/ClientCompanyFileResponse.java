@@ -1,11 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "발주처 파일 정보 응답")
 public record ClientCompanyFileResponse(
@@ -27,7 +27,7 @@ public record ClientCompanyFileResponse(
         @Schema(description = "등록일", example = "2024-01-01T12:34:56") OffsetDateTime createdAt,
 
         @Schema(description = "수정일", example = "2024-01-01T12:34:56") OffsetDateTime updatedAt) {
-    public static ClientCompanyFileResponse from(ClientCompanyFile file) {
+    public static ClientCompanyFileResponse from(final ClientCompanyFile file) {
         return new ClientCompanyFileResponse(
                 file.getId(),
                 file.getName(),
