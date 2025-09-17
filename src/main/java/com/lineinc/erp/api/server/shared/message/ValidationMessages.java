@@ -1,9 +1,9 @@
 package com.lineinc.erp.api.server.shared.message;
 
-public final class ValidationMessages {
+import lombok.experimental.UtilityClass;
 
-    private ValidationMessages() {
-    } // 인스턴스화 방지
+@UtilityClass
+public class ValidationMessages {
 
     // ===== 시스템 공통 메시지 =====
     public static final String INTERNAL_SERVER_ERROR = "서버 내부 오류가 발생했습니다.";
