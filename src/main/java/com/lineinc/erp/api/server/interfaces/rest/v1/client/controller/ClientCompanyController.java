@@ -31,10 +31,10 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyDeleteRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyFileTypeResponse;
@@ -107,7 +107,7 @@ public class ClientCompanyController extends BaseController {
     @Operation(summary = "발주처 삭제")
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteClientCompanies(
-            @RequestBody final DeleteClientCompaniesRequest clientCompanyIds) {
+            @RequestBody final ClientCompanyDeleteRequest clientCompanyIds) {
         companyService.deleteClientCompanies(clientCompanyIds);
         return ResponseEntity.ok().build();
     }

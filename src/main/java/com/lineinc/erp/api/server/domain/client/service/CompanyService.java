@@ -24,9 +24,9 @@ import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyDeleteRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.DeleteClientCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyContactResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
@@ -91,7 +91,7 @@ public class CompanyService {
     }
 
     @Transactional
-    public void deleteClientCompanies(final DeleteClientCompaniesRequest request) {
+    public void deleteClientCompanies(final ClientCompanyDeleteRequest request) {
         final List<ClientCompany> clientCompanies = companyRepository.findAllById(request.clientCompanyIds());
         if (clientCompanies.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND);
