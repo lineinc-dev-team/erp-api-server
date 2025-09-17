@@ -64,9 +64,11 @@ public class ClientCompanyController {
     private final CompanyService companyService;
 
     @Operation(summary = "발주처 등록", description = "발주처 정보를 등록합니다")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "발주처 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저를 등록하려는 경우") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "발주처 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저를 등록하려는 경우")
+    })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createClientCompany(

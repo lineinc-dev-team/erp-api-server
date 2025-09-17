@@ -10,6 +10,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
@@ -156,6 +157,24 @@ public class ClientCompany extends BaseEntity {
         this.landlineNumber = request.landlineNumber();
         this.businessNumber = request.businessNumber();
         syncTransientFields();
+    }
+
+    public static ClientCompany createFrom(final ClientCompanyCreateRequest request, final User user) {
+        return ClientCompany.builder()
+                .name(request.name())
+                .businessNumber(request.businessNumber())
+                .ceoName(request.ceoName())
+                .address(request.address())
+                .detailAddress(request.detailAddress())
+                .landlineNumber(request.landlineNumber())
+                .phoneNumber(request.phoneNumber())
+                .email(request.email())
+                .user(user)
+                .paymentMethod(request.paymentMethod())
+                .paymentPeriod(request.paymentPeriod())
+                .memo(request.memo())
+                .isActive(request.isActive())
+                .build();
     }
 
 }

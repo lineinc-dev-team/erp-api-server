@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.client.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
@@ -20,6 +21,7 @@ import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistor
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
@@ -50,34 +52,22 @@ public class CompanyService {
 
     @Transactional
     public void createClientCompany(final ClientCompanyCreateRequest request) {
+        // 1. 사업자등록번호 중복 확인
+        validateBusinessNumberNotExists(request.businessNumber());
 
-        if (companyRepository.existsByBusinessNumber(request.businessNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
-        }
+        // 2. 담당자 정보 조회 (userId가 있는 경우에만)
+        final User user = Optional.ofNullable(request.userId())
+                .map(userService::getUserByIdOrThrow)
+                .orElse(null);
 
-        // 1. ClientCompany 객체 먼저 빌드
-        final ClientCompany clientCompany = ClientCompany.builder()
-                .name(request.name())
-                .businessNumber(request.businessNumber())
-                .ceoName(request.ceoName())
-                .address(request.address())
-                .detailAddress(request.detailAddress())
-                .landlineNumber(request.landlineNumber())
-                .phoneNumber(request.phoneNumber())
-                .email(request.email())
-                .user(request.userId() != null ? userService.getUserByIdOrThrow(request.userId()) : null)
-                .paymentMethod(request.paymentMethod())
-                .paymentPeriod(request.paymentPeriod())
-                .memo(request.memo())
-                .isActive(request.isActive())
-                .build();
+        // 3. ClientCompany 엔티티 생성
+        final ClientCompany clientCompany = ClientCompany.createFrom(request, user);
 
-        // 2. 자식 엔티티 생성 + 연관관계 설정
+        // 4. 연관된 자식 엔티티들 생성 및 연관관계 설정
         contactService.createClientCompanyContacts(clientCompany, request.contacts());
         fileService.createClientCompanyFile(clientCompany, request.files());
 
-        // 3. 모든 연관관계 설정 후 save
+        // 5. 최종 저장
         companyRepository.save(clientCompany);
     }
 
@@ -258,5 +248,13 @@ public class CompanyService {
         final Page<ClientCompanyChangeHistory> historyPage = companyChangeHistoryRepository
                 .findByClientCompanyWithPaging(clientCompany, pageable);
         return historyPage.map(ClientCompanyChangeHistoryResponse::from);
+    }
+
+    // 사업자등록번호 중복 확인
+    private void validateBusinessNumberNotExists(final String businessNumber) {
+        if (companyRepository.existsByBusinessNumber(businessNumber)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
+        }
     }
 }

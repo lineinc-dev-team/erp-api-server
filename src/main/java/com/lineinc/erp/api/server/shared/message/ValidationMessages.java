@@ -13,6 +13,7 @@ public final class ValidationMessages {
     public static final String INVALID_PROPERTY_REFERENCE = "요청에 잘못된 정렬 조건 또는 필드명이 포함되어 있습니다.";
     public static final String RATE_LIMIT_EXCEEDED = "요청 횟수 제한을 초과했습니다.";
     public static final String CHANGE_HISTORY_NOT_FOUND = "해당 변경이력을 찾을 수 없습니다.";
+    public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 반드시 한 명이어야 합니다.";
 
     // ===== 인증/권한 관련 메시지 =====
     public static final String ACCESS_DENIED = "접근 권한이 없습니다.";
@@ -53,7 +54,6 @@ public final class ValidationMessages {
     public static final String LABOR_NOT_FOUND = "존재하지 않는 노무입니다.";
     public static final String LABOR_ALREADY_EXISTS = "이미 등록된 인력입니다. 동일한 주민등록번호의 인력이 존재합니다.";
     public static final String TEMPORARY_LABOR_NAME_REQUIRED = "임시 인력 등록시 이름은 필수입니다.";
-    public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 반드시 한 명이어야 합니다.";
     public static final String LABOR_PAYROLL_SUMMARY_NOT_FOUND = "존재하지 않는 노무명세서 집계입니다.";
     public static final String LABOR_PAYROLL_NOT_FOUND = "존재하지 않는 노무명세서입니다.";
     public static final String DAILY_REPORT_EMPLOYEE_DUPLICATE_LABOR_ID = "같은 인력이 중복으로 등록되었습니다.";

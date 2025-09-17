@@ -18,9 +18,9 @@ import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistory
 import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
+import com.lineinc.erp.api.server.shared.util.ValidationUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,60 +32,29 @@ public class CompanyContactService {
     private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
     private final Javers javers;
 
-    /**
-     * 신규 연락처들을 생성하여 ClientCompany에 추가합니다.
-     *
-     * @param clientCompany 연락처가 속할 ClientCompany 엔티티
-     * @param requests      생성 요청 리스트 (null 또는 빈 리스트면 아무 작업 안 함)
-     */
     public void createClientCompanyContacts(final ClientCompany clientCompany,
             final List<ClientCompanyContactCreateRequest> requests) {
-        if (Objects.isNull(requests) || requests.isEmpty())
-            return;
+        // 1. 메인 담당자가 정확히 1명 존재하는지 검증
+        ValidationUtils.validateMainContactExists(requests, ClientCompanyContactCreateRequest::isMain);
 
-        final long mainCount = requests.stream().filter(ClientCompanyContactCreateRequest::isMain).count();
-        if (mainCount != 1) {
-            throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
-        }
-
-        // 요청 리스트를 순회하며 각각 ClientCompanyContact 엔티티 생성 후 연관관계 설정 및 추가
+        // 2. 요청 리스트를 순회하며 각각 ClientCompanyContact 엔티티 생성 후 연관관계 설정 및 추가
         requests.stream()
-                .map(dto -> ClientCompanyContact.builder()
-                        .name(dto.name())
-                        .position(dto.position())
-                        .department(dto.department())
-                        .landlineNumber(dto.landlineNumber())
-                        .phoneNumber(dto.phoneNumber())
-                        .email(dto.email())
-                        .memo(dto.memo())
-                        .isMain(dto.isMain())
-                        .clientCompany(clientCompany)
-                        .build())
+                .map(request -> ClientCompanyContact.createFrom(request, clientCompany))
                 .forEach(clientCompany.getContacts()::add);
     }
 
-    /**
-     * ClientCompany의 연락처들을 요청에 맞게 수정, 생성, 삭제 처리합니다.
-     * - 요청 리스트가 null이면 아무 작업도 수행하지 않습니다.
-     * - 빈 리스트를 전달하면 기존 연락처 전부 soft delete 처리합니다.
-     *
-     * @param clientCompany 연락처가 속한 ClientCompany 엔티티
-     * @param requests      수정 요청 리스트 (null일 경우 무시)
-     */
     @Transactional
     public void updateClientCompanyContacts(final ClientCompany clientCompany,
             final List<ClientCompanyContactUpdateRequest> requests) {
-        if (Objects.nonNull(requests) && !requests.isEmpty()) {
-            final long mainCount = requests.stream().filter(ClientCompanyContactUpdateRequest::isMain).count();
-            if (mainCount != 1) {
-                throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
-            }
-        }
+        // 1. 메인 담당자가 정확히 1명 존재하는지 검증
+        ValidationUtils.validateMainContactExists(requests, ClientCompanyContactUpdateRequest::isMain);
 
+        // 2. 변경 이력 추적을 위한 기존 담당자 정보 스냅샷 생성
         final List<ClientCompanyContact> beforeContacts = clientCompany.getContacts().stream()
                 .map(contact -> JaversUtils.createSnapshot(javers, contact, ClientCompanyContact.class))
                 .toList();
 
+        // 3. 기존 담당자 목록과 요청 데이터를 동기화 (추가/수정/삭제)
         EntitySyncUtils.syncList(
                 clientCompany.getContacts(),
                 requests,
@@ -101,6 +70,7 @@ public class CompanyContactService {
                         .clientCompany(clientCompany)
                         .build());
 
+        // 4. 변경 후 담당자 정보 수집
         final List<ClientCompanyContact> afterContacts = new ArrayList<>(clientCompany.getContacts());
 
         final List<Map<String, String>> allChanges = new ArrayList<>();
@@ -142,4 +112,5 @@ public class CompanyContactService {
             companyChangeHistoryRepository.save(history);
         }
     }
+
 }

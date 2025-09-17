@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
@@ -88,6 +89,21 @@ public class ClientCompanyContact extends BaseEntity {
         this.phoneNumber = request.phoneNumber();
         this.email = request.email();
         this.memo = request.memo();
+    }
+
+    public static ClientCompanyContact createFrom(final ClientCompanyContactCreateRequest request,
+            final ClientCompany clientCompany) {
+        return ClientCompanyContact.builder()
+                .name(request.name())
+                .position(request.position())
+                .department(request.department())
+                .landlineNumber(request.landlineNumber())
+                .phoneNumber(request.phoneNumber())
+                .email(request.email())
+                .memo(request.memo())
+                .isMain(request.isMain())
+                .clientCompany(clientCompany)
+                .build();
     }
 
 }
