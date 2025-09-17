@@ -33,10 +33,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
         @Index(columnList = "name"),
-        @Index(columnList = "department"),
-        @Index(columnList = "position"),
-        @Index(columnList = "phoneNumber"),
-        @Index(columnList = "email")
 })
 public class ClientCompanyContact extends BaseEntity {
     private static final String SEQUENCE_NAME = "client_company_contact_seq";

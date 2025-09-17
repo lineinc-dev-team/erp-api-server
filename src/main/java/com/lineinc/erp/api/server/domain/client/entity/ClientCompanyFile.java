@@ -17,11 +17,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,10 +32,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = {
-        @Index(columnList = "name"),
-        @Index(columnList = "originalFileName")
-})
 public class ClientCompanyFile extends BaseEntity {
     private static final String SEQUENCE_NAME = "client_company_file_seq";
 
