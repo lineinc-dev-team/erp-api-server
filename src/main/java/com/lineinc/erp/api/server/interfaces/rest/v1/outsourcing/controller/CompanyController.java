@@ -76,10 +76,10 @@ public class CompanyController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<CompanyResponse>>> getAllOutsourcingCompanies(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid OutsourcingCompanyListRequest request) {
-        Page<CompanyResponse> page = outsourcingCompanyService.getAllOutsourcingCompanies(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final OutsourcingCompanyListRequest request) {
+        final Page<CompanyResponse> page = outsourcingCompanyService.getAllOutsourcingCompanies(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -93,7 +93,7 @@ public class CompanyController {
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/default-deductions")
     public ResponseEntity<SuccessResponse<List<CompanyDefaultDeductionsResponse>>> getDeductionItems() {
-        List<CompanyDefaultDeductionsResponse> responseList = Arrays
+        final List<CompanyDefaultDeductionsResponse> responseList = Arrays
                 .stream(OutsourcingCompanyDefaultDeductionsType.values())
                 .map(dd -> new CompanyDefaultDeductionsResponse(dd.name(), dd.getLabel()))
                 .toList();
@@ -105,7 +105,7 @@ public class CompanyController {
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/types")
     public ResponseEntity<SuccessResponse<List<CompanyTypeResponse>>> getSeparations() {
-        List<CompanyTypeResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
+        final List<CompanyTypeResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
                 .map(type -> new CompanyTypeResponse(type.name(), type.getLabel()))
                 .toList();
 
@@ -120,7 +120,7 @@ public class CompanyController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createOutsourcingCompany(
-            @Valid @RequestBody OutsourcingCompanyCreateRequest request) {
+            @Valid @RequestBody final OutsourcingCompanyCreateRequest request) {
         outsourcingCompanyService.createOutsourcingCompany(request);
         return ResponseEntity.ok().build();
     }
@@ -133,8 +133,8 @@ public class CompanyController {
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<CompanyDetailResponse>> getOutsourcingCompanyById(
-            @PathVariable Long id) {
-        CompanyDetailResponse response = outsourcingCompanyService.getOutsourcingCompanyById(id);
+            @PathVariable final Long id) {
+        final CompanyDetailResponse response = outsourcingCompanyService.getOutsourcingCompanyById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -147,8 +147,8 @@ public class CompanyController {
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateOutsourcingCompany(
-            @PathVariable Long id,
-            @Valid @RequestBody OutsourcingCompanyUpdateRequest request) {
+            @PathVariable final Long id,
+            @Valid @RequestBody final OutsourcingCompanyUpdateRequest request) {
         outsourcingCompanyService.updateOutsourcingCompany(id, request);
         return ResponseEntity.ok().build();
     }
@@ -160,7 +160,8 @@ public class CompanyController {
     })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.DELETE)
-    public ResponseEntity<Void> deleteOutsourcingCompanies(@RequestBody DeleteOutsourcingCompaniesRequest request) {
+    public ResponseEntity<Void> deleteOutsourcingCompanies(
+            @RequestBody final DeleteOutsourcingCompaniesRequest request) {
         outsourcingCompanyService.deleteOutsourcingCompanies(request);
         return ResponseEntity.ok().build();
     }
@@ -173,11 +174,11 @@ public class CompanyController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public void downloadOutsourcingCompaniesExcel(
-            @Valid SortRequest sortRequest,
-            @Valid OutsourcingCompanyListRequest request,
-            @Valid OutsourcingCompanyDownloadRequest companyDownloadRequest,
-            HttpServletResponse response) throws IOException {
-        List<String> parsed = DownloadFieldUtils.parseFields(companyDownloadRequest.fields());
+            @Valid final SortRequest sortRequest,
+            @Valid final OutsourcingCompanyListRequest request,
+            @Valid final OutsourcingCompanyDownloadRequest companyDownloadRequest,
+            final HttpServletResponse response) throws IOException {
+        final List<String> parsed = DownloadFieldUtils.parseFields(companyDownloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed, OutsourcingCompanyDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "외주업체 목록.xlsx");
 
@@ -196,10 +197,10 @@ public class CompanyController {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<CompanyChangeHistoryResponse>>> getOutsourcingCompanyChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Slice<CompanyChangeHistoryResponse> slice = outsourcingCompanyService
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Slice<CompanyChangeHistoryResponse> slice = outsourcingCompanyService
                 .getOutsourcingCompanyChangeHistories(
                         id,
                         PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
@@ -214,10 +215,10 @@ public class CompanyController {
     })
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<CompanyResponse.CompanySimpleResponse>>> searchClientCompanyByName(
-            @Valid SortRequest sortRequest,
-            @Valid PageRequest pageRequest,
-            @RequestParam(required = false) String keyword) {
-        Slice<CompanyResponse.CompanySimpleResponse> slice = outsourcingCompanyService.searchByName(keyword,
+            @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest,
+            @RequestParam(required = false) final String keyword) {
+        final Slice<CompanyResponse.CompanySimpleResponse> slice = outsourcingCompanyService.searchByName(keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
 
@@ -233,11 +234,11 @@ public class CompanyController {
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/{id}/contract-history")
     public ResponseEntity<SuccessResponse<PagingResponse<ContractHistoryResponse>>> getContractHistoryByCompany(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
 
-        Page<ContractHistoryResponse> page = outsourcingCompanyContractService.getContractHistoryByCompany(
+        final Page<ContractHistoryResponse> page = outsourcingCompanyContractService.getContractHistoryByCompany(
                 id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -253,10 +254,10 @@ public class CompanyController {
     })
     @GetMapping("/{id}/contract-equipments")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> getContractEquipmentsByCompany(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> slice = outsourcingCompanyContractService
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractEquipmentsByCompany(
                         id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                                 sortRequest.sort()));
@@ -271,10 +272,10 @@ public class CompanyController {
     })
     @GetMapping("/{id}/contract-drivers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractDriverResponse.ContractDriverSimpleResponse>>> getContractDriversByCompany(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Slice<ContractDriverResponse.ContractDriverSimpleResponse> slice = outsourcingCompanyContractService
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Slice<ContractDriverResponse.ContractDriverSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractDriversByCompany(
                         id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
@@ -288,26 +289,26 @@ public class CompanyController {
     })
     @GetMapping("/{id}/contract-workers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractWorkerResponse.ContractWorkerSimpleResponse>>> getContractWorkersByCompany(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> slice = outsourcingCompanyContractService
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractWorkersByCompany(
                         id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "장비 데이터가 존재하는 외주업체 목록 조회", description = "연결된 외주업체계약에 장비데이터가 존재하는 모든 외주업체 리스트를 반환합니다")
+    @Operation(summary = "장비 타입 계약을 가진 외주업체 목록 조회", description = "연결된 외주업체계약에 장비데이터가 존재하는 모든 외주업체 리스트를 반환합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content())
     })
     @GetMapping("/with-equipment")
     public ResponseEntity<SuccessResponse<SliceResponse<CompanyResponse.CompanySimpleResponse>>> getCompaniesWithEquipment(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Page<CompanyResponse.CompanySimpleResponse> page = outsourcingCompanyService
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Page<CompanyResponse.CompanySimpleResponse> page = outsourcingCompanyService
                 .getCompaniesWithEquipment(
                         PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
