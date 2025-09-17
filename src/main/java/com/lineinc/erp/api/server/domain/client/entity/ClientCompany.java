@@ -34,7 +34,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Table(indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "businessNumber"),
@@ -42,12 +41,12 @@ import lombok.Setter;
         @Index(columnList = "email"),
         @Index(columnList = "createdAt"),
         @Index(columnList = "phoneNumber")
-
 })
+@Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ClientCompany extends BaseEntity {
 
     @Id
