@@ -43,11 +43,11 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
             "updatedAt", QLabor.labor.updatedAt);
 
     @Override
-    public Page<LaborListResponse> findAll(LaborListRequest request, Pageable pageable) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+    public Page<LaborListResponse> findAll(final LaborListRequest request, final Pageable pageable) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        List<Labor> content = queryFactory
+        final List<Labor> content = queryFactory
                 .selectFrom(labor)
                 .leftJoin(labor.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .where(condition)
@@ -56,14 +56,14 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long totalCount = queryFactory
+        final Long totalCount = queryFactory
                 .select(labor.count())
                 .from(labor)
                 .where(condition)
                 .fetchOne();
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        final long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        List<LaborListResponse> responses = content.stream()
+        final List<LaborListResponse> responses = content.stream()
                 .map(LaborListResponse::from)
                 .toList();
 
@@ -71,11 +71,11 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
     }
 
     @Override
-    public List<LaborListResponse> findAllWithoutPaging(LaborListRequest request, Sort sort) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+    public List<LaborListResponse> findAllWithoutPaging(final LaborListRequest request, final Sort sort) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
-        List<Labor> content = queryFactory
+        final List<Labor> content = queryFactory
                 .selectFrom(labor)
                 .leftJoin(labor.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .where(condition)
@@ -87,8 +87,8 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
                 .toList();
     }
 
-    private BooleanBuilder buildCondition(LaborListRequest request) {
-        BooleanBuilder builder = new BooleanBuilder();
+    private BooleanBuilder buildCondition(final LaborListRequest request) {
+        final BooleanBuilder builder = new BooleanBuilder();
         builder.and(labor.deleted.eq(false));
 
         if (request.type() != null) {

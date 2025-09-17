@@ -57,19 +57,20 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
      * @return SiteResponse 리스트를 담은 Page 객체
      */
     @Override
-    public Page<SiteResponse> findAll(SiteListRequest request, Pageable pageable, List<Long> accessibleSiteIds) {
-        BooleanBuilder condition = buildCondition(request);
+    public Page<SiteResponse> findAll(final SiteListRequest request, final Pageable pageable,
+            final List<Long> accessibleSiteIds) {
+        final BooleanBuilder condition = buildCondition(request);
         if (accessibleSiteIds != null) {
             if (accessibleSiteIds.isEmpty()) {
                 return Page.empty(pageable);
             }
             condition.and(site.id.in(accessibleSiteIds));
         }
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
                 SORT_FIELDS);
 
-        List<Site> content = queryFactory
+        final List<Site> content = queryFactory
                 .selectFrom(site)
                 .leftJoin(site.clientCompany).fetchJoin()
                 .leftJoin(site.user).fetchJoin()
@@ -82,14 +83,14 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
                 .fetch();
 
         // count 쿼리를 별도로 수행 (성능 최적화를 위해 fetchResults 대신 직접 분리)
-        Long totalCount = queryFactory
+        final Long totalCount = queryFactory
                 .select(site.count())
                 .from(site)
                 .where(condition)
                 .fetchOne();
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        final long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        List<SiteResponse> responses = content.stream()
+        final List<SiteResponse> responses = content.stream()
                 .map(SiteResponse::from)
                 .toList();
 
@@ -97,15 +98,16 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
     }
 
     @Override
-    public List<Site> findAllWithoutPaging(SiteListRequest request, Sort sort, List<Long> accessibleSiteIds) {
-        BooleanBuilder condition = buildCondition(request);
+    public List<Site> findAllWithoutPaging(final SiteListRequest request, final Sort sort,
+            final List<Long> accessibleSiteIds) {
+        final BooleanBuilder condition = buildCondition(request);
         if (accessibleSiteIds != null) {
             if (accessibleSiteIds.isEmpty()) {
                 return List.of();
             }
             condition.and(site.id.in(accessibleSiteIds));
         }
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         return queryFactory
                 .selectFrom(site)
@@ -124,8 +126,8 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
      * @param request 검색 요청 객체
      * @return BooleanBuilder (QueryDSL 조건 객체)
      */
-    private BooleanBuilder buildCondition(SiteListRequest request) {
-        BooleanBuilder builder = new BooleanBuilder();
+    private BooleanBuilder buildCondition(final SiteListRequest request) {
+        final BooleanBuilder builder = new BooleanBuilder();
 
         // 삭제되지 않은 데이터만 조회
         builder.and(site.deleted.eq(false));
@@ -134,7 +136,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             builder.and(site.name.containsIgnoreCase(request.name().trim()));
         }
 
-        SiteType type = request.type();
+        final SiteType type = request.type();
         if (type != null) {
             builder.and(site.type.eq(type));
         }
@@ -152,7 +154,7 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             builder.and(site.district.eq(request.district().trim()));
         }
 
-        List<SiteProcessStatus> siteProcessStatuses = request.processStatuses();
+        final List<SiteProcessStatus> siteProcessStatuses = request.processStatuses();
         if (siteProcessStatuses != null && !siteProcessStatuses.isEmpty()) {
             builder.and(site.processes.any().status.in(siteProcessStatuses));
         }
@@ -164,22 +166,22 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         }
 
         if (request.startDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.startDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.startDate());
             builder.and(site.startedAt.goe(dateRange[0]));
         }
 
         if (request.endDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.endDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.endDate());
             builder.and(site.endedAt.lt(dateRange[1]));
         }
 
         if (request.createdStartDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
             builder.and(site.createdAt.goe(dateRange[0]));
         }
 
         if (request.createdEndDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
             builder.and(site.createdAt.lt(dateRange[1]));
         }
 

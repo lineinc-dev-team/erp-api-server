@@ -53,13 +53,13 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
      * @return OutsourcingCompanyResponse 리스트를 담은 Page 객체
      */
     @Override
-    public Page<CompanyResponse> findAll(OutsourcingCompanyListRequest request, Pageable pageable) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
+    public Page<CompanyResponse> findAll(final OutsourcingCompanyListRequest request, final Pageable pageable) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
                 SORT_FIELDS);
 
-        List<OutsourcingCompany> content = queryFactory
+        final List<OutsourcingCompany> content = queryFactory
                 .selectFrom(outsourcingCompany)
                 .distinct()
                 .leftJoin(outsourcingCompany.contacts, outsourcingCompanyContact).fetchJoin()
@@ -70,14 +70,14 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
                 .fetch();
 
         // count 쿼리를 별도로 수행 (성능 최적화를 위해 fetchResults 대신 직접 분리)
-        Long totalCount = queryFactory
+        final Long totalCount = queryFactory
                 .select(outsourcingCompany.count())
                 .from(outsourcingCompany)
                 .where(condition)
                 .fetchOne();
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        final long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        List<CompanyResponse> responses = content.stream()
+        final List<CompanyResponse> responses = content.stream()
                 .map(CompanyResponse::from)
                 .toList();
 
@@ -85,9 +85,9 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
     }
 
     @Override
-    public List<OutsourcingCompany> findAllWithoutPaging(OutsourcingCompanyListRequest request, Sort sort) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+    public List<OutsourcingCompany> findAllWithoutPaging(final OutsourcingCompanyListRequest request, final Sort sort) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         return queryFactory
                 .selectFrom(outsourcingCompany)
@@ -104,8 +104,8 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
      * @param request 검색 요청 객체
      * @return BooleanBuilder (QueryDSL 조건 객체)
      */
-    private BooleanBuilder buildCondition(OutsourcingCompanyListRequest request) {
-        BooleanBuilder builder = new BooleanBuilder();
+    private BooleanBuilder buildCondition(final OutsourcingCompanyListRequest request) {
+        final BooleanBuilder builder = new BooleanBuilder();
 
         // 삭제되지 않은 데이터만 조회
         builder.and(outsourcingCompany.deleted.eq(false));
@@ -121,7 +121,7 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
         }
 
         if (StringUtils.hasText(request.landlineNumber())) {
-            String number = request.landlineNumber().trim();
+            final String number = request.landlineNumber().trim();
             builder.and(outsourcingCompany.landlineNumber.contains(number));
         }
         if (request.isActive() != null) {
@@ -132,12 +132,12 @@ public class OutsourcingCompanyRepositoryImpl implements OutsourcingCompanyRepos
         }
 
         if (request.createdStartDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
             builder.and(outsourcingCompany.createdAt.goe(dateRange[0]));
         }
 
         if (request.createdEndDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
             builder.and(outsourcingCompany.createdAt.lt(dateRange[1]));
         }
 

@@ -55,13 +55,13 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
      * @return ClientCompanyResponse 리스트를 담은 Page 객체
      */
     @Override
-    public Page<ClientCompanyResponse> findAll(ClientCompanyListRequest request, Pageable pageable) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
+    public Page<ClientCompanyResponse> findAll(final ClientCompanyListRequest request, final Pageable pageable) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
                 pageable,
                 SORT_FIELDS);
 
-        List<ClientCompany> content = queryFactory
+        final List<ClientCompany> content = queryFactory
                 .selectFrom(clientCompany)
                 .distinct()
                 .leftJoin(clientCompany.contacts, clientCompanyContact).fetchJoin()
@@ -73,14 +73,14 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
                 .fetch();
 
         // count 쿼리를 별도로 수행 (성능 최적화를 위해 fetchResults 대신 직접 분리)
-        Long totalCount = queryFactory
+        final Long totalCount = queryFactory
                 .select(clientCompany.count())
                 .from(clientCompany)
                 .where(condition)
                 .fetchOne();
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        final long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        List<ClientCompanyResponse> responses = content.stream()
+        final List<ClientCompanyResponse> responses = content.stream()
                 .map(ClientCompanyResponse::from)
                 .toList();
 
@@ -93,8 +93,8 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
      * @param request 검색 요청 객체
      * @return BooleanBuilder (QueryDSL 조건 객체)
      */
-    private BooleanBuilder buildCondition(ClientCompanyListRequest request) {
-        BooleanBuilder builder = new BooleanBuilder();
+    private BooleanBuilder buildCondition(final ClientCompanyListRequest request) {
+        final BooleanBuilder builder = new BooleanBuilder();
         builder.and(clientCompany.deleted.eq(false));
 
         if (StringUtils.hasText(request.name())) {
@@ -120,7 +120,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
         }
         if (StringUtils.hasText(request.landlineNumber())) {
-            String number = request.landlineNumber().trim();
+            final String number = request.landlineNumber().trim();
             builder.and(
                     clientCompany.landlineNumber.contains(number)
                             .or(clientCompany.phoneNumber.contains(number)));
@@ -130,12 +130,12 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         }
 
         if (request.createdStartDate() != null) {
-            OffsetDateTime startOfDay = DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate());
+            final OffsetDateTime startOfDay = DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate());
             builder.and(clientCompany.createdAt.goe(startOfDay));
         }
 
         if (request.createdEndDate() != null) {
-            OffsetDateTime endOfDay = DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate());
+            final OffsetDateTime endOfDay = DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate());
             builder.and(clientCompany.createdAt.lt(endOfDay));
         }
 
@@ -143,9 +143,9 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
     }
 
     @Override
-    public List<ClientCompany> findAllWithoutPaging(ClientCompanyListRequest request, Sort sort) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+    public List<ClientCompany> findAllWithoutPaging(final ClientCompanyListRequest request, final Sort sort) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         return queryFactory
                 .selectFrom(clientCompany)

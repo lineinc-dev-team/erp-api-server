@@ -52,12 +52,13 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
             "updatedAt", fuelAggregation.updatedAt);
 
     @Override
-    public Page<FuelAggregationListResponse> findAll(FuelAggregationListRequest request, Pageable pageable) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+    public Page<FuelAggregationListResponse> findAll(final FuelAggregationListRequest request,
+            final Pageable pageable) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         // FuelInfo를 기준으로 조회하되, FuelAggregation 기준으로만 정렬
-        List<FuelInfo> fuelInfoContent = queryFactory
+        final List<FuelInfo> fuelInfoContent = queryFactory
                 .selectFrom(fuelInfo)
                 .innerJoin(fuelInfo.fuelAggregation, fuelAggregation).fetchJoin()
                 .leftJoin(fuelAggregation.site, site).fetchJoin()
@@ -72,7 +73,7 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
                 .fetch();
 
         // 전체 FuelInfo 개수 조회 (페이지네이션용)
-        Long totalCount = queryFactory
+        final Long totalCount = queryFactory
                 .select(fuelInfo.count())
                 .from(fuelInfo)
                 .innerJoin(fuelInfo.fuelAggregation, fuelAggregation)
@@ -84,18 +85,18 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
                 .where(condition)
                 .fetchOne();
 
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        final long total = Objects.requireNonNullElse(totalCount, 0L);
 
         // 각 FuelInfo마다 FuelAggregation 정보와 함께 응답 생성
-        List<FuelAggregationListResponse> responses = fuelInfoContent.stream()
+        final List<FuelAggregationListResponse> responses = fuelInfoContent.stream()
                 .map(info -> FuelAggregationListResponse.from(info.getFuelAggregation(), info))
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
     }
 
-    private BooleanBuilder buildCondition(FuelAggregationListRequest request) {
-        BooleanBuilder builder = new BooleanBuilder();
+    private BooleanBuilder buildCondition(final FuelAggregationListRequest request) {
+        final BooleanBuilder builder = new BooleanBuilder();
         builder.and(fuelAggregation.deleted.eq(false));
 
         if (StringUtils.hasText(request.siteName())) {
@@ -111,8 +112,8 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
             builder.and(equipment.vehicleNumber.containsIgnoreCase(request.vehicleNumber().trim()));
         }
         if (request.fuelTypes() != null && !request.fuelTypes().isEmpty()) {
-            BooleanBuilder fuelTypeCondition = new BooleanBuilder();
-            for (FuelInfoFuelType fuelType : request.fuelTypes()) {
+            final BooleanBuilder fuelTypeCondition = new BooleanBuilder();
+            for (final FuelInfoFuelType fuelType : request.fuelTypes()) {
                 fuelTypeCondition.or(fuelInfo.fuelType.eq(fuelType));
             }
             builder.and(fuelTypeCondition);
@@ -120,13 +121,13 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
 
         // 시작일 검색 (시작일 이후)
         if (request.dateStartDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.dateStartDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.dateStartDate());
             builder.and(fuelAggregation.date.goe(dateRange[0]));
         }
 
         // 종료일 검색 (종료일 이전)
         if (request.dateEndDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.dateEndDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.dateEndDate());
             builder.and(fuelAggregation.date.lt(dateRange[1]));
         }
 
@@ -134,12 +135,13 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
     }
 
     @Override
-    public List<FuelAggregationListResponse> findAllWithoutPaging(FuelAggregationListRequest request, Sort sort) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+    public List<FuelAggregationListResponse> findAllWithoutPaging(final FuelAggregationListRequest request,
+            final Sort sort) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         // FuelInfo를 기준으로 조회하되, FuelAggregation 기준으로만 정렬
-        List<FuelInfo> fuelInfoContent = queryFactory
+        final List<FuelInfo> fuelInfoContent = queryFactory
                 .selectFrom(fuelInfo)
                 .innerJoin(fuelInfo.fuelAggregation, fuelAggregation).fetchJoin()
                 .leftJoin(fuelAggregation.site, site).fetchJoin()

@@ -1,5 +1,17 @@
 package com.lineinc.erp.api.server.domain.user.repository;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.domain.user.entity.QUserRole;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -12,18 +24,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 사용자 Repository 커스텀 구현체
@@ -46,12 +48,12 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             "lastLoginAt", user.lastLoginAt);
 
     @Override
-    public Page<UserResponse> findAll(SearchUserRequest request, Pageable pageable) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+    public Page<UserResponse> findAll(final SearchUserRequest request, final Pageable pageable) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         // 데이터 조회
-        List<User> content = queryFactory
+        final List<User> content = queryFactory
                 .selectFrom(user)
                 .where(condition)
                 .orderBy(orders)
@@ -60,15 +62,15 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                 .fetch();
 
         // 전체 개수 조회
-        Long totalCount = queryFactory
+        final Long totalCount = queryFactory
                 .select(user.count())
                 .from(user)
                 .where(condition)
                 .fetchOne();
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        final long total = Objects.requireNonNullElse(totalCount, 0L);
 
         // DTO 변환
-        List<UserResponse> responses = content.stream()
+        final List<UserResponse> responses = content.stream()
                 .map(UserResponse::from)
                 .toList();
 
@@ -76,11 +78,11 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public List<UserResponse> findAllWithoutPaging(SearchUserRequest request, Sort sort) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+    public List<UserResponse> findAllWithoutPaging(final SearchUserRequest request, final Sort sort) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
-        List<User> users = queryFactory
+        final List<User> users = queryFactory
                 .selectFrom(user)
                 .where(condition)
                 .orderBy(orders)
@@ -97,8 +99,8 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
      * @param request 검색 요청
      * @return QueryDSL 조건 빌더
      */
-    private BooleanBuilder buildCondition(SearchUserRequest request) {
-        BooleanBuilder builder = new BooleanBuilder();
+    private BooleanBuilder buildCondition(final SearchUserRequest request) {
+        final BooleanBuilder builder = new BooleanBuilder();
 
         // 기본 조건: 관리자 제외, 삭제되지 않은 사용자
         builder.and(user.loginId.ne(AppConstants.ADMIN_LOGIN_ID));
@@ -116,7 +118,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         // 역할 필터
         if (request.roleId() != null) {
-            QUserRole userRole = QUserRole.userRole;
+            final QUserRole userRole = QUserRole.userRole;
             builder.and(user.id.in(
                     queryFactory.select(userRole.user.id)
                             .from(userRole)
@@ -125,23 +127,23 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         // 생성일 범위 필터
         if (request.createdStartDate() != null) {
-            OffsetDateTime startTime = DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate());
+            final OffsetDateTime startTime = DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate());
             builder.and(user.createdAt.goe(startTime));
         }
 
         if (request.createdEndDate() != null) {
-            OffsetDateTime endTime = DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate());
+            final OffsetDateTime endTime = DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate());
             builder.and(user.createdAt.lt(endTime));
         }
 
         // 마지막 로그인일 범위 필터
         if (request.lastLoginStartDate() != null) {
-            OffsetDateTime startTime = DateTimeFormatUtils.toUtcStartOfDay(request.lastLoginStartDate());
+            final OffsetDateTime startTime = DateTimeFormatUtils.toUtcStartOfDay(request.lastLoginStartDate());
             builder.and(user.lastLoginAt.goe(startTime));
         }
 
         if (request.lastLoginEndDate() != null) {
-            OffsetDateTime endTime = DateTimeFormatUtils.toUtcEndOfDay(request.lastLoginEndDate());
+            final OffsetDateTime endTime = DateTimeFormatUtils.toUtcEndOfDay(request.lastLoginEndDate());
             builder.and(user.lastLoginAt.lt(endTime));
         }
 
