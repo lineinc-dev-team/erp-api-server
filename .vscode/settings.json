@@ -9,12 +9,15 @@
     "editor.formatOnSave": true, // 저장 시 코드 자동 포맷팅
     "editor.tabSize": 4, // 탭 크기 4칸
     "editor.insertSpaces": true, // 탭 대신 스페이스 사용
-    "java.format.settings.profile": "GoogleStyle", // Google Java 스타일 사용
-    "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+    "java.format.onType.enabled": true, // 타이핑 중 자동 포맷팅
+    "java.format.comments.enabled": true, // 주석 포맷팅 활성화
+    "java.codeGeneration.insertionLocation": "afterCursor", // 코드 생성 위치
+    "java.maxConcurrentBuilds": 1, // 빌드 성능 최적화
     "[java]": {
         "editor.tabSize": 4, // Java 파일 전용 탭 크기 4칸
         "editor.insertSpaces": true,
-        "editor.detectIndentation": false // 자동 들여쓰기 감지 비활성화
+        "editor.detectIndentation": false, // 자동 들여쓰기 감지 비활성화
+        "editor.foldingImportsByDefault": true // Java 파일에서 imports 자동 접기
     },
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit", // imports 정리 명시적 실행
@@ -26,6 +29,9 @@
     "java.sources.organizeImports.starThreshold": 99, // import * 사용 임계값 (거의 사용 안함)
     // ===== IntelliJ처럼 사용되지 않는 코드를 회색으로 표시 =====
     "editor.semanticHighlighting.enabled": true, // 의미론적 하이라이팅 활성화
+    // ===== 코드 접기 설정 =====
+    "editor.foldingImportsByDefault": true, // 파일 열 때 imports 자동 접기
+    "editor.showFoldingControls": "mouseover", // 마우스 오버 시에만 접기 컨트롤 표시
     // ===== 추가 개발 편의 설정 =====
     "java.quickfix.showAt": "problem", // 문제가 있는 곳에만 Quick Fix 표시
     "java.completion.enabled": true, // 자동완성 활성화

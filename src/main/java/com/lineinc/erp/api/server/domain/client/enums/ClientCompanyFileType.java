@@ -7,8 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public enum ClientCompanyFileType {
-    BUSINESS_LICENSE("사업자등록증"),
-    BASIC("기본");
+    BUSINESS_LICENSE("사업자등록증"), BASIC("기본");
 
     private final String label;
 

@@ -30,10 +30,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(indexes = {
-        @Index(columnList = "name"),
-        @Index(columnList = "originalFileName")
-})
+@Table(indexes = { @Index(columnList = "name"), @Index(columnList = "originalFileName") })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -90,7 +87,8 @@ public class ClientCompanyFile extends BaseEntity {
     public void updateFrom(ClientCompanyFileUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        Optional.ofNullable(request.originalFileName())
+                .ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }

@@ -1,26 +1,44 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
-import jakarta.persistence.*;
-import lombok.*;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+
+import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
 @Table(indexes = {
-        @Index(columnList = "name"),
-        @Index(columnList = "businessNumber"),
-        @Index(columnList = "ceoName"),
-        @Index(columnList = "email"),
-        @Index(columnList = "createdAt"),
-        @Index(columnList = "phoneNumber")
+        @Index(columnList = "name"), @Index(columnList = "businessNumber"),
+        @Index(columnList = "ceoName"), @Index(columnList = "email"),
+        @Index(columnList = "createdAt"), @Index(columnList = "phoneNumber")
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

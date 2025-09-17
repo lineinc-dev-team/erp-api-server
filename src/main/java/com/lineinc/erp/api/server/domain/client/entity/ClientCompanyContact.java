@@ -1,24 +1,32 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
-import jakarta.persistence.*;
-import lombok.*;
+import java.util.Optional;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
-
-import java.util.Optional;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(indexes = {
-        @Index(columnList = "name"),
-        @Index(columnList = "department"),
-        @Index(columnList = "position"),
-        @Index(columnList = "phoneNumber"),
-        @Index(columnList = "email"),
-})
+@Table(indexes = {@Index(columnList = "name"), @Index(columnList = "department"),
+        @Index(columnList = "position"), @Index(columnList = "phoneNumber"),
+        @Index(columnList = "email"),})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -28,7 +36,8 @@ public class ClientCompanyContact extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_contact_seq")
-    @SequenceGenerator(name = "client_company_contact_seq", sequenceName = "client_company_contact_seq", allocationSize = 1)
+    @SequenceGenerator(name = "client_company_contact_seq",
+            sequenceName = "client_company_contact_seq", allocationSize = 1)
     private Long id;
 
     /**
