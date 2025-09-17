@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod
 import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ public record ClientCompanyUpdateRequest(
         @Schema(description = "비고 / 메모") String memo,
         @Schema(description = "사용 여부", example = "true") @NotNull Boolean isActive,
         @Schema(description = "본사 담당자 ID", example = "1") @NotNull Long userId,
-        @Schema(description = "담당자 목록") List<ClientCompanyContactUpdateRequest> contacts,
-        @Schema(description = "파일 목록") List<ClientCompanyFileUpdateRequest> files,
-        @Schema(description = "변경 이력 리스트") List<ChangeHistoryRequest> changeHistories) {
+        @Schema(description = "담당자 목록") @Valid List<ClientCompanyContactUpdateRequest> contacts,
+        @Schema(description = "파일 목록") @Valid List<ClientCompanyFileUpdateRequest> files,
+        @Schema(description = "변경 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
 }
