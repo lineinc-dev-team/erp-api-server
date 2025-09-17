@@ -5,7 +5,6 @@ import java.util.List;
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +24,6 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "비고 / 메모") String memo,
         @Schema(description = "사용 여부", example = "true") @NotNull Boolean isActive,
         @Schema(description = "본사 담당자 ID", example = "1") @NotNull Long userId,
-        @Schema(description = "담당자 목록") @Valid List<ClientCompanyContactCreateRequest> contacts,
-        @Schema(description = "파일 목록") @Valid List<ClientCompanyFileCreateRequest> files) {
+        @Schema(description = "담당자 목록") List<ClientCompanyContactCreateRequest> contacts,
+        @Schema(description = "파일 목록") List<ClientCompanyFileCreateRequest> files) {
 }
