@@ -91,7 +91,7 @@ public class ClientCompany extends BaseEntity {
     private ClientCompanyPaymentMethod paymentMethod;
 
     @Column
-    @DiffIgnore
+    @DiffInclude
     private String paymentPeriod;
 
     @Setter
