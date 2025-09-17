@@ -79,7 +79,7 @@ public class ClientCompanyContact extends BaseEntity {
     @Column
     @DiffInclude
     @Builder.Default
-    private final Boolean isMain = false;
+    private Boolean isMain = false;
 
     public void updateFrom(final ClientCompanyContactUpdateRequest request) {
         this.name = request.name();
@@ -87,6 +87,7 @@ public class ClientCompanyContact extends BaseEntity {
         this.position = request.position();
         this.landlineNumber = request.landlineNumber();
         this.phoneNumber = request.phoneNumber();
+        this.isMain = request.isMain();
         this.email = request.email();
         this.memo = request.memo();
     }
