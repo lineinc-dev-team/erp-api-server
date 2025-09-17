@@ -20,12 +20,16 @@
         "source.organizeImports": "explicit", // imports 정리 명시적 실행
         "source.removeUnusedImports": "explicit" // 사용되지 않는 imports 자동 제거
     },
-    // ===== 사용되지 않는 코드 감지 설정 (핵심!) =====
+    // ===== 사용되지 않는 코드 감지 설정 =====
     "java.errors.incompleteClasspath.severity": "warning", // 불완전한 classpath 경고 표시
     "java.sources.organizeImports.staticStarThreshold": 5, // static import * 사용 임계값
     "java.sources.organizeImports.starThreshold": 99, // import * 사용 임계값 (거의 사용 안함)
     // ===== IntelliJ처럼 사용되지 않는 코드를 회색으로 표시 =====
     "editor.semanticHighlighting.enabled": true, // 의미론적 하이라이팅 활성화
+    // ===== 추가 개발 편의 설정 =====
+    "java.quickfix.showAt": "problem", // 문제가 있는 곳에만 Quick Fix 표시
+    "java.completion.enabled": true, // 자동완성 활성화
+    "java.signatureHelp.enabled": true, // 메서드 시그니처 도움말 활성화
     // ===== 프로젝트 구조 설정 =====
     "java.project.sourcePaths": [
         "src/main/java" // 메인 소스 경로
