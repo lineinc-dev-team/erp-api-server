@@ -1,14 +1,16 @@
 package com.lineinc.erp.api.server.infrastructure.config.documentation;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.servers.Server;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.util.List;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class OpenAPIConfig {
@@ -18,14 +20,21 @@ public class OpenAPIConfig {
 
     @Bean
     public OpenAPI erpOpenAPI() {
-        String serverUrl = switch (activeProfile) {
+        final String serverUrl = switch (activeProfile) {
             case "dev" -> "https://dev-erp-api.dooson.it";
             case "prod" -> "https://erp-api.dooson.it";
             default -> "http://localhost:8080";
         };
 
         return new OpenAPI()
-                .components(new Components()) // 추가적인 인증/스키마 컴포넌트 설정 가능
+                .components(new Components()
+                        // 공통 응답 컴포넌트 정의 - 모든 API에서 재사용 가능
+                        .addResponses("BadRequest", new ApiResponse()
+                                .description("입력값 오류 또는 비즈니스 로직 위반"))
+                        .addResponses("NotFound", new ApiResponse()
+                                .description("요청한 리소스를 찾을 수 없음"))
+                        .addResponses("InternalServerError", new ApiResponse()
+                                .description("서버 내부 오류")))
                 .info(new Info() // 문서 정보 설정
                         .title("ERP 시스템 API 명세서")
                         .description("ERP 백엔드 REST API 문서입니다.")

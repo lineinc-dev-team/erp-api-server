@@ -24,6 +24,7 @@ import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod
 import com.lineinc.erp.api.server.domain.client.service.CompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
@@ -47,29 +48,21 @@ import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/client-companies")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/client-companies")
 @Tag(name = "발주처 관리", description = "발주처 관련 API")
-public class ClientCompanyController {
+public class ClientCompanyController extends BaseController {
 
     private final CompanyService companyService;
 
-    @Operation(summary = "발주처 등록", description = "발주처 정보를 등록합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "발주처 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저를 등록하려는 경우")
-    })
     @PostMapping
+    @Operation(summary = "발주처 등록")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createClientCompany(
             @Valid @RequestBody final ClientCompanyCreateRequest request) {
@@ -77,10 +70,8 @@ public class ClientCompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "발주처 목록 조회", description = "등록된 모든 발주처 정보를 반환합니다")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "발주처 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()), })
     @GetMapping
+    @Operation(summary = "발주처 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
             @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
@@ -93,9 +84,8 @@ public class ClientCompanyController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "발주처 이름 키워드 검색", description = "발주처 이름으로 간단한 검색을 수행합니다.")
-    @ApiResponses({ @ApiResponse(responseCode = "200", description = "검색 성공") })
     @GetMapping("/search")
+    @Operation(summary = "발주처 이름 검색")
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyResponse.ClientCompanySimpleResponse>>> searchClientCompanyByName(
             @Valid final SortRequest sortRequest, @Valid final PageRequest pageRequest,
             @RequestParam(required = false) final String keyword) {
@@ -109,10 +99,8 @@ public class ClientCompanyController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "발주처 삭제", description = "하나 이상의 발주처 ID를 받아 해당 발주처를 삭제합니다")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "발주처 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"), })
     @DeleteMapping
+    @Operation(summary = "발주처 삭제")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteClientCompanies(
             @RequestBody final DeleteClientCompaniesRequest clientCompanyIds) {
@@ -120,11 +108,8 @@ public class ClientCompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "발주처 수정", description = "특정 발주처 정보를 수정합니다")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음"), })
     @PatchMapping("/{id}")
+    @Operation(summary = "발주처 수정")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateClientCompany(@PathVariable final Long id,
             @Valid @RequestBody final ClientCompanyUpdateRequest request) {
@@ -132,10 +117,8 @@ public class ClientCompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "발주처 엑셀 다운로드", description = "검색 조건에 맞는 발주처 목록을 엑셀 파일로 다운로드합니다.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()) })
     @GetMapping("/download")
+    @Operation(summary = "발주처 엑셀 다운로드")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public void downloadClientCompaniesExcel(@Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request,
@@ -152,10 +135,8 @@ public class ClientCompanyController {
         }
     }
 
-    @Operation(summary = "발주처 상세 조회", description = "발주처 상세 정보를 반환합니다")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "발주처를 찾을 수 없음", content = @Content()), })
     @GetMapping("/{id}")
+    @Operation(summary = "발주처 상세 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<ClientCompanyDetailResponse>> getClientCompanyById(
             @PathVariable final Long id) {
@@ -163,9 +144,8 @@ public class ClientCompanyController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "발주처 변경 이력 조회", description = "특정 발주처의 변경 히스토리를 조회합니다.")
-    @ApiResponses({ @ApiResponse(responseCode = "200", description = "조회 성공") })
     @GetMapping("/{id}/change-histories")
+    @Operation(summary = "발주처 변경 이력 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
             @PathVariable final Long id, @Valid final PageRequest pageRequest,
@@ -178,8 +158,8 @@ public class ClientCompanyController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "결제 수단 목록 조회")
     @GetMapping("/payment-methods")
+    @Operation(summary = "결제 수단 목록 조회")
     public ResponseEntity<SuccessResponse<List<ClientCompanyPaymentMethodResponse>>> getPaymentMethods() {
         final List<ClientCompanyPaymentMethodResponse> paymentMethods = Arrays
                 .stream(ClientCompanyPaymentMethod.values())
@@ -188,8 +168,8 @@ public class ClientCompanyController {
         return ResponseEntity.ok(SuccessResponse.of(paymentMethods));
     }
 
-    @Operation(summary = "발주처 파일 타입 목록 조회", description = "발주처 파일 타입 목록을 반환합니다")
     @GetMapping("/file-types")
+    @Operation(summary = "발주처 파일 타입 목록 조회")
     public ResponseEntity<SuccessResponse<List<ClientCompanyFileTypeResponse>>> getFileTypes() {
         final List<ClientCompanyFileTypeResponse> responseList = Arrays.stream(ClientCompanyFileType.values())
                 .map(ClientCompanyFileTypeResponse::from)
