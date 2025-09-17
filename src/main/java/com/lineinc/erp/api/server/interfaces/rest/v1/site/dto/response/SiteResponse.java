@@ -1,14 +1,14 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanySimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-
-import java.time.OffsetDateTime;
 
 @Schema(description = "현장 정보 응답")
 public record SiteResponse(
@@ -48,8 +48,8 @@ public record SiteResponse(
 
         @Schema(description = "공정 소장 정보") UserResponse.UserSimpleResponse manager,
 
-        @Schema(description = "발주처 정보") ClientCompanyResponse.ClientCompanySimpleResponse clientCompany) {
-    public static SiteResponse from(Site site) {
+        @Schema(description = "발주처 정보") ClientCompanySimpleResponse clientCompany) {
+    public static SiteResponse from(final Site site) {
         return new SiteResponse(
                 site.getId(),
                 site.getName(),
@@ -75,7 +75,7 @@ public record SiteResponse(
                                 ? UserResponse.UserSimpleResponse.from(site.getProcesses().get(0).getManager())
                                 : null,
                 site.getClientCompany() != null
-                        ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany())
+                        ? ClientCompanySimpleResponse.from(site.getClientCompany())
                         : null);
     }
 
@@ -84,7 +84,7 @@ public record SiteResponse(
             @Schema(description = "현장 ID", example = "123") Long id,
             @Schema(description = "현장명", example = "서울 APT 신축공사") String name,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
-        public static SiteResponse.SiteSimpleResponse from(Site site) {
+        public static SiteResponse.SiteSimpleResponse from(final Site site) {
             return new SiteResponse.SiteSimpleResponse(site.getId(), site.getName(), site.isDeleted());
         }
     }

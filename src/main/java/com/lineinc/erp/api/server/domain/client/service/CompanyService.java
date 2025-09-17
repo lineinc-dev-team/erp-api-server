@@ -31,6 +31,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientC
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyContactResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -214,7 +215,7 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanyResponse.ClientCompanySimpleResponse> searchClientCompanyByName(final String keyword,
+    public Slice<ClientCompanySimpleResponse> searchClientCompanyByName(final String keyword,
             final Pageable pageable) {
         Slice<ClientCompany> companySlice;
 
@@ -224,7 +225,7 @@ public class CompanyService {
             companySlice = companyRepository.findByNameContainingIgnoreCase(keyword, pageable);
         }
 
-        return companySlice.map(ClientCompanyResponse.ClientCompanySimpleResponse::from);
+        return companySlice.map(ClientCompanySimpleResponse::from);
     }
 
     @Transactional(readOnly = true)

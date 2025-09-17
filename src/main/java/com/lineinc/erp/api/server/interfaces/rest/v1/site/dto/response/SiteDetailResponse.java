@@ -1,17 +1,17 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse.UserSimpleResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanySimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Schema(description = "현장 정보 응답")
 public record SiteDetailResponse(
@@ -47,7 +47,7 @@ public record SiteDetailResponse(
 
         @Valid @Schema(description = "공정 정보") SiteProcessResponse process,
 
-        @Schema(description = "발주처 정보") ClientCompanyResponse.ClientCompanySimpleResponse clientCompany,
+        @Schema(description = "발주처 정보") ClientCompanySimpleResponse clientCompany,
 
         @Schema(description = "본사 담당자 정보") UserSimpleResponse user,
 
@@ -55,8 +55,8 @@ public record SiteDetailResponse(
 
         @Schema(description = "계약 정보 목록") List<SiteContractResponse> contracts) {
 
-    public static SiteDetailResponse from(Site site, boolean hasAccess) {
-        List<SiteContractResponse> contractResponses = site.getContracts().stream()
+    public static SiteDetailResponse from(final Site site, final boolean hasAccess) {
+        final List<SiteContractResponse> contractResponses = site.getContracts().stream()
                 .map(SiteContractResponse::from)
                 .collect(Collectors.toList());
 
@@ -80,7 +80,7 @@ public record SiteDetailResponse(
                         ? SiteProcessResponse.from(site.getProcesses().get(0))
                         : null,
                 site.getClientCompany() != null
-                        ? ClientCompanyResponse.ClientCompanySimpleResponse.from(site.getClientCompany())
+                        ? ClientCompanySimpleResponse.from(site.getClientCompany())
                         : null,
                 site.getUser() != null ? UserResponse.UserSimpleResponse.from(site.getUser()) : null,
                 site.getProcesses() != null && !site.getProcesses().isEmpty()

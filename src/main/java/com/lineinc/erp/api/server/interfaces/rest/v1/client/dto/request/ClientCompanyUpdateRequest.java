@@ -24,7 +24,7 @@ public record ClientCompanyUpdateRequest(
         @Schema(description = "결제 유예 기간", example = "2") @NotBlank String paymentPeriod,
         @Schema(description = "비고 / 메모") String memo,
         @Schema(description = "사용 여부", example = "true") @NotNull Boolean isActive,
-        @Schema(description = "본사 담당자 ID", example = "123") @NotNull Long userId,
+        @Schema(description = "본사 담당자 ID", example = "1") @NotNull Long userId,
         @Schema(description = "담당자 목록") @Valid List<ClientCompanyContactUpdateRequest> contacts,
         @Schema(description = "파일 목록") @Valid List<ClientCompanyFileUpdateRequest> files,
         @Schema(description = "변경 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
+import org.springframework.util.StringUtils;
 
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
@@ -175,6 +176,18 @@ public class ClientCompany extends BaseEntity {
                 .memo(request.memo())
                 .isActive(request.isActive())
                 .build();
+    }
+
+    // 유효한 파일 URL이 있는지 확인
+    public boolean hasValidFiles() {
+        return files.stream().anyMatch(file -> StringUtils.hasText(file.getFileUrl()));
+    }
+
+    // 메인 연락처 목록 반환
+    public List<ClientCompanyContact> getMainContacts() {
+        return contacts.stream()
+                .filter(contact -> contact.getIsMain())
+                .toList();
     }
 
 }

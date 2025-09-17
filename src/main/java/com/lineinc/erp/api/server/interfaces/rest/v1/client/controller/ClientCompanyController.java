@@ -40,6 +40,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientC
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyFileTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyPaymentMethodResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
@@ -78,7 +79,8 @@ public class ClientCompanyController extends BaseController {
     @Operation(summary = "발주처 목록 조회")
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
-            @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request) {
         final Page<ClientCompanyResponse> page = companyService.getAllClientCompanies(request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
@@ -90,10 +92,10 @@ public class ClientCompanyController extends BaseController {
 
     @GetMapping("/search")
     @Operation(summary = "발주처 이름 검색")
-    public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyResponse.ClientCompanySimpleResponse>>> searchClientCompanyByName(
+    public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanySimpleResponse>>> searchClientCompanyByName(
             @Valid final SortRequest sortRequest, @Valid final PageRequest pageRequest,
             @RequestParam(required = false) final String keyword) {
-        final Slice<ClientCompanyResponse.ClientCompanySimpleResponse> slice = companyService
+        final Slice<ClientCompanySimpleResponse> slice = companyService
                 .searchClientCompanyByName(keyword,
                         PageableUtils.createPageable(pageRequest.page(),
                                 pageRequest.size(),
