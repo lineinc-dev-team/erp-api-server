@@ -5,7 +5,6 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 public final class AppConstants {
-
     // 권한 그룹명 관련 상수
     public static final String ROLE_ADMIN_NAME = "전체권한";
 
@@ -36,19 +35,10 @@ public final class AppConstants {
     public static final String MENU_WORK_DAILY_REPORT = "출역일보";
 
     // 시스템 기본 메뉴 이름 목록
-    public static final List<String> MENU_NAMES = List.of(
-            MENU_ACCOUNT,
-            MENU_PERMISSION,
-            MENU_CLIENT_COMPANY,
-            MENU_SITE,
-            MENU_MANAGEMENT_COST,
-            MENU_STEEL_MANAGEMENT,
-            MENU_MATERIAL_MANAGEMENT,
-            MENU_FUEL_AGGREGATION,
-            MENU_LABOR_MANAGEMENT,
-            MENU_LABOR_PAYROLL,
-            MENU_OUTSOURCING_COMPANY,
-            MENU_OUTSOURCING_COMPANY_CONTRACT,
+    public static final List<String> MENU_NAMES = List.of(MENU_ACCOUNT, MENU_PERMISSION,
+            MENU_CLIENT_COMPANY, MENU_SITE, MENU_MANAGEMENT_COST, MENU_STEEL_MANAGEMENT,
+            MENU_MATERIAL_MANAGEMENT, MENU_FUEL_AGGREGATION, MENU_LABOR_MANAGEMENT,
+            MENU_LABOR_PAYROLL, MENU_OUTSOURCING_COMPANY, MENU_OUTSOURCING_COMPANY_CONTRACT,
             MENU_WORK_DAILY_REPORT);
 
     // 직급(Grade) 관련 상수
@@ -67,22 +57,16 @@ public final class AppConstants {
     public static final String DEPT_SALES = "영업팀";
 
     // 직급 전체 목록
-    public static final List<String> GRADE_NAMES = List.of(
-            GRADE_EMPLOYEE,
-            GRADE_ASSISTANT_MANAGER,
-            GRADE_MANAGER);
+    public static final List<String> GRADE_NAMES =
+            List.of(GRADE_EMPLOYEE, GRADE_ASSISTANT_MANAGER, GRADE_MANAGER);
 
     // 직책 전체 목록
-    public static final List<String> POSITION_NAMES = List.of(
-            POSITION_TEAM_LEADER,
-            POSITION_PART_LEADER,
-            POSITION_HEAD);
+    public static final List<String> POSITION_NAMES =
+            List.of(POSITION_TEAM_LEADER, POSITION_PART_LEADER, POSITION_HEAD);
 
     // 부서 전체 목록
-    public static final List<String> DEPARTMENT_NAMES = List.of(
-            DEPT_SUPPORT,
-            DEPT_DEVELOPMENT,
-            DEPT_SALES);
+    public static final List<String> DEPARTMENT_NAMES =
+            List.of(DEPT_SUPPORT, DEPT_DEVELOPMENT, DEPT_SALES);
 
     // 시간 관련 상수
     public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
@@ -93,6 +77,5 @@ public final class AppConstants {
     // 세션 타임아웃 기본값 (초 단위, 예: 1800초 = 30분)
     public static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 1800;
 
-    private AppConstants() {
-    } // 인스턴스화 방지
+    private AppConstants() {} // 인스턴스화 방지
 }

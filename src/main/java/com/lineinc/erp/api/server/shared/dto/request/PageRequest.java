@@ -1,9 +1,9 @@
 package com.lineinc.erp.api.server.shared.dto.request;
 
+import org.springdoc.core.annotations.ParameterObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.springdoc.core.annotations.ParameterObject;
 
 @ParameterObject
 @Schema(description = "공통 페이징 요청")

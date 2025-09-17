@@ -1,25 +1,34 @@
 {
-    // Java 자동 빌드 설정 - 프로젝트 변경 시 자동으로 빌드 구성 업데이트
-    "java.configuration.updateBuildConfiguration": "automatic",
-    // Java null 분석 모드 - null 안전성 검사를 자동으로 수행
-    "java.compile.nullAnalysis.mode": "automatic",
-    // 기본 자동 포맷팅 설정
-    "editor.formatOnSave": true, // 저장 시 자동 포맷팅
-    "editor.formatOnPaste": true, // 붙여넣기 시 자동 포맷팅
-    // Java 전용 설정
-    "java.format.enabled": true, // Java 코드 포맷팅 활성화
-    "java.saveActions.organizeImports": false, // AI 코딩과 충돌 방지를 위해 import 자동 정리 비활성화
-    // 파일 자동 저장 설정
-    "files.autoSave": "afterDelay", // 지연 후 자동 저장
-    "files.autoSaveDelay": 1000, // 1초 후 자동 저장
-    // 탭 및 들여쓰기 설정
-    "editor.tabSize": 4, // 탭 크기를 4칸으로 설정
+    // ===== Java 언어 서버 기본 설정 =====
+    "java.compile.nullAnalysis.mode": "automatic", // null 분석 자동 활성화
+    "java.configuration.updateBuildConfiguration": "automatic", // 빌드 설정 자동 업데이트
+    "java.codeGeneration.hashCodeEquals.useJava7Objects": true, // hashCode/equals 생성 시 Objects 클래스 사용
+    "java.codeGeneration.useBlocks": true, // 코드 생성 시 블록 구문 사용
+    // ===== 코드 정리 및 포맷팅 설정 =====
+    "java.saveActions.organizeImports": true, // 저장 시 imports 자동 정리
+    "editor.formatOnSave": true, // 저장 시 코드 자동 포맷팅
+    "editor.tabSize": 4, // 탭 크기 4칸
     "editor.insertSpaces": true, // 탭 대신 스페이스 사용
-    "editor.detectIndentation": false, // 파일별 들여쓰기 자동 감지 비활성화
-    "editor.useTabStops": false, // 탭 정지점 사용 안함 
-    // Java 전용 들여쓰기 설정
-    "java.format.settings.url": "", // 사용자 정의 포맷팅 설정 URL (비어있음)
-    "java.format.settings.profile": "GoogleStyle", // Google Java 스타일 가이드 사용
-    // Java import 자동 숨기기 설정
-    "editor.foldingImportsByDefault": true // 파일 열 때 import 자동 접기
+    "java.format.settings.profile": "GoogleStyle", // Google Java 스타일 사용
+    "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+    "[java]": {
+        "editor.tabSize": 4, // Java 파일 전용 탭 크기 4칸
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false // 자동 들여쓰기 감지 비활성화
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit", // imports 정리 명시적 실행
+        "source.removeUnusedImports": "explicit" // 사용되지 않는 imports 자동 제거
+    },
+    // ===== 사용되지 않는 코드 감지 설정 (핵심!) =====
+    "java.errors.incompleteClasspath.severity": "warning", // 불완전한 classpath 경고 표시
+    "java.sources.organizeImports.staticStarThreshold": 5, // static import * 사용 임계값
+    "java.sources.organizeImports.starThreshold": 99, // import * 사용 임계값 (거의 사용 안함)
+    // ===== IntelliJ처럼 사용되지 않는 코드를 회색으로 표시 =====
+    "editor.semanticHighlighting.enabled": true, // 의미론적 하이라이팅 활성화
+    // ===== 프로젝트 구조 설정 =====
+    "java.project.sourcePaths": [
+        "src/main/java" // 메인 소스 경로
+    ],
+    "java.project.outputPath": "build/classes" // 컴파일된 클래스 출력 경로
 }
