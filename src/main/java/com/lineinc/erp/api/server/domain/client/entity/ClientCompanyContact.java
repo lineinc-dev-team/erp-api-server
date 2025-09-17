@@ -1,6 +1,14 @@
 package com.lineinc.erp.api.server.domain.client.entity;
 
 import java.util.Optional;
+
+import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,11 +20,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.SQLRestriction;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,9 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(indexes = {@Index(columnList = "name"), @Index(columnList = "department"),
-        @Index(columnList = "position"), @Index(columnList = "phoneNumber"),
-        @Index(columnList = "email"),})
+@Table(indexes = { @Index(columnList = "name"), @Index(columnList = "department"), @Index(columnList = "position"),
+        @Index(columnList = "phoneNumber"), @Index(columnList = "email") })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -36,8 +38,7 @@ public class ClientCompanyContact extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_company_contact_seq")
-    @SequenceGenerator(name = "client_company_contact_seq",
-            sequenceName = "client_company_contact_seq", allocationSize = 1)
+    @SequenceGenerator(name = "client_company_contact_seq", sequenceName = "client_company_contact_seq", allocationSize = 1)
     private Long id;
 
     /**
@@ -96,7 +97,7 @@ public class ClientCompanyContact extends BaseEntity {
     @Builder.Default
     private Boolean isMain = false;
 
-    public void updateFrom(ClientCompanyContactUpdateRequest request) {
+    public void updateFrom(final ClientCompanyContactUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.position()).ifPresent(val -> this.position = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);

@@ -84,11 +84,10 @@ public class ClientCompanyFile extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고 / 메모
 
-    public void updateFrom(ClientCompanyFileUpdateRequest request) {
+    public void updateFrom(final ClientCompanyFileUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName())
-                .ifPresent(val -> this.originalFileName = val);
+        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }

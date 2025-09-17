@@ -36,9 +36,13 @@ import lombok.Setter;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "name"), @Index(columnList = "businessNumber"),
-        @Index(columnList = "ceoName"), @Index(columnList = "email"),
-        @Index(columnList = "createdAt"), @Index(columnList = "phoneNumber")
+        @Index(columnList = "name"),
+        @Index(columnList = "businessNumber"),
+        @Index(columnList = "ceoName"),
+        @Index(columnList = "email"),
+        @Index(columnList = "createdAt"),
+        @Index(columnList = "phoneNumber")
+
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -51,88 +55,88 @@ public class ClientCompany extends BaseEntity {
     @SequenceGenerator(name = "client_company_seq", sequenceName = "client_company_seq", allocationSize = 1)
     private Long id;
 
-    @DiffInclude
     @Column(nullable = false)
+    @DiffInclude
     private String name;
 
-    @DiffInclude
     @Column
+    @DiffInclude
     private String businessNumber;
 
-    @DiffInclude
     @Column
+    @DiffInclude
     private String ceoName;
 
-    @DiffInclude
     @Column
+    @DiffInclude
     private String address;
 
-    @DiffInclude
     @Column
+    @DiffInclude
     private String detailAddress;
 
-    @DiffInclude
     @Column
+    @DiffInclude
     private String landlineNumber;
 
-    @DiffInclude
     @Column
+    @DiffInclude
     private String phoneNumber;
 
-    @DiffInclude
     @Column
+    @DiffInclude
     private String email;
 
     /**
      * 결제 방식 (현금/어음)
      */
-    @DiffIgnore
-    @Enumerated(EnumType.STRING)
     @Column
+    @Enumerated(EnumType.STRING)
+    @DiffIgnore
     private ClientCompanyPaymentMethod paymentMethod;
 
     /**
      * 결제 유예 기간
      */
-    @DiffInclude
     @Column
+    @DiffIgnore
     private String paymentPeriod;
 
     @Setter
-    @DiffIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @DiffIgnore
     private User user; // 본사 담당자
 
     /**
      * 발주처 담당자 목록
      */
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
-    @DiffIgnore
     @Builder.Default
-    private List<ClientCompanyContact> contacts = new ArrayList<>();
+    @DiffIgnore
+    private final List<ClientCompanyContact> contacts = new ArrayList<>();
 
     /**
      * 발주처 관련 첨부파일 목록
      */
     @OneToMany(mappedBy = "clientCompany", cascade = CascadeType.ALL, orphanRemoval = true)
-    @DiffIgnore
     @Builder.Default
-    private List<ClientCompanyFile> files = new ArrayList<>();
+    @DiffIgnore
+    private final List<ClientCompanyFile> files = new ArrayList<>();
 
     /**
      * 사용 여부
      */
-    @DiffInclude
-    @Builder.Default
     @Column(nullable = false)
+    @Builder.Default
+    @DiffInclude
     private boolean isActive = true;
 
     /**
      * 비고 / 메모
      */
-    @DiffInclude
     @Column(columnDefinition = "TEXT")
+    @DiffInclude
     private String memo;
 
     @Transient
@@ -151,7 +155,7 @@ public class ClientCompany extends BaseEntity {
         this.paymentMethodName = this.paymentMethod != null ? this.paymentMethod.getDisplayName() : null;
     }
 
-    public void updateFrom(ClientCompanyUpdateRequest request, User user) {
+    public void updateFrom(final ClientCompanyUpdateRequest request, final User user) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
         Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
