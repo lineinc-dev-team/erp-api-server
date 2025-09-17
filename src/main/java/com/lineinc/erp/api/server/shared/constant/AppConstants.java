@@ -80,6 +80,12 @@ public final class AppConstants {
 
     public static final String CLIENT_COMPANY_ID = "client_company_id";
 
+    // API 경로 관련 상수
+    public static final String API_V1_CLIENT_COMPANIES = "/api/v1/client-companies";
+
+    // Swagger 문서화 관련 상수
+    public static final String SWAGGER_TAG_CLIENT_COMPANY = "발주처 관련 API";
+
     private AppConstants() {
     } // 인스턴스화 방지
 }

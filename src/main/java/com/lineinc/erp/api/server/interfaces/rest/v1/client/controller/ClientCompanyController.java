@@ -1,5 +1,10 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.controller;
 
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.API_V1_CLIENT_COMPANIES;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_ACCOUNT;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_CLIENT_COMPANY;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.SWAGGER_TAG_CLIENT_COMPANY;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +40,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientC
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyFileTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyPaymentMethodResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
@@ -55,15 +59,15 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/client-companies")
-@Tag(name = "발주처 관리", description = "발주처 관련 API")
+@RequestMapping(API_V1_CLIENT_COMPANIES)
+@Tag(name = SWAGGER_TAG_CLIENT_COMPANY, description = SWAGGER_TAG_CLIENT_COMPANY)
 public class ClientCompanyController extends BaseController {
 
     private final CompanyService companyService;
 
     @PostMapping
     @Operation(summary = "발주처 등록")
-    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
+    @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createClientCompany(
             @Valid @RequestBody final ClientCompanyCreateRequest request) {
         companyService.createClientCompany(request);
@@ -72,7 +76,7 @@ public class ClientCompanyController extends BaseController {
 
     @GetMapping
     @Operation(summary = "발주처 목록 조회")
-    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyResponse>>> getAllClientCompanies(
             @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request) {
@@ -101,7 +105,7 @@ public class ClientCompanyController extends BaseController {
 
     @DeleteMapping
     @Operation(summary = "발주처 삭제")
-    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
+    @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteClientCompanies(
             @RequestBody final DeleteClientCompaniesRequest clientCompanyIds) {
         companyService.deleteClientCompanies(clientCompanyIds);
@@ -110,7 +114,7 @@ public class ClientCompanyController extends BaseController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "발주처 수정")
-    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.UPDATE)
+    @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateClientCompany(@PathVariable final Long id,
             @Valid @RequestBody final ClientCompanyUpdateRequest request) {
         companyService.updateClientCompany(id, request);
@@ -119,7 +123,7 @@ public class ClientCompanyController extends BaseController {
 
     @GetMapping("/download")
     @Operation(summary = "발주처 엑셀 다운로드")
-    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = MENU_ACCOUNT, action = PermissionAction.VIEW)
     public void downloadClientCompaniesExcel(@Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request,
             @Valid final ClientCompanyDownloadRequest companyDownloadRequest,
@@ -137,7 +141,7 @@ public class ClientCompanyController extends BaseController {
 
     @GetMapping("/{id}")
     @Operation(summary = "발주처 상세 조회")
-    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<ClientCompanyDetailResponse>> getClientCompanyById(
             @PathVariable final Long id) {
         final ClientCompanyDetailResponse response = companyService.getClientCompanyById(id);
@@ -146,7 +150,7 @@ public class ClientCompanyController extends BaseController {
 
     @GetMapping("/{id}/change-histories")
     @Operation(summary = "발주처 변경 이력 조회")
-    @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
             @PathVariable final Long id, @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
