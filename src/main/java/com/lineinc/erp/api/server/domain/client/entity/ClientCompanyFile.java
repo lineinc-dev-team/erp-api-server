@@ -6,6 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
@@ -69,6 +70,18 @@ public class ClientCompanyFile extends BaseEntity {
         this.originalFileName = request.originalFileName();
         this.type = request.type();
         this.memo = request.memo();
+    }
+
+    public static ClientCompanyFile createFrom(final ClientCompanyFileCreateRequest request,
+            final ClientCompany clientCompany) {
+        return ClientCompanyFile.builder()
+                .name(request.name())
+                .fileUrl(request.fileUrl())
+                .originalFileName(request.originalFileName())
+                .type(request.type())
+                .memo(request.memo())
+                .clientCompany(clientCompany)
+                .build();
     }
 
 }

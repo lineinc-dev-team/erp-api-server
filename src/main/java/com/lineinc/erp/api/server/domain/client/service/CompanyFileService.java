@@ -33,25 +33,10 @@ public class CompanyFileService {
     public void createClientCompanyFile(final ClientCompany clientCompany,
             final List<ClientCompanyFileCreateRequest> requests) {
         requests.stream()
-                .map(dto -> ClientCompanyFile.builder()
-                        .name(dto.name())
-                        .fileUrl(dto.fileUrl())
-                        .originalFileName(dto.originalFileName())
-                        .memo(dto.memo())
-                        .clientCompany(clientCompany)
-                        .type(dto.type())
-                        .build())
+                .map(dto -> ClientCompanyFile.createFrom(dto, clientCompany))
                 .forEach(clientCompany.getFiles()::add);
     }
 
-    /**
-     * ClientCompany의 파일들을 요청에 맞게 수정, 생성, 삭제 처리합니다.
-     * - 요청 리스트가 null이면 아무 작업도 수행하지 않습니다.
-     * - 빈 리스트를 전달하면 기존 파일 전부 soft delete 처리합니다.
-     *
-     * @param clientCompany 파일이 속한 ClientCompany 엔티티
-     * @param requests      수정 요청 리스트 (null일 경우 무시)
-     */
     @Transactional
     public void updateClientCompanyFiles(final ClientCompany clientCompany,
             final List<ClientCompanyFileUpdateRequest> requests) {

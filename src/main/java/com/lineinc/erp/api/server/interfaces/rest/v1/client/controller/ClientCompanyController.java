@@ -165,7 +165,7 @@ public class ClientCompanyController extends BaseController {
     }
 
     @GetMapping("/payment-methods")
-    @Operation(summary = "결제 수단 목록 조회")
+    @Operation(summary = "발주처 결제 수단 목록 조회")
     public ResponseEntity<SuccessResponse<List<ClientCompanyPaymentMethodResponse>>> getPaymentMethods() {
         final List<ClientCompanyPaymentMethodResponse> paymentMethods = Arrays
                 .stream(ClientCompanyPaymentMethod.values())
