@@ -13,7 +13,7 @@ public class ValidationMessages {
     public static final String INVALID_PROPERTY_REFERENCE = "요청에 잘못된 정렬 조건 또는 필드명이 포함되어 있습니다.";
     public static final String RATE_LIMIT_EXCEEDED = "요청 횟수 제한을 초과했습니다.";
     public static final String CHANGE_HISTORY_NOT_FOUND = "해당 변경이력을 찾을 수 없습니다.";
-    public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 최소 1명 이상 등록해야 하며 반드시 한 명이어야 합니다.";
+    public static final String MUST_HAVE_ONE_MAIN_CONTACT = "대표 담당자는 최소 1명 이상 등록해야 합니다.";
 
     // ===== 인증/권한 관련 메시지 =====
     public static final String ACCESS_DENIED = "접근 권한이 없습니다.";
