@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
-import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
@@ -182,10 +181,9 @@ public class UserService {
 
         final Department department = departmentRepository.findById(request.departmentId()).orElse(null);
         final Grade grade = gradeRepository.findById(request.gradeId()).orElse(null);
-        final Position position = positionRepository.findById(request.positionId()).orElse(null);
 
         // 사용자 정보 업데이트
-        user.updateFrom(request, department, grade, position);
+        user.updateFrom(request, department, grade);
         usersRepository.save(user);
 
         final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers,

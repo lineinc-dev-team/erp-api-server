@@ -28,7 +28,5 @@ public record CreateUserRequest(
 
         @NotNull @Schema(description = "직급 ID", example = "2") Long gradeId,
 
-        @Schema(description = "직책 ID", example = "3") Long positionId,
-
         @Schema(description = "비고", example = "추가 메모") String memo) {
 }

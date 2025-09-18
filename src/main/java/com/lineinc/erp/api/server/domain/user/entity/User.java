@@ -1,21 +1,42 @@
 package com.lineinc.erp.api.server.domain.user.entity;
 
+import java.time.OffsetDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.UpdateUserRequest;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.time.OffsetDateTime;
-import java.util.*;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -138,12 +159,12 @@ public class User extends BaseEntity implements UserDetails {
         return this.passwordHash;
     }
 
-    public void updatePassword(String newPasswordHash) {
+    public void updatePassword(final String newPasswordHash) {
         this.passwordHash = newPasswordHash;
         this.requirePasswordReset = false;
     }
 
-    public void resetPassword(String newPasswordHash) {
+    public void resetPassword(final String newPasswordHash) {
         this.passwordHash = newPasswordHash;
         this.requirePasswordReset = true;
     }
@@ -180,7 +201,7 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     // ===== 업데이트 메서드 =====
-    public void updateFrom(UpdateUserRequest request, Department department, Grade grade, Position position) {
+    public void updateFrom(final UpdateUserRequest request, final Department department, final Grade grade) {
         Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
         Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
         Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
@@ -190,7 +211,6 @@ public class User extends BaseEntity implements UserDetails {
         Optional.ofNullable(request.isHeadOffice()).ifPresent(val -> this.isHeadOffice = val);
         Optional.ofNullable(department).ifPresent(val -> this.department = val);
         Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
-        Optional.ofNullable(position).ifPresent(val -> this.position = val);
         syncTransientFields();
     }
 
