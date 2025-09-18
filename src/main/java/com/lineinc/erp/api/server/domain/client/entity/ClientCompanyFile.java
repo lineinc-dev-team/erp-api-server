@@ -61,6 +61,7 @@ public class ClientCompanyFile extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ClientCompanyFileType type;
 
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
 
