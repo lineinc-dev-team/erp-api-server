@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "슬라이스 처리된 응답 형식")
 public record SliceResponse<T>(
         @Schema(description = "슬라이스 정보") SliceInfo sliceInfo,
-
         @Schema(description = "데이터 리스트") List<T> content) {
     public SliceResponse(final SliceInfo sliceInfo, final List<T> content) {
         this.sliceInfo = sliceInfo;

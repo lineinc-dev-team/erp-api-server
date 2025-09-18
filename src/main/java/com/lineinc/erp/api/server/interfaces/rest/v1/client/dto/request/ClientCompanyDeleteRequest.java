@@ -7,5 +7,5 @@ import jakarta.validation.constraints.NotEmpty;
 
 @Schema(description = "발주처 삭제 요청")
 public record ClientCompanyDeleteRequest(
-        @NotEmpty @Schema(description = "삭제할 발주처 ID 목록", example = "[1, 2, 3]") List<Long> clientCompanyIds) {
+        @Schema(description = "삭제할 발주처 ID 목록", example = "[1, 2, 3]") @NotEmpty List<Long> clientCompanyIds) {
 }

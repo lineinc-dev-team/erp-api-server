@@ -87,22 +87,9 @@ public class CompanyService {
     }
 
     @Transactional
-    public void deleteClientCompany(final Long id) {
-        final ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
-        clientCompany.markAsDeleted();
-    }
-
-    @Transactional
     public void deleteClientCompanies(final ClientCompanyDeleteRequest request) {
         final List<ClientCompany> clientCompanies = companyRepository.findAllById(request.clientCompanyIds());
-        if (clientCompanies.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.CLIENT_COMPANY_NOT_FOUND);
-        }
-
-        for (final ClientCompany clientCompany : clientCompanies) {
-            clientCompany.markAsDeleted();
-        }
-
+        clientCompanies.forEach(ClientCompany::markAsDeleted);
         companyRepository.saveAll(clientCompanies);
     }
 
