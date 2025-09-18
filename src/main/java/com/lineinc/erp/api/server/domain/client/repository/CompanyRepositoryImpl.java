@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.domain.client.repository;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -114,8 +113,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             builder.and(clientCompany.user.username.containsIgnoreCase(request.userName().trim()));
         }
         if (StringUtils.hasText(request.email())) {
-            builder.and(
-                    clientCompany.email.containsIgnoreCase(request.email().trim()));
+            builder.and(clientCompany.email.containsIgnoreCase(request.email().trim()));
         }
         if (StringUtils.hasText(request.phoneNumber())) {
             builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
@@ -127,12 +125,10 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             builder.and(clientCompany.isActive.eq(request.isActive()));
         }
         if (Objects.nonNull(request.createdStartDate())) {
-            final OffsetDateTime startOfDay = DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate());
-            builder.and(clientCompany.createdAt.goe(startOfDay));
+            builder.and(clientCompany.createdAt.goe(DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate())));
         }
         if (Objects.nonNull(request.createdEndDate())) {
-            final OffsetDateTime endOfDay = DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate());
-            builder.and(clientCompany.createdAt.lt(endOfDay));
+            builder.and(clientCompany.createdAt.lt(DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate())));
         }
 
         return builder;
