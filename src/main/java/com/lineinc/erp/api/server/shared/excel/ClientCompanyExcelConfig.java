@@ -1,9 +1,14 @@
 package com.lineinc.erp.api.server.shared.excel;
 
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.EMPTY_VALUE;
+
 import java.util.Map;
+import java.util.Objects;
 
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.FormatUtils;
+import com.lineinc.erp.api.server.shared.util.StringUtils;
 
 import lombok.experimental.UtilityClass;
 
@@ -13,6 +18,7 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public final class ClientCompanyExcelConfig {
+
     // Excel 헤더 매핑 정보
     public static final Map<String, String> HEADERS = Map.ofEntries(
             Map.entry("id", "No."),
@@ -44,29 +50,31 @@ public final class ClientCompanyExcelConfig {
      */
     public static String getCellValue(final ClientCompanyResponse company, final String field) {
         final var mainContact = company.contacts().stream()
-                .filter(c -> c.isMain())
-                .findFirst()
-                .orElse(null);
+                .findFirst().orElse(null);
 
         return switch (field) {
             case "businessNumber" -> company.businessNumber();
             case "name" -> company.name();
             case "email" -> company.email();
             case "ceoName" -> company.ceoName();
-            case "address" -> company.address() + " " + company.detailAddress();
+            case "address" -> StringUtils.joinWithSpace(company.address(), company.detailAddress());
             case "phoneNumber" -> company.phoneNumber();
             case "landlineNumber" -> company.landlineNumber();
-            case "contactName" -> mainContact != null ? mainContact.name() : "";
+            case "contactName" -> Objects.nonNull(mainContact) ? mainContact.name() : EMPTY_VALUE;
             case "contactPositionAndDepartment" ->
-                mainContact != null ? mainContact.position() + " / " + mainContact.department() : "";
+                Objects.nonNull(mainContact)
+                        ? StringUtils.joinWithSlash(mainContact.position(), mainContact.department())
+                        : EMPTY_VALUE;
             case "contactLandlineNumberAndEmail" ->
-                mainContact != null ? mainContact.phoneNumber() + " / " + mainContact.email() : "";
-            case "userName" -> company.user() != null ? company.user().username() : "";
-            case "isActive" -> company.isActive() ? "Y" : "N";
+                Objects.nonNull(mainContact) ? StringUtils.joinWithSlash(mainContact.phoneNumber(), mainContact.email())
+                        : EMPTY_VALUE;
+            case "userName" -> Objects.nonNull(company.user()) ? company.user().username() : EMPTY_VALUE;
+            case "isActive" -> FormatUtils.toYesNo(company.isActive());
             case "createdAtAndUpdatedAt" ->
-                DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/"
-                        + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
-            case "hasFile" -> company.hasFile() ? "Y" : "N";
+                StringUtils.joinWithSlash(
+                        DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()),
+                        DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt()));
+            case "hasFile" -> FormatUtils.toYesNo(company.hasFile());
             case "memo" -> company.memo();
             default -> null;
         };

@@ -89,6 +89,9 @@ public final class AppConstants {
     // 엑셀 다운로드 파일명 관련 상수
     public static final String EXCEL_FILENAME_CLIENT_COMPANIES = "발주처 목록.xlsx";
 
+    // 빈 값 상수
+    public static final String EMPTY_VALUE = "";
+
     private AppConstants() {
     } // 인스턴스화 방지
 }

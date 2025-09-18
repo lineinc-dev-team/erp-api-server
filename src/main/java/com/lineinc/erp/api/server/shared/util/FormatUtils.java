@@ -15,7 +15,7 @@ public final class FormatUtils {
      * @param value Boolean 값
      * @return true면 "Y", false면 "N", null이면 null
      */
-    public static String toYesNo(Boolean value) {
+    public static String toYesNo(final Boolean value) {
         return value != null ? (value ? "Y" : "N") : null;
     }
 }
