@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -101,5 +103,17 @@ public class PageableUtils {
             final com.lineinc.erp.api.server.shared.dto.request.PageRequest pageRequest,
             final SortRequest sortRequest) {
         return createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
+    }
+
+    /**
+     * List, Pageable, total을 사용해 Page 객체를 생성하는 편의 메서드
+     * 
+     * @param content  페이지 내용
+     * @param pageable 페이지 정보
+     * @param total    전체 요소 수
+     * @return Page 객체
+     */
+    public static <T> Page<T> createPage(final List<T> content, final Pageable pageable, final long total) {
+        return new PageImpl<>(content, pageable, total);
     }
 }

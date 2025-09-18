@@ -6,9 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -52,13 +50,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             final Pageable pageable) {
 
         final BooleanBuilder condition = buildCondition(request);
-        final OrderSpecifier<?>[] orders;
-
-        if (pageable != null) {
-            orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
-        } else {
-            orders = PageableUtils.toOrderSpecifiers(Sort.unsorted(), SORT_FIELDS);
-        }
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         var query = queryFactory
                 .selectFrom(clientCompany)
@@ -69,7 +61,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
                 .orderBy(orders);
 
         // 페이징이 있는 경우에만 offset, limit 적용 (unpaged 제외)
-        if (pageable != null && pageable.isPaged()) {
+        if (pageable.isPaged()) {
             query = query.offset(pageable.getOffset()).limit(pageable.getPageSize());
         }
 
@@ -77,7 +69,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
 
         // count 쿼리는 페이징이 있을 때만 수행 (성능 최적화)
         long total;
-        if (pageable != null && pageable.isPaged()) {
+        if (pageable.isPaged()) {
             final Long totalCount = queryFactory
                     .select(clientCompany.count())
                     .from(clientCompany)
@@ -92,7 +84,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
                 .map(ClientCompanyResponse::from)
                 .toList();
 
-        return new PageImpl<>(responses, pageable != null ? pageable : Pageable.unpaged(), total);
+        return PageableUtils.createPage(responses, pageable, total);
     }
 
     /**
