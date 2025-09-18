@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,7 @@ public record SiteDetailResponse(
 
     public static SiteDetailResponse from(final Site site, final boolean hasAccess) {
         final List<SiteContractResponse> contractResponses = site.getContracts().stream()
+                .sorted(Comparator.comparing(contract -> contract.getId()))
                 .map(SiteContractResponse::from)
                 .collect(Collectors.toList());
 
