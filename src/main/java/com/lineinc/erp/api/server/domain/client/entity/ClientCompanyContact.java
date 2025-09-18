@@ -77,7 +77,7 @@ public class ClientCompanyContact extends BaseEntity {
     private String memo;
 
     @Column
-    @DiffInclude
+    @DiffIgnore
     @Builder.Default
     private Boolean isMain = false;
 
