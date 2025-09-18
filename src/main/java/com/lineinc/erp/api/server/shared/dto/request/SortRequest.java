@@ -1,7 +1,8 @@
 package com.lineinc.erp.api.server.shared.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.springdoc.core.annotations.ParameterObject;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @ParameterObject
 @Schema(description = "정렬 요청")
