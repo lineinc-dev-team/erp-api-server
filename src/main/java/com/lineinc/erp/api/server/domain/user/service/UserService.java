@@ -101,7 +101,7 @@ public class UserService {
                 .loginId(request.loginId())
                 .department(Department.builder().id(request.departmentId()).build())
                 .grade(Grade.builder().id(request.gradeId()).build())
-                .position(Position.builder().id(request.positionId()).build())
+                // .position(Position.builder().id(request.positionId()).build())
                 .passwordHash(passwordEncoder.encode(defaultPassword))
                 .phoneNumber(request.phoneNumber())
                 .landlineNumber(request.landlineNumber())

@@ -26,7 +26,7 @@ public record UpdateUserRequest(
 
         @Schema(description = "직급 ID", example = "2") @NotNull Long gradeId,
 
-        @Schema(description = "직책 ID", example = "3") @NotNull Long positionId,
+        @Schema(description = "직책 ID", example = "3") Long positionId,
 
         @Schema(description = "본사 여부", example = "true") Boolean isHeadOffice,
 
