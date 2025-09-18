@@ -96,6 +96,11 @@ public class CompanyService {
     public void updateClientCompany(final Long id, final ClientCompanyUpdateRequest request) {
         final ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
 
+        // 1. 사업자등록번호 중복 확인 (기존 값과 다를 때만)
+        if (!clientCompany.getBusinessNumber().equals(request.businessNumber())) {
+            validateBusinessNumberNotExists(request.businessNumber());
+        }
+
         clientCompany.syncTransientFields();
         final ClientCompany oldSnapshot = JaversUtils.createSnapshot(javers, clientCompany, ClientCompany.class);
         clientCompany.updateFrom(request, userService.getUserByIdOrThrow(request.userId()));
