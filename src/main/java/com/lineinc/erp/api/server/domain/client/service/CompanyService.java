@@ -214,17 +214,11 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanySimpleResponse> searchClientCompanyByName(final String keyword,
+    public Slice<ClientCompanySimpleResponse> searchClientCompanyByName(
+            final String keyword,
             final Pageable pageable) {
-        Slice<ClientCompany> companySlice;
-
-        if (keyword == null || keyword.isBlank()) {
-            companySlice = companyRepository.findAllBy(pageable);
-        } else {
-            companySlice = companyRepository.findByNameContainingIgnoreCase(keyword, pageable);
-        }
-
-        return companySlice.map(ClientCompanySimpleResponse::from);
+        return companyRepository.findByKeyword(keyword, pageable)
+                .map(ClientCompanySimpleResponse::from);
     }
 
     @Transactional(readOnly = true)

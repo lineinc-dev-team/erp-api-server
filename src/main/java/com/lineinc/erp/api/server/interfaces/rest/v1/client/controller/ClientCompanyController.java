@@ -89,16 +89,12 @@ public class ClientCompanyController extends BaseController {
     @GetMapping("/search")
     @Operation(summary = "발주처 이름 검색")
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanySimpleResponse>>> searchClientCompanyByName(
-            @Valid final SortRequest sortRequest, @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest,
             @RequestParam(required = false) final String keyword) {
-        final Slice<ClientCompanySimpleResponse> slice = companyService
-                .searchClientCompanyByName(keyword,
-                        PageableUtils.createPageable(pageRequest.page(),
-                                pageRequest.size(),
-                                sortRequest.sort()));
-
-        return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+        final Slice<ClientCompanySimpleResponse> slice = companyService.searchClientCompanyByName(keyword,
+                PageableUtils.createPageable(pageRequest, sortRequest));
+        return ResponseEntity.ok(SuccessResponse.of(SliceResponse.from(slice)));
     }
 
     @DeleteMapping

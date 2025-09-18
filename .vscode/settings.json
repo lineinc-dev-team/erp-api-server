@@ -53,5 +53,16 @@
     "java.project.sourcePaths": [
         "src/main/java" // 메인 소스코드 경로 지정
     ],
-    "java.project.outputPath": "build/classes" // 컴파일된 .class 파일 출력 경로
+    "java.project.outputPath": "build/classes", // 컴파일된 .class 파일 출력 경로
+    // SQL 색상 설정 (Java text block 내 SQL 하이라이팅)
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": "string.quoted.triple.java",
+                "settings": {
+                    "foreground": "#569CD6"
+                }
+            }
+        ]
+    },
 }
