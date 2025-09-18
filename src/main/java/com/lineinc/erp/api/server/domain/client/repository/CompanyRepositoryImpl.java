@@ -51,20 +51,34 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        var query = queryFactory
-                .selectFrom(clientCompany)
-                .distinct()
-                .leftJoin(clientCompany.contacts, clientCompanyContact).fetchJoin()
-                .leftJoin(clientCompany.user, user).fetchJoin()
+        // 1단계: ID만 페이징으로 조회
+        var idQuery = queryFactory
+                .select(clientCompany.id)
+                .from(clientCompany)
                 .where(condition)
                 .orderBy(orders);
 
         // 페이징이 있는 경우에만 offset, limit 적용 (unpaged 제외)
         if (pageable.isPaged()) {
-            query = query.offset(pageable.getOffset()).limit(pageable.getPageSize());
+            idQuery = idQuery.offset(pageable.getOffset()).limit(pageable.getPageSize());
         }
 
-        final List<ClientCompany> content = query.fetch();
+        final List<Long> ids = idQuery.fetch();
+
+        // 2단계: ID로 실제 데이터 fetchJoin 조회
+        final List<ClientCompany> content;
+        if (ids.isEmpty()) {
+            content = List.of();
+        } else {
+            content = queryFactory
+                    .selectFrom(clientCompany)
+                    .distinct()
+                    .leftJoin(clientCompany.contacts, clientCompanyContact).fetchJoin()
+                    .leftJoin(clientCompany.user, user).fetchJoin()
+                    .where(clientCompany.id.in(ids))
+                    .orderBy(orders)
+                    .fetch();
+        }
 
         // count 쿼리는 페이징이 있을 때만 수행 (성능 최적화)
         long total;
