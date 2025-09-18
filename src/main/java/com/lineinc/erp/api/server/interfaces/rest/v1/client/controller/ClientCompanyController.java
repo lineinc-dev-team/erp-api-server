@@ -43,7 +43,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientC
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
-import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
@@ -83,11 +82,8 @@ public class ClientCompanyController extends BaseController {
             @Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request) {
         final Page<ClientCompanyResponse> page = companyService.getAllClientCompanies(request,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                        sortRequest.sort()));
-
-        return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+                PageableUtils.createPageable(pageRequest, sortRequest));
+        return SuccessResponse.ok(PagingResponse.from(page));
     }
 
     @GetMapping("/search")

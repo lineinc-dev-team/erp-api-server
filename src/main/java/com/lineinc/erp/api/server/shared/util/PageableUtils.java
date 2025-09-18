@@ -1,30 +1,32 @@
 package com.lineinc.erp.api.server.shared.util;
 
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 
 public class PageableUtils {
 
     /**
      * 페이지 번호, 페이지 크기를 기반으로 Pageable 생성
      */
-    public static Pageable createPageable(int page, int size) {
+    public static Pageable createPageable(final int page, final int size) {
         return PageRequest.of(page, size);
     }
 
     /**
      * 페이지 번호, 페이지 크기, 정렬 조건 문자열을 기반으로 Pageable 생성
      */
-    public static Pageable createPageable(int page, int size, String sort) {
+    public static Pageable createPageable(final int page, final int size, final String sort) {
         if (sort == null || sort.isBlank()) {
             return PageRequest.of(page, size);
         }
@@ -35,20 +37,20 @@ public class PageableUtils {
      * 정렬 조건 문자열을 Spring Sort 객체로 변환
      * 예: "username,desc;createdAt,asc"
      */
-    public static Sort parseSort(String sortString) {
+    public static Sort parseSort(final String sortString) {
         if (sortString == null || sortString.isBlank()) {
             return Sort.unsorted();
         }
 
-        String[] sortParams = sortString.split(";");
-        List<Sort.Order> orders = new ArrayList<>();
+        final String[] sortParams = sortString.split(";");
+        final List<Sort.Order> orders = new ArrayList<>();
 
-        for (String param : sortParams) {
-            String[] parts = param.trim().split(",");
-            String field = parts[0].trim();
+        for (final String param : sortParams) {
+            final String[] parts = param.trim().split(",");
+            final String field = parts[0].trim();
             Sort.Direction direction = Sort.Direction.ASC;
 
-            if (parts.length > 1 && parts[1].equalsIgnoreCase("desc")) {
+            if (parts.length > 1 && "desc".equalsIgnoreCase(parts[1])) {
                 direction = Sort.Direction.DESC;
             }
 
@@ -58,8 +60,8 @@ public class PageableUtils {
     }
 
     public static OrderSpecifier<?>[] toOrderSpecifiers(
-            Pageable pageable,
-            Map<String, ComparableExpressionBase<?>> fieldMapping) {
+            final Pageable pageable,
+            final Map<String, ComparableExpressionBase<?>> fieldMapping) {
         if (pageable.getSort().isEmpty()) {
             return new OrderSpecifier[0]; // 기본 정렬 없이 빈 배열 반환
         }
@@ -67,16 +69,16 @@ public class PageableUtils {
     }
 
     public static OrderSpecifier<?>[] toOrderSpecifiers(
-            Sort sort,
-            Map<String, ComparableExpressionBase<?>> fieldMapping) {
+            final Sort sort,
+            final Map<String, ComparableExpressionBase<?>> fieldMapping) {
         if (sort == null || sort.isEmpty()) {
             return new OrderSpecifier[0];
         }
 
         return sort.stream()
                 .map(order -> {
-                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-                    ComparableExpressionBase<?> path = fieldMapping.get(order.getProperty());
+                    final Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+                    final ComparableExpressionBase<?> path = fieldMapping.get(order.getProperty());
 
                     if (path == null) {
                         return null; // 매핑 안 된 필드는 무시
@@ -86,5 +88,18 @@ public class PageableUtils {
                 })
                 .filter(Objects::nonNull)
                 .toArray(OrderSpecifier[]::new);
+    }
+
+    /**
+     * PageRequest, SortRequest로부터 Pageable을 생성하는 편의 메서드
+     * 
+     * @param pageRequest 페이지 요청 객체
+     * @param sortRequest 정렬 요청 객체
+     * @return Pageable 객체
+     */
+    public static Pageable createPageable(
+            final com.lineinc.erp.api.server.shared.dto.request.PageRequest pageRequest,
+            final SortRequest sortRequest) {
+        return createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
     }
 }
