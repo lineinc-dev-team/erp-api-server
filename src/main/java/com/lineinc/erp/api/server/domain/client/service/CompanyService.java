@@ -73,7 +73,8 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ClientCompanyResponse> getAllClientCompanies(final ClientCompanyListRequest request,
+    public Page<ClientCompanyResponse> getAllClientCompanies(
+            final ClientCompanyListRequest request,
             final Pageable pageable) {
         return companyRepository.findAll(request, pageable);
     }
@@ -143,11 +144,9 @@ public class CompanyService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(final ClientCompanyListRequest request, final Sort sort, final List<String> fields) {
-        final List<ClientCompanyResponse> clientCompanyResponses = companyRepository.findAllWithoutPaging(request, sort)
-                .stream()
-                .map(ClientCompanyResponse::from)
-                .toList();
-
+        final List<ClientCompanyResponse> clientCompanyResponses = companyRepository.findAll(request,
+                Pageable.unpaged(sort))
+                .getContent();
         return ExcelExportUtils.generateWorkbook(
                 clientCompanyResponses,
                 fields,

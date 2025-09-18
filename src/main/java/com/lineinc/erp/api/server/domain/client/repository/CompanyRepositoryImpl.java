@@ -49,42 +49,55 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
 
     /**
      * ClientCompany 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
+     * pageable이 null인 경우 페이징 없이 전체 조회
      *
      * @param request  검색 조건 (예: 발주처명)
-     * @param pageable 페이징 및 정렬 정보
+     * @param pageable 페이징 및 정렬 정보 (null 가능)
      * @return ClientCompanyResponse 리스트를 담은 Page 객체
      */
     @Override
     public Page<ClientCompanyResponse> findAll(final ClientCompanyListRequest request, final Pageable pageable) {
         final BooleanBuilder condition = buildCondition(request);
-        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
-                pageable,
-                SORT_FIELDS);
+        final OrderSpecifier<?>[] orders;
+        if (pageable != null) {
+            orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+        } else {
+            orders = PageableUtils.toOrderSpecifiers(Sort.unsorted(), SORT_FIELDS);
+        }
 
-        final List<ClientCompany> content = queryFactory
+        var query = queryFactory
                 .selectFrom(clientCompany)
                 .distinct()
                 .leftJoin(clientCompany.contacts, clientCompanyContact).fetchJoin()
                 .leftJoin(clientCompany.user, user).fetchJoin()
                 .where(condition)
-                .orderBy(orders)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .orderBy(orders);
 
-        // count 쿼리를 별도로 수행 (성능 최적화를 위해 fetchResults 대신 직접 분리)
-        final Long totalCount = queryFactory
-                .select(clientCompany.count())
-                .from(clientCompany)
-                .where(condition)
-                .fetchOne();
-        final long total = Objects.requireNonNullElse(totalCount, 0L);
+        // 페이징이 있는 경우에만 offset, limit 적용 (unpaged 제외)
+        if (pageable != null && pageable.isPaged()) {
+            query = query.offset(pageable.getOffset()).limit(pageable.getPageSize());
+        }
+
+        final List<ClientCompany> content = query.fetch();
+
+        // count 쿼리는 페이징이 있을 때만 수행 (성능 최적화)
+        long total;
+        if (pageable != null && pageable.isPaged()) {
+            final Long totalCount = queryFactory
+                    .select(clientCompany.count())
+                    .from(clientCompany)
+                    .where(condition)
+                    .fetchOne();
+            total = Objects.requireNonNullElse(totalCount, 0L);
+        } else {
+            total = content.size();
+        }
 
         final List<ClientCompanyResponse> responses = content.stream()
                 .map(ClientCompanyResponse::from)
                 .toList();
 
-        return new PageImpl<>(responses, pageable, total);
+        return new PageImpl<>(responses, pageable != null ? pageable : Pageable.unpaged(), total);
     }
 
     /**
@@ -142,17 +155,4 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
         return builder;
     }
 
-    @Override
-    public List<ClientCompany> findAllWithoutPaging(final ClientCompanyListRequest request, final Sort sort) {
-        final BooleanBuilder condition = buildCondition(request);
-        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
-
-        return queryFactory
-                .selectFrom(clientCompany)
-                .distinct()
-                .leftJoin(clientCompany.contacts, clientCompanyContact).fetchJoin()
-                .where(condition)
-                .orderBy(orders)
-                .fetch();
-    }
 }

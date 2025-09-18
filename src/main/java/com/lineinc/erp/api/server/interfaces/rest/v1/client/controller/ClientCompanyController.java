@@ -122,17 +122,18 @@ public class ClientCompanyController extends BaseController {
     @GetMapping("/download")
     @Operation(summary = "발주처 엑셀 다운로드")
     @RequireMenuPermission(menu = MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public void downloadClientCompaniesExcel(@Valid final SortRequest sortRequest,
+    public void downloadClientCompaniesExcel(
+            @Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request,
             @Valid final ClientCompanyDownloadRequest companyDownloadRequest,
             final HttpServletResponse response) throws IOException {
         final List<String> parsed = DownloadFieldUtils.parseFields(companyDownloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed,
                 ClientCompanyDownloadRequest.ALLOWED_FIELDS);
-        ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
 
         try (Workbook workbook = companyService.downloadExcel(request,
                 PageableUtils.parseSort(sortRequest.sort()), parsed)) {
+            ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
             workbook.write(response.getOutputStream());
         }
     }
