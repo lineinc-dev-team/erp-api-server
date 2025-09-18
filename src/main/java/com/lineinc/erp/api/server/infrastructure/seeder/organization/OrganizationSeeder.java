@@ -1,18 +1,19 @@
 package com.lineinc.erp.api.server.infrastructure.seeder.organization;
 
+import java.util.stream.Collectors;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -24,37 +25,58 @@ public class OrganizationSeeder {
 
     @Transactional
     public void seed() {
-        if (departmentRepository.count() == 0) {
-            var departments = AppConstants.DEPARTMENT_NAMES.stream()
-                    .map(name -> Department.builder()
-                            .name(name)
-                            .createdBy(AppConstants.SYSTEM_NAME)
-                            .updatedBy(AppConstants.SYSTEM_NAME)
-                            .build())
-                    .collect(Collectors.toList());
-            departmentRepository.saveAll(departments);
+        // 부서 시딩 - 없는 것만 추가
+        final var existingDepartmentNames = departmentRepository.findAll().stream()
+                .map(Department::getName)
+                .collect(Collectors.toSet());
+
+        final var newDepartments = AppConstants.DEPARTMENT_NAMES.stream()
+                .filter(name -> !existingDepartmentNames.contains(name))
+                .map(name -> Department.builder()
+                        .name(name)
+                        .createdBy(AppConstants.SYSTEM_NAME)
+                        .updatedBy(AppConstants.SYSTEM_NAME)
+                        .build())
+                .collect(Collectors.toList());
+
+        if (!newDepartments.isEmpty()) {
+            departmentRepository.saveAll(newDepartments);
         }
 
-        if (positionRepository.count() == 0) {
-            var positions = AppConstants.POSITION_NAMES.stream()
-                    .map(name -> Position.builder()
-                            .name(name)
-                            .createdBy(AppConstants.SYSTEM_NAME)
-                            .updatedBy(AppConstants.SYSTEM_NAME)
-                            .build())
-                    .collect(Collectors.toList());
-            positionRepository.saveAll(positions);
+        // 직책 시딩 - 없는 것만 추가
+        final var existingPositionNames = positionRepository.findAll().stream()
+                .map(Position::getName)
+                .collect(Collectors.toSet());
+
+        final var newPositions = AppConstants.POSITION_NAMES.stream()
+                .filter(name -> !existingPositionNames.contains(name))
+                .map(name -> Position.builder()
+                        .name(name)
+                        .createdBy(AppConstants.SYSTEM_NAME)
+                        .updatedBy(AppConstants.SYSTEM_NAME)
+                        .build())
+                .collect(Collectors.toList());
+
+        if (!newPositions.isEmpty()) {
+            positionRepository.saveAll(newPositions);
         }
 
-        if (gradeRepository.count() == 0) {
-            var grades = AppConstants.GRADE_NAMES.stream()
-                    .map(name -> Grade.builder()
-                            .name(name)
-                            .createdBy(AppConstants.SYSTEM_NAME)
-                            .updatedBy(AppConstants.SYSTEM_NAME)
-                            .build())
-                    .collect(Collectors.toList());
-            gradeRepository.saveAll(grades);
+        // 직급 시딩 - 없는 것만 추가
+        final var existingGradeNames = gradeRepository.findAll().stream()
+                .map(Grade::getName)
+                .collect(Collectors.toSet());
+
+        final var newGrades = AppConstants.GRADE_NAMES.stream()
+                .filter(name -> !existingGradeNames.contains(name))
+                .map(name -> Grade.builder()
+                        .name(name)
+                        .createdBy(AppConstants.SYSTEM_NAME)
+                        .updatedBy(AppConstants.SYSTEM_NAME)
+                        .build())
+                .collect(Collectors.toList());
+
+        if (!newGrades.isEmpty()) {
+            gradeRepository.saveAll(newGrades);
         }
     }
 }

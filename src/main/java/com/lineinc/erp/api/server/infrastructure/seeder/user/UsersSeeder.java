@@ -1,14 +1,16 @@
 package com.lineinc.erp.api.server.infrastructure.seeder.user;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -21,11 +23,11 @@ public class UsersSeeder {
     private final PasswordEncoder passwordEncoder;
 
     public void seed() {
-        Optional<User> existingAdmin = usersRepository.findByLoginIdAndDeletedFalse(AppConstants.ADMIN_LOGIN_ID);
+        final Optional<User> existingAdmin = usersRepository.findByLoginIdAndDeletedFalse(AppConstants.ADMIN_LOGIN_ID);
         if (existingAdmin.isPresent())
             return;
 
-        User admin = User.builder()
+        final User admin = User.builder()
                 .loginId(AppConstants.ADMIN_LOGIN_ID)
                 .username(AppConstants.ADMIN_USERNAME)
                 .email(AppConstants.ADMIN_EMAIL)

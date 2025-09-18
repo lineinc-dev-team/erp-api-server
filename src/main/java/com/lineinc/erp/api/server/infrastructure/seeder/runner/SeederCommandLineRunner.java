@@ -29,7 +29,7 @@ public class SeederCommandLineRunner implements CommandLineRunner {
     private boolean seederEnabled;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(final String... args) throws Exception {
         if (seederEnabled) {
             menuSeeder.seed();
             permissionSeeder.seed();

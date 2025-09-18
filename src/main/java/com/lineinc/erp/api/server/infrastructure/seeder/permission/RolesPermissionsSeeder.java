@@ -1,18 +1,19 @@
 package com.lineinc.erp.api.server.infrastructure.seeder.permission;
 
-import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import java.util.EnumSet;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import org.springframework.stereotype.Component;
+
 import com.lineinc.erp.api.server.domain.menu.repository.MenuRepository;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
 import com.lineinc.erp.api.server.domain.role.entity.Role;
 import com.lineinc.erp.api.server.domain.role.entity.RolePermission;
 import com.lineinc.erp.api.server.domain.role.repository.RoleRepository;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.util.EnumSet;
 
 /**
  * 역할(Role)과 권한(Permission)을 매핑하는 시더
@@ -32,24 +33,21 @@ public class RolesPermissionsSeeder {
     }
 
     private void assignAllPermissionsToRole() {
-        Role role = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME)
+        final Role role = roleRepository.findByName(AppConstants.ROLE_ADMIN_NAME)
                 .orElseGet(() -> roleRepository.save(Role.builder().name(AppConstants.ROLE_ADMIN_NAME).build()));
 
-        menuRepository.findAll().forEach(menu ->
-                EnumSet.allOf(PermissionAction.class).forEach(action ->
-                        permissionRepository.findByMenuAndAction(menu, action).ifPresent(permission -> {
-                            boolean alreadyExists = role.getPermissions().stream()
-                                    .anyMatch(rp -> rp.getPermission().equals(permission));
-                            if (!alreadyExists) {
-                                RolePermission rolePermission = RolePermission.builder()
-                                        .role(role)
-                                        .permission(permission)
-                                        .build();
-                                role.getPermissions().add(rolePermission);
-                            }
-                        })
-                )
-        );
+        menuRepository.findAll().forEach(menu -> EnumSet.allOf(PermissionAction.class)
+                .forEach(action -> permissionRepository.findByMenuAndAction(menu, action).ifPresent(permission -> {
+                    final boolean alreadyExists = role.getPermissions().stream()
+                            .anyMatch(rp -> rp.getPermission().equals(permission));
+                    if (!alreadyExists) {
+                        final RolePermission rolePermission = RolePermission.builder()
+                                .role(role)
+                                .permission(permission)
+                                .build();
+                        role.getPermissions().add(rolePermission);
+                    }
+                })));
 
         roleRepository.save(role);
     }
