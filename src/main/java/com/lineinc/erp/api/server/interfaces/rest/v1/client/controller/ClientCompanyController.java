@@ -123,12 +123,15 @@ public class ClientCompanyController extends BaseController {
             @Valid final ClientCompanyListRequest request,
             @Valid final ClientCompanyDownloadRequest companyDownloadRequest,
             final HttpServletResponse response) throws IOException {
-        final List<String> parsed = DownloadFieldUtils.parseFields(companyDownloadRequest.fields());
-        DownloadFieldUtils.validateFields(parsed,
+
+        DownloadFieldUtils.validateFields(
+                DownloadFieldUtils.parseFields(companyDownloadRequest.fields()),
                 ClientCompanyDownloadRequest.ALLOWED_FIELDS);
 
-        try (Workbook workbook = companyService.downloadExcel(request,
-                PageableUtils.parseSort(sortRequest.sort()), parsed)) {
+        try (Workbook workbook = companyService.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                DownloadFieldUtils.parseFields(companyDownloadRequest.fields()))) {
             ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
             workbook.write(response.getOutputStream());
         }

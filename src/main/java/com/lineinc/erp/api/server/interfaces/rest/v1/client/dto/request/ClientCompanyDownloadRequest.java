@@ -10,10 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 @ParameterObject
 @Schema(description = "발주처 엑셀 다운로드 요청")
 public record ClientCompanyDownloadRequest(
-        @NotBlank @Schema(description = "허용 필드: id, businessNumber, name, email, ceoName, address, phoneNumber, landlineNumber, contactName, contactPositionAndDepartment, contactLandlineNumberAndEmail, userName, isActive, createdAtAndUpdatedAt, hasFile, memo", example = "id,businessNumber,isActive") String fields) {
-    public static final List<String> ALLOWED_FIELDS = List.of(
-            "id", "businessNumber", "name", "email", "ceoName", "address",
-            "phoneNumber", "landlineNumber", "contactName", "contactPositionAndDepartment",
-            "contactLandlineNumberAndEmail", "userName", "isActive", "createdAtAndUpdatedAt",
-            "hasFile", "memo");
+        @NotBlank @Schema(description = "다운로드할 필드들을 쉼표로 구분", example = EXAMPLE_FIELDS) String fields) {
+    private static final String EXAMPLE_FIELDS = "id,businessNumber,name,email,ceoName,address,phoneNumber,landlineNumber,contactName,contactPositionAndDepartment,contactLandlineNumberAndEmail,userName,isActive,createdAtAndUpdatedAt,hasFile,memo";
+    public static final List<String> ALLOWED_FIELDS = List.of(EXAMPLE_FIELDS.split(","));
 }
