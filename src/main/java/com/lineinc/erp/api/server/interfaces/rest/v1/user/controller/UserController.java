@@ -65,7 +65,7 @@ public class UserController {
     })
     @PostMapping("/{id}/reset-password")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> resetPassword(@PathVariable Long id) {
+    public ResponseEntity<Void> resetPassword(@PathVariable final Long id) {
         userService.resetPassword(id);
         return ResponseEntity.ok().build();
     }
@@ -77,27 +77,29 @@ public class UserController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid SearchUserRequest request) {
-        Page<UserResponse> page = userService.getAllUsers(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final SearchUserRequest request) {
+        final Page<UserResponse> page = userService.getAllUsers(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "유저 이름 키워드 검색", description = "유저 이름으로 간단한 검색을 수행합니다.")
+    @Operation(summary = "유저 키워드 검색")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "검색 성공")
     })
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<UserResponse.UserSimpleResponse>>> searchUsersByName(
-            @Valid SortRequest sortRequest,
-            @Valid PageRequest pageRequest,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Boolean hasRole) {
-        Slice<UserResponse.UserSimpleResponse> slice = userService.searchUsersByName(keyword, hasRole,
+            @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest,
+            @RequestParam(required = false) final String keyword,
+            @RequestParam(required = false) final String loginIdKeyword,
+            @RequestParam(required = false) final Boolean hasRole) {
+        final Slice<UserResponse.UserSimpleResponse> slice = userService.searchUsers(keyword, loginIdKeyword,
+                hasRole,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
@@ -110,7 +112,7 @@ public class UserController {
     })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.CREATE)
-    public ResponseEntity<Void> createUser(@Valid @RequestBody CreateUserRequest request) {
+    public ResponseEntity<Void> createUser(@Valid @RequestBody final CreateUserRequest request) {
         userService.createUser(request);
         return ResponseEntity.ok().build();
     }
@@ -123,11 +125,11 @@ public class UserController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public void downloadUserListExcel(
-            @Valid SortRequest sortRequest,
-            @Valid SearchUserRequest request,
-            @Valid DownloadUserListRequest downloadUserListRequest,
-            HttpServletResponse response) throws IOException {
-        List<String> parsed = DownloadFieldUtils.parseFields(downloadUserListRequest.fields());
+            @Valid final SortRequest sortRequest,
+            @Valid final SearchUserRequest request,
+            @Valid final DownloadUserListRequest downloadUserListRequest,
+            final HttpServletResponse response) throws IOException {
+        final List<String> parsed = DownloadFieldUtils.parseFields(downloadUserListRequest.fields());
         DownloadFieldUtils.validateFields(parsed, DownloadUserListRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "유저 목록.xlsx");
 
@@ -147,7 +149,7 @@ public class UserController {
     })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.DELETE)
-    public ResponseEntity<Void> deleteUsers(@RequestBody BulkDeleteUsersRequest userIds) {
+    public ResponseEntity<Void> deleteUsers(@RequestBody final BulkDeleteUsersRequest userIds) {
         userService.deleteUsersByIds(userIds);
         return ResponseEntity.ok().build();
     }
@@ -161,8 +163,8 @@ public class UserController {
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateUser(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateUserRequest request) {
+            @PathVariable final Long id,
+            @Valid @RequestBody final UpdateUserRequest request) {
         userService.updateUser(id, request);
         return ResponseEntity.ok().build();
     }
@@ -174,8 +176,8 @@ public class UserController {
     })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<UserInfoResponse>> getUserDetail(@PathVariable Long id) {
-        UserInfoResponse response = userService.getUserDetail(id);
+    public ResponseEntity<SuccessResponse<UserInfoResponse>> getUserDetail(@PathVariable final Long id) {
+        final UserInfoResponse response = userService.getUserDetail(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -186,10 +188,10 @@ public class UserController {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<UserChangeHistoryResponse>>> getUserChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Slice<UserChangeHistoryResponse> slice = userService.getUserChangeHistoriesSlice(
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Slice<UserChangeHistoryResponse> slice = userService.getUserChangeHistoriesSlice(
                 id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(

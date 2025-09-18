@@ -1,24 +1,34 @@
 package com.lineinc.erp.api.server.domain.user.service;
 
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.shared.util.FormatUtils;
-import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
-import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import org.springframework.beans.factory.annotation.Value;
-import com.lineinc.erp.api.server.domain.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
-import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
+import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
 import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.BulkDeleteUsersRequest;
@@ -27,25 +37,15 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.SearchUser
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.UpdateUserRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.UserChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.UserInfoResponse;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.FormatUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * 사용자 관련 비즈니스 로직을 처리하는 서비스
@@ -71,13 +71,13 @@ public class UserService {
     private String defaultPassword;
 
     @Transactional
-    public void resetPassword(long id) {
-        User user = getUserByIdOrThrow(id);
-        String encodedPassword = passwordEncoder.encode(defaultPassword);
+    public void resetPassword(final long id) {
+        final User user = getUserByIdOrThrow(id);
+        final String encodedPassword = passwordEncoder.encode(defaultPassword);
         user.resetPassword(encodedPassword);
         usersRepository.save(user);
 
-        UserChangeHistory changeHistory = UserChangeHistory.builder()
+        final UserChangeHistory changeHistory = UserChangeHistory.builder()
                 .user(user)
                 .type(UserChangeHistoryType.BASIC)
                 .description(ValidationMessages.PASSWORD_RESET)
@@ -86,17 +86,17 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(SearchUserRequest request, Pageable pageable) {
+    public Page<UserResponse> getAllUsers(final SearchUserRequest request, final Pageable pageable) {
         return usersRepository.findAll(request, pageable);
     }
 
     @Transactional
-    public void createUser(CreateUserRequest request) {
+    public void createUser(final CreateUserRequest request) {
         if (usersRepository.existsByLoginIdAndDeletedFalse(request.loginId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.LOGIN_ID_ALREADY_EXISTS);
         }
 
-        User user = User.builder()
+        final User user = User.builder()
                 .username(request.username())
                 .loginId(request.loginId())
                 .department(Department.builder().id(request.departmentId()).build())
@@ -115,8 +115,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(SearchUserRequest request, Sort sort, List<String> fields) {
-        List<UserResponse> userResponses = usersRepository.findAllWithoutPaging(request, sort);
+    public Workbook downloadExcel(final SearchUserRequest request, final Sort sort, final List<String> fields) {
+        final List<UserResponse> userResponses = usersRepository.findAllWithoutPaging(request, sort);
         return ExcelExportUtils.generateWorkbook(
                 userResponses,
                 fields,
@@ -124,7 +124,7 @@ public class UserService {
                 this::getExcelCellValue);
     }
 
-    private String getExcelHeaderName(String field) {
+    private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "id" -> "No.";
             case "loginId" -> "사용자 ID";
@@ -144,7 +144,7 @@ public class UserService {
         };
     }
 
-    private String getExcelCellValue(UserResponse user, String field) {
+    private String getExcelCellValue(final UserResponse user, final String field) {
         return switch (field) {
             case "id" -> String.valueOf(user.id());
             case "loginId" -> user.loginId();
@@ -165,8 +165,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUsersByIds(BulkDeleteUsersRequest request) {
-        List<User> users = usersRepository.findAllById(request.userIds());
+    public void deleteUsersByIds(final BulkDeleteUsersRequest request) {
+        final List<User> users = usersRepository.findAllById(request.userIds());
         if (request.userIds().size() != users.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND);
         }
@@ -175,24 +175,24 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Long id, UpdateUserRequest request) {
-        User user = getUserByIdOrThrow(id);
+    public void updateUser(final Long id, final UpdateUserRequest request) {
+        final User user = getUserByIdOrThrow(id);
         user.syncTransientFields();
-        User oldUserSnapshot = JaversUtils.createSnapshot(javers, user, User.class);
+        final User oldUserSnapshot = JaversUtils.createSnapshot(javers, user, User.class);
 
-        Department department = departmentRepository.findById(request.departmentId()).orElse(null);
-        Grade grade = gradeRepository.findById(request.gradeId()).orElse(null);
-        Position position = positionRepository.findById(request.positionId()).orElse(null);
+        final Department department = departmentRepository.findById(request.departmentId()).orElse(null);
+        final Grade grade = gradeRepository.findById(request.gradeId()).orElse(null);
+        final Position position = positionRepository.findById(request.positionId()).orElse(null);
 
         // 사용자 정보 업데이트
         user.updateFrom(request, department, grade, position);
         usersRepository.save(user);
 
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers,
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers,
                 javers.compare(oldUserSnapshot, user));
 
         if (!simpleChanges.isEmpty()) {
-            UserChangeHistory changeHistory = UserChangeHistory.builder()
+            final UserChangeHistory changeHistory = UserChangeHistory.builder()
                     .user(user)
                     .type(UserChangeHistoryType.BASIC)
                     .changes(javers.getJsonConverter().toJson(simpleChanges))
@@ -208,62 +208,63 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<UserResponse.UserSimpleResponse> searchUsersByName(String keyword, Boolean hasRole,
-            Pageable pageable) {
-        Slice<User> userSlice = usersRepository.findAllByKeywordAndExcludeUsername(
-                keyword, AppConstants.ADMIN_USERNAME, hasRole, pageable);
+    public Slice<UserResponse.UserSimpleResponse> searchUsers(final String keyword, final String loginIdKeyword,
+            final Boolean hasRole,
+            final Pageable pageable) {
+        final Slice<User> userSlice = usersRepository.findAllByKeywordAndExcludeUsername(
+                keyword, loginIdKeyword, AppConstants.ADMIN_USERNAME, hasRole, pageable);
         return userSlice.map(UserResponse.UserSimpleResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public User getUserByIdOrThrow(Long id) {
+    public User getUserByIdOrThrow(final Long id) {
         return usersRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
     }
 
     @Transactional
-    public void updateLastLoginAt(Long userId) {
-        User user = usersRepository.findById(userId)
+    public void updateLastLoginAt(final Long userId) {
+        final User user = usersRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         user.setLastLoginAt(OffsetDateTime.now());
     }
 
     @Transactional(readOnly = true)
-    public UserInfoResponse getUserDetail(Long id) {
-        User user = usersRepository.findByIdWithRoles(id)
+    public UserInfoResponse getUserDetail(final Long id) {
+        final User user = usersRepository.findByIdWithRoles(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         return UserInfoResponse.from(user);
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getUser(Long id) {
-        User user = usersRepository.findByIdWithRoles(id)
+    public UserResponse getUser(final Long id) {
+        final User user = usersRepository.findByIdWithRoles(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
         return UserResponse.from(user);
     }
 
     @Transactional(readOnly = true)
-    public User getUserEntity(Long userId) {
+    public User getUserEntity(final Long userId) {
         return usersRepository.findById(userId)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.USER_NOT_FOUND));
     }
 
     @Transactional
-    public void changePassword(Long userId, PasswordChangeRequest request) {
-        User user = getUserByIdOrThrow(userId);
+    public void changePassword(final Long userId, final PasswordChangeRequest request) {
+        final User user = getUserByIdOrThrow(userId);
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
         user.setRequirePasswordReset(false);
         usersRepository.save(user);
     }
 
     @Transactional(readOnly = true)
-    public Slice<UserChangeHistoryResponse> getUserChangeHistoriesSlice(Long userId, Pageable pageable) {
-        User user = getUserByIdOrThrow(userId);
-        Slice<UserChangeHistory> historySlice = userChangeHistoryRepository.findByUser(user, pageable);
+    public Slice<UserChangeHistoryResponse> getUserChangeHistoriesSlice(final Long userId, final Pageable pageable) {
+        final User user = getUserByIdOrThrow(userId);
+        final Slice<UserChangeHistory> historySlice = userChangeHistoryRepository.findByUser(user, pageable);
         return historySlice.map(UserChangeHistoryResponse::from);
     }
 
@@ -272,19 +273,20 @@ public class UserService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithPaging(Long userId, Pageable pageable) {
-        User user = getUserByIdOrThrow(userId);
-        Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserWithPaging(user,
+    public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithPaging(final Long userId,
+            final Pageable pageable) {
+        final User user = getUserByIdOrThrow(userId);
+        final Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserWithPaging(user,
                 pageable);
         return historyPage.map(UserChangeHistoryResponse::from);
     }
 
-    public List<Long> getAccessibleSiteIds(User user) {
+    public List<Long> getAccessibleSiteIds(final User user) {
         if (!user.hasRoles()) {
             return List.of();
         }
 
-        boolean hasGlobalAccess = user.hasGlobalSiteProcessAccess();
+        final boolean hasGlobalAccess = user.hasGlobalSiteProcessAccess();
         if (hasGlobalAccess) {
             return null;
         }

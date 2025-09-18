@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.user.repository;
 
-import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.domain.user.entity.User;
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
@@ -44,6 +45,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
             WHERE u.deleted = false
             AND LOWER(u.username) != :excludeUsername
             AND (:keyword IS NULL OR :keyword = '' OR u.username LIKE %:keyword%)
+            AND (:loginIdKeyword IS NULL OR :loginIdKeyword = '' OR u.loginId LIKE %:loginIdKeyword%)
             AND (:hasRole IS NULL OR
                 (CASE WHEN :hasRole = true
                     THEN EXISTS (SELECT 1 FROM u.userRoles ur WHERE ur.deleted = false AND ur.role.deleted = false)
@@ -51,6 +53,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
                 END))
             """)
     Slice<User> findAllByKeywordAndExcludeUsername(@Param("keyword") String keyword,
+            @Param("loginIdKeyword") String loginIdKeyword,
             @Param("excludeUsername") String excludeUsername, @Param("hasRole") Boolean hasRole, Pageable pageable);
 
     /**
