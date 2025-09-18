@@ -42,9 +42,19 @@ public final class AppConstants {
             MENU_WORK_DAILY_REPORT);
 
     // 직급(Grade) 관련 상수
-    public static final String GRADE_EMPLOYEE = "사원";
-    public static final String GRADE_ASSISTANT_MANAGER = "대리";
+    public static final String GRADE_CEO = "대표이사";
+    public static final String GRADE_VICE_CHAIRMAN = "부회장";
+    public static final String GRADE_EXECUTIVE_VICE_PRESIDENT = "전무";
+    public static final String GRADE_MANAGING_DIRECTOR = "상무";
+    public static final String GRADE_EXECUTIVE_DIRECTOR = "이사";
+    public static final String GRADE_GENERAL_MANAGER = "부장";
+    public static final String GRADE_DEPUTY_GENERAL_MANAGER = "차장";
     public static final String GRADE_MANAGER = "과장";
+    public static final String GRADE_ASSISTANT_MANAGER = "대리";
+    public static final String GRADE_SUPERVISOR = "주임";
+    public static final String GRADE_EMPLOYEE = "사원";
+    public static final String GRADE_FOREMAN = "반장";
+    public static final String GRADE_TECHNICIAN = "기사";
 
     // 직책(Position) 관련 상수
     public static final String POSITION_TEAM_LEADER = "팀장";
@@ -56,8 +66,21 @@ public final class AppConstants {
     public static final String DEPT_DEVELOPMENT = "개발팀";
     public static final String DEPT_SALES = "영업팀";
 
-    // 직급 전체 목록
-    public static final List<String> GRADE_NAMES = List.of(GRADE_EMPLOYEE, GRADE_ASSISTANT_MANAGER, GRADE_MANAGER);
+    // 직급 전체 목록 (직급 순서대로)
+    public static final List<String> GRADE_NAMES = List.of(
+            GRADE_CEO,
+            GRADE_VICE_CHAIRMAN,
+            GRADE_EXECUTIVE_VICE_PRESIDENT,
+            GRADE_MANAGING_DIRECTOR,
+            GRADE_EXECUTIVE_DIRECTOR,
+            GRADE_GENERAL_MANAGER,
+            GRADE_DEPUTY_GENERAL_MANAGER,
+            GRADE_MANAGER,
+            GRADE_ASSISTANT_MANAGER,
+            GRADE_SUPERVISOR,
+            GRADE_EMPLOYEE,
+            GRADE_FOREMAN,
+            GRADE_TECHNICIAN);
 
     // 직책 전체 목록
     public static final List<String> POSITION_NAMES = List.of(POSITION_TEAM_LEADER, POSITION_PART_LEADER,
