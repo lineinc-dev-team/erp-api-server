@@ -152,9 +152,9 @@ public class CompanyService {
             case "phoneNumber" -> "개인 휴대폰";
             case "landlineNumber" -> "전화번호";
             case "contactName" -> "담당자명";
-            case "contactPositionAndDepartment" -> "직급/부서";
+            case "contactPositionAndDepartment" -> "부서/직급";
             case "contactLandlineNumberAndEmail" -> "담당자 연락처/이메일";
-            case "userName" -> "본사 담당자";
+            case "userName" -> "본사 담당자명";
             case "isActive" -> "사용여부";
             case "createdAtAndUpdatedAt" -> "등록일/수정일";
             case "hasFile" -> "첨부파일 유무";

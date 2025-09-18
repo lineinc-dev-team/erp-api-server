@@ -86,6 +86,9 @@ public final class AppConstants {
     // Swagger 문서화 관련 상수
     public static final String SWAGGER_V1_TAG_CLIENT_COMPANY = "발주처 관련 V1 API";
 
+    // 엑셀 다운로드 파일명 관련 상수
+    public static final String EXCEL_FILENAME_CLIENT_COMPANIES = "발주처 목록.xlsx";
+
     private AppConstants() {
     } // 인스턴스화 방지
 }

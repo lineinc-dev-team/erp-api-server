@@ -1,9 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.controller;
 
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.API_V1_CLIENT_COMPANIES;
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_ACCOUNT;
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_CLIENT_COMPANY;
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.SWAGGER_V1_TAG_CLIENT_COMPANY;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -132,7 +129,7 @@ public class ClientCompanyController extends BaseController {
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 DownloadFieldUtils.parseFields(companyDownloadRequest.fields()))) {
-            ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
+            ResponseHeaderUtils.setExcelDownloadHeader(response, EXCEL_FILENAME_CLIENT_COMPANIES);
             workbook.write(response.getOutputStream());
         }
     }
