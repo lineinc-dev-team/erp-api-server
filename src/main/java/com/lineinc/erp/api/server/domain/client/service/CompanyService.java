@@ -28,13 +28,12 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCo
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyContactResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
+import com.lineinc.erp.api.server.shared.excel.ClientCompanyExcelConfig;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
@@ -137,61 +136,8 @@ public class CompanyService {
         return ExcelExportUtils.generateWorkbook(
                 clientCompanyResponses,
                 fields,
-                this::getExcelHeaderName,
-                this::getExcelCellValue);
-    }
-
-    private String getExcelHeaderName(final String field) {
-        return switch (field) {
-            case "id" -> "No.";
-            case "businessNumber" -> "사업자등록번호";
-            case "name" -> "발주처명";
-            case "email" -> "이메일";
-            case "ceoName" -> "대표자명";
-            case "address" -> "본사 주소";
-            case "phoneNumber" -> "개인 휴대폰";
-            case "landlineNumber" -> "전화번호";
-            case "contactName" -> "담당자명";
-            case "contactPositionAndDepartment" -> "부서/직급";
-            case "contactLandlineNumberAndEmail" -> "담당자 연락처/이메일";
-            case "userName" -> "본사 담당자명";
-            case "isActive" -> "사용여부";
-            case "createdAtAndUpdatedAt" -> "등록일/수정일";
-            case "hasFile" -> "첨부파일 유무";
-            case "memo" -> "비고";
-            default -> null;
-        };
-    }
-
-    private String getExcelCellValue(final ClientCompanyResponse company, final String field) {
-        final ClientCompanyContactResponse mainContact = company.contacts().stream()
-                .filter(ClientCompanyContactResponse::isMain)
-                .findFirst()
-                .orElse(null);
-
-        return switch (field) {
-            case "id" -> String.valueOf(company.id());
-            case "businessNumber" -> company.businessNumber();
-            case "name" -> company.name();
-            case "email" -> company.email();
-            case "ceoName" -> company.ceoName();
-            case "address" -> company.address() + " " + company.detailAddress();
-            case "phoneNumber" -> company.phoneNumber();
-            case "landlineNumber" -> company.landlineNumber();
-            case "contactName" -> mainContact != null ? mainContact.name() : "";
-            case "contactPositionAndDepartment" ->
-                mainContact != null ? mainContact.position() + " / " + mainContact.department() : "";
-            case "contactLandlineNumberAndEmail" ->
-                mainContact != null ? mainContact.phoneNumber() + " / " + mainContact.email() : "";
-            case "userName" -> company.user() != null ? company.user().username() : "";
-            case "isActive" -> company.isActive() ? "Y" : "N";
-            case "createdAtAndUpdatedAt" ->
-                DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/"
-                        + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
-            case "hasFile" -> company.hasFile() ? "Y" : "N";
-            case "memo" -> company.memo();
-            default -> null;
-        };
+                ClientCompanyExcelConfig::getHeaderName,
+                ClientCompanyExcelConfig::getCellValue);
     }
 
     @Transactional(readOnly = true)
