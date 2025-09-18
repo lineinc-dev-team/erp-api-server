@@ -40,25 +40,20 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
     private final QClientCompanyContact clientCompanyContact = QClientCompanyContact.clientCompanyContact;
     private final QUser user = QUser.user;
 
-    // 정렬 필드를 미리 정의하여 정적 매핑. 추후 정렬 기준이 늘어나면 여기에 추가.
     private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
             "id", QClientCompany.clientCompany.id,
             "name", QClientCompany.clientCompany.name,
             "createdAt", QClientCompany.clientCompany.createdAt,
             "updatedAt", QClientCompany.clientCompany.updatedAt);
 
-    /**
-     * ClientCompany 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
-     * pageable이 null인 경우 페이징 없이 전체 조회
-     *
-     * @param request  검색 조건 (예: 발주처명)
-     * @param pageable 페이징 및 정렬 정보 (null 가능)
-     * @return ClientCompanyResponse 리스트를 담은 Page 객체
-     */
     @Override
-    public Page<ClientCompanyResponse> findAll(final ClientCompanyListRequest request, final Pageable pageable) {
+    public Page<ClientCompanyResponse> findAll(
+            final ClientCompanyListRequest request,
+            final Pageable pageable) {
+
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders;
+
         if (pageable != null) {
             orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
         } else {
@@ -120,7 +115,8 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             builder.and(clientCompany.ceoName.containsIgnoreCase(request.ceoName().trim()));
         }
         if (StringUtils.hasText(request.contactName())) {
-            builder.and(clientCompany.contacts.any().name.containsIgnoreCase(request.contactName().trim()));
+            builder.and(clientCompany.contacts.any().isMain.isTrue()
+                    .and(clientCompany.contacts.any().name.containsIgnoreCase(request.contactName().trim())));
         }
         if (StringUtils.hasText(request.userName())) {
             builder.and(clientCompany.user.username.containsIgnoreCase(request.userName().trim()));
@@ -133,21 +129,16 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             builder.and(clientCompany.phoneNumber.contains(request.phoneNumber().trim()));
         }
         if (StringUtils.hasText(request.landlineNumber())) {
-            final String number = request.landlineNumber().trim();
-            builder.and(
-                    clientCompany.landlineNumber.contains(number)
-                            .or(clientCompany.phoneNumber.contains(number)));
+            builder.and(clientCompany.landlineNumber.contains(request.landlineNumber().trim()));
         }
-        if (request.isActive() != null) {
+        if (Objects.nonNull(request.isActive())) {
             builder.and(clientCompany.isActive.eq(request.isActive()));
         }
-
-        if (request.createdStartDate() != null) {
+        if (Objects.nonNull(request.createdStartDate())) {
             final OffsetDateTime startOfDay = DateTimeFormatUtils.toUtcStartOfDay(request.createdStartDate());
             builder.and(clientCompany.createdAt.goe(startOfDay));
         }
-
-        if (request.createdEndDate() != null) {
+        if (Objects.nonNull(request.createdEndDate())) {
             final OffsetDateTime endOfDay = DateTimeFormatUtils.toUtcEndOfDay(request.createdEndDate());
             builder.and(clientCompany.createdAt.lt(endOfDay));
         }
