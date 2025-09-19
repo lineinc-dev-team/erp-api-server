@@ -40,8 +40,7 @@ public class UserV2Controller extends BaseController {
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
         final Page<UserChangeHistoryResponse> page = userV2Service.getUserChangeHistoriesWithPaging(
-                id,
-                PageableUtils.createPageable(pageRequest, sortRequest));
+                id, PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 

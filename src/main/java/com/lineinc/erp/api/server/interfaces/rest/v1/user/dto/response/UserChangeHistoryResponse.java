@@ -1,11 +1,12 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.OffsetDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "유저 변경 이력 응답")
 public record UserChangeHistoryResponse(
@@ -18,7 +19,7 @@ public record UserChangeHistoryResponse(
         @Schema(description = "수정자", example = "관리자") String updatedBy,
         @Schema(description = "변경 유형", example = "기본정보") String type,
         @Schema(description = "변경 유형 코드", example = "BASIC") UserChangeHistoryType typeCode) {
-    public static UserChangeHistoryResponse from(UserChangeHistory history) {
+    public static UserChangeHistoryResponse from(final UserChangeHistory history) {
         return new UserChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),

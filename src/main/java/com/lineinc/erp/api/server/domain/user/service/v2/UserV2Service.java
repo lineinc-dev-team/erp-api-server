@@ -30,8 +30,8 @@ public class UserV2Service {
      */
     public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithPaging(final Long userId,
             final Pageable pageable) {
-        final Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserIdWithPaging(userId,
-                pageable);
+        final Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserIdWithPaging(
+                userId, pageable);
         return historyPage.map(UserChangeHistoryResponse::from);
     }
 
