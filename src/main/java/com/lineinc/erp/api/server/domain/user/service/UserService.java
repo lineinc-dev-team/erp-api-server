@@ -22,7 +22,6 @@ import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
-import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
@@ -59,7 +58,6 @@ public class UserService {
     private final UserChangeHistoryRepository userChangeHistoryRepository;
     private final DepartmentRepository departmentRepository;
     private final GradeRepository gradeRepository;
-    private final PositionRepository positionRepository;
 
     // 기타 의존성
     private final PasswordEncoder passwordEncoder;
