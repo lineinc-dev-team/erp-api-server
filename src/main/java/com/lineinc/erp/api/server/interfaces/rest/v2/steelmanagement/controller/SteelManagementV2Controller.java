@@ -31,14 +31,13 @@ import lombok.RequiredArgsConstructor;
 public class SteelManagementV2Controller extends BaseController {
     private final SteelManagementV2Service steelManagementV2Service;
 
-    @Operation(summary = "강재수불부 수정이력 조회")
+    @Operation(summary = "강재수불부 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistoriesV2(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-
         final Page<SteelManagementChangeHistoryResponse> page = steelManagementV2Service
                 .getSteelManagementChangeHistoriesWithPaging(
                         id, PageableUtils.createPageable(pageRequest, sortRequest));

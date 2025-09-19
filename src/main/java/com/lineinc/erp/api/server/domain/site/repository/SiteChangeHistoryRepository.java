@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.site.repository;
 
-import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -9,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 
 @Repository
 public interface SiteChangeHistoryRepository extends JpaRepository<SiteChangeHistory, Long> {
@@ -32,4 +33,14 @@ public interface SiteChangeHistoryRepository extends JpaRepository<SiteChangeHis
      */
     @Query("SELECT sch FROM SiteChangeHistory sch WHERE sch.site = :site")
     Page<SiteChangeHistory> findBySiteWithPaging(@Param("site") Site site, Pageable pageable);
+
+    /**
+     * 현장 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param siteId   현장 ID
+     * @param pageable 페이징 정보
+     * @return 현장 변경 이력 페이지
+     */
+    @Query("SELECT sch FROM SiteChangeHistory sch WHERE sch.site.id = :siteId")
+    Page<SiteChangeHistory> findBySiteIdWithPaging(@Param("siteId") Long siteId, Pageable pageable);
 }
