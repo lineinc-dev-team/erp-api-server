@@ -1,30 +1,31 @@
 package com.lineinc.erp.api.server.domain.managementcost.service;
 
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.labor.entity.Labor;
-import com.lineinc.erp.api.server.domain.labor.service.LaborService;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
-import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostMealFeeDetailRepository;
-import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailUpdateRequest;
-
-import org.javers.core.Javers;
-import org.javers.core.diff.Diff;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.Objects;
 
-import lombok.RequiredArgsConstructor;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
+import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostMealFeeDetailRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -36,11 +37,11 @@ public class ManagementCostMealFeeDetailService {
     private final Javers javers;
 
     @Transactional
-    public void createManagementCostMealFeeDetails(ManagementCost managementCost,
-            List<ManagementCostMealFeeDetailCreateRequest> details) {
+    public void createManagementCostMealFeeDetails(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailCreateRequest> details) {
         if (details != null) {
-            for (ManagementCostMealFeeDetailCreateRequest detailReq : details) {
-                ManagementCostMealFeeDetail detail = ManagementCostMealFeeDetail.builder()
+            for (final ManagementCostMealFeeDetailCreateRequest detailReq : details) {
+                final ManagementCostMealFeeDetail detail = ManagementCostMealFeeDetail.builder()
                         .managementCost(managementCost)
                         .workType(detailReq.workType())
                         .labor(detailReq.laborId() != null ? laborService.getLaborByIdOrThrow(detailReq.laborId())
@@ -58,15 +59,15 @@ public class ManagementCostMealFeeDetailService {
     }
 
     @Transactional
-    public void updateManagementCostMealFeeDetails(ManagementCost managementCost,
-            List<ManagementCostMealFeeDetailUpdateRequest> requests) {
+    public void updateManagementCostMealFeeDetails(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailUpdateRequest> requests) {
 
         managementCost.getMealFeeDetails().forEach(detail -> {
             detail.syncTransientFields();
         });
 
         // 수정 전 스냅샷 생성
-        List<ManagementCostMealFeeDetail> beforeDetails = managementCost.getMealFeeDetails().stream()
+        final List<ManagementCostMealFeeDetail> beforeDetails = managementCost.getMealFeeDetails().stream()
                 .map(detail -> JaversUtils.createSnapshot(javers, detail, ManagementCostMealFeeDetail.class))
                 .toList();
 
@@ -74,11 +75,11 @@ public class ManagementCostMealFeeDetailService {
         EntitySyncUtils.syncList(
                 managementCost.getMealFeeDetails(),
                 requests,
-                (ManagementCostMealFeeDetailUpdateRequest dto) -> {
-                    Labor labor = (dto.laborId() != null)
+                (final ManagementCostMealFeeDetailUpdateRequest dto) -> {
+                    final Labor labor = (dto.laborId() != null)
                             ? laborService.getLaborByIdOrThrow(dto.laborId())
                             : null;
-                    ManagementCostMealFeeDetail detail = ManagementCostMealFeeDetail.builder()
+                    final ManagementCostMealFeeDetail detail = ManagementCostMealFeeDetail.builder()
                             .managementCost(managementCost)
                             .workType(dto.workType())
                             .labor(labor)
@@ -96,9 +97,9 @@ public class ManagementCostMealFeeDetailService {
                 });
 
         // 수정된 항목들의 Labor 엔티티 재설정
-        for (ManagementCostMealFeeDetail detail : managementCost.getMealFeeDetails()) {
+        for (final ManagementCostMealFeeDetail detail : managementCost.getMealFeeDetails()) {
             if (detail.getLaborId() != null) {
-                Labor labor = laborService.getLaborByIdOrThrow(detail.getLaborId());
+                final Labor labor = laborService.getLaborByIdOrThrow(detail.getLaborId());
                 detail.setEntities(labor);
             } else {
                 // laborId가 null인 경우 labor도 null로 설정
@@ -107,18 +108,18 @@ public class ManagementCostMealFeeDetailService {
         }
 
         // 변경 이력 추적 및 저장
-        List<ManagementCostMealFeeDetail> afterDetails = new ArrayList<>(managementCost.getMealFeeDetails());
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<ManagementCostMealFeeDetail> afterDetails = new ArrayList<>(managementCost.getMealFeeDetails());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
-        Set<Long> beforeIds = beforeDetails.stream()
+        final Set<Long> beforeIds = beforeDetails.stream()
                 .map(ManagementCostMealFeeDetail::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (ManagementCostMealFeeDetail after : afterDetails) {
+        for (final ManagementCostMealFeeDetail after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
-                Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
                 if (addedChange != null) {
                     allChanges.add(addedChange);
                 }
@@ -126,23 +127,23 @@ public class ManagementCostMealFeeDetailService {
         }
 
         // 수정된 식대 상세 항목
-        Map<Long, ManagementCostMealFeeDetail> afterMap = afterDetails.stream()
+        final Map<Long, ManagementCostMealFeeDetail> afterMap = afterDetails.stream()
                 .filter(d -> d.getId() != null)
                 .collect(Collectors.toMap(ManagementCostMealFeeDetail::getId, d -> d));
 
-        for (ManagementCostMealFeeDetail before : beforeDetails) {
+        for (final ManagementCostMealFeeDetail before : beforeDetails) {
             if (before.getId() != null && afterMap.containsKey(before.getId())) {
-                ManagementCostMealFeeDetail after = afterMap.get(before.getId());
-                Diff diff = javers.compare(before, after);
-                List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+                final ManagementCostMealFeeDetail after = afterMap.get(before.getId());
+                final Diff diff = javers.compare(before, after);
+                final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
                 allChanges.addAll(simpleChanges);
             }
         }
 
         // 변경 이력이 있으면 저장
         if (!allChanges.isEmpty()) {
-            String changesJson = javers.getJsonConverter().toJson(allChanges);
-            ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
                     .type(ManagementCostChangeType.MEAL_FEE)
                     .changes(changesJson)

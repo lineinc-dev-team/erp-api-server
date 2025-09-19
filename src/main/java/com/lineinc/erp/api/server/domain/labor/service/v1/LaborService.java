@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.labor.service;
+package com.lineinc.erp.api.server.domain.labor.service.v1;
 
 import java.text.NumberFormat;
 import java.util.List;

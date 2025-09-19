@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
-import com.lineinc.erp.api.server.domain.labor.service.LaborService;
+import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;

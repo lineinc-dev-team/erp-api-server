@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labor.service.LaborService;
+import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
