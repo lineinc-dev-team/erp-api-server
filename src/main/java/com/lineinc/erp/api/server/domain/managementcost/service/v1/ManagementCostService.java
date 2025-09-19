@@ -27,8 +27,8 @@ import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChan
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
@@ -158,7 +158,7 @@ public class ManagementCostService {
                 final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
                 if (!simpleChanges.isEmpty()) {
-                    final OutsourcingChangeHistory changeHistory = OutsourcingChangeHistory.builder()
+                    final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                             .outsourcingCompany(outsourcingCompany)
                             .type(OutsourcingChangeType.BASIC)
                             .changes(changesJson)

@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
@@ -119,7 +119,7 @@ public class OutsourcingCompanyService {
         final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            final OutsourcingChangeHistory changeHistory = OutsourcingChangeHistory.builder()
+            final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                     .outsourcingCompany(company)
                     .type(OutsourcingChangeType.BASIC)
                     .changes(changesJson)
@@ -243,7 +243,7 @@ public class OutsourcingCompanyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        final Slice<OutsourcingChangeHistory> histories = outsourcingCompanyChangeRepository
+        final Slice<OutsourcingCompanyChangeHistory> histories = outsourcingCompanyChangeRepository
                 .findAllByOutsourcingCompany(
                         company,
                         pageable);
@@ -261,7 +261,7 @@ public class OutsourcingCompanyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        final Page<OutsourcingChangeHistory> historyPage = outsourcingCompanyChangeRepository
+        final Page<OutsourcingCompanyChangeHistory> historyPage = outsourcingCompanyChangeRepository
                 .findAllByOutsourcingCompanyWithPaging(
                         company,
                         pageable);

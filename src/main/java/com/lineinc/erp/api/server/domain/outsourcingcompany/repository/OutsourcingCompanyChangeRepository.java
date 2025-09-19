@@ -7,15 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
 
-public interface OutsourcingCompanyChangeRepository extends JpaRepository<OutsourcingChangeHistory, Long> {
+public interface OutsourcingCompanyChangeRepository extends JpaRepository<OutsourcingCompanyChangeHistory, Long> {
 
     /**
      * 특정 외주업체의 변경 이력을 페이징하여 조회 (Slice 방식)
      */
-    Slice<OutsourcingChangeHistory> findAllByOutsourcingCompany(OutsourcingCompany company, Pageable pageable);
+    Slice<OutsourcingCompanyChangeHistory> findAllByOutsourcingCompany(OutsourcingCompany company, Pageable pageable);
 
     /**
      * 특정 외주업체의 변경 이력을 전체 개수와 함께 페이징하여 조회합니다.
@@ -25,7 +25,8 @@ public interface OutsourcingCompanyChangeRepository extends JpaRepository<Outsou
      * @param pageable 페이징 정보 (정렬 포함)
      * @return 외주업체 변경 이력 페이지 (전체 개수 포함)
      */
-    @Query("SELECT och FROM OutsourcingChangeHistory och WHERE och.outsourcingCompany = :company")
-    Page<OutsourcingChangeHistory> findAllByOutsourcingCompanyWithPaging(@Param("company") OutsourcingCompany company,
+    @Query("SELECT och FROM OutsourcingCompanyChangeHistory och WHERE och.outsourcingCompany = :company")
+    Page<OutsourcingCompanyChangeHistory> findAllByOutsourcingCompanyWithPaging(
+            @Param("company") OutsourcingCompany company,
             Pageable pageable);
 }
