@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.fuelaggregation.service;
+package com.lineinc.erp.api.server.domain.fuelaggregation.service.v1;
 
 import java.util.List;
 import java.util.Map;
@@ -62,14 +62,14 @@ public class FuelAggregationService {
     private final Javers javers;
 
     @Transactional
-    public void createFuelAggregation(FuelAggregationCreateRequest request) {
-        Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+    public void createFuelAggregation(final FuelAggregationCreateRequest request) {
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
-        FuelAggregation fuelAggregation = FuelAggregation.builder()
+        final FuelAggregation fuelAggregation = FuelAggregation.builder()
                 .site(site)
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
@@ -78,16 +78,16 @@ public class FuelAggregationService {
 
         fuelAggregationRepository.save(fuelAggregation);
 
-        for (FuelInfoCreateRequest fuelInfo : request.fuelInfos()) {
+        for (final FuelInfoCreateRequest fuelInfo : request.fuelInfos()) {
             // 업체, 기사, 장비 ID 검증
-            OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+            final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                     .getOutsourcingCompanyByIdOrThrow(fuelInfo.outsourcingCompanyId());
-            OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
+            final OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
                     .getDriverByIdOrThrow(fuelInfo.driverId());
-            OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
+            final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
                     .getEquipmentByIdOrThrow(fuelInfo.equipmentId());
 
-            FuelInfo fuelInfoEntity = FuelInfo.builder()
+            final FuelInfo fuelInfoEntity = FuelInfo.builder()
                     .fuelAggregation(fuelAggregation)
                     .outsourcingCompany(outsourcingCompany)
                     .driver(driver)
@@ -102,14 +102,16 @@ public class FuelAggregationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FuelAggregationListResponse> getAllFuelAggregations(FuelAggregationListRequest request,
-            Pageable pageable) {
+    public Page<FuelAggregationListResponse> getAllFuelAggregations(final FuelAggregationListRequest request,
+            final Pageable pageable) {
         return fuelAggregationRepository.findAll(request, pageable);
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(FuelAggregationListRequest request, Sort sort, List<String> fields) {
-        List<FuelAggregationListResponse> responses = fuelAggregationRepository.findAllWithoutPaging(request, sort);
+    public Workbook downloadExcel(final FuelAggregationListRequest request, final Sort sort,
+            final List<String> fields) {
+        final List<FuelAggregationListResponse> responses = fuelAggregationRepository.findAllWithoutPaging(request,
+                sort);
 
         return ExcelExportUtils.generateWorkbook(
                 responses,
@@ -118,7 +120,7 @@ public class FuelAggregationService {
                 this::getExcelCellValue);
     }
 
-    private String getExcelHeaderName(String field) {
+    private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "id" -> "No.";
             case "siteName" -> "현장명";
@@ -136,7 +138,7 @@ public class FuelAggregationService {
         };
     }
 
-    private String getExcelCellValue(FuelAggregationListResponse response, String field) {
+    private String getExcelCellValue(final FuelAggregationListResponse response, final String field) {
         return switch (field) {
             case "id" -> String.valueOf(response.id());
             case "siteName" -> response.site() != null ? response.site().name() : "";
@@ -168,8 +170,8 @@ public class FuelAggregationService {
     }
 
     @Transactional(readOnly = true)
-    public FuelAggregationDetailResponse getFuelAggregationById(Long id) {
-        FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
+    public FuelAggregationDetailResponse getFuelAggregationById(final Long id) {
+        final FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
@@ -177,7 +179,7 @@ public class FuelAggregationService {
     }
 
     @Transactional(readOnly = true)
-    public FuelAggregation getFuelAggregationByIdOrThrow(Long id) {
+    public FuelAggregation getFuelAggregationByIdOrThrow(final Long id) {
         return fuelAggregationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
@@ -187,11 +189,11 @@ public class FuelAggregationService {
      * 유류집계 변경 이력 조회 (Slice 방식)
      */
     @Transactional(readOnly = true)
-    public Slice<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistories(Long fuelAggregationId,
-            Pageable pageable) {
-        FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
+    public Slice<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistories(final Long fuelAggregationId,
+            final Pageable pageable) {
+        final FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
 
-        Slice<FuelAggregationChangeHistory> histories = fuelAggregationChangeHistoryRepository
+        final Slice<FuelAggregationChangeHistory> histories = fuelAggregationChangeHistoryRepository
                 .findByFuelAggregation(fuelAggregation, pageable);
         return histories.map(FuelAggregationChangeHistoryResponse::from);
     }
@@ -202,43 +204,44 @@ public class FuelAggregationService {
      */
     @Transactional(readOnly = true)
     public Page<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistoriesWithPaging(
-            Long fuelAggregationId,
-            Pageable pageable) {
-        FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
+            final Long fuelAggregationId,
+            final Pageable pageable) {
+        final FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
 
-        Page<FuelAggregationChangeHistory> historyPage = fuelAggregationChangeHistoryRepository
+        final Page<FuelAggregationChangeHistory> historyPage = fuelAggregationChangeHistoryRepository
                 .findByFuelAggregationWithPaging(fuelAggregation, pageable);
         return historyPage.map(FuelAggregationChangeHistoryResponse::from);
     }
 
     @Transactional
-    public void deleteFuelAggregations(DeleteFuelAggregationsRequest request) {
-        List<FuelAggregation> fuelAggregations = fuelAggregationRepository.findAllById(request.fuelAggregationIds());
+    public void deleteFuelAggregations(final DeleteFuelAggregationsRequest request) {
+        final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
+                .findAllById(request.fuelAggregationIds());
         if (fuelAggregations.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.FUEL_AGGREGATION_NOT_FOUND);
         }
 
-        for (FuelAggregation fuelAggregation : fuelAggregations) {
+        for (final FuelAggregation fuelAggregation : fuelAggregations) {
             fuelAggregation.markAsDeleted();
         }
         fuelAggregationRepository.saveAll(fuelAggregations);
     }
 
     @Transactional
-    public void addFuelInfoToAggregation(Long fuelAggregationId, AddFuelInfoRequest request) {
-        FuelAggregation fuelAggregation = fuelAggregationRepository.findById(fuelAggregationId)
+    public void addFuelInfoToAggregation(final Long fuelAggregationId, final AddFuelInfoRequest request) {
+        final FuelAggregation fuelAggregation = fuelAggregationRepository.findById(fuelAggregationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
         // 업체, 기사, 장비 ID 검증
-        OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+        final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                 .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
-        OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
+        final OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
                 .getDriverByIdOrThrow(request.driverId());
-        OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
+        final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
                 .getEquipmentByIdOrThrow(request.equipmentId());
 
-        FuelInfo fuelInfo = FuelInfo.builder()
+        final FuelInfo fuelInfo = FuelInfo.builder()
                 .fuelAggregation(fuelAggregation)
                 .outsourcingCompany(outsourcingCompany)
                 .driver(driver)
@@ -252,30 +255,30 @@ public class FuelAggregationService {
     }
 
     @Transactional
-    public void updateFuelAggregation(Long id, FuelAggregationUpdateRequest request) {
-        FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
+    public void updateFuelAggregation(final Long id, final FuelAggregationUpdateRequest request) {
+        final FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
-        Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
         fuelAggregation.syncTransientFields();
-        FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
+        final FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
 
         fuelAggregation.updateFrom(request, site, siteProcess);
         fuelAggregationRepository.save(fuelAggregation);
 
-        Diff diff = javers.compare(oldSnapshot, fuelAggregation);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        final Diff diff = javers.compare(oldSnapshot, fuelAggregation);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
+            final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
                     .fuelAggregation(fuelAggregation)
                     .type(FuelAggregationChangeType.BASIC)
                     .changes(changesJson)
@@ -285,7 +288,7 @@ public class FuelAggregationService {
 
         // 변경이력 memo 업데이트 처리
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (FuelAggregationUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+            for (final FuelAggregationUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
                 fuelAggregationChangeHistoryRepository.findById(historyRequest.id())
                         .filter(history -> history.getFuelAggregation().getId().equals(fuelAggregation.getId()))
                         .ifPresent(history -> {

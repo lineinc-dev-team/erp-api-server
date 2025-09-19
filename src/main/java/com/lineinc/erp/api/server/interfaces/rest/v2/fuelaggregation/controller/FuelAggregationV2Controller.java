@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregationService;
+import com.lineinc.erp.api.server.domain.fuelaggregation.service.v1.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationChangeHistoryResponse;
@@ -41,12 +41,13 @@ public class FuelAggregationV2Controller {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationChangeHistoryResponse>>> getFuelAggregationChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
 
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
-        var page = fuelAggregationService.getFuelAggregationChangeHistoriesWithPaging(id, pageable);
+        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                sortRequest.sort());
+        final var page = fuelAggregationService.getFuelAggregationChangeHistoriesWithPaging(id, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));

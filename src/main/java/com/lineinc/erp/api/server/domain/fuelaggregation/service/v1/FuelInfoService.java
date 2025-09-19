@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.fuelaggregation.service;
+package com.lineinc.erp.api.server.domain.fuelaggregation.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +37,12 @@ public class FuelInfoService {
     private final Javers javers;
 
     @Transactional
-    public void updateFuelInfos(FuelAggregation fuelAggregation, List<FuelInfoUpdateRequest> requests) {
+    public void updateFuelInfos(final FuelAggregation fuelAggregation, final List<FuelInfoUpdateRequest> requests) {
         // 모든 FuelInfo의 transient 필드 동기화
         fuelAggregation.getFuelInfos().forEach(FuelInfo::syncTransientFields);
 
         // 변경 전 상태 저장 (Javers 스냅샷) - syncTransientFields 호출 후
-        List<FuelInfo> beforeFuelInfos = fuelAggregation.getFuelInfos().stream()
+        final List<FuelInfo> beforeFuelInfos = fuelAggregation.getFuelInfos().stream()
                 .map(fuelInfo -> JaversUtils.createSnapshot(javers, fuelInfo, FuelInfo.class))
                 .toList();
 
@@ -50,13 +50,13 @@ public class FuelInfoService {
         EntitySyncUtils.syncList(
                 fuelAggregation.getFuelInfos(),
                 requests,
-                (FuelInfoUpdateRequest dto) -> {
+                (final FuelInfoUpdateRequest dto) -> {
                     // 업체, 기사, 장비 ID 검증
-                    OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                    final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                             .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
-                    OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
+                    final OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
                             .getDriverByIdOrThrow(dto.driverId());
-                    OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
+                    final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
                             .getEquipmentByIdOrThrow(dto.equipmentId());
 
                     return FuelInfo.builder()
@@ -71,14 +71,14 @@ public class FuelInfoService {
                 });
 
         // EntitySyncUtils 실행 후, 각 FuelInfo에 실제 엔티티 설정
-        for (FuelInfo fuelInfo : fuelAggregation.getFuelInfos()) {
+        for (final FuelInfo fuelInfo : fuelAggregation.getFuelInfos()) {
             if (fuelInfo.getOutsourcingCompanyId() != null) {
-                OutsourcingCompany company = outsourcingCompanyService
+                final OutsourcingCompany company = outsourcingCompanyService
                         .getOutsourcingCompanyByIdOrThrow(fuelInfo.getOutsourcingCompanyId());
-                OutsourcingCompanyContractDriver driver = fuelInfo.getDriverId() != null
+                final OutsourcingCompanyContractDriver driver = fuelInfo.getDriverId() != null
                         ? outsourcingCompanyContractService.getDriverByIdOrThrow(fuelInfo.getDriverId())
                         : null;
-                OutsourcingCompanyContractEquipment equipment = fuelInfo.getEquipmentId() != null
+                final OutsourcingCompanyContractEquipment equipment = fuelInfo.getEquipmentId() != null
                         ? outsourcingCompanyContractService.getEquipmentByIdOrThrow(fuelInfo.getEquipmentId())
                         : null;
 
@@ -90,40 +90,40 @@ public class FuelInfoService {
         fuelAggregation.getFuelInfos().forEach(FuelInfo::syncTransientFields);
 
         // 변경사항 감지 및 이력 저장
-        List<FuelInfo> afterFuelInfos = new ArrayList<>(fuelAggregation.getFuelInfos());
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<FuelInfo> afterFuelInfos = new ArrayList<>(fuelAggregation.getFuelInfos());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 유류정보
-        Set<Long> beforeIds = beforeFuelInfos.stream()
+        final Set<Long> beforeIds = beforeFuelInfos.stream()
                 .map(FuelInfo::getId)
                 .filter(id -> id != null)
                 .collect(Collectors.toSet());
 
-        for (FuelInfo after : afterFuelInfos) {
+        for (final FuelInfo after : afterFuelInfos) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
         // 수정된 유류정보
-        Map<Long, FuelInfo> afterMap = afterFuelInfos.stream()
+        final Map<Long, FuelInfo> afterMap = afterFuelInfos.stream()
                 .filter(f -> f.getId() != null)
                 .collect(Collectors.toMap(FuelInfo::getId, f -> f));
 
-        for (FuelInfo before : beforeFuelInfos) {
+        for (final FuelInfo before : beforeFuelInfos) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            FuelInfo after = afterMap.get(before.getId());
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final FuelInfo after = afterMap.get(before.getId());
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
         }
 
         // 변경사항이 있다면 이력 저장
         if (!allChanges.isEmpty()) {
-            String changesJson = javers.getJsonConverter().toJson(allChanges);
-            FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
                     .fuelAggregation(fuelAggregation)
                     .type(FuelAggregationChangeType.FUEL_INFO)
                     .changes(changesJson)

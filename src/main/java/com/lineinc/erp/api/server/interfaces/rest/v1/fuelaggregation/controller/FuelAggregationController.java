@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
-import com.lineinc.erp.api.server.domain.fuelaggregation.service.FuelAggregationService;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.service.v1.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
@@ -69,7 +69,7 @@ public class FuelAggregationController {
     @GetMapping("/weather-types")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WeatherTypeResponse>>> getWeatherTypes() {
-        List<WeatherTypeResponse> weatherTypes = Arrays.stream(FuelAggregationWeatherType.values())
+        final List<WeatherTypeResponse> weatherTypes = Arrays.stream(FuelAggregationWeatherType.values())
                 .map(WeatherTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(weatherTypes));
@@ -83,7 +83,7 @@ public class FuelAggregationController {
     @GetMapping("/fuel-types")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<FuelTypeResponse>>> getFuelTypes() {
-        List<FuelTypeResponse> fuelTypes = Arrays.stream(FuelInfoFuelType.values())
+        final List<FuelTypeResponse> fuelTypes = Arrays.stream(FuelInfoFuelType.values())
                 .map(FuelTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(fuelTypes));
@@ -97,7 +97,7 @@ public class FuelAggregationController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.CREATE)
     public ResponseEntity<SuccessResponse<Void>> createFuelAggregation(
-            @Valid @RequestBody FuelAggregationCreateRequest request) {
+            @Valid @RequestBody final FuelAggregationCreateRequest request) {
         fuelAggregationService.createFuelAggregation(request);
         return ResponseEntity.ok().build();
     }
@@ -110,7 +110,7 @@ public class FuelAggregationController {
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteFuelAggregations(
-            @RequestBody DeleteFuelAggregationsRequest request) {
+            @RequestBody final DeleteFuelAggregationsRequest request) {
         fuelAggregationService.deleteFuelAggregations(request);
         return ResponseEntity.ok().build();
     }
@@ -124,8 +124,8 @@ public class FuelAggregationController {
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateFuelAggregation(
-            @PathVariable Long id,
-            @Valid @RequestBody FuelAggregationUpdateRequest request) {
+            @PathVariable final Long id,
+            @Valid @RequestBody final FuelAggregationUpdateRequest request) {
         fuelAggregationService.updateFuelAggregation(id, request);
         return ResponseEntity.ok().build();
     }
@@ -138,11 +138,11 @@ public class FuelAggregationController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationListResponse>>> getFuelAggregations(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid FuelAggregationListRequest request) {
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final FuelAggregationListRequest request) {
 
-        Page<FuelAggregationListResponse> page = fuelAggregationService.getAllFuelAggregations(
+        final Page<FuelAggregationListResponse> page = fuelAggregationService.getAllFuelAggregations(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -159,8 +159,8 @@ public class FuelAggregationController {
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<FuelAggregationDetailResponse>> getFuelAggregationById(
-            @PathVariable Long id) {
-        FuelAggregationDetailResponse response = fuelAggregationService.getFuelAggregationById(id);
+            @PathVariable final Long id) {
+        final FuelAggregationDetailResponse response = fuelAggregationService.getFuelAggregationById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -172,12 +172,13 @@ public class FuelAggregationController {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<FuelAggregationChangeHistoryResponse>>> getFuelAggregationChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
 
-        Slice<FuelAggregationChangeHistoryResponse> slice = fuelAggregationService.getFuelAggregationChangeHistories(id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        final Slice<FuelAggregationChangeHistoryResponse> slice = fuelAggregationService
+                .getFuelAggregationChangeHistories(id,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
@@ -191,11 +192,11 @@ public class FuelAggregationController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public void downloadFuelAggregationsExcel(
-            @Valid SortRequest sortRequest,
-            @Valid FuelAggregationListRequest request,
-            @Valid FuelAggregationDownloadRequest downloadRequest,
-            HttpServletResponse response) throws IOException {
-        List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
+            @Valid final SortRequest sortRequest,
+            @Valid final FuelAggregationListRequest request,
+            @Valid final FuelAggregationDownloadRequest downloadRequest,
+            final HttpServletResponse response) throws IOException {
+        final List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed, FuelAggregationDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "유류집계 목록.xlsx");
 
