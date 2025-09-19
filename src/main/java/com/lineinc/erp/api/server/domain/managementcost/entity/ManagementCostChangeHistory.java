@@ -5,7 +5,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,7 +49,7 @@ public class ManagementCostChangeHistory extends BaseEntity {
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ManagementCostChangeType type;
+    private ManagementCostChangeHistoryType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")

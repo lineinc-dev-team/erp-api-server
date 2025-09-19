@@ -1,26 +1,28 @@
 package com.lineinc.erp.api.server.domain.managementcost.service;
 
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
-import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostFileRepository;
-import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
-import org.javers.core.Javers;
-import org.javers.core.diff.Diff;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
+import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostFileRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -100,7 +102,7 @@ public class ManagementCostFileService {
             String changesJson = javers.getJsonConverter().toJson(allChanges);
             ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
-                    .type(ManagementCostChangeType.ATTACHMENT)
+                    .type(ManagementCostChangeHistoryType.ATTACHMENT)
                     .changes(changesJson)
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);

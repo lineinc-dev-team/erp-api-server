@@ -1,27 +1,29 @@
 package com.lineinc.erp.api.server.domain.managementcost.service;
 
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
-import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostKeyMoneyDetailRepository;
-import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailUpdateRequest;
-import org.javers.core.Javers;
-import org.javers.core.diff.Diff;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.Objects;
 
-import lombok.RequiredArgsConstructor;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
+import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostKeyMoneyDetailRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -106,7 +108,7 @@ public class ManagementCostKeyMoneyDetailService {
             String changesJson = javers.getJsonConverter().toJson(allChanges);
             ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
-                    .type(ManagementCostChangeType.KEY_MONEY_DETAIL)
+                    .type(ManagementCostChangeHistoryType.KEY_MONEY_DETAIL)
                     .changes(changesJson)
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);

@@ -24,7 +24,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostCha
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
@@ -381,7 +381,7 @@ public class ManagementCostService {
         if (!simpleChanges.isEmpty()) {
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
-                    .type(ManagementCostChangeType.BASIC)
+                    .type(ManagementCostChangeHistoryType.BASIC)
                     .changes(changesJson)
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);

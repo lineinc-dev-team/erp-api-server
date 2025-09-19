@@ -17,7 +17,7 @@ import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostMealFeeDetailRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
@@ -145,7 +145,7 @@ public class ManagementCostMealFeeDetailService {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
-                    .type(ManagementCostChangeType.MEAL_FEE)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE)
                     .changes(changesJson)
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);

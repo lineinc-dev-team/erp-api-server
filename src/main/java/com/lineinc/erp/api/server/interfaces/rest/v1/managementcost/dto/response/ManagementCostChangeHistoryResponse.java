@@ -1,11 +1,12 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeType;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 
-import java.time.OffsetDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "관리비 변경 이력 응답")
 public record ManagementCostChangeHistoryResponse(
@@ -23,7 +24,7 @@ public record ManagementCostChangeHistoryResponse(
 
         @Schema(description = "변경 유형", example = "기본 정보") String type,
 
-        @Schema(description = "변경 유형 코드", example = "BASIC") ManagementCostChangeType typeCode) {
+        @Schema(description = "변경 유형 코드", example = "BASIC") ManagementCostChangeHistoryType typeCode) {
 
     public static ManagementCostChangeHistoryResponse from(ManagementCostChangeHistory history) {
         return new ManagementCostChangeHistoryResponse(

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ManagementCostChangeType {
+public enum ManagementCostChangeHistoryType {
 
     BASIC("기본정보"),
     MEAL_FEE("식대"),
