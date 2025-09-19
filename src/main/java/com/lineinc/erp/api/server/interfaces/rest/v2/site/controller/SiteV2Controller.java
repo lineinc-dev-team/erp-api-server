@@ -30,12 +30,12 @@ public class SiteV2Controller extends BaseController {
 
     @Operation(summary = "현장 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
-    public ResponseEntity<SuccessResponse<PagingResponse<SiteChangeHistoryResponse>>> getSiteChangeHistoriesV2(
+    public ResponseEntity<SuccessResponse<PagingResponse<SiteChangeHistoryResponse>>> getSiteChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-        final Page<SiteChangeHistoryResponse> page = siteV2Service.getSiteChangeHistoriesWithPaging(id,
-                PageableUtils.createPageable(pageRequest, sortRequest));
+        final Page<SiteChangeHistoryResponse> page = siteV2Service.getSiteChangeHistoriesWithPaging(
+                id, PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 }

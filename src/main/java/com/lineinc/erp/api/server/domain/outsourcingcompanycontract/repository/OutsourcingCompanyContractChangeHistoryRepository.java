@@ -32,4 +32,15 @@ public interface OutsourcingCompanyContractChangeHistoryRepository
     @Query("SELECT ch FROM OutsourcingCompanyContractChangeHistory ch WHERE ch.outsourcingCompanyContract = :contract")
     Page<OutsourcingCompanyContractChangeHistory> findByOutsourcingCompanyContractWithPaging(
             @Param("contract") OutsourcingCompanyContract contract, Pageable pageable);
+
+    /**
+     * 계약 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param contractId 계약 ID
+     * @param pageable   페이징 정보
+     * @return 계약 변경 이력 페이지
+     */
+    @Query("SELECT ch FROM OutsourcingCompanyContractChangeHistory ch WHERE ch.outsourcingCompanyContract.id = :contractId")
+    Page<OutsourcingCompanyContractChangeHistory> findByContractIdWithPaging(
+            @Param("contractId") Long contractId, Pageable pageable);
 }

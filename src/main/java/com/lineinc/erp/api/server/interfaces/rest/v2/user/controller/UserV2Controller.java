@@ -35,7 +35,7 @@ public class UserV2Controller extends BaseController {
     @Operation(summary = "유저 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<UserChangeHistoryResponse>>> getUserChangeHistoriesV2(
+    public ResponseEntity<SuccessResponse<PagingResponse<UserChangeHistoryResponse>>> getUserChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {

@@ -34,7 +34,7 @@ public class SteelManagementV2Controller extends BaseController {
     @Operation(summary = "강재수불부 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistoriesV2(
+    public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
