@@ -30,4 +30,15 @@ public interface SteelManagementChangeHistoryRepository extends JpaRepository<St
     @Query("SELECT smch FROM SteelManagementChangeHistory smch WHERE smch.steelManagement = :steelManagement")
     Page<SteelManagementChangeHistory> findBySteelManagementWithPaging(
             @Param("steelManagement") SteelManagement steelManagement, Pageable pageable);
+
+    /**
+     * 강재수불부 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param steelManagementId 강재수불부 ID
+     * @param pageable          페이징 정보
+     * @return 강재수불부 변경 이력 페이지
+     */
+    @Query("SELECT smch FROM SteelManagementChangeHistory smch WHERE smch.steelManagement.id = :steelManagementId")
+    Page<SteelManagementChangeHistory> findBySteelManagementIdWithPaging(
+            @Param("steelManagementId") Long steelManagementId, Pageable pageable);
 }
