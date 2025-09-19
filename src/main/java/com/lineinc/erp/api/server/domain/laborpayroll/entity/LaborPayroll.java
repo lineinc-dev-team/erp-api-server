@@ -7,9 +7,9 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollCalculator;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollCalculator;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollInfo;
 
 import jakarta.persistence.Column;
@@ -258,17 +258,17 @@ public class LaborPayroll extends BaseEntity {
      * 특정 일의 근무시간을 가져오는 메서드
      * 리플렉션을 사용해서 switch문 대신 동적으로 필드 접근
      */
-    public Double getDayHours(int day) {
+    public Double getDayHours(final int day) {
         if (day < 1 || day > 31) {
             return 0.0;
         }
 
         try {
-            String fieldName = String.format("day%02dHours", day);
-            var field = this.getClass().getDeclaredField(fieldName);
+            final String fieldName = String.format("day%02dHours", day);
+            final var field = this.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
             return (Double) field.get(this);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return 0.0;
         }
     }
@@ -277,17 +277,17 @@ public class LaborPayroll extends BaseEntity {
      * 특정 일의 근무시간을 설정하는 메서드
      * 리플렉션을 사용해서 switch문 대신 동적으로 필드 설정
      */
-    public void setDayHours(int day, Double hours) {
+    public void setDayHours(final int day, final Double hours) {
         if (day < 1 || day > 31) {
             return;
         }
 
         try {
-            String fieldName = String.format("day%02dHours", day);
-            var field = this.getClass().getDeclaredField(fieldName);
+            final String fieldName = String.format("day%02dHours", day);
+            final var field = this.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
             field.set(this, hours);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // 필드 설정 실패 시 무시
         }
     }
@@ -339,14 +339,14 @@ public class LaborPayroll extends BaseEntity {
      */
     private void calculateDeductions() {
         // 주민번호로 나이 계산
-        int age = LaborPayrollCalculator.calculateAge(labor);
+        final int age = LaborPayrollCalculator.calculateAge(labor);
 
         // 국민연금 상한액 (2025년 기준)
-        BigDecimal pensionCeiling = new BigDecimal("6370000");
-        BigDecimal pensionMaxAmount = new BigDecimal("286650");
+        final BigDecimal pensionCeiling = new BigDecimal("6370000");
+        final BigDecimal pensionMaxAmount = new BigDecimal("286650");
 
         // 소득세 계산: 첫 번째 평일 근무 여부를 기준으로 계산
-        BigDecimal calculatedIncomeTax = LaborPayrollCalculator.calculateIncomeTax(dailyWage, this, yearMonth);
+        final BigDecimal calculatedIncomeTax = LaborPayrollCalculator.calculateIncomeTax(dailyWage, this, yearMonth);
 
         // 소득세 1000원 미만은 0으로 처리 (엑셀 수식: =IF(AN6<1000, 0, AN6))
         if (calculatedIncomeTax.compareTo(new BigDecimal("1000")) < 0) {
@@ -356,11 +356,11 @@ public class LaborPayroll extends BaseEntity {
         }
 
         // 주민세: ROUNDDOWN(소득세 × 10%, -1) && 첫 번째 평일 근무해야 함
-        boolean workedOnFirstWeekday = LaborPayrollCalculator.workedOnFirstWeekday(this, yearMonth);
+        final boolean workedOnFirstWeekday = LaborPayrollCalculator.workedOnFirstWeekday(this, yearMonth);
         if (!workedOnFirstWeekday || incomeTax.compareTo(BigDecimal.ZERO) == 0) {
             this.localTax = BigDecimal.ZERO;
         } else {
-            BigDecimal tax = incomeTax.multiply(new BigDecimal("0.1"));
+            final BigDecimal tax = incomeTax.multiply(new BigDecimal("0.1"));
             this.localTax = LaborPayrollCalculator.roundDown(tax, -1);
         }
 
@@ -368,7 +368,7 @@ public class LaborPayroll extends BaseEntity {
         // =IFERROR(IF(AND($AM6<65),ROUNDDOWN(ROUNDDOWN(AA6*0.9%,-1),IF((AM6<65),0)),0),0)
         // $AM6: 만나이, AA6: 노무비 총액 - 65세 미만이면 고용보험 적용
         if (age < 65) {
-            BigDecimal insurance = totalLaborCost.multiply(new BigDecimal("0.009"));
+            final BigDecimal insurance = totalLaborCost.multiply(new BigDecimal("0.009"));
             this.employmentInsurance = LaborPayrollCalculator.roundDown(insurance, -1);
         } else {
             this.employmentInsurance = BigDecimal.ZERO;
@@ -376,7 +376,7 @@ public class LaborPayroll extends BaseEntity {
 
         // 건강보험: IF(총근무일수 >= 8, ROUNDDOWN(총노무비 × 3.545%, -1), 0)
         if (totalWorkDays.compareTo(new BigDecimal("8")) >= 0) {
-            BigDecimal insurance = totalLaborCost.multiply(new BigDecimal("0.03545"));
+            final BigDecimal insurance = totalLaborCost.multiply(new BigDecimal("0.03545"));
             this.healthInsurance = LaborPayrollCalculator.roundDown(insurance, -1);
         } else {
             this.healthInsurance = BigDecimal.ZERO;
@@ -387,8 +387,8 @@ public class LaborPayroll extends BaseEntity {
                 || totalLaborCost.compareTo(new BigDecimal("2200000")) >= 0)) {
             if (totalLaborCost.compareTo(pensionCeiling) <= 0) {
                 // 상한액 이하: ROUNDDOWN(ROUNDDOWN(총노무비, -3) × 4.5%, -1)
-                BigDecimal roundedCost = LaborPayrollCalculator.roundDown(totalLaborCost, -3);
-                BigDecimal pension = roundedCost.multiply(new BigDecimal("0.045"));
+                final BigDecimal roundedCost = LaborPayrollCalculator.roundDown(totalLaborCost, -3);
+                final BigDecimal pension = roundedCost.multiply(new BigDecimal("0.045"));
                 this.nationalPension = LaborPayrollCalculator.roundDown(pension, -1);
             } else {
                 // 상한액 초과: 고정액
@@ -402,9 +402,9 @@ public class LaborPayroll extends BaseEntity {
         // Z6: 총 일수, AD6: 건강보험료
         if (totalWorkDays.compareTo(new BigDecimal("8")) >= 0) {
             // 건강보험료 * (0.9182% / 7.09%) 계산
-            BigDecimal rate = new BigDecimal("0.009182").divide(new BigDecimal("0.0709"), 10,
+            final BigDecimal rate = new BigDecimal("0.009182").divide(new BigDecimal("0.0709"), 10,
                     java.math.RoundingMode.HALF_UP);
-            BigDecimal insurance = healthInsurance.multiply(rate);
+            final BigDecimal insurance = healthInsurance.multiply(rate);
             this.longTermCareInsurance = LaborPayrollCalculator.roundDown(insurance, -1);
         } else {
             this.longTermCareInsurance = BigDecimal.ZERO;
@@ -415,7 +415,7 @@ public class LaborPayroll extends BaseEntity {
      * LaborPayrollInfo로부터 업데이트
      * 리플렉션을 사용해서 반복문으로 간소화
      */
-    public void updateFrom(LaborPayrollInfo info) {
+    public void updateFrom(final LaborPayrollInfo info) {
         // 1일~31일 공수 업데이트 (리플렉션 사용)
         updateDayHoursFromInfo(info);
 
@@ -470,20 +470,20 @@ public class LaborPayroll extends BaseEntity {
     /**
      * LaborPayrollInfo의 일별 근무시간을 리플렉션으로 업데이트
      */
-    private void updateDayHoursFromInfo(LaborPayrollInfo info) {
+    private void updateDayHoursFromInfo(final LaborPayrollInfo info) {
         try {
             for (int day = 1; day <= 31; day++) {
-                String fieldName = String.format("day%02dHours", day);
-                String methodName = fieldName; // record의 getter는 필드명과 동일
+                final String fieldName = String.format("day%02dHours", day);
+                final String methodName = fieldName; // record의 getter는 필드명과 동일
 
-                var method = info.getClass().getMethod(methodName);
-                Double dayHours = (Double) method.invoke(info);
+                final var method = info.getClass().getMethod(methodName);
+                final Double dayHours = (Double) method.invoke(info);
 
                 if (dayHours != null) {
                     setDayHours(day, dayHours);
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // 리플렉션 실패 시 무시
         }
     }

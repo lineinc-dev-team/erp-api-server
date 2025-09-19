@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollService;
+import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollChangeHistoryResponse;
@@ -45,13 +45,14 @@ public class LaborPayrollV2Controller {
     @GetMapping("/summary/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollChangeHistoryResponse>>> getLaborPayrollChangeHistories(
-            @Parameter(description = "노무명세서 집계 ID") @PathVariable Long id,
-            @Parameter(description = "페이징 정보") @ModelAttribute PageRequest pageRequest,
-            @Parameter(description = "정렬 정보") @ModelAttribute SortRequest sortRequest) {
+            @Parameter(description = "노무명세서 집계 ID") @PathVariable final Long id,
+            @Parameter(description = "페이징 정보") @ModelAttribute final PageRequest pageRequest,
+            @Parameter(description = "정렬 정보") @ModelAttribute final SortRequest sortRequest) {
 
-        Page<LaborPayrollChangeHistoryResponse> page = laborPayrollService.getLaborPayrollChangeHistoriesWithPaging(
-                id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        final Page<LaborPayrollChangeHistoryResponse> page = laborPayrollService
+                .getLaborPayrollChangeHistoriesWithPaging(
+                        id,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
