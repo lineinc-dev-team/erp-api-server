@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeHistoryType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -64,7 +64,7 @@ public class SiteProcessService {
         if (!simpleChanges.isEmpty()) {
             SiteChangeHistory changeHistory = SiteChangeHistory.builder()
                     .site(site)
-                    .type(SiteChangeType.PROCESS)
+                    .type(SiteChangeHistoryType.PROCESS)
                     .changes(changesJson)
                     .build();
             siteChangeHistoryRepository.save(changeHistory);

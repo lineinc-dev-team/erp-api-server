@@ -20,7 +20,7 @@ import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.clientcompany.service.v1.ClientCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
-import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeHistoryType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -228,7 +228,7 @@ public class SiteService {
         if (!simpleChanges.isEmpty()) {
             final SiteChangeHistory changeHistory = SiteChangeHistory.builder()
                     .site(site)
-                    .type(SiteChangeType.BASIC)
+                    .type(SiteChangeHistoryType.BASIC)
                     .changes(changesJson)
                     .build();
             siteChangeHistoryRepository.save(changeHistory);

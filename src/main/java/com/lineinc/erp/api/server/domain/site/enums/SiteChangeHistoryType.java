@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SiteChangeType {
+public enum SiteChangeHistoryType {
     BASIC("현장정보"),
     PROCESS("공정정보"),
     CONTRACT("계약서 관리");

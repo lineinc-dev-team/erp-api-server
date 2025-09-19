@@ -1,28 +1,30 @@
 package com.lineinc.erp.api.server.domain.site.service;
 
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
-import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
-import com.lineinc.erp.api.server.domain.site.repository.SiteContractRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteContractRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteContractUpdateRequest;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.springframework.transaction.annotation.Transactional;
 
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
-import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
+import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
+import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeHistoryType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.site.repository.SiteContractRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteContractRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteContractUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +35,9 @@ public class SiteContractService {
     private final Javers javers;
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
-    public void createContracts(Site site, List<CreateSiteContractRequest> requests) {
-        for (CreateSiteContractRequest contractReq : requests) {
-            SiteContract contract = siteContractRepository.save(SiteContract.builder()
+    public void createContracts(final Site site, final List<CreateSiteContractRequest> requests) {
+        for (final CreateSiteContractRequest contractReq : requests) {
+            final SiteContract contract = siteContractRepository.save(SiteContract.builder()
                     .site(site)
                     .name(contractReq.name())
                     .amount(contractReq.amount())
@@ -49,9 +51,9 @@ public class SiteContractService {
     }
 
     @Transactional
-    public void updateContracts(Site site, List<SiteContractUpdateRequest> requests) {
+    public void updateContracts(final Site site, final List<SiteContractUpdateRequest> requests) {
         // 1. 현재 계약서 목록을 복사해 변경 전 상태(snapshot) 보관
-        List<SiteContract> beforeContracts = site.getContracts().stream()
+        final List<SiteContract> beforeContracts = site.getContracts().stream()
                 .map(contract -> {
                     return JaversUtils.createSnapshot(javers, contract, SiteContract.class);
                 })
@@ -61,8 +63,8 @@ public class SiteContractService {
         EntitySyncUtils.syncList(
                 site.getContracts(),
                 requests,
-                (SiteContractUpdateRequest dto) -> {
-                    SiteContract contract = SiteContract.builder()
+                (final SiteContractUpdateRequest dto) -> {
+                    final SiteContract contract = SiteContract.builder()
                             .site(site)
                             .name(dto.name())
                             .amount(dto.amount())
@@ -87,48 +89,48 @@ public class SiteContractService {
         siteContractRepository.saveAll(site.getContracts());
 
         // 3. 동기화 이후 현재 계약서 상태 저장
-        List<SiteContract> afterContracts = new ArrayList<>(site.getContracts());
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<SiteContract> afterContracts = new ArrayList<>(site.getContracts());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 4. 새롭게 추가된 계약서 감지
-        Set<Long> beforeIds = beforeContracts.stream()
+        final Set<Long> beforeIds = beforeContracts.stream()
                 .map(SiteContract::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (SiteContract after : afterContracts) {
+        for (final SiteContract after : afterContracts) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
         // 5. 기존 계약서 중 수정된 항목 감지
-        Map<Long, SiteContract> afterMap = afterContracts.stream()
+        final Map<Long, SiteContract> afterMap = afterContracts.stream()
                 .filter(c -> c.getId() != null)
                 .collect(Collectors.toMap(SiteContract::getId, c -> c));
 
-        for (SiteContract before : beforeContracts) {
+        for (final SiteContract before : beforeContracts) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            SiteContract after = afterMap.get(before.getId());
+            final SiteContract after = afterMap.get(before.getId());
 
             // 계약서 단위 변경 감지 (첨부파일은 포함되지 않음)
-            Diff diff = javers.compare(before, after);
+            final Diff diff = javers.compare(before, after);
 
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
 
             // 파일 추가 감지
-            List<SiteFile> beforeFiles = before.getFiles();
-            List<SiteFile> afterFiles = after.getFiles();
+            final List<SiteFile> beforeFiles = before.getFiles();
+            final List<SiteFile> afterFiles = after.getFiles();
 
-            Set<Long> beforeFileIds = beforeFiles.stream()
+            final Set<Long> beforeFileIds = beforeFiles.stream()
                     .map(SiteFile::getId)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
 
-            for (SiteFile afterFile : afterFiles) {
+            for (final SiteFile afterFile : afterFiles) {
                 if (afterFile.getId() == null || !beforeFileIds.contains(afterFile.getId())) {
                     allChanges.add(JaversUtils.extractAddedEntityChange(javers, afterFile));
                 }
@@ -138,15 +140,15 @@ public class SiteContractService {
         // 7. 변경된 이력이 있다면 SiteChangeHistory 엔티티로 저장
         if (!allChanges.isEmpty()) {
             // property가 "id"인 변경사항 제외
-            List<Map<String, String>> filteredChanges = allChanges.stream()
+            final List<Map<String, String>> filteredChanges = allChanges.stream()
                     .filter(change -> !"id".equals(change.get("property")))
                     .toList();
 
             if (!filteredChanges.isEmpty()) {
-                String json = javers.getJsonConverter().toJson(filteredChanges);
-                SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+                final String json = javers.getJsonConverter().toJson(filteredChanges);
+                final SiteChangeHistory changeHistory = SiteChangeHistory.builder()
                         .site(site)
-                        .type(SiteChangeType.CONTRACT)
+                        .type(SiteChangeHistoryType.CONTRACT)
                         .changes(json)
                         .build();
                 siteChangeHistoryRepository.save(changeHistory);
