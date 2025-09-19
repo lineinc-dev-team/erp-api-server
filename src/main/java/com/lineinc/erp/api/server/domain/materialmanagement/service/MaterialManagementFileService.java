@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
-import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeType;
+import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeHistoryType;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementFileUpdateRequest;
@@ -32,8 +32,8 @@ public class MaterialManagementFileService {
 
     @Transactional
     public void createMaterialFileManagement(
-            MaterialManagement materialManagement,
-            List<MaterialManagementFileCreateRequest> requests) {
+            final MaterialManagement materialManagement,
+            final List<MaterialManagementFileCreateRequest> requests) {
 
         if (requests == null || requests.isEmpty()) {
             return;
@@ -51,17 +51,17 @@ public class MaterialManagementFileService {
 
     @Transactional
     public void updateMaterialManagementFiles(
-            MaterialManagement materialManagement,
-            List<MaterialManagementFileUpdateRequest> requests) {
+            final MaterialManagement materialManagement,
+            final List<MaterialManagementFileUpdateRequest> requests) {
         // 변경 전 상태 저장 (Javers 스냅샷)
-        List<MaterialManagementFile> beforeFiles = materialManagement.getFiles().stream()
+        final List<MaterialManagementFile> beforeFiles = materialManagement.getFiles().stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, MaterialManagementFile.class))
                 .toList();
 
         EntitySyncUtils.syncList(
                 materialManagement.getFiles(),
                 requests,
-                (MaterialManagementFileUpdateRequest dto) -> MaterialManagementFile.builder()
+                (final MaterialManagementFileUpdateRequest dto) -> MaterialManagementFile.builder()
                         .materialManagement(materialManagement)
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
@@ -69,40 +69,40 @@ public class MaterialManagementFileService {
                         .build());
 
         // 변경사항 추적 및 수정이력 생성
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 파일
-        Set<Long> beforeIds = beforeFiles.stream()
+        final Set<Long> beforeIds = beforeFiles.stream()
                 .map(MaterialManagementFile::getId)
                 .filter(id -> id != null)
                 .collect(Collectors.toSet());
 
-        for (MaterialManagementFile after : materialManagement.getFiles()) {
+        for (final MaterialManagementFile after : materialManagement.getFiles()) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
         // 수정된 파일
-        Map<Long, MaterialManagementFile> afterMap = materialManagement.getFiles().stream()
+        final Map<Long, MaterialManagementFile> afterMap = materialManagement.getFiles().stream()
                 .filter(f -> f.getId() != null)
                 .collect(Collectors.toMap(MaterialManagementFile::getId, f -> f));
 
-        for (MaterialManagementFile before : beforeFiles) {
+        for (final MaterialManagementFile before : beforeFiles) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
-            MaterialManagementFile after = afterMap.get(before.getId());
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final MaterialManagementFile after = afterMap.get(before.getId());
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
         }
 
         // 변경사항이 있을 때만 수정이력 생성
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            MaterialManagementChangeHistory history = MaterialManagementChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final MaterialManagementChangeHistory history = MaterialManagementChangeHistory.builder()
                     .materialManagement(materialManagement)
-                    .type(MaterialManagementChangeType.ATTACHMENT)
+                    .type(MaterialManagementChangeHistoryType.ATTACHMENT)
                     .changes(json)
                     .build();
             changeHistoryRepository.save(history);

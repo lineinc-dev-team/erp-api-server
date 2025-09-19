@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementChangeHistory;
-import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeType;
+import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeHistoryType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -24,8 +24,8 @@ public record MaterialManagementChangeHistoryResponse(
 
         @Schema(description = "변경 유형", example = "기본정보") String type,
 
-        @Schema(description = "변경 유형 코드", example = "BASIC") MaterialManagementChangeType typeCode) {
-    public static MaterialManagementChangeHistoryResponse from(MaterialManagementChangeHistory history) {
+        @Schema(description = "변경 유형 코드", example = "BASIC") MaterialManagementChangeHistoryType typeCode) {
+    public static MaterialManagementChangeHistoryResponse from(final MaterialManagementChangeHistory history) {
         return new MaterialManagementChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),

@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementChangeHistory;
-import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeType;
+import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeHistoryType;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementDetailRepository;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
@@ -60,14 +60,14 @@ public class MaterialManagementService {
     private final MaterialManagementChangeHistoryRepository materialManagementChangeHistoryRepository;
 
     @Transactional
-    public void createMaterialManagement(MaterialManagementCreateRequest request) {
-        Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+    public void createMaterialManagement(final MaterialManagementCreateRequest request) {
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
-        MaterialManagement materialManagement = MaterialManagement.builder()
+        final MaterialManagement materialManagement = MaterialManagement.builder()
                 .site(site)
                 .siteProcess(siteProcess)
                 .inputType(request.inputType())
@@ -78,7 +78,7 @@ public class MaterialManagementService {
 
         // 외주업체 설정
         if (request.outsourcingCompanyId() != null) {
-            var outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
+            final var outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                             ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
             materialManagement.changeOutsourcingCompany(outsourcingCompany);
@@ -90,20 +90,20 @@ public class MaterialManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MaterialManagementResponse> getAllMaterialManagements(MaterialManagementListRequest request,
-            Pageable pageable) {
+    public Page<MaterialManagementResponse> getAllMaterialManagements(final MaterialManagementListRequest request,
+            final Pageable pageable) {
         return materialManagementRepository.findAll(request, pageable);
     }
 
     @Transactional
-    public void deleteMaterialManagements(DeleteMaterialManagementsRequest request) {
-        List<MaterialManagement> materialManagements = materialManagementRepository
+    public void deleteMaterialManagements(final DeleteMaterialManagementsRequest request) {
+        final List<MaterialManagement> materialManagements = materialManagementRepository
                 .findAllById(request.materialManagementIds());
         if (materialManagements.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND);
         }
 
-        for (MaterialManagement materialManagement : materialManagements) {
+        for (final MaterialManagement materialManagement : materialManagements) {
             materialManagement.markAsDeleted();
         }
 
@@ -111,8 +111,10 @@ public class MaterialManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(MaterialManagementListRequest request, Sort sort, List<String> fields) {
-        List<MaterialManagementResponse> responses = materialManagementRepository.findAllWithoutPaging(request, sort);
+    public Workbook downloadExcel(final MaterialManagementListRequest request, final Sort sort,
+            final List<String> fields) {
+        final List<MaterialManagementResponse> responses = materialManagementRepository.findAllWithoutPaging(request,
+                sort);
 
         return ExcelExportUtils.generateWorkbook(
                 responses,
@@ -121,7 +123,7 @@ public class MaterialManagementService {
                 this::getExcelCellValue);
     }
 
-    private String getExcelHeaderName(String field) {
+    private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "siteName" -> "현장명";
             case "processName" -> "공정명";
@@ -143,7 +145,7 @@ public class MaterialManagementService {
         };
     }
 
-    private String getExcelCellValue(MaterialManagementResponse materialManagement, String field) {
+    private String getExcelCellValue(final MaterialManagementResponse materialManagement, final String field) {
         return switch (field) {
             case "siteName" -> materialManagement.site() != null ? materialManagement.site().name() : "";
             case "processName" -> materialManagement.process() != null ? materialManagement.process().name() : "";
@@ -182,14 +184,15 @@ public class MaterialManagementService {
     }
 
     @Transactional(readOnly = true)
-    public MaterialManagementDetailViewResponse getMaterialManagementById(Long id) {
-        MaterialManagement materialManagement = materialManagementRepository.findById(id)
+    public MaterialManagementDetailViewResponse getMaterialManagementById(final Long id) {
+        final MaterialManagement materialManagement = materialManagementRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
         return MaterialManagementDetailViewResponse.from(materialManagement);
     }
 
-    public Slice<MaterialManagementNameResponse> getMaterialManagementNames(String keyword, Pageable pageable) {
+    public Slice<MaterialManagementNameResponse> getMaterialManagementNames(final String keyword,
+            final Pageable pageable) {
         Slice<Object[]> resultSlice;
 
         if (keyword == null || keyword.isBlank()) {
@@ -202,17 +205,17 @@ public class MaterialManagementService {
     }
 
     @Transactional
-    public void updateMaterialManagement(Long id, MaterialManagementUpdateRequest request) {
-        MaterialManagement materialManagement = materialManagementRepository.findById(id)
+    public void updateMaterialManagement(final Long id, final MaterialManagementUpdateRequest request) {
+        final MaterialManagement materialManagement = materialManagementRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
 
         // siteId가 null이면 기존 site 유지, 아니면 새로운 site 검증
-        Site site = request.siteId() != null ? siteService.getSiteByIdOrThrow(request.siteId())
+        final Site site = request.siteId() != null ? siteService.getSiteByIdOrThrow(request.siteId())
                 : materialManagement.getSite();
 
         // siteProcessId가 null이면 기존 siteProcess 유지, 아니면 새로운 siteProcess 검증
-        SiteProcess siteProcess = request.siteProcessId() != null
+        final SiteProcess siteProcess = request.siteProcessId() != null
                 ? siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId())
                 : materialManagement.getSiteProcess();
 
@@ -232,7 +235,7 @@ public class MaterialManagementService {
 
         materialManagement.syncTransientFields();
         // 변경 전 상태 저장 (Javers 스냅샷)
-        MaterialManagement oldSnapshot = JaversUtils.createSnapshot(javers, materialManagement,
+        final MaterialManagement oldSnapshot = JaversUtils.createSnapshot(javers, materialManagement,
                 MaterialManagement.class);
 
         // updateFrom 메서드에서 모든 필드 업데이트
@@ -249,22 +252,23 @@ public class MaterialManagementService {
         }
 
         // Javers를 사용하여 변경사항 추적
-        Diff diff = javers.compare(oldSnapshot, materialManagement);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        final Diff diff = javers.compare(oldSnapshot, materialManagement);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         // 변경사항이 있을 때만 수정이력 생성
         if (!simpleChanges.isEmpty()) {
-            MaterialManagementChangeHistory changeHistory = MaterialManagementChangeHistory.builder()
+            final MaterialManagementChangeHistory changeHistory = MaterialManagementChangeHistory.builder()
                     .materialManagement(materialManagement)
-                    .type(MaterialManagementChangeType.BASIC)
+                    .type(MaterialManagementChangeHistoryType.BASIC)
                     .changes(changesJson)
                     .build();
             changeHistoryRepository.save(changeHistory);
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (MaterialManagementUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+            for (final MaterialManagementUpdateRequest.ChangeHistoryRequest historyRequest : request
+                    .changeHistories()) {
                 materialManagementChangeHistoryRepository.findById(historyRequest.id())
                         .filter(history -> history.getMaterialManagement().getId().equals(materialManagement.getId()))
                         .ifPresent(history -> {
@@ -274,7 +278,7 @@ public class MaterialManagementService {
         }
     }
 
-    public MaterialManagement getMaterialManagementByIdOrThrow(Long materialManagementId) {
+    public MaterialManagement getMaterialManagementByIdOrThrow(final Long materialManagementId) {
         return materialManagementRepository.findById(materialManagementId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));

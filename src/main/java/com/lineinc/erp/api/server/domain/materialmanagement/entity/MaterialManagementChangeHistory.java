@@ -6,7 +6,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeType;
+import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeHistoryType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,7 +46,7 @@ public class MaterialManagementChangeHistory extends BaseEntity {
     @DiffInclude
     @Enumerated(EnumType.STRING)
     @Column
-    private MaterialManagementChangeType type;
+    private MaterialManagementChangeHistoryType type;
 
     @DiffInclude
     @JdbcTypeCode(SqlTypes.JSON)
