@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.managementcost.service;
+package com.lineinc.erp.api.server.domain.managementcost.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +32,11 @@ public class ManagementCostFileService {
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
     private final Javers javers;
 
-    public void createManagementCostFiles(List<ManagementCostFileCreateRequest> files, ManagementCost managementCost) {
+    public void createManagementCostFiles(final List<ManagementCostFileCreateRequest> files,
+            final ManagementCost managementCost) {
         if (files != null) {
-            for (ManagementCostFileCreateRequest fileReq : files) {
-                ManagementCostFile file = ManagementCostFile.builder()
+            for (final ManagementCostFileCreateRequest fileReq : files) {
+                final ManagementCostFile file = ManagementCostFile.builder()
                         .managementCost(managementCost)
                         .fileUrl(fileReq.fileUrl())
                         .originalFileName(fileReq.originalFileName())
@@ -47,11 +48,11 @@ public class ManagementCostFileService {
     }
 
     @Transactional
-    public void updateManagementCostFiles(ManagementCost managementCost,
-            List<ManagementCostFileUpdateRequest> requests) {
+    public void updateManagementCostFiles(final ManagementCost managementCost,
+            final List<ManagementCostFileUpdateRequest> requests) {
 
         // 변경 전 상태 저장 (Javers 스냅샷) - syncTransientFields 호출 후
-        List<ManagementCostFile> beforeFiles = managementCost.getFiles().stream()
+        final List<ManagementCostFile> beforeFiles = managementCost.getFiles().stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, ManagementCostFile.class))
                 .toList();
 
@@ -59,7 +60,7 @@ public class ManagementCostFileService {
         EntitySyncUtils.syncList(
                 managementCost.getFiles(),
                 requests,
-                (ManagementCostFileUpdateRequest dto) -> ManagementCostFile.builder()
+                (final ManagementCostFileUpdateRequest dto) -> ManagementCostFile.builder()
                         .managementCost(managementCost)
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
@@ -67,40 +68,40 @@ public class ManagementCostFileService {
                         .build());
 
         // 변경사항 감지 및 이력 저장
-        List<ManagementCostFile> afterFiles = new ArrayList<>(managementCost.getFiles());
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<ManagementCostFile> afterFiles = new ArrayList<>(managementCost.getFiles());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 파일
-        Set<Long> beforeIds = beforeFiles.stream()
+        final Set<Long> beforeIds = beforeFiles.stream()
                 .map(ManagementCostFile::getId)
                 .filter(id -> id != null)
                 .collect(Collectors.toSet());
 
-        for (ManagementCostFile after : afterFiles) {
+        for (final ManagementCostFile after : afterFiles) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
         // 수정된 파일
-        Map<Long, ManagementCostFile> afterMap = afterFiles.stream()
+        final Map<Long, ManagementCostFile> afterMap = afterFiles.stream()
                 .filter(f -> f.getId() != null)
                 .collect(Collectors.toMap(ManagementCostFile::getId, f -> f));
 
-        for (ManagementCostFile before : beforeFiles) {
+        for (final ManagementCostFile before : beforeFiles) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            ManagementCostFile after = afterMap.get(before.getId());
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final ManagementCostFile after = afterMap.get(before.getId());
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
         }
 
         // 변경사항이 있다면 이력 저장
         if (!allChanges.isEmpty()) {
-            String changesJson = javers.getJsonConverter().toJson(allChanges);
-            ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
                     .type(ManagementCostChangeHistoryType.ATTACHMENT)
                     .changes(changesJson)

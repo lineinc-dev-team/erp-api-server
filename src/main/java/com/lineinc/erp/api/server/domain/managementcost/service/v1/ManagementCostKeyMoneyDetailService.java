@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.managementcost.service;
+package com.lineinc.erp.api.server.domain.managementcost.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +34,11 @@ public class ManagementCostKeyMoneyDetailService {
     private final Javers javers;
 
     @Transactional
-    public void createManagementCostKeyMoneyDetails(ManagementCost managementCost,
-            List<ManagementCostKeyMoneyDetailCreateRequest> details) {
+    public void createManagementCostKeyMoneyDetails(final ManagementCost managementCost,
+            final List<ManagementCostKeyMoneyDetailCreateRequest> details) {
         if (details != null) {
-            for (ManagementCostKeyMoneyDetailCreateRequest detailReq : details) {
-                ManagementCostKeyMoneyDetail detail = ManagementCostKeyMoneyDetail.builder()
+            for (final ManagementCostKeyMoneyDetailCreateRequest detailReq : details) {
+                final ManagementCostKeyMoneyDetail detail = ManagementCostKeyMoneyDetail.builder()
                         .managementCost(managementCost)
                         .account(detailReq.account())
                         .purpose(detailReq.purpose())
@@ -52,11 +52,11 @@ public class ManagementCostKeyMoneyDetailService {
     }
 
     @Transactional
-    public void updateManagementCostKeyMoneyDetails(ManagementCost managementCost,
-            List<ManagementCostKeyMoneyDetailUpdateRequest> requests) {
+    public void updateManagementCostKeyMoneyDetails(final ManagementCost managementCost,
+            final List<ManagementCostKeyMoneyDetailUpdateRequest> requests) {
 
         // 수정 전 스냅샷 생성
-        List<ManagementCostKeyMoneyDetail> beforeDetails = managementCost.getKeyMoneyDetails().stream()
+        final List<ManagementCostKeyMoneyDetail> beforeDetails = managementCost.getKeyMoneyDetails().stream()
                 .map(detail -> JaversUtils.createSnapshot(javers, detail, ManagementCostKeyMoneyDetail.class))
                 .toList();
 
@@ -64,7 +64,7 @@ public class ManagementCostKeyMoneyDetailService {
         EntitySyncUtils.syncList(
                 managementCost.getKeyMoneyDetails(),
                 requests,
-                (ManagementCostKeyMoneyDetailUpdateRequest dto) -> ManagementCostKeyMoneyDetail.builder()
+                (final ManagementCostKeyMoneyDetailUpdateRequest dto) -> ManagementCostKeyMoneyDetail.builder()
                         .managementCost(managementCost)
                         .account(dto.account())
                         .purpose(dto.purpose())
@@ -74,39 +74,39 @@ public class ManagementCostKeyMoneyDetailService {
                         .build());
 
         // 변경 이력 추적 및 저장
-        List<ManagementCostKeyMoneyDetail> afterDetails = new ArrayList<>(managementCost.getKeyMoneyDetails());
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<ManagementCostKeyMoneyDetail> afterDetails = new ArrayList<>(managementCost.getKeyMoneyDetails());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 전도금 상세 항목
-        Set<Long> beforeIds = beforeDetails.stream()
+        final Set<Long> beforeIds = beforeDetails.stream()
                 .map(ManagementCostKeyMoneyDetail::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (ManagementCostKeyMoneyDetail after : afterDetails) {
+        for (final ManagementCostKeyMoneyDetail after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
         // 수정된 전도금 상세 항목
-        Map<Long, ManagementCostKeyMoneyDetail> afterMap = afterDetails.stream()
+        final Map<Long, ManagementCostKeyMoneyDetail> afterMap = afterDetails.stream()
                 .filter(d -> d.getId() != null)
                 .collect(Collectors.toMap(ManagementCostKeyMoneyDetail::getId, d -> d));
 
-        for (ManagementCostKeyMoneyDetail before : beforeDetails) {
+        for (final ManagementCostKeyMoneyDetail before : beforeDetails) {
             if (before.getId() != null && afterMap.containsKey(before.getId())) {
-                ManagementCostKeyMoneyDetail after = afterMap.get(before.getId());
-                Diff diff = javers.compare(before, after);
-                List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+                final ManagementCostKeyMoneyDetail after = afterMap.get(before.getId());
+                final Diff diff = javers.compare(before, after);
+                final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
                 allChanges.addAll(simpleChanges);
             }
         }
 
         // 변경 이력이 있으면 저장
         if (!allChanges.isEmpty()) {
-            String changesJson = javers.getJsonConverter().toJson(allChanges);
-            ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
                     .type(ManagementCostChangeHistoryType.KEY_MONEY_DETAIL)
                     .changes(changesJson)

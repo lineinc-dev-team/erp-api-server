@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
-import com.lineinc.erp.api.server.domain.managementcost.service.ManagementCostService;
+import com.lineinc.erp.api.server.domain.managementcost.service.v1.ManagementCostService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
