@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcing.service;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.service;
 
 import java.util.List;
 import java.util.Map;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingChangeType;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyChangeRepository;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingChangeHistory;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;

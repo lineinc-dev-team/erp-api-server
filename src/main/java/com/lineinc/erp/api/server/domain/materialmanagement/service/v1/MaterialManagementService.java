@@ -23,8 +23,8 @@ import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManage
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementDetailRepository;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;

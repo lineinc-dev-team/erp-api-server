@@ -1,17 +1,29 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractWorker;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo;
-
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractWorker;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -54,15 +66,15 @@ public class DailyReportOutsourcing extends BaseEntity {
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
-    public void updateFrom(OutsourcingUpdateInfo request) {
+    public void updateFrom(final OutsourcingUpdateInfo request) {
         Optional.ofNullable(request.category()).ifPresent(val -> this.category = val);
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 
-    public void setEntities(OutsourcingCompany outsourcingCompany,
-            OutsourcingCompanyContractWorker outsourcingCompanyContractWorker) {
+    public void setEntities(final OutsourcingCompany outsourcingCompany,
+            final OutsourcingCompanyContractWorker outsourcingCompanyContractWorker) {
         this.outsourcingCompany = outsourcingCompany;
         this.outsourcingCompanyContractWorker = outsourcingCompanyContractWorker;
     }

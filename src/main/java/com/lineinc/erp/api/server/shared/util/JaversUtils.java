@@ -28,8 +28,8 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKey
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractContact;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;

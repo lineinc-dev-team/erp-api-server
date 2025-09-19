@@ -2,13 +2,13 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 등록 요청")
 public record OutsourcingCompanyCreateRequest(

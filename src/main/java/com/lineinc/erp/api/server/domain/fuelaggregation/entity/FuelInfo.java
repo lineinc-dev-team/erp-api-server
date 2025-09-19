@@ -8,7 +8,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest.FuelInfoUpdateRequest;
@@ -139,7 +139,7 @@ public class FuelInfo extends BaseEntity {
         this.vehicleNumber = this.equipment != null ? this.equipment.getVehicleNumber() : null;
     }
 
-    public void updateFrom(FuelInfoUpdateRequest request) {
+    public void updateFrom(final FuelInfoUpdateRequest request) {
         // ID만 저장
         this.outsourcingCompanyId = request.outsourcingCompanyId();
         this.driverId = request.driverId();
@@ -152,9 +152,9 @@ public class FuelInfo extends BaseEntity {
     }
 
     // ID로부터 실제 엔티티를 설정하는 메서드 (별도로 호출)
-    public void setEntities(OutsourcingCompany outsourcingCompany,
-            OutsourcingCompanyContractDriver driver,
-            OutsourcingCompanyContractEquipment equipment) {
+    public void setEntities(final OutsourcingCompany outsourcingCompany,
+            final OutsourcingCompanyContractDriver driver,
+            final OutsourcingCompanyContractEquipment equipment) {
         this.outsourcingCompany = outsourcingCompany;
         this.driver = driver;
         this.equipment = equipment;

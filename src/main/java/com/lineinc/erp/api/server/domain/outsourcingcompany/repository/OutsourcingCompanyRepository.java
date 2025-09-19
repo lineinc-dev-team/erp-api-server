@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcing.repository;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 
 public interface OutsourcingCompanyRepository
         extends JpaRepository<OutsourcingCompany, Long>, OutsourcingCompanyRepositoryCustom {

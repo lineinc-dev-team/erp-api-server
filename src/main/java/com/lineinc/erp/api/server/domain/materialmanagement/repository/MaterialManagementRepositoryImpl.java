@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;

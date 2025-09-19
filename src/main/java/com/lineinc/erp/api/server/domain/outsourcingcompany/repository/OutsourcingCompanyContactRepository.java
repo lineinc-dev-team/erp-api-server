@@ -1,7 +1,8 @@
-package com.lineinc.erp.api.server.domain.outsourcing.repository;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.repository;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
 
 public interface OutsourcingCompanyContactRepository extends JpaRepository<OutsourcingCompanyContact, Long> {
 }

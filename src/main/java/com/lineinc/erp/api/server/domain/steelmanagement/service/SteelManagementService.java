@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
@@ -62,9 +62,9 @@ public class SteelManagementService {
     private final Javers javers;
 
     @Transactional
-    public void createSteelManagement(SteelManagementCreateRequest request) {
-        Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+    public void createSteelManagement(final SteelManagementCreateRequest request) {
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
@@ -94,25 +94,27 @@ public class SteelManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Page<SteelManagementResponse> getSteelManagementList(SteelManagementListRequest request, Pageable pageable) {
+    public Page<SteelManagementResponse> getSteelManagementList(final SteelManagementListRequest request,
+            final Pageable pageable) {
         return steelManagementRepository.findAll(request, pageable);
     }
 
     @Transactional
-    public void deleteSteelManagements(DeleteSteelManagementRequest request) {
-        List<SteelManagement> steelManagements = steelManagementRepository.findAllById(request.steelManagementIds());
+    public void deleteSteelManagements(final DeleteSteelManagementRequest request) {
+        final List<SteelManagement> steelManagements = steelManagementRepository
+                .findAllById(request.steelManagementIds());
         if (steelManagements.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);
         }
 
-        for (SteelManagement steelManagement : steelManagements) {
+        for (final SteelManagement steelManagement : steelManagements) {
             steelManagement.markAsDeleted();
         }
 
         steelManagementRepository.saveAll(steelManagements);
     }
 
-    private void validateCreatableSteelType(SteelManagementType type) {
+    private void validateCreatableSteelType(final SteelManagementType type) {
         if (!(type == SteelManagementType.ORDER
                 || type == SteelManagementType.PURCHASE
                 || type == SteelManagementType.LEASE)) {
@@ -121,13 +123,14 @@ public class SteelManagementService {
     }
 
     @Transactional
-    public void approveSteelManagements(ApproveSteelManagementRequest request) {
-        List<SteelManagement> steelManagements = steelManagementRepository.findAllById(request.steelManagementIds());
+    public void approveSteelManagements(final ApproveSteelManagementRequest request) {
+        final List<SteelManagement> steelManagements = steelManagementRepository
+                .findAllById(request.steelManagementIds());
         if (steelManagements.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);
         }
 
-        for (SteelManagement steelManagement : steelManagements) {
+        for (final SteelManagement steelManagement : steelManagements) {
             if (steelManagement.getType() == SteelManagementType.RELEASE) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ValidationMessages.CANNOT_APPROVE_RELEASED_STEEL);
@@ -139,13 +142,14 @@ public class SteelManagementService {
     }
 
     @Transactional
-    public void releaseSteelManagements(ReleaseSteelManagementRequest request) {
-        List<SteelManagement> steelManagements = steelManagementRepository.findAllById(request.steelManagementIds());
+    public void releaseSteelManagements(final ReleaseSteelManagementRequest request) {
+        final List<SteelManagement> steelManagements = steelManagementRepository
+                .findAllById(request.steelManagementIds());
         if (steelManagements.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);
         }
 
-        for (SteelManagement steelManagement : steelManagements) {
+        for (final SteelManagement steelManagement : steelManagements) {
             if (steelManagement.getType() != SteelManagementType.APPROVAL) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ValidationMessages.CANNOT_RELEASE_NON_APPROVED_STEEL);
@@ -157,8 +161,9 @@ public class SteelManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(SteelManagementListRequest request, Sort sort, List<String> fields) {
-        List<SteelManagementResponse> steelManagementResponses = steelManagementRepository
+    public Workbook downloadExcel(final SteelManagementListRequest request, final Sort sort,
+            final List<String> fields) {
+        final List<SteelManagementResponse> steelManagementResponses = steelManagementRepository
                 .findAllWithoutPaging(request, sort)
                 .stream()
                 .map(SteelManagementResponse::from)
@@ -171,7 +176,7 @@ public class SteelManagementService {
                 this::getExcelCellValue);
     }
 
-    private String getExcelHeaderName(String field) {
+    private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "id" -> "No.";
             case "siteName" -> "현장명";
@@ -189,7 +194,7 @@ public class SteelManagementService {
         };
     }
 
-    private String getExcelCellValue(SteelManagementResponse steelManagement, String field) {
+    private String getExcelCellValue(final SteelManagementResponse steelManagement, final String field) {
         return switch (field) {
             case "id" -> String.valueOf(steelManagement.id());
             case "siteName" -> steelManagement.site().name();
@@ -205,10 +210,10 @@ public class SteelManagementService {
                     ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.releaseDate())
                     : "";
             case "startDateAndEndDate" -> {
-                String startDate = steelManagement.startDate() != null
+                final String startDate = steelManagement.startDate() != null
                         ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.startDate())
                         : "";
-                String endDate = steelManagement.endDate() != null
+                final String endDate = steelManagement.endDate() != null
                         ? DateTimeFormatUtils.formatKoreaLocalDate(steelManagement.endDate())
                         : "";
                 yield startDate + " ~ " + endDate;
@@ -230,14 +235,14 @@ public class SteelManagementService {
     }
 
     @Transactional(readOnly = true)
-    public SteelManagementDetailViewResponse getSteelManagementById(Long siteId) {
-        SteelManagement steelManagement = steelManagementRepository.findById(siteId)
+    public SteelManagementDetailViewResponse getSteelManagementById(final Long siteId) {
+        final SteelManagement steelManagement = steelManagementRepository.findById(siteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
         return SteelManagementDetailViewResponse.from(steelManagement);
     }
 
-    public Slice<SteelManagementNameResponse> getSteelManagementNames(String keyword, Pageable pageable) {
+    public Slice<SteelManagementNameResponse> getSteelManagementNames(final String keyword, final Pageable pageable) {
         Slice<Object[]> resultSlice;
 
         if (keyword == null || keyword.isBlank()) {
@@ -250,8 +255,8 @@ public class SteelManagementService {
     }
 
     @Transactional
-    public void updateSteelManagement(Long id, SteelManagementUpdateRequest request) {
-        SteelManagement steelManagement = steelManagementRepository.findById(id)
+    public void updateSteelManagement(final Long id, final SteelManagementUpdateRequest request) {
+        final SteelManagement steelManagement = steelManagementRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
 
@@ -275,19 +280,19 @@ public class SteelManagementService {
         }
 
         steelManagement.syncTransientFields();
-        SteelManagement oldSnapshot = JaversUtils.createSnapshot(javers, steelManagement, SteelManagement.class);
+        final SteelManagement oldSnapshot = JaversUtils.createSnapshot(javers, steelManagement, SteelManagement.class);
 
         steelManagement.updateFrom(request, site, siteProcess, outsourcingCompany);
         steelManagementRepository.save(steelManagement);
 
-        Diff diff = javers.compare(oldSnapshot, steelManagement);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final Diff diff = javers.compare(oldSnapshot, steelManagement);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
 
         // outsourcingCompanyName 변경사항 분리
-        List<Map<String, String>> outsourcingChanges = new ArrayList<>();
-        List<Map<String, String>> otherChanges = new ArrayList<>();
+        final List<Map<String, String>> outsourcingChanges = new ArrayList<>();
+        final List<Map<String, String>> otherChanges = new ArrayList<>();
 
-        for (Map<String, String> change : simpleChanges) {
+        for (final Map<String, String> change : simpleChanges) {
             if ("outsourcingCompanyName".equals(change.get("property"))) {
                 outsourcingChanges.add(change);
             } else {
@@ -297,8 +302,8 @@ public class SteelManagementService {
 
         // 기본 변경사항 저장 (outsourcingCompanyName 제외)
         if (!otherChanges.isEmpty()) {
-            String otherChangesJson = javers.getJsonConverter().toJson(otherChanges);
-            SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
+            final String otherChangesJson = javers.getJsonConverter().toJson(otherChanges);
+            final SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
                     .steelManagement(steelManagement)
                     .type(SteelManagementChangeHistoryType.BASIC)
                     .changes(otherChangesJson)
@@ -308,8 +313,8 @@ public class SteelManagementService {
 
         // 외주업체 변경사항 별도 저장
         if (!outsourcingChanges.isEmpty()) {
-            String outsourcingChangesJson = javers.getJsonConverter().toJson(outsourcingChanges);
-            SteelManagementChangeHistory outsourcingChangeHistory = SteelManagementChangeHistory.builder()
+            final String outsourcingChangesJson = javers.getJsonConverter().toJson(outsourcingChanges);
+            final SteelManagementChangeHistory outsourcingChangeHistory = SteelManagementChangeHistory.builder()
                     .steelManagement(steelManagement)
                     .type(SteelManagementChangeHistoryType.OUTSOURCING_COMPANY)
                     .changes(outsourcingChangesJson)
@@ -319,7 +324,7 @@ public class SteelManagementService {
 
         if (request.changeHistories() != null &&
                 !request.changeHistories().isEmpty()) {
-            for (SteelManagementUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+            for (final SteelManagementUpdateRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
                 steelManagementChangeHistoryRepository.findById(historyRequest.id())
                         .filter(history -> history.getSteelManagement().getId().equals(steelManagement.getId()))
                         .ifPresent(history -> {
@@ -332,7 +337,7 @@ public class SteelManagementService {
         steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files());
     }
 
-    public SteelManagement getSteelManagementByIdOrThrow(Long steelManagementId) {
+    public SteelManagement getSteelManagementByIdOrThrow(final Long steelManagementId) {
         return steelManagementRepository.findById(steelManagementId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));

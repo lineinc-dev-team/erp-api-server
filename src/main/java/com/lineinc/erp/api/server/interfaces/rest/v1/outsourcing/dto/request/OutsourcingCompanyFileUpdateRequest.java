@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyFileType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyFileType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

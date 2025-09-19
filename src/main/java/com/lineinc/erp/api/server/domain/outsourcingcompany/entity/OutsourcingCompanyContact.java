@@ -1,14 +1,30 @@
-package com.lineinc.erp.api.server.domain.outsourcing.entity;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.entity;
+
+import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactUpdateRequest;
-import jakarta.persistence.*;
-import lombok.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
 
 @Entity
 @Getter
@@ -87,7 +103,7 @@ public class OutsourcingCompanyContact extends BaseEntity
     private Boolean isMain = false;
 
     @Override
-    public void updateFrom(OutsourcingCompanyContactUpdateRequest request) {
+    public void updateFrom(final OutsourcingCompanyContactUpdateRequest request) {
         this.name = request.name();
         this.department = request.department();
         this.position = request.position();

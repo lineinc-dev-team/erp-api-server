@@ -1,14 +1,14 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 상세 응답")
 public record CompanyDetailResponse(
@@ -55,7 +55,7 @@ public record CompanyDetailResponse(
         @Schema(description = "담당자 목록") List<CompanyContactResponse> contacts,
 
         @Schema(description = "파일 목록") List<CompanyFileResponse> files) {
-    public static CompanyDetailResponse from(OutsourcingCompany company) {
+    public static CompanyDetailResponse from(final OutsourcingCompany company) {
         return new CompanyDetailResponse(
                 company.getId(),
                 company.getName(),

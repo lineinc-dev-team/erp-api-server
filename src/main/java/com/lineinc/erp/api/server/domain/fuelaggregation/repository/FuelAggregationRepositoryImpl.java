@@ -16,7 +16,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.QFuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.QFuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.QOutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.QOutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcing.repository;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.repository;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -12,9 +12,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompanyContact;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompanyContact;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;

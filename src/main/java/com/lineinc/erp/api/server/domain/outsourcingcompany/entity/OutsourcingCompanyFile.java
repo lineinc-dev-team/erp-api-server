@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcing.entity;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.entity;
 
 import java.util.Optional;
 
@@ -8,7 +8,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyFileType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
 
 import jakarta.persistence.Column;
@@ -93,7 +93,7 @@ public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<
     private String memo; // 비고 / 메모
 
     @Override
-    public void updateFrom(OutsourcingCompanyFileUpdateRequest request) {
+    public void updateFrom(final OutsourcingCompanyFileUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);

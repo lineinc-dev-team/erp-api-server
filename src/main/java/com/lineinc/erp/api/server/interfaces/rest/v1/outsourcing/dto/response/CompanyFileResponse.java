@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyFileType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyFile;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyFileType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -20,7 +20,7 @@ public record CompanyFileResponse(
         @Schema(description = "파일 타입 코드") OutsourcingCompanyFileType typeCode,
 
         @Schema(description = "비고") String memo) {
-    public static CompanyFileResponse from(OutsourcingCompanyFile file) {
+    public static CompanyFileResponse from(final OutsourcingCompanyFile file) {
         return new CompanyFileResponse(
                 file.getId(),
                 file.getName(),

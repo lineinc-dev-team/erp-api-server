@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcing.enums;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,10 @@ public enum OutsourcingCompanyDefaultDeductionsType {
 
     private final String label;
 
-    public static String safeLabelOf(String name) {
+    public static String safeLabelOf(final String name) {
         try {
             return OutsourcingCompanyDefaultDeductionsType.valueOf(name).getLabel();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return name;
         }
     }

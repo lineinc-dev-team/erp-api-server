@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcing.enums;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

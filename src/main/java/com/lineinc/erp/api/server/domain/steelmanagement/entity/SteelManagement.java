@@ -9,7 +9,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
@@ -190,8 +190,8 @@ public class SteelManagement extends BaseEntity {
                 : null;
     }
 
-    public void updateFrom(SteelManagementUpdateRequest request, Site site, SiteProcess siteProcess,
-            OutsourcingCompany outsourcingCompany) {
+    public void updateFrom(final SteelManagementUpdateRequest request, final Site site, final SiteProcess siteProcess,
+            final OutsourcingCompany outsourcingCompany) {
         Optional.ofNullable(site).ifPresent(val -> this.site = val);
         Optional.ofNullable(siteProcess).ifPresent(val -> this.siteProcess = val);
         Optional.ofNullable(outsourcingCompany).ifPresent(val -> this.outsourcingCompany = val);
@@ -207,7 +207,7 @@ public class SteelManagement extends BaseEntity {
         syncTransientFields();
     }
 
-    public void changeType(SteelManagementType newType) {
+    public void changeType(final SteelManagementType newType) {
         // 반출 상태로 변경할 때는 previousType을 변경하지 않음
         if (newType != SteelManagementType.RELEASE && this.type != null && !this.type.equals(newType)) {
             this.previousType = this.type;

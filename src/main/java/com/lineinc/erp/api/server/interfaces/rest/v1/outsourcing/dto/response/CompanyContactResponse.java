@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractContact;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +27,7 @@ public record CompanyContactResponse(
         @Schema(description = "대표 담당자 여부", example = "true") Boolean isMain
 
 ) {
-    public static CompanyContactResponse from(OutsourcingCompanyContact contact) {
+    public static CompanyContactResponse from(final OutsourcingCompanyContact contact) {
         return new CompanyContactResponse(
                 contact.getId(),
                 contact.getName(),
@@ -40,7 +40,7 @@ public record CompanyContactResponse(
                 contact.getIsMain());
     }
 
-    public static CompanyContactResponse from(OutsourcingCompanyContractContact contact) {
+    public static CompanyContactResponse from(final OutsourcingCompanyContractContact contact) {
         return new CompanyContactResponse(
                 contact.getId(),
                 contact.getName(),

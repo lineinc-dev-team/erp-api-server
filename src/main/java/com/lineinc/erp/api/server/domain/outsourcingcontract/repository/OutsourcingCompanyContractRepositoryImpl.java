@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.domain.outsourcingcontract.repository;
 
-import static com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany.outsourcingCompany;
+import static com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany.outsourcingCompany;
 import static com.lineinc.erp.api.server.domain.outsourcingcontract.entity.QOutsourcingCompanyContract.outsourcingCompanyContract;
 import static com.lineinc.erp.api.server.domain.outsourcingcontract.entity.QOutsourcingCompanyContractContact.outsourcingCompanyContractContact;
 import static com.lineinc.erp.api.server.domain.site.entity.QSite.site;

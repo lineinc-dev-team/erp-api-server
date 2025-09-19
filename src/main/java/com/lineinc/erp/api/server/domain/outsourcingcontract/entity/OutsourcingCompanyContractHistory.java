@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.outsourcingcontract.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

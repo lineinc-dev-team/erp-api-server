@@ -1,14 +1,14 @@
-package com.lineinc.erp.api.server.domain.outsourcing.repository;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.repository;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.List;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 
 public interface OutsourcingCompanyRepositoryCustom {
 
@@ -17,14 +17,12 @@ public interface OutsourcingCompanyRepositoryCustom {
      */
     Page<CompanyResponse> findAll(
             OutsourcingCompanyListRequest request,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     /**
      * 엑셀 다운로드용 - 페이지네이션 없이 발주처 목록 전체 조회
      */
     List<OutsourcingCompany> findAllWithoutPaging(
             OutsourcingCompanyListRequest request,
-            Sort sort
-    );
+            Sort sort);
 }

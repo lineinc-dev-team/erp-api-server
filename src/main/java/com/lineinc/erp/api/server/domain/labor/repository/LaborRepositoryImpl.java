@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.entity.QLabor;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.QOutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborListResponse;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;

@@ -1,14 +1,15 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 목록 응답")
 public record CompanyResponse(
@@ -53,7 +54,7 @@ public record CompanyResponse(
         @Schema(description = "담당자 목록") List<CompanyContactResponse> contacts
 
 ) {
-    public static CompanyResponse from(OutsourcingCompany company) {
+    public static CompanyResponse from(final OutsourcingCompany company) {
         return new CompanyResponse(
                 company.getId(),
                 company.getName(),
@@ -102,7 +103,7 @@ public record CompanyResponse(
 
             @Schema(description = "예금주", example = "홍길동") String accountHolder,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
-        public static CompanyResponse.CompanySimpleResponse from(OutsourcingCompany company) {
+        public static CompanyResponse.CompanySimpleResponse from(final OutsourcingCompany company) {
             return new CompanyResponse.CompanySimpleResponse(
                     company.getId(),
                     company.getName(),
