@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.site.service;
+package com.lineinc.erp.api.server.domain.site.service.v1;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class SiteProcessService {
     private final Javers javers;
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
-    public void createProcess(Site site, CreateSiteProcessRequest request) {
+    public void createProcess(final Site site, final CreateSiteProcessRequest request) {
         siteProcessRepository.save(SiteProcess.builder()
                 .site(site)
                 .name(request.name())
@@ -48,21 +48,21 @@ public class SiteProcessService {
                 .build());
     }
 
-    public void updateProcess(Site site, UpdateSiteProcessRequest request) {
-        SiteProcess siteProcess = site.getProcesses().get(0);
-        User user = userService.getUserByIdOrThrow(request.managerId());
+    public void updateProcess(final Site site, final UpdateSiteProcessRequest request) {
+        final SiteProcess siteProcess = site.getProcesses().get(0);
+        final User user = userService.getUserByIdOrThrow(request.managerId());
 
         siteProcess.syncTransientFields();
-        SiteProcess oldSnapshot = JaversUtils.createSnapshot(javers, siteProcess, SiteProcess.class);
+        final SiteProcess oldSnapshot = JaversUtils.createSnapshot(javers, siteProcess, SiteProcess.class);
         siteProcess.updateFrom(request, user);
         siteProcessRepository.save(siteProcess);
 
-        Diff diff = javers.compare(oldSnapshot, siteProcess);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        final Diff diff = javers.compare(oldSnapshot, siteProcess);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+            final SiteChangeHistory changeHistory = SiteChangeHistory.builder()
                     .site(site)
                     .type(SiteChangeHistoryType.PROCESS)
                     .changes(changesJson)
@@ -71,16 +71,17 @@ public class SiteProcessService {
         }
     }
 
-    public SiteProcess getSiteProcessByIdOrThrow(Long id) {
+    public SiteProcess getSiteProcessByIdOrThrow(final Long id) {
         return siteProcessRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.SITE_PROCESS_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(Long siteId, String keyword,
-            Pageable pageable) {
-        String searchKeyword = (keyword != null && !keyword.isBlank()) ? keyword : null;
+    public Slice<SiteProcessResponse.SiteProcessSimpleResponse> searchSiteProcessByName(final Long siteId,
+            final String keyword,
+            final Pageable pageable) {
+        final String searchKeyword = (keyword != null && !keyword.isBlank()) ? keyword : null;
         return siteProcessRepository.findBySiteIdAndKeyword(siteId, searchKeyword, pageable)
                 .map(SiteProcessResponse.SiteProcessSimpleResponse::from);
     }

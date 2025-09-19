@@ -22,8 +22,8 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
-import com.lineinc.erp.api.server.domain.site.service.SiteService;
+import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
+import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeHistoryType;

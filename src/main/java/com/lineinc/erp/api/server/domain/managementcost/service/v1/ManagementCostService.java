@@ -36,8 +36,8 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.Outsourci
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
-import com.lineinc.erp.api.server.domain.site.service.SiteService;
+import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
+import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;

@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.site.service;
+package com.lineinc.erp.api.server.domain.site.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;

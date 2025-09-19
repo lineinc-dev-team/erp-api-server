@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
+import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -37,11 +37,11 @@ public class SiteProcessController {
     })
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<SiteProcessResponse.SiteProcessSimpleResponse>>> searchSiteProcessByKeyword(
-            @Valid SortRequest sortRequest,
-            @Valid PageRequest pageRequest,
-            @RequestParam(required = false) Long siteId,
-            @RequestParam(required = false) String keyword) {
-        Slice<SiteProcessResponse.SiteProcessSimpleResponse> slice = siteProcessService.searchSiteProcessByName(
+            @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest,
+            @RequestParam(required = false) final Long siteId,
+            @RequestParam(required = false) final String keyword) {
+        final Slice<SiteProcessResponse.SiteProcessSimpleResponse> slice = siteProcessService.searchSiteProcessByName(
                 siteId,
                 keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
