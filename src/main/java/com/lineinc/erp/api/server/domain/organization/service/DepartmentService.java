@@ -1,15 +1,17 @@
 package com.lineinc.erp.api.server.domain.organization.service;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.repository.DepartmentRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.organization.dto.response.DepartmentResponse;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +21,9 @@ public class DepartmentService {
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getAllDepartments() {
-        List<Department> departments = departmentRepository.findAll();
+        final List<Department> departments = departmentRepository.findAll();
         return departments.stream()
+                .sorted(Comparator.comparing(Department::getId))
                 .map(dept -> new DepartmentResponse(dept.getId(), dept.getName()))
                 .collect(Collectors.toList());
     }

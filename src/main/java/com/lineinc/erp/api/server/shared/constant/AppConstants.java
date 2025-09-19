@@ -62,9 +62,13 @@ public final class AppConstants {
     public static final String POSITION_HEAD = "실장";
 
     // 부서(Department) 관련 상수
-    public static final String DEPT_SUPPORT = "경영지원팀";
-    public static final String DEPT_DEVELOPMENT = "개발팀";
-    public static final String DEPT_SALES = "영업팀";
+    public static final String DEPT_CEO = "대표이사";
+    public static final String DEPT_LEGAL_AUDIT = "법무감사실";
+    public static final String DEPT_MANAGEMENT = "관리부";
+    public static final String DEPT_MATERIAL_PURCHASING = "자재 외주구매";
+    public static final String DEPT_ENGINEERING = "공무부";
+    public static final String DEPT_CIVIL_ENGINEERING = "토목공사팀";
+    public static final String DEPT_DUSON_INTERNATIONAL = "두손인터내셔널";
 
     // 직급 전체 목록 (직급 순서대로)
     public static final List<String> GRADE_NAMES = List.of(
@@ -87,7 +91,14 @@ public final class AppConstants {
             POSITION_HEAD);
 
     // 부서 전체 목록
-    public static final List<String> DEPARTMENT_NAMES = List.of(DEPT_SUPPORT, DEPT_DEVELOPMENT, DEPT_SALES);
+    public static final List<String> DEPARTMENT_NAMES = List.of(
+            DEPT_CEO,
+            DEPT_LEGAL_AUDIT,
+            DEPT_MANAGEMENT,
+            DEPT_MATERIAL_PURCHASING,
+            DEPT_ENGINEERING,
+            DEPT_CIVIL_ENGINEERING,
+            DEPT_DUSON_INTERNATIONAL);
 
     // 시간 관련 상수
     public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
