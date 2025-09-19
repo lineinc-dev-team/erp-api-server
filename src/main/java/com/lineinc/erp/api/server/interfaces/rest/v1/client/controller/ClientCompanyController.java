@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.controller;
 
-import static com.lineinc.erp.api.server.shared.constant.AppConstants.*;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_ACCOUNT;
+import static com.lineinc.erp.api.server.shared.constant.AppConstants.MENU_CLIENT_COMPANY;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,8 +57,8 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(API_V1_CLIENT_COMPANIES)
-@Tag(name = SWAGGER_V1_TAG_CLIENT_COMPANY)
+@RequestMapping("/api/v1/client-companies")
+@Tag(name = "발주처 관련 API")
 public class ClientCompanyController extends BaseController {
 
     private final CompanyService companyService;
@@ -129,7 +130,7 @@ public class ClientCompanyController extends BaseController {
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 DownloadFieldUtils.parseFields(companyDownloadRequest.fields()))) {
-            ResponseHeaderUtils.setExcelDownloadHeader(response, EXCEL_FILENAME_CLIENT_COMPANIES);
+            ResponseHeaderUtils.setExcelDownloadHeader(response, "발주처 목록.xlsx");
             workbook.write(response.getOutputStream());
         }
     }

@@ -4,6 +4,9 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class AppConstants {
     // 권한 그룹명 관련 상수
     public static final String ROLE_ADMIN_NAME = "전체권한";
@@ -114,18 +117,6 @@ public final class AppConstants {
 
     public static final String CLIENT_COMPANY_ID = "client_company_id";
 
-    // API 경로 관련 상수
-    public static final String API_V1_CLIENT_COMPANIES = "/api/v1/client-companies";
-
-    // Swagger 문서화 관련 상수
-    public static final String SWAGGER_V1_TAG_CLIENT_COMPANY = "발주처 관련 V1 API";
-
-    // 엑셀 다운로드 파일명 관련 상수
-    public static final String EXCEL_FILENAME_CLIENT_COMPANIES = "발주처 목록.xlsx";
-
     // 빈 값 상수
     public static final String EMPTY_VALUE = "";
-
-    private AppConstants() {
-    } // 인스턴스화 방지
 }
