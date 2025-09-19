@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.menu.service.MenuService;
+import com.lineinc.erp.api.server.domain.menu.service.v1.MenuService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.menu.dto.response.MenuWithPermissionsResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
@@ -31,7 +31,7 @@ public class MenuController {
     })
     @GetMapping("/permissions")
     public ResponseEntity<SuccessResponse<List<MenuWithPermissionsResponse>>> getMenusWithPermissions() {
-        List<MenuWithPermissionsResponse> responseList = menuService.getMenusWithPermissions();
+        final List<MenuWithPermissionsResponse> responseList = menuService.getMenusWithPermissions();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 

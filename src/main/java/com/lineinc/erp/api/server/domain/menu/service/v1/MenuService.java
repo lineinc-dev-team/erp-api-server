@@ -1,13 +1,14 @@
-package com.lineinc.erp.api.server.domain.menu.service;
+package com.lineinc.erp.api.server.domain.menu.service.v1;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
 
 import com.lineinc.erp.api.server.domain.menu.repository.MenuRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.menu.dto.response.MenuWithPermissionsResponse;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
