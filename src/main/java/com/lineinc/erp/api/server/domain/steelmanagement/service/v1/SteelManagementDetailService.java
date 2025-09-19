@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.steelmanagement.service;
+package com.lineinc.erp.api.server.domain.steelmanagement.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +33,13 @@ public class SteelManagementDetailService {
     private final Javers javers;
 
     @Transactional
-    public void createSteelManagementDetail(SteelManagement steelManagement,
-            List<SteelManagementDetailCreateRequest> requests) {
+    public void createSteelManagementDetail(final SteelManagement steelManagement,
+            final List<SteelManagementDetailCreateRequest> requests) {
         if (requests == null || requests.isEmpty()) {
             return;
         }
 
-        List<SteelManagementDetail> details = requests.stream()
+        final List<SteelManagementDetail> details = requests.stream()
                 .map(request -> SteelManagementDetail.builder()
                         .steelManagement(steelManagement)
                         .standard(request.standard())
@@ -60,17 +60,17 @@ public class SteelManagementDetailService {
     }
 
     @Transactional
-    public void updateSteelManagementDetails(SteelManagement steelManagement,
-            List<SteelManagementDetailUpdateRequest> requests) {
+    public void updateSteelManagementDetails(final SteelManagement steelManagement,
+            final List<SteelManagementDetailUpdateRequest> requests) {
         // 1. 현재 상세 목록을 복사해 변경 전 상태(snapshot) 보관
-        List<SteelManagementDetail> beforeDetails = steelManagement.getDetails().stream()
+        final List<SteelManagementDetail> beforeDetails = steelManagement.getDetails().stream()
                 .map(detail -> JaversUtils.createSnapshot(javers, detail, SteelManagementDetail.class))
                 .toList();
 
         EntitySyncUtils.syncList(
                 steelManagement.getDetails(),
                 requests,
-                (SteelManagementDetailUpdateRequest dto) -> SteelManagementDetail.builder()
+                (final SteelManagementDetailUpdateRequest dto) -> SteelManagementDetail.builder()
                         .steelManagement(steelManagement)
                         .standard(dto.standard())
                         .name(dto.name())
@@ -86,40 +86,40 @@ public class SteelManagementDetailService {
                         .build());
 
         // 2. 변경 후 상태와 비교하여 변경 이력 생성
-        List<SteelManagementDetail> afterDetails = new ArrayList<>(steelManagement.getDetails());
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<SteelManagementDetail> afterDetails = new ArrayList<>(steelManagement.getDetails());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 상세 항목
-        Set<Long> beforeIds = beforeDetails.stream()
+        final Set<Long> beforeIds = beforeDetails.stream()
                 .map(SteelManagementDetail::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (SteelManagementDetail after : afterDetails) {
+        for (final SteelManagementDetail after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
         // 수정된 상세 항목
-        Map<Long, SteelManagementDetail> afterMap = afterDetails.stream()
+        final Map<Long, SteelManagementDetail> afterMap = afterDetails.stream()
                 .filter(d -> d.getId() != null)
                 .collect(Collectors.toMap(SteelManagementDetail::getId, d -> d));
 
-        for (SteelManagementDetail before : beforeDetails) {
+        for (final SteelManagementDetail before : beforeDetails) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            SteelManagementDetail after = afterMap.get(before.getId());
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final SteelManagementDetail after = afterMap.get(before.getId());
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
         }
 
         // 3. 변경된 이력이 있다면 SteelManagementChangeHistory 엔티티로 저장
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
                     .steelManagement(steelManagement)
                     .type(SteelManagementChangeHistoryType.DETAIL)
                     .changes(json)

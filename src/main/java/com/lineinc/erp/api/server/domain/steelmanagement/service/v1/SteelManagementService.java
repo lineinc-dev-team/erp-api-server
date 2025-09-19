@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.steelmanagement.service;
+package com.lineinc.erp.api.server.domain.steelmanagement.service.v1;
 
 import java.text.NumberFormat;
 import java.time.OffsetDateTime;

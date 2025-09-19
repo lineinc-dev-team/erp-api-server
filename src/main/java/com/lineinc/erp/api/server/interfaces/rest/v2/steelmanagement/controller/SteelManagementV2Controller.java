@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.domain.steelmanagement.service.SteelManagementChangeHistoryService;
+import com.lineinc.erp.api.server.domain.steelmanagement.service.v1.SteelManagementChangeHistoryService;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementChangeHistoryResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -40,13 +40,13 @@ public class SteelManagementV2Controller {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
 
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
+        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
                 pageRequest.size(), sortRequest.sort());
-        var page = steelManagementChangeHistoryService.getSteelManagementChangeHistoryWithPaging(id, pageable);
+        final var page = steelManagementChangeHistoryService.getSteelManagementChangeHistoryWithPaging(id, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));

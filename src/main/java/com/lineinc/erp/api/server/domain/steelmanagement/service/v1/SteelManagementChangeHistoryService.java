@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.steelmanagement.service;
+package com.lineinc.erp.api.server.domain.steelmanagement.service.v1;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +24,10 @@ public class SteelManagementChangeHistoryService {
      * 강재수불부 변경 이력 조회 (Slice 방식)
      */
     @Transactional(readOnly = true)
-    public Slice<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistory(Long steelManagementId,
-            Pageable pageable) {
-        SteelManagement steelManagement = steelManagementService.getSteelManagementByIdOrThrow(steelManagementId);
-        Slice<SteelManagementChangeHistory> changeHistories = steelManagementChangeHistoryRepository
+    public Slice<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistory(final Long steelManagementId,
+            final Pageable pageable) {
+        final SteelManagement steelManagement = steelManagementService.getSteelManagementByIdOrThrow(steelManagementId);
+        final Slice<SteelManagementChangeHistory> changeHistories = steelManagementChangeHistoryRepository
                 .findBySteelManagement(steelManagement, pageable);
 
         return changeHistories.map(SteelManagementChangeHistoryResponse::from);
@@ -38,10 +38,11 @@ public class SteelManagementChangeHistoryService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistoryWithPaging(Long steelManagementId,
-            Pageable pageable) {
-        SteelManagement steelManagement = steelManagementService.getSteelManagementByIdOrThrow(steelManagementId);
-        Page<SteelManagementChangeHistory> changeHistoryPage = steelManagementChangeHistoryRepository
+    public Page<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistoryWithPaging(
+            final Long steelManagementId,
+            final Pageable pageable) {
+        final SteelManagement steelManagement = steelManagementService.getSteelManagementByIdOrThrow(steelManagementId);
+        final Page<SteelManagementChangeHistory> changeHistoryPage = steelManagementChangeHistoryRepository
                 .findBySteelManagementWithPaging(steelManagement, pageable);
 
         return changeHistoryPage.map(SteelManagementChangeHistoryResponse::from);
