@@ -9,25 +9,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.dailyreport.service.DailyReportService;
+import com.lineinc.erp.api.server.domain.dailyreport.service.v1.DailyReportService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -61,7 +61,7 @@ public class DailyReportController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createDailyReport(
-            @Valid @RequestBody DailyReportCreateRequest request) {
+            @Valid @RequestBody final DailyReportCreateRequest request) {
         dailyReportService.createDailyReport(request);
         return ResponseEntity.ok().build();
     }
@@ -75,8 +75,8 @@ public class DailyReportController {
     @PatchMapping
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReport(
-            @Valid DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody DailyReportUpdateRequest request) {
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportUpdateRequest request) {
         dailyReportService.updateDailyReport(searchRequest, request);
         return ResponseEntity.ok().build();
     }
@@ -90,8 +90,8 @@ public class DailyReportController {
     @GetMapping("/detail")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<DailyReportDetailResponse>> getDailyReportDetail(
-            @Valid DailyReportSearchRequest request) {
-        DailyReportDetailResponse response = dailyReportService.getDailyReportDetail(request);
+            @Valid final DailyReportSearchRequest request) {
+        final DailyReportDetailResponse response = dailyReportService.getDailyReportDetail(request);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -104,10 +104,10 @@ public class DailyReportController {
     @GetMapping("/employees")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportEmployeeResponse>>> searchDailyReportEmployees(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid DailyReportSearchRequest request) {
-        Slice<DailyReportEmployeeResponse> slice = dailyReportService.searchDailyReportEmployees(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportEmployeeResponse> slice = dailyReportService.searchDailyReportEmployees(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -125,8 +125,8 @@ public class DailyReportController {
     @PatchMapping("/employees")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportEmployee(
-            @Valid DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody DailyReportEmployeeUpdateRequest request) {
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportEmployeeUpdateRequest request) {
         dailyReportService.updateDailyReportEmployees(searchRequest, request);
         return ResponseEntity.ok().build();
     }
@@ -140,8 +140,8 @@ public class DailyReportController {
     @PatchMapping("/direct-contracts")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportDirectContract(
-            @Valid DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody DailyReportDirectContractUpdateRequest request) {
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportDirectContractUpdateRequest request) {
         dailyReportService.updateDailyReportDirectContracts(searchRequest, request);
         return ResponseEntity.ok().build();
     }
@@ -155,8 +155,8 @@ public class DailyReportController {
     @PatchMapping("/outsourcings")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportOutsourcing(
-            @Valid DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody DailyReportOutsourcingUpdateRequest request) {
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportOutsourcingUpdateRequest request) {
         dailyReportService.updateDailyReportOutsourcings(searchRequest, request);
         return ResponseEntity.ok().build();
     }
@@ -170,8 +170,8 @@ public class DailyReportController {
     @PatchMapping("/equipments")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportEquipment(
-            @Valid DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody DailyReportEquipmentUpdateRequest request) {
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportEquipmentUpdateRequest request) {
         dailyReportService.updateDailyReportEquipments(searchRequest, request);
         return ResponseEntity.ok().build();
     }
@@ -185,8 +185,8 @@ public class DailyReportController {
     @PatchMapping("/fuels")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportFuel(
-            @Valid DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody DailyReportFuelUpdateRequest request) {
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportFuelUpdateRequest request) {
         dailyReportService.updateDailyReportFuels(searchRequest, request);
         return ResponseEntity.ok().build();
     }
@@ -200,8 +200,8 @@ public class DailyReportController {
     @PatchMapping("/files")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportFile(
-            @Valid DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody DailyReportFileUpdateRequest request) {
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportFileUpdateRequest request) {
         dailyReportService.updateDailyReportFiles(searchRequest, request);
         return ResponseEntity.ok().build();
     }
@@ -215,10 +215,10 @@ public class DailyReportController {
     @GetMapping("/direct-contracts")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractResponse>>> searchDailyReportDirectContracts(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid DailyReportSearchRequest request) {
-        Slice<DailyReportDirectContractResponse> slice = dailyReportService.searchDailyReportDirectContracts(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportDirectContractResponse> slice = dailyReportService.searchDailyReportDirectContracts(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -236,10 +236,10 @@ public class DailyReportController {
     @GetMapping("/outsourcings")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportOutsourcingResponse>>> searchDailyReportOutsourcings(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid DailyReportSearchRequest request) {
-        Slice<DailyReportOutsourcingResponse> slice = dailyReportService.searchDailyReportOutsourcings(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportOutsourcingResponse> slice = dailyReportService.searchDailyReportOutsourcings(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -257,10 +257,10 @@ public class DailyReportController {
     @GetMapping("/fuels")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportFuelResponse>>> searchDailyReportFuels(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid DailyReportSearchRequest request) {
-        Slice<DailyReportFuelResponse> slice = dailyReportService.searchDailyReportFuels(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportFuelResponse> slice = dailyReportService.searchDailyReportFuels(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -278,10 +278,10 @@ public class DailyReportController {
     @GetMapping("/equipments")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportEquipmentResponse>>> searchDailyReportEquipments(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid DailyReportSearchRequest request) {
-        Slice<DailyReportEquipmentResponse> slice = dailyReportService.searchDailyReportEquipments(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportEquipmentResponse> slice = dailyReportService.searchDailyReportEquipments(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -299,10 +299,10 @@ public class DailyReportController {
     @GetMapping("/files")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportFileResponse>>> searchDailyReportFiles(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid DailyReportSearchRequest request) {
-        Slice<DailyReportFileResponse> slice = dailyReportService.searchDailyReportFiles(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportFileResponse> slice = dailyReportService.searchDailyReportFiles(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -319,7 +319,7 @@ public class DailyReportController {
     })
     @PatchMapping("/complete")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.APPROVE)
-    public ResponseEntity<Void> completeDailyReport(@Valid DailyReportSearchRequest searchRequest) {
+    public ResponseEntity<Void> completeDailyReport(@Valid final DailyReportSearchRequest searchRequest) {
         dailyReportService.completeDailyReport(searchRequest);
         return ResponseEntity.ok().build();
     }

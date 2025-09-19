@@ -91,7 +91,7 @@ public class BatchExecutionHistory {
      * 
      * @param errorMessage 오류 메시지
      */
-    public void markAsFailed(String errorMessage) {
+    public void markAsFailed(final String errorMessage) {
         this.endTime = OffsetDateTime.now();
         this.status = BatchExecutionStatus.FAILED;
         this.errorMessage = errorMessage;
