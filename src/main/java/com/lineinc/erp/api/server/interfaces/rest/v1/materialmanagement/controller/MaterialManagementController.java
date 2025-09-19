@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
-import com.lineinc.erp.api.server.domain.materialmanagement.service.MaterialManagementChangeHistoryService;
-import com.lineinc.erp.api.server.domain.materialmanagement.service.MaterialManagementService;
+import com.lineinc.erp.api.server.domain.materialmanagement.service.v1.MaterialManagementChangeHistoryService;
+import com.lineinc.erp.api.server.domain.materialmanagement.service.v1.MaterialManagementService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
@@ -73,7 +73,7 @@ public class MaterialManagementController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createMaterialManagement(
-            @Valid @RequestBody MaterialManagementCreateRequest request) {
+            @Valid @RequestBody final MaterialManagementCreateRequest request) {
         materialManagementService.createMaterialManagement(request);
         return ResponseEntity.ok().build();
     }
@@ -83,7 +83,7 @@ public class MaterialManagementController {
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     @GetMapping("/input-types")
     public ResponseEntity<SuccessResponse<List<MaterialManagementInputTypeResponse>>> getMaterialManagementInputTypes() {
-        List<MaterialManagementInputTypeResponse> responseList = Arrays
+        final List<MaterialManagementInputTypeResponse> responseList = Arrays
                 .stream(MaterialManagementInputType.values())
                 .map(type -> new MaterialManagementInputTypeResponse(type.name(), type.getLabel()))
                 .toList();
@@ -96,11 +96,13 @@ public class MaterialManagementController {
     })
     @GetMapping("/detail-names/search")
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementNameResponse>>> getMaterialManagementDetailNames(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @RequestParam(required = false) String keyword) {
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
-        Slice<MaterialManagementNameResponse> slice = materialManagementService.getMaterialManagementNames(keyword,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @RequestParam(required = false) final String keyword) {
+        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                sortRequest.sort());
+        final Slice<MaterialManagementNameResponse> slice = materialManagementService.getMaterialManagementNames(
+                keyword,
                 pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(
@@ -115,11 +117,11 @@ public class MaterialManagementController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<MaterialManagementResponse>>> getMaterialManagements(
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest,
-            @Valid MaterialManagementListRequest request) {
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final MaterialManagementListRequest request) {
 
-        Page<MaterialManagementResponse> page = materialManagementService.getAllMaterialManagements(
+        final Page<MaterialManagementResponse> page = materialManagementService.getAllMaterialManagements(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
@@ -137,7 +139,7 @@ public class MaterialManagementController {
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteMaterialManagements(
-            @RequestBody DeleteMaterialManagementsRequest materialManagementIds) {
+            @RequestBody final DeleteMaterialManagementsRequest materialManagementIds) {
         materialManagementService.deleteMaterialManagements(materialManagementIds);
         return ResponseEntity.ok().build();
     }
@@ -150,11 +152,11 @@ public class MaterialManagementController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public void downloadSitesExcel(
-            @Valid SortRequest sortRequest,
-            @Valid MaterialManagementListRequest request,
-            @Valid MaterialManagementDownloadRequest materialManagementDownloadRequest,
-            HttpServletResponse response) throws IOException {
-        List<String> parsed = DownloadFieldUtils.parseFields(materialManagementDownloadRequest.fields());
+            @Valid final SortRequest sortRequest,
+            @Valid final MaterialManagementListRequest request,
+            @Valid final MaterialManagementDownloadRequest materialManagementDownloadRequest,
+            final HttpServletResponse response) throws IOException {
+        final List<String> parsed = DownloadFieldUtils.parseFields(materialManagementDownloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed,
                 MaterialManagementDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "자재관리 목록.xlsx");
@@ -175,8 +177,8 @@ public class MaterialManagementController {
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<MaterialManagementDetailViewResponse>> getMaterialManagementDetail(
-            @PathVariable Long id) {
-        MaterialManagementDetailViewResponse response = materialManagementService.getMaterialManagementById(id);
+            @PathVariable final Long id) {
+        final MaterialManagementDetailViewResponse response = materialManagementService.getMaterialManagementById(id);
         return ResponseEntity.ok(
                 SuccessResponse.of(response));
     }
@@ -190,8 +192,8 @@ public class MaterialManagementController {
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateMaterialManagement(
-            @PathVariable Long id,
-            @Valid @RequestBody MaterialManagementUpdateRequest request) {
+            @PathVariable final Long id,
+            @Valid @RequestBody final MaterialManagementUpdateRequest request) {
         materialManagementService.updateMaterialManagement(id, request);
         return ResponseEntity.ok().build();
     }
@@ -204,13 +206,13 @@ public class MaterialManagementController {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementChangeHistoryResponse>>> getMaterialManagementChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
 
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
+        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
                 pageRequest.size(), sortRequest.sort());
-        var slice = changeHistoryService.getChangeHistories(id, pageable);
+        final var slice = changeHistoryService.getChangeHistories(id, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent().stream()

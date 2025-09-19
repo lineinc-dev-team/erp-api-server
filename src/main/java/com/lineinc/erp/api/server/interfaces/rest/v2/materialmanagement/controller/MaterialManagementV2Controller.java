@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.materialmanagement.service.MaterialManagementChangeHistoryService;
+import com.lineinc.erp.api.server.domain.materialmanagement.service.v1.MaterialManagementChangeHistoryService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementChangeHistoryResponse;
@@ -41,13 +41,13 @@ public class MaterialManagementV2Controller {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<MaterialManagementChangeHistoryResponse>>> getMaterialManagementChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
 
-        Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
+        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
                 pageRequest.size(), sortRequest.sort());
-        var page = materialManagementChangeHistoryService.getChangeHistoriesWithPaging(id, pageable);
+        final var page = materialManagementChangeHistoryService.getChangeHistoriesWithPaging(id, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));

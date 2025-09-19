@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.materialmanagement.service;
+package com.lineinc.erp.api.server.domain.materialmanagement.service.v1;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,11 +24,12 @@ public class MaterialManagementChangeHistoryService {
     /**
      * 자재관리의 변경이력을 조회합니다. (Slice 방식)
      */
-    public Slice<MaterialManagementChangeHistory> getChangeHistories(Long materialManagementId, Pageable pageable) {
-        MaterialManagement materialManagement = materialManagementService
+    public Slice<MaterialManagementChangeHistory> getChangeHistories(final Long materialManagementId,
+            final Pageable pageable) {
+        final MaterialManagement materialManagement = materialManagementService
                 .getMaterialManagementByIdOrThrow(materialManagementId);
         // 자재관리 변경이력 조회 (페이지 단위)
-        Slice<MaterialManagementChangeHistory> historySlice = changeHistoryRepository
+        final Slice<MaterialManagementChangeHistory> historySlice = changeHistoryRepository
                 .findByMaterialManagement(materialManagement, pageable);
 
         return historySlice;
@@ -38,11 +39,11 @@ public class MaterialManagementChangeHistoryService {
      * 자재관리 변경 이력을 전체 개수와 함께 조회
      * 페이지 네비게이션이 필요한 경우 사용
      */
-    public Page<MaterialManagementChangeHistoryResponse> getChangeHistoriesWithPaging(Long materialManagementId,
-            Pageable pageable) {
-        MaterialManagement materialManagement = materialManagementService
+    public Page<MaterialManagementChangeHistoryResponse> getChangeHistoriesWithPaging(final Long materialManagementId,
+            final Pageable pageable) {
+        final MaterialManagement materialManagement = materialManagementService
                 .getMaterialManagementByIdOrThrow(materialManagementId);
-        Page<MaterialManagementChangeHistory> historyPage = changeHistoryRepository
+        final Page<MaterialManagementChangeHistory> historyPage = changeHistoryRepository
                 .findByMaterialManagementWithPaging(materialManagement, pageable);
 
         return historyPage.map(MaterialManagementChangeHistoryResponse::from);

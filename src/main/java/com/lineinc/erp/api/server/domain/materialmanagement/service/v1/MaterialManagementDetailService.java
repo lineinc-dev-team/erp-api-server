@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.materialmanagement.service;
+package com.lineinc.erp.api.server.domain.materialmanagement.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;
