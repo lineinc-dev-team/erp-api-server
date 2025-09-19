@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
 import java.time.OffsetDateTime;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyContact;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

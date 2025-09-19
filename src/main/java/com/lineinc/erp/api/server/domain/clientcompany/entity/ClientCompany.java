@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client.entity;
+package com.lineinc.erp.api.server.domain.clientcompany.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 import org.springframework.util.StringUtils;
 
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;

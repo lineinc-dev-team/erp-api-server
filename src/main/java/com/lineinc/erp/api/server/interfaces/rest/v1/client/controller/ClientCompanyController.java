@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
-import com.lineinc.erp.api.server.domain.client.service.CompanyService;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyFileType;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
+import com.lineinc.erp.api.server.domain.clientcompany.service.v1.CompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;

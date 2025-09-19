@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import com.lineinc.erp.api.server.domain.user.entity.User;

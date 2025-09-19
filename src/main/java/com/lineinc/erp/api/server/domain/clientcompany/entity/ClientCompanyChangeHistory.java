@@ -1,9 +1,9 @@
-package com.lineinc.erp.api.server.domain.client.entity;
+package com.lineinc.erp.api.server.domain.clientcompany.entity;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 

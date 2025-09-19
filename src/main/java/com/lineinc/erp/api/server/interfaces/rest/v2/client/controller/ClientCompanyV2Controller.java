@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.client.service.CompanyService;
+import com.lineinc.erp.api.server.domain.clientcompany.service.v1.CompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
@@ -39,9 +39,10 @@ public class ClientCompanyV2Controller {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
-            @PathVariable Long id, @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Page<ClientCompanyChangeHistoryResponse> page = companyService.getClientCompanyChangeHistoriesWithPaging(id,
+            @PathVariable final Long id, @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Page<ClientCompanyChangeHistoryResponse> page = companyService.getClientCompanyChangeHistoriesWithPaging(
+                id,
                 PageableUtils.createPageable(pageRequest.page(),
                         pageRequest.size(),
                         sortRequest.sort()));

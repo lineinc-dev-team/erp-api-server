@@ -3,8 +3,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

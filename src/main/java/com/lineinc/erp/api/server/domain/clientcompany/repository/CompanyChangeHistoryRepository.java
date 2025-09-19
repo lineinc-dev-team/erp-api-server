@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client.repository;
+package com.lineinc.erp.api.server.domain.clientcompany.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChangeHistory;
 
 @Repository
 public interface CompanyChangeHistoryRepository extends JpaRepository<ClientCompanyChangeHistory, Long> {

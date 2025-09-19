@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request;
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;

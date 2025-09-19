@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

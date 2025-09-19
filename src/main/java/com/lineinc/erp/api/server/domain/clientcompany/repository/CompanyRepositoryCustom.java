@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client.repository;
+package com.lineinc.erp.api.server.domain.clientcompany.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

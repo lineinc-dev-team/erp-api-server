@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client.service;
+package com.lineinc.erp.api.server.domain.clientcompany.service.v1;
 
 import java.util.List;
 import java.util.Map;
@@ -16,11 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
-import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
-import com.lineinc.erp.api.server.domain.client.repository.CompanyRepository;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
+import com.lineinc.erp.api.server.domain.clientcompany.repository.CompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.clientcompany.repository.CompanyRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;

@@ -1,10 +1,10 @@
-package com.lineinc.erp.api.server.domain.client.entity;
+package com.lineinc.erp.api.server.domain.clientcompany.entity;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyFileType;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyFileType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;

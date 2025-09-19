@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client.service;
+package com.lineinc.erp.api.server.domain.clientcompany.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +11,11 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.stereotype.Service;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyChangeHistoryChangeType;
-import com.lineinc.erp.api.server.domain.client.repository.CompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyFile;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
+import com.lineinc.erp.api.server.domain.clientcompany.repository.CompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;

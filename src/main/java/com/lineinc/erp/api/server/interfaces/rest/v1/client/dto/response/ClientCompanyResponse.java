@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;

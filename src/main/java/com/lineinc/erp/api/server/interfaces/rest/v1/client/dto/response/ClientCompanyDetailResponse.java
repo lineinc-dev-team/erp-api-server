@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.enums.ClientCompanyPaymentMethod;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;

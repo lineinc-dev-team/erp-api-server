@@ -3,7 +3,12 @@ package com.lineinc.erp.api.server.shared.util;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -13,20 +18,31 @@ import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyContact;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompanyFile;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyContact;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompanyFile;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.*;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractConstruction;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractContact;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriverFile;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractFile;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractSubEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractWorker;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractWorkerFile;
 import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
-import com.lineinc.erp.api.server.domain.managementcost.entity.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,8 +84,8 @@ public class JaversUtils {
             Map.entry(ManagementCostKeyMoneyDetail.class,
                     entity -> ((ManagementCostKeyMoneyDetail) entity).getAccount()),
             Map.entry(ManagementCostMealFeeDetail.class, entity -> {
-                ManagementCostMealFeeDetail detail = (ManagementCostMealFeeDetail) entity;
-                String name = detail.getName();
+                final ManagementCostMealFeeDetail detail = (ManagementCostMealFeeDetail) entity;
+                final String name = detail.getName();
                 if (name != null && !name.trim().isEmpty()) {
                     return name;
                 }
@@ -83,19 +99,19 @@ public class JaversUtils {
             Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getOriginalFileName()));
 
     // ================== Snapshot ==================
-    public static <T> T createSnapshot(Javers javers, T entity, Class<T> clazz) {
+    public static <T> T createSnapshot(final Javers javers, final T entity, final Class<T> clazz) {
         try {
-            Object unproxied = unproxyRecursive(entity);
-            String json = javers.getJsonConverter().toJson(unproxied);
+            final Object unproxied = unproxyRecursive(entity);
+            final String json = javers.getJsonConverter().toJson(unproxied);
             return javers.getJsonConverter().fromJson(json, clazz);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("❌ createSnapshot 직렬화 실패 클래스: {}", entity.getClass().getName(), e);
             throw e;
         }
     }
 
     // ================== 변경 내역 ==================
-    public static List<Map<String, String>> extractModifiedChanges(Javers javers, Diff diff) {
+    public static List<Map<String, String>> extractModifiedChanges(final Javers javers, final Diff diff) {
         return diff.getChanges().stream()
                 .filter(c -> c instanceof ValueChange)
                 .map(c -> (ValueChange) c)
@@ -104,7 +120,7 @@ public class JaversUtils {
                     if ("deleted".equals(vc.getPropertyName())
                             && Boolean.FALSE.equals(vc.getLeft())
                             && Boolean.TRUE.equals(vc.getRight())) {
-                        String beforeValue = formatDeletedContactName(vc.getAffectedObject());
+                        final String beforeValue = formatDeletedContactName(vc.getAffectedObject());
 
                         // 의미있는 식별자가 없으면 히스토리를 생성하지 않음
                         if (beforeValue == null || beforeValue.trim().isEmpty() || "항목".equals(beforeValue)) {
@@ -124,8 +140,8 @@ public class JaversUtils {
                     }
 
                     // before와 after 값이 실제로 다른지 확인
-                    String beforeValue = toJsonSafe(javers, vc.getLeft());
-                    String afterValue = toJsonSafe(javers, vc.getRight());
+                    final String beforeValue = toJsonSafe(javers, vc.getLeft());
+                    final String afterValue = toJsonSafe(javers, vc.getRight());
 
                     // 값이 동일하면 변경 이력에 포함하지 않음
                     if (beforeValue.equals(afterValue)) {
@@ -133,7 +149,7 @@ public class JaversUtils {
                     }
 
                     // 수정 변경
-                    String propertyName = vc.getPropertyName();
+                    final String propertyName = vc.getPropertyName();
 
                     return Map.of(
                             "property", propertyName,
@@ -146,7 +162,7 @@ public class JaversUtils {
     }
 
     // 삭제 전용 변경 감지
-    public static boolean isDeletedChange(Diff diff) {
+    public static boolean isDeletedChange(final Diff diff) {
         return diff.getChanges().stream()
                 .filter(c -> c instanceof ValueChange)
                 .map(c -> (ValueChange) c)
@@ -155,8 +171,8 @@ public class JaversUtils {
     }
 
     // 시스템 전용 변경인지 확인 (일반 수정 이력에서 제외)
-    private static boolean isSystemOnlyChange(ValueChange vc) {
-        String propertyName = vc.getPropertyName();
+    private static boolean isSystemOnlyChange(final ValueChange vc) {
+        final String propertyName = vc.getPropertyName();
 
         // deleted 필드는 삭제 시에만 추적하고, 일반 수정에서는 제외
         if ("deleted".equals(propertyName)) {
@@ -171,8 +187,8 @@ public class JaversUtils {
         return false;
     }
 
-    public static Map<String, String> extractAddedEntityChange(Javers javers, Object newEntity) {
-        String afterValue = extractEntityName(newEntity);
+    public static Map<String, String> extractAddedEntityChange(final Javers javers, final Object newEntity) {
+        final String afterValue = extractEntityName(newEntity);
         if (afterValue == null || afterValue.trim().isEmpty()) {
             // 의미있는 식별자가 없으면 히스토리를 생성하지 않음
             return null;
@@ -186,21 +202,21 @@ public class JaversUtils {
     }
 
     // ================== 공통 유틸 ==================
-    private static String extractEntityName(Object entity) {
+    private static String extractEntityName(final Object entity) {
         if (entity == null)
             return null;
-        Function<Object, String> extractor = ENTITY_NAME_EXTRACTORS.get(entity.getClass());
+        final Function<Object, String> extractor = ENTITY_NAME_EXTRACTORS.get(entity.getClass());
         if (extractor != null) {
             try {
                 return extractor.apply(entity);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 log.warn("엔티티 이름 추출 실패: {}", entity.getClass().getSimpleName(), e);
             }
         }
         return null;
     }
 
-    private static String toJsonSafe(Javers javers, Object obj) {
+    private static String toJsonSafe(final Javers javers, final Object obj) {
         if (obj == null)
             return "";
         if (obj instanceof String || obj instanceof Boolean || obj instanceof Character) {
@@ -211,7 +227,7 @@ public class JaversUtils {
                 return ((BigDecimal) obj).stripTrailingZeros().toPlainString();
             }
             // 4자리 이상 정수에만 천 단위 구분자 추가
-            double value = ((Number) obj).doubleValue();
+            final double value = ((Number) obj).doubleValue();
             if (value >= 1000 && value == Math.floor(value)) {
                 return NumberFormat.getNumberInstance().format((long) value);
             }
@@ -221,7 +237,7 @@ public class JaversUtils {
     }
 
     private static String formatDeletedContactName(Object affectedObject) {
-        if (affectedObject instanceof Optional<?> optional) {
+        if (affectedObject instanceof final Optional<?> optional) {
             affectedObject = optional.orElse(null);
         }
 
@@ -229,7 +245,7 @@ public class JaversUtils {
             return "항목";
         }
 
-        String entityName = extractEntityName(affectedObject);
+        final String entityName = extractEntityName(affectedObject);
         if (entityName != null) {
             return entityName;
         }
@@ -238,22 +254,22 @@ public class JaversUtils {
     }
 
     // ================== Hibernate Proxy 제거 + 순환참조 방지 ==================
-    private static Object unproxyRecursive(Object entity) {
-        Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+    private static Object unproxyRecursive(final Object entity) {
+        final Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
         return unproxyRecursive(entity, visited);
     }
 
-    private static Object unproxyRecursive(Object entity, Set<Object> visited) {
+    private static Object unproxyRecursive(Object entity, final Set<Object> visited) {
         if (entity == null || visited.contains(entity))
             return entity;
         visited.add(entity);
 
-        if (entity instanceof HibernateProxy proxy) {
+        if (entity instanceof final HibernateProxy proxy) {
             entity = Hibernate.unproxy(proxy);
         }
 
         // 이미 초기화된 필드만 처리 (Lazy Loading 방지)
-        for (Field field : entity.getClass().getDeclaredFields()) {
+        for (final Field field : entity.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
                 // Hibernate 프록시나 PersistentCollection인 경우 초기화 여부 확인
@@ -261,24 +277,24 @@ public class JaversUtils {
                     continue; // 초기화되지 않은 Lazy 필드는 건드리지 않음
                 }
 
-                Object value = field.get(entity);
+                final Object value = field.get(entity);
                 if (value == null || visited.contains(value))
                     continue;
 
-                if (value instanceof Iterable<?> iterable) {
-                    for (Object item : iterable) {
+                if (value instanceof final Iterable<?> iterable) {
+                    for (final Object item : iterable) {
                         unproxyRecursive(item, visited);
                     }
-                } else if (value instanceof Map<?, ?> map) {
-                    for (Map.Entry<?, ?> entry : map.entrySet()) {
+                } else if (value instanceof final Map<?, ?> map) {
+                    for (final Map.Entry<?, ?> entry : map.entrySet()) {
                         unproxyRecursive(entry.getKey(), visited);
                         unproxyRecursive(entry.getValue(), visited);
                     }
                 } else if (!field.getType().isPrimitive() && !field.getType().getName().startsWith("java.")) {
-                    Object unproxiedValue = unproxyRecursive(value, visited);
+                    final Object unproxiedValue = unproxyRecursive(value, visited);
                     field.set(entity, unproxiedValue);
                 }
-            } catch (Exception ignored) {
+            } catch (final Exception ignored) {
                 // 접근 실패한 필드는 무시 (Lazy Loading 에러 등)
             }
         }
@@ -287,9 +303,9 @@ public class JaversUtils {
     }
 
     // Hibernate Lazy 필드 초기화 여부 확인
-    private static boolean isHibernateLazyField(Object entity, Field field) {
+    private static boolean isHibernateLazyField(final Object entity, final Field field) {
         try {
-            Object value = field.get(entity);
+            final Object value = field.get(entity);
 
             // PersistentCollection 체크 (OneToMany, ManyToMany 등)
             if (value != null && value.getClass().getName().contains("PersistentCollection")) {
@@ -302,7 +318,7 @@ public class JaversUtils {
             }
 
             return false;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // 접근 불가능한 필드는 Lazy로 간주
             return true;
         }

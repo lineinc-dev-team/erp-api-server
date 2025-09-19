@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client.entity;
+package com.lineinc.erp.api.server.domain.clientcompany.entity;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;

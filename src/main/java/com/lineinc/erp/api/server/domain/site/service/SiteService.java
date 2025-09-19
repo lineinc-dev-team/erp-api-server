@@ -1,26 +1,9 @@
 package com.lineinc.erp.api.server.domain.site.service;
 
-import com.lineinc.erp.api.server.domain.client.service.CompanyService;
-import com.lineinc.erp.api.server.domain.user.service.UserService;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.DeleteSitesRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteChangeHistoryResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
-import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.site.entity.Site;
-import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
-import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
-import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
-import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
-import com.lineinc.erp.api.server.domain.user.entity.User;
-import lombok.RequiredArgsConstructor;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -33,9 +16,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.service.v1.CompanyService;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
+import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
+import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.DeleteSitesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
+import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -51,14 +53,14 @@ public class SiteService {
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
     @Transactional
-    public void createSite(CreateSiteRequest request) {
-        ClientCompany clientCompany = companyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
-        User user = userService.getUserByIdOrThrow(request.userId());
+    public void createSite(final CreateSiteRequest request) {
+        final ClientCompany clientCompany = companyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
+        final User user = userService.getUserByIdOrThrow(request.userId());
 
-        OffsetDateTime startedAt = DateTimeFormatUtils.toOffsetDateTime(request.startedAt());
-        OffsetDateTime endedAt = DateTimeFormatUtils.toOffsetDateTime(request.endedAt());
+        final OffsetDateTime startedAt = DateTimeFormatUtils.toOffsetDateTime(request.startedAt());
+        final OffsetDateTime endedAt = DateTimeFormatUtils.toOffsetDateTime(request.endedAt());
 
-        Site site = siteRepository.save(Site.builder()
+        final Site site = siteRepository.save(Site.builder()
                 .name(request.name())
                 .address(request.address())
                 .detailAddress(request.detailAddress())
@@ -82,27 +84,27 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public void validateDuplicateName(String name) {
+    public void validateDuplicateName(final String name) {
         if (siteRepository.existsByName(name)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_NAME_ALREADY_EXISTS);
         }
     }
 
     @Transactional(readOnly = true)
-    public Page<SiteResponse> getAllSites(Long userId, SiteListRequest request, Pageable pageable) {
-        User user = userService.getUserByIdOrThrow(userId);
-        List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+    public Page<SiteResponse> getAllSites(final Long userId, final SiteListRequest request, final Pageable pageable) {
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
         return siteRepository.findAll(request, pageable, accessibleSiteIds);
     }
 
     @Transactional
-    public void deleteSites(DeleteSitesRequest request) {
-        List<Site> sites = siteRepository.findAllById(request.siteIds());
+    public void deleteSites(final DeleteSitesRequest request) {
+        final List<Site> sites = siteRepository.findAllById(request.siteIds());
         if (sites.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND);
         }
 
-        for (Site site : sites) {
+        for (final Site site : sites) {
             site.markAsDeleted();
             site.getProcesses().forEach(process -> process.markAsDeleted());
         }
@@ -111,10 +113,11 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(Long userId, SiteListRequest request, Sort sort, List<String> fields) {
-        User user = userService.getUserByIdOrThrow(userId);
-        List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
-        List<SiteResponse> siteResponses = siteRepository.findAllWithoutPaging(request, sort, accessibleSiteIds)
+    public Workbook downloadExcel(final Long userId, final SiteListRequest request, final Sort sort,
+            final List<String> fields) {
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        final List<SiteResponse> siteResponses = siteRepository.findAllWithoutPaging(request, sort, accessibleSiteIds)
                 .stream()
                 .map(SiteResponse::from)
                 .toList();
@@ -126,7 +129,7 @@ public class SiteService {
                 this::getExcelCellValue);
     }
 
-    private String getExcelHeaderName(String field) {
+    private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "id" -> "No.";
             case "name" -> "현장명";
@@ -146,7 +149,7 @@ public class SiteService {
         };
     }
 
-    private String getExcelCellValue(SiteResponse siteResponse, String field) {
+    private String getExcelCellValue(final SiteResponse siteResponse, final String field) {
         return switch (field) {
             case "id" -> String.valueOf(siteResponse.id());
             case "name" -> siteResponse.name();
@@ -169,28 +172,28 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Site getSiteByIdOrThrow(Long siteId) {
+    public Site getSiteByIdOrThrow(final Long siteId) {
         return siteRepository.findById(siteId)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public SiteDetailResponse getSiteById(Long siteId, Long userId) {
-        Site site = siteRepository.findById(siteId)
+    public SiteDetailResponse getSiteById(final Long siteId, final Long userId) {
+        final Site site = siteRepository.findById(siteId)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
-        User user = userService.getUserByIdOrThrow(userId);
-        boolean hasAccess = hasSiteProcessAccess(user, siteId);
+        final User user = userService.getUserByIdOrThrow(userId);
+        final boolean hasAccess = hasSiteProcessAccess(user, siteId);
         return SiteDetailResponse.from(site, hasAccess);
     }
 
-    private boolean hasSiteProcessAccess(User user, Long siteId) {
+    private boolean hasSiteProcessAccess(final User user, final Long siteId) {
         if (user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
             return false;
         }
 
-        boolean hasGlobalAccess = user.getUserRoles().stream()
+        final boolean hasGlobalAccess = user.getUserRoles().stream()
                 .anyMatch(r -> r.getRole().isHasGlobalSiteProcessAccess());
         if (hasGlobalAccess) {
             return true;
@@ -202,8 +205,8 @@ public class SiteService {
     }
 
     @Transactional
-    public void updateSite(Long siteId, UpdateSiteRequest request) {
-        Site site = siteRepository.findById(siteId)
+    public void updateSite(final Long siteId, final UpdateSiteRequest request) {
+        final Site site = siteRepository.findById(siteId)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
 
@@ -212,18 +215,18 @@ public class SiteService {
         }
 
         site.syncTransientFields();
-        Site oldSnapshot = JaversUtils.createSnapshot(javers, site, Site.class);
+        final Site oldSnapshot = JaversUtils.createSnapshot(javers, site, Site.class);
 
         site.updateFrom(request, userService.getUserByIdOrThrow(request.userId()),
                 companyService.getClientCompanyByIdOrThrow(request.clientCompanyId()));
         siteRepository.save(site);
 
-        Diff diff = javers.compare(oldSnapshot, site);
-        List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+        final Diff diff = javers.compare(oldSnapshot, site);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+            final SiteChangeHistory changeHistory = SiteChangeHistory.builder()
                     .site(site)
                     .type(SiteChangeType.BASIC)
                     .changes(changesJson)
@@ -232,7 +235,7 @@ public class SiteService {
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
-            for (UpdateSiteRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
+            for (final UpdateSiteRequest.ChangeHistoryRequest historyRequest : request.changeHistories()) {
                 siteChangeHistoryRepository.findById(historyRequest.id())
                         .filter(history -> history.getSite().getId().equals(site.getId()))
                         .ifPresent(history -> {
@@ -252,7 +255,7 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<SiteResponse.SiteSimpleResponse> searchSiteByName(String keyword, Pageable pageable) {
+    public Slice<SiteResponse.SiteSimpleResponse> searchSiteByName(final String keyword, final Pageable pageable) {
         Slice<Site> siteSlice;
 
         if (keyword == null || keyword.isBlank()) {
@@ -265,12 +268,12 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<SiteChangeHistoryResponse> getSiteChangeHistories(Long siteId, Pageable pageable) {
+    public Slice<SiteChangeHistoryResponse> getSiteChangeHistories(final Long siteId, final Pageable pageable) {
         // 해당 현장 존재 여부 확인 (예외 처리)
-        Site site = getSiteByIdOrThrow(siteId);
+        final Site site = getSiteByIdOrThrow(siteId);
 
         // 현장 변경 이력 조회 (페이지 단위)
-        Slice<SiteChangeHistory> historySlice = siteChangeHistoryRepository.findBySite(site, pageable);
+        final Slice<SiteChangeHistory> historySlice = siteChangeHistoryRepository.findBySite(site, pageable);
 
         // 엔티티 -> DTO 변환 후 반환
         return historySlice.map(SiteChangeHistoryResponse::from);
@@ -281,12 +284,13 @@ public class SiteService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<SiteChangeHistoryResponse> getSiteChangeHistoriesWithPaging(Long siteId, Pageable pageable) {
+    public Page<SiteChangeHistoryResponse> getSiteChangeHistoriesWithPaging(final Long siteId,
+            final Pageable pageable) {
         // 해당 현장 존재 여부 확인 (예외 처리)
-        Site site = getSiteByIdOrThrow(siteId);
+        final Site site = getSiteByIdOrThrow(siteId);
 
         // 현장 변경 이력 조회 (전체 개수 포함)
-        Page<SiteChangeHistory> historyPage = siteChangeHistoryRepository.findBySiteWithPaging(site, pageable);
+        final Page<SiteChangeHistory> historyPage = siteChangeHistoryRepository.findBySiteWithPaging(site, pageable);
 
         // 엔티티 -> DTO 변환 후 반환
         return historyPage.map(SiteChangeHistoryResponse::from);

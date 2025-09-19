@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.client.repository;
+package com.lineinc.erp.api.server.domain.clientcompany.repository;
 
 import java.util.List;
 import java.util.Map;
@@ -9,9 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import com.lineinc.erp.api.server.domain.client.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.QClientCompany;
-import com.lineinc.erp.api.server.domain.client.entity.QClientCompanyContact;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.QClientCompany;
+import com.lineinc.erp.api.server.domain.clientcompany.entity.QClientCompanyContact;
 import com.lineinc.erp.api.server.domain.user.entity.QUser;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyResponse;
