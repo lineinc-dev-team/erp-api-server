@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
@@ -121,7 +121,7 @@ public class OutsourcingCompanyService {
         if (!simpleChanges.isEmpty()) {
             final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                     .outsourcingCompany(company)
-                    .type(OutsourcingChangeType.BASIC)
+                    .type(OutsourcingCompanyChangeHistoryType.BASIC)
                     .changes(changesJson)
                     .build();
             outsourcingCompanyChangeRepository.save(changeHistory);

@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -24,7 +24,7 @@ public record CompanyChangeHistoryResponse(
 
         @Schema(description = "변경 유형", example = "기본 정보") String type,
 
-        @Schema(description = "변경 유형 코드", example = "CONTACT") OutsourcingChangeType typeCode) {
+        @Schema(description = "변경 유형 코드", example = "CONTACT") OutsourcingCompanyChangeHistoryType typeCode) {
     public static CompanyChangeHistoryResponse from(final OutsourcingCompanyChangeHistory history) {
         return new CompanyChangeHistoryResponse(
                 history.getId(),

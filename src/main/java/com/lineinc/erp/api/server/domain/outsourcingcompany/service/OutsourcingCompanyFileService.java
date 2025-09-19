@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyFile;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
@@ -101,7 +101,7 @@ public class OutsourcingCompanyFileService {
             final String json = javers.getJsonConverter().toJson(allChanges);
             final OutsourcingCompanyChangeHistory history = OutsourcingCompanyChangeHistory.builder()
                     .outsourcingCompany(company)
-                    .type(OutsourcingChangeType.ATTACHMENT)
+                    .type(OutsourcingCompanyChangeHistoryType.ATTACHMENT)
                     .changes(json)
                     .build();
             outsourcingCompanyChangeRepository.save(history);

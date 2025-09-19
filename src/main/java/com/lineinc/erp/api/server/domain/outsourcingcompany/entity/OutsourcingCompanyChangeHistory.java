@@ -4,7 +4,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,7 +42,7 @@ public class OutsourcingCompanyChangeHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private OutsourcingChangeType type;
+    private OutsourcingCompanyChangeHistoryType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")

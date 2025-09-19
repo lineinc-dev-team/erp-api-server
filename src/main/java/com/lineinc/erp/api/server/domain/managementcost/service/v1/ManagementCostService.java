@@ -29,7 +29,7 @@ import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCos
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
@@ -160,7 +160,7 @@ public class ManagementCostService {
                 if (!simpleChanges.isEmpty()) {
                     final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                             .outsourcingCompany(outsourcingCompany)
-                            .type(OutsourcingChangeType.BASIC)
+                            .type(OutsourcingCompanyChangeHistoryType.BASIC)
                             .changes(changesJson)
                             .build();
                     outsourcingCompanyChangeRepository.save(changeHistory);
