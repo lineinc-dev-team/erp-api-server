@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
-import com.lineinc.erp.api.server.domain.clientcompany.service.v1.CompanyService;
+import com.lineinc.erp.api.server.domain.clientcompany.service.v1.ClientCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 import com.lineinc.erp.api.server.domain.site.enums.SiteChangeType;
@@ -45,7 +45,7 @@ public class SiteService {
 
     private final SiteRepository siteRepository;
 
-    private final CompanyService companyService;
+    private final ClientCompanyService clientCompanyService;
     private final SiteProcessService siteProcessService;
     private final SiteContractService siteContractService;
     private final UserService userService;
@@ -54,7 +54,7 @@ public class SiteService {
 
     @Transactional
     public void createSite(final CreateSiteRequest request) {
-        final ClientCompany clientCompany = companyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
+        final ClientCompany clientCompany = clientCompanyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
         final User user = userService.getUserByIdOrThrow(request.userId());
 
         final OffsetDateTime startedAt = DateTimeFormatUtils.toOffsetDateTime(request.startedAt());
@@ -218,7 +218,7 @@ public class SiteService {
         final Site oldSnapshot = JaversUtils.createSnapshot(javers, site, Site.class);
 
         site.updateFrom(request, userService.getUserByIdOrThrow(request.userId()),
-                companyService.getClientCompanyByIdOrThrow(request.clientCompanyId()));
+                clientCompanyService.getClientCompanyByIdOrThrow(request.clientCompanyId()));
         siteRepository.save(site);
 
         final Diff diff = javers.compare(oldSnapshot, site);

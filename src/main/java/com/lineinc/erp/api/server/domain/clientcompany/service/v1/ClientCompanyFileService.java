@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CompanyFileService {
+public class ClientCompanyFileService {
     private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
     private final Javers javers;
 

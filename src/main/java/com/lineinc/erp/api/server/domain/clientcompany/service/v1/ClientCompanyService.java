@@ -41,11 +41,11 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CompanyService {
+public class ClientCompanyService {
 
     private final ClientCompanyRepository clientCompanyRepository;
-    private final CompanyContactService contactService;
-    private final CompanyFileService fileService;
+    private final ClientCompanyContactService contactService;
+    private final ClientCompanyFileService fileService;
     private final UserService userService;
     private final Javers javers;
     private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;

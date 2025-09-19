@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.clientcompany.service.v1.CompanyService;
+import com.lineinc.erp.api.server.domain.clientcompany.service.v1.ClientCompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response.ClientCompanyChangeHistoryResponse;
@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "발주처 관리 V2", description = "발주처 관련 V2 API")
 public class ClientCompanyV2Controller {
 
-    private final CompanyService companyService;
+    private final ClientCompanyService clientCompanyService;
 
     @Operation(summary = "발주처 변경 이력 조회", description = "특정 발주처의 변경 히스토리를 조회합니다.")
     @ApiResponses({ @ApiResponse(responseCode = "200", description = "조회 성공"), })
@@ -41,11 +41,12 @@ public class ClientCompanyV2Controller {
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
             @PathVariable final Long id, @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-        final Page<ClientCompanyChangeHistoryResponse> page = companyService.getClientCompanyChangeHistoriesWithPaging(
-                id,
-                PageableUtils.createPageable(pageRequest.page(),
-                        pageRequest.size(),
-                        sortRequest.sort()));
+        final Page<ClientCompanyChangeHistoryResponse> page = clientCompanyService
+                .getClientCompanyChangeHistoriesWithPaging(
+                        id,
+                        PageableUtils.createPageable(pageRequest.page(),
+                                pageRequest.size(),
+                                sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }

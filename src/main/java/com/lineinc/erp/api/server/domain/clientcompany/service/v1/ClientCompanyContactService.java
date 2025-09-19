@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CompanyContactService {
+public class ClientCompanyContactService {
 
     private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
     private final Javers javers;

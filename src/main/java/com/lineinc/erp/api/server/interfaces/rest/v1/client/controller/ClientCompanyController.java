@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyFileType;
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
-import com.lineinc.erp.api.server.domain.clientcompany.service.v1.CompanyService;
+import com.lineinc.erp.api.server.domain.clientcompany.service.v1.ClientCompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
@@ -61,14 +61,14 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "발주처 관련 API")
 public class ClientCompanyController extends BaseController {
 
-    private final CompanyService companyService;
+    private final ClientCompanyService clientCompanyService;
 
     @PostMapping
     @Operation(summary = "발주처 등록")
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createClientCompany(
             @Valid @RequestBody final ClientCompanyCreateRequest request) {
-        companyService.createClientCompany(request);
+        clientCompanyService.createClientCompany(request);
         return ResponseEntity.ok().build();
     }
 
@@ -79,7 +79,7 @@ public class ClientCompanyController extends BaseController {
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request) {
-        final Page<ClientCompanyResponse> page = companyService.getAllClientCompanies(request,
+        final Page<ClientCompanyResponse> page = clientCompanyService.getAllClientCompanies(request,
                 PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
@@ -90,7 +90,7 @@ public class ClientCompanyController extends BaseController {
             @Valid final SortRequest sortRequest,
             @Valid final PageRequest pageRequest,
             @RequestParam(required = false) final String keyword) {
-        final Slice<ClientCompanySimpleResponse> slice = companyService.searchClientCompanyByName(keyword,
+        final Slice<ClientCompanySimpleResponse> slice = clientCompanyService.searchClientCompanyByName(keyword,
                 PageableUtils.createPageable(pageRequest, sortRequest));
         return ResponseEntity.ok(SuccessResponse.of(SliceResponse.from(slice)));
     }
@@ -100,7 +100,7 @@ public class ClientCompanyController extends BaseController {
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteClientCompanies(
             @RequestBody final ClientCompanyDeleteRequest clientCompanyIds) {
-        companyService.deleteClientCompanies(clientCompanyIds);
+        clientCompanyService.deleteClientCompanies(clientCompanyIds);
         return ResponseEntity.ok().build();
     }
 
@@ -109,7 +109,7 @@ public class ClientCompanyController extends BaseController {
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateClientCompany(@PathVariable final Long id,
             @Valid @RequestBody final ClientCompanyUpdateRequest request) {
-        companyService.updateClientCompany(id, request);
+        clientCompanyService.updateClientCompany(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -126,7 +126,7 @@ public class ClientCompanyController extends BaseController {
                 DownloadFieldUtils.parseFields(companyDownloadRequest.fields()),
                 ClientCompanyDownloadRequest.ALLOWED_FIELDS);
 
-        try (Workbook workbook = companyService.downloadExcel(
+        try (Workbook workbook = clientCompanyService.downloadExcel(
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 DownloadFieldUtils.parseFields(companyDownloadRequest.fields()))) {
@@ -140,7 +140,7 @@ public class ClientCompanyController extends BaseController {
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<ClientCompanyDetailResponse>> getClientCompanyById(
             @PathVariable final Long id) {
-        final ClientCompanyDetailResponse response = companyService.getClientCompanyById(id);
+        final ClientCompanyDetailResponse response = clientCompanyService.getClientCompanyById(id);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
@@ -150,7 +150,7 @@ public class ClientCompanyController extends BaseController {
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
             @PathVariable final Long id, @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-        final Slice<ClientCompanyChangeHistoryResponse> slice = companyService.getClientCompanyChangeHistories(id,
+        final Slice<ClientCompanyChangeHistoryResponse> slice = clientCompanyService.getClientCompanyChangeHistories(id,
                 PageableUtils.createPageable(pageRequest.page(),
                         pageRequest.size(),
                         sortRequest.sort()));
