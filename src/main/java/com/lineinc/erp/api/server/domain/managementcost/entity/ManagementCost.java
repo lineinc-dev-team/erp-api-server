@@ -1,23 +1,42 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
-import org.javers.core.metamodel.annotation.DiffInclude;
-import org.javers.core.metamodel.annotation.DiffIgnore;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(indexes = {
@@ -56,7 +75,7 @@ public class ManagementCost extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column
     @DiffIgnore
-    private ItemType itemType;
+    private ManagementCostItemType itemType;
 
     /**
      * 항목 설명 (예: 6월 전기요금 등)
@@ -116,8 +135,8 @@ public class ManagementCost extends BaseEntity {
     @DiffInclude
     private String itemTypeName;
 
-    public void updateFrom(ManagementCostUpdateRequest request, Site site, SiteProcess siteProcess,
-            OutsourcingCompany outsourcingCompany) {
+    public void updateFrom(final ManagementCostUpdateRequest request, final Site site, final SiteProcess siteProcess,
+            final OutsourcingCompany outsourcingCompany) {
         this.site = site;
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;

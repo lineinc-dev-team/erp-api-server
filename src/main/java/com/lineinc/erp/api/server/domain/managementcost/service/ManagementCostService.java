@@ -23,8 +23,8 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
-import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingChangeHistory;
@@ -430,9 +430,11 @@ public class ManagementCostService {
         Slice<Object[]> resultSlice;
 
         if (keyword == null || keyword.isBlank()) {
-            resultSlice = managementCostRepository.findAllDistinctItemDescriptions(ItemType.ETC, pageable);
+            resultSlice = managementCostRepository.findAllDistinctItemDescriptions(ManagementCostItemType.ETC,
+                    pageable);
         } else {
-            resultSlice = managementCostRepository.findDistinctItemDescriptionsByKeyword(ItemType.ETC, keyword,
+            resultSlice = managementCostRepository.findDistinctItemDescriptionsByKeyword(ManagementCostItemType.ETC,
+                    keyword,
                     pageable);
         }
 

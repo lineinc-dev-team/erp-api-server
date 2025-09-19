@@ -1,15 +1,14 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyBasicInfoRequest;
-
 import java.time.LocalDate;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.managementcost.enums.ItemType;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyBasicInfoRequest;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "관리비 등록 요청")
 public record ManagementCostCreateRequest(
@@ -19,7 +18,7 @@ public record ManagementCostCreateRequest(
 
         @Schema(description = "외주 업체 ID", example = "1") Long outsourcingCompanyId,
 
-        @Schema(description = "관리비 항목 구분", example = "DEPOSIT") @NotNull ItemType itemType,
+        @Schema(description = "관리비 항목 구분", example = "DEPOSIT") @NotNull ManagementCostItemType itemType,
 
         @Schema(description = "관리비 항목 설명", example = "6월 전기요금") String itemTypeDescription,
 

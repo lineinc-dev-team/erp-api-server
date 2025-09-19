@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.domain.managementcost.enums;
 import lombok.Getter;
 
 @Getter
-public enum ItemType {
+public enum ManagementCostItemType {
     DEPOSIT("보증금"),
     MONTHLY_RENT("월세"),
     MAINTENANCE("관리비(가스/전기/수도)"),
@@ -14,7 +14,7 @@ public enum ItemType {
 
     private final String label;
 
-    ItemType(String label) {
+    ManagementCostItemType(final String label) {
         this.label = label;
     }
 }

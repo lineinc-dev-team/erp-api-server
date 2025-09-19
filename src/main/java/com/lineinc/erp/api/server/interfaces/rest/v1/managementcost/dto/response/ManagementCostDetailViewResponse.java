@@ -1,14 +1,14 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
 
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "관리비 정보 응답")
 public record ManagementCostDetailViewResponse(
@@ -38,7 +38,7 @@ public record ManagementCostDetailViewResponse(
 
         @Schema(description = "식대 상세 목록") List<ManagementCostMealFeeDetailResponse> mealFeeDetails) {
 
-    public static ManagementCostDetailViewResponse from(ManagementCost cost) {
+    public static ManagementCostDetailViewResponse from(final ManagementCost cost) {
         return new ManagementCostDetailViewResponse(
                 cost.getId(),
                 cost.getItemType().getLabel(),

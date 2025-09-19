@@ -1,13 +1,13 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.time.OffsetDateTime;
 
 @Schema(description = "관리비 정보 응답")
 public record ManagementCostResponse(
@@ -38,7 +38,7 @@ public record ManagementCostResponse(
         @Schema(description = "업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany
 
 ) {
-    public static ManagementCostResponse from(ManagementCost cost) {
+    public static ManagementCostResponse from(final ManagementCost cost) {
         return new ManagementCostResponse(
                 cost.getId(),
                 cost.getItemType().getLabel(),
