@@ -32,8 +32,8 @@ import lombok.experimental.SuperBuilder;
 public class OutsourcingCompanyChangeHistory extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_change_history_seq")
-    @SequenceGenerator(name = "outsourcing_change_history_seq", sequenceName = "outsourcing_change_history_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_change_history_seq")
+    @SequenceGenerator(name = "outsourcing_company_change_history_seq", sequenceName = "outsourcing_company_change_history_seq", allocationSize = 1)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
