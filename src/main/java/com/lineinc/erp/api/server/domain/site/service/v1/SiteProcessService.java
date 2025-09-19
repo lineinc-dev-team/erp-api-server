@@ -19,7 +19,7 @@ import com.lineinc.erp.api.server.domain.site.enums.SiteChangeHistoryType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
-import com.lineinc.erp.api.server.domain.user.service.UserService;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteProcessRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteProcessRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
