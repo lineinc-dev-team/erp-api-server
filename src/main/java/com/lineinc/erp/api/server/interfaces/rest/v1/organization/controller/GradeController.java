@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.organization.service.GradeService;
+import com.lineinc.erp.api.server.domain.organization.service.v1.GradeService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.organization.dto.response.GradeResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 

@@ -1,15 +1,16 @@
-package com.lineinc.erp.api.server.domain.organization.service;
+package com.lineinc.erp.api.server.domain.organization.service.v1;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.domain.organization.repository.PositionRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.organization.dto.response.PositionResponse;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class PositionService {
 
     @Transactional(readOnly = true)
     public List<PositionResponse> getAllPositions() {
-        List<Position> positions = positionRepository.findAll();
+        final List<Position> positions = positionRepository.findAll();
         return positions.stream()
                 .map(position -> new PositionResponse(position.getId(), position.getName()))
                 .collect(Collectors.toList());
