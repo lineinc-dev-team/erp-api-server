@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractContact;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractContact;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -15,7 +15,7 @@ public record ContractContactResponse(
         @Schema(description = "전화번호", example = "02-1234-5678") String landlineNumber,
         @Schema(description = "비고", example = "주요 거래처 담당") String memo,
         @Schema(description = "대표 담당자 여부", example = "true") Boolean isMain) {
-    public static ContractContactResponse from(OutsourcingCompanyContractContact contact) {
+    public static ContractContactResponse from(final OutsourcingCompanyContractContact contact) {
         return new ContractContactResponse(
                 contact.getId(),
                 contact.getName(),

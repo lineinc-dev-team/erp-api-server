@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractHistory;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractHistory;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -35,11 +35,11 @@ public record ContractHistoryResponse(
 
         @Schema(description = "수정일") OffsetDateTime updatedAt) {
 
-    public static ContractHistoryResponse from(OutsourcingCompanyContractHistory history) {
-        var contract = history.getContract();
+    public static ContractHistoryResponse from(final OutsourcingCompanyContractHistory history) {
+        final var contract = history.getContract();
 
         // 담당자명 (대표 담당자 우선, 없으면 첫 번째 담당자)
-        String contactName = contract.getContacts() != null && !contract.getContacts().isEmpty()
+        final String contactName = contract.getContacts() != null && !contract.getContacts().isEmpty()
                 ? contract.getContacts().stream()
                         .filter(contact -> contact.getIsMain())
                         .findFirst()
@@ -48,7 +48,7 @@ public record ContractHistoryResponse(
                 : null;
 
         // 첨부파일 목록
-        List<ContractFileResponse> files = contract.getFiles() != null
+        final List<ContractFileResponse> files = contract.getFiles() != null
                 ? contract.getFiles().stream()
                         .map(ContractFileResponse::from)
                         .toList()

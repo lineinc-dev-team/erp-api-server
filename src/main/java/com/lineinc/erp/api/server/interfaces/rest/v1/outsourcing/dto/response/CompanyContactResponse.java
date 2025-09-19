@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractContact;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractContact;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

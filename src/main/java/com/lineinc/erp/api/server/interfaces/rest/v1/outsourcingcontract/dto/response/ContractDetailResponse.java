@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
@@ -40,7 +40,7 @@ public record ContractDetailResponse(
         @Schema(description = "계약 담당자 목록") List<ContractContactResponse> contacts,
         @Schema(description = "계약 첨부파일 목록") List<ContractFileResponse> files) {
 
-    public static ContractDetailResponse from(OutsourcingCompanyContract contract) {
+    public static ContractDetailResponse from(final OutsourcingCompanyContract contract) {
         return new ContractDetailResponse(
                 contract.getId(),
                 contract.getType() != null ? contract.getType().getLabel() : null,
@@ -52,7 +52,7 @@ public record ContractDetailResponse(
                 contract.getDefaultDeductions() != null && !contract.getDefaultDeductions().trim().isEmpty()
                         ? Arrays.stream(contract.getDefaultDeductions().split(","))
                                 .map(String::trim)
-                                .map(com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
+                                .map(com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
                                 .collect(Collectors.joining(","))
                         : null,
                 contract.getDefaultDeductions() != null ? contract.getDefaultDeductions() : null,

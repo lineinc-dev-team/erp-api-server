@@ -3,8 +3,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractChangeType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractChangeHistory;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -24,7 +24,7 @@ public record ContractChangeHistoryResponse(
         @Schema(description = "변경 유형", example = "담당자") String type,
 
         @Schema(description = "변경 유형 코드", example = "CONTACT") OutsourcingCompanyContractChangeType typeCode) {
-    public static ContractChangeHistoryResponse from(OutsourcingCompanyContractChangeHistory history) {
+    public static ContractChangeHistoryResponse from(final OutsourcingCompanyContractChangeHistory history) {
         return new ContractChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),

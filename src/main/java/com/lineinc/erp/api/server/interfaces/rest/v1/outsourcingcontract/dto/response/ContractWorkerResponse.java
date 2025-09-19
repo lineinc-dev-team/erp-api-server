@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractWorker;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractWorker;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -18,7 +18,7 @@ public record ContractWorkerResponse(
         @Schema(description = "수정일시") OffsetDateTime updatedAt,
         @Schema(description = "인력 파일 목록") List<ContractWorkerFileResponse> files) {
 
-    public static ContractWorkerResponse from(OutsourcingCompanyContractWorker worker) {
+    public static ContractWorkerResponse from(final OutsourcingCompanyContractWorker worker) {
         return new ContractWorkerResponse(
                 worker.getId(),
                 worker.getName(),
@@ -39,7 +39,7 @@ public record ContractWorkerResponse(
             @Schema(description = "카테고리", example = "용접공") String category,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
-        public static ContractWorkerSimpleResponse from(OutsourcingCompanyContractWorker worker) {
+        public static ContractWorkerSimpleResponse from(final OutsourcingCompanyContractWorker worker) {
             return new ContractWorkerSimpleResponse(
                     worker.getId(),
                     worker.getName(),

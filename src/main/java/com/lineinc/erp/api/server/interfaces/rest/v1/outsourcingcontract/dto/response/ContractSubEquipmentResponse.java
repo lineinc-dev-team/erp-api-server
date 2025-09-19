@@ -1,6 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractSubEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -12,7 +12,7 @@ public record ContractSubEquipmentResponse(
         @Schema(description = "설명", example = "비트손료") String description,
         @Schema(description = "메모", example = "특수 부속장비") String memo) {
 
-    public static ContractSubEquipmentResponse from(OutsourcingCompanyContractSubEquipment subEquipment) {
+    public static ContractSubEquipmentResponse from(final OutsourcingCompanyContractSubEquipment subEquipment) {
         return new ContractSubEquipmentResponse(
                 subEquipment.getId(),
                 subEquipment.getType() != null ? subEquipment.getType().getLabel() : null,

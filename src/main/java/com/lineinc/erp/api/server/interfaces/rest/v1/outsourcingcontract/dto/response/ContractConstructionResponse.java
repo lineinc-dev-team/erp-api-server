@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 
 import java.time.OffsetDateTime;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractConstruction;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -21,7 +21,7 @@ public record ContractConstructionResponse(
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt) {
 
-    public static ContractConstructionResponse from(OutsourcingCompanyContractConstruction construction) {
+    public static ContractConstructionResponse from(final OutsourcingCompanyContractConstruction construction) {
         return new ContractConstructionResponse(
                 construction.getId(),
                 construction.getItem(),

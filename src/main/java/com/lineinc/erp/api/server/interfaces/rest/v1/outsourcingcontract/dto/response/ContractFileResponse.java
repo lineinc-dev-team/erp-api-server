@@ -2,8 +2,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 
 import java.time.OffsetDateTime;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractFile;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractFileType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractFile;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractFileType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -18,7 +18,7 @@ public record ContractFileResponse(
         @Schema(description = "파일 유형 코드", example = "CONTRACT") OutsourcingCompanyContractFileType typeCode,
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt) {
-    public static ContractFileResponse from(OutsourcingCompanyContractFile file) {
+    public static ContractFileResponse from(final OutsourcingCompanyContractFile file) {
         return new ContractFileResponse(
                 file.getId(),
                 file.getName(),

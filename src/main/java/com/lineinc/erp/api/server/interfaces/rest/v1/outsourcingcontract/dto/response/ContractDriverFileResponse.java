@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 
 import java.time.OffsetDateTime;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriverFile;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriverFile;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -16,7 +16,7 @@ public record ContractDriverFileResponse(
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt) {
 
-    public static ContractDriverFileResponse from(OutsourcingCompanyContractDriverFile file) {
+    public static ContractDriverFileResponse from(final OutsourcingCompanyContractDriverFile file) {
         return new ContractDriverFileResponse(
                 file.getId(),
                 file.getDocumentType() != null ? file.getDocumentType().getLabel() : null,

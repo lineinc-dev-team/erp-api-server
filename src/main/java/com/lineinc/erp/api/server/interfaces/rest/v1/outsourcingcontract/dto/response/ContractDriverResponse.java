@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -16,7 +16,7 @@ public record ContractDriverResponse(
         @Schema(description = "수정일시") OffsetDateTime updatedAt,
         @Schema(description = "기사 서류 목록") List<ContractDriverFileResponse> files) {
 
-    public static ContractDriverResponse from(OutsourcingCompanyContractDriver driver) {
+    public static ContractDriverResponse from(final OutsourcingCompanyContractDriver driver) {
         return new ContractDriverResponse(
                 driver.getId(),
                 driver.getName(),
@@ -34,7 +34,7 @@ public record ContractDriverResponse(
             @Schema(description = "기사명", example = "김운전") String name,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
-        public static ContractDriverSimpleResponse from(OutsourcingCompanyContractDriver driver) {
+        public static ContractDriverSimpleResponse from(final OutsourcingCompanyContractDriver driver) {
             return new ContractDriverSimpleResponse(
                     driver.getId(),
                     driver.getName(),

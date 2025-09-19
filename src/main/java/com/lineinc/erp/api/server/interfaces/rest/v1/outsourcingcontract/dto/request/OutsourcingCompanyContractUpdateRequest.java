@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyTaxInvoiceConditionType;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractCategoryType;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractStatus;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;

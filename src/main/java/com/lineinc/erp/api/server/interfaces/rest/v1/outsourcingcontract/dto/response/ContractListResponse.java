@@ -3,9 +3,9 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractFileType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContactResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,9 +39,9 @@ public record ContractListResponse(
         @Schema(description = "보증서 첨부 여부") Boolean hasGuaranteeCertificate,
         @Schema(description = "계약서 첨부 여부") Boolean hasContractCertificate) {
 
-    public static ContractListResponse from(OutsourcingCompanyContract contract) {
+    public static ContractListResponse from(final OutsourcingCompanyContract contract) {
         // 담당자 목록 생성 (대표담당자만)
-        List<CompanyContactResponse> contacts = contract.getContacts() != null
+        final List<CompanyContactResponse> contacts = contract.getContacts() != null
                 && !contract.getContacts().isEmpty()
                         ? contract.getContacts().stream()
                                 .filter(contact -> contact.getIsMain())
