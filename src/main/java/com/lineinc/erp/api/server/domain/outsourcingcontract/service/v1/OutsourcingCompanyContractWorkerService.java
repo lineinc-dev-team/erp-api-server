@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcingcontract.service;
+package com.lineinc.erp.api.server.domain.outsourcingcontract.service.v1;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -45,16 +45,17 @@ public class OutsourcingCompanyContractWorkerService {
      * 계약 인력 정보를 수정합니다.
      */
     @Transactional
-    public void updateContractWorkers(Long contractId, List<OutsourcingCompanyContractWorkerUpdateRequest> workers) {
+    public void updateContractWorkers(final Long contractId,
+            final List<OutsourcingCompanyContractWorkerUpdateRequest> workers) {
         // 1. 계약이 존재하는지 확인
-        OutsourcingCompanyContract contract = contractRepository.findById(contractId)
+        final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
                 .orElseThrow(
                         () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
         // 2. 변경 전 스냅샷 생성 (파일 포함)
-        List<OutsourcingCompanyContractWorker> beforeWorkers = contract.getWorkers().stream()
+        final List<OutsourcingCompanyContractWorker> beforeWorkers = contract.getWorkers().stream()
                 .map(worker -> {
-                    OutsourcingCompanyContractWorker snapshot = JaversUtils.createSnapshot(javers, worker,
+                    final OutsourcingCompanyContractWorker snapshot = JaversUtils.createSnapshot(javers, worker,
                             OutsourcingCompanyContractWorker.class);
                     return snapshot;
                 })
@@ -64,8 +65,8 @@ public class OutsourcingCompanyContractWorkerService {
         EntitySyncUtils.syncList(
                 contract.getWorkers(),
                 workers,
-                (OutsourcingCompanyContractWorkerUpdateRequest dto) -> {
-                    OutsourcingCompanyContractWorker worker = OutsourcingCompanyContractWorker.builder()
+                (final OutsourcingCompanyContractWorkerUpdateRequest dto) -> {
+                    final OutsourcingCompanyContractWorker worker = OutsourcingCompanyContractWorker.builder()
                             .name(dto.name())
                             .category(dto.category())
                             .taskDescription(dto.taskDescription())
@@ -90,69 +91,69 @@ public class OutsourcingCompanyContractWorkerService {
         contractRepository.save(contract);
 
         // 4. 변경사항 추출 및 변경 히스토리 저장
-        List<OutsourcingCompanyContractWorker> afterWorkers = new ArrayList<>(contract.getWorkers());
-        Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
+        final List<OutsourcingCompanyContractWorker> afterWorkers = new ArrayList<>(contract.getWorkers());
+        final Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
 
-        Set<Long> beforeIds = beforeWorkers.stream()
+        final Set<Long> beforeIds = beforeWorkers.stream()
                 .map(OutsourcingCompanyContractWorker::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (OutsourcingCompanyContractWorker after : afterWorkers) {
+        for (final OutsourcingCompanyContractWorker after : afterWorkers) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
-        Map<Long, OutsourcingCompanyContractWorker> afterMap = afterWorkers.stream()
+        final Map<Long, OutsourcingCompanyContractWorker> afterMap = afterWorkers.stream()
                 .filter(w -> w.getId() != null)
                 .collect(Collectors.toMap(OutsourcingCompanyContractWorker::getId, w -> w));
 
-        for (OutsourcingCompanyContractWorker before : beforeWorkers) {
+        for (final OutsourcingCompanyContractWorker before : beforeWorkers) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            OutsourcingCompanyContractWorker after = afterMap.get(before.getId());
+            final OutsourcingCompanyContractWorker after = afterMap.get(before.getId());
 
             // 인력 단위 변경 감지 (파일은 포함되지 않음)
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
 
             // 워커가 그대로 존재하는 경우에만 파일 변경사항 감지
-            List<OutsourcingCompanyContractWorkerFile> beforeFiles = before.getFiles();
-            List<OutsourcingCompanyContractWorkerFile> afterFiles = after.getFiles();
-            Set<Long> beforeFileIds = beforeFiles.stream()
+            final List<OutsourcingCompanyContractWorkerFile> beforeFiles = before.getFiles();
+            final List<OutsourcingCompanyContractWorkerFile> afterFiles = after.getFiles();
+            final Set<Long> beforeFileIds = beforeFiles.stream()
                     .map(OutsourcingCompanyContractWorkerFile::getId)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
 
             // 파일 추가 감지
-            for (OutsourcingCompanyContractWorkerFile afterFile : afterFiles) {
+            for (final OutsourcingCompanyContractWorkerFile afterFile : afterFiles) {
                 if (afterFile.getId() == null || !beforeFileIds.contains(afterFile.getId())) {
                     allChanges.add(JaversUtils.extractAddedEntityChange(javers, afterFile));
                 }
             }
 
             // 파일 수정 감지
-            Map<Long, OutsourcingCompanyContractWorkerFile> afterFileMap = afterFiles.stream()
+            final Map<Long, OutsourcingCompanyContractWorkerFile> afterFileMap = afterFiles.stream()
                     .filter(f -> f.getId() != null)
                     .collect(Collectors.toMap(OutsourcingCompanyContractWorkerFile::getId, f -> f));
 
-            for (OutsourcingCompanyContractWorkerFile beforeFile : beforeFiles) {
+            for (final OutsourcingCompanyContractWorkerFile beforeFile : beforeFiles) {
                 if (beforeFile.getId() == null || !afterFileMap.containsKey(beforeFile.getId()))
                     continue;
 
-                OutsourcingCompanyContractWorkerFile afterFile = afterFileMap.get(beforeFile.getId());
-                Diff fileDiff = javers.compare(beforeFile, afterFile);
-                List<Map<String, String>> fileModified = JaversUtils.extractModifiedChanges(javers, fileDiff);
+                final OutsourcingCompanyContractWorkerFile afterFile = afterFileMap.get(beforeFile.getId());
+                final Diff fileDiff = javers.compare(beforeFile, afterFile);
+                final List<Map<String, String>> fileModified = JaversUtils.extractModifiedChanges(javers, fileDiff);
                 allChanges.addAll(fileModified);
             }
         }
 
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
                     .outsourcingCompanyContract(contract)
                     .type(OutsourcingCompanyContractChangeType.WORKER)
                     .changes(json)

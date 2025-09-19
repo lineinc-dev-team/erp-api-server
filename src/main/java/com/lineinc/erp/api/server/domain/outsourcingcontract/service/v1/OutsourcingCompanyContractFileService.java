@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcingcontract.service;
+package com.lineinc.erp.api.server.domain.outsourcingcontract.service.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractContact;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractFile;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.repository.OutsourcingCompanyContractRepository;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractContactUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
@@ -27,86 +27,85 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 외주업체 계약 담당자 서비스
+ * 외주업체 계약 첨부파일 서비스
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class OutsourcingCompanyContractContactService {
+public class OutsourcingCompanyContractFileService {
 
     private final OutsourcingCompanyContractRepository contractRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository changeHistoryRepository;
     private final Javers javers;
 
     /**
-     * 계약 담당자 정보를 수정합니다.
+     * 계약 첨부파일 정보를 수정합니다.
      */
     @Transactional
-    public void updateContractContacts(Long contractId, List<OutsourcingCompanyContractContactUpdateRequest> contacts) {
+    public void updateContractFiles(final Long contractId,
+            final List<OutsourcingCompanyContractFileUpdateRequest> files) {
+        log.info("계약 첨부파일 정보 수정: contractId={}, files={}", contractId, files);
 
         // 1. 계약이 존재하는지 확인
-        OutsourcingCompanyContract contract = contractRepository.findById(contractId)
+        final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
                 .orElseThrow(
                         () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
         // 2. 변경 전 스냅샷 생성
-        List<OutsourcingCompanyContractContact> beforeContacts = contract.getContacts().stream()
-                .map(contact -> JaversUtils.createSnapshot(javers, contact, OutsourcingCompanyContractContact.class))
+        final List<OutsourcingCompanyContractFile> beforeFiles = contract.getFiles().stream()
+                .map(file -> JaversUtils.createSnapshot(javers, file, OutsourcingCompanyContractFile.class))
                 .toList();
 
-        // 3. 담당자 정보 동기화 (EntitySyncUtils 사용)
+        // 3. 첨부파일 정보 동기화 (EntitySyncUtils 사용)
         EntitySyncUtils.syncList(
-                contract.getContacts(),
-                contacts,
-                (OutsourcingCompanyContractContactUpdateRequest dto) -> OutsourcingCompanyContractContact.builder()
+                contract.getFiles(),
+                files,
+                (final OutsourcingCompanyContractFileUpdateRequest dto) -> OutsourcingCompanyContractFile.builder()
                         .name(dto.name())
-                        .department(dto.department())
-                        .position(dto.position())
-                        .landlineNumber(dto.landlineNumber())
-                        .phoneNumber(dto.phoneNumber())
-                        .email(dto.email())
+                        .fileUrl(dto.fileUrl())
+                        .originalFileName(dto.originalFileName())
+                        .type(dto.type())
                         .memo(dto.memo())
                         .outsourcingCompanyContract(contract)
                         .build());
 
         // 4. 변경사항 추출 및 변경 히스토리 저장
-        List<OutsourcingCompanyContractContact> afterContacts = new ArrayList<>(contract.getContacts());
-        List<Map<String, String>> allChanges = new ArrayList<>();
+        final List<OutsourcingCompanyContractFile> afterFiles = new ArrayList<>(contract.getFiles());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
 
-        Set<Long> beforeIds = beforeContacts.stream()
-                .map(OutsourcingCompanyContractContact::getId)
+        final Set<Long> beforeIds = beforeFiles.stream()
+                .map(OutsourcingCompanyContractFile::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (OutsourcingCompanyContractContact after : afterContacts) {
+        for (final OutsourcingCompanyContractFile after : afterFiles) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
-        Map<Long, OutsourcingCompanyContractContact> afterMap = afterContacts.stream()
-                .filter(c -> c.getId() != null)
-                .collect(Collectors.toMap(OutsourcingCompanyContractContact::getId, c -> c));
+        final Map<Long, OutsourcingCompanyContractFile> afterMap = afterFiles.stream()
+                .filter(f -> f.getId() != null)
+                .collect(Collectors.toMap(OutsourcingCompanyContractFile::getId, f -> f));
 
-        for (OutsourcingCompanyContractContact before : beforeContacts) {
+        for (final OutsourcingCompanyContractFile before : beforeFiles) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
-            OutsourcingCompanyContractContact after = afterMap.get(before.getId());
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final OutsourcingCompanyContractFile after = afterMap.get(before.getId());
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
         }
 
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
                     .outsourcingCompanyContract(contract)
-                    .type(OutsourcingCompanyContractChangeType.CONTACT)
+                    .type(OutsourcingCompanyContractChangeType.ATTACHMENT)
                     .changes(json)
                     .build();
             changeHistoryRepository.save(history);
         }
     }
-
 }

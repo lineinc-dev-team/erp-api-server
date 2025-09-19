@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcingcontract.service;
+package com.lineinc.erp.api.server.domain.outsourcingcontract.service.v1;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -40,17 +40,18 @@ public class OutsourcingCompanyContractConstructionService {
      * 계약 공사항목 정보를 수정합니다.
      */
     @Transactional
-    public void updateContractConstructions(Long contractId,
-            List<OutsourcingCompanyContractConstructionUpdateRequest> constructions) {
+    public void updateContractConstructions(final Long contractId,
+            final List<OutsourcingCompanyContractConstructionUpdateRequest> constructions) {
         // 1. 계약 존재 확인
-        OutsourcingCompanyContract contract = contractRepository.findById(contractId)
+        final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
                 .orElseThrow(
                         () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
         // 2. 변경 전 스냅샷 생성
-        List<OutsourcingCompanyContractConstruction> beforeConstructions = contract.getConstructions().stream()
+        final List<OutsourcingCompanyContractConstruction> beforeConstructions = contract.getConstructions().stream()
                 .map(construction -> {
-                    OutsourcingCompanyContractConstruction snapshot = JaversUtils.createSnapshot(javers, construction,
+                    final OutsourcingCompanyContractConstruction snapshot = JaversUtils.createSnapshot(javers,
+                            construction,
                             OutsourcingCompanyContractConstruction.class);
                     return snapshot;
                 })
@@ -60,8 +61,8 @@ public class OutsourcingCompanyContractConstructionService {
         EntitySyncUtils.syncList(
                 contract.getConstructions(),
                 constructions,
-                (OutsourcingCompanyContractConstructionUpdateRequest dto) -> {
-                    OutsourcingCompanyContractConstruction construction = OutsourcingCompanyContractConstruction
+                (final OutsourcingCompanyContractConstructionUpdateRequest dto) -> {
+                    final OutsourcingCompanyContractConstruction construction = OutsourcingCompanyContractConstruction
                             .builder()
                             .outsourcingCompanyContract(contract)
                             .item(dto.item())
@@ -81,40 +82,41 @@ public class OutsourcingCompanyContractConstructionService {
         contractRepository.save(contract);
 
         // 4. 변경사항 추출 및 변경 히스토리 저장
-        List<OutsourcingCompanyContractConstruction> afterConstructions = new ArrayList<>(contract.getConstructions());
-        Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
+        final List<OutsourcingCompanyContractConstruction> afterConstructions = new ArrayList<>(
+                contract.getConstructions());
+        final Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
 
-        Set<Long> beforeIds = beforeConstructions.stream()
+        final Set<Long> beforeIds = beforeConstructions.stream()
                 .map(OutsourcingCompanyContractConstruction::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (OutsourcingCompanyContractConstruction after : afterConstructions) {
+        for (final OutsourcingCompanyContractConstruction after : afterConstructions) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
-        Map<Long, OutsourcingCompanyContractConstruction> afterMap = afterConstructions.stream()
+        final Map<Long, OutsourcingCompanyContractConstruction> afterMap = afterConstructions.stream()
                 .filter(c -> c.getId() != null)
                 .collect(Collectors.toMap(OutsourcingCompanyContractConstruction::getId, c -> c));
 
-        for (OutsourcingCompanyContractConstruction before : beforeConstructions) {
+        for (final OutsourcingCompanyContractConstruction before : beforeConstructions) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            OutsourcingCompanyContractConstruction after = afterMap.get(before.getId());
+            final OutsourcingCompanyContractConstruction after = afterMap.get(before.getId());
 
             // 공사항목 단위 변경 감지
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
         }
 
         // 5. 변경 히스토리 저장
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
                     .outsourcingCompanyContract(contract)
                     .type(OutsourcingCompanyContractChangeType.CONSTRUCTION)
                     .changes(json)

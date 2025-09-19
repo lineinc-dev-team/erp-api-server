@@ -24,7 +24,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCo
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.enums.OutsourcingCompanyContractType;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.service.OutsourcingCompanyContractService;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;

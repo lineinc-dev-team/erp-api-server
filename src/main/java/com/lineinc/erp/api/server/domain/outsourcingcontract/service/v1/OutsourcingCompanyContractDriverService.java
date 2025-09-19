@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcingcontract.service;
+package com.lineinc.erp.api.server.domain.outsourcingcontract.service.v1;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -41,19 +41,20 @@ public class OutsourcingCompanyContractDriverService {
      * 계약 운전자 정보를 수정합니다.
      */
     @Transactional
-    public void updateContractDrivers(Long contractId, List<OutsourcingCompanyContractDriverUpdateRequest> drivers) {
+    public void updateContractDrivers(final Long contractId,
+            final List<OutsourcingCompanyContractDriverUpdateRequest> drivers) {
         // 1. 계약 존재 확인
-        OutsourcingCompanyContract contract = contractRepository.findById(contractId)
+        final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
                 .orElseThrow(
                         () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
         // 2. 변경 전 스냅샷 생성 (파일 포함)
-        List<OutsourcingCompanyContractDriver> beforeDrivers = contract.getDrivers().stream()
+        final List<OutsourcingCompanyContractDriver> beforeDrivers = contract.getDrivers().stream()
                 .map(driver -> {
                     // 운전자 파일의 transient 필드 동기화
                     driver.getFiles().forEach(OutsourcingCompanyContractDriverFile::syncTransientFields);
 
-                    OutsourcingCompanyContractDriver snapshot = JaversUtils.createSnapshot(javers, driver,
+                    final OutsourcingCompanyContractDriver snapshot = JaversUtils.createSnapshot(javers, driver,
                             OutsourcingCompanyContractDriver.class);
                     // 파일 목록도 깊은 복사로 생성
                     snapshot.setFiles(driver.getFiles().stream()
@@ -68,8 +69,8 @@ public class OutsourcingCompanyContractDriverService {
         EntitySyncUtils.syncList(
                 contract.getDrivers(),
                 drivers,
-                (OutsourcingCompanyContractDriverUpdateRequest dto) -> {
-                    OutsourcingCompanyContractDriver driver = OutsourcingCompanyContractDriver.builder()
+                (final OutsourcingCompanyContractDriverUpdateRequest dto) -> {
+                    final OutsourcingCompanyContractDriver driver = OutsourcingCompanyContractDriver.builder()
                             .outsourcingCompanyContract(contract)
                             .name(dto.name())
                             .memo(dto.memo())
@@ -79,7 +80,7 @@ public class OutsourcingCompanyContractDriverService {
                     if (dto.files() != null && !dto.files().isEmpty()) {
                         driver.setFiles(dto.files().stream()
                                 .map(fileDto -> {
-                                    OutsourcingCompanyContractDriverFile file = OutsourcingCompanyContractDriverFile
+                                    final OutsourcingCompanyContractDriverFile file = OutsourcingCompanyContractDriverFile
                                             .builder()
                                             .driver(driver)
                                             .documentType(fileDto.documentType())
@@ -99,70 +100,70 @@ public class OutsourcingCompanyContractDriverService {
         contractRepository.save(contract);
 
         // 4. 변경사항 추출 및 변경 히스토리 저장
-        List<OutsourcingCompanyContractDriver> afterDrivers = new ArrayList<>(contract.getDrivers());
-        Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
+        final List<OutsourcingCompanyContractDriver> afterDrivers = new ArrayList<>(contract.getDrivers());
+        final Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
 
-        Set<Long> beforeIds = beforeDrivers.stream()
+        final Set<Long> beforeIds = beforeDrivers.stream()
                 .map(OutsourcingCompanyContractDriver::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (OutsourcingCompanyContractDriver after : afterDrivers) {
+        for (final OutsourcingCompanyContractDriver after : afterDrivers) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
-        Map<Long, OutsourcingCompanyContractDriver> afterMap = afterDrivers.stream()
+        final Map<Long, OutsourcingCompanyContractDriver> afterMap = afterDrivers.stream()
                 .filter(d -> d.getId() != null)
                 .collect(Collectors.toMap(OutsourcingCompanyContractDriver::getId, d -> d));
 
-        for (OutsourcingCompanyContractDriver before : beforeDrivers) {
+        for (final OutsourcingCompanyContractDriver before : beforeDrivers) {
             if (before.getId() == null || !afterMap.containsKey(before.getId()))
                 continue;
 
-            OutsourcingCompanyContractDriver after = afterMap.get(before.getId());
+            final OutsourcingCompanyContractDriver after = afterMap.get(before.getId());
 
             // 운전자 단위 변경 감지 (파일은 포함되지 않음)
-            Diff diff = javers.compare(before, after);
-            List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
+            final Diff diff = javers.compare(before, after);
+            final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
 
             // 운전자가 그대로 존재하는 경우에만 파일 변경사항 감지
-            List<OutsourcingCompanyContractDriverFile> beforeFiles = before.getFiles();
-            List<OutsourcingCompanyContractDriverFile> afterFiles = after.getFiles();
-            Set<Long> beforeFileIds = beforeFiles.stream()
+            final List<OutsourcingCompanyContractDriverFile> beforeFiles = before.getFiles();
+            final List<OutsourcingCompanyContractDriverFile> afterFiles = after.getFiles();
+            final Set<Long> beforeFileIds = beforeFiles.stream()
                     .map(OutsourcingCompanyContractDriverFile::getId)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
 
             // 파일 추가 감지
-            for (OutsourcingCompanyContractDriverFile afterFile : afterFiles) {
+            for (final OutsourcingCompanyContractDriverFile afterFile : afterFiles) {
                 if (afterFile.getId() == null || !beforeFileIds.contains(afterFile.getId())) {
                     allChanges.add(JaversUtils.extractAddedEntityChange(javers, afterFile));
                 }
             }
 
             // 파일 수정 감지
-            Map<Long, OutsourcingCompanyContractDriverFile> afterFileMap = afterFiles.stream()
+            final Map<Long, OutsourcingCompanyContractDriverFile> afterFileMap = afterFiles.stream()
                     .filter(f -> f.getId() != null)
                     .collect(Collectors.toMap(OutsourcingCompanyContractDriverFile::getId, f -> f));
 
-            for (OutsourcingCompanyContractDriverFile beforeFile : beforeFiles) {
+            for (final OutsourcingCompanyContractDriverFile beforeFile : beforeFiles) {
                 if (beforeFile.getId() == null || !afterFileMap.containsKey(beforeFile.getId()))
                     continue;
 
-                OutsourcingCompanyContractDriverFile afterFile = afterFileMap.get(beforeFile.getId());
-                Diff fileDiff = javers.compare(beforeFile, afterFile);
-                List<Map<String, String>> fileModified = JaversUtils.extractModifiedChanges(javers, fileDiff);
+                final OutsourcingCompanyContractDriverFile afterFile = afterFileMap.get(beforeFile.getId());
+                final Diff fileDiff = javers.compare(beforeFile, afterFile);
+                final List<Map<String, String>> fileModified = JaversUtils.extractModifiedChanges(javers, fileDiff);
                 allChanges.addAll(fileModified);
             }
         }
 
         // 5. 변경 히스토리 저장
         if (!allChanges.isEmpty()) {
-            String json = javers.getJsonConverter().toJson(allChanges);
-            OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()
                     .outsourcingCompanyContract(contract)
                     .type(OutsourcingCompanyContractChangeType.DRIVER)
                     .changes(json)

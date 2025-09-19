@@ -20,7 +20,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
-import com.lineinc.erp.api.server.domain.outsourcingcontract.service.OutsourcingCompanyContractService;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest.FuelInfoUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;

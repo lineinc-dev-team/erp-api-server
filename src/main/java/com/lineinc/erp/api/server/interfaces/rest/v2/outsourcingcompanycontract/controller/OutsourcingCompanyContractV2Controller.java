@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.outsourcingcontract.service.OutsourcingCompanyContractService;
+import com.lineinc.erp.api.server.domain.outsourcingcontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractChangeHistoryResponse;
@@ -43,10 +43,10 @@ public class OutsourcingCompanyContractV2Controller {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ContractChangeHistoryResponse>>> getContractChangeHistories(
-            @PathVariable Long id,
-            @Valid PageRequest pageRequest,
-            @Valid SortRequest sortRequest) {
-        Page<ContractChangeHistoryResponse> page = outsourcingCompanyContractService
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Page<ContractChangeHistoryResponse> page = outsourcingCompanyContractService
                 .getContractChangeHistoriesWithPaging(
                         id,
                         PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
