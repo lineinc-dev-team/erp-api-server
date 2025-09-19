@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Repository
 @RequiredArgsConstructor
-public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
+public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     private final QClientCompany clientCompany = QClientCompany.clientCompany;

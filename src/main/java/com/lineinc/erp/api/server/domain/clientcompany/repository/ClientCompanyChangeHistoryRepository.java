@@ -12,7 +12,7 @@ import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChangeHistory;
 
 @Repository
-public interface CompanyChangeHistoryRepository extends JpaRepository<ClientCompanyChangeHistory, Long> {
+public interface ClientCompanyChangeHistoryRepository extends JpaRepository<ClientCompanyChangeHistory, Long> {
 
     /**
      * 특정 발주처의 변경 이력을 페이징하여 조회 (Slice 방식)

@@ -15,7 +15,7 @@ import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
-import com.lineinc.erp.api.server.domain.clientcompany.repository.CompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.clientcompany.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CompanyContactService {
 
-    private final CompanyChangeHistoryRepository companyChangeHistoryRepository;
+    private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
     private final Javers javers;
 
     public void createClientCompanyContacts(final ClientCompany clientCompany,
@@ -109,7 +109,7 @@ public class CompanyContactService {
                     .type(ClientCompanyChangeHistoryChangeType.CONTACT)
                     .changes(json)
                     .build();
-            companyChangeHistoryRepository.save(history);
+            clientCompanyChangeHistoryRepository.save(history);
         }
     }
 

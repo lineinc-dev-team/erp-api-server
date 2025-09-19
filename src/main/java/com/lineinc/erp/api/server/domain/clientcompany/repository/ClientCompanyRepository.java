@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 
 @Repository
-public interface CompanyRepository extends JpaRepository<ClientCompany, Long>, CompanyRepositoryCustom {
+public interface ClientCompanyRepository extends JpaRepository<ClientCompany, Long>, ClientCompanyRepositoryCustom {
 
     /**
      * 발주처명으로 검색하여 슬라이스 조회
