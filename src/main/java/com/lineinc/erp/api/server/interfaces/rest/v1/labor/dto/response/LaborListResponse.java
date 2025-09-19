@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labor.enums.WorkType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
 
@@ -18,7 +18,7 @@ public record LaborListResponse(
         @Schema(description = "구분 설명") String typeDescription,
         @Schema(description = "이름") String name,
         @Schema(description = "공종") String workType,
-        @Schema(description = "공종 코드") WorkType workTypeCode,
+        @Schema(description = "공종 코드") LaborWorkType workTypeCode,
         @Schema(description = "공종 설명") String workTypeDescription,
         @Schema(description = "본사 인력 여부") Boolean isHeadOffice,
         @Schema(description = "주작업") String mainWork,

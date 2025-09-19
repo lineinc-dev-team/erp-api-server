@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labor.enums.WorkType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.domain.labor.service.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
@@ -103,7 +103,7 @@ public class LaborController {
     @GetMapping("/work-types")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WorkTypeResponse>>> getWorkTypes() {
-        final List<WorkTypeResponse> workTypes = Arrays.stream(WorkType.values())
+        final List<WorkTypeResponse> workTypes = Arrays.stream(LaborWorkType.values())
                 .map(WorkTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(workTypes));

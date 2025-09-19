@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request;
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.labor.enums.WorkType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -11,7 +11,7 @@ public record LaborUpdateRequest(
         @Schema(description = "구분 설명", example = "기술공") String typeDescription,
         @Schema(description = "이름", example = "홍길동") String name,
         @Schema(description = "주민등록번호", example = "860101-1234567") String residentNumber,
-        @Schema(description = "공종", example = "SCAFFOLDING") WorkType workType,
+        @Schema(description = "공종", example = "SCAFFOLDING") LaborWorkType workType,
         @Schema(description = "공종 설명", example = "콘크리트 공사") String workTypeDescription,
         @Schema(description = "주작업", example = "콘크리트 타설") String mainWork,
         @Schema(description = "기준일당", example = "150000") Long dailyWage,

@@ -10,7 +10,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborFileType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labor.enums.WorkType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -85,7 +85,7 @@ public class Labor extends BaseEntity {
     @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
-    private WorkType workType;
+    private LaborWorkType workType;
 
     /**
      * 공종 설명

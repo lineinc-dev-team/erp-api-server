@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response;
 
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labor.enums.WorkType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
 
@@ -27,14 +27,14 @@ public record LaborSimpleResponse(
         @Schema(description = "소속 업체") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "본사여부") Boolean isHeadOffice,
         @Schema(description = "공종") String workType,
-        @Schema(description = "공종 코드") WorkType workTypeCode,
+        @Schema(description = "공종 코드") LaborWorkType workTypeCode,
         @Schema(description = "공종 설명") String workTypeDescription,
         @Schema(description = "주작업") String mainWork) {
 
     /**
      * Labor 엔티티로부터 DTO 생성
      */
-    public static LaborSimpleResponse from(Labor labor) {
+    public static LaborSimpleResponse from(final Labor labor) {
         return new LaborSimpleResponse(
                 labor.getId(),
                 labor.getType() != null ? labor.getType().getLabel() : null,

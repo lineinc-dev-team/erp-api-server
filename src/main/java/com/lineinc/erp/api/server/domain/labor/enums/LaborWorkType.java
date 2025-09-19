@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum WorkType {
+public enum LaborWorkType {
     FOREMAN("반장"),
     CARPENTER("목수"),
     REBAR("철근"),
