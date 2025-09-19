@@ -29,4 +29,15 @@ public interface OutsourcingCompanyChangeRepository extends JpaRepository<Outsou
     Page<OutsourcingCompanyChangeHistory> findAllByOutsourcingCompanyWithPaging(
             @Param("company") OutsourcingCompany company,
             Pageable pageable);
+
+    /**
+     * 외주업체 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param companyId 외주업체 ID
+     * @param pageable  페이징 정보
+     * @return 외주업체 변경 이력 페이지
+     */
+    @Query("SELECT och FROM OutsourcingCompanyChangeHistory och WHERE och.outsourcingCompany.id = :companyId")
+    Page<OutsourcingCompanyChangeHistory> findByCompanyIdWithPaging(
+            @Param("companyId") Long companyId, Pageable pageable);
 }
