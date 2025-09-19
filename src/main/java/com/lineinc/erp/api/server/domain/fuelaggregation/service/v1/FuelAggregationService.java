@@ -23,7 +23,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregat
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.service.OutsourcingCompanyContractService;

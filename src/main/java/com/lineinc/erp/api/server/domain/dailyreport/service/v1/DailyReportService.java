@@ -30,7 +30,7 @@ import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollSyncService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractWorker;

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.entity.OutsourcingCompanyContractConstruction;

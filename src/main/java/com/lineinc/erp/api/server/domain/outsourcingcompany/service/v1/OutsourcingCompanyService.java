@@ -1,4 +1,4 @@
-package com.lineinc.erp.api.server.domain.outsourcingcompany.service;
+package com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1;
 
 import java.util.List;
 import java.util.Map;

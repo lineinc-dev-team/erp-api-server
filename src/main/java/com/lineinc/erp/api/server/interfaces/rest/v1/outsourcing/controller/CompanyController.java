@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcontract.service.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;

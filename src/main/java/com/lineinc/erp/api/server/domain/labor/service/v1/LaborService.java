@@ -26,7 +26,7 @@ import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.DeleteLaborsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborFileCreateRequest;

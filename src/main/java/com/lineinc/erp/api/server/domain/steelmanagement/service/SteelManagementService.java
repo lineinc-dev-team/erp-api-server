@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.service.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.SiteProcessService;
