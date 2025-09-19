@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.domain.managementcost.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;

@@ -12,8 +12,9 @@ import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -25,8 +26,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

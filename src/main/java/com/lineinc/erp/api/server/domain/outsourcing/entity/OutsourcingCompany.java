@@ -1,21 +1,38 @@
 package com.lineinc.erp.api.server.domain.outsourcing.entity;
 
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcing.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -147,7 +164,7 @@ public class OutsourcingCompany extends BaseEntity {
                         .collect(Collectors.joining(","));
     }
 
-    public void updateFrom(OutsourcingCompanyUpdateRequest request) {
+    public void updateFrom(final OutsourcingCompanyUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
         Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
@@ -171,8 +188,8 @@ public class OutsourcingCompany extends BaseEntity {
     /**
      * 외주업체 기본 정보를 업데이트합니다.
      */
-    public void updateOutsourcingCompanyInfo(String name, String businessNumber, String ceoName,
-            String bankName, String accountNumber, String accountHolder, String memo) {
+    public void updateOutsourcingCompanyInfo(final String name, final String businessNumber, final String ceoName,
+            final String bankName, final String accountNumber, final String accountHolder, final String memo) {
         Optional.ofNullable(name).ifPresent(val -> this.name = val);
         Optional.ofNullable(businessNumber).ifPresent(val -> this.businessNumber = val);
         Optional.ofNullable(ceoName).ifPresent(val -> this.ceoName = val);

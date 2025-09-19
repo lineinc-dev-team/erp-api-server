@@ -24,10 +24,10 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourci
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labormanagement.repository.LaborRepository;
-import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
+import com.lineinc.erp.api.server.domain.labor.service.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.LaborPayrollSyncService;
 import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcing.service.OutsourcingCompanyService;

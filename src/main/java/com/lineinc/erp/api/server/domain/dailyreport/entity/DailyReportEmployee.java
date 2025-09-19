@@ -1,16 +1,27 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo;
-
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -48,13 +59,13 @@ public class DailyReportEmployee extends BaseEntity {
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
-    public void updateFrom(EmployeeUpdateInfo request) {
+    public void updateFrom(final EmployeeUpdateInfo request) {
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 
-    public void setEntities(Labor labor) {
+    public void setEntities(final Labor labor) {
         this.labor = labor;
     }
 }

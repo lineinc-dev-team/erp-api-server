@@ -47,12 +47,13 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
             "updatedAt", materialManagement.updatedAt);
 
     @Override
-    public Page<MaterialManagementResponse> findAll(MaterialManagementListRequest request, Pageable pageable) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+    public Page<MaterialManagementResponse> findAll(final MaterialManagementListRequest request,
+            final Pageable pageable) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         // MaterialManagementDetail을 기준으로 조회하되, MaterialManagement 기준으로만 정렬
-        List<MaterialManagementDetail> detailContent = queryFactory
+        final List<MaterialManagementDetail> detailContent = queryFactory
                 .selectFrom(materialManagementDetail)
                 .innerJoin(materialManagementDetail.materialManagement, materialManagement).fetchJoin()
                 .leftJoin(materialManagement.site, site).fetchJoin()
@@ -65,7 +66,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .fetch();
 
         // 전체 MaterialManagementDetail 개수 조회 (페이지네이션용)
-        Long totalCount = queryFactory
+        final Long totalCount = queryFactory
                 .select(materialManagementDetail.count())
                 .from(materialManagementDetail)
                 .innerJoin(materialManagementDetail.materialManagement, materialManagement)
@@ -75,18 +76,18 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .where(condition)
                 .fetchOne();
 
-        long total = Objects.requireNonNullElse(totalCount, 0L);
+        final long total = Objects.requireNonNullElse(totalCount, 0L);
 
         // 각 상세품목에 대해 MaterialManagement 정보와 해당 상세품목을 포함하여 응답 생성
-        List<MaterialManagementResponse> responses = detailContent.stream()
+        final List<MaterialManagementResponse> responses = detailContent.stream()
                 .map(detail -> MaterialManagementResponse.from(detail.getMaterialManagement(), detail))
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
     }
 
-    private BooleanBuilder buildCondition(MaterialManagementListRequest request) {
-        BooleanBuilder builder = new BooleanBuilder();
+    private BooleanBuilder buildCondition(final MaterialManagementListRequest request) {
+        final BooleanBuilder builder = new BooleanBuilder();
         builder.and(materialManagement.deleted.eq(false));
 
         if (StringUtils.hasText(request.siteName())) {
@@ -104,13 +105,13 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
 
         // 시작일 검색 (시작일 이후)
         if (request.deliveryStartDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.deliveryStartDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.deliveryStartDate());
             builder.and(materialManagement.deliveryDate.goe(dateRange[0]));
         }
 
         // 종료일 검색 (종료일 이전)
         if (request.deliveryEndDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.deliveryEndDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.deliveryEndDate());
             builder.and(materialManagement.deliveryDate.lt(dateRange[1]));
         }
 
@@ -118,12 +119,13 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
     }
 
     @Override
-    public List<MaterialManagementResponse> findAllWithoutPaging(MaterialManagementListRequest request, Sort sort) {
-        BooleanBuilder condition = buildCondition(request);
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+    public List<MaterialManagementResponse> findAllWithoutPaging(final MaterialManagementListRequest request,
+            final Sort sort) {
+        final BooleanBuilder condition = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         // MaterialManagementDetail을 기준으로 조회하되, MaterialManagement 기준으로만 정렬
-        List<MaterialManagementDetail> detailContent = queryFactory
+        final List<MaterialManagementDetail> detailContent = queryFactory
                 .selectFrom(materialManagementDetail)
                 .innerJoin(materialManagementDetail.materialManagement, materialManagement).fetchJoin()
                 .leftJoin(materialManagement.site, site).fetchJoin()
@@ -134,7 +136,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .fetch();
 
         // 각 상세품목에 대해 MaterialManagement 정보와 해당 상세품목을 포함하여 응답 생성
-        List<MaterialManagementResponse> responses = detailContent.stream()
+        final List<MaterialManagementResponse> responses = detailContent.stream()
                 .map(detail -> MaterialManagementResponse.from(detail.getMaterialManagement(), detail))
                 .toList();
 

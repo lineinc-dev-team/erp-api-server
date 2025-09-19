@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
-import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborSimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -24,7 +24,7 @@ public record ManagementCostMealFeeDetailResponse(
         @Schema(description = "비고", example = "현장 식대") String memo,
 
         @Schema(description = "인력 정보") LaborSimpleResponse labor) {
-    public static ManagementCostMealFeeDetailResponse from(ManagementCostMealFeeDetail detail) {
+    public static ManagementCostMealFeeDetailResponse from(final ManagementCostMealFeeDetail detail) {
         return new ManagementCostMealFeeDetailResponse(
                 detail.getId(),
                 detail.getWorkType(),

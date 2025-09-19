@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response;
 
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labormanagement.enums.WorkType;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.domain.labor.enums.WorkType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
 

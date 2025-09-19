@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.DayOfWeek;
 
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 
 /**

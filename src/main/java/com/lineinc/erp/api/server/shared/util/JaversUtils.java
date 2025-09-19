@@ -21,7 +21,7 @@ import org.javers.core.diff.changetype.ValueChange;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.LaborFile;
+import com.lineinc.erp.api.server.domain.labor.entity.LaborFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;

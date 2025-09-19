@@ -1,12 +1,12 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
-import com.lineinc.erp.api.server.interfaces.rest.v1.labormanagement.dto.response.LaborNameResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.time.OffsetDateTime;
 
 @Schema(description = "출역일보 직영/계약직 응답")
 public record DailyReportDirectContractResponse(
@@ -30,7 +30,7 @@ public record DailyReportDirectContractResponse(
 
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
 
-    public static DailyReportDirectContractResponse from(DailyReportDirectContract directContract) {
+    public static DailyReportDirectContractResponse from(final DailyReportDirectContract directContract) {
         return new DailyReportDirectContractResponse(
                 directContract.getId(),
                 directContract.getPosition(),

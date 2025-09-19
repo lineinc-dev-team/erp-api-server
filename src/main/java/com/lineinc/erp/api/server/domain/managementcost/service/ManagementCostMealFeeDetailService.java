@@ -2,6 +2,8 @@ package com.lineinc.erp.api.server.domain.managementcost.service;
 
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.service.LaborService;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
@@ -10,8 +12,7 @@ import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCos
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailUpdateRequest;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
-import com.lineinc.erp.api.server.domain.labormanagement.service.LaborService;
+
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import java.util.ArrayList;

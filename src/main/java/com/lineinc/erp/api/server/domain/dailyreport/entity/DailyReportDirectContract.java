@@ -1,17 +1,29 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.labormanagement.entity.Labor;
-import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo;
-
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.outsourcing.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -57,7 +69,7 @@ public class DailyReportDirectContract extends BaseEntity {
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
-    public void updateFrom(DirectContractUpdateInfo request) {
+    public void updateFrom(final DirectContractUpdateInfo request) {
         Optional.ofNullable(request.position()).ifPresent(val -> this.position = val);
         Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
@@ -66,7 +78,7 @@ public class DailyReportDirectContract extends BaseEntity {
         this.labor.updatePreviousDailyWage(this.unitPrice);
     }
 
-    public void setEntities(OutsourcingCompany outsourcingCompany, Labor labor) {
+    public void setEntities(final OutsourcingCompany outsourcingCompany, final Labor labor) {
         this.outsourcingCompany = outsourcingCompany;
         this.labor = labor;
     }

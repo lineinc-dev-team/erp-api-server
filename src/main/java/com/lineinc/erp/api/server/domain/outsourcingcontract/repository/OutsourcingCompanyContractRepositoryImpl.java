@@ -24,9 +24,9 @@ import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.querydsl.jpa.JPAExpressions;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,15 +55,15 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
     }
 
     @Override
-    public Page<OutsourcingCompanyContract> findBySearchConditions(ContractListSearchRequest searchRequest,
-            Pageable pageable) {
+    public Page<OutsourcingCompanyContract> findBySearchConditions(final ContractListSearchRequest searchRequest,
+            final Pageable pageable) {
 
         // 검색 조건을 동적으로 구성
-        BooleanBuilder whereClause = buildSearchCondition(searchRequest);
+        final BooleanBuilder whereClause = buildSearchCondition(searchRequest);
 
         // 기본 쿼리 구성 - files만 fetch join (MultipleBagFetchException 회피), contacts는 배치 페치
         // 사용
-        JPAQuery<OutsourcingCompanyContract> query = queryFactory
+        final JPAQuery<OutsourcingCompanyContract> query = queryFactory
                 .selectFrom(outsourcingCompanyContract)
                 .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .leftJoin(outsourcingCompanyContract.site, site).fetchJoin()
@@ -73,18 +73,18 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
                 .distinct(); // files fetch join으로 인한 중복 제거
 
         // 정렬 적용
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
         query.orderBy(orders);
 
         // 페이징 적용
-        List<OutsourcingCompanyContract> content = query
+        final List<OutsourcingCompanyContract> content = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         // 전체 개수 조회
         // count 쿼리는 전량 fetch 후 size 계산 대신 count 사용
-        Long total = queryFactory
+        final Long total = queryFactory
                 .select(outsourcingCompanyContract.id.count())
                 .from(outsourcingCompanyContract)
                 .leftJoin(outsourcingCompanyContract.outsourcingCompany, outsourcingCompany)
@@ -97,12 +97,13 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
     }
 
     @Override
-    public List<OutsourcingCompanyContract> findAllWithoutPaging(ContractListSearchRequest searchRequest, Sort sort) {
+    public List<OutsourcingCompanyContract> findAllWithoutPaging(final ContractListSearchRequest searchRequest,
+            final Sort sort) {
         // 검색 조건을 동적으로 구성
-        BooleanBuilder whereClause = buildSearchCondition(searchRequest);
+        final BooleanBuilder whereClause = buildSearchCondition(searchRequest);
 
         // 정렬 적용
-        OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         // 기본 쿼리 구성
         return queryFactory
@@ -120,8 +121,8 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
     /**
      * 검색 조건을 구성하는 공통 메서드
      */
-    private BooleanBuilder buildSearchCondition(ContractListSearchRequest searchRequest) {
-        BooleanBuilder whereClause = new BooleanBuilder();
+    private BooleanBuilder buildSearchCondition(final ContractListSearchRequest searchRequest) {
+        final BooleanBuilder whereClause = new BooleanBuilder();
 
         // 삭제되지 않은 데이터만 조회
         whereClause.and(outsourcingCompanyContract.deleted.eq(false));
@@ -159,13 +160,13 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
 
         // 계약 시작일 검색 (시작일 이후) - LocalDate를 UTC 범위로 변환
         if (searchRequest.contractStartDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(searchRequest.contractStartDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(searchRequest.contractStartDate());
             whereClause.and(outsourcingCompanyContract.contractStartDate.goe(dateRange[0]));
         }
 
         // 계약 종료일 검색 (종료일 이전) - LocalDate를 UTC 범위로 변환
         if (searchRequest.contractEndDate() != null) {
-            OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(searchRequest.contractEndDate());
+            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(searchRequest.contractEndDate());
             whereClause.and(outsourcingCompanyContract.contractEndDate.lt(dateRange[1]));
         }
 

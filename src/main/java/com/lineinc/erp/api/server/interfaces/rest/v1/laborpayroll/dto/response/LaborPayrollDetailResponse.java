@@ -73,7 +73,7 @@ public record LaborPayrollDetailResponse(
     /**
      * LaborPayroll 엔티티로부터 DTO 생성
      */
-    public static LaborPayrollDetailResponse from(LaborPayroll laborPayroll) {
+    public static LaborPayrollDetailResponse from(final LaborPayroll laborPayroll) {
         return new LaborPayrollDetailResponse(
                 laborPayroll.getId(),
 
