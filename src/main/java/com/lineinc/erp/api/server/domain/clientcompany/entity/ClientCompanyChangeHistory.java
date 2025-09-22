@@ -55,6 +55,9 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @Column(columnDefinition = "jsonb")
     private String changes;
 
+    @Column
+    private String description;
+
     @Setter
     @Column(columnDefinition = "TEXT")
     private String memo;

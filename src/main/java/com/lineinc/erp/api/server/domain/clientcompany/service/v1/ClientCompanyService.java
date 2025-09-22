@@ -69,6 +69,12 @@ public class ClientCompanyService {
 
         // 5. 최종 저장
         clientCompanyRepository.save(clientCompany);
+
+        final ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
+                .clientCompany(clientCompany)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        clientCompanyChangeHistoryRepository.save(changeHistory);
     }
 
     @Transactional(readOnly = true)
