@@ -107,11 +107,17 @@ public class SteelManagementService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND);
         }
 
-        for (final SteelManagement steelManagement : steelManagements) {
+        // 삭제 가능한 강재만 필터링 (승인, 반출 상태는 삭제 불가)
+        final List<SteelManagement> deletableSteelManagements = steelManagements.stream()
+                .filter(steelManagement -> steelManagement.getType() != SteelManagementType.APPROVAL
+                        && steelManagement.getType() != SteelManagementType.RELEASE)
+                .toList();
+
+        for (final SteelManagement steelManagement : deletableSteelManagements) {
             steelManagement.markAsDeleted();
         }
 
-        steelManagementRepository.saveAll(steelManagements);
+        steelManagementRepository.saveAll(deletableSteelManagements);
     }
 
     private void validateCreatableSteelType(final SteelManagementType type) {

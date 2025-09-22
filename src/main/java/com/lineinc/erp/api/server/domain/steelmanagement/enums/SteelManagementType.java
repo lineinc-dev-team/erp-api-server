@@ -12,7 +12,7 @@ public enum SteelManagementType {
 
     private final String label;
 
-    SteelManagementType(String label) {
+    SteelManagementType(final String label) {
         this.label = label;
     }
 
