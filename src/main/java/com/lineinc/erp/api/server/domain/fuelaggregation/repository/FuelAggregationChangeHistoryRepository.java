@@ -30,4 +30,15 @@ public interface FuelAggregationChangeHistoryRepository extends JpaRepository<Fu
     @Query("SELECT fach FROM FuelAggregationChangeHistory fach WHERE fach.fuelAggregation = :fuelAggregation")
     Page<FuelAggregationChangeHistory> findByFuelAggregationWithPaging(
             @Param("fuelAggregation") FuelAggregation fuelAggregation, Pageable pageable);
+
+    /**
+     * 유류집계 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param fuelAggregationId 유류집계 ID
+     * @param pageable          페이징 정보
+     * @return 유류집계 변경 이력 페이지
+     */
+    @Query("SELECT fach FROM FuelAggregationChangeHistory fach WHERE fach.fuelAggregation.id = :fuelAggregationId")
+    Page<FuelAggregationChangeHistory> findByFuelAggregationWithPaging(
+            @Param("fuelAggregationId") Long fuelAggregationId, Pageable pageable);
 }
