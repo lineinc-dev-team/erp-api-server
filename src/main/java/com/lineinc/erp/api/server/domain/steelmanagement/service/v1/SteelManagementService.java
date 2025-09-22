@@ -91,6 +91,12 @@ public class SteelManagementService {
         steelManagement = steelManagementRepository.save(steelManagement);
         steelManagementDetailService.createSteelManagementDetail(steelManagement, request.details());
         steelManagementFileService.createSteelManagementFiles(steelManagement, request.files());
+
+        final SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
+                .steelManagement(steelManagement)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        steelManagementChangeHistoryRepository.save(changeHistory);
     }
 
     @Transactional(readOnly = true)
