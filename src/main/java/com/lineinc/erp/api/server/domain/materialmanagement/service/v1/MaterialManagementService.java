@@ -87,6 +87,12 @@ public class MaterialManagementService {
         materialManagementDetailService.createMaterialDetailManagement(materialManagement, request.details());
         materialManagementFileService.createMaterialFileManagement(materialManagement, request.files());
         materialManagementRepository.save(materialManagement);
+
+        final MaterialManagementChangeHistory changeHistory = MaterialManagementChangeHistory.builder()
+                .materialManagement(materialManagement)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        materialManagementChangeHistoryRepository.save(changeHistory);
     }
 
     @Transactional(readOnly = true)

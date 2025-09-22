@@ -50,8 +50,11 @@ public class MaterialManagementChangeHistory extends BaseEntity {
 
     @DiffInclude
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String changes;
+
+    @Column
+    private String description;
 
     @Setter
     @DiffInclude
