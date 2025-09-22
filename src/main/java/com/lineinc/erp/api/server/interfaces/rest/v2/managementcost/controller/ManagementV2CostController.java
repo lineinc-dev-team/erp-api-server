@@ -7,21 +7,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.domain.managementcost.service.v1.ManagementCostService;
+import com.lineinc.erp.api.server.domain.managementcost.service.v2.ManagementCostV2Service;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostChangeHistoryResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
-import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,25 +27,21 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v2/management-costs")
 @RequiredArgsConstructor
-@Tag(name = "관리비 관리 V2", description = "관리비 관련 V2 API")
-public class ManagementV2CostController {
+@Tag(name = "관리비 관리 V2")
+public class ManagementV2CostController extends BaseController {
 
-    private final ManagementCostService managementCostService;
+    private final ManagementCostV2Service managementCostV2Service;
 
-    @Operation(summary = "관리비 수정이력 조회", description = "관리비의 수정이력을 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
+    @Operation(summary = "관리비 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<ManagementCostChangeHistoryResponse>>> getManagementCostChangeHistories(
+    public ResponseEntity<SuccessResponse<PagingResponse<ManagementCostChangeHistoryResponse>>> getManagementCostChangeHistoriesWithPaging(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-        final Page<ManagementCostChangeHistoryResponse> page = managementCostService
-                .getManagementCostChangeHistoriesWithPaging(id,
-                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
-        return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+        final Page<ManagementCostChangeHistoryResponse> page = managementCostV2Service
+                .getManagementCostChangeHistoriesWithPaging(
+                        id, PageableUtils.createPageable(pageRequest, sortRequest));
+        return SuccessResponse.ok(PagingResponse.from(page));
     }
 }

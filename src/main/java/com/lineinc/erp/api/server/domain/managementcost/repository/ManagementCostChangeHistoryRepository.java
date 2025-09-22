@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.managementcost.repository;
 
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
-import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -9,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 
 @Repository
 public interface ManagementCostChangeHistoryRepository extends JpaRepository<ManagementCostChangeHistory, Long> {
@@ -29,4 +30,15 @@ public interface ManagementCostChangeHistoryRepository extends JpaRepository<Man
     @Query("SELECT mch FROM ManagementCostChangeHistory mch WHERE mch.managementCost = :managementCost")
     Page<ManagementCostChangeHistory> findAllByManagementCostWithPaging(
             @Param("managementCost") ManagementCost managementCost, Pageable pageable);
+
+    /**
+     * 관리비 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param managementCostId 관리비 ID
+     * @param pageable         페이징 정보
+     * @return 관리비 변경 이력 페이지
+     */
+    @Query("SELECT mch FROM ManagementCostChangeHistory mch WHERE mch.managementCost.id = :managementCostId")
+    Page<ManagementCostChangeHistory> findAllByManagementCostWithPaging(
+            @Param("managementCostId") Long managementCostId, Pageable pageable);
 }
