@@ -81,6 +81,12 @@ public class SiteService {
         if (request.contracts() != null && !request.contracts().isEmpty()) {
             siteContractService.createContracts(site, request.contracts());
         }
+
+        final SiteChangeHistory changeHistory = SiteChangeHistory.builder()
+                .site(site)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        siteChangeHistoryRepository.save(changeHistory);
     }
 
     @Transactional(readOnly = true)
