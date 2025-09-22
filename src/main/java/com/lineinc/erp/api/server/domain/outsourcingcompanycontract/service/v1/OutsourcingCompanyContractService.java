@@ -143,6 +143,12 @@ public class OutsourcingCompanyContractService {
 
         // 8. 계약 이력 생성
         createContractHistory(contract);
+
+        final OutsourcingCompanyContractChangeHistory changeHistory = OutsourcingCompanyContractChangeHistory.builder()
+                .outsourcingCompanyContract(contract)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        contractChangeHistoryRepository.save(changeHistory);
     }
 
     /**
