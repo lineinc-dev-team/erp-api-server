@@ -110,6 +110,12 @@ public class LaborService {
 
         labor.syncTransientFields();
         laborRepository.save(labor);
+
+        final LaborChangeHistory changeHistory = LaborChangeHistory.builder()
+                .labor(labor)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        laborChangeHistoryRepository.save(changeHistory);
     }
 
     /**

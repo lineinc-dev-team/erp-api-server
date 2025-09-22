@@ -48,11 +48,11 @@ public class LaborChangeHistory extends BaseEntity {
      * 변경 유형
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private LaborChangeType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String changes;
 
     /**
@@ -60,6 +60,9 @@ public class LaborChangeHistory extends BaseEntity {
      */
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    @Column
+    private String description;
 
     /**
      * 메모를 설정합니다.
