@@ -43,4 +43,19 @@ public interface LaborPayrollChangeHistoryRepository extends JpaRepository<Labor
     Page<LaborPayrollChangeHistory> findBySummaryIdWithPaging(
             @Param("laborPayrollSummary") LaborPayrollSummary laborPayrollSummary,
             Pageable pageable);
+
+    /**
+     * 노무명세서 집계 ID로 변경이력을 페이징하여 조회합니다.
+     * 
+     * @param laborPayrollSummaryId 노무명세서 집계 ID
+     * @param pageable              페이징 정보
+     * @return 노무명세서 변경이력 페이지
+     */
+    @Query("""
+            SELECT h FROM LaborPayrollChangeHistory h
+            WHERE h.laborPayrollSummary.id = :laborPayrollSummaryId
+            """)
+    Page<LaborPayrollChangeHistory> findBySummaryIdWithPaging(
+            @Param("laborPayrollSummaryId") Long laborPayrollSummaryId,
+            Pageable pageable);
 }
