@@ -98,6 +98,12 @@ public class FuelAggregationService {
                     .memo(fuelInfo.memo())
                     .build();
             fuelInfoRepository.save(fuelInfoEntity);
+
+            final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
+                    .fuelAggregation(fuelAggregation)
+                    .description(ValidationMessages.INITIAL_CREATION)
+                    .build();
+            fuelAggregationChangeHistoryRepository.save(changeHistory);
         }
 
     }
