@@ -126,6 +126,18 @@ public class ClientCompany extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    @Column
+    @DiffInclude
+    private String homepageUrl;
+
+    @Column
+    @DiffInclude
+    private String homepageLoginId;
+
+    @Column
+    @DiffInclude
+    private String homepagePassword;
+
     @Transient
     @DiffInclude
     private String userName;
@@ -157,6 +169,9 @@ public class ClientCompany extends BaseEntity {
         this.detailAddress = request.detailAddress();
         this.landlineNumber = request.landlineNumber();
         this.businessNumber = request.businessNumber();
+        this.homepageUrl = request.homepageUrl();
+        this.homepageLoginId = request.homepageLoginId();
+        this.homepagePassword = request.homepagePassword();
         syncTransientFields();
     }
 
@@ -175,6 +190,9 @@ public class ClientCompany extends BaseEntity {
                 .paymentPeriod(request.paymentPeriod())
                 .memo(request.memo())
                 .isActive(request.isActive())
+                .homepageUrl(request.homepageUrl())
+                .homepageLoginId(request.homepageLoginId())
+                .homepagePassword(request.homepagePassword())
                 .build();
     }
 

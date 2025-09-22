@@ -29,6 +29,9 @@ public record ClientCompanyDetailResponse(
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt,
         @Schema(description = "비고", example = "기타 메모") String memo,
+        @Schema(description = "홈페이지 URL", example = "https://www.samsung.com") String homepageUrl,
+        @Schema(description = "홈페이지 로그인 아이디", example = "admin") String homepageLoginId,
+        @Schema(description = "홈페이지 패스워드", example = "password123") String homepagePassword,
         @Schema(description = "발주처 담당자 목록") List<ClientCompanyContactResponse> contacts,
         @Schema(description = "발주처 파일 목록") List<ClientCompanyFileResponse> files,
         @Schema(description = "본사 담당자") UserResponse.UserSimpleResponse user) {
@@ -50,6 +53,9 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getCreatedAt(),
                 clientCompany.getUpdatedAt(),
                 clientCompany.getMemo(),
+                clientCompany.getHomepageUrl(),
+                clientCompany.getHomepageLoginId(),
+                clientCompany.getHomepagePassword(),
                 clientCompany.getContacts().stream()
                         .map(ClientCompanyContactResponse::from)
                         .collect(Collectors.toList()),

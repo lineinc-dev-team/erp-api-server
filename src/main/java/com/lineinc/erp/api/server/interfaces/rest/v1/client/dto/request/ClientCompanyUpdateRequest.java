@@ -25,6 +25,9 @@ public record ClientCompanyUpdateRequest(
         @Schema(description = "비고 / 메모") String memo,
         @Schema(description = "사용 여부", example = "true") @NotNull Boolean isActive,
         @Schema(description = "본사 담당자 ID", example = "1") @NotNull Long userId,
+        @Schema(description = "홈페이지 URL", example = "https://www.samsung.com") String homepageUrl,
+        @Schema(description = "홈페이지 로그인 아이디", example = "admin") String homepageLoginId,
+        @Schema(description = "홈페이지 패스워드", example = "password123") String homepagePassword,
         @Schema(description = "담당자 목록") @Valid List<ClientCompanyContactUpdateRequest> contacts,
         @Schema(description = "파일 목록") @Valid List<ClientCompanyFileUpdateRequest> files,
         @Schema(description = "변경 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
