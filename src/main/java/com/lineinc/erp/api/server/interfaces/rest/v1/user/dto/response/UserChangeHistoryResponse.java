@@ -28,7 +28,7 @@ public record UserChangeHistoryResponse(
                 history.getCreatedAt(),
                 history.getUpdatedAt(),
                 history.getUpdatedBy(),
-                history.getType().getLabel(),
+                history.getType() != null ? history.getType().getLabel() : null,
                 history.getType());
     }
 }

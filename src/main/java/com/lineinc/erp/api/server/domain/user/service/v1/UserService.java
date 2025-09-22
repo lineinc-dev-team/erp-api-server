@@ -98,7 +98,6 @@ public class UserService {
                 .loginId(request.loginId())
                 .department(Department.builder().id(request.departmentId()).build())
                 .grade(Grade.builder().id(request.gradeId()).build())
-                // .position(Position.builder().id(request.positionId()).build())
                 .passwordHash(passwordEncoder.encode(defaultPassword))
                 .phoneNumber(request.phoneNumber())
                 .landlineNumber(request.landlineNumber())
@@ -109,6 +108,12 @@ public class UserService {
                 .build();
 
         usersRepository.save(user);
+
+        final UserChangeHistory changeHistory = UserChangeHistory.builder()
+                .user(user)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        userChangeHistoryRepository.save(changeHistory);
     }
 
     @Transactional(readOnly = true)
