@@ -34,7 +34,7 @@ public record MaterialManagementDetailViewResponse(
         @Schema(description = "상세 목록") List<MaterialManagementDetailResponse> details,
 
         @Schema(description = "파일 목록") List<MaterialManagementFileResponse> files) {
-    public static MaterialManagementDetailViewResponse from(MaterialManagement entity) {
+    public static MaterialManagementDetailViewResponse from(final MaterialManagement entity) {
         return new MaterialManagementDetailViewResponse(
                 entity.getId(),
                 entity.getInputType() != null ? entity.getInputType().getLabel() : null,

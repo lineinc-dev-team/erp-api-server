@@ -38,6 +38,7 @@ public class ManagementCostFileService {
             for (final ManagementCostFileCreateRequest fileReq : files) {
                 final ManagementCostFile file = ManagementCostFile.builder()
                         .managementCost(managementCost)
+                        .name(fileReq.name())
                         .fileUrl(fileReq.fileUrl())
                         .originalFileName(fileReq.originalFileName())
                         .memo(fileReq.memo())
@@ -62,6 +63,7 @@ public class ManagementCostFileService {
                 requests,
                 (final ManagementCostFileUpdateRequest dto) -> ManagementCostFile.builder()
                         .managementCost(managementCost)
+                        .name(dto.name())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())

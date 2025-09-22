@@ -42,6 +42,7 @@ public class MaterialManagementFileService {
         requests.stream()
                 .map(file -> MaterialManagementFile.builder()
                         .materialManagement(materialManagement)
+                        .name(file.name())
                         .fileUrl(file.fileUrl())
                         .originalFileName(file.originalFileName())
                         .memo(file.memo())
@@ -63,6 +64,7 @@ public class MaterialManagementFileService {
                 requests,
                 (final MaterialManagementFileUpdateRequest dto) -> MaterialManagementFile.builder()
                         .materialManagement(materialManagement)
+                        .name(dto.name())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
                         .memo(dto.memo())
