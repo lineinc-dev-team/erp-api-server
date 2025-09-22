@@ -73,17 +73,21 @@ public class OutsourcingCompanyService {
                 .memo(request.memo())
                 .build();
 
-        // 2. 담당자 및 파일 생성, 연관관계 설정
+        // 2. 외주업체 먼저 저장
+        outsourcingCompanyRepository.save(outsourcingCompany);
+
+        // 3. 담당자 및 파일 생성, 연관관계 설정
         outsourcingCompanyContactService.createOutsourcingCompanyContacts(outsourcingCompany, request.contacts());
         outsourcingCompanyFileService.createOutsourcingCompanyFiles(outsourcingCompany, request.files());
 
+        // 4. 변경 이력 생성
         final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                 .outsourcingCompany(outsourcingCompany)
                 .description(ValidationMessages.INITIAL_CREATION)
                 .build();
         outsourcingCompanyChangeRepository.save(changeHistory);
 
-        return outsourcingCompanyRepository.save(outsourcingCompany);
+        return outsourcingCompany;
     }
 
     @Transactional(readOnly = true)
