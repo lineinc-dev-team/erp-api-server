@@ -42,9 +42,9 @@ public record SteelManagementResponse(
         @Schema(description = "총금액", example = "1000000") Long totalAmount
 
 ) {
-    public static SteelManagementResponse from(SteelManagement entity) {
+    public static SteelManagementResponse from(final SteelManagement entity) {
         // 총금액 계산 (상세 품목의 공급가 합계)
-        Long totalAmount = entity.getDetails().stream()
+        final Long totalAmount = entity.getDetails().stream()
                 .mapToLong(detail -> detail.getSupplyPrice() != null ? detail.getSupplyPrice() : 0L)
                 .sum();
 
@@ -58,7 +58,8 @@ public record SteelManagementResponse(
                 entity.getOrderDate(),
                 entity.getApprovalDate(),
                 entity.getReleaseDate(),
-                entity.getFiles() != null && !entity.getFiles().isEmpty(),
+                entity.getFiles() != null && entity.getFiles().stream()
+                        .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty()),
                 entity.getMemo(),
                 SiteResponse.SiteSimpleResponse.from(entity.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(entity.getSiteProcess()),
