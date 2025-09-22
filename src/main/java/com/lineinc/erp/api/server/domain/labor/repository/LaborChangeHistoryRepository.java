@@ -29,4 +29,14 @@ public interface LaborChangeHistoryRepository extends JpaRepository<LaborChangeH
      */
     @Query("SELECT lch FROM LaborChangeHistory lch WHERE lch.labor = :labor")
     Page<LaborChangeHistory> findByLaborWithPaging(@Param("labor") Labor labor, Pageable pageable);
+
+    /**
+     * 노무 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param laborId  노무 ID
+     * @param pageable 페이징 정보
+     * @return 노무 변경 이력 페이지
+     */
+    @Query("SELECT lch FROM LaborChangeHistory lch WHERE lch.labor.id = :laborId")
+    Page<LaborChangeHistory> findByLaborWithPaging(@Param("laborId") Long laborId, Pageable pageable);
 }
