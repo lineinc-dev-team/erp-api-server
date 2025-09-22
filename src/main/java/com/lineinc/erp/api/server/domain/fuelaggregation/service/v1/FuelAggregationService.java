@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.service.v1;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -158,7 +159,9 @@ public class FuelAggregationService {
                     ? response.fuelInfo().equipment().specification()
                     : "";
             case "fuelType" -> response.fuelInfo() != null ? response.fuelInfo().fuelType() : "";
-            case "fuelAmount" -> response.fuelInfo() != null ? String.valueOf(response.fuelInfo().fuelAmount()) : "";
+            case "fuelAmount" -> response.fuelInfo() != null && response.fuelInfo().fuelAmount() != null
+                    ? NumberFormat.getNumberInstance().format(response.fuelInfo().fuelAmount())
+                    : "";
             case "createdAtAndUpdatedAt" ->
                 response.createdAt() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
                         + " / "
