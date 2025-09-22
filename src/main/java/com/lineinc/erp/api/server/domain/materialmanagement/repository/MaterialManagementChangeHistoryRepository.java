@@ -32,4 +32,15 @@ public interface MaterialManagementChangeHistoryRepository
     @Query("SELECT mmch FROM MaterialManagementChangeHistory mmch WHERE mmch.materialManagement = :materialManagement")
     Page<MaterialManagementChangeHistory> findByMaterialManagementWithPaging(
             @Param("materialManagement") MaterialManagement materialManagement, Pageable pageable);
+
+    /**
+     * 자재관리 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param materialManagementId 자재관리 ID
+     * @param pageable             페이징 정보
+     * @return 자재관리 변경 이력 페이지
+     */
+    @Query("SELECT mmch FROM MaterialManagementChangeHistory mmch WHERE mmch.materialManagement.id = :materialManagementId")
+    Page<MaterialManagementChangeHistory> findByMaterialManagementWithPaging(
+            @Param("materialManagementId") Long materialManagementId, Pageable pageable);
 }
