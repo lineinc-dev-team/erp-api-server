@@ -45,8 +45,11 @@ public class OutsourcingCompanyChangeHistory extends BaseEntity {
     private OutsourcingCompanyChangeHistoryType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String changes;
+
+    @Column
+    private String description;
 
     @Setter
     @Column(columnDefinition = "TEXT")

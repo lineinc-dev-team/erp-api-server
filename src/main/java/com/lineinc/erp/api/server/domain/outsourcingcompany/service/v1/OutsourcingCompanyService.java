@@ -77,6 +77,12 @@ public class OutsourcingCompanyService {
         outsourcingCompanyContactService.createOutsourcingCompanyContacts(outsourcingCompany, request.contacts());
         outsourcingCompanyFileService.createOutsourcingCompanyFiles(outsourcingCompany, request.files());
 
+        final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
+                .outsourcingCompany(outsourcingCompany)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        outsourcingCompanyChangeRepository.save(changeHistory);
+
         return outsourcingCompanyRepository.save(outsourcingCompany);
     }
 
