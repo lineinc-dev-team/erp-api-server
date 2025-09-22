@@ -48,12 +48,15 @@ public class ManagementCostChangeHistory extends BaseEntity {
      * 변경 유형
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private ManagementCostChangeHistoryType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String changes;
+
+    @Column
+    private String description;
 
     /**
      * 메모
@@ -64,7 +67,7 @@ public class ManagementCostChangeHistory extends BaseEntity {
     /**
      * 메모를 설정합니다.
      */
-    public void setMemo(String memo) {
+    public void setMemo(final String memo) {
         this.memo = memo;
     }
 }

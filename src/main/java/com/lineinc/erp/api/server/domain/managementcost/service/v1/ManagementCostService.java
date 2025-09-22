@@ -124,6 +124,12 @@ public class ManagementCostService {
         if (request.files() != null && !request.files().isEmpty()) {
             managementCostFileService.createManagementCostFiles(request.files(), managementCost);
         }
+
+        final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+                .managementCost(managementCost)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        managementCostChangeHistoryRepository.save(changeHistory);
     }
 
     /**
