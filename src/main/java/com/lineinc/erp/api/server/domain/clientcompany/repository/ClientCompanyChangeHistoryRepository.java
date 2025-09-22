@@ -35,4 +35,15 @@ public interface ClientCompanyChangeHistoryRepository extends JpaRepository<Clie
     Page<ClientCompanyChangeHistory> findByClientCompanyWithPaging(@Param("clientCompany") ClientCompany clientCompany,
             Pageable pageable);
 
+    /**
+     * 발주처 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param clientCompanyId 발주처 ID
+     * @param pageable        페이징 정보
+     * @return 발주처 변경 이력 페이지
+     */
+    @Query("SELECT cch FROM ClientCompanyChangeHistory cch WHERE cch.clientCompany.id = :clientCompanyId")
+    Page<ClientCompanyChangeHistory> findByClientCompanyWithPaging(
+            @Param("clientCompanyId") Long clientCompanyId, Pageable pageable);
+
 }
