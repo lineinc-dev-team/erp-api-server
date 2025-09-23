@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.menu.entity.Menu;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.permission.repository.PermissionRepository;
@@ -83,27 +84,31 @@ public class RoleService {
         final Role role = roleRepository.findRoleWithPermissions(roleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        // 한 번의 스트림으로 모든 처리 완료 - 성능 최적화
-        return role.getPermissions().stream()
+        // 권한을 메뉴별로 그룹화하고 정렬
+        final Map<Long, List<Permission>> groupedByMenu = role.getPermissions().stream()
                 .map(RolePermission::getPermission)
-                .collect(Collectors.groupingBy(
-                        permission -> permission.getMenu().getId(),
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                permissions -> {
-                                    // 권한 정렬 및 DTO 변환
-                                    final var sortedPermissions = permissions.stream()
-                                            .sorted(Comparator.comparing(Permission::getId))
-                                            .map(MenusPermissionsResponse.PermissionDto::from)
-                                            .toList();
-                                    final String menuName = permissions.get(0).getMenu().getName();
-                                    return MenusPermissionsResponse.from(
-                                            permissions.get(0).getMenu().getId(),
-                                            menuName,
-                                            sortedPermissions);
-                                })))
-                .values()
-                .stream()
+                .collect(Collectors.groupingBy(permission -> permission.getMenu().getId()));
+
+        return groupedByMenu.entrySet().stream()
+                .map(entry -> {
+                    final Long menuId = entry.getKey();
+                    final List<Permission> permissions = entry.getValue();
+
+                    // 메뉴 정보
+                    final Menu menu = permissions.get(0).getMenu();
+
+                    // 권한 정렬 및 DTO 변환
+                    final List<MenusPermissionsResponse.PermissionDto> sortedPermissions = permissions.stream()
+                            .sorted(Comparator.comparing(Permission::getOrder))
+                            .map(MenusPermissionsResponse.PermissionDto::from)
+                            .toList();
+
+                    return MenusPermissionsResponse.from(menuId, menu.getName(), sortedPermissions);
+                })
+                .sorted(Comparator.comparing(response -> {
+                    // 메뉴 order로 정렬
+                    return groupedByMenu.get(response.id()).get(0).getMenu().getOrder();
+                }))
                 .toList();
     }
 
