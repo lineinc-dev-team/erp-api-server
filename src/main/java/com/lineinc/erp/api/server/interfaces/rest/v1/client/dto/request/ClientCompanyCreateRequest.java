@@ -18,7 +18,7 @@ public record ClientCompanyCreateRequest(
         @Schema(description = "본사 주소", example = "서울시 강남구") @NotBlank String address,
         @Schema(description = "상세 주소", example = "강남구 테헤란로 123") @NotBlank String detailAddress,
         @Schema(description = "전화번호", example = "02-123-5678") @NotBlank String landlineNumber,
-        @Schema(description = "개인 휴대폰", example = "010-1234-5678") @NotBlank String phoneNumber,
+        @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
         @Schema(description = "이메일", example = "example@samsung.com") @NotBlank @Email String email,
         @Schema(description = "결제 방식", example = "CASH") @NotNull ClientCompanyPaymentMethod paymentMethod,
         @Schema(description = "결제 유예 기간", example = "2") @NotBlank String paymentPeriod,
