@@ -157,6 +157,8 @@ public class MaterialManagement extends BaseEntity {
                 .ifPresent(value -> this.deliveryDate = DateTimeFormatUtils.toOffsetDateTime(value));
         Optional.ofNullable(request.memo())
                 .ifPresent(value -> this.memo = value);
+        Optional.ofNullable(request.inputType())
+                .ifPresent(value -> this.inputType = value);
 
         syncTransientFields();
     }
