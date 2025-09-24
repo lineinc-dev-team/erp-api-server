@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record ClientCompanyUpdateRequest(
         @Schema(description = "발주처명", example = "삼성건설") @NotBlank String name,
-        @Schema(description = "사업자등록번호", example = "123-45-67890") @NotBlank String businessNumber,
+        @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
         @Schema(description = "대표자명", example = "홍길동") @NotBlank String ceoName,
         @Schema(description = "주소", example = "서울시 강남구") @NotBlank String address,
         @Schema(description = "상세 주소", example = "강남대로 123, 3층") @NotBlank String detailAddress,
