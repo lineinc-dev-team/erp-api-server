@@ -24,6 +24,11 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourci
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
+import com.lineinc.erp.api.server.domain.fuelaggregation.service.v1.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
@@ -52,7 +57,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
@@ -66,6 +70,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -88,6 +94,8 @@ public class DailyReportService {
     private final OutsourcingCompanyContractEquipmentRepository outsourcingCompanyContractEquipmentRepository;
     private final UserService userService;
     private final LaborPayrollSyncService laborPayrollSyncService;
+    private final FuelAggregationService fuelAggregationService;
+    private final FuelInfoRepository fuelInfoRepository;
 
     @Transactional
     public void createDailyReport(final DailyReportCreateRequest request) {
@@ -242,36 +250,31 @@ public class DailyReportService {
         }
 
         // 유류 출역 정보 추가
-        if (request.fuels() != null) {
-            for (final DailyReportFuelCreateRequest fuelRequest : request.fuels()) {
-                final OutsourcingCompany company = fuelRequest.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(fuelRequest.outsourcingCompanyId())
-                        : null;
+        if (request.fuels() != null && !request.fuels().isEmpty()) {
+            // 새로 생성
+            final FuelAggregationCreateRequest fuelAggregationRequest = new FuelAggregationCreateRequest(
+                    request.siteId(),
+                    request.siteProcessId(),
+                    request.reportDate(),
+                    request.weather(),
+                    request.fuels().stream()
+                            .map(fuelRequest -> new FuelInfoCreateRequest(
+                                    fuelRequest.outsourcingCompanyId(),
+                                    fuelRequest.outsourcingCompanyContractDriverId(),
+                                    fuelRequest.outsourcingCompanyContractEquipmentId(),
+                                    FuelInfoFuelType.fromLabel(fuelRequest.fuelType()),
+                                    fuelRequest.fuelAmount(),
+                                    fuelRequest.memo()))
+                            .toList());
+            final FuelAggregation fuelAggregation = fuelAggregationService
+                    .createFuelAggregation(fuelAggregationRequest);
 
-                OutsourcingCompanyContractDriver driver = null;
-                if (fuelRequest.outsourcingCompanyContractDriverId() != null) {
-                    driver = getOutsourcingCompanyContractDriverByIdOrThrow(
-                            fuelRequest.outsourcingCompanyContractDriverId());
-                }
-
-                OutsourcingCompanyContractEquipment equipment = null;
-                if (fuelRequest.outsourcingCompanyContractEquipmentId() != null) {
-                    equipment = getOutsourcingCompanyContractEquipmentByIdOrThrow(
-                            fuelRequest.outsourcingCompanyContractEquipmentId());
-                }
-
-                final DailyReportFuel fuel = DailyReportFuel.builder()
-                        .dailyReport(dailyReport)
-                        .outsourcingCompany(company)
-                        .outsourcingCompanyContractDriver(driver)
-                        .outsourcingCompanyContractEquipment(equipment)
-                        .fuelType(fuelRequest.fuelType())
-                        .fuelAmount(fuelRequest.fuelAmount())
-                        .memo(fuelRequest.memo())
-                        .build();
-
-                dailyReport.getFuels().add(fuel);
-            }
+            // FuelAggregation만 연결하는 DailyReportFuel 생성
+            final DailyReportFuel fuel = DailyReportFuel.builder()
+                    .dailyReport(dailyReport)
+                    .fuelAggregation(fuelAggregation)
+                    .build();
+            dailyReport.getFuels().add(fuel);
         }
 
         // 현장 사진 정보 추가
@@ -478,28 +481,20 @@ public class DailyReportService {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
-        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        // FuelInfo를 직접 페이징으로 조회
+        final Slice<FuelInfo> fuelInfoSlice = fuelInfoRepository.findByDailyReportSiteAndProcessAndDate(
+                site, siteProcess, DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), pageable);
 
-        // DailyReport 슬라이스를 DailyReportFuelResponse 슬라이스로 변환
-        // 각 DailyReport의 유류들을 개별 항목으로 변환
-        final List<DailyReportFuelResponse> allFuels = new ArrayList<>();
-
-        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
-            for (final DailyReportFuel fuel : dailyReport.getFuels()) {
-                allFuels.add(DailyReportFuelResponse.from(fuel));
-            }
-        }
+        // FuelInfo를 DailyReportFuelResponse로 변환
+        final List<DailyReportFuelResponse> fuelResponses = fuelInfoSlice.getContent().stream()
+                .map(fuelInfo -> DailyReportFuelResponse.from(fuelInfo))
+                .toList();
 
         // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
         final Slice<DailyReportFuelResponse> fuelSlice = new SliceImpl<>(
-                allFuels,
+                fuelResponses,
                 pageable,
-                dailyReportSlice.hasNext());
+                fuelInfoSlice.hasNext());
 
         return fuelSlice;
     }

@@ -63,21 +63,21 @@ public class FuelAggregationService {
     private final Javers javers;
 
     @Transactional
-    public void createFuelAggregation(final FuelAggregationCreateRequest request) {
+    public FuelAggregation createFuelAggregation(final FuelAggregationCreateRequest request) {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
-        final FuelAggregation fuelAggregation = FuelAggregation.builder()
+        FuelAggregation fuelAggregation = FuelAggregation.builder()
                 .site(site)
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
                 .weather(request.weather())
                 .build();
 
-        fuelAggregationRepository.save(fuelAggregation);
+        fuelAggregation = fuelAggregationRepository.save(fuelAggregation);
 
         for (final FuelInfoCreateRequest fuelInfo : request.fuelInfos()) {
             // 업체, 기사, 장비 ID 검증
@@ -97,15 +97,21 @@ public class FuelAggregationService {
                     .fuelAmount(fuelInfo.fuelAmount())
                     .memo(fuelInfo.memo())
                     .build();
-            fuelInfoRepository.save(fuelInfoEntity);
 
-            final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
-                    .fuelAggregation(fuelAggregation)
-                    .description(ValidationMessages.INITIAL_CREATION)
-                    .build();
-            fuelAggregationChangeHistoryRepository.save(changeHistory);
+            // FuelInfo를 저장하고 FuelAggregation의 컬렉션에도 추가
+            fuelInfoRepository.save(fuelInfoEntity);
+            fuelAggregation.getFuelInfos().add(fuelInfoEntity);
+
         }
 
+        final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
+                .fuelAggregation(fuelAggregation)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .build();
+        fuelAggregationChangeHistoryRepository.save(changeHistory);
+
+        // FuelInfo들이 저장된 후 다시 조회하여 반환
+        return fuelAggregationRepository.findById(fuelAggregation.getId()).orElse(fuelAggregation);
     }
 
     @Transactional(readOnly = true)

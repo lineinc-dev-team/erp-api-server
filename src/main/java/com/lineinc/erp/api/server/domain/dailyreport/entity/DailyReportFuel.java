@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
@@ -61,6 +62,10 @@ public class DailyReportFuel extends BaseEntity {
 
     @Column
     private Long fuelAmount; // 주유량
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fuel_aggregation_id")
+    private FuelAggregation fuelAggregation; // 유류집계
 
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
