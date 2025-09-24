@@ -81,7 +81,7 @@ public class Site extends BaseEntity {
 
     @DiffIgnore
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private SiteType type; // 현장 유형
 
     @DiffIgnore

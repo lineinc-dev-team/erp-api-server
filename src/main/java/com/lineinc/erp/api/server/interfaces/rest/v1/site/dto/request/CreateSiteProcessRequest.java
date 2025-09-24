@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "현장 공정 등록 요청")
 public record CreateSiteProcessRequest(
         @NotBlank @Schema(description = "공정명", example = "기초 공사") String name,
-        @NotBlank @Schema(description = "사무실 연락처", example = "02-123-4567") String officePhone,
+        @Schema(description = "사무실 연락처", example = "02-123-4567") String officePhone,
         @NotNull @Schema(description = "진행 상태", example = "NOT_STARTED") SiteProcessStatus status,
         @NotNull @Schema(description = "공정소장 ID", example = "2") Long managerId,
         @Schema(description = "비고") String memo) {

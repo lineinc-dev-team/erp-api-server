@@ -69,7 +69,7 @@ public record SiteDetailResponse(
                 site.getDetailAddress(),
                 site.getCity(),
                 site.getDistrict(),
-                site.getType().getLabel(),
+                site.getType() != null ? site.getType().getLabel() : null,
                 site.getType(),
                 site.getStartedAt(),
                 site.getEndedAt(),
