@@ -1,10 +1,12 @@
 package com.lineinc.erp.api.server.infrastructure.config.persistence;
 
-import com.lineinc.erp.api.server.infrastructure.config.audit.AuditorAwareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+import com.lineinc.erp.api.server.domain.user.repository.UserRepository;
+import com.lineinc.erp.api.server.infrastructure.config.audit.AuditorAwareImpl;
 
 /**
  * JPA Auditing 설정 클래스입니다.
@@ -21,7 +23,7 @@ public class JpaAuditingConfig {
      * @return AuditorAware<String> 구현체
      */
     @Bean
-    public AuditorAware<String> auditorAware() {
-        return new AuditorAwareImpl();
+    public AuditorAware<String> auditorAware(final UserRepository userRepository) {
+        return new AuditorAwareImpl(userRepository);
     }
 }
