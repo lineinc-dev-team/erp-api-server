@@ -22,7 +22,7 @@ public record OutsourcingCompanyUpdateRequest(
         @Schema(description = "휴대폰번호", example = "010-1234-5678") String phoneNumber,
         @Schema(description = "이메일", example = "ceo@outsourcing.com") @Email @NotBlank String email,
         @Schema(description = "활성 여부", example = "true") @NotNull Boolean isActive,
-        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FUEL_COST,MEAL_COST") @NotBlank String defaultDeductions,
+        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FUEL_COST,MEAL_COST") String defaultDeductions,
         @Schema(description = "기본 공제 항목 설명", example = "3.3% 원천징수") String defaultDeductionsDescription,
         @Schema(description = "은행명", example = "국민은행") @NotBlank String bankName,
         @Schema(description = "계좌번호", example = "123456-78-901234") @NotBlank String accountNumber,
