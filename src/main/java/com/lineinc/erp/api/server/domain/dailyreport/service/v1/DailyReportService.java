@@ -26,7 +26,6 @@ import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.service.v1.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
@@ -262,7 +261,7 @@ public class DailyReportService {
                                     fuelRequest.outsourcingCompanyId(),
                                     fuelRequest.outsourcingCompanyContractDriverId(),
                                     fuelRequest.outsourcingCompanyContractEquipmentId(),
-                                    FuelInfoFuelType.fromLabel(fuelRequest.fuelType()),
+                                    fuelRequest.fuelType(),
                                     fuelRequest.fuelAmount(),
                                     fuelRequest.memo()))
                             .toList());
