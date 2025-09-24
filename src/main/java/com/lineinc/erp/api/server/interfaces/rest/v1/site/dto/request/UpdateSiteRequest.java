@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotNull;
 public record UpdateSiteRequest(
         @Schema(description = "현장명", example = "서울 APT 신축공사") @NotBlank String name,
         @Schema(description = "주소", example = "서울시 강남구 역삼동") String address,
-        @Schema(description = "상세 주소", example = "역삼로 123") @NotBlank String detailAddress,
+        @Schema(description = "상세 주소", example = "역삼로 123") String detailAddress,
         @Schema(description = "시", example = "서울시") String city,
         @Schema(description = "구", example = "강남구") String district,
         @Schema(description = "현장 유형", example = "RETAINING_WALL") SiteType type,

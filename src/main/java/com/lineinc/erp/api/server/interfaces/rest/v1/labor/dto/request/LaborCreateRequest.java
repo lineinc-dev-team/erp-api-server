@@ -18,7 +18,7 @@ public record LaborCreateRequest(
         @NotBlank @Schema(description = "이름", example = "홍길동") String name,
         @NotBlank @Schema(description = "주민등록번호", example = "123456-1234567") String residentNumber,
         @NotBlank @Schema(description = "주소", example = "서울시 강남구") String address,
-        @NotBlank @Schema(description = "상세주소", example = "테헤란로 123") String detailAddress,
+        @Schema(description = "상세주소", example = "테헤란로 123") String detailAddress,
         @NotBlank @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
         @Schema(description = "비고", example = "추가 메모") String memo,
         @Schema(description = "공종", example = "WELDER") LaborWorkType workType,

@@ -18,7 +18,7 @@ public record OutsourcingCompanyCreateRequest(
         @Schema(description = "구분 설명", example = "직접 시공 업체") String typeDescription,
         @Schema(description = "대표자명", example = "김대표") @NotBlank String ceoName,
         @Schema(description = "주소", example = "서울특별시 강남구 테헤란로 123") @NotBlank String address,
-        @Schema(description = "상세주소", example = "5층 501호") @NotBlank String detailAddress,
+        @Schema(description = "상세주소", example = "5층 501호") String detailAddress,
         @Schema(description = "전화번호", example = "02-123-4567") @NotBlank String landlineNumber,
         @Schema(description = "이메일", example = "ceo@outsourcing.com") @NotBlank @Email String email,
         @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FUEL_COST,FOUR_INSURANCES") String defaultDeductions,
