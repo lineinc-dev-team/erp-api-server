@@ -1,19 +1,37 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteContractUpdateRequest;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
-import java.util.List;
-import java.util.ArrayList;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteContractUpdateRequest;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -46,6 +64,18 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
     @DiffInclude
     private Long amount; // 계약금액
 
+    @Column
+    @DiffInclude
+    private Long supplyPrice; // 공급가
+
+    @Column
+    @DiffInclude
+    private Long vat; // 부가세
+
+    @Column
+    @DiffInclude
+    private Long purchaseTax; // 매입세
+
     @Column(columnDefinition = "TEXT")
     @DiffInclude
     private String memo; // 비고
@@ -57,9 +87,12 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
     private List<SiteFile> files = new ArrayList<>();
 
     @Override
-    public void updateFrom(SiteContractUpdateRequest request) {
+    public void updateFrom(final SiteContractUpdateRequest request) {
         this.name = request.name();
         this.amount = request.amount();
+        this.supplyPrice = request.supplyPrice();
+        this.vat = request.vat();
+        this.purchaseTax = request.purchaseTax();
         this.memo = request.memo();
 
         if (request.files() != null) {

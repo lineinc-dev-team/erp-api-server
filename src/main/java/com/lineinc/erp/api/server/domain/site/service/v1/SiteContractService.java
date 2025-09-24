@@ -41,6 +41,9 @@ public class SiteContractService {
                     .site(site)
                     .name(contractReq.name())
                     .amount(contractReq.amount())
+                    .supplyPrice(contractReq.supplyPrice())
+                    .vat(contractReq.vat())
+                    .purchaseTax(contractReq.purchaseTax())
                     .memo(contractReq.memo())
                     .build());
 
@@ -68,6 +71,9 @@ public class SiteContractService {
                             .site(site)
                             .name(dto.name())
                             .amount(dto.amount())
+                            .supplyPrice(dto.supplyPrice())
+                            .vat(dto.vat())
+                            .purchaseTax(dto.purchaseTax())
                             .memo(dto.memo())
                             .build();
                     // 요청에 포함된 첨부파일이 있다면 SiteFile 객체로 변환하여 등록
