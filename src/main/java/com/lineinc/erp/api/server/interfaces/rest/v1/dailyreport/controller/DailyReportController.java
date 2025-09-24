@@ -176,6 +176,7 @@ public class DailyReportController {
         return ResponseEntity.ok().build();
     }
 
+    @Deprecated
     @Operation(summary = "출역일보 유류 수정", description = "출역일보 유류 정보를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "수정 성공"),
