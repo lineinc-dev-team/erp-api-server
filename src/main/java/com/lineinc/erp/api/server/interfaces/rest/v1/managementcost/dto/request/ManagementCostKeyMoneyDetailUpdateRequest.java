@@ -10,5 +10,6 @@ public record ManagementCostKeyMoneyDetailUpdateRequest(
         @Schema(description = "사용목적", example = "현장 운영비") @NotNull String purpose,
         @Schema(description = "인원 수", example = "5") @NotNull Integer personnelCount,
         @Schema(description = "금액", example = "500000") @NotNull Long amount,
+        @Schema(description = "공제여부", example = "true") Boolean isDeductible,
         @Schema(description = "비고", example = "1차 전도금") String memo) {
 }

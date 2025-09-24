@@ -44,6 +44,7 @@ public class ManagementCostKeyMoneyDetailService {
                         .purpose(detailReq.purpose())
                         .personnelCount(detailReq.personnelCount())
                         .amount(detailReq.amount())
+                        .isDeductible(detailReq.isDeductible())
                         .memo(detailReq.memo())
                         .build();
                 managementCostKeyMoneyDetailRepository.save(detail);
@@ -71,6 +72,7 @@ public class ManagementCostKeyMoneyDetailService {
                         .personnelCount(dto.personnelCount())
                         .amount(dto.amount())
                         .memo(dto.memo())
+                        .isDeductible(dto.isDeductible())
                         .build());
 
         // 변경 이력 추적 및 저장

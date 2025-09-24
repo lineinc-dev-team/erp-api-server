@@ -23,6 +23,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -83,6 +84,14 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
     @Column(nullable = false)
     private Long total;
 
+    /**
+     * 공제여부
+     */
+    @Column
+    @DiffInclude
+    @Builder.Default
+    private Boolean isDeductible = false;
+
     @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
@@ -94,6 +103,7 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
         Optional.ofNullable(request.supplyPrice()).ifPresent(val -> this.supplyPrice = val);
         Optional.ofNullable(request.vat()).ifPresent(val -> this.vat = val);
         Optional.ofNullable(request.total()).ifPresent(val -> this.total = val);
+        Optional.ofNullable(request.isDeductible()).ifPresent(val -> this.isDeductible = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

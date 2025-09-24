@@ -206,6 +206,7 @@ public class ManagementCostService {
                         .purpose(request.purpose())
                         .personnelCount(request.personnelCount())
                         .amount(request.amount())
+                        .isDeductible(request.isDeductible())
                         .memo(request.memo())
                         .build())
                 .collect(Collectors.toList());

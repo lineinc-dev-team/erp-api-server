@@ -1,16 +1,30 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
+import java.util.Optional;
+
+import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailUpdateRequest;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
-import org.javers.core.metamodel.annotation.DiffInclude;
-import org.javers.core.metamodel.annotation.DiffIgnore;
 
-import java.util.Optional;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -60,6 +74,14 @@ public class ManagementCostKeyMoneyDetail extends BaseEntity
     private Long amount;
 
     /**
+     * 공제여부
+     */
+    @Column
+    @DiffInclude
+    @Builder.Default
+    private Boolean isDeductible = false;
+
+    /**
      * 비고
      */
     @DiffInclude
@@ -67,11 +89,12 @@ public class ManagementCostKeyMoneyDetail extends BaseEntity
     private String memo;
 
     @Override
-    public void updateFrom(ManagementCostKeyMoneyDetailUpdateRequest request) {
+    public void updateFrom(final ManagementCostKeyMoneyDetailUpdateRequest request) {
         Optional.ofNullable(request.account()).ifPresent(val -> this.account = val);
         Optional.ofNullable(request.purpose()).ifPresent(val -> this.purpose = val);
         Optional.ofNullable(request.personnelCount()).ifPresent(val -> this.personnelCount = val);
         Optional.ofNullable(request.amount()).ifPresent(val -> this.amount = val);
+        Optional.ofNullable(request.isDeductible()).ifPresent(val -> this.isDeductible = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 }

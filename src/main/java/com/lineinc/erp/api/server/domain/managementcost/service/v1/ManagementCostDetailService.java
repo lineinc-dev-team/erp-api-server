@@ -45,6 +45,7 @@ public class ManagementCostDetailService {
                         .supplyPrice(detailReq.supplyPrice())
                         .vat(detailReq.vat())
                         .total(detailReq.total())
+                        .isDeductible(detailReq.isDeductible())
                         .memo(detailReq.memo())
                         .build();
                 managementCostDetailRepository.save(detail);
@@ -72,6 +73,7 @@ public class ManagementCostDetailService {
                         .supplyPrice(dto.supplyPrice())
                         .vat(dto.vat())
                         .total(dto.total())
+                        .isDeductible(dto.isDeductible())
                         .memo(dto.memo())
                         .build());
 
