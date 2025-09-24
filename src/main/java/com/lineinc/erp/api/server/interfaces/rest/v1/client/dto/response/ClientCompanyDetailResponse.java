@@ -46,7 +46,7 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getLandlineNumber(),
                 clientCompany.getPhoneNumber(),
                 clientCompany.getEmail(),
-                clientCompany.getPaymentMethod().getLabel(),
+                clientCompany.getPaymentMethod() != null ? clientCompany.getPaymentMethod().getLabel() : null,
                 clientCompany.getPaymentMethod(),
                 clientCompany.getPaymentPeriod(),
                 clientCompany.isActive(),
