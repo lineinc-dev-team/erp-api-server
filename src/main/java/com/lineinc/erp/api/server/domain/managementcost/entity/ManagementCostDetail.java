@@ -57,6 +57,13 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
     private String name;
 
     /**
+     * 수량
+     */
+    @DiffInclude
+    @Column
+    private Integer quantity;
+
+    /**
      * 단가
      */
     @DiffInclude
@@ -99,6 +106,7 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
     @Override
     public void updateFrom(final ManagementCostDetailUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
+        Optional.ofNullable(request.quantity()).ifPresent(val -> this.quantity = val);
         Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
         Optional.ofNullable(request.supplyPrice()).ifPresent(val -> this.supplyPrice = val);
         Optional.ofNullable(request.vat()).ifPresent(val -> this.vat = val);

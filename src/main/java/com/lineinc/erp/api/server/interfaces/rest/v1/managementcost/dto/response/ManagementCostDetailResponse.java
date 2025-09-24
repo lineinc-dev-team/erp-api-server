@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record ManagementCostDetailResponse(
         @Schema(description = "관리비 상세 ID", example = "1") Long id,
         @Schema(description = "품목명", example = "철근") String name,
+        @Schema(description = "수량", example = "10") Integer quantity,
         @Schema(description = "단가", example = "10000") Long unitPrice,
         @Schema(description = "공급가", example = "100000") Long supplyPrice,
         @Schema(description = "부가세", example = "10000") Long vat,
@@ -18,6 +19,7 @@ public record ManagementCostDetailResponse(
         return new ManagementCostDetailResponse(
                 detail.getId(),
                 detail.getName(),
+                detail.getQuantity(),
                 detail.getUnitPrice(),
                 detail.getSupplyPrice(),
                 detail.getVat(),
