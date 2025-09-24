@@ -332,8 +332,19 @@ public class ManagementCostService {
                 yield "";
             }
             case "total" -> {
-                if (managementCost.total() != null) {
-                    yield NumberFormat.getNumberInstance().format(managementCost.total());
+                // 관리비 타입에 따라 다른 총합 사용
+                if ("KEY_MONEY".equals(managementCost.itemTypeCode())) {
+                    if (managementCost.keyMoneyAmountTotal() != null) {
+                        yield NumberFormat.getNumberInstance().format(managementCost.keyMoneyAmountTotal());
+                    }
+                } else if ("MEAL_FEE".equals(managementCost.itemTypeCode())) {
+                    if (managementCost.mealFeeAmountTotal() != null) {
+                        yield NumberFormat.getNumberInstance().format(managementCost.mealFeeAmountTotal());
+                    }
+                } else {
+                    if (managementCost.total() != null) {
+                        yield NumberFormat.getNumberInstance().format(managementCost.total());
+                    }
                 }
                 yield "";
             }
