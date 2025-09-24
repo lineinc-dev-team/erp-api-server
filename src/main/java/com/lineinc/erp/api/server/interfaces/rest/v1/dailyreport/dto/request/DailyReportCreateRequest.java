@@ -19,6 +19,6 @@ public record DailyReportCreateRequest(
         @Schema(description = "직영/계약직 출역 정보") @Valid List<DailyReportDirectContractCreateRequest> directContracts,
         @Schema(description = "외주 출역 정보") @Valid List<DailyReportOutsourcingCreateRequest> outsourcings,
         @Schema(description = "외주업체계약 장비 출역 정보") @Valid List<DailyReportOutsourcingEquipmentCreateRequest> outsourcingEquipments,
-        @Schema(description = "유류 출역 정보") @Valid List<DailyReportFuelCreateRequest> fuels,
+        @Schema(description = "유류 출역 정보") @Valid List<DailyReportFuelCreateRequest> fuelInfos,
         @Schema(description = "현장 사진 정보") @Valid List<DailyReportFileCreateRequest> files) {
 }

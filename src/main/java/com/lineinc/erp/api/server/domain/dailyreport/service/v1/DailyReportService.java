@@ -249,21 +249,21 @@ public class DailyReportService {
         }
 
         // 유류 출역 정보 추가
-        if (request.fuels() != null && !request.fuels().isEmpty()) {
+        if (request.fuelInfos() != null && !request.fuelInfos().isEmpty()) {
             // 새로 생성
             final FuelAggregationCreateRequest fuelAggregationRequest = new FuelAggregationCreateRequest(
                     request.siteId(),
                     request.siteProcessId(),
                     request.reportDate(),
                     request.weather(),
-                    request.fuels().stream()
-                            .map(fuelRequest -> new FuelInfoCreateRequest(
-                                    fuelRequest.outsourcingCompanyId(),
-                                    fuelRequest.outsourcingCompanyContractDriverId(),
-                                    fuelRequest.outsourcingCompanyContractEquipmentId(),
-                                    fuelRequest.fuelType(),
-                                    fuelRequest.fuelAmount(),
-                                    fuelRequest.memo()))
+                    request.fuelInfos().stream()
+                            .map(fuelInfoRequest -> new FuelInfoCreateRequest(
+                                    fuelInfoRequest.outsourcingCompanyId(),
+                                    fuelInfoRequest.driverId(),
+                                    fuelInfoRequest.equipmentId(),
+                                    fuelInfoRequest.fuelType(),
+                                    fuelInfoRequest.fuelAmount(),
+                                    fuelInfoRequest.memo()))
                             .toList());
             final FuelAggregation fuelAggregation = fuelAggregationService
                     .createFuelAggregation(fuelAggregationRequest);
