@@ -15,10 +15,10 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "현장 등록 요청")
 public record CreateSiteRequest(
         @NotBlank @Schema(description = "현장명", example = "서울 APT 신축공사") String name,
-        @NotBlank @Schema(description = "주소", example = "서울시 강남구 역삼동") String address,
+        @Schema(description = "주소", example = "서울시 강남구 역삼동") String address,
         @NotBlank @Schema(description = "상세 주소", example = "역삼로 123") String detailAddress,
-        @NotBlank @Schema(description = "시", example = "서울시") String city,
-        @NotBlank @Schema(description = "구", example = "강남구") String district,
+        @Schema(description = "시", example = "서울시") String city,
+        @Schema(description = "구", example = "강남구") String district,
         @Schema(description = "현장 유형", example = "RETAINING_WALL") SiteType type,
         @NotNull @Schema(description = "발주처 ID", example = "1") Long clientCompanyId,
         @NotNull @Schema(description = "사업 시작일", example = "2024-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startedAt,
