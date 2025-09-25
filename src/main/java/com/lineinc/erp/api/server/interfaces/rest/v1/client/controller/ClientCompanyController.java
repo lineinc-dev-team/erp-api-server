@@ -152,12 +152,14 @@ public class ClientCompanyController extends BaseController {
     @Operation(summary = "발주처 변경 이력 조회")
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistories(
-            @PathVariable final Long id, @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest) {
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
         final Slice<ClientCompanyChangeHistoryResponse> slice = clientCompanyService.getClientCompanyChangeHistories(id,
-                PageableUtils.createPageable(pageRequest.page(),
-                        pageRequest.size(),
-                        sortRequest.sort()));
+                PageableUtils.createPageable(
+                        pageRequest.page(), pageRequest.size(), sortRequest.sort()),
+                user);
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }

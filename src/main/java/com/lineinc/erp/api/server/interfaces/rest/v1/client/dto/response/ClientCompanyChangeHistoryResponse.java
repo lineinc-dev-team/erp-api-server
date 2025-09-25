@@ -18,8 +18,10 @@ public record ClientCompanyChangeHistoryResponse(
         @Schema(description = "수정 일시", example = "2025-07-15T10:00:00+09:00") OffsetDateTime updatedAt,
         @Schema(description = "수정자", example = "관리자") String updatedBy,
         @Schema(description = "변경 유형", example = "기본 정보") String type,
-        @Schema(description = "변경 유형 코드", example = "CONTACT") ClientCompanyChangeHistoryChangeType typeCode) {
-    public static ClientCompanyChangeHistoryResponse from(final ClientCompanyChangeHistory history) {
+        @Schema(description = "변경 유형 코드", example = "CONTACT") ClientCompanyChangeHistoryChangeType typeCode,
+        @Schema(description = "수정 가능여부", example = "true") Boolean isEditable) {
+    public static ClientCompanyChangeHistoryResponse from(
+            final ClientCompanyChangeHistory history, final Long userId) {
         return new ClientCompanyChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),
@@ -29,6 +31,7 @@ public record ClientCompanyChangeHistoryResponse(
                 history.getUpdatedAt(),
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
-                history.getType());
+                history.getType(),
+                history.getUser() != null && userId.equals(history.getUser().getId()));
     }
 }

@@ -172,12 +172,14 @@ public class ClientCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(final Long clientCompanyId,
-            final Pageable pageable) {
+    public Slice<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistories(
+            final Long clientCompanyId,
+            final Pageable pageable,
+            final CustomUserDetails user) {
         final ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
         final Slice<ClientCompanyChangeHistory> historySlice = clientCompanyChangeHistoryRepository
                 .findByClientCompany(clientCompany, pageable);
-        return historySlice.map(ClientCompanyChangeHistoryResponse::from);
+        return historySlice.map(history -> ClientCompanyChangeHistoryResponse.from(history, user.getUserId()));
     }
 
     /**
@@ -187,11 +189,12 @@ public class ClientCompanyService {
     @Transactional(readOnly = true)
     public Page<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistoriesWithPaging(
             final Long clientCompanyId,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final CustomUserDetails user) {
         final ClientCompany clientCompany = getClientCompanyByIdOrThrow(clientCompanyId);
         final Page<ClientCompanyChangeHistory> historyPage = clientCompanyChangeHistoryRepository
                 .findByClientCompanyWithPaging(clientCompany, pageable);
-        return historyPage.map(ClientCompanyChangeHistoryResponse::from);
+        return historyPage.map(history -> ClientCompanyChangeHistoryResponse.from(history, user.getUserId()));
     }
 
     // 사업자등록번호 중복 확인
