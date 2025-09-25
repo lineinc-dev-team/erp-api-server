@@ -96,7 +96,7 @@ public class JaversUtils {
                 }
                 return null;
             }),
-            Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getOriginalFileName()));
+            Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getName()));
 
     // ================== Snapshot ==================
     public static <T> T createSnapshot(final Javers javers, final T entity, final Class<T> clazz) {
