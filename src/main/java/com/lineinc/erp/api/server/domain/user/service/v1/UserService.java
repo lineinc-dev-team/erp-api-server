@@ -88,7 +88,7 @@ public class UserService {
     }
 
     @Transactional
-    public void createUser(final CreateUserRequest request) {
+    public void createUser(final CreateUserRequest request, final Long userId) {
         if (usersRepository.existsByLoginIdAndDeletedFalse(request.loginId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.LOGIN_ID_ALREADY_EXISTS);
         }
@@ -112,6 +112,7 @@ public class UserService {
         final UserChangeHistory changeHistory = UserChangeHistory.builder()
                 .user(user)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .updatedByUser(getUserByIdOrThrow(userId))
                 .build();
         userChangeHistoryRepository.save(changeHistory);
     }
@@ -177,7 +178,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(final Long id, final UpdateUserRequest request) {
+    public void updateUser(final Long id, final UpdateUserRequest request, final Long userId) {
         final User user = getUserByIdOrThrow(id);
         user.syncTransientFields();
         final User oldUserSnapshot = JaversUtils.createSnapshot(javers, user, User.class);
@@ -197,6 +198,7 @@ public class UserService {
                     .user(user)
                     .type(UserChangeHistoryType.BASIC)
                     .changes(javers.getJsonConverter().toJson(simpleChanges))
+                    .updatedByUser(getUserByIdOrThrow(userId))
                     .build();
             userChangeHistoryRepository.save(changeHistory);
         }
@@ -263,10 +265,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<UserChangeHistoryResponse> getUserChangeHistoriesSlice(final Long userId, final Pageable pageable) {
+    public Slice<UserChangeHistoryResponse> getUserChangeHistoriesSlice(final Long userId, final Pageable pageable,
+            final Long loggedInUserId) {
         final User user = getUserByIdOrThrow(userId);
         final Slice<UserChangeHistory> historySlice = userChangeHistoryRepository.findByUser(user, pageable);
-        return historySlice.map(UserChangeHistoryResponse::from);
+        return historySlice.map(history -> UserChangeHistoryResponse.from(history, loggedInUserId));
     }
 
     /**
@@ -275,11 +278,11 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithPaging(final Long userId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long loggedInUserId) {
         final User user = getUserByIdOrThrow(userId);
         final Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserWithPaging(user,
                 pageable);
-        return historyPage.map(UserChangeHistoryResponse::from);
+        return historyPage.map(history -> UserChangeHistoryResponse.from(history, loggedInUserId));
     }
 
     public List<Long> getAccessibleSiteIds(final User user) {

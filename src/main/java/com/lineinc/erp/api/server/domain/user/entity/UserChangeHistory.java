@@ -40,7 +40,7 @@ public class UserChangeHistory extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -53,6 +53,10 @@ public class UserChangeHistory extends BaseEntity {
 
     @Column
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by_id")
+    private User updatedByUser;
 
     @Setter
     @Column(columnDefinition = "TEXT")

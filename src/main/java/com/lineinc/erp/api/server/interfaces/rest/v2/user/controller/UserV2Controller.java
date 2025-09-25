@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v2.user.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.user.service.v2.UserV2Service;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.UserChangeHistoryResponse;
@@ -38,9 +40,10 @@ public class UserV2Controller extends BaseController {
     public ResponseEntity<SuccessResponse<PagingResponse<UserChangeHistoryResponse>>> getUserChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest) {
+            @Valid final SortRequest sortRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
         final Page<UserChangeHistoryResponse> page = userV2Service.getUserChangeHistoriesWithPaging(
-                id, PageableUtils.createPageable(pageRequest, sortRequest));
+                id, PageableUtils.createPageable(pageRequest, sortRequest), user.getUserId());
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 
