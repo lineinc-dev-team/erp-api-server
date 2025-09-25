@@ -27,6 +27,7 @@ import com.lineinc.erp.api.server.domain.labor.repository.LaborChangeHistoryRepo
 import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.DeleteLaborsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborFileCreateRequest;
@@ -56,11 +57,12 @@ public class LaborService {
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final LaborFileService laborFileService;
     private final Javers javers;
+    private final UserService userService;
 
     /**
      * 노무 등록
      */
-    public void createLabor(final LaborCreateRequest request) {
+    public void createLabor(final LaborCreateRequest request, final Long userId) {
         // 주민등록번호 중복 체크
         if (laborRepository.existsByResidentNumber(request.residentNumber())) {
             throw new IllegalArgumentException(ValidationMessages.LABOR_ALREADY_EXISTS);
@@ -114,6 +116,7 @@ public class LaborService {
         final LaborChangeHistory changeHistory = LaborChangeHistory.builder()
                 .labor(labor)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId))
                 .build();
         laborChangeHistoryRepository.save(changeHistory);
     }
@@ -201,7 +204,7 @@ public class LaborService {
      * 인력정보 수정
      */
     @Transactional
-    public void updateLabor(final Long id, final LaborUpdateRequest request) {
+    public void updateLabor(final Long id, final LaborUpdateRequest request, final Long userId) {
         final Labor labor = getLaborByIdOrThrow(id);
 
         // 주민등록번호 중복 체크 (현재 인력 제외)
@@ -242,12 +245,13 @@ public class LaborService {
                     .labor(labor)
                     .type(LaborChangeType.BASIC)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             laborChangeHistoryRepository.save(changeHistory);
         }
 
         // 첨부파일 처리
-        laborFileService.updateLaborFiles(labor, request.files());
+        laborFileService.updateLaborFiles(labor, request.files(), userId);
 
         // 변경이력 메모 수정 처리
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
@@ -368,7 +372,8 @@ public class LaborService {
      * 인력정보 변경 이력 조회
      */
     @Transactional(readOnly = true)
-    public Slice<LaborChangeHistoryResponse> getLaborChangeHistories(final Long id, final Pageable pageable) {
+    public Slice<LaborChangeHistoryResponse> getLaborChangeHistories(final Long id, final Pageable pageable,
+            final Long userId) {
         // 인력정보 존재 확인
         final Labor labor = getLaborByIdOrThrow(id);
 
@@ -376,7 +381,7 @@ public class LaborService {
         final Slice<LaborChangeHistory> historySlice = laborChangeHistoryRepository.findByLabor(labor, pageable);
 
         // 엔티티를 DTO로 변환하여 슬라이스 반환
-        return historySlice.map(LaborChangeHistoryResponse::from);
+        return historySlice.map(history -> LaborChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -384,7 +389,8 @@ public class LaborService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<LaborChangeHistoryResponse> getLaborChangeHistoriesWithPaging(final Long id, final Pageable pageable) {
+    public Page<LaborChangeHistoryResponse> getLaborChangeHistoriesWithPaging(final Long id, final Pageable pageable,
+            final Long userId) {
         // 인력정보 존재 확인
         final Labor labor = getLaborByIdOrThrow(id);
 
@@ -393,6 +399,6 @@ public class LaborService {
                 pageable);
 
         // 엔티티를 DTO로 변환하여 페이지 반환
-        return historyPage.map(LaborChangeHistoryResponse::from);
+        return historyPage.map(history -> LaborChangeHistoryResponse.from(history, userId));
     }
 }

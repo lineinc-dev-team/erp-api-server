@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.domain.labor.entity.LaborChangeHistory;
 import com.lineinc.erp.api.server.domain.labor.entity.LaborFile;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborChangeType;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
@@ -29,12 +30,13 @@ public class LaborFileService {
 
     private final LaborChangeHistoryRepository laborChangeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     /**
      * 인력정보 첨부파일 수정
      */
     @Transactional
-    public void updateLaborFiles(final Labor labor, final List<LaborFileUpdateRequest> requests) {
+    public void updateLaborFiles(final Labor labor, final List<LaborFileUpdateRequest> requests, final Long userId) {
         // 변경 전 상태 저장 (Javers 스냅샷)
         final List<LaborFile> beforeFiles = labor.getFiles().stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, LaborFile.class))
@@ -89,6 +91,7 @@ public class LaborFileService {
                     .labor(labor)
                     .type(LaborChangeType.ATTACHMENT)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             laborChangeHistoryRepository.save(changeHistory);
         }

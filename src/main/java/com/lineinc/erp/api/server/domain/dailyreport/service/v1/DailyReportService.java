@@ -29,7 +29,9 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.service.v1.FuelAggregationService;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.entity.LaborChangeHistory;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.domain.labor.repository.LaborChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollSyncService;
@@ -95,6 +97,7 @@ public class DailyReportService {
     private final LaborPayrollSyncService laborPayrollSyncService;
     private final FuelAggregationService fuelAggregationService;
     private final FuelInfoRepository fuelInfoRepository;
+    private final LaborChangeHistoryRepository laborChangeHistoryRepository;
 
     @Transactional
     public void createDailyReport(final DailyReportCreateRequest request, final Long userId) {
@@ -160,7 +163,7 @@ public class DailyReportService {
                 // 임시 인력인 경우 새로운 인력을 생성
                 if (Boolean.TRUE.equals(directContractRequest.isTemporary())) {
                     labor = createTemporaryLabor(directContractRequest.temporaryLaborName(),
-                            directContractRequest.unitPrice());
+                            directContractRequest.unitPrice(), userId);
                 } else {
                     // 기존 인력 검색
                     labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
@@ -646,7 +649,7 @@ public class DailyReportService {
 
     @Transactional
     public void updateDailyReportDirectContracts(final DailyReportSearchRequest searchRequest,
-            final DailyReportDirectContractUpdateRequest request) {
+            final DailyReportDirectContractUpdateRequest request, final Long userId) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
@@ -684,7 +687,7 @@ public class DailyReportService {
                     Labor labor;
                     // 임시 인력인 경우 새로운 인력을 생성
                     if (Boolean.TRUE.equals(dto.isTemporary())) {
-                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice());
+                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId);
                     } else {
                         // 기존 인력 검색
                         labor = laborService.getLaborByIdOrThrow(dto.laborId());
@@ -1084,7 +1087,7 @@ public class DailyReportService {
     /**
      * 임시 인력 생성 메서드
      */
-    private Labor createTemporaryLabor(final String temporaryLaborName, final Long unitPrice) {
+    private Labor createTemporaryLabor(final String temporaryLaborName, final Long unitPrice, final Long userId) {
         // 임시 인력 이름이 필수
         if (temporaryLaborName == null || temporaryLaborName.trim().isEmpty()) {
             throw new IllegalArgumentException(ValidationMessages.TEMPORARY_LABOR_NAME_REQUIRED);
@@ -1099,7 +1102,16 @@ public class DailyReportService {
                 .dailyWage(unitPrice)
                 .build();
 
-        return laborRepository.save(temporaryLabor);
+        final Labor labor = laborRepository.save(temporaryLabor);
+
+        final LaborChangeHistory changeHistory = LaborChangeHistory.builder()
+                .labor(labor)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId))
+                .build();
+        laborChangeHistoryRepository.save(changeHistory);
+
+        return labor;
     }
 
     /**

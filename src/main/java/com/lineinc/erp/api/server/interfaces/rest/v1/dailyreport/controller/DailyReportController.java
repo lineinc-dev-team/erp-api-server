@@ -144,8 +144,9 @@ public class DailyReportController {
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportDirectContract(
             @Valid final DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody final DailyReportDirectContractUpdateRequest request) {
-        dailyReportService.updateDailyReportDirectContracts(searchRequest, request);
+            @Valid @RequestBody final DailyReportDirectContractUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        dailyReportService.updateDailyReportDirectContracts(searchRequest, request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,6 +27,7 @@ import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.DeleteLaborsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborCreateRequest;
@@ -77,8 +79,9 @@ public class LaborController {
     })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.CREATE)
-    public ResponseEntity<Void> createLabor(@Valid @RequestBody final LaborCreateRequest request) {
-        laborService.createLabor(request);
+    public ResponseEntity<Void> createLabor(@Valid @RequestBody final LaborCreateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        laborService.createLabor(request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -204,8 +207,9 @@ public class LaborController {
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLabor(
             @PathVariable final Long id,
-            @Valid @RequestBody final LaborUpdateRequest request) {
-        laborService.updateLabor(id, request);
+            @Valid @RequestBody final LaborUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        laborService.updateLabor(id, request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -219,9 +223,11 @@ public class LaborController {
     public ResponseEntity<SuccessResponse<SliceResponse<LaborChangeHistoryResponse>>> getLaborChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest) {
+            @Valid final SortRequest sortRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
         final Slice<LaborChangeHistoryResponse> slice = laborService.getLaborChangeHistories(id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()),
+                user.getUserId());
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 

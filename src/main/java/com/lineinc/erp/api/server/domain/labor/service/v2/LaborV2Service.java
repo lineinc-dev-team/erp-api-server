@@ -30,9 +30,10 @@ public class LaborV2Service {
      */
     public Page<LaborChangeHistoryResponse> getLaborChangeHistoriesWithPaging(
             final Long laborId,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final Long userId) {
         final Page<LaborChangeHistory> historyPage = laborChangeHistoryRepository
                 .findByLaborWithPaging(laborId, pageable);
-        return historyPage.map(LaborChangeHistoryResponse::from);
+        return historyPage.map(history -> LaborChangeHistoryResponse.from(history, userId));
     }
 }
