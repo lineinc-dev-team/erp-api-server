@@ -5,6 +5,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.laborpayroll.enums.LaborPayrollChangeType;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,6 +59,10 @@ public class LaborPayrollChangeHistory extends BaseEntity {
     @Setter
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column
     private String description;

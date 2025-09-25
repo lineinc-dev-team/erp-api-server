@@ -1,11 +1,12 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollChangeHistory;
 import com.lineinc.erp.api.server.domain.laborpayroll.enums.LaborPayrollChangeType;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.OffsetDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 노무명세서 변경이력 응답 DTO
@@ -20,9 +21,10 @@ public record LaborPayrollChangeHistoryResponse(
         @Schema(description = "수정 일시", example = "2025-01-15T10:00:00+09:00") OffsetDateTime updatedAt,
         @Schema(description = "수정자", example = "관리자") String updatedBy,
         @Schema(description = "변경 유형", example = "노무명세서") String type,
-        @Schema(description = "변경 유형 코드", example = "LABOR_PAYROLL") LaborPayrollChangeType typeCode) {
+        @Schema(description = "변경 유형 코드", example = "LABOR_PAYROLL") LaborPayrollChangeType typeCode,
+        @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
 
-    public static LaborPayrollChangeHistoryResponse from(LaborPayrollChangeHistory history) {
+    public static LaborPayrollChangeHistoryResponse from(final LaborPayrollChangeHistory history, final Long userId) {
         return new LaborPayrollChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),
@@ -32,6 +34,7 @@ public record LaborPayrollChangeHistoryResponse(
                 history.getUpdatedAt(),
                 history.getUpdatedBy(),
                 history.getType().getLabel(),
-                history.getType());
+                history.getType(),
+                history.getUser() != null && history.getUser().getId().equals(userId));
     }
 }

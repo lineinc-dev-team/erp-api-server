@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDetailSearchRequest;
@@ -154,8 +156,9 @@ public class LaborPayrollController {
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrollSummary(
             @Parameter(description = "집계 ID") @PathVariable final Long id,
-            @Parameter(description = "수정 요청") @Valid @RequestBody final LaborPayrollSummaryUpdateRequest request) {
-        laborPayrollService.updateLaborPayrollSummary(id, request);
+            @Parameter(description = "수정 요청") @Valid @RequestBody final LaborPayrollSummaryUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        laborPayrollService.updateLaborPayrollSummary(id, request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -171,8 +174,9 @@ public class LaborPayrollController {
     @PatchMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrolls(
-            @Parameter(description = "수정 요청") @Valid @RequestBody final LaborPayrollUpdateRequest request) {
-        laborPayrollService.updateLaborPayrolls(request);
+            @Parameter(description = "수정 요청") @Valid @RequestBody final LaborPayrollUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        laborPayrollService.updateLaborPayrolls(request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -189,11 +193,13 @@ public class LaborPayrollController {
     public ResponseEntity<SuccessResponse<SliceResponse<LaborPayrollChangeHistoryResponse>>> getLaborPayrollChangeHistories(
             @Parameter(description = "노무명세서 집계 ID") @PathVariable final Long id,
             @Parameter(description = "페이징 정보") @ModelAttribute final PageRequest pageRequest,
-            @Parameter(description = "정렬 정보") @ModelAttribute final SortRequest sortRequest) {
+            @Parameter(description = "정렬 정보") @ModelAttribute final SortRequest sortRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
 
         final var slice = laborPayrollService.getLaborPayrollChangeHistories(
                 id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()),
+                user.getUserId());
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));

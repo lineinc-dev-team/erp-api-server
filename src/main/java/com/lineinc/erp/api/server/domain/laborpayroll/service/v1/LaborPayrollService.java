@@ -27,6 +27,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.enums.LaborPayrollChangeTy
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollInfo;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
@@ -59,6 +60,7 @@ public class LaborPayrollService {
     private final LaborPayrollRepository laborPayrollRepository;
     private final LaborPayrollChangeHistoryRepository laborPayrollChangeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     /**
      * 노무명세서 월별 집계 목록 조회 (페이징)
@@ -218,7 +220,8 @@ public class LaborPayrollService {
      * 집계 테이블의 비고 필드만 수정 가능
      */
     @Transactional
-    public void updateLaborPayrollSummary(final Long id, final LaborPayrollSummaryUpdateRequest request) {
+    public void updateLaborPayrollSummary(final Long id, final LaborPayrollSummaryUpdateRequest request,
+            final Long userId) {
         final LaborPayrollSummary summary = laborPayrollSummaryRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.LABOR_PAYROLL_SUMMARY_NOT_FOUND));
@@ -240,6 +243,7 @@ public class LaborPayrollService {
                     .type(LaborPayrollChangeType.BASIC)
                     .changes(changesJson)
                     .laborPayrollSummary(summary)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             laborPayrollChangeHistoryRepository.save(changeHistory);
         }
@@ -291,7 +295,7 @@ public class LaborPayrollService {
      * 여러 노무명세서를 한 번에 수정
      */
     @Transactional
-    public void updateLaborPayrolls(final LaborPayrollUpdateRequest request) {
+    public void updateLaborPayrolls(final LaborPayrollUpdateRequest request, final Long userId) {
         if (request.laborPayrollInfos() == null || request.laborPayrollInfos().isEmpty()) {
             return;
         }
@@ -328,6 +332,7 @@ public class LaborPayrollService {
                         .changes(changesJson)
                         .laborPayrollSummary(summary)
                         .description(generateLaborDescription(laborPayroll))
+                        .user(userService.getUserByIdOrThrow(userId))
                         .build();
                 laborPayrollChangeHistoryRepository.save(changeHistory);
             }
@@ -399,10 +404,10 @@ public class LaborPayrollService {
      */
     @Transactional(readOnly = true)
     public Slice<LaborPayrollChangeHistoryResponse> getLaborPayrollChangeHistories(
-            final Long laborPayrollSummaryId, final Pageable pageable) {
+            final Long laborPayrollSummaryId, final Pageable pageable, final Long userId) {
         final Slice<LaborPayrollChangeHistory> changeHistories = laborPayrollChangeHistoryRepository
                 .findBySummaryId(laborPayrollSummaryId, pageable);
-        return changeHistories.map(LaborPayrollChangeHistoryResponse::from);
+        return changeHistories.map(history -> LaborPayrollChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -411,11 +416,11 @@ public class LaborPayrollService {
      */
     @Transactional(readOnly = true)
     public Page<LaborPayrollChangeHistoryResponse> getLaborPayrollChangeHistoriesWithPaging(
-            final Long laborPayrollSummaryId, final Pageable pageable) {
+            final Long laborPayrollSummaryId, final Pageable pageable, final Long userId) {
         final LaborPayrollSummary laborPayrollSummary = getLaborPayrollSummaryByIdOrThrow(laborPayrollSummaryId);
         final Page<LaborPayrollChangeHistory> changeHistoryPage = laborPayrollChangeHistoryRepository
                 .findBySummaryIdWithPaging(laborPayrollSummary, pageable);
-        return changeHistoryPage.map(LaborPayrollChangeHistoryResponse::from);
+        return changeHistoryPage.map(history -> LaborPayrollChangeHistoryResponse.from(history, userId));
     }
 
     /**
