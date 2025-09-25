@@ -185,6 +185,13 @@ public class ManagementCostService {
                     .memo(outsourcingCompanyInfo.memo())
                     .build();
             outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
+
+            // 변경 이력 생성
+            final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
+                    .outsourcingCompany(outsourcingCompany)
+                    .description(ValidationMessages.INITIAL_CREATION)
+                    .build();
+            outsourcingCompanyChangeRepository.save(changeHistory);
         }
 
         return outsourcingCompany;
