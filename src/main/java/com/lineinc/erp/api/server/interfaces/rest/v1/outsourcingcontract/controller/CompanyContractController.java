@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.contro
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -117,6 +118,7 @@ public class CompanyContractController {
     @GetMapping("/types")
     public ResponseEntity<SuccessResponse<List<ContractTypeResponse>>> getContractTypes() {
         final List<ContractTypeResponse> responseList = Arrays.stream(OutsourcingCompanyContractType.values())
+                .sorted(Comparator.comparingInt(OutsourcingCompanyContractType::getOrder))
                 .map(type -> new ContractTypeResponse(type.name(), type.getLabel()))
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
