@@ -217,8 +217,9 @@ public class CompanyController {
     public ResponseEntity<SuccessResponse<SliceResponse<CompanyResponse.CompanySimpleResponse>>> searchClientCompanyByName(
             @Valid final SortRequest sortRequest,
             @Valid final PageRequest pageRequest,
-            @RequestParam(required = false) final String keyword) {
-        final Slice<CompanyResponse.CompanySimpleResponse> slice = outsourcingCompanyService.searchByName(keyword,
+            @RequestParam(required = false) final String keyword,
+            @RequestParam(required = false) final OutsourcingCompanyType type) {
+        final Slice<CompanyResponse.CompanySimpleResponse> slice = outsourcingCompanyService.searchByName(keyword, type,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
 

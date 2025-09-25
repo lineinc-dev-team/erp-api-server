@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 
 public interface OutsourcingCompanyRepository
         extends JpaRepository<OutsourcingCompany, Long>, OutsourcingCompanyRepositoryCustom {
@@ -31,8 +32,10 @@ public interface OutsourcingCompanyRepository
     @Query("""
             SELECT oc FROM OutsourcingCompany oc WHERE \
             (:name IS NULL OR LOWER(oc.name) LIKE LOWER(CONCAT('%', CAST(:name AS text), '%'))) AND \
-            oc.deleted = false""")
-    Slice<OutsourcingCompany> findByNameAndKeyword(@Param("name") String name, Pageable pageable);
+            oc.deleted = false AND \
+            (:type IS NULL OR oc.type = :type)""")
+    Slice<OutsourcingCompany> findByNameAndKeyword(@Param("name") String name,
+            @Param("type") OutsourcingCompanyType type, Pageable pageable);
 
     /**
      * 장비 타입 계약을 가진 외주업체 목록을 조회합니다.

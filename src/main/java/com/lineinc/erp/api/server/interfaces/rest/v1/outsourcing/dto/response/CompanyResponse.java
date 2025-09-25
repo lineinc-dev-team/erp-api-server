@@ -90,17 +90,13 @@ public record CompanyResponse(
     @Schema(description = "간단한 외주업체 응답")
     public static record CompanySimpleResponse(
             @Schema(description = "외주업체 ID", example = "123") Long id,
-
             @Schema(description = "외주업체 이름", example = "삼성건설") String name,
-
             @Schema(description = "외주업체 사업자등록번호", example = "123-45-67890") String businessNumber,
-
+            @Schema(description = "외주업체 구분", example = "외주") String type,
+            @Schema(description = "외주업체 구분 코드", example = "CONSTRUCTION") OutsourcingCompanyType typeCode,
             @Schema(description = "대표자명", example = "홍길동") String ceoName,
-
             @Schema(description = "은행명", example = "신한은행") String bankName,
-
             @Schema(description = "계좌번호", example = "123-456-789012") String accountNumber,
-
             @Schema(description = "예금주", example = "홍길동") String accountHolder,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static CompanyResponse.CompanySimpleResponse from(final OutsourcingCompany company) {
@@ -108,6 +104,8 @@ public record CompanyResponse(
                     company.getId(),
                     company.getName(),
                     company.getBusinessNumber(),
+                    company.getType() != null ? company.getType().getLabel() : null,
+                    company.getType(),
                     company.getCeoName(),
                     company.getBankName(),
                     company.getAccountNumber(),
