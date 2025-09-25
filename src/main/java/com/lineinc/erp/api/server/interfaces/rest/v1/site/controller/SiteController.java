@@ -71,8 +71,10 @@ public class SiteController {
     })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.CREATE)
-    public ResponseEntity<Void> createSite(@Valid @RequestBody final CreateSiteRequest request) {
-        siteService.createSite(request);
+    public ResponseEntity<Void> createSite(
+            @Valid @RequestBody final CreateSiteRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        siteService.createSite(request, user);
         return ResponseEntity.ok().build();
     }
 

@@ -69,8 +69,9 @@ public class ClientCompanyController extends BaseController {
     @Operation(summary = "발주처 등록")
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createClientCompany(
-            @Valid @RequestBody final ClientCompanyCreateRequest request) {
-        clientCompanyService.createClientCompany(request);
+            @Valid @RequestBody final ClientCompanyCreateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        clientCompanyService.createClientCompany(request, user);
         return ResponseEntity.ok().build();
     }
 

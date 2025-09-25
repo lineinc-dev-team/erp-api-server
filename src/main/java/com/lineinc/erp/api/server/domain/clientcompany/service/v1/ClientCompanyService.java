@@ -52,7 +52,7 @@ public class ClientCompanyService {
     private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
 
     @Transactional
-    public void createClientCompany(final ClientCompanyCreateRequest request) {
+    public void createClientCompany(final ClientCompanyCreateRequest request, final CustomUserDetails userEntity) {
         // 1. 사업자등록번호 중복 확인
         validateBusinessNumberNotExists(request.businessNumber());
 
@@ -73,6 +73,7 @@ public class ClientCompanyService {
 
         final ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
                 .clientCompany(clientCompany)
+                .user(userService.getUserByIdOrThrow(userEntity.getUserId()))
                 .description(ValidationMessages.INITIAL_CREATION)
                 .build();
         clientCompanyChangeHistoryRepository.save(changeHistory);

@@ -25,6 +25,7 @@ import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryReposi
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.DeleteSitesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteListRequest;
@@ -53,7 +54,7 @@ public class SiteService {
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
 
     @Transactional
-    public void createSite(final CreateSiteRequest request) {
+    public void createSite(final CreateSiteRequest request, final CustomUserDetails userEntity) {
         final ClientCompany clientCompany = clientCompanyService.getClientCompanyByIdOrThrow(request.clientCompanyId());
         final User user = userService.getUserByIdOrThrow(request.userId());
 
@@ -85,6 +86,7 @@ public class SiteService {
         final SiteChangeHistory changeHistory = SiteChangeHistory.builder()
                 .site(site)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userEntity.getUserId()))
                 .build();
         siteChangeHistoryRepository.save(changeHistory);
     }
