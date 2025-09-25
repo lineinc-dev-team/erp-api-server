@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -106,6 +107,7 @@ public class CompanyController {
     @GetMapping("/types")
     public ResponseEntity<SuccessResponse<List<CompanyTypeResponse>>> getSeparations() {
         final List<CompanyTypeResponse> responseList = Arrays.stream(OutsourcingCompanyType.values())
+                .sorted(Comparator.comparingInt(OutsourcingCompanyType::getOrder))
                 .map(type -> new CompanyTypeResponse(type.name(), type.getLabel()))
                 .toList();
 
