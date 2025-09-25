@@ -23,6 +23,8 @@ public record ManagementCostResponse(
         @Schema(description = "합계 총합", example = "1100000") Long total,
         @Schema(description = "전도금 총합", example = "500000") Long keyMoneyAmountTotal,
         @Schema(description = "식대 총합", example = "300000") Long mealFeeAmountTotal,
+        @Schema(description = "전도금 공제액 총합", example = "500000") Long keyMoneyDeductAmountTotal,
+        @Schema(description = "품목 상세 공제액 총합", example = "300000") Long detailDeductAmountTotal,
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
         @Schema(description = "업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany) {
@@ -56,6 +58,16 @@ public record ManagementCostResponse(
                 cost.getMealFeeDetails().stream()
                         .filter(detail -> detail.getAmount() != null)
                         .mapToLong(detail -> detail.getAmount())
+                        .sum(),
+                cost.getKeyMoneyDetails().stream()
+                        .filter(detail -> detail.getAmount() != null && detail.getIsDeductible() != null
+                                && detail.getIsDeductible())
+                        .mapToLong(detail -> detail.getAmount())
+                        .sum(),
+                cost.getDetails().stream()
+                        .filter(detail -> detail.getTotal() != null && detail.getIsDeductible() != null
+                                && detail.getIsDeductible())
+                        .mapToLong(detail -> detail.getTotal())
                         .sum(),
                 SiteResponse.SiteSimpleResponse.from(cost.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(cost.getSiteProcess()),

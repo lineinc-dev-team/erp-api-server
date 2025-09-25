@@ -302,6 +302,7 @@ public class ManagementCostService {
             case "supplyPrice" -> "공급가";
             case "vat" -> "부가세";
             case "total" -> "합계";
+            case "deductibleAmount" -> "공제액";
             case "hasFile" -> "첨부파일";
             case "memo" -> "비고";
             default -> null;
@@ -360,8 +361,22 @@ public class ManagementCostService {
                 }
                 yield "";
             }
+
             case "hasFile" -> managementCost.hasFile() ? "Y" : "N";
             case "memo" -> managementCost.memo();
+            case "deductibleAmount" -> {
+                // 관리비 타입에 따라 다른 공제액 사용
+                if ("KEY_MONEY".equals(managementCost.itemTypeCode())) {
+                    if (managementCost.keyMoneyDeductAmountTotal() != null) {
+                        yield NumberFormat.getNumberInstance().format(managementCost.keyMoneyDeductAmountTotal());
+                    }
+                } else {
+                    if (managementCost.detailDeductAmountTotal() != null) {
+                        yield NumberFormat.getNumberInstance().format(managementCost.detailDeductAmountTotal());
+                    }
+                }
+                yield "";
+            }
             default -> null;
         };
     }
