@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OutsourcingCompanyContractType {
-    SERVICE("용역"),
+    SERVICE("노무"),
     EQUIPMENT("장비"),
     CONSTRUCTION("공사"),
     ETC("기타");
