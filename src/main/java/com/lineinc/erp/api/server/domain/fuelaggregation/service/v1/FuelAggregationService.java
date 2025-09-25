@@ -32,6 +32,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.AddFuelInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
@@ -60,10 +61,11 @@ public class FuelAggregationService {
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
     private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
     private final FuelInfoService fuelInfoService;
+    private final UserService userService;
     private final Javers javers;
 
     @Transactional
-    public FuelAggregation createFuelAggregation(final FuelAggregationCreateRequest request) {
+    public FuelAggregation createFuelAggregation(final FuelAggregationCreateRequest request, final Long userId) {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
@@ -107,6 +109,7 @@ public class FuelAggregationService {
         final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
                 .fuelAggregation(fuelAggregation)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId))
                 .build();
         fuelAggregationChangeHistoryRepository.save(changeHistory);
 
@@ -205,12 +208,12 @@ public class FuelAggregationService {
      */
     @Transactional(readOnly = true)
     public Slice<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistories(final Long fuelAggregationId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
 
         final Slice<FuelAggregationChangeHistory> histories = fuelAggregationChangeHistoryRepository
                 .findByFuelAggregation(fuelAggregation, pageable);
-        return histories.map(FuelAggregationChangeHistoryResponse::from);
+        return histories.map(history -> FuelAggregationChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -220,12 +223,12 @@ public class FuelAggregationService {
     @Transactional(readOnly = true)
     public Page<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistoriesWithPaging(
             final Long fuelAggregationId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final FuelAggregation fuelAggregation = getFuelAggregationByIdOrThrow(fuelAggregationId);
 
         final Page<FuelAggregationChangeHistory> historyPage = fuelAggregationChangeHistoryRepository
                 .findByFuelAggregationWithPaging(fuelAggregation, pageable);
-        return historyPage.map(FuelAggregationChangeHistoryResponse::from);
+        return historyPage.map(history -> FuelAggregationChangeHistoryResponse.from(history, userId));
     }
 
     @Transactional
@@ -270,7 +273,7 @@ public class FuelAggregationService {
     }
 
     @Transactional
-    public void updateFuelAggregation(final Long id, final FuelAggregationUpdateRequest request) {
+    public void updateFuelAggregation(final Long id, final FuelAggregationUpdateRequest request, final Long userId) {
         final FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
@@ -297,6 +300,7 @@ public class FuelAggregationService {
                     .fuelAggregation(fuelAggregation)
                     .type(FuelAggregationChangeType.BASIC)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             fuelAggregationChangeHistoryRepository.save(changeHistory);
         }
@@ -314,7 +318,7 @@ public class FuelAggregationService {
 
         // 유류정보 수정 처리
         if (request.fuelInfos() != null) {
-            fuelInfoService.updateFuelInfos(fuelAggregation, request.fuelInfos());
+            fuelInfoService.updateFuelInfos(fuelAggregation, request.fuelInfos(), userId);
         }
     }
 

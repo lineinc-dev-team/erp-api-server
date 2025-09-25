@@ -30,9 +30,9 @@ public class FuelAggregationV2Service {
      */
     public Page<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistoriesWithPaging(
             final Long fuelAggregationId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final Page<FuelAggregationChangeHistory> historyPage = fuelAggregationChangeHistoryRepository
                 .findByFuelAggregationWithPaging(fuelAggregationId, pageable);
-        return historyPage.map(FuelAggregationChangeHistoryResponse::from);
+        return historyPage.map(history -> FuelAggregationChangeHistoryResponse.from(history, userId));
     }
 }

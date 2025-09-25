@@ -97,7 +97,7 @@ public class DailyReportService {
     private final FuelInfoRepository fuelInfoRepository;
 
     @Transactional
-    public void createDailyReport(final DailyReportCreateRequest request) {
+    public void createDailyReport(final DailyReportCreateRequest request, final Long userId) {
         // 현장 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
@@ -266,7 +266,7 @@ public class DailyReportService {
                                     fuelInfoRequest.memo()))
                             .toList());
             final FuelAggregation fuelAggregation = fuelAggregationService
-                    .createFuelAggregation(fuelAggregationRequest);
+                    .createFuelAggregation(fuelAggregationRequest, userId);
 
             // FuelAggregation만 연결하는 DailyReportFuel 생성
             final DailyReportFuel fuel = DailyReportFuel.builder()

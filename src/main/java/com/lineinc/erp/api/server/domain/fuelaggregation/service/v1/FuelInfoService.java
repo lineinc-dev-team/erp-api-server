@@ -21,6 +21,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.Outsourci
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest.FuelInfoUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
@@ -35,9 +36,11 @@ public class FuelInfoService {
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
     private final Javers javers;
+    private final UserService userService;
 
     @Transactional
-    public void updateFuelInfos(final FuelAggregation fuelAggregation, final List<FuelInfoUpdateRequest> requests) {
+    public void updateFuelInfos(final FuelAggregation fuelAggregation, final List<FuelInfoUpdateRequest> requests,
+            final Long userId) {
         // 모든 FuelInfo의 transient 필드 동기화
         fuelAggregation.getFuelInfos().forEach(FuelInfo::syncTransientFields);
 
@@ -127,6 +130,7 @@ public class FuelInfoService {
                     .fuelAggregation(fuelAggregation)
                     .type(FuelAggregationChangeType.FUEL_INFO)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             fuelAggregationChangeHistoryRepository.save(changeHistory);
         }

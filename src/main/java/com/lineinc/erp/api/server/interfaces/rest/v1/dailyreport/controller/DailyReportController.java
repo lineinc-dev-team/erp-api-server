@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.controller;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.dailyreport.service.v1.DailyReportService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
@@ -61,8 +63,9 @@ public class DailyReportController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createDailyReport(
-            @Valid @RequestBody final DailyReportCreateRequest request) {
-        dailyReportService.createDailyReport(request);
+            @Valid @RequestBody final DailyReportCreateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        dailyReportService.createDailyReport(request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
