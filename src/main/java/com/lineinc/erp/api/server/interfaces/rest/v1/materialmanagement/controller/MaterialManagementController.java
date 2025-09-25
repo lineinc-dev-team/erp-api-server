@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.control
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -85,6 +86,7 @@ public class MaterialManagementController {
     public ResponseEntity<SuccessResponse<List<MaterialManagementInputTypeResponse>>> getMaterialManagementInputTypes() {
         final List<MaterialManagementInputTypeResponse> responseList = Arrays
                 .stream(MaterialManagementInputType.values())
+                .sorted(Comparator.comparingInt(MaterialManagementInputType::getOrder))
                 .map(type -> new MaterialManagementInputTypeResponse(type.name(), type.getLabel()))
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
