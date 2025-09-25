@@ -32,7 +32,7 @@ public record SiteResponse(
 
         @Schema(description = "사업 종료일", example = "2025-12-31T00:00:00+09:00") OffsetDateTime endedAt,
 
-        @Schema(description = "도급금액", example = "100000000") Long contractAmount,
+        @Schema(description = "계약금액", example = "100000000") Long contractAmount,
 
         @Schema(description = "비고", example = "비고 내용") String memo,
 

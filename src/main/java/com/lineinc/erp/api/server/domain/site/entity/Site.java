@@ -104,7 +104,7 @@ public class Site extends BaseEntity {
 
     @DiffInclude
     @Column
-    private Long contractAmount; // 도급금액
+    private Long contractAmount; // 계약금액
 
     @Builder.Default
     @DiffIgnore

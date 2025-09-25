@@ -149,7 +149,7 @@ public class SiteService {
             case "createdAt" -> "등록일자";
             case "hasFile" -> "첨부파일";
             case "memo" -> "비고";
-            case "contractAmount" -> "도급금액";
+            case "contractAmount" -> "계약금액";
             case "managerName" -> "공정소장";
             default -> null;
         };
