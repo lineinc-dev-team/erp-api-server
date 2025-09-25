@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKey
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostKeyMoneyDetailRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -32,6 +33,7 @@ public class ManagementCostKeyMoneyDetailService {
     private final ManagementCostKeyMoneyDetailRepository managementCostKeyMoneyDetailRepository;
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     @Transactional
     public void createManagementCostKeyMoneyDetails(final ManagementCost managementCost,
@@ -54,7 +56,7 @@ public class ManagementCostKeyMoneyDetailService {
 
     @Transactional
     public void updateManagementCostKeyMoneyDetails(final ManagementCost managementCost,
-            final List<ManagementCostKeyMoneyDetailUpdateRequest> requests) {
+            final List<ManagementCostKeyMoneyDetailUpdateRequest> requests, final Long userId) {
 
         // 수정 전 스냅샷 생성
         final List<ManagementCostKeyMoneyDetail> beforeDetails = managementCost.getKeyMoneyDetails().stream()
@@ -112,6 +114,7 @@ public class ManagementCostKeyMoneyDetailService {
                     .managementCost(managementCost)
                     .type(ManagementCostChangeHistoryType.KEY_MONEY_DETAIL)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }

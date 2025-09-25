@@ -30,9 +30,9 @@ public class ManagementCostV2Service {
      */
     public Page<ManagementCostChangeHistoryResponse> getManagementCostChangeHistoriesWithPaging(
             final Long managementCostId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final Page<ManagementCostChangeHistory> historyPage = managementCostChangeHistoryRepository
                 .findAllByManagementCostWithPaging(managementCostId, pageable);
-        return historyPage.map(ManagementCostChangeHistoryResponse::from);
+        return historyPage.map(history -> ManagementCostChangeHistoryResponse.from(history, userId));
     }
 }

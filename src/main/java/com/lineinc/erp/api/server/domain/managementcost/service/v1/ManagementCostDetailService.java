@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDet
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostDetailRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostDetailUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -32,6 +33,7 @@ public class ManagementCostDetailService {
     private final ManagementCostDetailRepository managementCostDetailRepository;
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     @Transactional
     public void createManagementCostDetails(final ManagementCost managementCost,
@@ -56,7 +58,7 @@ public class ManagementCostDetailService {
 
     @Transactional
     public void updateManagementCostDetails(final ManagementCost managementCost,
-            final List<ManagementCostDetailUpdateRequest> requests) {
+            final List<ManagementCostDetailUpdateRequest> requests, final Long userId) {
 
         // 수정 전 스냅샷 생성
         final List<ManagementCostDetail> beforeDetails = managementCost.getDetails().stream()
@@ -116,6 +118,7 @@ public class ManagementCostDetailService {
                     .managementCost(managementCost)
                     .type(ManagementCostChangeHistoryType.ITEM_DETAIL)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }

@@ -20,6 +20,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMea
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostMealFeeDetailRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -35,6 +36,7 @@ public class ManagementCostMealFeeDetailService {
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
     private final LaborService laborService;
     private final Javers javers;
+    private final UserService userService;
 
     @Transactional
     public void createManagementCostMealFeeDetails(final ManagementCost managementCost,
@@ -60,7 +62,7 @@ public class ManagementCostMealFeeDetailService {
 
     @Transactional
     public void updateManagementCostMealFeeDetails(final ManagementCost managementCost,
-            final List<ManagementCostMealFeeDetailUpdateRequest> requests) {
+            final List<ManagementCostMealFeeDetailUpdateRequest> requests, final Long userId) {
 
         managementCost.getMealFeeDetails().forEach(detail -> {
             detail.syncTransientFields();
@@ -147,6 +149,7 @@ public class ManagementCostMealFeeDetailService {
                     .managementCost(managementCost)
                     .type(ManagementCostChangeHistoryType.MEAL_FEE)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }

@@ -38,6 +38,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
@@ -77,9 +78,10 @@ public class ManagementCostService {
     private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
 
     private final Javers javers;
+    private final UserService userService;
 
     @Transactional
-    public void createManagementCost(final ManagementCostCreateRequest request) {
+    public void createManagementCost(final ManagementCostCreateRequest request, final Long userId) {
         // 1. 현장 및 공정 존재 확인
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
@@ -90,7 +92,7 @@ public class ManagementCostService {
         // 2. 외주업체 처리
         final OutsourcingCompany outsourcingCompany = processOutsourcingCompany(
                 request.outsourcingCompanyId(),
-                request.outsourcingCompanyInfo());
+                request.outsourcingCompanyInfo(), userId);
 
         // 3. 관리비 엔티티 생성 및 저장
         ManagementCost managementCost = ManagementCost.builder()
@@ -128,6 +130,7 @@ public class ManagementCostService {
         final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                 .managementCost(managementCost)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId))
                 .build();
         managementCostChangeHistoryRepository.save(changeHistory);
     }
@@ -136,7 +139,7 @@ public class ManagementCostService {
      * 외주업체 처리 (생성 또는 수정)
      */
     private OutsourcingCompany processOutsourcingCompany(final Long outsourcingCompanyId,
-            final OutsourcingCompanyBasicInfoRequest outsourcingCompanyInfo) {
+            final OutsourcingCompanyBasicInfoRequest outsourcingCompanyInfo, final Long userId) {
         OutsourcingCompany outsourcingCompany = null;
 
         if (outsourcingCompanyId != null) {
@@ -167,6 +170,7 @@ public class ManagementCostService {
                     final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                             .outsourcingCompany(outsourcingCompany)
                             .type(OutsourcingCompanyChangeHistoryType.BASIC)
+                            .user(userService.getUserByIdOrThrow(userId))
                             .changes(changesJson)
                             .build();
                     outsourcingCompanyChangeRepository.save(changeHistory);
@@ -189,6 +193,7 @@ public class ManagementCostService {
             // 변경 이력 생성
             final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                     .outsourcingCompany(outsourcingCompany)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .description(ValidationMessages.INITIAL_CREATION)
                     .build();
             outsourcingCompanyChangeRepository.save(changeHistory);
@@ -377,7 +382,8 @@ public class ManagementCostService {
     }
 
     @Transactional
-    public void updateManagementCost(final Long managementCostId, final ManagementCostUpdateRequest request) {
+    public void updateManagementCost(final Long managementCostId, final ManagementCostUpdateRequest request,
+            final Long userId) {
         final ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
@@ -388,7 +394,7 @@ public class ManagementCostService {
         // 2. 외주업체 처리
         final OutsourcingCompany outsourcingCompany = processOutsourcingCompany(
                 request.outsourcingCompanyId(),
-                request.outsourcingCompanyInfo());
+                request.outsourcingCompanyInfo(), userId);
 
         // 수정 전 스냅샷 생성
         managementCost.syncTransientFields();
@@ -407,6 +413,7 @@ public class ManagementCostService {
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
                     .type(ManagementCostChangeHistoryType.BASIC)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .changes(changesJson)
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);
@@ -426,25 +433,25 @@ public class ManagementCostService {
         // 상세 정보 업데이트
         if (request.details() != null) {
             managementCostDetailService.updateManagementCostDetails(managementCost,
-                    request.details());
+                    request.details(), userId);
         }
 
         // 전도금 상세 정보 업데이트
         if (request.keyMoneyDetails() != null) {
             managementCostKeyMoneyDetailService.updateManagementCostKeyMoneyDetails(managementCost,
-                    request.keyMoneyDetails());
+                    request.keyMoneyDetails(), userId);
         }
 
         // 식대 상세 정보 업데이트
         if (request.mealFeeDetails() != null) {
             managementCostMealFeeDetailService.updateManagementCostMealFeeDetails(managementCost,
-                    request.mealFeeDetails());
+                    request.mealFeeDetails(), userId);
         }
 
         // 파일 업데이트
         if (request.files() != null) {
             managementCostFileService.updateManagementCostFiles(managementCost,
-                    request.files());
+                    request.files(), userId);
         }
     }
 
@@ -479,11 +486,11 @@ public class ManagementCostService {
      */
     @Transactional(readOnly = true)
     public Slice<ManagementCostChangeHistoryResponse> getManagementCostChangeHistories(final Long managementCostId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
 
         return managementCostChangeHistoryRepository.findAllByManagementCost(managementCost, pageable)
-                .map(ManagementCostChangeHistoryResponse::from);
+                .map(history -> ManagementCostChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -493,11 +500,11 @@ public class ManagementCostService {
     @Transactional(readOnly = true)
     public Page<ManagementCostChangeHistoryResponse> getManagementCostChangeHistoriesWithPaging(
             final Long managementCostId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final ManagementCost managementCost = getManagementCostByIdOrThrow(managementCostId);
 
         final Page<ManagementCostChangeHistory> historyPage = managementCostChangeHistoryRepository
                 .findAllByManagementCostWithPaging(managementCost, pageable);
-        return historyPage.map(ManagementCostChangeHistoryResponse::from);
+        return historyPage.map(history -> ManagementCostChangeHistoryResponse.from(history, userId));
     }
 }

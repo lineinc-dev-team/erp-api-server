@@ -18,9 +18,11 @@ public record ManagementCostChangeHistoryResponse(
         @Schema(description = "수정 일시", example = "2025-07-15T10:00:00+09:00") OffsetDateTime updatedAt,
         @Schema(description = "수정자", example = "관리자") String updatedBy,
         @Schema(description = "변경 유형", example = "기본 정보") String type,
-        @Schema(description = "변경 유형 코드", example = "BASIC") ManagementCostChangeHistoryType typeCode) {
+        @Schema(description = "변경 유형 코드", example = "BASIC") ManagementCostChangeHistoryType typeCode,
+        @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
 
-    public static ManagementCostChangeHistoryResponse from(final ManagementCostChangeHistory history) {
+    public static ManagementCostChangeHistoryResponse from(final ManagementCostChangeHistory history,
+            final Long userId) {
         return new ManagementCostChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -30,6 +32,7 @@ public record ManagementCostChangeHistoryResponse(
                 history.getUpdatedAt(),
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
-                history.getType());
+                history.getType(),
+                history.getUser() != null && history.getUser().getId().equals(userId));
     }
 }

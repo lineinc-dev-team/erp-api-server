@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.service.v1.ManagementCostService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
@@ -71,8 +73,9 @@ public class ManagementCostController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createManagementCost(
-            @Valid @RequestBody final ManagementCostCreateRequest request) {
-        managementCostService.createManagementCost(request);
+            @Valid @RequestBody final ManagementCostCreateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        managementCostService.createManagementCost(request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -194,8 +197,9 @@ public class ManagementCostController {
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateManagementCost(
             @PathVariable final Long id,
-            @Valid @RequestBody final ManagementCostUpdateRequest request) {
-        managementCostService.updateManagementCost(id, request);
+            @Valid @RequestBody final ManagementCostUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        managementCostService.updateManagementCost(id, request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -209,10 +213,12 @@ public class ManagementCostController {
     public ResponseEntity<SuccessResponse<SliceResponse<ManagementCostChangeHistoryResponse>>> getManagementCostChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest) {
+            @Valid final SortRequest sortRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
         final Slice<ManagementCostChangeHistoryResponse> slice = managementCostService.getManagementCostChangeHistories(
                 id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()),
+                user.getUserId());
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }

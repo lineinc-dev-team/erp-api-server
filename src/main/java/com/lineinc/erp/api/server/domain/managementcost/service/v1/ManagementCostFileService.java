@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFil
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostFileRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -31,6 +32,7 @@ public class ManagementCostFileService {
     private final ManagementCostFileRepository managementCostFileRepository;
     private final ManagementCostChangeHistoryRepository managementCostChangeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     public void createManagementCostFiles(final List<ManagementCostFileCreateRequest> files,
             final ManagementCost managementCost) {
@@ -50,7 +52,7 @@ public class ManagementCostFileService {
 
     @Transactional
     public void updateManagementCostFiles(final ManagementCost managementCost,
-            final List<ManagementCostFileUpdateRequest> requests) {
+            final List<ManagementCostFileUpdateRequest> requests, final Long userId) {
 
         // 변경 전 상태 저장 (Javers 스냅샷) - syncTransientFields 호출 후
         final List<ManagementCostFile> beforeFiles = managementCost.getFiles().stream()
@@ -107,6 +109,7 @@ public class ManagementCostFileService {
                     .managementCost(managementCost)
                     .type(ManagementCostChangeHistoryType.ATTACHMENT)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }
