@@ -157,11 +157,6 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             builder.and(user.grade.id.eq(request.gradeId()));
         }
 
-        // 직책 필터
-        if (request.positionId() != null) {
-            builder.and(user.position.id.eq(request.positionId()));
-        }
-
         return builder;
     }
 }

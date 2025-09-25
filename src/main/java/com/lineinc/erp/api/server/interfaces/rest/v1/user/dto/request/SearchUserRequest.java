@@ -1,10 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @ParameterObject
 @Schema(description = "유저 검색 및 페이징 요청")
@@ -26,7 +27,5 @@ public record SearchUserRequest(
 
         @Schema(description = "부서 ID", example = "1") Long departmentId,
 
-        @Schema(description = "직급 ID", example = "2") Long gradeId,
-
-        @Schema(description = "직책 ID", example = "3") Long positionId) {
+        @Schema(description = "직급 ID", example = "2") Long gradeId) {
 }
