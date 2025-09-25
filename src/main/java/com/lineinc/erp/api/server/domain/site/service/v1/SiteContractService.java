@@ -44,6 +44,9 @@ public class SiteContractService {
                     .supplyPrice(contractReq.supplyPrice())
                     .vat(contractReq.vat())
                     .purchaseTax(contractReq.purchaseTax())
+                    .contractPerformanceGuaranteeRate(contractReq.contractPerformanceGuaranteeRate())
+                    .defectPerformanceGuaranteeRate(contractReq.defectPerformanceGuaranteeRate())
+                    .defectWarrantyPeriod(contractReq.defectWarrantyPeriod())
                     .memo(contractReq.memo())
                     .build());
 
@@ -74,6 +77,9 @@ public class SiteContractService {
                             .supplyPrice(dto.supplyPrice())
                             .vat(dto.vat())
                             .purchaseTax(dto.purchaseTax())
+                            .contractPerformanceGuaranteeRate(dto.contractPerformanceGuaranteeRate())
+                            .defectPerformanceGuaranteeRate(dto.defectPerformanceGuaranteeRate())
+                            .defectWarrantyPeriod(dto.defectWarrantyPeriod())
                             .memo(dto.memo())
                             .build();
                     // 요청에 포함된 첨부파일이 있다면 SiteFile 객체로 변환하여 등록

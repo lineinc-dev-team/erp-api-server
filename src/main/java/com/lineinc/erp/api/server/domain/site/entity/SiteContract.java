@@ -76,6 +76,18 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
     @DiffInclude
     private Long purchaseTax; // 매입세
 
+    @Column
+    @DiffInclude
+    private Long contractPerformanceGuaranteeRate; // 계약이행 보증률
+
+    @Column
+    @DiffInclude
+    private Long defectPerformanceGuaranteeRate; // 하자이행 보증률
+
+    @Column
+    @DiffInclude
+    private Long defectWarrantyPeriod; // 하자보증기간
+
     @Column(columnDefinition = "TEXT")
     @DiffInclude
     private String memo; // 비고
@@ -93,6 +105,9 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
         this.supplyPrice = request.supplyPrice();
         this.vat = request.vat();
         this.purchaseTax = request.purchaseTax();
+        this.contractPerformanceGuaranteeRate = request.contractPerformanceGuaranteeRate();
+        this.defectPerformanceGuaranteeRate = request.defectPerformanceGuaranteeRate();
+        this.defectWarrantyPeriod = request.defectWarrantyPeriod();
         this.memo = request.memo();
 
         if (request.files() != null) {
