@@ -76,6 +76,7 @@ public class ManagementCostFile extends BaseEntity implements UpdatableFrom<Mana
 
     @Override
     public void updateFrom(final ManagementCostFileUpdateRequest request) {
+        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
         Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
