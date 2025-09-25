@@ -123,9 +123,6 @@ public class FuelAggregation extends BaseEntity {
         this.site = site;
         this.siteProcess = siteProcess;
 
-        if (request.date() != null) {
-            this.date = DateTimeFormatUtils.toOffsetDateTime(request.date());
-        }
         if (request.weather() != null) {
             this.weather = request.weather();
         }
