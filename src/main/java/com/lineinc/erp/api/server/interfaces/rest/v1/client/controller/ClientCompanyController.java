@@ -12,6 +12,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,6 +27,7 @@ import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyFileTy
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.domain.clientcompany.service.v1.ClientCompanyService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
@@ -107,9 +109,11 @@ public class ClientCompanyController extends BaseController {
     @PatchMapping("/{id}")
     @Operation(summary = "발주처 수정")
     @RequireMenuPermission(menu = MENU_CLIENT_COMPANY, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateClientCompany(@PathVariable final Long id,
-            @Valid @RequestBody final ClientCompanyUpdateRequest request) {
-        clientCompanyService.updateClientCompany(id, request);
+    public ResponseEntity<Void> updateClientCompany(
+            @PathVariable final Long id,
+            @Valid @RequestBody final ClientCompanyUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        clientCompanyService.updateClientCompany(id, request, user);
         return ResponseEntity.ok().build();
     }
 

@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChang
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.clientcompany.repository.ClientCompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyContactUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -45,7 +46,7 @@ public class ClientCompanyContactService {
 
     @Transactional
     public void updateClientCompanyContacts(final ClientCompany clientCompany,
-            final List<ClientCompanyContactUpdateRequest> requests) {
+            final List<ClientCompanyContactUpdateRequest> requests, final User user) {
         // 1. 메인 담당자가 정확히 1명 존재하는지 검증
         ValidationUtils.validateMainContactExists(requests, ClientCompanyContactUpdateRequest::isMain);
 
@@ -106,6 +107,7 @@ public class ClientCompanyContactService {
             final String json = javers.getJsonConverter().toJson(allChanges);
             final ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
+                    .user(user)
                     .type(ClientCompanyChangeHistoryChangeType.CONTACT)
                     .changes(json)
                     .build();

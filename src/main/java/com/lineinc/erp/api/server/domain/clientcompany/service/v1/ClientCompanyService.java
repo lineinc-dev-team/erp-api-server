@@ -23,6 +23,7 @@ import com.lineinc.erp.api.server.domain.clientcompany.repository.ClientCompanyC
 import com.lineinc.erp.api.server.domain.clientcompany.repository.ClientCompanyRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyDeleteRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyListRequest;
@@ -99,7 +100,8 @@ public class ClientCompanyService {
     }
 
     @Transactional
-    public void updateClientCompany(final Long id, final ClientCompanyUpdateRequest request) {
+    public void updateClientCompany(final Long id, final ClientCompanyUpdateRequest request,
+            final CustomUserDetails user) {
         final ClientCompany clientCompany = getClientCompanyByIdOrThrow(id);
 
         // 1. 사업자등록번호 중복 확인 (기존 값과 다를 때만)
@@ -107,6 +109,8 @@ public class ClientCompanyService {
                 && !clientCompany.getBusinessNumber().equals(request.businessNumber())) {
             validateBusinessNumberNotExists(request.businessNumber());
         }
+
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
 
         clientCompany.syncTransientFields();
         final ClientCompany oldSnapshot = JaversUtils.createSnapshot(javers, clientCompany, ClientCompany.class);
@@ -120,6 +124,7 @@ public class ClientCompanyService {
         if (!simpleChanges.isEmpty()) {
             final ClientCompanyChangeHistory changeHistory = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
+                    .user(userEntity)
                     .type(ClientCompanyChangeHistoryChangeType.BASIC)
                     .changes(changesJson)
                     .build();
@@ -136,8 +141,8 @@ public class ClientCompanyService {
             }
         }
 
-        contactService.updateClientCompanyContacts(clientCompany, request.contacts());
-        fileService.updateClientCompanyFiles(clientCompany, request.files());
+        contactService.updateClientCompanyContacts(clientCompany, request.contacts(), userEntity);
+        fileService.updateClientCompanyFiles(clientCompany, request.files(), userEntity);
     }
 
     @Transactional(readOnly = true)

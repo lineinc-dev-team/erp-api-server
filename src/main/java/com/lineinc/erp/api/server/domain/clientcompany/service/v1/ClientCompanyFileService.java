@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChang
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.clientcompany.repository.ClientCompanyChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request.ClientCompanyFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -39,7 +40,7 @@ public class ClientCompanyFileService {
 
     @Transactional
     public void updateClientCompanyFiles(final ClientCompany clientCompany,
-            final List<ClientCompanyFileUpdateRequest> requests) {
+            final List<ClientCompanyFileUpdateRequest> requests, final User user) {
         final List<ClientCompanyFile> beforeFiles = clientCompany.getFiles().stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, ClientCompanyFile.class))
                 .toList();
@@ -89,6 +90,7 @@ public class ClientCompanyFileService {
             final String json = javers.getJsonConverter().toJson(allChanges);
             final ClientCompanyChangeHistory history = ClientCompanyChangeHistory.builder()
                     .clientCompany(clientCompany)
+                    .user(user)
                     .type(ClientCompanyChangeHistoryChangeType.ATTACHMENT)
                     .changes(json)
                     .build();

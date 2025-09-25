@@ -5,6 +5,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -46,6 +47,10 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.CLIENT_COMPANY_ID, nullable = false)
     private ClientCompany clientCompany;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user; // 수정자
 
     @Column
     @Enumerated(EnumType.STRING)
