@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,9 +17,9 @@ public record SiteContractUpdateRequest(
         @Schema(description = "공급가", example = "13636364") Long supplyPrice,
         @Schema(description = "부가세", example = "1363636") Long vat,
         @Schema(description = "매입세", example = "1000000") Long purchaseTax,
-        @Schema(description = "계약이행 보증률", example = "5") Long contractPerformanceGuaranteeRate,
-        @Schema(description = "하자이행 보증률", example = "3") Long defectPerformanceGuaranteeRate,
-        @Schema(description = "하자보증기간", example = "24") Long defectWarrantyPeriod,
+        @Min(0) @Max(100) @Schema(description = "계약이행 보증률", example = "5") Long contractPerformanceGuaranteeRate,
+        @Min(0) @Max(100) @Schema(description = "하자이행 보증률", example = "3") Long defectPerformanceGuaranteeRate,
+        @Min(0) @Max(99) @Schema(description = "하자보증기간", example = "24") Long defectWarrantyPeriod,
         @Schema(description = "비고") String memo,
         @Valid @Schema(description = "계약 관련 파일 목록") List<UpdateSiteFileRequest> files) {
 }
