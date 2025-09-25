@@ -21,6 +21,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCom
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
@@ -45,9 +46,11 @@ public class OutsourcingCompanyService {
     private final OutsourcingCompanyFileService outsourcingCompanyFileService;
     private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
     private final Javers javers;
+    private final UserService userService;
 
     @Transactional
-    public OutsourcingCompany createOutsourcingCompany(final OutsourcingCompanyCreateRequest request) {
+    public OutsourcingCompany createOutsourcingCompany(final OutsourcingCompanyCreateRequest request,
+            final Long userId) {
 
         if (outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -85,6 +88,7 @@ public class OutsourcingCompanyService {
         final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
                 .outsourcingCompany(outsourcingCompany)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId))
                 .build();
         outsourcingCompanyChangeRepository.save(changeHistory);
 
@@ -107,7 +111,8 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional
-    public void updateOutsourcingCompany(final Long id, final OutsourcingCompanyUpdateRequest request) {
+    public void updateOutsourcingCompany(final Long id, final OutsourcingCompanyUpdateRequest request,
+            final Long userId) {
         final OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
@@ -134,6 +139,7 @@ public class OutsourcingCompanyService {
                     .outsourcingCompany(company)
                     .type(OutsourcingCompanyChangeHistoryType.BASIC)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             outsourcingCompanyChangeRepository.save(changeHistory);
         }
@@ -148,8 +154,8 @@ public class OutsourcingCompanyService {
             }
         }
 
-        outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts());
-        outsourcingCompanyFileService.updateOutsourcingCompanyFiles(company, request.files());
+        outsourcingCompanyContactService.updateOutsourcingCompanyContacts(company, request.contacts(), userId);
+        outsourcingCompanyFileService.updateOutsourcingCompanyFiles(company, request.files(), userId);
     }
 
     @Transactional(readOnly = true)
@@ -249,7 +255,7 @@ public class OutsourcingCompanyService {
 
     @Transactional(readOnly = true)
     public Slice<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistories(final Long id,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
@@ -258,7 +264,7 @@ public class OutsourcingCompanyService {
                 .findAllByOutsourcingCompany(
                         company,
                         pageable);
-        return histories.map(CompanyChangeHistoryResponse::from);
+        return histories.map(history -> CompanyChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -267,7 +273,7 @@ public class OutsourcingCompanyService {
      */
     @Transactional(readOnly = true)
     public Page<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistoriesWithPaging(final Long id,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final OutsourcingCompany company = outsourcingCompanyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
@@ -276,7 +282,7 @@ public class OutsourcingCompanyService {
                 .findAllByOutsourcingCompanyWithPaging(
                         company,
                         pageable);
-        return historyPage.map(CompanyChangeHistoryResponse::from);
+        return historyPage.map(history -> CompanyChangeHistoryResponse.from(history, userId));
     }
 
     @Transactional(readOnly = true)

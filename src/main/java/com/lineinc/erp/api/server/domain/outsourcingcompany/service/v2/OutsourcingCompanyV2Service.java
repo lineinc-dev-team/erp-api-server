@@ -30,9 +30,9 @@ public class OutsourcingCompanyV2Service {
      */
     public Page<CompanyChangeHistoryResponse> getOutsourcingCompanyChangeHistoriesWithPaging(
             final Long companyId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final Page<OutsourcingCompanyChangeHistory> historyPage = outsourcingCompanyChangeRepository
                 .findByCompanyIdWithPaging(companyId, pageable);
-        return historyPage.map(CompanyChangeHistoryResponse::from);
+        return historyPage.map(history -> CompanyChangeHistoryResponse.from(history, userId));
     }
 }

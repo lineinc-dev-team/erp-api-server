@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class OutsourcingCompanyFileService {
     private final Javers javers;
     private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
+    private final UserService userService;
 
     @Transactional
     public void createOutsourcingCompanyFiles(
@@ -54,7 +56,7 @@ public class OutsourcingCompanyFileService {
     @Transactional
     public void updateOutsourcingCompanyFiles(
             final OutsourcingCompany company,
-            final List<OutsourcingCompanyFileUpdateRequest> requests) {
+            final List<OutsourcingCompanyFileUpdateRequest> requests, final Long userId) {
         final List<OutsourcingCompanyFile> beforeFiles = company.getFiles().stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, OutsourcingCompanyFile.class))
                 .toList();
@@ -103,6 +105,7 @@ public class OutsourcingCompanyFileService {
                     .outsourcingCompany(company)
                     .type(OutsourcingCompanyChangeHistoryType.ATTACHMENT)
                     .changes(json)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             outsourcingCompanyChangeRepository.save(history);
         }

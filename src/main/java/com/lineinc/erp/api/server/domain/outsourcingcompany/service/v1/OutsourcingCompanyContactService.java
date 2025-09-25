@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactUpdateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class OutsourcingCompanyContactService {
     private final Javers javers;
     private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
+    private final UserService userService;
 
     @Transactional
     public void createOutsourcingCompanyContacts(
@@ -62,7 +64,7 @@ public class OutsourcingCompanyContactService {
 
     @Transactional
     public void updateOutsourcingCompanyContacts(final OutsourcingCompany company,
-            final List<OutsourcingCompanyContactUpdateRequest> requests) {
+            final List<OutsourcingCompanyContactUpdateRequest> requests, final Long userId) {
         if (requests != null && !requests.isEmpty()) {
             final long mainCount = requests.stream().filter(OutsourcingCompanyContactUpdateRequest::isMain).count();
             if (mainCount != 1) {
@@ -122,6 +124,7 @@ public class OutsourcingCompanyContactService {
                     .outsourcingCompany(company)
                     .type(OutsourcingCompanyChangeHistoryType.CONTACT)
                     .changes(json)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             outsourcingCompanyChangeRepository.save(history);
         }
