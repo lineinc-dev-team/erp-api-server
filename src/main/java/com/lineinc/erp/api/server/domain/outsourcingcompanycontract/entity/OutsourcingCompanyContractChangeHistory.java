@@ -5,6 +5,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,6 +51,10 @@ public class OutsourcingCompanyContractChangeHistory extends BaseEntity {
 
     @Column
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Setter
     @Column(columnDefinition = "TEXT")

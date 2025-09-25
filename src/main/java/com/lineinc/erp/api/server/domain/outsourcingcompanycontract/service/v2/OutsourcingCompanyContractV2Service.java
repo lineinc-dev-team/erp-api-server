@@ -30,9 +30,9 @@ public class OutsourcingCompanyContractV2Service {
      */
     public Page<ContractChangeHistoryResponse> getContractChangeHistoriesWithPaging(
             final Long contractId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final Page<OutsourcingCompanyContractChangeHistory> historyPage = contractChangeHistoryRepository
                 .findByContractIdWithPaging(contractId, pageable);
-        return historyPage.map(ContractChangeHistoryResponse::from);
+        return historyPage.map(history -> ContractChangeHistoryResponse.from(history, userId));
     }
 }

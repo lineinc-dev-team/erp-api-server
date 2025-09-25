@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractConstructionUpdateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -35,13 +36,14 @@ public class OutsourcingCompanyContractConstructionService {
     private final OutsourcingCompanyContractRepository contractRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository changeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     /**
      * 계약 공사항목 정보를 수정합니다.
      */
     @Transactional
     public void updateContractConstructions(final Long contractId,
-            final List<OutsourcingCompanyContractConstructionUpdateRequest> constructions) {
+            final List<OutsourcingCompanyContractConstructionUpdateRequest> constructions, final Long userId) {
         // 1. 계약 존재 확인
         final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
                 .orElseThrow(
@@ -120,6 +122,7 @@ public class OutsourcingCompanyContractConstructionService {
                     .outsourcingCompanyContract(contract)
                     .type(OutsourcingCompanyContractChangeType.CONSTRUCTION)
                     .changes(json)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             changeHistoryRepository.save(history);
         }

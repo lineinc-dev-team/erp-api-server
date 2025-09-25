@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -38,13 +39,14 @@ public class OutsourcingCompanyContractFileService {
     private final OutsourcingCompanyContractRepository contractRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository changeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     /**
      * 계약 첨부파일 정보를 수정합니다.
      */
     @Transactional
     public void updateContractFiles(final Long contractId,
-            final List<OutsourcingCompanyContractFileUpdateRequest> files) {
+            final List<OutsourcingCompanyContractFileUpdateRequest> files, final Long userId) {
         log.info("계약 첨부파일 정보 수정: contractId={}, files={}", contractId, files);
 
         // 1. 계약이 존재하는지 확인
@@ -104,6 +106,7 @@ public class OutsourcingCompanyContractFileService {
                     .outsourcingCompanyContract(contract)
                     .type(OutsourcingCompanyContractChangeType.ATTACHMENT)
                     .changes(json)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             changeHistoryRepository.save(history);
         }

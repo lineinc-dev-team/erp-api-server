@@ -20,6 +20,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractDriverUpdateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -36,13 +37,14 @@ public class OutsourcingCompanyContractDriverService {
     private final OutsourcingCompanyContractRepository contractRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository changeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     /**
      * 계약 운전자 정보를 수정합니다.
      */
     @Transactional
     public void updateContractDrivers(final Long contractId,
-            final List<OutsourcingCompanyContractDriverUpdateRequest> drivers) {
+            final List<OutsourcingCompanyContractDriverUpdateRequest> drivers, final Long userId) {
         // 1. 계약 존재 확인
         final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
                 .orElseThrow(
@@ -167,6 +169,7 @@ public class OutsourcingCompanyContractDriverService {
                     .outsourcingCompanyContract(contract)
                     .type(OutsourcingCompanyContractChangeType.DRIVER)
                     .changes(json)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             changeHistoryRepository.save(history);
         }

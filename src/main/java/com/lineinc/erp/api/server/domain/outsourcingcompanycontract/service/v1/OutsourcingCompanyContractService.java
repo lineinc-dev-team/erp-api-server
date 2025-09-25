@@ -45,6 +45,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.ContractListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractContactCreateRequest;
@@ -101,11 +102,12 @@ public class OutsourcingCompanyContractService {
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
     private final OutsourcingCompanyService outsourcingCompanyService;
+    private final UserService userService;
 
     /**
      * 외주업체 계약을 생성합니다.
      */
-    public void createContract(final OutsourcingCompanyContractCreateRequest request) {
+    public void createContract(final OutsourcingCompanyContractCreateRequest request, final Long userId) {
         log.info("외주업체 계약 생성 시작: {}", request);
 
         // 1. 기본 계약 정보 생성
@@ -147,6 +149,7 @@ public class OutsourcingCompanyContractService {
         final OutsourcingCompanyContractChangeHistory changeHistory = OutsourcingCompanyContractChangeHistory.builder()
                 .outsourcingCompanyContract(contract)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId))
                 .build();
         contractChangeHistoryRepository.save(changeHistory);
     }
@@ -611,7 +614,8 @@ public class OutsourcingCompanyContractService {
     /**
      * 외주업체 계약을 수정합니다.
      */
-    public void updateContract(final Long contractId, final OutsourcingCompanyContractUpdateRequest request) {
+    public void updateContract(final Long contractId, final OutsourcingCompanyContractUpdateRequest request,
+            final Long userId) {
 
         // 1. 계약이 존재하는지 확인
         final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
@@ -642,38 +646,39 @@ public class OutsourcingCompanyContractService {
                     .outsourcingCompanyContract(contract)
                     .type(OutsourcingCompanyContractChangeType.BASIC)
                     .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
                     .build();
             contractChangeHistoryRepository.save(changeHistory);
         }
 
         // 5. 담당자 정보 수정
         if (request.contacts() != null) {
-            contractContactService.updateContractContacts(contract.getId(), request.contacts());
+            contractContactService.updateContractContacts(contract.getId(), request.contacts(), userId);
         }
 
         // 6. 첨부파일 정보 수정
         if (request.files() != null) {
-            contractFileService.updateContractFiles(contract.getId(), request.files());
+            contractFileService.updateContractFiles(contract.getId(), request.files(), userId);
         }
 
         // 7. 인력 정보 수정
         if (request.workers() != null) {
-            contractWorkerService.updateContractWorkers(contract.getId(), request.workers());
+            contractWorkerService.updateContractWorkers(contract.getId(), request.workers(), userId);
         }
 
         // 8. 장비 정보 수정
         if (request.equipments() != null) {
-            contractEquipmentService.updateContractEquipments(contract.getId(), request.equipments());
+            contractEquipmentService.updateContractEquipments(contract.getId(), request.equipments(), userId);
         }
 
         // 9. 운전자 정보 수정
         if (request.drivers() != null) {
-            contractDriverService.updateContractDrivers(contract.getId(), request.drivers());
+            contractDriverService.updateContractDrivers(contract.getId(), request.drivers(), userId);
         }
 
         // 10. 공사항목 정보 수정
         if (request.constructions() != null) {
-            contractConstructionService.updateContractConstructions(contract.getId(), request.constructions());
+            contractConstructionService.updateContractConstructions(contract.getId(), request.constructions(), userId);
         }
 
         // 11. 사용자 정의 변경 이력 저장
@@ -724,12 +729,12 @@ public class OutsourcingCompanyContractService {
      */
     @Transactional(readOnly = true)
     public Page<ContractChangeHistoryResponse> getContractChangeHistoriesWithPaging(final Long contractId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final OutsourcingCompanyContract contract = getContractByIdOrThrow(contractId);
 
         final Page<OutsourcingCompanyContractChangeHistory> historyPage = contractChangeHistoryRepository
                 .findByOutsourcingCompanyContractWithPaging(contract, pageable);
-        return historyPage.map(ContractChangeHistoryResponse::from);
+        return historyPage.map(history -> ContractChangeHistoryResponse.from(history, userId));
     }
 
     /**
