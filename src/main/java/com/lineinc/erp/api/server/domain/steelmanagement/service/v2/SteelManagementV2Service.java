@@ -30,9 +30,9 @@ public class SteelManagementV2Service {
      */
     public Page<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistoriesWithPaging(
             final Long steelManagementId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final Page<SteelManagementChangeHistory> historyPage = steelManagementChangeHistoryRepository
                 .findBySteelManagementIdWithPaging(steelManagementId, pageable);
-        return historyPage.map(SteelManagementChangeHistoryResponse::from);
+        return historyPage.map(history -> SteelManagementChangeHistoryResponse.from(history, userId));
     }
 }

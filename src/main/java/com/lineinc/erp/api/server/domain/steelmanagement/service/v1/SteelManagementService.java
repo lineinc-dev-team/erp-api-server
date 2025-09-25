@@ -31,6 +31,8 @@ import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementTy
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementDetailRepository;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementRepository;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ReleaseSteelManagementRequest;
@@ -60,9 +62,10 @@ public class SteelManagementService {
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final SteelManagementChangeHistoryRepository steelManagementChangeHistoryRepository;
     private final Javers javers;
+    private final UserService userService;
 
     @Transactional
-    public void createSteelManagement(final SteelManagementCreateRequest request) {
+    public void createSteelManagement(final SteelManagementCreateRequest request, final CustomUserDetails user) {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
@@ -95,6 +98,7 @@ public class SteelManagementService {
         final SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
                 .steelManagement(steelManagement)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(user.getUserId()))
                 .build();
         steelManagementChangeHistoryRepository.save(changeHistory);
     }
@@ -267,7 +271,8 @@ public class SteelManagementService {
     }
 
     @Transactional
-    public void updateSteelManagement(final Long id, final SteelManagementUpdateRequest request) {
+    public void updateSteelManagement(final Long id, final SteelManagementUpdateRequest request,
+            final CustomUserDetails user) {
         final SteelManagement steelManagement = steelManagementRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
@@ -319,6 +324,7 @@ public class SteelManagementService {
                     .steelManagement(steelManagement)
                     .type(SteelManagementChangeHistoryType.BASIC)
                     .changes(otherChangesJson)
+                    .user(userService.getUserByIdOrThrow(user.getUserId()))
                     .build();
             steelManagementChangeHistoryRepository.save(changeHistory);
         }
@@ -330,6 +336,7 @@ public class SteelManagementService {
                     .steelManagement(steelManagement)
                     .type(SteelManagementChangeHistoryType.OUTSOURCING_COMPANY)
                     .changes(outsourcingChangesJson)
+                    .user(userService.getUserByIdOrThrow(user.getUserId()))
                     .build();
             steelManagementChangeHistoryRepository.save(outsourcingChangeHistory);
         }
@@ -345,8 +352,10 @@ public class SteelManagementService {
             }
         }
 
-        steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details());
-        steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files());
+        steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details(),
+                userService.getUserByIdOrThrow(user.getUserId()));
+        steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files(),
+                userService.getUserByIdOrThrow(user.getUserId()));
     }
 
     public SteelManagement getSteelManagementByIdOrThrow(final Long steelManagementId) {

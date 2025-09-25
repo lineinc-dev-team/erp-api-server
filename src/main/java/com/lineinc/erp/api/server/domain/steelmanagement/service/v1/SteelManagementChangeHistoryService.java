@@ -25,12 +25,12 @@ public class SteelManagementChangeHistoryService {
      */
     @Transactional(readOnly = true)
     public Slice<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistory(final Long steelManagementId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final SteelManagement steelManagement = steelManagementService.getSteelManagementByIdOrThrow(steelManagementId);
         final Slice<SteelManagementChangeHistory> changeHistories = steelManagementChangeHistoryRepository
                 .findBySteelManagement(steelManagement, pageable);
 
-        return changeHistories.map(SteelManagementChangeHistoryResponse::from);
+        return changeHistories.map(history -> SteelManagementChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -40,11 +40,11 @@ public class SteelManagementChangeHistoryService {
     @Transactional(readOnly = true)
     public Page<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistoryWithPaging(
             final Long steelManagementId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final SteelManagement steelManagement = steelManagementService.getSteelManagementByIdOrThrow(steelManagementId);
         final Page<SteelManagementChangeHistory> changeHistoryPage = steelManagementChangeHistoryRepository
                 .findBySteelManagementWithPaging(steelManagement, pageable);
 
-        return changeHistoryPage.map(SteelManagementChangeHistoryResponse::from);
+        return changeHistoryPage.map(history -> SteelManagementChangeHistoryResponse.from(history, userId));
     }
 }

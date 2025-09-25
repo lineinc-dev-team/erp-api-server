@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,6 +23,7 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementType;
 import com.lineinc.erp.api.server.domain.steelmanagement.service.v1.SteelManagementChangeHistoryService;
 import com.lineinc.erp.api.server.domain.steelmanagement.service.v1.SteelManagementService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
@@ -72,8 +74,9 @@ public class SteelManagementController {
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.CREATE)
     public ResponseEntity<SuccessResponse<Long>> createSteelManagement(
-            @Valid @RequestBody final SteelManagementCreateRequest request) {
-        steelManagementService.createSteelManagement(request);
+            @Valid @RequestBody final SteelManagementCreateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        steelManagementService.createSteelManagement(request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -87,8 +90,9 @@ public class SteelManagementController {
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateSteelManagement(
             @PathVariable final Long id,
-            @Valid @RequestBody final SteelManagementUpdateRequest request) {
-        steelManagementService.updateSteelManagement(id, request);
+            @Valid @RequestBody final SteelManagementUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        steelManagementService.updateSteelManagement(id, request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -231,11 +235,13 @@ public class SteelManagementController {
     public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest) {
+            @Valid final SortRequest sortRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
 
         final Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
                 pageRequest.size(), sortRequest.sort());
-        final var slice = steelManagementChangeHistoryService.getSteelManagementChangeHistory(id, pageable);
+        final var slice = steelManagementChangeHistoryService.getSteelManagementChangeHistory(id, pageable,
+                user.getUserId());
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));

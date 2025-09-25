@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementF
 import com.lineinc.erp.api.server.domain.steelmanagement.enums.SteelManagementChangeHistoryType;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementFileRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.SteelManagementFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -55,7 +56,7 @@ public class SteelManagementFileService {
 
     @Transactional
     public void updateSteelManagementFiles(final SteelManagement steelManagement,
-            final List<SteelManagementFileUpdateRequest> requests) {
+            final List<SteelManagementFileUpdateRequest> requests, final User user) {
         // 1. 현재 파일 목록을 복사해 변경 전 상태(snapshot) 보관
         final List<SteelManagementFile> beforeFiles = steelManagement.getFiles().stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, SteelManagementFile.class))
@@ -110,6 +111,7 @@ public class SteelManagementFileService {
                     .steelManagement(steelManagement)
                     .type(SteelManagementChangeHistoryType.ATTACHMENT)
                     .changes(json)
+                    .user(user)
                     .build();
             steelManagementChangeHistoryRepository.save(changeHistory);
         }
