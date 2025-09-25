@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labor.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -104,6 +105,7 @@ public class LaborController {
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WorkTypeResponse>>> getWorkTypes() {
         final List<WorkTypeResponse> workTypes = Arrays.stream(LaborWorkType.values())
+                .sorted(Comparator.comparingInt(LaborWorkType::getOrder))
                 .map(WorkTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(workTypes));
