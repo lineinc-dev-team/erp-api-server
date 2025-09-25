@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -67,7 +68,6 @@ public class ManagementCostController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 현장 또는 공정을 등록하려는경우")
     })
-
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createManagementCost(
@@ -85,6 +85,7 @@ public class ManagementCostController {
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<ItemTypeResponse>>> getItemTypes() {
         final List<ItemTypeResponse> itemTypes = Arrays.stream(ManagementCostItemType.values())
+                .sorted(Comparator.comparingInt(ManagementCostItemType::getOrder))
                 .map(ItemTypeResponse::from)
                 .toList();
         return ResponseEntity.ok(SuccessResponse.of(itemTypes));
