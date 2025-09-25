@@ -18,8 +18,10 @@ public record MaterialManagementChangeHistoryResponse(
         @Schema(description = "수정 일시", example = "2025-07-15T10:00:00+09:00") OffsetDateTime updatedAt,
         @Schema(description = "수정자", example = "관리자") String updatedBy,
         @Schema(description = "변경 유형", example = "기본정보") String type,
-        @Schema(description = "변경 유형 코드", example = "BASIC") MaterialManagementChangeHistoryType typeCode) {
-    public static MaterialManagementChangeHistoryResponse from(final MaterialManagementChangeHistory history) {
+        @Schema(description = "변경 유형 코드", example = "BASIC") MaterialManagementChangeHistoryType typeCode,
+        @Schema(description = "수정 가능여부", example = "true") Boolean isEditable) {
+    public static MaterialManagementChangeHistoryResponse from(final MaterialManagementChangeHistory history,
+            final Long userId) {
         return new MaterialManagementChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -29,6 +31,7 @@ public record MaterialManagementChangeHistoryResponse(
                 history.getUpdatedAt(),
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
-                history.getType());
+                history.getType(),
+                history.getUser() != null && history.getUser().getId().equals(userId));
     }
 }

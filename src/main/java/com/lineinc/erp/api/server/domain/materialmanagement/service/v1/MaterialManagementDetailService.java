@@ -15,6 +15,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManag
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeHistoryType;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementDetailUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -58,7 +59,7 @@ public class MaterialManagementDetailService {
 
     @Transactional
     public void updateMaterialManagementDetails(final MaterialManagement materialManagement,
-            final List<MaterialManagementDetailUpdateRequest> requests) {
+            final List<MaterialManagementDetailUpdateRequest> requests, final User user) {
         // 변경 전 상태 저장 (Javers 스냅샷)
         final List<MaterialManagementDetail> beforeDetails = materialManagement.getDetails().stream()
                 .map(detail -> JaversUtils.createSnapshot(javers, detail, MaterialManagementDetail.class))
@@ -116,6 +117,7 @@ public class MaterialManagementDetailService {
                     .materialManagement(materialManagement)
                     .type(MaterialManagementChangeHistoryType.MATERIAL)
                     .changes(json)
+                    .user(user)
                     .build();
             changeHistoryRepository.save(history);
         }

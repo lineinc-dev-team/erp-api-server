@@ -30,9 +30,9 @@ public class MaterialManagementV2Service {
      */
     public Page<MaterialManagementChangeHistoryResponse> getMaterialManagementChangeHistoriesWithPaging(
             final Long materialManagementId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final Page<MaterialManagementChangeHistory> historyPage = materialManagementChangeHistoryRepository
                 .findByMaterialManagementWithPaging(materialManagementId, pageable);
-        return historyPage.map(MaterialManagementChangeHistoryResponse::from);
+        return historyPage.map(history -> MaterialManagementChangeHistoryResponse.from(history, userId));
     }
 }

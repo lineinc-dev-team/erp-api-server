@@ -40,12 +40,12 @@ public class MaterialManagementChangeHistoryService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     public Page<MaterialManagementChangeHistoryResponse> getChangeHistoriesWithPaging(final Long materialManagementId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         final MaterialManagement materialManagement = materialManagementService
                 .getMaterialManagementByIdOrThrow(materialManagementId);
         final Page<MaterialManagementChangeHistory> historyPage = changeHistoryRepository
                 .findByMaterialManagementWithPaging(materialManagement, pageable);
 
-        return historyPage.map(MaterialManagementChangeHistoryResponse::from);
+        return historyPage.map(history -> MaterialManagementChangeHistoryResponse.from(history, userId));
     }
 }

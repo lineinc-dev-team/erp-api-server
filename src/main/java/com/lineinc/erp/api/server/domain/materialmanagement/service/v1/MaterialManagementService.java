@@ -29,6 +29,9 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
+import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
@@ -58,9 +61,10 @@ public class MaterialManagementService {
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
     private final Javers javers;
     private final MaterialManagementChangeHistoryRepository materialManagementChangeHistoryRepository;
+    private final UserService userService;
 
     @Transactional
-    public void createMaterialManagement(final MaterialManagementCreateRequest request) {
+    public void createMaterialManagement(final MaterialManagementCreateRequest request, final CustomUserDetails user) {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
@@ -91,6 +95,7 @@ public class MaterialManagementService {
         final MaterialManagementChangeHistory changeHistory = MaterialManagementChangeHistory.builder()
                 .materialManagement(materialManagement)
                 .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(user.getUserId()))
                 .build();
         materialManagementChangeHistoryRepository.save(changeHistory);
     }
@@ -211,7 +216,8 @@ public class MaterialManagementService {
     }
 
     @Transactional
-    public void updateMaterialManagement(final Long id, final MaterialManagementUpdateRequest request) {
+    public void updateMaterialManagement(final Long id, final MaterialManagementUpdateRequest request,
+            final CustomUserDetails user) {
         final MaterialManagement materialManagement = materialManagementRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
@@ -247,14 +253,17 @@ public class MaterialManagementService {
         // updateFrom 메서드에서 모든 필드 업데이트
         materialManagement.updateFrom(request, site, siteProcess, outsourcingCompany);
 
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         // 자재 상세 정보가 있는 경우에만 업데이트
         if (request.details() != null) {
-            materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details());
+            materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details(),
+                    userEntity);
         }
 
         // 파일 정보가 있는 경우에만 업데이트
         if (request.files() != null) {
-            materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files());
+            materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files(),
+                    userEntity);
         }
 
         // Javers를 사용하여 변경사항 추적
@@ -268,6 +277,7 @@ public class MaterialManagementService {
                     .materialManagement(materialManagement)
                     .type(MaterialManagementChangeHistoryType.BASIC)
                     .changes(changesJson)
+                    .user(userEntity)
                     .build();
             changeHistoryRepository.save(changeHistory);
         }
