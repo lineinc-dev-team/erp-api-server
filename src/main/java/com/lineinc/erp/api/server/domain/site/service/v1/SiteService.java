@@ -213,7 +213,7 @@ public class SiteService {
     }
 
     @Transactional
-    public void updateSite(final Long siteId, final UpdateSiteRequest request) {
+    public void updateSite(final Long siteId, final UpdateSiteRequest request, final CustomUserDetails userEntity) {
         final Site site = siteRepository.findById(siteId)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
@@ -221,6 +221,8 @@ public class SiteService {
         if (!site.getName().equals(request.name())) {
             validateDuplicateName(request.name());
         }
+
+        final User user = userService.getUserByIdOrThrow(userEntity.getUserId());
 
         site.syncTransientFields();
         final Site oldSnapshot = JaversUtils.createSnapshot(javers, site, Site.class);
@@ -238,6 +240,7 @@ public class SiteService {
                     .site(site)
                     .type(SiteChangeHistoryType.BASIC)
                     .changes(changesJson)
+                    .user(user)
                     .build();
             siteChangeHistoryRepository.save(changeHistory);
         }
@@ -253,11 +256,13 @@ public class SiteService {
         }
 
         if (request.process() != null) {
-            siteProcessService.updateProcess(site, request.process());
+            siteProcessService.updateProcess(site, request.process(),
+                    user);
         }
 
         if (request.contracts() != null) {
-            siteContractService.updateContracts(site, request.contracts());
+            siteContractService.updateContracts(site, request.contracts(),
+                    user);
         }
 
     }
@@ -276,7 +281,8 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<SiteChangeHistoryResponse> getSiteChangeHistories(final Long siteId, final Pageable pageable) {
+    public Slice<SiteChangeHistoryResponse> getSiteChangeHistories(final Long siteId, final Pageable pageable,
+            final Long userId) {
         // 해당 현장 존재 여부 확인 (예외 처리)
         final Site site = getSiteByIdOrThrow(siteId);
 
@@ -284,7 +290,7 @@ public class SiteService {
         final Slice<SiteChangeHistory> historySlice = siteChangeHistoryRepository.findBySite(site, pageable);
 
         // 엔티티 -> DTO 변환 후 반환
-        return historySlice.map(SiteChangeHistoryResponse::from);
+        return historySlice.map(history -> SiteChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -293,7 +299,7 @@ public class SiteService {
      */
     @Transactional(readOnly = true)
     public Page<SiteChangeHistoryResponse> getSiteChangeHistoriesWithPaging(final Long siteId,
-            final Pageable pageable) {
+            final Pageable pageable, final Long userId) {
         // 해당 현장 존재 여부 확인 (예외 처리)
         final Site site = getSiteByIdOrThrow(siteId);
 
@@ -301,6 +307,6 @@ public class SiteService {
         final Page<SiteChangeHistory> historyPage = siteChangeHistoryRepository.findBySiteWithPaging(site, pageable);
 
         // 엔티티 -> DTO 변환 후 반환
-        return historyPage.map(SiteChangeHistoryResponse::from);
+        return historyPage.map(history -> SiteChangeHistoryResponse.from(history, userId));
     }
 }

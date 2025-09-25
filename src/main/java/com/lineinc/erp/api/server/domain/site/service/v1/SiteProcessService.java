@@ -48,7 +48,7 @@ public class SiteProcessService {
                 .build());
     }
 
-    public void updateProcess(final Site site, final UpdateSiteProcessRequest request) {
+    public void updateProcess(final Site site, final UpdateSiteProcessRequest request, final User userEntity) {
         final SiteProcess siteProcess = site.getProcesses().get(0);
         final User user = userService.getUserByIdOrThrow(request.managerId());
 
@@ -66,6 +66,7 @@ public class SiteProcessService {
                     .site(site)
                     .type(SiteChangeHistoryType.PROCESS)
                     .changes(changesJson)
+                    .user(userEntity)
                     .build();
             siteChangeHistoryRepository.save(changeHistory);
         }

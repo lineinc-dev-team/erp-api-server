@@ -162,8 +162,9 @@ public class SiteController {
     @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateSite(
             @PathVariable final Long id,
-            @Valid @RequestBody final UpdateSiteRequest request) {
-        siteService.updateSite(id, request);
+            @Valid @RequestBody final UpdateSiteRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        siteService.updateSite(id, request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -210,9 +211,11 @@ public class SiteController {
     public ResponseEntity<SuccessResponse<SliceResponse<SiteChangeHistoryResponse>>> getSiteChangeHistories(
             @PathVariable final Long id,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest) {
+            @Valid final SortRequest sortRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
         final Slice<SiteChangeHistoryResponse> slice = siteService.getSiteChangeHistories(id,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()),
+                user.getUserId());
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 }

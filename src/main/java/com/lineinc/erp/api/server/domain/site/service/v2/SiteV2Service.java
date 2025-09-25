@@ -30,9 +30,10 @@ public class SiteV2Service {
      */
     public Page<SiteChangeHistoryResponse> getSiteChangeHistoriesWithPaging(
             final Long siteId,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final Long userId) {
         final Page<SiteChangeHistory> historyPage = siteChangeHistoryRepository
                 .findBySiteIdWithPaging(siteId, pageable);
-        return historyPage.map(SiteChangeHistoryResponse::from);
+        return historyPage.map(history -> SiteChangeHistoryResponse.from(history, userId));
     }
 }

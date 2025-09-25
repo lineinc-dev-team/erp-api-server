@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.site.enums.SiteChangeHistoryType;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteContractRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.CreateSiteContractRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteContractUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
@@ -57,7 +58,8 @@ public class SiteContractService {
     }
 
     @Transactional
-    public void updateContracts(final Site site, final List<SiteContractUpdateRequest> requests) {
+    public void updateContracts(final Site site, final List<SiteContractUpdateRequest> requests,
+            final User userEntity) {
         // 1. 현재 계약서 목록을 복사해 변경 전 상태(snapshot) 보관
         final List<SiteContract> beforeContracts = site.getContracts().stream()
                 .map(contract -> {
@@ -162,6 +164,7 @@ public class SiteContractService {
                         .site(site)
                         .type(SiteChangeHistoryType.CONTRACT)
                         .changes(json)
+                        .user(userEntity)
                         .build();
                 siteChangeHistoryRepository.save(changeHistory);
             }
