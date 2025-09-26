@@ -43,13 +43,13 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
 
         try {
             // 오늘 날짜 계산 (한국 시간 기준)
-            LocalDate today = LocalDate.now(AppConstants.KOREA_ZONE);
-            OffsetDateTime todayStart = DateTimeFormatUtils.toUtcStartOfDay(today);
+            final LocalDate today = LocalDate.now(AppConstants.KOREA_ZONE);
+            final OffsetDateTime todayStart = DateTimeFormatUtils.toUtcStartOfDay(today);
 
             log.info("자동 마감 대상: {} 이전 날짜의 모든 출역일보", today);
 
             // 오늘 이전의 모든 PENDING 상태 출역일보 조회
-            List<DailyReport> pendingReports = dailyReportRepository
+            final List<DailyReport> pendingReports = dailyReportRepository
                     .findByReportDateBeforeAndStatus(todayStart, DailyReportStatus.PENDING);
 
             if (pendingReports.isEmpty()) {
@@ -61,7 +61,7 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
 
             // 각 출역일보를 자동 마감 처리
             int completedCount = 0;
-            for (DailyReport report : pendingReports) {
+            for (final DailyReport report : pendingReports) {
                 try {
                     report.autoComplete();
                     dailyReportRepository.save(report);
@@ -72,14 +72,14 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
                             report.getSite().getName(),
                             report.getSiteProcess().getName(),
                             DateTimeFormatUtils.toKoreaLocalDate(report.getReportDate()));
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     log.error("출역일보 자동 마감 실패 - ID: {}, 오류: {}", report.getId(), e.getMessage(), e);
                 }
             }
 
             log.info("출역일보 자동 마감 배치 완료 - 총 {}건 중 {}건 성공", pendingReports.size(), completedCount);
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("출역일보 자동 마감 배치 실행 중 오류 발생", e);
             throw e;
         }

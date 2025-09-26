@@ -34,16 +34,17 @@ public class TenureCalculationBatchService implements BatchService {
         return "근속기간 계산 배치";
     }
 
+    @Override
     @Transactional
     public void execute() {
         // 한국 시간 기준으로 전월 계산 (현재 월에서 1개월 빼기)
-        LocalDate lastMonth = LocalDate.now(AppConstants.KOREA_ZONE).minusMonths(1);
-        String yearMonth = lastMonth.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        final LocalDate lastMonth = LocalDate.now(AppConstants.KOREA_ZONE).minusMonths(1);
+        final String yearMonth = lastMonth.format(DateTimeFormatter.ofPattern("yyyy-MM"));
 
         log.info("근속기간 계산 배치 시작 - 대상 월: {}", yearMonth);
 
         // 전월 노무비명세서 데이터 조회
-        List<LaborPayroll> payrolls = laborPayrollRepository.findByYearMonth(yearMonth);
+        final List<LaborPayroll> payrolls = laborPayrollRepository.findByYearMonth(yearMonth);
 
         if (payrolls.isEmpty()) {
             log.info("전월 노무비명세서 데이터가 없습니다. - 대상 월: {}", yearMonth);
@@ -51,39 +52,40 @@ public class TenureCalculationBatchService implements BatchService {
         }
 
         // 인력별로 총 근무시간 합산
-        Map<Long, BigDecimal> laborTotalHours = new HashMap<>();
-        Map<Long, Labor> laborMap = new HashMap<>();
+        final Map<Long, BigDecimal> laborTotalHours = new HashMap<>();
+        final Map<Long, Labor> laborMap = new HashMap<>();
 
-        for (LaborPayroll payroll : payrolls) {
+        for (final LaborPayroll payroll : payrolls) {
             if (payroll.getLabor() == null) {
                 continue;
             }
 
-            Long laborId = payroll.getLabor().getId();
-            Labor labor = payroll.getLabor();
+            final Long laborId = payroll.getLabor().getId();
+            final Labor labor = payroll.getLabor();
 
             // 인력 정보 저장
             laborMap.put(laborId, labor);
 
             // 총 근무시간 합산
             if (payroll.getTotalWorkHours() != null) {
-                BigDecimal currentHours = laborTotalHours.getOrDefault(laborId, BigDecimal.ZERO);
+                final BigDecimal currentHours = laborTotalHours.getOrDefault(laborId, BigDecimal.ZERO);
                 laborTotalHours.put(laborId, currentHours.add(payroll.getTotalWorkHours()));
             }
         }
 
+        // 처리된 인력 수, 근속기간 증가 수, 근속기간 초기화 수, 퇴직금 발생 대상 수
         int processedCount = 0;
         int tenureIncreasedCount = 0;
         int tenureResetCount = 0;
         int severancePayEnabledCount = 0;
 
         // 각 인력별로 근속기간 처리
-        for (Map.Entry<Long, Labor> entry : laborMap.entrySet()) {
-            Long laborId = entry.getKey();
-            Labor labor = entry.getValue();
-            BigDecimal totalHours = laborTotalHours.get(laborId);
+        for (final Map.Entry<Long, Labor> entry : laborMap.entrySet()) {
+            final Long laborId = entry.getKey();
+            final Labor labor = entry.getValue();
+            final BigDecimal totalHours = laborTotalHours.get(laborId);
 
-            boolean isProcessed = processLaborTenure(labor, totalHours);
+            final boolean isProcessed = processLaborTenure(labor, totalHours);
 
             if (isProcessed) {
                 processedCount++;
@@ -113,7 +115,7 @@ public class TenureCalculationBatchService implements BatchService {
      * @param totalHours 해당 인력의 전월 총 근무시간 (모든 현장/공정 합산)
      * @return 처리 여부
      */
-    private boolean processLaborTenure(Labor labor, BigDecimal totalHours) {
+    private boolean processLaborTenure(final Labor labor, final BigDecimal totalHours) {
         try {
             // 총 근무시간 확인
             if (totalHours == null) {
@@ -123,7 +125,7 @@ public class TenureCalculationBatchService implements BatchService {
 
             // 7.5시간 이상인 경우 근속기간 증가
             if (totalHours.compareTo(new BigDecimal("7.5")) >= 0) {
-                int currentTenureMonths = labor.getTenureMonths() != null ? labor.getTenureMonths() : 0;
+                final int currentTenureMonths = labor.getTenureMonths() != null ? labor.getTenureMonths() : 0;
                 labor.setTenureMonths(currentTenureMonths + 1);
 
                 log.debug("인력 ID {} 근속기간 증가: {}개월 -> {}개월 (전월 총 근무시간: {}시간)",
@@ -145,7 +147,7 @@ public class TenureCalculationBatchService implements BatchService {
             }
 
             return true;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("인력 ID {} 근속기간 처리 중 오류 발생", labor.getId(), e);
             return false;
         }
