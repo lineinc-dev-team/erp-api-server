@@ -66,6 +66,7 @@ public class ValidationMessages {
     public static final String CANNOT_APPROVE_RELEASED_STEEL = "이미 반출된 건은 승인으로 변경할 수 없습니다.";
     public static final String CANNOT_RELEASE_NON_APPROVED_STEEL = "반출 처리는 승인된 건만 가능합니다.";
     public static final String INVALID_INITIAL_STEEL_TYPE = "유효하지 않은 초기 강재 타입입니다.";
+    public static final String CANNOT_DELETE_APPROVED_OR_RELEASED_STEEL = "승인 혹은 반출 상태인 강재수불부는 삭제가 불가능합니다.";
 
     // ===== 관리비/유류 관련 메시지 =====
     public static final String MANAGEMENT_COST_NOT_FOUND = "존재하지 않는 관리비입니다.";
