@@ -98,6 +98,7 @@ public record CompanyResponse(
             @Schema(description = "은행명", example = "신한은행") String bankName,
             @Schema(description = "계좌번호", example = "123-456-789012") String accountNumber,
             @Schema(description = "예금주", example = "홍길동") String accountHolder,
+            @Schema(description = "주소", example = "서울특별시 강남구") String address,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static CompanyResponse.CompanySimpleResponse from(final OutsourcingCompany company) {
             return new CompanyResponse.CompanySimpleResponse(
@@ -110,6 +111,7 @@ public record CompanyResponse(
                     company.getBankName(),
                     company.getAccountNumber(),
                     company.getAccountHolder(),
+                    company.getAddress(),
                     company.isDeleted());
         }
     }
