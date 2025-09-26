@@ -19,7 +19,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
@@ -177,22 +176,6 @@ public class DailyReportController {
             @Valid final DailyReportSearchRequest searchRequest,
             @Valid @RequestBody final DailyReportEquipmentUpdateRequest request) {
         dailyReportService.updateDailyReportEquipments(searchRequest, request);
-        return ResponseEntity.ok().build();
-    }
-
-    @Deprecated
-    @Operation(summary = "출역일보 유류 수정", description = "출역일보 유류 정보를 수정합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "출역일보 유류 정보를 찾을 수 없음", content = @Content())
-    })
-    @PatchMapping("/fuels")
-    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateDailyReportFuel(
-            @Valid final DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody final DailyReportFuelUpdateRequest request) {
-        dailyReportService.updateDailyReportFuels(searchRequest, request);
         return ResponseEntity.ok().build();
     }
 
