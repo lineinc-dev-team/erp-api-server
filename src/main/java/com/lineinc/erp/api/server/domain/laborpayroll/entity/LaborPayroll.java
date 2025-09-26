@@ -205,7 +205,7 @@ public class LaborPayroll extends BaseEntity {
     private Double day31Hours;
 
     // 계산된 값들
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal totalWorkHours; // 총 근무시간
 
@@ -213,40 +213,40 @@ public class LaborPayroll extends BaseEntity {
     @DiffInclude
     private BigDecimal totalWorkDays; // 총 근무일수
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal totalLaborCost; // 총 노무비
 
     // 공제 항목들
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal incomeTax; // 소득세
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal employmentInsurance; // 고용보험료
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal healthInsurance; // 건강보험료
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal localTax; // 주민세
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal nationalPension; // 국민연금
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal longTermCareInsurance; // 장기요양보험료
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal totalDeductions; // 총 공제액
 
-    @Column(precision = 12, scale = 2)
+    @Column(precision = 15, scale = 2)
     @DiffInclude
     private BigDecimal netPayment; // 차감지급액
 

@@ -94,13 +94,13 @@ public class LaborPayrollSummary extends BaseEntity {
      * 집계 데이터 업데이트
      */
     public void updateSummary(
-            Integer regularEmployeeCount,
-            Integer directContractCount,
-            Integer etcCount,
-            BigDecimal totalLaborCost,
-            BigDecimal totalDeductions,
-            BigDecimal totalNetPayment,
-            String memo) {
+            final Integer regularEmployeeCount,
+            final Integer directContractCount,
+            final Integer etcCount,
+            final BigDecimal totalLaborCost,
+            final BigDecimal totalDeductions,
+            final BigDecimal totalNetPayment,
+            final String memo) {
 
         this.regularEmployeeCount = regularEmployeeCount;
         this.directContractCount = directContractCount;
@@ -114,7 +114,7 @@ public class LaborPayrollSummary extends BaseEntity {
     /**
      * memo 필드만 업데이트
      */
-    public void updateMemo(String memo) {
+    public void updateMemo(final String memo) {
         this.memo = memo;
     }
 }
