@@ -115,7 +115,8 @@ public class ClientCompanyService {
 
         clientCompany.syncTransientFields();
         final ClientCompany oldSnapshot = JaversUtils.createSnapshot(javers, clientCompany, ClientCompany.class);
-        clientCompany.updateFrom(request, userService.getUserByIdOrThrow(request.userId()));
+        clientCompany.updateFrom(request,
+                request.userId() != null ? userService.getUserByIdOrThrow(request.userId()) : null);
         clientCompanyRepository.save(clientCompany);
 
         final Diff diff = javers.compare(oldSnapshot, clientCompany);
