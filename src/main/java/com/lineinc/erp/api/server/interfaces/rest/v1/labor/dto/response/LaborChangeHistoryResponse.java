@@ -20,7 +20,7 @@ public record LaborChangeHistoryResponse(
         @Schema(description = "변경 유형", example = "기본정보") String type,
         @Schema(description = "변경 유형 코드", example = "BASIC") LaborChangeType typeCode,
         @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
-    public static LaborChangeHistoryResponse from(final LaborChangeHistory history, final Long userId) {
+    public static LaborChangeHistoryResponse from(final LaborChangeHistory history, final Long loginUserId) {
         return new LaborChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -31,6 +31,6 @@ public record LaborChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUser() != null && history.getUser().getId().equals(userId));
+                history.getUser() != null && history.getUser().getId().equals(loginUserId));
     }
 }

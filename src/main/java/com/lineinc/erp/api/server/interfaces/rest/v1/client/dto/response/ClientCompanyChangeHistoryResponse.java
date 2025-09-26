@@ -21,7 +21,7 @@ public record ClientCompanyChangeHistoryResponse(
         @Schema(description = "변경 유형 코드", example = "CONTACT") ClientCompanyChangeHistoryChangeType typeCode,
         @Schema(description = "수정 가능여부", example = "true") Boolean isEditable) {
     public static ClientCompanyChangeHistoryResponse from(
-            final ClientCompanyChangeHistory history, final Long userId) {
+            final ClientCompanyChangeHistory history, final Long loginUserId) {
         return new ClientCompanyChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),
@@ -32,6 +32,6 @@ public record ClientCompanyChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUser() != null && userId.equals(history.getUser().getId()));
+                history.getUser() != null && loginUserId.equals(history.getUser().getId()));
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.user.entity.UserChangeHistory;
 import com.lineinc.erp.api.server.domain.user.repository.UserChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.response.UserChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,10 @@ public class UserV2Service {
      * @return 사용자 변경 이력 페이지
      */
     public Page<UserChangeHistoryResponse> getUserChangeHistoriesWithPaging(final Long userId,
-            final Pageable pageable, final Long loggedInUserId) {
+            final CustomUserDetails loginUser, final Pageable pageable) {
         final Page<UserChangeHistory> historyPage = userChangeHistoryRepository.findByUserIdWithPaging(
                 userId, pageable);
-        return historyPage.map(history -> UserChangeHistoryResponse.from(history, loggedInUserId));
+        return historyPage.map(history -> UserChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 
 }

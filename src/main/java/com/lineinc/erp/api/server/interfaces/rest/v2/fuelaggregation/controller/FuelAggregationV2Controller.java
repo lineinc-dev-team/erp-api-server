@@ -39,12 +39,12 @@ public class FuelAggregationV2Controller extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationChangeHistoryResponse>>> getFuelAggregationChangeHistoriesWithPaging(
             @PathVariable final Long id,
+            @AuthenticationPrincipal final CustomUserDetails loginUser,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
-            @AuthenticationPrincipal final CustomUserDetails user) {
+            @Valid final SortRequest sortRequest) {
         final Page<FuelAggregationChangeHistoryResponse> page = fuelAggregationV2Service
                 .getFuelAggregationChangeHistoriesWithPaging(
-                        id, PageableUtils.createPageable(pageRequest, sortRequest), user.getUserId());
+                        id, loginUser, PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 }

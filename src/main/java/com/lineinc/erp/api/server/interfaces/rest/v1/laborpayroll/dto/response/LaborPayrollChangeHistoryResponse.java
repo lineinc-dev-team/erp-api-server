@@ -24,7 +24,8 @@ public record LaborPayrollChangeHistoryResponse(
         @Schema(description = "변경 유형 코드", example = "LABOR_PAYROLL") LaborPayrollChangeType typeCode,
         @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
 
-    public static LaborPayrollChangeHistoryResponse from(final LaborPayrollChangeHistory history, final Long userId) {
+    public static LaborPayrollChangeHistoryResponse from(final LaborPayrollChangeHistory history,
+            final Long loginUserId) {
         return new LaborPayrollChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),
@@ -35,6 +36,6 @@ public record LaborPayrollChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType().getLabel(),
                 history.getType(),
-                history.getUser() != null && history.getUser().getId().equals(userId));
+                history.getUser() != null && history.getUser().getId().equals(loginUserId));
     }
 }

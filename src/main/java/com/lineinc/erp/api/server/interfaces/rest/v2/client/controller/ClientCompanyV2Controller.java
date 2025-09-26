@@ -39,12 +39,12 @@ public class ClientCompanyV2Controller extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_CLIENT_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ClientCompanyChangeHistoryResponse>>> getClientCompanyChangeHistoriesWithPaging(
             @PathVariable final Long id,
+            @AuthenticationPrincipal final CustomUserDetails loginUser,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
-            @AuthenticationPrincipal final CustomUserDetails user) {
+            @Valid final SortRequest sortRequest) {
         final Page<ClientCompanyChangeHistoryResponse> page = clientCompanyV2Service
                 .getClientCompanyChangeHistoriesWithPaging(
-                        id, PageableUtils.createPageable(pageRequest, sortRequest), user);
+                        id, loginUser, PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 }

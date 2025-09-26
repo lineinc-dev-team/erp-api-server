@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,10 @@ public class MaterialManagementV2Service {
      */
     public Page<MaterialManagementChangeHistoryResponse> getMaterialManagementChangeHistoriesWithPaging(
             final Long materialManagementId,
-            final Pageable pageable, final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<MaterialManagementChangeHistory> historyPage = materialManagementChangeHistoryRepository
                 .findByMaterialManagementWithPaging(materialManagementId, pageable);
-        return historyPage.map(history -> MaterialManagementChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> MaterialManagementChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

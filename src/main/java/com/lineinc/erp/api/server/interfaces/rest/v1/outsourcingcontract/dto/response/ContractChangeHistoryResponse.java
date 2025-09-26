@@ -21,7 +21,7 @@ public record ContractChangeHistoryResponse(
         @Schema(description = "변경 유형 코드", example = "CONTACT") OutsourcingCompanyContractChangeType typeCode,
         @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
     public static ContractChangeHistoryResponse from(final OutsourcingCompanyContractChangeHistory history,
-            final Long userId) {
+            final Long loginUserId) {
         return new ContractChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -32,6 +32,6 @@ public record ContractChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUser() != null && history.getUser().getId().equals(userId));
+                history.getUser() != null && history.getUser().getId().equals(loginUserId));
     }
 }

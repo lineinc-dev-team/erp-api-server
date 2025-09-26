@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,10 @@ public class OutsourcingCompanyContractV2Service {
      */
     public Page<ContractChangeHistoryResponse> getContractChangeHistoriesWithPaging(
             final Long contractId,
-            final Pageable pageable, final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<OutsourcingCompanyContractChangeHistory> historyPage = contractChangeHistoryRepository
                 .findByContractIdWithPaging(contractId, pageable);
-        return historyPage.map(history -> ContractChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> ContractChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

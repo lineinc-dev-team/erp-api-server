@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 import com.lineinc.erp.api.server.domain.site.repository.SiteChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,10 @@ public class SiteV2Service {
      */
     public Page<SiteChangeHistoryResponse> getSiteChangeHistoriesWithPaging(
             final Long siteId,
-            final Pageable pageable,
-            final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<SiteChangeHistory> historyPage = siteChangeHistoryRepository
                 .findBySiteIdWithPaging(siteId, pageable);
-        return historyPage.map(history -> SiteChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> SiteChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

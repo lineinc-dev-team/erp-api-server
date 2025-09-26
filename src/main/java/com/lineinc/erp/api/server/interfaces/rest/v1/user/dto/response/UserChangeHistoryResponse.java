@@ -20,7 +20,7 @@ public record UserChangeHistoryResponse(
         @Schema(description = "변경 유형", example = "기본정보") String type,
         @Schema(description = "변경 유형 코드", example = "BASIC") UserChangeHistoryType typeCode,
         @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
-    public static UserChangeHistoryResponse from(final UserChangeHistory history, final Long loggedInUserId) {
+    public static UserChangeHistoryResponse from(final UserChangeHistory history, final Long loginUserId) {
         return new UserChangeHistoryResponse(
                 history.getId(),
                 history.getChanges(),
@@ -31,6 +31,6 @@ public record UserChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUpdatedByUser() != null && history.getUpdatedByUser().getId().equals(loggedInUserId));
+                history.getUpdatedByUser() != null && history.getUpdatedByUser().getId().equals(loginUserId));
     }
 }

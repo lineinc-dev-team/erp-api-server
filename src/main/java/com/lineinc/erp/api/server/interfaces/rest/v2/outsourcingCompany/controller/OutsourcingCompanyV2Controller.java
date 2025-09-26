@@ -39,12 +39,12 @@ public class OutsourcingCompanyV2Controller extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<CompanyChangeHistoryResponse>>> getOutsourcingCompanyChangeHistoriesWithPaging(
             @PathVariable final Long id,
+            @AuthenticationPrincipal final CustomUserDetails loginUser,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
-            @AuthenticationPrincipal final CustomUserDetails user) {
+            @Valid final SortRequest sortRequest) {
         final Page<CompanyChangeHistoryResponse> page = outsourcingCompanyV2Service
                 .getOutsourcingCompanyChangeHistoriesWithPaging(
-                        id, PageableUtils.createPageable(pageRequest, sortRequest), user.getUserId());
+                        id, loginUser, PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 

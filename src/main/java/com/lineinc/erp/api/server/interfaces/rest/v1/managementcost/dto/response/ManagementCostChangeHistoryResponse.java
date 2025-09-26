@@ -22,7 +22,7 @@ public record ManagementCostChangeHistoryResponse(
         @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
 
     public static ManagementCostChangeHistoryResponse from(final ManagementCostChangeHistory history,
-            final Long userId) {
+            final Long loginUserId) {
         return new ManagementCostChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -33,6 +33,6 @@ public record ManagementCostChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUser() != null && history.getUser().getId().equals(userId));
+                history.getUser() != null && history.getUser().getId().equals(loginUserId));
     }
 }

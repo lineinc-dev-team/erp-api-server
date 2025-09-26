@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.labor.entity.LaborChangeHistory;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,10 @@ public class LaborV2Service {
      */
     public Page<LaborChangeHistoryResponse> getLaborChangeHistoriesWithPaging(
             final Long laborId,
-            final Pageable pageable,
-            final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<LaborChangeHistory> historyPage = laborChangeHistoryRepository
                 .findByLaborWithPaging(laborId, pageable);
-        return historyPage.map(history -> LaborChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> LaborChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

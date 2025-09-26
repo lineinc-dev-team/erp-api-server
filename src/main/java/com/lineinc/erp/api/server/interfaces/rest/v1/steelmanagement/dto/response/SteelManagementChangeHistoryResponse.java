@@ -22,7 +22,7 @@ public record SteelManagementChangeHistoryResponse(
         @Schema(description = "수정 가능 여부", example = "true") Boolean isEditable) {
 
     public static SteelManagementChangeHistoryResponse from(final SteelManagementChangeHistory history,
-            final Long userId) {
+            final Long loginUserId) {
         return new SteelManagementChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -33,6 +33,6 @@ public record SteelManagementChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUser() != null && history.getUser().getId().equals(userId));
+                history.getUser() != null && history.getUser().getId().equals(loginUserId));
     }
 }

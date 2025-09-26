@@ -21,7 +21,7 @@ public record MaterialManagementChangeHistoryResponse(
         @Schema(description = "변경 유형 코드", example = "BASIC") MaterialManagementChangeHistoryType typeCode,
         @Schema(description = "수정 가능여부", example = "true") Boolean isEditable) {
     public static MaterialManagementChangeHistoryResponse from(final MaterialManagementChangeHistory history,
-            final Long userId) {
+            final Long loginUserId) {
         return new MaterialManagementChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -32,6 +32,6 @@ public record MaterialManagementChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUser() != null && history.getUser().getId().equals(userId));
+                history.getUser() != null && history.getUser().getId().equals(loginUserId));
     }
 }

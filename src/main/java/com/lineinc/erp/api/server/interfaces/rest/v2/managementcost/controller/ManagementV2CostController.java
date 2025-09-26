@@ -39,12 +39,12 @@ public class ManagementV2CostController extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ManagementCostChangeHistoryResponse>>> getManagementCostChangeHistoriesWithPaging(
             @PathVariable final Long id,
+            @AuthenticationPrincipal final CustomUserDetails loginUser,
             @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
-            @AuthenticationPrincipal final CustomUserDetails user) {
+            @Valid final SortRequest sortRequest) {
         final Page<ManagementCostChangeHistoryResponse> page = managementCostV2Service
                 .getManagementCostChangeHistoriesWithPaging(
-                        id, PageableUtils.createPageable(pageRequest, sortRequest), user.getUserId());
+                        id, loginUser, PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 }

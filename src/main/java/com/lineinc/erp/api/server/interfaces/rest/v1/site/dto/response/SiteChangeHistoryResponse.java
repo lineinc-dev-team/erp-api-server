@@ -20,7 +20,7 @@ public record SiteChangeHistoryResponse(
         @Schema(description = "변경 유형", example = "현장정보") String type,
         @Schema(description = "변경 유형 코드", example = "CONTACT") SiteChangeHistoryType typeCode,
         @Schema(description = "수정 가능여부", example = "true") Boolean isEditable) {
-    public static SiteChangeHistoryResponse from(final SiteChangeHistory history, final Long userId) {
+    public static SiteChangeHistoryResponse from(final SiteChangeHistory history, final Long loginUserId) {
         return new SiteChangeHistoryResponse(
                 history.getId(),
                 history.getDescription(),
@@ -31,6 +31,6 @@ public record SiteChangeHistoryResponse(
                 history.getUpdatedBy(),
                 history.getType() != null ? history.getType().getLabel() : null,
                 history.getType(),
-                history.getUser() != null && history.getUser().getId().equals(userId));
+                history.getUser() != null && history.getUser().getId().equals(loginUserId));
     }
 }

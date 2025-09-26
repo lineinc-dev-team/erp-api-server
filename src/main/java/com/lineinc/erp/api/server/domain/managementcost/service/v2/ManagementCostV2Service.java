@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,10 @@ public class ManagementCostV2Service {
      */
     public Page<ManagementCostChangeHistoryResponse> getManagementCostChangeHistoriesWithPaging(
             final Long managementCostId,
-            final Pageable pageable, final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<ManagementCostChangeHistory> historyPage = managementCostChangeHistoryRepository
                 .findAllByManagementCostWithPaging(managementCostId, pageable);
-        return historyPage.map(history -> ManagementCostChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> ManagementCostChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

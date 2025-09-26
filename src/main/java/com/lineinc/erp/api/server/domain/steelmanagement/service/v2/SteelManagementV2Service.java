@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.steelmanagement.repository.SteelManagementChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,10 @@ public class SteelManagementV2Service {
      */
     public Page<SteelManagementChangeHistoryResponse> getSteelManagementChangeHistoriesWithPaging(
             final Long steelManagementId,
-            final Pageable pageable, final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<SteelManagementChangeHistory> historyPage = steelManagementChangeHistoryRepository
                 .findBySteelManagementIdWithPaging(steelManagementId, pageable);
-        return historyPage.map(history -> SteelManagementChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> SteelManagementChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

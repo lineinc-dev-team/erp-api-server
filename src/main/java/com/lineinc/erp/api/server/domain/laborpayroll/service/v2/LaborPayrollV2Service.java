@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollChangeHistory;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,10 @@ public class LaborPayrollV2Service {
      */
     public Page<LaborPayrollChangeHistoryResponse> getLaborPayrollChangeHistoriesWithPaging(
             final Long laborPayrollSummaryId,
-            final Pageable pageable,
-            final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<LaborPayrollChangeHistory> historyPage = laborPayrollChangeHistoryRepository
                 .findBySummaryIdWithPaging(laborPayrollSummaryId, pageable);
-        return historyPage.map(history -> LaborPayrollChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> LaborPayrollChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

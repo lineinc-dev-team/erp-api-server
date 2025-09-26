@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationChangeHistoryResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,10 @@ public class FuelAggregationV2Service {
      */
     public Page<FuelAggregationChangeHistoryResponse> getFuelAggregationChangeHistoriesWithPaging(
             final Long fuelAggregationId,
-            final Pageable pageable, final Long userId) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<FuelAggregationChangeHistory> historyPage = fuelAggregationChangeHistoryRepository
                 .findByFuelAggregationWithPaging(fuelAggregationId, pageable);
-        return historyPage.map(history -> FuelAggregationChangeHistoryResponse.from(history, userId));
+        return historyPage.map(history -> FuelAggregationChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }

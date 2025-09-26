@@ -31,10 +31,10 @@ public class ClientCompanyV2Service {
      */
     public Page<ClientCompanyChangeHistoryResponse> getClientCompanyChangeHistoriesWithPaging(
             final Long clientCompanyId,
-            final Pageable pageable,
-            final CustomUserDetails user) {
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
         final Page<ClientCompanyChangeHistory> historyPage = clientCompanyChangeHistoryRepository
                 .findByClientCompanyWithPaging(clientCompanyId, pageable);
-        return historyPage.map(history -> ClientCompanyChangeHistoryResponse.from(history, user.getUserId()));
+        return historyPage.map(history -> ClientCompanyChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }
