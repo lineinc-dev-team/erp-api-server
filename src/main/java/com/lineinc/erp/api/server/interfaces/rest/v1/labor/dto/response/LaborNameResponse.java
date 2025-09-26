@@ -2,6 +2,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response;
 
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
+import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -14,9 +16,12 @@ public record LaborNameResponse(
         @Schema(description = "노무인력 유형", example = "정직원") String type,
         @Schema(description = "임시 인력 여부", example = "false") Boolean isTemporary,
         @Schema(description = "퇴직금 발생 여부", example = "false") Boolean isSeverancePayEligible,
-        @Schema(description = "노무인력 유형 코드", example = "REGULAR_EMPLOYEE") LaborType typeCode) {
+        @Schema(description = "노무인력 유형 코드", example = "REGULAR_EMPLOYEE") LaborType typeCode,
+        @Schema(description = "소속업체 정보") CompanySimpleResponse outsourcingCompany,
+        @Schema(description = "주민등록번호") String residentNumber,
+        @Schema(description = "휴대폰 번호") String phoneNumber) {
 
-    public static LaborNameResponse from(Labor labor) {
+    public static LaborNameResponse from(final Labor labor) {
         return new LaborNameResponse(
                 labor.getId(),
                 labor.getName(),
@@ -25,6 +30,10 @@ public record LaborNameResponse(
                 labor.getType() != null ? labor.getType().getLabel() : null,
                 labor.getIsTemporary(),
                 labor.getIsSeverancePayEligible(),
-                labor.getType());
+                labor.getType(),
+                labor.getOutsourcingCompany() != null ? CompanySimpleResponse.from(labor.getOutsourcingCompany())
+                        : null,
+                PrivacyMaskingUtils.maskResidentNumber(labor.getResidentNumber()),
+                labor.getPhoneNumber());
     }
 }
