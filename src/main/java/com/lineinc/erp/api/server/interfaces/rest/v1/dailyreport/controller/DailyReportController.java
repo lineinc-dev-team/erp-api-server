@@ -129,7 +129,6 @@ public class DailyReportController {
     public ResponseEntity<Void> updateDailyReportEmployee(
             @Valid final DailyReportSearchRequest searchRequest,
             @Valid @RequestBody final DailyReportEmployeeUpdateRequest request) {
-        System.out.println(123123123);
         dailyReportService.updateDailyReportEmployees(searchRequest, request);
         return ResponseEntity.ok().build();
     }
