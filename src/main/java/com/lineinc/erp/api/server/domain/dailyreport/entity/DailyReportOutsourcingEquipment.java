@@ -81,8 +81,8 @@ public class DailyReportOutsourcingEquipment extends BaseEntity {
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
         Optional.ofNullable(request.workHours()).ifPresent(val -> this.workHours = val);
-        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        this.originalFileName = request.originalFileName();
+        this.fileUrl = request.fileUrl();
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

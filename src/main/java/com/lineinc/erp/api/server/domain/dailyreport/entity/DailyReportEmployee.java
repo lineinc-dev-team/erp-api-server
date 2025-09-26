@@ -68,8 +68,8 @@ public class DailyReportEmployee extends BaseEntity {
     public void updateFrom(final EmployeeUpdateInfo request) {
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
-        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        this.originalFileName = request.originalFileName();
+        this.fileUrl = request.fileUrl();
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

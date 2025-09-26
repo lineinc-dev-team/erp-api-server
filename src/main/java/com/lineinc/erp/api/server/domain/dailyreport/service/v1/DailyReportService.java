@@ -592,6 +592,7 @@ public class DailyReportService {
     @Transactional
     public void updateDailyReportEmployees(final DailyReportSearchRequest searchRequest,
             final DailyReportEmployeeUpdateRequest request) {
+        System.out.println("init!!");
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
@@ -622,11 +623,16 @@ public class DailyReportService {
                     ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
         }
 
+        System.out.println(222222);
+
         // EntitySyncUtils.syncList를 사용하여 직원정보 동기화
         EntitySyncUtils.syncList(
                 dailyReport.getEmployees(),
                 request.employees(),
                 (final DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo dto) -> {
+                    System.out.println("dto = " + dto);
+                    System.out.println("dto.fileUrl() = " + dto.fileUrl());
+                    System.out.println("dto.originalFileName() = " + dto.originalFileName());
                     return DailyReportEmployee.builder()
                             .dailyReport(dailyReport)
                             .labor(laborService.getLaborByIdOrThrow(dto.laborId()))
@@ -653,10 +659,10 @@ public class DailyReportService {
             }
         }
 
-        final DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
+        // final DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
 
-        // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
+        // // 노무비 명세서 동기화
+        // laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
     }
 
     @Transactional

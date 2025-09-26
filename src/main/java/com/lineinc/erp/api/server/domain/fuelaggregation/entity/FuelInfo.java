@@ -157,8 +157,8 @@ public class FuelInfo extends BaseEntity {
         Optional.ofNullable(request.fuelType()).ifPresent(val -> this.fuelType = val);
         Optional.ofNullable(request.fuelAmount()).ifPresent(val -> this.fuelAmount = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
     }
 
     // ID로부터 실제 엔티티를 설정하는 메서드 (별도로 호출)
