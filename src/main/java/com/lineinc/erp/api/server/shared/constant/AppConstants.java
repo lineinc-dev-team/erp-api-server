@@ -116,6 +116,7 @@ public final class AppConstants {
     public static final int SEQUENCE_ALLOCATION_DEFAULT = 1;
 
     public static final String CLIENT_COMPANY_ID = "client_company_id";
+    public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";
 
     // 빈 값 상수
     public static final String EMPTY_VALUE = "";

@@ -53,7 +53,6 @@ import lombok.Setter;
 public class ClientCompany extends BaseEntity {
 
     private static final String SEQUENCE_NAME = "client_company_seq";
-    private static final String MAPPED_BY_CLIENT_COMPANY = "clientCompany";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
@@ -109,12 +108,12 @@ public class ClientCompany extends BaseEntity {
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(mappedBy = MAPPED_BY_CLIENT_COMPANY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.CLIENT_COMPANY_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ClientCompanyContact> contacts = new ArrayList<>();
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(mappedBy = MAPPED_BY_CLIENT_COMPANY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.CLIENT_COMPANY_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ClientCompanyFile> files = new ArrayList<>();
 
     @Column
