@@ -70,6 +70,8 @@ public class FuelInfoService {
                             .fuelType(dto.fuelType())
                             .fuelAmount(dto.fuelAmount())
                             .memo(dto.memo())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
                             .build();
                 });
 
