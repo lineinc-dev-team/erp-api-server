@@ -60,6 +60,12 @@ public class DailyReportOutsourcing extends BaseEntity {
     @Column
     private Double workQuantity; // 공수
 
+    @Column
+    private String fileUrl;
+
+    @Column
+    private String originalFileName;
+
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
@@ -70,6 +76,8 @@ public class DailyReportOutsourcing extends BaseEntity {
         Optional.ofNullable(request.category()).ifPresent(val -> this.category = val);
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
+        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
+        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

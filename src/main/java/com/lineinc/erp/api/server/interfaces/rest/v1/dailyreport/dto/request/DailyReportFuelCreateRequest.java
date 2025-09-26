@@ -12,5 +12,7 @@ public record DailyReportFuelCreateRequest(
         @Schema(description = "외주업체계약 장비 ID", example = "1") @NotNull Long equipmentId,
         @Schema(description = "유종", example = "GASOLINE") @NotNull FuelInfoFuelType fuelType,
         @Schema(description = "주유량", example = "50") @NotNull Long fuelAmount,
+        @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
+        @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
         @Schema(description = "비고", example = "특별 지시사항") String memo) {
 }

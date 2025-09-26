@@ -1,11 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
 
 @Schema(description = "출역일보 장비 수정 요청")
 public record DailyReportEquipmentUpdateRequest(
@@ -20,6 +20,8 @@ public record DailyReportEquipmentUpdateRequest(
             @Schema(description = "작업내용", example = "기초 굴착 작업") @NotBlank String workContent,
             @Schema(description = "단가", example = "50000") @NotNull Long unitPrice,
             @Schema(description = "작업시간", example = "1.0") @NotNull Double workHours,
+            @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
+            @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
             @Schema(description = "비고", example = "정상 작동") String memo) {
     }
 }

@@ -53,6 +53,12 @@ public class DailyReportEmployee extends BaseEntity {
     @Column
     private Double workQuantity; // 공수
 
+    @Column
+    private String fileUrl;
+
+    @Column
+    private String originalFileName;
+
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
@@ -62,6 +68,8 @@ public class DailyReportEmployee extends BaseEntity {
     public void updateFrom(final EmployeeUpdateInfo request) {
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
+        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
+        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

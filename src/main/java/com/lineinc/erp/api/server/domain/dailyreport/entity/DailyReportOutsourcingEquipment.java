@@ -65,6 +65,12 @@ public class DailyReportOutsourcingEquipment extends BaseEntity {
     @Column
     private Double workHours; // 시간
 
+    @Column
+    private String fileUrl;
+
+    @Column
+    private String originalFileName;
+
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
@@ -75,6 +81,8 @@ public class DailyReportOutsourcingEquipment extends BaseEntity {
         Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
         Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
         Optional.ofNullable(request.workHours()).ifPresent(val -> this.workHours = val);
+        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
+        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 

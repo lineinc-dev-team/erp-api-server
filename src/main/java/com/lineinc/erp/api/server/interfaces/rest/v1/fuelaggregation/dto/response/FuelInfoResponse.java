@@ -13,9 +13,11 @@ public record FuelInfoResponse(
         @Schema(description = "유종", example = "휘발유") String fuelType,
         @Schema(description = "유종 코드", example = "GASOLINE") String fuelTypeCode,
         @Schema(description = "주유량 (리터)", example = "50") Long fuelAmount,
+        @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
+        @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
         @Schema(description = "비고", example = "오전 주유") String memo) {
 
-    public static FuelInfoResponse from(FuelInfo entity) {
+    public static FuelInfoResponse from(final FuelInfo entity) {
         String equipmentInfo = null;
         if (entity.getEquipment() != null) {
             if (entity.getEquipment().getVehicleNumber() != null && entity.getEquipment().getSpecification() != null) {
@@ -36,6 +38,8 @@ public record FuelInfoResponse(
                 entity.getFuelType() != null ? entity.getFuelType().getLabel() : null,
                 entity.getFuelType() != null ? entity.getFuelType().name() : null,
                 entity.getFuelAmount(),
+                entity.getFileUrl(),
+                entity.getOriginalFileName(),
                 entity.getMemo());
     }
 }

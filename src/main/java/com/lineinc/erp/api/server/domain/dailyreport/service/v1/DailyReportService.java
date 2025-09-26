@@ -142,6 +142,8 @@ public class DailyReportService {
                         .workQuantity(employeeRequest.workQuantity())
                         .unitPrice(labor.getDailyWage())
                         .memo(employeeRequest.memo())
+                        .fileUrl(employeeRequest.fileUrl())
+                        .originalFileName(employeeRequest.originalFileName())
                         .build();
 
                 dailyReport.getEmployees().add(employee);
@@ -185,6 +187,8 @@ public class DailyReportService {
                         .unitPrice(directContractRequest.unitPrice())
                         .workQuantity(directContractRequest.workQuantity())
                         .memo(directContractRequest.memo())
+                        .fileUrl(directContractRequest.fileUrl())
+                        .originalFileName(directContractRequest.originalFileName())
                         .build();
 
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
@@ -211,6 +215,8 @@ public class DailyReportService {
                         .workContent(outsourcingRequest.workContent())
                         .workQuantity(outsourcingRequest.workQuantity())
                         .memo(outsourcingRequest.memo())
+                        .fileUrl(outsourcingRequest.fileUrl())
+                        .originalFileName(outsourcingRequest.originalFileName())
                         .build();
 
                 dailyReport.getOutsourcings().add(outsourcing);
@@ -245,6 +251,8 @@ public class DailyReportService {
                         .unitPrice(equipmentRequest.unitPrice())
                         .workHours(equipmentRequest.workHours())
                         .memo(equipmentRequest.memo())
+                        .fileUrl(equipmentRequest.fileUrl())
+                        .originalFileName(equipmentRequest.originalFileName())
                         .build();
 
                 dailyReport.getOutsourcingEquipments().add(outsourcingEquipment);
@@ -266,6 +274,8 @@ public class DailyReportService {
                                     fuelInfoRequest.equipmentId(),
                                     fuelInfoRequest.fuelType(),
                                     fuelInfoRequest.fuelAmount(),
+                                    fuelInfoRequest.fileUrl(),
+                                    fuelInfoRequest.originalFileName(),
                                     fuelInfoRequest.memo()))
                             .toList());
             final FuelAggregation fuelAggregation = fuelAggregationService

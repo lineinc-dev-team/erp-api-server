@@ -17,21 +17,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "유류집계 상세 정보 응답")
 public record FuelAggregationDetailResponse(
         @Schema(description = "유류집계 ID", example = "1") Long id,
-
         @Schema(description = "집계일자", example = "2025-07-28T10:30:00+09:00") OffsetDateTime date,
-
         @Schema(description = "날씨", example = "맑음") String weather,
-
         @Schema(description = "날씨 코드", example = "SUNNY") String weatherCode,
-
         @Schema(description = "생성일", example = "2025-01-15T10:30:00+09:00") OffsetDateTime createdAt,
-
         @Schema(description = "수정일", example = "2025-01-16T14:20:00+09:00") OffsetDateTime updatedAt,
-
         @Schema(description = "유류정보 목록") List<FuelInfoDetailResponse> fuelInfos,
-
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
-
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process) {
 
     public static FuelAggregationDetailResponse from(final FuelAggregation entity) {
@@ -53,23 +45,16 @@ public record FuelAggregationDetailResponse(
     @Schema(description = "유류정보 상세 응답")
     public record FuelInfoDetailResponse(
             @Schema(description = "유류정보 ID", example = "1") Long id,
-
             @Schema(description = "기사 정보") ContractDriverResponse.ContractDriverSimpleResponse driver,
-
             @Schema(description = "장비 정보") ContractEquipmentResponse.ContractEquipmentSimpleResponse equipment,
-
             @Schema(description = "유종", example = "경유") String fuelType,
-
             @Schema(description = "유종 코드", example = "DIESEL") String fuelTypeCode,
-
             @Schema(description = "주유량 (리터)", example = "50") Long fuelAmount,
-
             @Schema(description = "등록일", example = "2025-01-15T10:30:00+09:00") OffsetDateTime createdAt,
-
             @Schema(description = "수정일", example = "2025-01-16T14:20:00+09:00") OffsetDateTime updatedAt,
-
             @Schema(description = "비고", example = "오전 주유") String memo,
-
+            @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
+            @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
             @Schema(description = "업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany) {
 
         public static FuelInfoDetailResponse from(final FuelInfo entity) {
@@ -87,6 +72,8 @@ public record FuelAggregationDetailResponse(
                     entity.getCreatedAt(),
                     entity.getUpdatedAt(),
                     entity.getMemo(),
+                    entity.getFileUrl(),
+                    entity.getOriginalFileName(),
                     entity.getOutsourcingCompany() != null
                             ? CompanyResponse.CompanySimpleResponse.from(entity.getOutsourcingCompany())
                             : null);

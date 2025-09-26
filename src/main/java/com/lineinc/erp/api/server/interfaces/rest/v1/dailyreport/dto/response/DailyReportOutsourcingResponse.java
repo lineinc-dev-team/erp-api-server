@@ -17,9 +17,11 @@ public record DailyReportOutsourcingResponse(
         @Schema(description = "비고", example = "오전 작업") String memo,
         @Schema(description = "업체 정보") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "외주업체계약 인력명", example = "김철수") ContractWorkerSimpleResponse outsourcingCompanyWorker,
+        @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
+        @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
-    public static DailyReportOutsourcingResponse from(DailyReportOutsourcing outsourcing) {
+    public static DailyReportOutsourcingResponse from(final DailyReportOutsourcing outsourcing) {
         return new DailyReportOutsourcingResponse(
                 outsourcing.getId(),
                 outsourcing.getWorkContent(),
@@ -32,6 +34,8 @@ public record DailyReportOutsourcingResponse(
                 outsourcing.getOutsourcingCompanyContractWorker() != null
                         ? ContractWorkerSimpleResponse.from(outsourcing.getOutsourcingCompanyContractWorker())
                         : null,
+                outsourcing.getFileUrl(),
+                outsourcing.getOriginalFileName(),
                 outsourcing.getCreatedAt(),
                 outsourcing.getUpdatedAt());
     }

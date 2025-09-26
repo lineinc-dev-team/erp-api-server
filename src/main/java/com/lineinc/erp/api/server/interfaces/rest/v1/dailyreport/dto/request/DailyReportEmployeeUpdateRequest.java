@@ -1,12 +1,12 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-
-import java.util.List;
 
 @Schema(description = "출역일보 직원정보 수정 요청")
 public record DailyReportEmployeeUpdateRequest(
@@ -18,6 +18,8 @@ public record DailyReportEmployeeUpdateRequest(
             @Schema(description = "노무인력 ID", example = "1") @NotNull Long laborId,
             @Schema(description = "작업내용", example = "기초공사") @NotBlank String workContent,
             @Schema(description = "공수", example = "1.0") @NotNull @Positive Double workQuantity,
+            @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
+            @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
             @Schema(description = "비고", example = "특별 지시사항") String memo) {
     }
 }
