@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest.FileUpdateInfo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,10 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest.FileUpdateInfo;
-
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -77,10 +74,10 @@ public class DailyReportFile extends BaseEntity {
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
-    public void updateFrom(FileUpdateInfo request) {
-        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
-        Optional.ofNullable(request.description()).ifPresent(val -> this.description = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+    public void updateFrom(final FileUpdateInfo request) {
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.description = request.description();
+        this.memo = request.memo();
     }
 }
