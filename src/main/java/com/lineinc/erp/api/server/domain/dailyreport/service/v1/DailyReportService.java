@@ -634,6 +634,8 @@ public class DailyReportService {
                             .workQuantity(dto.workQuantity())
                             .unitPrice(laborService.getLaborByIdOrThrow(dto.laborId())
                                     .getDailyWage())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
                             .memo(dto.memo())
                             .build();
                 });
@@ -724,6 +726,8 @@ public class DailyReportService {
                             .unitPrice(dto.unitPrice())
                             .workQuantity(dto.workQuantity())
                             .memo(dto.memo())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
                             .build();
                 });
 
@@ -789,6 +793,8 @@ public class DailyReportService {
                             .workContent(dto.workContent())
                             .workQuantity(dto.workQuantity())
                             .memo(dto.memo())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
                             .build();
                 });
 
@@ -858,6 +864,8 @@ public class DailyReportService {
                             .unitPrice(dto.unitPrice())
                             .workHours(dto.workHours())
                             .memo(dto.memo())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
                             .build();
                 });
 
