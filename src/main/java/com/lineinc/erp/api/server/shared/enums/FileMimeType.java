@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.shared.enums;
 
-import lombok.Getter;
-
 import java.util.Arrays;
+
+import lombok.Getter;
 
 @Getter
 public enum FileMimeType {
@@ -14,6 +14,7 @@ public enum FileMimeType {
     WEBP("image/webp", ".webp"),
     SVG("image/svg+xml", ".svg"),
     BMP("image/bmp", ".bmp"),
+    TIF("image/tiff", ".tif"),
     TIFF("image/tiff", ".tiff"),
     ICO("image/x-icon", ".ico"),
 
@@ -27,6 +28,8 @@ public enum FileMimeType {
     PPTX("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx"),
     HWP("application/x-hwp", ".hwp"),
     HWPX("application/vnd.hancom.hwp", ".hwpx"),
+    ODS("application/vnd.oasis.opendocument.spreadsheet", ".ods"),
+    ODP("application/vnd.oasis.opendocument.presentation", ".odp"),
 
     // 텍스트 파일들
     TXT("text/plain", ".txt"),
@@ -40,6 +43,7 @@ public enum FileMimeType {
 
     // 압축 파일들 (안전한 것들만)
     ZIP("application/zip", ".zip"),
+    SEVEN_Z("application/x-7z-compressed", ".7z"),
     TAR("application/x-tar", ".tar"),
     GZ("application/gzip", ".gz"),
 
@@ -58,21 +62,24 @@ public enum FileMimeType {
 
     // 기타 안전한 파일들
     EML("message/rfc822", ".eml"),
-    MSG("application/vnd.ms-outlook", ".msg");
+    MSG("application/vnd.ms-outlook", ".msg"),
+
+    // CAD 파일들
+    DWG("application/dwg", ".dwg");
 
     private final String mime;
     private final String extension;
 
-    FileMimeType(String mime, String extension) {
+    FileMimeType(final String mime, final String extension) {
         this.mime = mime;
         this.extension = extension;
     }
 
-    public static boolean isSupported(String input) {
+    public static boolean isSupported(final String input) {
         return Arrays.stream(values()).anyMatch(f -> f.mime.equals(input));
     }
 
-    public static FileMimeType fromMime(String input) {
+    public static FileMimeType fromMime(final String input) {
         return Arrays.stream(values())
                 .filter(f -> f.mime.equals(input))
                 .findFirst()
