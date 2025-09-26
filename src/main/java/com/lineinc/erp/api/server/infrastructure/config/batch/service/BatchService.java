@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.infrastructure.config.batch.service;
 
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionHistoryStatus;
 
 /**
  * 배치 작업 서비스 인터페이스
@@ -31,7 +32,7 @@ public interface BatchService {
         return BatchExecutionHistory.builder()
                 .batchName(getBatchName())
                 .startTime(java.time.OffsetDateTime.now())
-                .status(BatchExecutionHistory.BatchExecutionStatus.RUNNING)
+                .status(BatchExecutionHistoryStatus.RUNNING)
                 .build();
     }
 }
