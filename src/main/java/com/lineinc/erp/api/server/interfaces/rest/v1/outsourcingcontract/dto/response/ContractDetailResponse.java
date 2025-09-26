@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,9 +77,11 @@ public record ContractDetailResponse(
                         : null,
                 contract.getContacts() != null ? contract.getContacts().stream()
                         .map(ContractContactResponse::from)
+                        .sorted(Comparator.comparing(ContractContactResponse::id))
                         .toList() : List.of(),
                 contract.getFiles() != null ? contract.getFiles().stream()
                         .map(ContractFileResponse::from)
+                        .sorted(Comparator.comparing(ContractFileResponse::id))
                         .toList() : List.of());
     }
 }

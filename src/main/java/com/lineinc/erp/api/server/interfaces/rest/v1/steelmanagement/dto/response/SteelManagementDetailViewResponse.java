@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagement;
@@ -47,19 +48,21 @@ public record SteelManagementDetailViewResponse(
         @Schema(description = "강재 관리 첨부파일 목록") List<SteelManagementFileResponse> files
 
 ) {
-    public static SteelManagementDetailViewResponse from(SteelManagement entity) {
-        List<SteelManagementDetailResponse> details = entity.getDetails().stream()
+    public static SteelManagementDetailViewResponse from(final SteelManagement entity) {
+        final List<SteelManagementDetailResponse> details = entity.getDetails().stream()
                 .map(SteelManagementDetailResponse::from)
+                .sorted(Comparator.comparing(SteelManagementDetailResponse::id))
                 .toList();
 
-        List<SteelManagementFileResponse> files = entity.getFiles().stream()
+        final List<SteelManagementFileResponse> files = entity.getFiles().stream()
                 .map(SteelManagementFileResponse::from)
+                .sorted(Comparator.comparing(SteelManagementFileResponse::id))
                 .toList();
 
-        String typeLabel = entity.getType() != null ? entity.getType().getLabel() : null;
-        String typeCode = entity.getType() != null ? entity.getType().name() : null;
-        String previousTypeLabel = entity.getPreviousType() != null ? entity.getPreviousType().getLabel() : null;
-        String previousTypeCode = entity.getPreviousType() != null ? entity.getPreviousType().name() : null;
+        final String typeLabel = entity.getType() != null ? entity.getType().getLabel() : null;
+        final String typeCode = entity.getType() != null ? entity.getType().name() : null;
+        final String previousTypeLabel = entity.getPreviousType() != null ? entity.getPreviousType().getLabel() : null;
+        final String previousTypeCode = entity.getPreviousType() != null ? entity.getPreviousType().name() : null;
 
         return new SteelManagementDetailViewResponse(
                 entity.getId(),

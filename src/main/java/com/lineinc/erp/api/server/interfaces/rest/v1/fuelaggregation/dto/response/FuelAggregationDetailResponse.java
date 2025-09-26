@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
@@ -33,7 +34,7 @@ public record FuelAggregationDetailResponse(
 
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process) {
 
-    public static FuelAggregationDetailResponse from(FuelAggregation entity) {
+    public static FuelAggregationDetailResponse from(final FuelAggregation entity) {
         return new FuelAggregationDetailResponse(
                 entity.getId(),
                 entity.getDate(),
@@ -43,6 +44,7 @@ public record FuelAggregationDetailResponse(
                 entity.getUpdatedAt(),
                 entity.getFuelInfos().stream()
                         .map(FuelInfoDetailResponse::from)
+                        .sorted(Comparator.comparing(FuelInfoDetailResponse::id))
                         .toList(),
                 SiteResponse.SiteSimpleResponse.from(entity.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(entity.getSiteProcess()));
@@ -70,7 +72,7 @@ public record FuelAggregationDetailResponse(
 
             @Schema(description = "업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany) {
 
-        public static FuelInfoDetailResponse from(FuelInfo entity) {
+        public static FuelInfoDetailResponse from(final FuelInfo entity) {
             return new FuelInfoDetailResponse(
                     entity.getId(),
                     entity.getDriver() != null

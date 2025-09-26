@@ -1,8 +1,8 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
@@ -49,9 +49,11 @@ public record MaterialManagementDetailViewResponse(
                         : null,
                 entity.getDetails().stream()
                         .map(MaterialManagementDetailResponse::from)
-                        .collect(Collectors.toList()),
+                        .sorted(Comparator.comparing(MaterialManagementDetailResponse::id))
+                        .toList(),
                 entity.getFiles().stream()
                         .map(MaterialManagementFileResponse::from)
-                        .collect(Collectors.toList()));
+                        .sorted(Comparator.comparing(MaterialManagementFileResponse::id))
+                        .toList());
     }
 }

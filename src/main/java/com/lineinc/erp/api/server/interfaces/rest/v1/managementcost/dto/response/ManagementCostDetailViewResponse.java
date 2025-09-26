@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
@@ -46,14 +47,22 @@ public record ManagementCostDetailViewResponse(
                 cost.getItemTypeDescription(),
                 cost.getPaymentDate(),
                 cost.getMemo(),
-                cost.getDetails().stream().map(ManagementCostDetailResponse::from).toList(),
-                cost.getFiles().stream().map(ManagementCostFileResponse::from).toList(),
+                cost.getDetails().stream().map(ManagementCostDetailResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostDetailResponse::id))
+                        .toList(),
+                cost.getFiles().stream().map(ManagementCostFileResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostFileResponse::id))
+                        .toList(),
                 SiteResponse.SiteSimpleResponse.from(cost.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(cost.getSiteProcess()),
                 cost.getOutsourcingCompany() != null
                         ? CompanyResponse.CompanySimpleResponse.from(cost.getOutsourcingCompany())
                         : null,
-                cost.getKeyMoneyDetails().stream().map(ManagementCostKeyMoneyDetailResponse::from).toList(),
-                cost.getMealFeeDetails().stream().map(ManagementCostMealFeeDetailResponse::from).toList());
+                cost.getKeyMoneyDetails().stream().map(ManagementCostKeyMoneyDetailResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostKeyMoneyDetailResponse::id))
+                        .toList(),
+                cost.getMealFeeDetails().stream().map(ManagementCostMealFeeDetailResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostMealFeeDetailResponse::id))
+                        .toList());
     }
 }

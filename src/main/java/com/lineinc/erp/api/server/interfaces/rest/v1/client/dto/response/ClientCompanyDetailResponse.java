@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,9 +59,11 @@ public record ClientCompanyDetailResponse(
                 clientCompany.getHomepagePassword(),
                 clientCompany.getContacts().stream()
                         .map(ClientCompanyContactResponse::from)
+                        .sorted(Comparator.comparing(ClientCompanyContactResponse::id))
                         .collect(Collectors.toList()),
                 clientCompany.getFiles().stream()
                         .map(ClientCompanyFileResponse::from)
+                        .sorted(Comparator.comparing(ClientCompanyFileResponse::id))
                         .collect(Collectors.toList()),
                 Optional.ofNullable(clientCompany.getUser())
                         .map(UserResponse.UserSimpleResponse::from)

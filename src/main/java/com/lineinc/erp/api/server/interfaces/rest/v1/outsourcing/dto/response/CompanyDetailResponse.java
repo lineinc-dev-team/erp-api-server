@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,9 +84,11 @@ public record CompanyDetailResponse(
                 company.getMemo(),
                 company.getContacts().stream()
                         .map(CompanyContactResponse::from)
+                        .sorted(Comparator.comparing(CompanyContactResponse::id))
                         .toList(),
                 company.getFiles().stream()
                         .map(CompanyFileResponse::from)
+                        .sorted(Comparator.comparing(CompanyFileResponse::id))
                         .toList());
     }
 }
