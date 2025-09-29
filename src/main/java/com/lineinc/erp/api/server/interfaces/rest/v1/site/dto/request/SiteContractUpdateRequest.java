@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "현장 계약 수정 요청")
 public record SiteContractUpdateRequest(
@@ -21,5 +22,5 @@ public record SiteContractUpdateRequest(
         @Min(0) @Max(100) @Schema(description = "하자이행 보증률", example = "3") Long defectPerformanceGuaranteeRate,
         @Min(0) @Max(99) @Schema(description = "하자보증기간", example = "24") Long defectWarrantyPeriod,
         @Schema(description = "비고") String memo,
-        @Schema(description = "계약 관련 파일 목록 (최소 1개 이상 필요)") @Valid @Min(1) List<UpdateSiteFileRequest> files) {
+        @Schema(description = "계약 관련 파일 목록 (최소 1개 이상 필요)") @Valid @Size(min = 1) List<UpdateSiteFileRequest> files) {
 }
