@@ -63,8 +63,9 @@ public class LaborService {
      * 노무 등록
      */
     public void createLabor(final LaborCreateRequest request, final Long userId) {
-        // 주민등록번호 중복 체크
-        if (laborRepository.existsByResidentNumber(request.residentNumber())) {
+        // 주민등록번호 중복 체크 (* 포함시 제외)
+        if (request.residentNumber() != null && !request.residentNumber().contains("*")
+                && laborRepository.existsByResidentNumber(request.residentNumber())) {
             throw new IllegalArgumentException(ValidationMessages.LABOR_ALREADY_EXISTS);
         }
 
@@ -207,8 +208,9 @@ public class LaborService {
     public void updateLabor(final Long id, final LaborUpdateRequest request, final Long userId) {
         final Labor labor = getLaborByIdOrThrow(id);
 
-        // 주민등록번호 중복 체크 (현재 인력 제외)
-        if (laborRepository.existsByResidentNumberExcludingId(request.residentNumber(), id)) {
+        // 주민등록번호 중복 체크 (현재 인력 제외, * 포함시 제외)
+        if (request.residentNumber() != null && !request.residentNumber().contains("*")
+                && laborRepository.existsByResidentNumberExcludingId(request.residentNumber(), id)) {
             throw new IllegalArgumentException(ValidationMessages.LABOR_ALREADY_EXISTS);
         }
 

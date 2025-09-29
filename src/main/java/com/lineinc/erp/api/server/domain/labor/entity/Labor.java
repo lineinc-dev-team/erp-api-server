@@ -276,7 +276,9 @@ public class Labor extends BaseEntity {
             final Boolean isHeadOffice) {
         Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.residentNumber()).ifPresent(val -> this.residentNumber = val);
+        Optional.ofNullable(request.residentNumber())
+                .filter(val -> !val.contains("*"))
+                .ifPresent(val -> this.residentNumber = val);
         Optional.ofNullable(request.workType()).ifPresent(val -> this.workType = val);
         Optional.ofNullable(request.workTypeDescription()).ifPresent(val -> this.workTypeDescription = val);
         Optional.ofNullable(request.mainWork()).ifPresent(val -> this.mainWork = val);
