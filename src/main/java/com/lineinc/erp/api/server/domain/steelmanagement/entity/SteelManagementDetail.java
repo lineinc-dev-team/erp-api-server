@@ -117,11 +117,18 @@ public class SteelManagementDetail extends BaseEntity {
     @DiffInclude
     private Integer supplyPrice;
 
+    /**
+     * 부가세
+     */
+    @DiffInclude
+    @Column
+    private Integer vat;
+
     @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    public void updateFrom(SteelManagementDetailUpdateRequest request) {
+    public void updateFrom(final SteelManagementDetailUpdateRequest request) {
         Optional.ofNullable(request.standard()).ifPresent(val -> this.standard = val);
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.unit()).ifPresent(val -> this.unit = val);
@@ -132,6 +139,7 @@ public class SteelManagementDetail extends BaseEntity {
         Optional.ofNullable(request.quantity()).ifPresent(val -> this.quantity = val);
         Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
         Optional.ofNullable(request.supplyPrice()).ifPresent(val -> this.supplyPrice = val);
+        Optional.ofNullable(request.vat()).ifPresent(val -> this.vat = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
     }
 }

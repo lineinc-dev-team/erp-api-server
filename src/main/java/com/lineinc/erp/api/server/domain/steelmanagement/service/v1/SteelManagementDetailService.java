@@ -53,6 +53,7 @@ public class SteelManagementDetailService {
                         .quantity(request.quantity())
                         .unitPrice(request.unitPrice())
                         .supplyPrice(request.supplyPrice())
+                        .vat(request.vat())
                         .memo(request.memo())
                         .build())
                 .collect(Collectors.toList());
@@ -83,6 +84,7 @@ public class SteelManagementDetailService {
                         .quantity(dto.quantity())
                         .unitPrice(dto.unitPrice())
                         .supplyPrice(dto.supplyPrice())
+                        .vat(dto.vat())
                         .memo(dto.memo())
                         .build());
 

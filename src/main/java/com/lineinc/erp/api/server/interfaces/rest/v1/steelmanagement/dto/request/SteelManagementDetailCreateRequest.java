@@ -14,5 +14,6 @@ public record SteelManagementDetailCreateRequest(
         @Schema(description = "수량", example = "100") Integer quantity,
         @Schema(description = "단가", example = "12000") Integer unitPrice,
         @Schema(description = "공급가", example = "1200000") Integer supplyPrice,
+        @Schema(description = "부가세", example = "120000") Integer vat,
         @Schema(description = "비고", example = "특별 관리 대상") String memo) {
 }

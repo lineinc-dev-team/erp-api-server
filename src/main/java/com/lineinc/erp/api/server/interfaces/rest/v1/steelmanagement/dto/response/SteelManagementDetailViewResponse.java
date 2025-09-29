@@ -14,40 +14,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "강재 관리 상세 응답")
 public record SteelManagementDetailViewResponse(
         @Schema(description = "강재 관리 ID", example = "1") Long id,
-
         @Schema(description = "용도", example = "철근 콘크리트 타설용") String usage,
-
         @Schema(description = "강재 수불 유형", example = "발주") String type,
-
         @Schema(description = "강재 수불 유형 코드", example = "PURCHASE") String typeCode,
-
         @Schema(description = "이전 강재 수불 유형", example = "발주") String previousType,
-
         @Schema(description = "이전 강재 수불 유형 코드", example = "ORDER") String previousTypeCode,
-
         @Schema(description = "기간 시작일", example = "2024-07-01T00:00:00+09:00") OffsetDateTime startDate,
-
         @Schema(description = "기간 종료일", example = "2024-07-31T00:00:00+09:00") OffsetDateTime endDate,
-
         @Schema(description = "발주일", example = "2024-07-15T00:00:00+09:00") OffsetDateTime orderDate,
-
         @Schema(description = "승인일", example = "2024-07-20T00:00:00+09:00") OffsetDateTime approvalDate,
-
         @Schema(description = "반출일", example = "2024-07-25T00:00:00+09:00") OffsetDateTime releaseDate,
-
         @Schema(description = "비고", example = "7월 강재 입출고 내역") String memo,
-
         @Schema(description = "강재 상세 품목 목록") List<SteelManagementDetailResponse> details,
-
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
-
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
-
         @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
-
-        @Schema(description = "강재 관리 첨부파일 목록") List<SteelManagementFileResponse> files
-
-) {
+        @Schema(description = "강재 관리 첨부파일 목록") List<SteelManagementFileResponse> files) {
     public static SteelManagementDetailViewResponse from(final SteelManagement entity) {
         final List<SteelManagementDetailResponse> details = entity.getDetails().stream()
                 .map(SteelManagementDetailResponse::from)
