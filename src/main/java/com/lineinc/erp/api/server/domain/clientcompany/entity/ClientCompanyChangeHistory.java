@@ -50,7 +50,7 @@ public class ClientCompanyChangeHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user; // 수정자
+    private User user;
 
     @Column
     @Enumerated(EnumType.STRING)

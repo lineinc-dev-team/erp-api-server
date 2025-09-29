@@ -12,12 +12,12 @@ public enum PermissionAction {
 
     private final String label;
 
-    PermissionAction(String label) {
+    PermissionAction(final String label) {
         this.label = label;
     }
 
-    public static PermissionAction fromLabel(String label) {
-        for (PermissionAction action : values()) {
+    public static PermissionAction fromLabel(final String label) {
+        for (final PermissionAction action : values()) {
             if (action.label.equals(label) || action.name().equals(label)) {
                 return action;
             }

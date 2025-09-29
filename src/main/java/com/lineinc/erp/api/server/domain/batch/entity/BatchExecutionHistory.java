@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.batch.entity;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionHistoryStatus;
@@ -58,13 +59,13 @@ public class BatchExecutionHistory {
     public void markAsCompleted() {
         this.endTime = OffsetDateTime.now();
         this.status = BatchExecutionHistoryStatus.COMPLETED;
-        this.executionTimeSeconds = java.time.Duration.between(this.startTime, this.endTime).toMillis() / 1000.0;
+        this.executionTimeSeconds = Duration.between(this.startTime, this.endTime).toMillis() / 1000.0;
     }
 
     public void markAsFailed(final String errorMessage) {
         this.endTime = OffsetDateTime.now();
         this.status = BatchExecutionHistoryStatus.FAILED;
         this.errorMessage = errorMessage;
-        this.executionTimeSeconds = java.time.Duration.between(this.startTime, this.endTime).toMillis() / 1000.0;
+        this.executionTimeSeconds = Duration.between(this.startTime, this.endTime).toMillis() / 1000.0;
     }
 }
