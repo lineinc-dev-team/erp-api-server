@@ -9,14 +9,9 @@ import jakarta.validation.constraints.Positive;
 @Schema(description = "유류정보 추가 요청")
 public record AddFuelInfoRequest(
         @NotNull @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
-
         @NotNull @Schema(description = "기사 ID", example = "1") Long driverId,
-
         @NotNull @Schema(description = "장비 ID", example = "1") Long equipmentId,
-
         @NotNull @Schema(description = "유종", example = "DIESEL") FuelInfoFuelType fuelType,
-
         @NotNull @Positive @Schema(description = "주유량 (리터)", example = "50") Long fuelAmount,
-
         @Schema(description = "비고", example = "오전 주유") String memo) {
 }
