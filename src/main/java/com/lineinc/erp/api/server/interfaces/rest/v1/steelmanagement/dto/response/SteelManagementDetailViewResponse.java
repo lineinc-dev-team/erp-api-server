@@ -26,6 +26,7 @@ public record SteelManagementDetailViewResponse(
         @Schema(description = "반출일", example = "2024-07-25T00:00:00+09:00") OffsetDateTime releaseDate,
         @Schema(description = "비고", example = "7월 강재 입출고 내역") String memo,
         @Schema(description = "강재 상세 품목 목록") List<SteelManagementDetailResponse> details,
+        @Schema(description = "강재 반출 상세 품목 목록") List<SteelManagementReturnDetailResponse> returnDetails,
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
         @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
@@ -34,6 +35,11 @@ public record SteelManagementDetailViewResponse(
         final List<SteelManagementDetailResponse> details = entity.getDetails().stream()
                 .map(SteelManagementDetailResponse::from)
                 .sorted(Comparator.comparing(SteelManagementDetailResponse::id))
+                .toList();
+
+        final List<SteelManagementReturnDetailResponse> returnDetails = entity.getReturnDetails().stream()
+                .map(SteelManagementReturnDetailResponse::from)
+                .sorted(Comparator.comparing(SteelManagementReturnDetailResponse::id))
                 .toList();
 
         final List<SteelManagementFileResponse> files = entity.getFiles().stream()
@@ -60,6 +66,7 @@ public record SteelManagementDetailViewResponse(
                 entity.getReleaseDate(),
                 entity.getMemo(),
                 details,
+                returnDetails,
                 SiteResponse.SiteSimpleResponse.from(entity.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(entity.getSiteProcess()),
                 entity.getOutsourcingCompany() != null

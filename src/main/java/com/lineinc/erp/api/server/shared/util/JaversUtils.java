@@ -43,6 +43,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteContract;
 import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
+import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementReturnDetail;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,6 +78,7 @@ public class JaversUtils {
             Map.entry(OutsourcingCompanyContractConstruction.class,
                     entity -> ((OutsourcingCompanyContractConstruction) entity).getItem()),
             Map.entry(SteelManagementDetail.class, entity -> ((SteelManagementDetail) entity).getName()),
+            Map.entry(SteelManagementReturnDetail.class, entity -> ((SteelManagementReturnDetail) entity).getName()),
             Map.entry(SteelManagementFile.class, entity -> ((SteelManagementFile) entity).getName()),
             Map.entry(FuelInfo.class, entity -> ((FuelInfo) entity).getOutsourcingCompanyName()),
             Map.entry(LaborFile.class, entity -> ((LaborFile) entity).getName()),

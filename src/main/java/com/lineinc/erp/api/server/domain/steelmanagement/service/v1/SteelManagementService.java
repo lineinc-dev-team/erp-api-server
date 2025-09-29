@@ -58,6 +58,7 @@ public class SteelManagementService {
     private final SteelManagementRepository steelManagementRepository;
     private final SteelManagementDetailRepository steelManagementDetailRepository;
     private final SteelManagementDetailService steelManagementDetailService;
+    private final SteelManagementReturnDetailService steelManagementReturnDetailService;
     private final SteelManagementFileService steelManagementFileService;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final SteelManagementChangeHistoryRepository steelManagementChangeHistoryRepository;
@@ -359,6 +360,8 @@ public class SteelManagementService {
         }
 
         steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details(),
+                userService.getUserByIdOrThrow(user.getUserId()));
+        steelManagementReturnDetailService.updateSteelManagementReturnDetails(steelManagement, request.returnDetails(),
                 userService.getUserByIdOrThrow(user.getUserId()));
         steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files(),
                 userService.getUserByIdOrThrow(user.getUserId()));

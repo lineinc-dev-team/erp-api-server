@@ -84,6 +84,11 @@ public class SteelManagement extends BaseEntity {
     @Builder.Default
     private List<SteelManagementDetail> details = new ArrayList<>();
 
+    @DiffIgnore
+    @OneToMany(mappedBy = "steelManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SteelManagementReturnDetail> returnDetails = new ArrayList<>();
+
     // ===== 시스템/상태 정보 (변경 추적 제외) =====
     @DiffIgnore
     @Enumerated(EnumType.STRING)
