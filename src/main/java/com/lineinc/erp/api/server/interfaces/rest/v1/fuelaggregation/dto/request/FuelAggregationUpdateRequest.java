@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.reques
 
 import java.util.List;
 
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,9 +10,6 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "유류집계 수정 요청")
 public record FuelAggregationUpdateRequest(
-        @Schema(description = "현장 ID", example = "1") @NotNull Long siteId,
-        @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
-        @Schema(description = "날씨", example = "SUNNY") @NotNull FuelAggregationWeatherType weather,
         @Schema(description = "유류정보 수정 목록") @Valid List<FuelInfoUpdateRequest> fuelInfos,
         @Schema(description = "수정 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
     @Schema(description = "유류정보 수정 요청")

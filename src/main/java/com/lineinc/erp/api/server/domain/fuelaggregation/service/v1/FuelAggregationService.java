@@ -278,17 +278,10 @@ public class FuelAggregationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
-        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
-
-        if (!siteProcess.getSite().getId().equals(site.getId())) {
-            throw new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
-        }
-
         fuelAggregation.syncTransientFields();
         final FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
 
-        fuelAggregation.updateFrom(request, site, siteProcess);
+        // fuelAggregation.updateFrom(request);
         fuelAggregationRepository.save(fuelAggregation);
 
         final Diff diff = javers.compare(oldSnapshot, fuelAggregation);

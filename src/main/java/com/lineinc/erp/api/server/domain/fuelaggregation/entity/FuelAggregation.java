@@ -119,13 +119,7 @@ public class FuelAggregation extends BaseEntity {
         this.weatherName = this.weather != null ? this.weather.getLabel() : null;
     }
 
-    public void updateFrom(final FuelAggregationUpdateRequest request, final Site site, final SiteProcess siteProcess) {
-        this.site = site;
-        this.siteProcess = siteProcess;
-
-        if (request.weather() != null) {
-            this.weather = request.weather();
-        }
+    public void updateFrom(final FuelAggregationUpdateRequest request) {
         syncTransientFields();
     }
 }
