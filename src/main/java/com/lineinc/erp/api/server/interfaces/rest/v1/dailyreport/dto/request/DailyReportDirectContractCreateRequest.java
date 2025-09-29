@@ -1,6 +1,9 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -17,5 +20,6 @@ public record DailyReportDirectContractCreateRequest(
         @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
         @Schema(description = "비고", example = "특별 지시사항") String memo,
         @Schema(description = "임시 인력 여부", example = "false") @NotNull Boolean isTemporary,
-        @Schema(description = "임시 인력 이름", example = "김철수") String temporaryLaborName) {
+        @Schema(description = "임시 인력 이름", example = "김철수") String temporaryLaborName,
+        @Schema(description = "파일 목록") @Valid List<DailyReportDocumentCreateRequest> files) {
 }

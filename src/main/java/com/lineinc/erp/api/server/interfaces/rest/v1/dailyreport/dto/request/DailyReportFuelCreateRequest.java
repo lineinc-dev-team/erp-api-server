@@ -1,8 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request;
 
+import java.util.List;
+
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "유류 출역일보 등록 요청")
@@ -14,5 +17,6 @@ public record DailyReportFuelCreateRequest(
         @Schema(description = "주유량", example = "50") @NotNull Long fuelAmount,
         @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
         @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
-        @Schema(description = "비고", example = "특별 지시사항") String memo) {
+        @Schema(description = "비고", example = "특별 지시사항") String memo,
+        @Schema(description = "파일 목록") @Valid List<DailyReportDocumentCreateRequest> files) {
 }

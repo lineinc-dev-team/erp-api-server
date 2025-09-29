@@ -17,11 +17,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployeeFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuelFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipmentFile;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingFile;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
@@ -145,6 +150,18 @@ public class DailyReportService {
                         .originalFileName(employeeRequest.originalFileName())
                         .build();
 
+                if (employeeRequest.files() != null) {
+                    employee.getFiles().addAll(employeeRequest.files().stream()
+                            .<DailyReportEmployeeFile>map(file -> DailyReportEmployeeFile.builder()
+                                    .dailyReportEmployee(employee)
+                                    .name(file.name())
+                                    .fileUrl(file.fileUrl())
+                                    .originalFileName(file.originalFileName())
+                                    .memo(file.memo())
+                                    .build())
+                            .toList());
+                }
+
                 dailyReport.getEmployees().add(employee);
             }
         }
@@ -190,6 +207,19 @@ public class DailyReportService {
                         .originalFileName(directContractRequest.originalFileName())
                         .build();
 
+                // 파일 목록 설정
+                if (directContractRequest.files() != null) {
+                    directContract.getFiles().addAll(directContractRequest.files().stream()
+                            .<DailyReportDirectContractFile>map(file -> DailyReportDirectContractFile.builder()
+                                    .dailyReportDirectContract(directContract)
+                                    .name(file.name())
+                                    .fileUrl(file.fileUrl())
+                                    .originalFileName(file.originalFileName())
+                                    .memo(file.memo())
+                                    .build())
+                            .toList());
+                }
+
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
 
                 dailyReport.getDirectContracts().add(directContract);
@@ -217,6 +247,18 @@ public class DailyReportService {
                         .fileUrl(outsourcingRequest.fileUrl())
                         .originalFileName(outsourcingRequest.originalFileName())
                         .build();
+
+                if (outsourcingRequest.files() != null) {
+                    outsourcing.getFiles().addAll(outsourcingRequest.files().stream()
+                            .<DailyReportOutsourcingFile>map(file -> DailyReportOutsourcingFile.builder()
+                                    .dailyReportOutsourcing(outsourcing)
+                                    .name(file.name())
+                                    .fileUrl(file.fileUrl())
+                                    .originalFileName(file.originalFileName())
+                                    .memo(file.memo())
+                                    .build())
+                            .toList());
+                }
 
                 dailyReport.getOutsourcings().add(outsourcing);
             }
@@ -254,6 +296,19 @@ public class DailyReportService {
                         .originalFileName(equipmentRequest.originalFileName())
                         .build();
 
+                if (equipmentRequest.files() != null) {
+                    outsourcingEquipment.getFiles().addAll(equipmentRequest.files().stream()
+                            .<DailyReportOutsourcingEquipmentFile>map(
+                                    file -> DailyReportOutsourcingEquipmentFile.builder()
+                                            .dailyReportOutsourcingEquipment(outsourcingEquipment)
+                                            .name(file.name())
+                                            .fileUrl(file.fileUrl())
+                                            .originalFileName(file.originalFileName())
+                                            .memo(file.memo())
+                                            .build())
+                            .toList());
+                }
+
                 dailyReport.getOutsourcingEquipments().add(outsourcingEquipment);
             }
         }
@@ -285,6 +340,21 @@ public class DailyReportService {
                     .dailyReport(dailyReport)
                     .fuelAggregation(fuelAggregation)
                     .build();
+
+            if (request.fuelInfos().stream().anyMatch(fuelInfo -> fuelInfo.files() != null)) {
+                fuel.getFiles().addAll(request.fuelInfos().stream()
+                        .filter(fuelInfo -> fuelInfo.files() != null)
+                        .flatMap(fuelInfo -> fuelInfo.files().stream())
+                        .<DailyReportFuelFile>map(file -> DailyReportFuelFile.builder()
+                                .dailyReportFuel(fuel)
+                                .name(file.name())
+                                .fileUrl(file.fileUrl())
+                                .originalFileName(file.originalFileName())
+                                .memo(file.memo())
+                                .build())
+                        .toList());
+            }
+
             dailyReport.getFuels().add(fuel);
         }
 
