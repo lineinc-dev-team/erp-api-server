@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "현장 계약 등록 요청")
 public record CreateSiteContractRequest(
         @NotBlank @Schema(description = "계약명", example = "전기공사 계약") String name,
-        @NotNull @Min(1) @Schema(description = "계약금액", example = "15000000") Long amount,
+        @NotNull @Schema(description = "계약금액", example = "15000000") Long amount,
         @Schema(description = "공급가", example = "13636364") Long supplyPrice,
         @Schema(description = "부가세", example = "1363636") Long vat,
         @Schema(description = "매입세", example = "1000000") Long purchaseTax,
