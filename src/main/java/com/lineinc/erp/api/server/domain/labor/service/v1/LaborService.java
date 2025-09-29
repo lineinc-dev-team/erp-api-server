@@ -224,6 +224,7 @@ public class LaborService {
         } else if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() == 0) {
             // outsourcingCompanyId가 0인 경우 본사 인력으로 처리
             isHeadOffice = true;
+            outsourcingCompany = null;
         }
 
         // 변경 전 상태 저장 (Javers 스냅샷)
