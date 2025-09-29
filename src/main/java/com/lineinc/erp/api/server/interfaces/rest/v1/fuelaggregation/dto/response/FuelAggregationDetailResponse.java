@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 
+import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
@@ -26,12 +27,28 @@ public record FuelAggregationDetailResponse(
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process) {
 
-    public static FuelAggregationDetailResponse from(final FuelAggregation entity) {
+    public static FuelAggregationDetailResponse from(final FuelAggregation entity,
+            final DailyReportRepository dailyReportRepository) {
+        // 출역일보에서 날씨 정보 가져오기
+        String weatherLabel = null;
+        String weatherCode = null;
+
+        if (entity.getSite() != null && entity.getSiteProcess() != null && entity.getDate() != null) {
+            final var dailyReport = dailyReportRepository.findBySiteAndSiteProcessAndReportDate(
+                    entity.getSite(), entity.getSiteProcess(),
+                    entity.getDate());
+
+            if (dailyReport.isPresent() && dailyReport.get().getWeather() != null) {
+                weatherLabel = dailyReport.get().getWeather().getLabel();
+                weatherCode = dailyReport.get().getWeather().name();
+            }
+        }
+
         return new FuelAggregationDetailResponse(
                 entity.getId(),
                 entity.getDate(),
-                entity.getWeather() != null ? entity.getWeather().getLabel() : null,
-                entity.getWeather() != null ? entity.getWeather().name() : null,
+                weatherLabel,
+                weatherCode,
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getFuelInfos().stream()

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
@@ -57,6 +58,7 @@ public class FuelAggregationService {
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
     private final FuelInfoRepository fuelInfoRepository;
+    private final DailyReportRepository dailyReportRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
     private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
@@ -193,7 +195,7 @@ public class FuelAggregationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
-        return FuelAggregationDetailResponse.from(fuelAggregation);
+        return FuelAggregationDetailResponse.from(fuelAggregation, dailyReportRepository);
     }
 
     @Transactional(readOnly = true)
