@@ -359,10 +359,15 @@ public class SteelManagementService {
             }
         }
 
+        // 상세 정보 업데이트
         steelManagementDetailService.updateSteelManagementDetails(steelManagement, request.details(),
                 userService.getUserByIdOrThrow(user.getUserId()));
+
+        // 반출 상세 정보 업데이트
         steelManagementReturnDetailService.updateSteelManagementReturnDetails(steelManagement, request.returnDetails(),
                 userService.getUserByIdOrThrow(user.getUserId()));
+
+        // 파일 업데이트
         steelManagementFileService.updateSteelManagementFiles(steelManagement, request.files(),
                 userService.getUserByIdOrThrow(user.getUserId()));
     }
