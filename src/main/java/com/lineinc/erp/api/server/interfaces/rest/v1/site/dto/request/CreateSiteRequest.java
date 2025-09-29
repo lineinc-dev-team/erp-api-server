@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.domain.site.enums.SiteType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "현장 등록 요청")
@@ -27,5 +28,5 @@ public record CreateSiteRequest(
         @NotNull @Schema(description = "도급 금액", example = "100000000") Long contractAmount,
         @Schema(description = "비고") String memo,
         @Valid @Schema(description = "현장 공정 정보") CreateSiteProcessRequest process,
-        @Valid @Schema(description = "현장 계약 목록") List<CreateSiteContractRequest> contracts) {
+        @Schema(description = "현장 계약 목록 (최소 1개 이상 필요)") @NotEmpty @Valid List<CreateSiteContractRequest> contracts) {
 }
