@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
@@ -19,6 +20,7 @@ public record DailyReportOutsourcingResponse(
         @Schema(description = "외주업체계약 인력명", example = "김철수") ContractWorkerSimpleResponse outsourcingCompanyWorker,
         @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
         @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
+        @Schema(description = "사진 목록") List<DailyReportDocumentResponse> files,
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
     public static DailyReportOutsourcingResponse from(final DailyReportOutsourcing outsourcing) {
@@ -36,6 +38,9 @@ public record DailyReportOutsourcingResponse(
                         : null,
                 outsourcing.getFileUrl(),
                 outsourcing.getOriginalFileName(),
+                outsourcing.getFiles() != null ? outsourcing.getFiles().stream()
+                        .map(DailyReportDocumentResponse::from)
+                        .toList() : List.of(),
                 outsourcing.getCreatedAt(),
                 outsourcing.getUpdatedAt());
     }
