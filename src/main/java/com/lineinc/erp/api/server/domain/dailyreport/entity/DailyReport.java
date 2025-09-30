@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -103,6 +105,60 @@ public class DailyReport extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
+    // 직원 관련
+    @Column
+    private Double employeeWorkQuantitySum; // 직원 공수합
+
+    @Column
+    @Builder.Default
+    private Boolean employeeEvidenceSubmitted = false; // 직원 증빙 여부
+
+    // 직영/계약직 관련
+    @Column
+    private Double directContractWorkQuantitySum; // 직영계약직 공수합
+
+    @Column
+    @Builder.Default
+    private Boolean directContractEvidenceSubmitted = false; // 직영계약직 증빙 여부
+
+    // 외주 관련
+    @Column
+    private Double outsourcingWorkQuantitySum; // 외주 공수합
+
+    @Column
+    @Builder.Default
+    private Boolean outsourcingEvidenceSubmitted = false; // 외주 증빙 여부
+
+    // 장비 관련
+    @Column
+    private Double equipmentTotalHours; // 장비 총 가동 시간
+
+    @Column
+    @Builder.Default
+    private Boolean equipmentEvidenceSubmitted = false; // 장비 증빙 여부
+
+    // 현장 사진 관련
+    @Column
+    @Builder.Default
+    private Boolean sitePhotoSubmitted = false; // 현장 사진 여부
+
+    // 유류 관련
+    @Column
+    private Double gasolineTotalAmount; // 휘발유 총 주유량
+
+    @Column
+    private Double dieselTotalAmount; // 경유 총 주유량
+
+    @Column
+    private Double ureaTotalAmount; // 요소수 총 주유량
+
+    @Column
+    private Double etcTotalAmount; // 기타 총 주유량
+
+    @Column
+    @Builder.Default
+    private Boolean fuelEvidenceSubmitted = false; // 유류 증빙 여부
+
     /**
      * 출역일보를 수동 마감 처리합니다.
      */
@@ -117,5 +173,176 @@ public class DailyReport extends BaseEntity {
     public void autoComplete() {
         this.status = DailyReportStatus.AUTO_COMPLETED;
         this.completedAt = OffsetDateTime.now(AppConstants.KOREA_ZONE);
+    }
+
+    /**
+     * 직원 공수합 계산 및 업데이트
+     */
+    public void updateEmployeeWorkQuantitySum() {
+        this.employeeWorkQuantitySum = employees.stream()
+                .filter(employee -> !employee.isDeleted())
+                .mapToDouble(employee -> employee.getWorkQuantity() != null ? employee.getWorkQuantity() : 0.0)
+                .sum();
+    }
+
+    /**
+     * 직영/계약직 공수합 계산 및 업데이트
+     */
+    public void updateDirectContractWorkQuantitySum() {
+        this.directContractWorkQuantitySum = directContracts.stream()
+                .filter(contract -> !contract.isDeleted())
+                .mapToDouble(contract -> contract.getWorkQuantity() != null ? contract.getWorkQuantity() : 0.0)
+                .sum();
+    }
+
+    /**
+     * 외주 공수합 계산 및 업데이트
+     */
+    public void updateOutsourcingWorkQuantitySum() {
+        this.outsourcingWorkQuantitySum = outsourcings.stream()
+                .filter(outsourcing -> !outsourcing.isDeleted())
+                .mapToDouble(outsourcing -> outsourcing.getWorkQuantity() != null ? outsourcing.getWorkQuantity() : 0.0)
+                .sum();
+    }
+
+    /**
+     * 장비 총시간 계산 및 업데이트
+     */
+    public void updateEquipmentTotalHours() {
+        this.equipmentTotalHours = outsourcingEquipments.stream()
+                .filter(equipment -> !equipment.isDeleted())
+                .mapToDouble(equipment -> equipment.getWorkHours() != null ? equipment.getWorkHours() : 0.0)
+                .sum();
+    }
+
+    /**
+     * 현장 사진 여부 업데이트
+     */
+    public void updateSitePhotoSubmitted() {
+        this.sitePhotoSubmitted = !files.isEmpty();
+    }
+
+    /**
+     * 직원 증빙 여부 업데이트
+     */
+    public void updateEmployeeEvidenceSubmitted() {
+        this.employeeEvidenceSubmitted = evidenceFiles.stream()
+                .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.EMPLOYEE);
+    }
+
+    /**
+     * 직영/계약직 증빙 여부 업데이트
+     */
+    public void updateDirectContractEvidenceSubmitted() {
+        this.directContractEvidenceSubmitted = evidenceFiles.stream()
+                .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.DIRECT_CONTRACT);
+    }
+
+    /**
+     * 외주 증빙 여부 업데이트
+     */
+    public void updateOutsourcingEvidenceSubmitted() {
+        this.outsourcingEvidenceSubmitted = evidenceFiles.stream()
+                .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.OUTSOURCING);
+    }
+
+    /**
+     * 장비 증빙 여부 업데이트
+     */
+    public void updateEquipmentEvidenceSubmitted() {
+        this.equipmentEvidenceSubmitted = evidenceFiles.stream()
+                .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.EQUIPMENT);
+    }
+
+    /**
+     * 휘발유 총 주유량 계산 및 업데이트
+     */
+    public void updateGasolineTotalAmount() {
+        this.gasolineTotalAmount = fuels.stream()
+                .filter(fuel -> !fuel.isDeleted())
+                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                        ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> info.getFuelType() != null
+                                        && info.getFuelType() == FuelInfoFuelType.GASOLINE)
+                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                .sum()
+                        : 0.0)
+                .sum();
+    }
+
+    /**
+     * 경유 총 주유량 계산 및 업데이트
+     */
+    public void updateDieselTotalAmount() {
+        this.dieselTotalAmount = fuels.stream()
+                .filter(fuel -> !fuel.isDeleted())
+                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                        ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> info.getFuelType() != null
+                                        && info.getFuelType() == FuelInfoFuelType.DIESEL)
+                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                .sum()
+                        : 0.0)
+                .sum();
+    }
+
+    /**
+     * 요소수 총 주유량 계산 및 업데이트
+     */
+    public void updateUreaTotalAmount() {
+        this.ureaTotalAmount = fuels.stream()
+                .filter(fuel -> !fuel.isDeleted())
+                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                        ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> info.getFuelType() != null
+                                        && info.getFuelType() == FuelInfoFuelType.UREA)
+                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                .sum()
+                        : 0.0)
+                .sum();
+    }
+
+    /**
+     * 기타 총 주유량 계산 및 업데이트
+     */
+    public void updateEtcTotalAmount() {
+        this.etcTotalAmount = fuels.stream()
+                .filter(fuel -> !fuel.isDeleted())
+                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                        ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> info.getFuelType() != null
+                                        && info.getFuelType() == FuelInfoFuelType.ETC)
+                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                .sum()
+                        : 0.0)
+                .sum();
+    }
+
+    /**
+     * 유류 증빙 여부 업데이트
+     */
+    public void updateFuelEvidenceSubmitted() {
+        this.fuelEvidenceSubmitted = evidenceFiles.stream()
+                .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.FUEL);
+    }
+
+    /**
+     * 모든 집계 데이터 업데이트
+     */
+    public void updateAllAggregatedData() {
+        updateEmployeeWorkQuantitySum();
+        updateDirectContractWorkQuantitySum();
+        updateOutsourcingWorkQuantitySum();
+        updateEquipmentTotalHours();
+        updateSitePhotoSubmitted();
+        updateEmployeeEvidenceSubmitted();
+        updateDirectContractEvidenceSubmitted();
+        updateOutsourcingEvidenceSubmitted();
+        updateEquipmentEvidenceSubmitted();
+        updateGasolineTotalAmount();
+        updateDieselTotalAmount();
+        updateUreaTotalAmount();
+        updateEtcTotalAmount();
+        updateFuelEvidenceSubmitted();
     }
 }
