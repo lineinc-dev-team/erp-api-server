@@ -64,8 +64,8 @@ public class LaborPayrollSyncService {
         // 3. 노무비 명세서 재생성
         regeneratePayrollsFromReports(monthlyReports, yearMonth);
 
-        // // 4. 집계 테이블 업데이트
-        updateSummaryTable(dailyReport.getSite(), dailyReport.getSiteProcess(),
+        // 4. 집계 테이블 재생성
+        regenerateSummaryTable(dailyReport.getSite(), dailyReport.getSiteProcess(),
                 yearMonth);
 
         log.info("노무비 명세서 동기화 완료: 출역일보 ID={}", dailyReport.getId());
@@ -241,21 +241,38 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 집계 테이블 업데이트
+     * 집계 테이블 재생성 (기존 데이터 삭제 후 새로 생성)
      */
-    private void updateSummaryTable(final Site site, final SiteProcess siteProcess, final String yearMonth) {
-        final List<LaborPayroll> payrolls = findPayrollsForSummary(site, siteProcess, yearMonth);
-        final var existingSummary = findExistingSummary(site, siteProcess, yearMonth);
+    private void regenerateSummaryTable(final Site site, final SiteProcess siteProcess, final String yearMonth) {
+        // 1. 기존 집계 데이터 삭제
+        removeExistingSummary(site, siteProcess, yearMonth);
 
+        // 2. 해당 월 노무비 명세서 조회
+        final List<LaborPayroll> payrolls = findPayrollsForSummary(site, siteProcess, yearMonth);
+
+        // 3. 노무비 명세서가 없으면 생성하지 않음
         if (payrolls.isEmpty()) {
-            deleteSummaryIfExists(existingSummary, site, siteProcess, yearMonth);
+            log.info("노무비 명세서가 없어 집계 테이블 생성 건너뜀: 현장={}, 공정={}, 년월={}",
+                    site.getName(), siteProcess.getName(), yearMonth);
             return;
         }
 
+        // 4. 집계 데이터 계산 및 새로 생성
         final var calculatedData = calculateSummaryData(payrolls);
-        final LaborPayrollSummary summary = createOrUpdateSummary(existingSummary, site, siteProcess, yearMonth,
-                calculatedData);
+        final LaborPayrollSummary summary = createNewSummary(site, siteProcess, yearMonth, calculatedData);
         laborPayrollSummaryRepository.save(summary);
+    }
+
+    /**
+     * 기존 집계 데이터 삭제
+     */
+    private void removeExistingSummary(final Site site, final SiteProcess siteProcess, final String yearMonth) {
+        final Optional<LaborPayrollSummary> existingSummary = findExistingSummary(site, siteProcess, yearMonth);
+        if (existingSummary.isPresent()) {
+            laborPayrollSummaryRepository.delete(existingSummary.get());
+            log.info("기존 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
+                    site.getName(), siteProcess.getName(), yearMonth);
+        }
     }
 
     /**
@@ -272,51 +289,6 @@ public class LaborPayrollSyncService {
     private Optional<LaborPayrollSummary> findExistingSummary(final Site site, final SiteProcess siteProcess,
             final String yearMonth) {
         return laborPayrollSummaryRepository.findBySiteAndSiteProcessAndYearMonth(site, siteProcess, yearMonth);
-    }
-
-    /**
-     * 집계 데이터가 없을 때 기존 데이터 삭제
-     */
-    private void deleteSummaryIfExists(final Optional<LaborPayrollSummary> existingSummary, final Site site,
-            final SiteProcess siteProcess, final String yearMonth) {
-        if (existingSummary.isPresent()) {
-            laborPayrollSummaryRepository.delete(existingSummary.get());
-            log.info("노무비 명세서가 없어 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
-                    site.getName(), siteProcess.getName(), yearMonth);
-        }
-    }
-
-    /**
-     * 집계 데이터 생성 또는 업데이트
-     */
-    private LaborPayrollSummary createOrUpdateSummary(final Optional<LaborPayrollSummary> existingSummary,
-            final Site site,
-            final SiteProcess siteProcess,
-            final String yearMonth, final SummaryData calculatedData) {
-        if (existingSummary.isPresent()) {
-            return updateExistingSummary(existingSummary.get(), calculatedData, site, siteProcess, yearMonth);
-        } else {
-            return createNewSummary(site, siteProcess, yearMonth, calculatedData);
-        }
-    }
-
-    /**
-     * 기존 집계 데이터 업데이트
-     */
-    private LaborPayrollSummary updateExistingSummary(final LaborPayrollSummary summary,
-            final SummaryData calculatedData,
-            final Site site, final SiteProcess siteProcess, final String yearMonth) {
-        summary.updateSummary(
-                calculatedData.regularEmployeeCount(),
-                calculatedData.directContractCount(),
-                calculatedData.etcCount(),
-                calculatedData.totalLaborCost(),
-                calculatedData.totalDeductions(),
-                calculatedData.totalNetPayment(),
-                null);
-        log.info("집계 테이블 업데이트: 현장={}, 공정={}, 년월={}",
-                site.getName(), siteProcess.getName(), yearMonth);
-        return summary;
     }
 
     /**
