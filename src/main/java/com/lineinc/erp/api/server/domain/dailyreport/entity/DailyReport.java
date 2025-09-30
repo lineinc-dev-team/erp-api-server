@@ -99,6 +99,10 @@ public class DailyReport extends BaseEntity {
     @Builder.Default
     private List<DailyReportEvidenceFile> evidenceFiles = new ArrayList<>(); // 증빙 파일 목록
 
+    @Setter
+    @Column(columnDefinition = "TEXT")
+    private String memo; // 비고
+
     /**
      * 출역일보를 수동 마감 처리합니다.
      */

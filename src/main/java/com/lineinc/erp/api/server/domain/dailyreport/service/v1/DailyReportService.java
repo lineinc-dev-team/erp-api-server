@@ -122,6 +122,7 @@ public class DailyReportService {
                 .siteProcess(siteProcess)
                 .reportDate(reportDate)
                 .weather(request.weather())
+                .memo(request.memo())
                 .build();
 
         // 직원 출역 정보 추가
@@ -361,6 +362,9 @@ public class DailyReportService {
         // 현재는 날씨 데이터만 수정
         if (request.weather() != null) {
             dailyReport.setWeather(request.weather());
+        }
+        if (request.memo() != null) {
+            dailyReport.setMemo(request.memo());
         }
 
         // EntitySyncUtils.syncList를 사용하여 증빙 파일 동기화

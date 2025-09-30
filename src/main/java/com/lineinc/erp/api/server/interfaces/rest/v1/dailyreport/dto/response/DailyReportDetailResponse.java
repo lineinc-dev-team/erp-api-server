@@ -1,13 +1,14 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
-import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse.SiteSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse.SiteProcessSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse.SiteSimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.OffsetDateTime;
 
 @Schema(description = "출역일보 상세 조회 응답")
 public record DailyReportDetailResponse(
@@ -18,10 +19,11 @@ public record DailyReportDetailResponse(
         @Schema(description = "날씨", example = "맑음") String weather,
         @Schema(description = "날씨 코드", example = "SUNNY") FuelAggregationWeatherType weatherCode,
         @Schema(description = "출역일보 상태", example = "PENDING") DailyReportStatus status,
+        @Schema(description = "비고", example = "특별 지시사항") String memo,
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt,
         @Schema(description = "마감일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime completedAt) {
-    public static DailyReportDetailResponse from(DailyReport dailyReport) {
+    public static DailyReportDetailResponse from(final DailyReport dailyReport) {
         return new DailyReportDetailResponse(
                 dailyReport.getId(),
                 dailyReport.getSite() != null ? SiteSimpleResponse.from(dailyReport.getSite()) : null,
@@ -31,6 +33,7 @@ public record DailyReportDetailResponse(
                 dailyReport.getWeather() != null ? dailyReport.getWeather().getLabel() : null,
                 dailyReport.getWeather(),
                 dailyReport.getStatus(),
+                dailyReport.getMemo(),
                 dailyReport.getCreatedAt(),
                 dailyReport.getUpdatedAt(),
                 dailyReport.getCompletedAt());
