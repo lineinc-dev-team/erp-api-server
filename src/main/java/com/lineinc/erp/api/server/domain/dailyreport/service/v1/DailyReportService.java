@@ -328,6 +328,9 @@ public class DailyReportService {
 
         final DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
 
+        savedDailyReport.updateAllAggregatedData();
+        dailyReportRepository.save(savedDailyReport);
+
         // 노무비 명세서 동기화
         laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
     }
@@ -403,6 +406,9 @@ public class DailyReportService {
             }
         }
 
+        dailyReportRepository.save(dailyReport);
+
+        dailyReport.updateAllAggregatedData();
         dailyReportRepository.save(dailyReport);
     }
 
@@ -723,6 +729,9 @@ public class DailyReportService {
 
         final DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
 
+        savedDailyReport.updateAllAggregatedData();
+        dailyReportRepository.save(savedDailyReport);
+
         // 노무비 명세서 동기화
         laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
     }
@@ -824,6 +833,9 @@ public class DailyReportService {
 
         final DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
 
+        savedDailyReport.updateAllAggregatedData();
+        dailyReportRepository.save(savedDailyReport);
+
         // 노무비 명세서 동기화
         laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
     }
@@ -890,6 +902,8 @@ public class DailyReportService {
             }
         }
 
+        dailyReportRepository.save(dailyReport);
+        dailyReport.updateAllAggregatedData();
         dailyReportRepository.save(dailyReport);
     }
 
@@ -971,6 +985,8 @@ public class DailyReportService {
         }
 
         dailyReportRepository.save(dailyReport);
+        dailyReport.updateAllAggregatedData();
+        dailyReportRepository.save(dailyReport);
     }
 
     @Transactional
@@ -1016,6 +1032,8 @@ public class DailyReportService {
             }
         }
 
+        dailyReportRepository.save(dailyReport);
+        dailyReport.updateAllAggregatedData();
         dailyReportRepository.save(dailyReport);
     }
 

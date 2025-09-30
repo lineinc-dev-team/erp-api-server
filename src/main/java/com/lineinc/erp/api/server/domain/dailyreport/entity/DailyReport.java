@@ -219,7 +219,8 @@ public class DailyReport extends BaseEntity {
      * 현장 사진 여부 업데이트
      */
     public void updateSitePhotoSubmitted() {
-        this.sitePhotoSubmitted = !files.isEmpty();
+        this.sitePhotoSubmitted = files.stream()
+                .anyMatch(file -> !file.isDeleted());
     }
 
     /**
