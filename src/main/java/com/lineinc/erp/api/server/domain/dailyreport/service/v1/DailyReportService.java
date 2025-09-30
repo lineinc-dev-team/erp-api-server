@@ -23,6 +23,7 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
@@ -69,6 +70,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEvidenceFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
@@ -608,6 +610,29 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return fileSlice;
+    }
+
+    /**
+     * 출역일보 증빙 파일 정보를 슬라이스로 조회합니다.
+     * 
+     * @param id       출역일보 아이디
+     * @param fileType 증빙 파일 타입
+     * @param pageable 페이징 정보
+     * @return 출역일보 증빙 파일 정보 슬라이스
+     */
+    public Slice<DailyReportEvidenceFileResponse> searchDailyReportEvidenceFiles(final Long id,
+            final DailyReportEvidenceFileType fileType,
+            final Pageable pageable) {
+        final DailyReport dailyReport = dailyReportRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        final List<DailyReportEvidenceFileResponse> evidenceFiles = dailyReport.getEvidenceFiles().stream()
+                .filter(file -> fileType == null || file.getFileType() == fileType)
+                .map(DailyReportEvidenceFileResponse::from)
+                .toList();
+
+        return new SliceImpl<>(evidenceFiles, pageable, false);
     }
 
     @Transactional

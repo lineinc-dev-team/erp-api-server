@@ -22,7 +22,6 @@ public record DailyReportEquipmentUpdateRequest(
             @Schema(description = "작업시간", example = "1.0") @NotNull Double workHours,
             @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
             @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
-            @Schema(description = "비고", example = "정상 작동") String memo,
-            @Schema(description = "파일 목록") @Valid List<DailyReportDocumentUpdateRequest> files) {
+            @Schema(description = "비고", example = "정상 작동") String memo) {
     }
 }

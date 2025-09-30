@@ -25,7 +25,6 @@ public record DailyReportDirectContractUpdateRequest(
             @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
             @Schema(description = "비고", example = "오전 작업") String memo,
             @Schema(description = "임시 인력 여부", example = "false") @NotNull Boolean isTemporary,
-            @Schema(description = "임시 인력 이름", example = "김철수") String temporaryLaborName,
-            @Schema(description = "파일 목록") @Valid List<DailyReportDocumentUpdateRequest> files) {
+            @Schema(description = "임시 인력 이름", example = "김철수") String temporaryLaborName) {
     }
 }
