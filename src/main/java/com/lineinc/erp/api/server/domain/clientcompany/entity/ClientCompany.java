@@ -85,6 +85,10 @@ public class ClientCompany extends BaseEntity {
 
     @Column
     @DiffInclude
+    private String faxNumber;
+
+    @Column
+    @DiffInclude
     private String phoneNumber;
 
     @Column
@@ -167,6 +171,7 @@ public class ClientCompany extends BaseEntity {
         this.paymentPeriod = request.paymentPeriod();
         this.detailAddress = request.detailAddress();
         this.landlineNumber = request.landlineNumber();
+        this.faxNumber = request.faxNumber();
         this.businessNumber = request.businessNumber();
         this.homepageUrl = request.homepageUrl();
         this.homepageLoginId = request.homepageLoginId();
@@ -182,6 +187,7 @@ public class ClientCompany extends BaseEntity {
                 .address(request.address())
                 .detailAddress(request.detailAddress())
                 .landlineNumber(request.landlineNumber())
+                .faxNumber(request.faxNumber())
                 .phoneNumber(request.phoneNumber())
                 .email(request.email())
                 .user(user)

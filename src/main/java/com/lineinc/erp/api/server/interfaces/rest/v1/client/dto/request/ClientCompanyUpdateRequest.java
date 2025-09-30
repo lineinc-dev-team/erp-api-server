@@ -18,6 +18,7 @@ public record ClientCompanyUpdateRequest(
         @Schema(description = "주소", example = "서울시 강남구") @NotBlank String address,
         @Schema(description = "상세 주소", example = "강남대로 123, 3층") String detailAddress,
         @Schema(description = "전화번호", example = "02-123-5678") @NotBlank String landlineNumber,
+        @Schema(description = "팩스번호", example = "02-123-5679") String faxNumber,
         @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
         @Schema(description = "이메일", example = "example@samsung.com") @NotBlank @Email String email,
         @Schema(description = "결제 방식", example = "CASH") ClientCompanyPaymentMethod paymentMethod,
