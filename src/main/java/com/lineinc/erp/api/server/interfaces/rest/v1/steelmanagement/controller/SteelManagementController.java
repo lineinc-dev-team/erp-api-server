@@ -25,6 +25,7 @@ import com.lineinc.erp.api.server.domain.steelmanagement.service.v1.SteelManagem
 import com.lineinc.erp.api.server.domain.steelmanagement.service.v1.SteelManagementService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ApproveSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.DeleteSteelManagementRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.request.ReleaseSteelManagementRequest;
@@ -50,9 +51,6 @@ import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -62,15 +60,11 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/steel-managements")
 @RequiredArgsConstructor
 @Tag(name = "강재수불부 관리", description = "강재수불부 관리 API")
-public class SteelManagementController {
+public class SteelManagementController extends BaseController {
     private final SteelManagementService steelManagementService;
     private final SteelManagementChangeHistoryService steelManagementChangeHistoryService;
 
     @Operation(summary = "강재수불부 등록", description = "강재수불부 정보를 등록합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "성공", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.CREATE)
     public ResponseEntity<SuccessResponse<Long>> createSteelManagement(
@@ -81,11 +75,6 @@ public class SteelManagementController {
     }
 
     @Operation(summary = "강재 관리 수정", description = "강재 관리 정보를 수정합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "강재 관리를 찾을 수 없음")
-    })
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateSteelManagement(
@@ -97,9 +86,6 @@ public class SteelManagementController {
     }
 
     @Operation(summary = "강재수불부 목록 조회", description = "등록된 강재수불부 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류") })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementResponse>>> getSteelManagementList(
@@ -125,9 +111,6 @@ public class SteelManagementController {
     }
 
     @Operation(summary = "강재수불부 상세 품명 키워드 검색", description = "상세 품명으로 간단한 검색을 수행합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
     @GetMapping("/detail-names/search")
     public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementNameResponse>>> getSteelManagementDetailNames(
             @Valid final PageRequest pageRequest,
@@ -143,11 +126,6 @@ public class SteelManagementController {
     }
 
     @Operation(summary = "강재수불부 삭제", description = "하나 이상의 강재수불부 ID를 받아 해당 데이터를 삭제합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음")
-    })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteSteelManagements(
@@ -157,40 +135,26 @@ public class SteelManagementController {
     }
 
     @Operation(summary = "강재수불부 승인 처리", description = "하나 이상의 강재수불부 ID를 받아 구분값을 승인으로 변경합니다.")
-
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "승인 처리 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음")
-    })
     @PatchMapping("/approve")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.APPROVE)
     public ResponseEntity<Void> approveSteelManagement(
-            @Valid @RequestBody final ApproveSteelManagementRequest request) {
-        steelManagementService.approveSteelManagements(request);
+            @Valid @RequestBody final ApproveSteelManagementRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        steelManagementService.approveSteelManagements(request, user);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "강재수불부 반출 처리", description = "하나 이상의 강재수불부 ID를 받아 구분값을 반출로 변경합니다.")
-
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "반출 처리 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음")
-    })
     @PatchMapping("/release")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<Void> releaseSteelManagements(
-            @Valid @RequestBody final ReleaseSteelManagementRequest request) {
-        steelManagementService.releaseSteelManagements(request);
+            @Valid @RequestBody final ReleaseSteelManagementRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        steelManagementService.releaseSteelManagements(request, user);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "강재수불부 엑셀 다운로드", description = "검색 조건에 맞는 강재수불부 목록을 엑셀 파일로 다운로드합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류")
-    })
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public void downloadSteelManagementsExcel(
@@ -212,10 +176,6 @@ public class SteelManagementController {
     }
 
     @Operation(summary = "강재수불부 상세 조회", description = "강재수불부 상세 정보를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SteelManagementDetailViewResponse>> getSteelManagementDetail(
@@ -226,10 +186,6 @@ public class SteelManagementController {
     }
 
     @Operation(summary = "강재수불부 수정이력 조회", description = "강재수불부의 수정이력을 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "강재수불부를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistories(

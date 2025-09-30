@@ -146,7 +146,7 @@ public class SteelManagementService {
     }
 
     @Transactional
-    public void approveSteelManagements(final ApproveSteelManagementRequest request) {
+    public void approveSteelManagements(final ApproveSteelManagementRequest request, final CustomUserDetails user) {
         final List<SteelManagement> steelManagements = steelManagementRepository
                 .findAllById(request.steelManagementIds());
         if (steelManagements.isEmpty()) {
@@ -158,6 +158,13 @@ public class SteelManagementService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ValidationMessages.CANNOT_APPROVE_RELEASED_STEEL);
             }
+
+            final SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
+                    .steelManagement(steelManagement)
+                    .description(ValidationMessages.APPROVAL_CREATION)
+                    .user(userService.getUserByIdOrThrow(user.getUserId()))
+                    .build();
+            steelManagementChangeHistoryRepository.save(changeHistory);
             steelManagement.changeType(SteelManagementType.APPROVAL);
         }
 
@@ -165,7 +172,7 @@ public class SteelManagementService {
     }
 
     @Transactional
-    public void releaseSteelManagements(final ReleaseSteelManagementRequest request) {
+    public void releaseSteelManagements(final ReleaseSteelManagementRequest request, final CustomUserDetails user) {
         final List<SteelManagement> steelManagements = steelManagementRepository
                 .findAllById(request.steelManagementIds());
         if (steelManagements.isEmpty()) {
@@ -177,6 +184,12 @@ public class SteelManagementService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ValidationMessages.CANNOT_RELEASE_NON_APPROVED_STEEL);
             }
+            final SteelManagementChangeHistory changeHistory = SteelManagementChangeHistory.builder()
+                    .steelManagement(steelManagement)
+                    .description(ValidationMessages.RELEASE_CREATION)
+                    .user(userService.getUserByIdOrThrow(user.getUserId()))
+                    .build();
+            steelManagementChangeHistoryRepository.save(changeHistory);
             steelManagement.changeType(SteelManagementType.RELEASE);
         }
 
