@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.annotations.SQLRestriction;
@@ -11,7 +9,6 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,11 +17,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -71,10 +66,6 @@ public class DailyReportOutsourcing extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
-
-    @OneToMany(mappedBy = "dailyReportOutsourcing", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<DailyReportOutsourcingFile> files = new ArrayList<>();
 
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.

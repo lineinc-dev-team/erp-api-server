@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
@@ -17,7 +16,6 @@ public record DailyReportEmployeeResponse(
         @Schema(description = "인력 정보") LaborNameResponse labor,
         @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
         @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
-        @Schema(description = "사진 목록") List<DailyReportDocumentResponse> files,
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
 
@@ -30,9 +28,6 @@ public record DailyReportEmployeeResponse(
                 employee.getLabor() != null ? LaborNameResponse.from(employee.getLabor()) : null,
                 employee.getFileUrl(),
                 employee.getOriginalFileName(),
-                employee.getFiles() != null ? employee.getFiles().stream()
-                        .map(DailyReportDocumentResponse::from)
-                        .toList() : List.of(),
                 employee.getCreatedAt(),
                 employee.getUpdatedAt());
     }
