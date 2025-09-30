@@ -125,6 +125,23 @@ public class DailyReportService {
                 .memo(request.memo())
                 .build();
 
+        // 증빙 파일 추가
+        if (request.evidenceFiles() != null) {
+            for (final var evidenceFileRequest : request.evidenceFiles()) {
+                for (final var evidenceFileInfo : evidenceFileRequest.files()) {
+                    final DailyReportEvidenceFile evidenceFile = DailyReportEvidenceFile.builder()
+                            .dailyReport(dailyReport)
+                            .fileType(evidenceFileRequest.fileType())
+                            .name(evidenceFileInfo.name())
+                            .fileUrl(evidenceFileInfo.fileUrl())
+                            .originalFileName(evidenceFileInfo.originalFileName())
+                            .memo(evidenceFileInfo.memo())
+                            .build();
+                    dailyReport.getEvidenceFiles().add(evidenceFile);
+                }
+            }
+        }
+
         // 직원 출역 정보 추가
         if (request.employees() != null) {
             // 중복 laborId 체크
