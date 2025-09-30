@@ -21,6 +21,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
@@ -31,10 +32,12 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEvidenceFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -52,6 +55,22 @@ import lombok.RequiredArgsConstructor;
 public class DailyReportController extends BaseController {
 
     private final DailyReportService dailyReportService;
+
+    @Operation(summary = "출역일보 목록 조회", description = "출역일보 목록을 조회합니다. 모든 필터는 선택사항입니다.")
+    @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<DailyReportListResponse>>> searchDailyReports(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportListSearchRequest searchRequest) {
+        final org.springframework.data.domain.Page<DailyReportListResponse> page = dailyReportService
+                .searchDailyReports(
+                        searchRequest,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                                sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(PagingResponse.from(page)));
+    }
 
     @Operation(summary = "출역일보 등록", description = "새로운 출역일보를 등록합니다.")
     @PostMapping

@@ -1,9 +1,11 @@
 package com.lineinc.erp.api.server.domain.dailyreport.repository;
 
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
 
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,15 +13,12 @@ import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface DailyReportRepository extends JpaRepository<DailyReport, Long> {
+public interface DailyReportRepository extends JpaRepository<DailyReport, Long>, DailyReportRepositoryCustom {
 
     /**
      * 현장, 공정, 일자, 날씨(선택사항)로 출역일보를 슬라이스로 조회합니다.
@@ -32,10 +31,11 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      * @param pageable    페이징 정보
      * @return 출역일보 슬라이스
      */
-    @Query("SELECT dr FROM DailyReport dr WHERE dr.site = :site AND dr.siteProcess = :siteProcess " +
-            "AND dr.reportDate = :reportDate " +
-            "AND (:weather IS NULL OR dr.weather = :weather) " +
-            "AND dr.deleted = false")
+    @Query("""
+            SELECT dr FROM DailyReport dr WHERE dr.site = :site AND dr.siteProcess = :siteProcess \
+            AND dr.reportDate = :reportDate \
+            AND (:weather IS NULL OR dr.weather = :weather) \
+            AND dr.deleted = false""")
     Slice<DailyReport> findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
             @Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
@@ -47,13 +47,14 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      * 특정 인력의 특정 기간 출역일보를 조회합니다.
      * 직영/계약직 인력만 고려합니다.
      */
-    @Query("SELECT DISTINCT dr FROM DailyReport dr " +
-            "LEFT JOIN dr.employees e " +
-            "LEFT JOIN dr.directContracts dc " +
-            "WHERE (e.labor.id = :laborId OR dc.labor.id = :laborId) " +
-            "AND dr.reportDate >= :startDate AND dr.reportDate <= :endDate " +
-            "AND dr.deleted = false AND (e.deleted = false OR e IS NULL) " +
-            "AND (dc.deleted = false OR dc IS NULL)")
+    @Query("""
+            SELECT DISTINCT dr FROM DailyReport dr \
+            LEFT JOIN dr.employees e \
+            LEFT JOIN dr.directContracts dc \
+            WHERE (e.labor.id = :laborId OR dc.labor.id = :laborId) \
+            AND dr.reportDate >= :startDate AND dr.reportDate <= :endDate \
+            AND dr.deleted = false AND (e.deleted = false OR e IS NULL) \
+            AND (dc.deleted = false OR dc IS NULL)""")
     List<DailyReport> findByLaborIdAndDateRange(@Param("laborId") Long laborId,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
@@ -61,11 +62,12 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     /**
      * 같은 날짜, 현장, 공정에 대한 출역일보 존재 여부를 확인합니다.
      */
-    @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
-            "WHERE dr.site.id = :siteId " +
-            "AND dr.siteProcess.id = :siteProcessId " +
-            "AND dr.reportDate = :reportDate " +
-            "AND dr.deleted = false")
+    @Query("""
+            SELECT COUNT(dr) > 0 FROM DailyReport dr \
+            WHERE dr.site.id = :siteId \
+            AND dr.siteProcess.id = :siteProcessId \
+            AND dr.reportDate = :reportDate \
+            AND dr.deleted = false""")
     boolean existsBySiteAndSiteProcessAndReportDate(@Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
             @Param("reportDate") OffsetDateTime reportDate);
@@ -73,11 +75,12 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     /**
      * 같은 날짜, 현장, 공정에 대한 출역일보를 조회합니다.
      */
-    @Query("SELECT dr FROM DailyReport dr " +
-            "WHERE dr.site = :site " +
-            "AND dr.siteProcess = :siteProcess " +
-            "AND dr.reportDate = :reportDate " +
-            "AND dr.deleted = false")
+    @Query("""
+            SELECT dr FROM DailyReport dr \
+            WHERE dr.site = :site \
+            AND dr.siteProcess = :siteProcess \
+            AND dr.reportDate = :reportDate \
+            AND dr.deleted = false""")
     Optional<DailyReport> findBySiteAndSiteProcessAndReportDate(@Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("reportDate") OffsetDateTime reportDate);
@@ -86,23 +89,25 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      * 특정 인력의 지정된 날짜 이후 출근 기록이 있는지 확인합니다.
      * 계약직 인력만 대상으로 합니다.
      */
-    @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
-            "LEFT JOIN dr.directContracts dc " +
-            "WHERE dc.labor.id = :laborId " +
-            "AND dr.reportDate >= :startDate " +
-            "AND dr.deleted = false AND dc.deleted = false")
+    @Query("""
+            SELECT COUNT(dr) > 0 FROM DailyReport dr \
+            LEFT JOIN dr.directContracts dc \
+            WHERE dc.labor.id = :laborId \
+            AND dr.reportDate >= :startDate \
+            AND dr.deleted = false AND dc.deleted = false""")
     boolean hasWorkRecordSince(@Param("laborId") Long laborId, @Param("startDate") OffsetDateTime startDate);
 
     /**
      * 특정 인력의 지난달 근로시간(공수)을 계산합니다.
      * 계약직 인력만 대상으로 합니다.
      */
-    @Query("SELECT COALESCE(SUM(dc.workQuantity), 0) " +
-            "FROM DailyReport dr " +
-            "LEFT JOIN dr.directContracts dc " +
-            "WHERE dc.labor.id = :laborId " +
-            "AND dr.reportDate >= :startDate AND dr.reportDate < :endDate " +
-            "AND dr.deleted = false AND dc.deleted = false")
+    @Query("""
+            SELECT COALESCE(SUM(dc.workQuantity), 0) \
+            FROM DailyReport dr \
+            LEFT JOIN dr.directContracts dc \
+            WHERE dc.labor.id = :laborId \
+            AND dr.reportDate >= :startDate AND dr.reportDate < :endDate \
+            AND dr.deleted = false AND dc.deleted = false""")
     Double calculateLastMonthWorkHours(@Param("laborId") Long laborId,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
@@ -111,11 +116,12 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      * 특정 날짜 범위와 상태로 출역일보를 조회합니다.
      * 자동 마감 배치에서 사용됩니다.
      */
-    @Query("SELECT dr FROM DailyReport dr " +
-            "WHERE dr.reportDate >= :startDate " +
-            "AND dr.reportDate <= :endDate " +
-            "AND dr.status = :status " +
-            "AND dr.deleted = false")
+    @Query("""
+            SELECT dr FROM DailyReport dr \
+            WHERE dr.reportDate >= :startDate \
+            AND dr.reportDate <= :endDate \
+            AND dr.status = :status \
+            AND dr.deleted = false""")
     List<DailyReport> findByReportDateBetweenAndStatus(@Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate,
             @Param("status") DailyReportStatus status);
@@ -124,10 +130,11 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      * 특정 날짜 이전의 특정 상태 출역일보를 조회합니다.
      * 자동 마감 배치에서 사용됩니다.
      */
-    @Query("SELECT dr FROM DailyReport dr " +
-            "WHERE dr.reportDate < :beforeDate " +
-            "AND dr.status = :status " +
-            "AND dr.deleted = false")
+    @Query("""
+            SELECT dr FROM DailyReport dr \
+            WHERE dr.reportDate < :beforeDate \
+            AND dr.status = :status \
+            AND dr.deleted = false""")
     List<DailyReport> findByReportDateBeforeAndStatus(@Param("beforeDate") OffsetDateTime beforeDate,
             @Param("status") DailyReportStatus status);
 
@@ -135,13 +142,14 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
      * 특정 현장, 공정, 날짜 범위로 출역일보를 조회합니다.
      * 노무비 명세서 동기화에서 사용됩니다.
      */
-    @Query("SELECT dr FROM DailyReport dr " +
-            "WHERE dr.site = :site " +
-            "AND dr.siteProcess = :siteProcess " +
-            "AND dr.reportDate >= :startDate " +
-            "AND dr.reportDate <= :endDate " +
-            "AND dr.deleted = false " +
-            "ORDER BY dr.reportDate ASC")
+    @Query("""
+            SELECT dr FROM DailyReport dr \
+            WHERE dr.site = :site \
+            AND dr.siteProcess = :siteProcess \
+            AND dr.reportDate >= :startDate \
+            AND dr.reportDate <= :endDate \
+            AND dr.deleted = false \
+            ORDER BY dr.reportDate ASC""")
     List<DailyReport> findBySiteAndSiteProcessAndReportDateBetween(@Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("startDate") OffsetDateTime startDate,
@@ -150,11 +158,12 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     /**
      * 같은 날짜에 특정 직원이 이미 출근했는지 확인합니다. (모든 현장/공정 포함)
      */
-    @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
-            "JOIN dr.employees e " +
-            "WHERE dr.reportDate = :reportDate " +
-            "AND e.labor.id = :laborId " +
-            "AND dr.deleted = false AND e.deleted = false")
+    @Query("""
+            SELECT COUNT(dr) > 0 FROM DailyReport dr \
+            JOIN dr.employees e \
+            WHERE dr.reportDate = :reportDate \
+            AND e.labor.id = :laborId \
+            AND dr.deleted = false AND e.deleted = false""")
     boolean existsByReportDateAndEmployeesLaborId(
             @Param("reportDate") OffsetDateTime reportDate,
             @Param("laborId") Long laborId);
@@ -162,12 +171,14 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     /**
      * 같은 날짜에 특정 직영/계약직 인력이 이미 출근했는지 확인합니다. (모든 현장/공정 포함)
      */
-    @Query("SELECT COUNT(dr) > 0 FROM DailyReport dr " +
-            "JOIN dr.directContracts dc " +
-            "WHERE dr.reportDate = :reportDate " +
-            "AND dc.labor.id = :laborId " +
-            "AND dr.deleted = false AND dc.deleted = false")
+    @Query("""
+            SELECT COUNT(dr) > 0 FROM DailyReport dr \
+            JOIN dr.directContracts dc \
+            WHERE dr.reportDate = :reportDate \
+            AND dc.labor.id = :laborId \
+            AND dr.deleted = false AND dc.deleted = false""")
     boolean existsByReportDateAndDirectContractsLaborId(
             @Param("reportDate") OffsetDateTime reportDate,
             @Param("laborId") Long laborId);
+
 }
