@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEvidenceFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
@@ -56,6 +57,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEvidenceFileUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
@@ -359,6 +361,25 @@ public class DailyReportService {
             dailyReport.setWeather(request.weather());
         }
 
+        // EntitySyncUtils.syncList를 사용하여 증빙 파일 동기화
+        if (request.evidenceFiles() != null) {
+            for (final DailyReportEvidenceFileUpdateRequest evidenceFileRequest : request.evidenceFiles()) {
+                EntitySyncUtils.syncList(
+                        dailyReport.getEvidenceFiles(),
+                        evidenceFileRequest.files(),
+                        (final DailyReportEvidenceFileUpdateRequest.FileUpdateInfo dto) -> {
+                            return DailyReportEvidenceFile.builder()
+                                    .dailyReport(dailyReport)
+                                    .fileType(evidenceFileRequest.fileType())
+                                    .name(dto.name())
+                                    .fileUrl(dto.fileUrl())
+                                    .originalFileName(dto.originalFileName())
+                                    .memo(dto.memo())
+                                    .build();
+                        });
+            }
+        }
+
         dailyReportRepository.save(dailyReport);
     }
 
@@ -628,9 +649,6 @@ public class DailyReportService {
                 dailyReport.getEmployees(),
                 request.employees(),
                 (final DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo dto) -> {
-                    System.out.println("dto = " + dto);
-                    System.out.println("dto.fileUrl() = " + dto.fileUrl());
-                    System.out.println("dto.originalFileName() = " + dto.originalFileName());
                     return DailyReportEmployee.builder()
                             .dailyReport(dailyReport)
                             .labor(laborService.getLaborByIdOrThrow(dto.laborId()))

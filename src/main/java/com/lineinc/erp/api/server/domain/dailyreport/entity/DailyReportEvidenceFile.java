@@ -6,6 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEvidenceFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -82,4 +83,11 @@ public class DailyReportEvidenceFile extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     @DiffInclude
     private String memo;
+
+    public void updateFrom(final DailyReportEvidenceFileUpdateRequest.FileUpdateInfo request) {
+        this.name = request.name();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.memo = request.memo();
+    }
 }
