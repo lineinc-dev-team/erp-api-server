@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
  * 강재수불부 V2 엔티티
  */
 @Entity
-@Table(indexes = {
+@Table(name = "steel_management_v2", indexes = {
         @Index(columnList = "created_at"),
         @Index(columnList = "updated_at"),
 })

@@ -5,15 +5,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
-import com.lineinc.erp.api.server.domain.steelmanagement.service.v2.SteelManagementV2Service;
+import com.lineinc.erp.api.server.domain.steelmanagementv2.service.SteelManagementV2Service;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
-import com.lineinc.erp.api.server.interfaces.rest.v1.steelmanagement.dto.response.SteelManagementChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2CreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -33,15 +36,25 @@ import lombok.RequiredArgsConstructor;
 public class SteelManagementV2Controller extends BaseController {
     private final SteelManagementV2Service steelManagementV2Service;
 
+    @Operation(summary = "강재수불부 등록")
+    @PostMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.CREATE)
+    public ResponseEntity<Void> createSteelManagementV2(
+            @Valid @RequestBody final SteelManagementV2CreateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        steelManagementV2Service.createSteelManagementV2(request, user);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "강재수불부 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementChangeHistoryResponse>>> getSteelManagementChangeHistories(
+    public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementChangeHistoryV2Response>>> getSteelManagementChangeHistories(
             @PathVariable final Long id,
             @AuthenticationPrincipal final CustomUserDetails loginUser,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-        final Page<SteelManagementChangeHistoryResponse> page = steelManagementV2Service
+        final Page<SteelManagementChangeHistoryV2Response> page = steelManagementV2Service
                 .getSteelManagementChangeHistoriesWithPaging(
                         id, loginUser, PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));

@@ -32,7 +32,7 @@ import lombok.experimental.SuperBuilder;
  * 강재수불부 V2 상세 엔티티
  */
 @Entity
-@Table(indexes = {
+@Table(name = "steel_management_detail_v2", indexes = {
         @Index(columnList = "name"), // 품명 검색 최적화
         @Index(columnList = "type"), // 타입별 조회 최적화
 })
