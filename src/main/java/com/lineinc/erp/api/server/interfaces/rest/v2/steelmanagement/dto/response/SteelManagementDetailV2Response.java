@@ -24,9 +24,9 @@ public record SteelManagementDetailV2Response(
 
         @Schema(description = "총무게 (kg)", example = "56.0") Double totalWeight,
 
-        @Schema(description = "단가 (원)", example = "12000") Integer unitPrice,
+        @Schema(description = "단가 (원)", example = "12000") Long unitPrice,
 
-        @Schema(description = "금액 (원)", example = "672000") Integer amount,
+        @Schema(description = "금액 (원)", example = "672000") Long amount,
 
         @Schema(description = "구분", example = "PURCHASE") SteelManagementDetailV2Category category,
 

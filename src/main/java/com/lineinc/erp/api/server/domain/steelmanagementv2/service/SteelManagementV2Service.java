@@ -87,6 +87,10 @@ public class SteelManagementV2Service {
 
         steelManagementV2 = steelManagementV2Repository.save(steelManagementV2);
 
+        // 집계 계산
+        steelManagementV2.calculateAggregations();
+        steelManagementV2 = steelManagementV2Repository.save(steelManagementV2);
+
         // 변경 이력 생성
         final SteelManagementChangeHistoryV2 changeHistory = SteelManagementChangeHistoryV2.builder()
                 .steelManagementV2(steelManagementV2)

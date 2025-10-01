@@ -106,14 +106,14 @@ public class SteelManagementDetailV2 extends BaseEntity {
      */
     @DiffInclude
     @Column
-    private Integer unitPrice;
+    private Long unitPrice;
 
     /**
      * 금액
      */
     @DiffInclude
     @Column
-    private Integer amount;
+    private Long amount;
 
     /**
      * 구분: 자사자재, 구매, 임대
