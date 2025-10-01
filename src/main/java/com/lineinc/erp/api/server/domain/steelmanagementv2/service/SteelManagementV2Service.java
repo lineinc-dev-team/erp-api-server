@@ -156,13 +156,6 @@ public class SteelManagementV2Service {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
 
-        // 현장 및 공정 검증
-        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.processId());
-        if (!siteProcess.getSite().getId().equals(site.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
-        }
-
         // 1. 상세 항목 변경 전 스냅샷 생성
         final List<SteelManagementDetailV2> beforeDetails = steelManagementV2.getDetails().stream()
                 .filter(detail -> detail.getType() == request.type())

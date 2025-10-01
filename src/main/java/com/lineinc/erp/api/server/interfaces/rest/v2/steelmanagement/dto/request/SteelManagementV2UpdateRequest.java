@@ -9,8 +9,6 @@ import jakarta.validation.Valid;
 
 @Schema(description = "강재수불부 V2 수정 요청")
 public record SteelManagementV2UpdateRequest(
-        @Schema(description = "현장 ID", example = "1") Long siteId,
-        @Schema(description = "공정 ID", example = "10") Long processId,
         @Schema(description = "타입 (입고/출고/사장/고철)", example = "INCOMING") SteelManagementDetailV2Type type,
         @Valid @Schema(description = "강재수불부 상세 항목 목록") List<SteelManagementDetailV2UpdateRequest> details) {
 }
