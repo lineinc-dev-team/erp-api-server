@@ -136,14 +136,14 @@ public class SteelManagementDetailV2 extends BaseEntity {
     /**
      * 파일 URL
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String fileUrl;
 
     /**
      * 원본 파일명
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private String originalFileName;
 
