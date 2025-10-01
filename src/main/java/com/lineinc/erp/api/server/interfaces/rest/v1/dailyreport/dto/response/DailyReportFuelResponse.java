@@ -18,6 +18,8 @@ public record DailyReportFuelResponse(
         @Schema(description = "유종 타입 코드", example = "DIESEL") FuelInfoFuelType fuelTypeCode,
         @Schema(description = "주유량", example = "100") Long fuelAmount,
         @Schema(description = "비고", example = "오전 주유") String memo,
+        @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
+        @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
         @Schema(description = "업체 정보") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "기사 정보") ContractDriverSimpleResponse outsourcingCompanyDriver,
         @Schema(description = "장비 정보") ContractEquipmentSimpleResponse outsourcingCompanyEquipment,
@@ -32,6 +34,8 @@ public record DailyReportFuelResponse(
                 fuelInfo.getFuelType() != null ? fuelInfo.getFuelType() : null,
                 fuelInfo.getFuelAmount(),
                 fuelInfo.getMemo(),
+                fuelInfo.getFileUrl(),
+                fuelInfo.getOriginalFileName(),
                 fuelInfo.getOutsourcingCompany() != null
                         ? CompanySimpleResponse.from(fuelInfo.getOutsourcingCompany())
                         : null,
