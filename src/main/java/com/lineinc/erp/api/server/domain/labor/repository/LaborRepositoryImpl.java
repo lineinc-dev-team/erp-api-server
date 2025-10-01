@@ -111,13 +111,13 @@ public class LaborRepositoryImpl implements LaborRepositoryCustom {
             builder.and(labor.isHeadOffice.eq(request.isHeadOffice()));
         }
 
-        if (request.outsourcingCompanyId() != null) {
-            if (request.outsourcingCompanyId() == 0) {
+        if (request.outsourcingCompanyName() != null) {
+            if (request.outsourcingCompanyName() == "") {
                 // 0인 경우 본사 인력
                 builder.and(labor.isHeadOffice.eq(true));
             } else {
                 // 특정 외주업체 소속
-                builder.and(labor.outsourcingCompany.id.eq(request.outsourcingCompanyId()));
+                builder.and(labor.outsourcingCompany.name.containsIgnoreCase(request.outsourcingCompanyName().trim()));
             }
         }
 
