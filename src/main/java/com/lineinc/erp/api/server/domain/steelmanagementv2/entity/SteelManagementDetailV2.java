@@ -158,9 +158,43 @@ public class SteelManagementDetailV2 extends BaseEntity {
      * 요청 DTO로부터 엔티티 업데이트
      */
     public void updateFrom(
-            final SteelManagementDetailV2UpdateRequest request) {
-        this.fileUrl = request.fileUrl();
-        this.originalFileName = request.originalFileName();
-        this.memo = request.memo();
+            final SteelManagementDetailV2UpdateRequest request,
+            final OutsourcingCompany outsourcingCompany) {
+        if (outsourcingCompany != null) {
+            this.outsourcingCompany = outsourcingCompany;
+        }
+        if (request.name() != null) {
+            this.name = request.name();
+        }
+        if (request.specification() != null) {
+            this.specification = request.specification();
+        }
+        if (request.weight() != null) {
+            this.weight = request.weight();
+        }
+        if (request.count() != null) {
+            this.count = request.count();
+        }
+        if (request.totalWeight() != null) {
+            this.totalWeight = request.totalWeight();
+        }
+        if (request.unitPrice() != null) {
+            this.unitPrice = request.unitPrice();
+        }
+        if (request.amount() != null) {
+            this.amount = request.amount();
+        }
+        if (request.category() != null) {
+            this.category = request.category();
+        }
+        if (request.fileUrl() != null) {
+            this.fileUrl = request.fileUrl();
+        }
+        if (request.originalFileName() != null) {
+            this.originalFileName = request.originalFileName();
+        }
+        if (request.memo() != null) {
+            this.memo = request.memo();
+        }
     }
 }

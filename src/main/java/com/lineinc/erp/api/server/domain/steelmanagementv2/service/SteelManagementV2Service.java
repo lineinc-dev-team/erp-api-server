@@ -39,7 +39,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.respons
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2DetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -156,49 +155,64 @@ public class SteelManagementV2Service {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
 
-        // 1. 상세 항목 변경 전 스냅샷 생성
         final List<SteelManagementDetailV2> beforeDetails = steelManagementV2.getDetails().stream()
                 .filter(detail -> detail.getType() == request.type())
                 .map(detail -> JaversUtils.createSnapshot(javers, detail, SteelManagementDetailV2.class))
                 .toList();
 
-        // 2. 상세 항목 동기화 (타입별로 필터링)
-        final List<SteelManagementDetailV2> typeFilteredDetails = steelManagementV2.getDetails().stream()
+        // 2. 요청 ID 목록
+        final Set<Long> requestIds = request.details().stream()
+                .map(SteelManagementDetailV2UpdateRequest::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // 3. 해당 타입의 기존 항목 중 요청에 없는 것은 논리삭제 (다른 타입은 건드리지 않음!)
+        steelManagementV2.getDetails().stream()
                 .filter(detail -> detail.getType() == request.type())
-                .collect(Collectors.toList());
+                .filter(detail -> detail.getId() != null && !requestIds.contains(detail.getId()))
+                .forEach(detail -> detail.markAsDeleted());
 
-        EntitySyncUtils.syncList(
-                typeFilteredDetails,
-                request.details(),
-                (final SteelManagementDetailV2UpdateRequest dto) -> {
-                    final OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
-                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
-                            : null;
-                    return SteelManagementDetailV2.builder()
-                            .steelManagementV2(steelManagementV2)
-                            .outsourcingCompany(outsourcingCompany)
-                            .type(request.type())
-                            .name(dto.name())
-                            .specification(dto.specification())
-                            .weight(dto.weight())
-                            .count(dto.count())
-                            .totalWeight(dto.totalWeight())
-                            .unitPrice(dto.unitPrice())
-                            .amount(dto.amount())
-                            .category(dto.category())
-                            .fileUrl(dto.fileUrl())
-                            .originalFileName(dto.originalFileName())
-                            .memo(dto.memo())
-                            .build();
-                });
+        // 4. 요청 항목 처리
+        for (final SteelManagementDetailV2UpdateRequest dto : request.details()) {
+            final OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
+                    ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                    : null;
 
-        // 3. 변경 후 상태와 비교하여 변경 이력 생성
-        final List<SteelManagementDetailV2> afterDetails = steelManagementV2.getDetails().stream()
+            if (dto.id() != null) {
+                // 기존 항목 수정
+                final SteelManagementDetailV2 existingDetail = steelManagementV2.getDetails().stream()
+                        .filter(d -> d.getId() != null && d.getId().equals(dto.id()))
+                        .findFirst()
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+                existingDetail.updateFrom(dto, outsourcingCompany);
+            } else {
+                // 신규 항목 추가
+                final SteelManagementDetailV2 newDetail = SteelManagementDetailV2.builder()
+                        .steelManagementV2(steelManagementV2)
+                        .outsourcingCompany(outsourcingCompany)
+                        .type(request.type())
+                        .name(dto.name())
+                        .specification(dto.specification())
+                        .weight(dto.weight())
+                        .count(dto.count())
+                        .totalWeight(dto.totalWeight())
+                        .unitPrice(dto.unitPrice())
+                        .amount(dto.amount())
+                        .category(dto.category())
+                        .fileUrl(dto.fileUrl())
+                        .originalFileName(dto.originalFileName())
+                        .memo(dto.memo())
+                        .build();
+                steelManagementV2.getDetails().add(newDetail);
+            }
+        }
+
+        final List<SteelManagementDetailV2> afterDetails = new ArrayList<>(steelManagementV2.getDetails()).stream()
                 .filter(detail -> detail.getType() == request.type())
                 .toList();
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
-        // 추가된 상세 항목
         final Set<Long> beforeIds = beforeDetails.stream()
                 .map(SteelManagementDetailV2::getId)
                 .filter(Objects::nonNull)
@@ -210,7 +224,6 @@ public class SteelManagementV2Service {
             }
         }
 
-        // 수정된 상세 항목
         final Map<Long, SteelManagementDetailV2> afterMap = afterDetails.stream()
                 .filter(d -> d.getId() != null)
                 .collect(Collectors.toMap(SteelManagementDetailV2::getId, d -> d));
@@ -226,11 +239,6 @@ public class SteelManagementV2Service {
             allChanges.addAll(modified);
         }
 
-        // 4. 집계 재계산
-        steelManagementV2.calculateAggregations();
-        steelManagementV2Repository.save(steelManagementV2);
-
-        // 5. 변경 이력 저장 (변경사항이 있을 때만)
         if (!allChanges.isEmpty()) {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
             final SteelManagementChangeHistoryV2Type historyType = SteelManagementChangeHistoryV2Type
@@ -243,6 +251,9 @@ public class SteelManagementV2Service {
                     .build();
             changeHistoryRepository.save(changeHistory);
         }
+
+        steelManagementV2.calculateAggregations();
+        steelManagementV2Repository.save(steelManagementV2);
     }
 
     /**

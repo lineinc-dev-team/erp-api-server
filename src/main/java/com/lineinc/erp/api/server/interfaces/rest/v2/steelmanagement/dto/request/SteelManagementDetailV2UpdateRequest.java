@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record SteelManagementDetailV2UpdateRequest(
         @Schema(description = "ID (신규는 null)", example = "1") Long id,
         @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
-        @Schema(description = "품명", example = "철근") String name,
+        @Schema(description = "품명", example = "H Beam") String name,
         @Schema(description = "규격", example = "D10") String specification,
         @Schema(description = "무게 (톤)", example = "5.6") Double weight,
         @Schema(description = "본", example = "10") Integer count,

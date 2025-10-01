@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 public record SteelManagementDetailV2CreateRequest(
         @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "타입 (입고/출고/사장/고철)", example = "INCOMING", required = true) @NotNull SteelManagementDetailV2Type type,
-        @Schema(description = "품명", example = "철근") @NotNull String name,
+        @Schema(description = "품명", example = "H Beam") @NotNull String name,
         @Schema(description = "규격", example = "D10") @NotNull String specification,
         @Schema(description = "무게 (톤)", example = "5.6") @NotNull Double weight,
         @Schema(description = "본", example = "10") @NotNull Integer count,

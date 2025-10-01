@@ -100,7 +100,7 @@ public class JaversUtils {
                 return null;
             }),
             Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getName()),
-            Map.entry(SteelManagementDetailV2.class, entity -> ((SteelManagementDetailV2) entity).getName()));
+            Map.entry(SteelManagementDetailV2.class, entity -> ((SteelManagementDetailV2) entity).getSpecification()));
 
     // ================== Snapshot ==================
     public static <T> T createSnapshot(final Javers javers, final T entity, final Class<T> clazz) {
