@@ -2,8 +2,6 @@ package com.lineinc.erp.api.server.domain.menu.entity;
 
 import java.util.List;
 
-import org.hibernate.annotations.SQLRestriction;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
 
@@ -32,7 +30,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class Menu extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menu_seq")
