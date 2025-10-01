@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2CreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2UpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2DetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
@@ -73,6 +75,17 @@ public class SteelManagementV2Controller extends BaseController {
             @RequestParam(required = false) @Schema(description = "타입 필터 (입고/출고/사장/고철)", example = "INCOMING") final SteelManagementDetailV2Type type) {
         final SteelManagementV2DetailResponse response = steelManagementV2Service.getSteelManagementV2ById(id, type);
         return SuccessResponse.ok(response);
+    }
+
+    @Operation(summary = "강재수불부 수정")
+    @PatchMapping("/{id}")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateSteelManagementV2(
+            @PathVariable final Long id,
+            @Valid @RequestBody final SteelManagementV2UpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        steelManagementV2Service.updateSteelManagementV2(id, request, user);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "강재수불부 변경 이력 조회")

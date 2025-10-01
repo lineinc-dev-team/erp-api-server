@@ -44,6 +44,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementDetail;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementFile;
 import com.lineinc.erp.api.server.domain.steelmanagement.entity.SteelManagementReturnDetail;
+import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagementDetailV2;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -98,7 +99,8 @@ public class JaversUtils {
                 }
                 return null;
             }),
-            Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getName()));
+            Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getName()),
+            Map.entry(SteelManagementDetailV2.class, entity -> ((SteelManagementDetailV2) entity).getName()));
 
     // ================== Snapshot ==================
     public static <T> T createSnapshot(final Javers javers, final T entity, final Class<T> clazz) {

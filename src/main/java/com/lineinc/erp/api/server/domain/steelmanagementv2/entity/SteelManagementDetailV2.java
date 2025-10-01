@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementDetailV2UpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -70,7 +71,7 @@ public class SteelManagementDetailV2 extends BaseEntity {
     /**
      * 타입: 입고, 출고, 사장, 고청
      */
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SteelManagementDetailV2Type type;
@@ -78,56 +79,56 @@ public class SteelManagementDetailV2 extends BaseEntity {
     /**
      * 품명
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String name;
 
     /**
      * 규격
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String specification;
 
     /**
      * 무게
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private Double weight;
 
     /**
      * 본
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private Integer count;
 
     /**
      * 총무게
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private Double totalWeight;
 
     /**
      * 단가
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private Long unitPrice;
 
     /**
      * 금액
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private Long amount;
 
     /**
      * 구분: 자사자재, 구매, 임대
      */
-    @DiffInclude
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     @Column
     private SteelManagementDetailV2Category category;
@@ -142,7 +143,7 @@ public class SteelManagementDetailV2 extends BaseEntity {
     /**
      * 원본 파일명
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String originalFileName;
 
@@ -152,4 +153,14 @@ public class SteelManagementDetailV2 extends BaseEntity {
     @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo;
+
+    /**
+     * 요청 DTO로부터 엔티티 업데이트
+     */
+    public void updateFrom(
+            final SteelManagementDetailV2UpdateRequest request) {
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.memo = request.memo();
+    }
 }
