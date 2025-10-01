@@ -116,6 +116,12 @@ public class SteelManagementV2 extends BaseEntity {
     @Column
     private Long scrapAmount;
 
+    // 최종 집계
+    @Column
+    private Long totalInvestmentAmount; // 총 금액(투입비)
+    @Column
+    private Long onSiteRemainingAmount; // 현장보류수량 (금액)
+
     /**
      * 상세 항목을 기반으로 집계 값을 계산
      */
@@ -169,6 +175,25 @@ public class SteelManagementV2 extends BaseEntity {
                 SteelManagementDetailV2Type.SCRAP);
         this.scrapAmount = calculateAmountByType(
                 SteelManagementDetailV2Type.SCRAP);
+
+        // 최종 집계
+        // 입고 소계
+        final long incomingSubtotal = (this.incomingOwnMaterialAmount != null ? this.incomingOwnMaterialAmount : 0L)
+                + (this.incomingPurchaseAmount != null ? this.incomingPurchaseAmount : 0L)
+                + (this.incomingRentalAmount != null ? this.incomingRentalAmount : 0L);
+
+        // 출고 소계
+        final long outgoingSubtotal = (this.outgoingOwnMaterialAmount != null ? this.outgoingOwnMaterialAmount : 0L)
+                + (this.outgoingPurchaseAmount != null ? this.outgoingPurchaseAmount : 0L)
+                + (this.outgoingRentalAmount != null ? this.outgoingRentalAmount : 0L);
+
+        // 총 금액(투입비) = 입고 소계 + 출고 소계 - 고철
+        this.totalInvestmentAmount = incomingSubtotal + outgoingSubtotal
+                - (this.scrapAmount != null ? this.scrapAmount : 0L);
+
+        // 현장보류수량 = 입고 소계 - 출고 소계 - 고철
+        this.onSiteRemainingAmount = incomingSubtotal - outgoingSubtotal
+                - (this.scrapAmount != null ? this.scrapAmount : 0L);
     }
 
     private Double calculateTotalWeight(

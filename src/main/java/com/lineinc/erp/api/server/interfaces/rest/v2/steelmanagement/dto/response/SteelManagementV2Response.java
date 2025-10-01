@@ -37,7 +37,11 @@ public record SteelManagementV2Response(
 
         // 고철 집계
         @Schema(description = "고철 총무게", example = "100.0") Double scrapTotalWeight,
-        @Schema(description = "고철 금액", example = "500000") Long scrapAmount) {
+        @Schema(description = "고철 금액", example = "500000") Long scrapAmount,
+
+        // 최종 집계
+        @Schema(description = "총 금액(투입비)", example = "15000000") Long totalInvestmentAmount,
+        @Schema(description = "현장보류수량", example = "3000000") Long onSiteRemainingAmount) {
 
     public static SteelManagementV2Response from(final SteelManagementV2 entity) {
         return new SteelManagementV2Response(
@@ -60,6 +64,8 @@ public record SteelManagementV2Response(
                 entity.getOutgoingRentalAmount(),
                 entity.getOnSiteStockTotalWeight(),
                 entity.getScrapTotalWeight(),
-                entity.getScrapAmount());
+                entity.getScrapAmount(),
+                entity.getTotalInvestmentAmount(),
+                entity.getOnSiteRemainingAmount());
     }
 }
