@@ -1,16 +1,20 @@
 package com.lineinc.erp.api.server.domain.steelmanagementv2.service;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +43,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.respons
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2DetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -266,5 +272,109 @@ public class SteelManagementV2Service {
         final Page<SteelManagementChangeHistoryV2> historyPage = changeHistoryRepository
                 .findBySteelManagementV2IdWithPaging(id, pageable);
         return historyPage.map(history -> SteelManagementChangeHistoryV2Response.from(history, loginUser.getUserId()));
+    }
+
+    /**
+     * 강재수불부 목록 엑셀 다운로드
+     */
+    @Transactional(readOnly = true)
+    public Workbook downloadExcel(
+            final SteelManagementV2ListRequest request,
+            final Sort sort,
+            final List<String> fields) {
+        final List<SteelManagementV2Response> responses = steelManagementV2Repository.findAllWithoutPaging(request,
+                sort);
+
+        return ExcelExportUtils.generateWorkbook(
+                responses,
+                fields,
+                this::getExcelHeaderName,
+                this::getExcelCellValue);
+    }
+
+    private String getExcelHeaderName(final String field) {
+        return switch (field) {
+            case "siteName" -> "현장명";
+            case "processName" -> "공정명";
+            case "incomingOwnMaterial" -> "입고 자사(톤/금액)";
+            case "incomingPurchase" -> "입고 구매(톤/금액)";
+            case "incomingRental" -> "입고 임대(톤/금액)";
+            case "outgoingOwnMaterial" -> "출고 자사(톤/금액)";
+            case "outgoingPurchase" -> "출고 구매(톤/금액)";
+            case "outgoingRental" -> "출고 임대(톤/금액)";
+            case "onSiteStock" -> "사장(톤)";
+            case "scrap" -> "고철(톤/금액)";
+            case "totalInvestmentAmount" -> "총 금액(투입비)";
+            case "onSiteRemainingAmount" -> "현장보유수량(금액)";
+            case "createdAt" -> "등록일";
+            default -> "";
+        };
+    }
+
+    private String getExcelCellValue(final SteelManagementV2Response response, final String field) {
+        final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.KOREA);
+        return switch (field) {
+            case "siteName" -> response.site() != null ? response.site().name() : "";
+            case "processName" -> response.process() != null ? response.process().name() : "";
+            case "incomingOwnMaterial" -> formatWeightAndAmount(
+                    response.incomingOwnMaterialTotalWeight(),
+                    response.incomingOwnMaterialAmount(),
+                    numberFormat);
+            case "incomingPurchase" -> formatWeightAndAmount(
+                    response.incomingPurchaseTotalWeight(),
+                    response.incomingPurchaseAmount(),
+                    numberFormat);
+            case "incomingRental" -> formatWeightAndAmount(
+                    response.incomingRentalTotalWeight(),
+                    response.incomingRentalAmount(),
+                    numberFormat);
+            case "outgoingOwnMaterial" -> formatWeightAndAmount(
+                    response.outgoingOwnMaterialTotalWeight(),
+                    response.outgoingOwnMaterialAmount(),
+                    numberFormat);
+            case "outgoingPurchase" -> formatWeightAndAmount(
+                    response.outgoingPurchaseTotalWeight(),
+                    response.outgoingPurchaseAmount(),
+                    numberFormat);
+            case "outgoingRental" -> formatWeightAndAmount(
+                    response.outgoingRentalTotalWeight(),
+                    response.outgoingRentalAmount(),
+                    numberFormat);
+            case "onSiteStock" ->
+                response.onSiteStockTotalWeight() != null
+                        ? numberFormat.format(response.onSiteStockTotalWeight())
+                        : "";
+            case "scrap" -> formatWeightAndAmount(
+                    response.scrapTotalWeight(),
+                    response.scrapAmount(),
+                    numberFormat);
+            case "totalInvestmentAmount" ->
+                response.totalInvestmentAmount() != null
+                        ? numberFormat.format(response.totalInvestmentAmount())
+                        : "";
+            case "onSiteRemainingAmount" ->
+                response.onSiteRemainingAmount() != null
+                        ? numberFormat.format(response.onSiteRemainingAmount())
+                        : "";
+            case "createdAt" ->
+                response.createdAt() != null
+                        ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
+                        : "";
+            default -> "";
+        };
+    }
+
+    private String formatWeightAndAmount(final Double weight, final Long amount, final NumberFormat numberFormat) {
+        // 둘 다 null이거나 둘 다 0인 경우 "-"만 표시
+        final boolean weightIsEmpty = weight == null || weight == 0.0;
+        final boolean amountIsEmpty = amount == null || amount == 0L;
+
+        if (weightIsEmpty && amountIsEmpty) {
+            return null;
+        }
+
+        final String weightStr = weight != null && weight != 0.0 ? numberFormat.format(weight) : "-";
+        final String amountStr = amount != null && amount != 0L ? numberFormat.format(amount) : "-";
+        return weightStr + " / " + amountStr;
     }
 }

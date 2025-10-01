@@ -79,48 +79,102 @@ public class SteelManagementV2 extends BaseEntity {
 
     // ===== 집계 필드 =====
     // 입고 집계
+    /**
+     * 입고 자사자재 총 무게(톤)
+     */
     @Column
     private Double incomingOwnMaterialTotalWeight;
+    /**
+     * 입고 자사자재 총 금액
+     */
     @Column
     private Long incomingOwnMaterialAmount;
+    /**
+     * 입고 구매자재 총 무게(톤)
+     */
     @Column
     private Double incomingPurchaseTotalWeight;
+    /**
+     * 입고 구매자재 총 금액
+     */
     @Column
     private Long incomingPurchaseAmount;
+    /**
+     * 입고 임대자재 총 무게(톤)
+     */
     @Column
     private Double incomingRentalTotalWeight;
+    /**
+     * 입고 임대자재 총 금액
+     */
     @Column
     private Long incomingRentalAmount;
 
     // 출고 집계
+    /**
+     * 출고 자사자재 총 무게(톤)
+     */
     @Column
     private Double outgoingOwnMaterialTotalWeight;
+    /**
+     * 출고 자사자재 총 금액
+     */
     @Column
     private Long outgoingOwnMaterialAmount;
+    /**
+     * 출고 구매자재 총 무게(톤)
+     */
     @Column
     private Double outgoingPurchaseTotalWeight;
+    /**
+     * 출고 구매자재 총 금액
+     */
     @Column
     private Long outgoingPurchaseAmount;
+    /**
+     * 출고 임대자재 총 무게(톤)
+     */
     @Column
     private Double outgoingRentalTotalWeight;
+    /**
+     * 출고 임대자재 총 금액
+     */
     @Column
     private Long outgoingRentalAmount;
 
     // 사장 집계
+    /**
+     * 사장(현장 적치) 총 무게(톤)
+     * 땅에 박아놓은 강재의 무게
+     */
     @Column
     private Double onSiteStockTotalWeight;
 
     // 고철 집계
+    /**
+     * 고철 총 무게(톤)
+     */
     @Column
     private Double scrapTotalWeight;
+    /**
+     * 고철 총 금액
+     */
     @Column
     private Long scrapAmount;
 
     // 최종 집계
+    /**
+     * 총 금액(투입비)
+     * 계산식: 입고 소계 + 출고 소계 - 고철
+     */
     @Column
-    private Long totalInvestmentAmount; // 총 금액(투입비)
+    private Long totalInvestmentAmount;
+    /**
+     * 현장보류수량 (금액)
+     * 계산식: 입고 소계 - 출고 소계 - 고철
+     */
     @Column
-    private Long onSiteRemainingAmount; // 현장보류수량 (금액)
+    private Long onSiteRemainingAmount;
 
     /**
      * 상세 항목을 기반으로 집계 값을 계산

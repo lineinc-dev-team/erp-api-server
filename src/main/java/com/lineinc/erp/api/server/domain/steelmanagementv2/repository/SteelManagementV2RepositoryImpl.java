@@ -80,6 +80,29 @@ public class SteelManagementV2RepositoryImpl implements SteelManagementV2Reposit
         return new PageImpl<>(responses, pageable, total);
     }
 
+    @Override
+    public List<SteelManagementV2Response> findAllWithoutPaging(
+            final SteelManagementV2ListRequest request,
+            final org.springframework.data.domain.Sort sort) {
+
+        final BooleanBuilder builder = buildCondition(request);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        final List<SteelManagementV2> content = queryFactory
+                .selectFrom(steelManagementV2)
+                .distinct()
+                .leftJoin(steelManagementV2.site, site).fetchJoin()
+                .leftJoin(steelManagementV2.siteProcess, siteProcess).fetchJoin()
+                .leftJoin(steelManagementV2.details, detail)
+                .where(builder)
+                .orderBy(orders)
+                .fetch();
+
+        return content.stream()
+                .map(SteelManagementV2Response::from)
+                .toList();
+    }
+
     private BooleanBuilder buildCondition(final SteelManagementV2ListRequest request) {
         final BooleanBuilder builder = new BooleanBuilder();
         builder.and(steelManagementV2.deleted.isFalse());

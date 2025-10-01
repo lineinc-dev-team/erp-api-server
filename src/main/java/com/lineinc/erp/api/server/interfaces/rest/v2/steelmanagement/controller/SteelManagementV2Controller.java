@@ -1,5 +1,9 @@
 package com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.controller;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +23,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2CreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2DownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2UpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
@@ -29,11 +34,17 @@ import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
+import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -86,6 +97,29 @@ public class SteelManagementV2Controller extends BaseController {
             @AuthenticationPrincipal final CustomUserDetails user) {
         steelManagementV2Service.updateSteelManagementV2(id, request, user);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "강재수불부 목록 엑셀 다운로드", description = "검색 조건에 맞는 강재수불부 목록을 엑셀 파일로 다운로드합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public void downloadSteelManagementsExcel(
+            @Valid final SortRequest sortRequest,
+            @Valid final SteelManagementV2ListRequest request,
+            @Valid final SteelManagementV2DownloadRequest downloadRequest,
+            final HttpServletResponse response) throws IOException {
+        final List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, SteelManagementV2DownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 목록.xlsx");
+        try (Workbook workbook = steelManagementV2Service.downloadExcel(
+                request,
+                PageableUtils.parseSort(sortRequest.sort()),
+                parsed)) {
+            workbook.write(response.getOutputStream());
+        }
     }
 
     @Operation(summary = "강재수불부 변경 이력 조회")
