@@ -99,6 +99,8 @@ public class FuelAggregationService {
                     .equipment(equipment)
                     .fuelType(fuelInfo.fuelType())
                     .fuelAmount(fuelInfo.fuelAmount())
+                    .fileUrl(fuelInfo.fileUrl())
+                    .originalFileName(fuelInfo.originalFileName())
                     .memo(fuelInfo.memo())
                     .build();
 
