@@ -305,7 +305,7 @@ public class SteelManagementV2Service {
             case "onSiteStock" -> "사장(톤)";
             case "scrap" -> "고철(톤/금액)";
             case "totalInvestmentAmount" -> "총 금액(투입비)";
-            case "onSiteRemainingAmount" -> "현장보유수량(금액)";
+            case "onSiteRemainingWeight" -> "현장보류수량(톤)";
             case "createdAt" -> "등록일";
             default -> "";
         };
@@ -352,9 +352,9 @@ public class SteelManagementV2Service {
                 response.totalInvestmentAmount() != null
                         ? numberFormat.format(response.totalInvestmentAmount())
                         : "";
-            case "onSiteRemainingAmount" ->
-                response.onSiteRemainingAmount() != null
-                        ? numberFormat.format(response.onSiteRemainingAmount())
+            case "onSiteRemainingWeight" ->
+                response.onSiteRemainingWeight() != null
+                        ? numberFormat.format(response.onSiteRemainingWeight())
                         : "";
             case "createdAt" ->
                 response.createdAt() != null

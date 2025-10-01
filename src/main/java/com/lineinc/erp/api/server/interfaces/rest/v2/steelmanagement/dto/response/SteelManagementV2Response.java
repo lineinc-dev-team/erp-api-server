@@ -41,7 +41,7 @@ public record SteelManagementV2Response(
 
         // 최종 집계
         @Schema(description = "총 금액(투입비)", example = "15000000") Long totalInvestmentAmount,
-        @Schema(description = "현장보류수량", example = "3000000") Long onSiteRemainingAmount) {
+        @Schema(description = "현장보류수량(톤)", example = "1200.0") Double onSiteRemainingWeight) {
 
     public static SteelManagementV2Response from(final SteelManagementV2 entity) {
         return new SteelManagementV2Response(
@@ -66,6 +66,6 @@ public record SteelManagementV2Response(
                 entity.getScrapTotalWeight(),
                 entity.getScrapAmount(),
                 entity.getTotalInvestmentAmount(),
-                entity.getOnSiteRemainingAmount());
+                entity.getOnSiteRemainingWeight());
     }
 }

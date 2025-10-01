@@ -170,11 +170,11 @@ public class SteelManagementV2 extends BaseEntity {
     @Column
     private Long totalInvestmentAmount;
     /**
-     * 현장보류수량 (금액)
-     * 계산식: 입고 소계 - 출고 소계 - 고철
+     * 현장보류수량 (톤)
+     * 계산식: 입고 소계 총무게 - 출고 소계 총무게 - 고철 총무게
      */
     @Column
-    private Long onSiteRemainingAmount;
+    private Double onSiteRemainingWeight;
 
     /**
      * 상세 항목을 기반으로 집계 값을 계산
@@ -241,13 +241,25 @@ public class SteelManagementV2 extends BaseEntity {
                 + (this.outgoingPurchaseAmount != null ? this.outgoingPurchaseAmount : 0L)
                 + (this.outgoingRentalAmount != null ? this.outgoingRentalAmount : 0L);
 
-        // 총 금액(투입비) = 입고 소계 + 출고 소계 - 고철
+        // 총 금액(투입비) = 입고 소계(금액) + 출고 소계(금액) - 고철(금액)
         this.totalInvestmentAmount = incomingSubtotal + outgoingSubtotal
                 - (this.scrapAmount != null ? this.scrapAmount : 0L);
 
-        // 현장보류수량 = 입고 소계 - 출고 소계 - 고철
-        this.onSiteRemainingAmount = incomingSubtotal - outgoingSubtotal
-                - (this.scrapAmount != null ? this.scrapAmount : 0L);
+        // 현장보류수량(톤) = 입고 소계(총무게) - 출고 소계(총무게) - 고철(총무게)
+        final double incomingWeightSubtotal = (this.incomingOwnMaterialTotalWeight != null
+                ? this.incomingOwnMaterialTotalWeight
+                : 0.0)
+                + (this.incomingPurchaseTotalWeight != null ? this.incomingPurchaseTotalWeight : 0.0)
+                + (this.incomingRentalTotalWeight != null ? this.incomingRentalTotalWeight : 0.0);
+
+        final double outgoingWeightSubtotal = (this.outgoingOwnMaterialTotalWeight != null
+                ? this.outgoingOwnMaterialTotalWeight
+                : 0.0)
+                + (this.outgoingPurchaseTotalWeight != null ? this.outgoingPurchaseTotalWeight : 0.0)
+                + (this.outgoingRentalTotalWeight != null ? this.outgoingRentalTotalWeight : 0.0);
+
+        this.onSiteRemainingWeight = incomingWeightSubtotal - outgoingWeightSubtotal
+                - (this.scrapTotalWeight != null ? this.scrapTotalWeight : 0.0);
     }
 
     private Double calculateTotalWeight(
