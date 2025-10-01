@@ -16,7 +16,9 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2CreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -44,6 +46,19 @@ public class SteelManagementV2Controller extends BaseController {
             @AuthenticationPrincipal final CustomUserDetails user) {
         steelManagementV2Service.createSteelManagementV2(request, user);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "강재수불부 목록 조회")
+    @GetMapping
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementV2Response>>> getSteelManagementV2List(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final SteelManagementV2ListRequest request) {
+        final Page<SteelManagementV2Response> page = steelManagementV2Service.getSteelManagementV2List(
+                request,
+                PageableUtils.createPageable(pageRequest, sortRequest));
+        return SuccessResponse.ok(PagingResponse.from(page));
     }
 
     @Operation(summary = "강재수불부 변경 이력 조회")

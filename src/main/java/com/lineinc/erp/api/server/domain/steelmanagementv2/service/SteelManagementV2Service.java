@@ -20,7 +20,9 @@ import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementDetailV2CreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2CreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
 import lombok.RequiredArgsConstructor;
@@ -92,6 +94,15 @@ public class SteelManagementV2Service {
                 .user(userService.getUserByIdOrThrow(user.getUserId()))
                 .build();
         changeHistoryRepository.save(changeHistory);
+    }
+
+    /**
+     * 강재수불부 목록 조회 (페이징)
+     */
+    public Page<SteelManagementV2Response> getSteelManagementV2List(
+            final SteelManagementV2ListRequest request,
+            final Pageable pageable) {
+        return steelManagementV2Repository.findAll(request, pageable);
     }
 
     /**

@@ -9,5 +9,6 @@ import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagemen
  * 강재수불부 V2 Repository
  */
 @Repository
-public interface SteelManagementV2Repository extends JpaRepository<SteelManagementV2, Long> {
+public interface SteelManagementV2Repository extends JpaRepository<SteelManagementV2, Long>,
+        SteelManagementV2RepositoryCustom {
 }
