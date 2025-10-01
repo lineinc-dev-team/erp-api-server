@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
@@ -41,6 +43,7 @@ public class SteelManagementV2Service {
     private final SteelManagementV2Repository steelManagementV2Repository;
     private final SteelManagementChangeHistoryV2Repository changeHistoryRepository;
     private final UserService userService;
+    private final OutsourcingCompanyService outsourcingCompanyService;
 
     /**
      * 강재수불부 V2 등록
@@ -67,8 +70,11 @@ public class SteelManagementV2Service {
 
         // 상세 항목 생성
         for (final SteelManagementDetailV2CreateRequest detailRequest : request.details()) {
+            final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                    .getOutsourcingCompanyByIdOrThrow(detailRequest.outsourcingCompanyId());
             final SteelManagementDetailV2 detail = SteelManagementDetailV2.builder()
                     .steelManagementV2(steelManagementV2)
+                    .outsourcingCompany(outsourcingCompany)
                     .type(detailRequest.type())
                     .name(detailRequest.name())
                     .specification(detailRequest.specification())

@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -57,6 +58,14 @@ public class SteelManagementDetailV2 extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "steel_management_v2_id", nullable = false)
     private SteelManagementV2 steelManagementV2;
+
+    /**
+     * 외주업체 참조
+     */
+    @DiffIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_id")
+    private OutsourcingCompany outsourcingCompany;
 
     /**
      * 타입: 입고, 출고, 사장, 고청

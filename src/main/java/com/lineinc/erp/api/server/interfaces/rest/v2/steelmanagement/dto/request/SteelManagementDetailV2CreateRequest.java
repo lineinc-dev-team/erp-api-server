@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "강재수불부 V2 상세 항목 등록 요청")
 public record SteelManagementDetailV2CreateRequest(
+        @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "타입 (입고/출고/사장/고철)", example = "INCOMING", required = true) @NotNull SteelManagementDetailV2Type type,
         @Schema(description = "품명", example = "철근") @NotNull String name,
         @Schema(description = "규격", example = "D10") @NotNull String specification,
