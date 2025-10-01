@@ -22,6 +22,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2CreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2DetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
@@ -107,6 +108,18 @@ public class SteelManagementV2Service {
             final SteelManagementV2ListRequest request,
             final Pageable pageable) {
         return steelManagementV2Repository.findAll(request, pageable);
+    }
+
+    /**
+     * 강재수불부 상세 조회
+     */
+    public SteelManagementV2DetailResponse getSteelManagementV2ById(
+            final Long id,
+            final com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type type) {
+        final SteelManagementV2 steelManagementV2 = steelManagementV2Repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+        return SteelManagementV2DetailResponse.from(steelManagementV2, type);
     }
 
     /**
