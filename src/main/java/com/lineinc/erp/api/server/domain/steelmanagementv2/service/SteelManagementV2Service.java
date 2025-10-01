@@ -185,7 +185,7 @@ public class SteelManagementV2Service {
                         .findFirst()
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
-                existingDetail.updateFrom(dto, outsourcingCompany);
+                existingDetail.updateFrom(dto);
             } else {
                 // 신규 항목 추가
                 final SteelManagementDetailV2 newDetail = SteelManagementDetailV2.builder()
