@@ -80,6 +80,11 @@ public class SteelManagementV2Service {
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
+        // 동일한 현장 및 공정에 대한 데이터가 이미 있는지 확인
+        if (steelManagementV2Repository.existsBySiteAndSiteProcess(site, siteProcess)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.STEEL_MANAGEMENT_ALREADY_EXISTS);
+        }
 
         // 강재수불부 V2 생성
         SteelManagementV2 steelManagementV2 = SteelManagementV2.builder()

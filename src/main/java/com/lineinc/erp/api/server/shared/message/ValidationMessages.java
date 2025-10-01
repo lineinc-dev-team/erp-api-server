@@ -69,6 +69,7 @@ public class ValidationMessages {
     public static final String CANNOT_DELETE_APPROVED_OR_RELEASED_STEEL = "승인 혹은 반출 상태인 강재수불부는 삭제가 불가능합니다.";
     public static final String APPROVAL_CREATION = "승인";
     public static final String RELEASE_CREATION = "반출";
+    public static final String STEEL_MANAGEMENT_ALREADY_EXISTS = "해당 현장과 공정에 대한 강재수불부가 이미 존재합니다.";
 
     // ===== 관리비/유류 관련 메시지 =====
     public static final String MANAGEMENT_COST_NOT_FOUND = "존재하지 않는 관리비입니다.";

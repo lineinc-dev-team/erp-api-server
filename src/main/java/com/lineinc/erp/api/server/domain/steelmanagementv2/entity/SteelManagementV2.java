@@ -262,6 +262,13 @@ public class SteelManagementV2 extends BaseEntity {
                 - (this.scrapTotalWeight != null ? this.scrapTotalWeight : 0.0);
     }
 
+    /**
+     * 특정 타입과 카테고리의 총 무게를 계산
+     *
+     * @param type     상세 타입 (입고/출고/사장/고철)
+     * @param category 상세 카테고리 (자사자재/구매/임대)
+     * @return 총 무게(톤)
+     */
     private Double calculateTotalWeight(
             final SteelManagementDetailV2Type type,
             final SteelManagementDetailV2Category category) {
@@ -271,6 +278,13 @@ public class SteelManagementV2 extends BaseEntity {
                 .sum();
     }
 
+    /**
+     * 특정 타입과 카테고리의 총 금액을 계산
+     *
+     * @param type     상세 타입 (입고/출고/사장/고철)
+     * @param category 상세 카테고리 (자사자재/구매/임대)
+     * @return 총 금액
+     */
     private Long calculateAmount(
             final SteelManagementDetailV2Type type,
             final SteelManagementDetailV2Category category) {
@@ -280,6 +294,12 @@ public class SteelManagementV2 extends BaseEntity {
                 .sum();
     }
 
+    /**
+     * 특정 타입의 총 무게를 계산 (카테고리 무관)
+     *
+     * @param type 상세 타입 (입고/출고/사장/고철)
+     * @return 총 무게(톤)
+     */
     private Double calculateTotalWeightByType(
             final SteelManagementDetailV2Type type) {
         return details.stream()
@@ -288,6 +308,12 @@ public class SteelManagementV2 extends BaseEntity {
                 .sum();
     }
 
+    /**
+     * 특정 타입의 총 금액을 계산 (카테고리 무관)
+     *
+     * @param type 상세 타입 (입고/출고/사장/고철)
+     * @return 총 금액
+     */
     private Long calculateAmountByType(
             final SteelManagementDetailV2Type type) {
         return details.stream()
