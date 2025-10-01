@@ -1,13 +1,14 @@
 package com.lineinc.erp.api.server.domain.role.repository;
 
-import com.lineinc.erp.api.server.domain.role.entity.Role;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import com.lineinc.erp.api.server.domain.role.entity.Role;
 
 public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositoryCustom {
 
@@ -41,7 +42,7 @@ public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositor
             LEFT JOIN FETCH r.permissions rp
             LEFT JOIN FETCH rp.permission p
             LEFT JOIN FETCH p.menu m
-            WHERE r.id = :roleId
+            WHERE r.id = :roleId AND m.deleted = false
             """)
     Optional<Role> findRoleWithPermissions(@Param("roleId") Long roleId);
 
