@@ -8,7 +8,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.SiteContractUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
@@ -44,7 +43,7 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "amount"),
         @Index(columnList = "created_at")
 })
-public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContractUpdateRequest> {
+public class SiteContract extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_contract_seq")
@@ -98,7 +97,6 @@ public class SiteContract extends BaseEntity implements UpdatableFrom<SiteContra
     @OneToMany(mappedBy = "siteContract", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SiteFile> files = new ArrayList<>();
 
-    @Override
     public void updateFrom(final SiteContractUpdateRequest request) {
         this.name = request.name();
         this.amount = request.amount();

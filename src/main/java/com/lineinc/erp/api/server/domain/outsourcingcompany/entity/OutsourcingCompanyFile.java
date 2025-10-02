@@ -7,7 +7,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
 
@@ -41,7 +40,7 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "original_file_name"),
         @Index(columnList = "created_at")
 })
-public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<OutsourcingCompanyFileUpdateRequest> {
+public class OutsourcingCompanyFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_file_seq")
@@ -92,7 +91,6 @@ public class OutsourcingCompanyFile extends BaseEntity implements UpdatableFrom<
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고 / 메모
 
-    @Override
     public void updateFrom(final OutsourcingCompanyFileUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);

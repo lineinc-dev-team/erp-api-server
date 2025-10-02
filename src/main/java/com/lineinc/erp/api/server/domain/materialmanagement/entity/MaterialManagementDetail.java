@@ -5,7 +5,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementDetailUpdateRequest;
 
 import jakarta.persistence.Column;
@@ -34,8 +33,7 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "name")
 })
 @SQLRestriction("deleted = false")
-public class MaterialManagementDetail extends BaseEntity
-        implements UpdatableFrom<MaterialManagementDetailUpdateRequest> {
+public class MaterialManagementDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_management_detail_seq")
@@ -110,8 +108,7 @@ public class MaterialManagementDetail extends BaseEntity
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    @Override
-    public void updateFrom(MaterialManagementDetailUpdateRequest request) {
+    public void updateFrom(final MaterialManagementDetailUpdateRequest request) {
         java.util.Optional.ofNullable(request.name()).ifPresent(v -> this.name = v);
         java.util.Optional.ofNullable(request.standard()).ifPresent(v -> this.standard = v);
         java.util.Optional.ofNullable(request.usage()).ifPresent(v -> this.usage = v);

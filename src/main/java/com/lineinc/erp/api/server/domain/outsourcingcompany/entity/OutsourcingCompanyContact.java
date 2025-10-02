@@ -5,7 +5,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactUpdateRequest;
 
 import jakarta.persistence.Column;
@@ -38,8 +37,7 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "phone_number"),
         @Index(columnList = "created_at"),
 })
-public class OutsourcingCompanyContact extends BaseEntity
-        implements UpdatableFrom<OutsourcingCompanyContactUpdateRequest> {
+public class OutsourcingCompanyContact extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contact_seq")
@@ -102,7 +100,6 @@ public class OutsourcingCompanyContact extends BaseEntity
     @Builder.Default
     private Boolean isMain = false;
 
-    @Override
     public void updateFrom(final OutsourcingCompanyContactUpdateRequest request) {
         this.name = request.name();
         this.department = request.department();

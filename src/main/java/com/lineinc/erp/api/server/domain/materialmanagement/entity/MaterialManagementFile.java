@@ -7,7 +7,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementFileUpdateRequest;
 
 import jakarta.persistence.Column;
@@ -31,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class MaterialManagementFile extends BaseEntity implements UpdatableFrom<MaterialManagementFileUpdateRequest> {
+public class MaterialManagementFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_management_file_seq")
@@ -71,7 +70,6 @@ public class MaterialManagementFile extends BaseEntity implements UpdatableFrom<
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    @Override
     public void updateFrom(final MaterialManagementFileUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(value -> this.name = value);
         Optional.ofNullable(request.fileUrl()).ifPresent(value -> this.fileUrl = value);

@@ -7,7 +7,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostDetailUpdateRequest;
 
 import jakarta.persistence.Column;
@@ -37,7 +36,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<ManagementCostDetailUpdateRequest> {
+public class ManagementCostDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_detail_seq")
@@ -103,7 +102,6 @@ public class ManagementCostDetail extends BaseEntity implements UpdatableFrom<Ma
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    @Override
     public void updateFrom(final ManagementCostDetailUpdateRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.quantity()).ifPresent(val -> this.quantity = val);

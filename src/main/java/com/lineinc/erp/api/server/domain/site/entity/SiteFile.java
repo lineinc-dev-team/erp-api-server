@@ -5,7 +5,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.common.entity.interfaces.UpdatableFrom;
 import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteFileRequest;
 
@@ -38,7 +37,7 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "type"),
         @Index(columnList = "original_file_name")
 })
-public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFileRequest> {
+public class SiteFile extends BaseEntity {
 
     @Id
     @DiffInclude
@@ -79,8 +78,7 @@ public class SiteFile extends BaseEntity implements UpdatableFrom<UpdateSiteFile
     @Column(nullable = false)
     private SiteFileType type;
 
-    @Override
-    public void updateFrom(UpdateSiteFileRequest request) {
+    public void updateFrom(final UpdateSiteFileRequest request) {
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
         this.memo = request.memo();
