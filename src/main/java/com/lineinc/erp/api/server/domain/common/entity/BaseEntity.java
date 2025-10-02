@@ -41,7 +41,6 @@ public abstract class BaseEntity {
      * 수정 일시 자동 저장 필드
      * - 엔티티가 수정될 때 현재 시간으로 자동 업데이트
      */
-    @Column
     @UpdateTimestamp
     private OffsetDateTime updatedAt;
 
@@ -57,7 +56,6 @@ public abstract class BaseEntity {
      * 수정자 정보 자동 저장 필드
      * - 마지막으로 수정한 사용자 ID 또는 이름 등을 자동 저장
      */
-    @Column
     @LastModifiedBy
     private String updatedBy;
 
@@ -72,7 +70,6 @@ public abstract class BaseEntity {
     /**
      * 삭제 일시 저장 필드 (Soft Delete용)
      */
-    @Column
     private OffsetDateTime deletedAt;
 
     /**
