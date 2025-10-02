@@ -978,8 +978,7 @@ public class DailyReportService {
                         .filter(eq -> eq.getId() != null && eq.getId().equals(equipmentInfo.id()))
                         .findFirst()
                         .ifPresent(eq -> {
-                            eq.updateFrom(equipmentInfo);
-                            eq.setEntities(outsourcingCompany, outsourcingCompanyContractDriver,
+                            eq.updateFrom(equipmentInfo, outsourcingCompany, outsourcingCompanyContractDriver,
                                     outsourcingCompanyContractEquipment);
                         });
             }
