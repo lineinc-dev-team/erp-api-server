@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record SteelManagementV2Response(
         @Schema(description = "ID", example = "1") Long id,
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
-        @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
+        @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse siteProcess,
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt,
 

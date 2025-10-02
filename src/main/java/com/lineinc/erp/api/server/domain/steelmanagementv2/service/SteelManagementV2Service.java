@@ -320,7 +320,7 @@ public class SteelManagementV2Service {
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.KOREA);
         return switch (field) {
             case "siteName" -> response.site() != null ? response.site().name() : "";
-            case "processName" -> response.process() != null ? response.process().name() : "";
+            case "processName" -> response.siteProcess() != null ? response.siteProcess().name() : "";
             case "incomingOwnMaterial" -> formatWeightAndAmount(
                     response.incomingOwnMaterialTotalWeight(),
                     response.incomingOwnMaterialAmount(),
