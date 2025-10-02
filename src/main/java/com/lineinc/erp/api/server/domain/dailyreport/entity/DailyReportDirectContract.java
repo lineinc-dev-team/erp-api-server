@@ -1,13 +1,12 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,40 +30,36 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class DailyReportDirectContract extends BaseEntity {
+    private static final String SEQUENCE_NAME = "daily_report_direct_contract_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_report_direct_contract_seq")
-    @SequenceGenerator(name = "daily_report_direct_contract_seq", sequenceName = "daily_report_direct_contract_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_report_id", nullable = false)
+    @JoinColumn(name = AppConstants.DAILY_REPORT_ID, nullable = false)
     private DailyReport dailyReport; // 출역일보
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     private OutsourcingCompany outsourcingCompany; // 업체
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id")
+    @JoinColumn(name = AppConstants.LABOR_ID)
     private Labor labor; // 노무인력
 
-    @Column
     private String position; // 직급
 
     @Column(columnDefinition = "TEXT")
     private String workContent; // 작업내용
 
-    @Column
     private Long unitPrice; // 단가
 
-    @Column
     private Double workQuantity; // 공수
 
-    @Column
     private String fileUrl;
 
-    @Column
     private String originalFileName;
 
     @Column(columnDefinition = "TEXT")
@@ -74,13 +69,13 @@ public class DailyReportDirectContract extends BaseEntity {
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
     public void updateFrom(final DirectContractUpdateInfo request) {
-        Optional.ofNullable(request.position()).ifPresent(val -> this.position = val);
-        Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
-        Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
-        Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
+        this.position = request.position();
+        this.unitPrice = request.unitPrice();
+        this.workContent = request.workContent();
+        this.workQuantity = request.workQuantity();
         this.originalFileName = request.originalFileName();
         this.fileUrl = request.fileUrl();
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.memo = request.memo();
         this.labor.updatePreviousDailyWage(this.unitPrice);
     }
 

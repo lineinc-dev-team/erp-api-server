@@ -120,6 +120,9 @@ public final class AppConstants {
     public static final String USER_ID = "user_id";
     public static final String SITE_ID = "site_id";
     public static final String SITE_PROCESS_ID = "site_process_id";
+    public static final String DAILY_REPORT_ID = "daily_report_id";
+    public static final String OUTSOURCING_COMPANY_ID = "outsourcing_company_id";
+    public static final String LABOR_ID = "labor_id";
 
     // 엔티티 매핑 관련 상수
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";
