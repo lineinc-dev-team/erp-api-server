@@ -113,8 +113,8 @@ public class SteelManagementV2RepositoryImpl implements SteelManagementV2Reposit
         }
 
         // 공정명 검색
-        if (StringUtils.hasText(request.processName())) {
-            builder.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
+        if (StringUtils.hasText(request.siteProcessName())) {
+            builder.and(siteProcess.name.containsIgnoreCase(request.siteProcessName().trim()));
         }
 
         // 등록일 검색

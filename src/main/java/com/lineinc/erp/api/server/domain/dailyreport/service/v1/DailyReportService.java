@@ -898,8 +898,7 @@ public class DailyReportService {
                         .filter(os -> os.getId() != null && os.getId().equals(outsourcingInfo.id()))
                         .findFirst()
                         .ifPresent(os -> {
-                            os.updateFrom(outsourcingInfo);
-                            os.setEntities(company, outsourcingCompanyContractWorker);
+                            os.updateFrom(outsourcingInfo, company, outsourcingCompanyContractWorker);
                         });
             }
         }
