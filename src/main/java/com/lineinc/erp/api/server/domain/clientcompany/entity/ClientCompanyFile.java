@@ -45,19 +45,15 @@ public class ClientCompanyFile extends BaseEntity {
     @JoinColumn(name = AppConstants.CLIENT_COMPANY_ID, nullable = false)
     private ClientCompany clientCompany;
 
-    @Column
     @DiffInclude
     private String name;
 
-    @Column
     @DiffIgnore
     private String fileUrl;
 
-    @Column
     @DiffInclude
     private String originalFileName;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private ClientCompanyFileType type;
 

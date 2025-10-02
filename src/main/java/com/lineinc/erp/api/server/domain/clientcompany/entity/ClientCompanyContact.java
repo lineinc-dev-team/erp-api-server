@@ -48,27 +48,21 @@ public class ClientCompanyContact extends BaseEntity {
     @JoinColumn(name = AppConstants.CLIENT_COMPANY_ID, nullable = false)
     private ClientCompany clientCompany;
 
-    @Column
     @DiffInclude
     private String name;
 
-    @Column
     @DiffInclude
     private String department;
 
-    @Column
     @DiffInclude
     private String position;
 
-    @Column
     @DiffInclude
     private String landlineNumber;
 
-    @Column
     @DiffInclude
     private String phoneNumber;
 
-    @Column
     @DiffInclude
     private String email;
 
@@ -76,7 +70,6 @@ public class ClientCompanyContact extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    @Column
     @DiffIgnore
     @Builder.Default
     private Boolean isMain = false;

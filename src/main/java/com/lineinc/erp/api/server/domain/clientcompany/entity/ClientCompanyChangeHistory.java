@@ -52,7 +52,6 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private ClientCompanyChangeHistoryChangeType type;
 
@@ -60,7 +59,6 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     @Column(columnDefinition = "jsonb")
     private String changes;
 
-    @Column
     private String description;
 
     @Setter

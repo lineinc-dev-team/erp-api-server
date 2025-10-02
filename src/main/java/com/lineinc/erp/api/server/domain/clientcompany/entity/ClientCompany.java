@@ -59,48 +59,37 @@ public class ClientCompany extends BaseEntity {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
-    @Column
     @DiffInclude
     private String name;
 
-    @Column
     @DiffInclude
     private String businessNumber;
 
-    @Column
     @DiffInclude
     private String ceoName;
 
-    @Column
     @DiffInclude
     private String address;
 
-    @Column
     @DiffInclude
     private String detailAddress;
 
-    @Column
     @DiffInclude
     private String landlineNumber;
 
-    @Column
     @DiffInclude
     private String faxNumber;
 
-    @Column
     @DiffInclude
     private String phoneNumber;
 
-    @Column
     @DiffInclude
     private String email;
 
-    @Column
     @DiffIgnore
     @Enumerated(EnumType.STRING)
     private ClientCompanyPaymentMethod paymentMethod;
 
-    @Column
     @DiffInclude
     private String paymentPeriod;
 
@@ -120,7 +109,6 @@ public class ClientCompany extends BaseEntity {
     @OneToMany(mappedBy = AppConstants.CLIENT_COMPANY_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ClientCompanyFile> files = new ArrayList<>();
 
-    @Column
     @DiffInclude
     @Builder.Default
     private boolean isActive = true;
@@ -129,15 +117,12 @@ public class ClientCompany extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    @Column
     @DiffInclude
     private String homepageUrl;
 
-    @Column
     @DiffInclude
     private String homepageLoginId;
 
-    @Column
     @DiffInclude
     private String homepagePassword;
 
