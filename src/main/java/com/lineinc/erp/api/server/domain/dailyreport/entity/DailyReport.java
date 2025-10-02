@@ -213,6 +213,7 @@ public class DailyReport extends BaseEntity {
      */
     public void updateEmployeeEvidenceSubmitted() {
         this.employeeEvidenceSubmitted = evidenceFiles.stream()
+                .filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.EMPLOYEE);
     }
 
@@ -221,6 +222,7 @@ public class DailyReport extends BaseEntity {
      */
     public void updateDirectContractEvidenceSubmitted() {
         this.directContractEvidenceSubmitted = evidenceFiles.stream()
+                .filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.DIRECT_CONTRACT);
     }
 
@@ -229,6 +231,7 @@ public class DailyReport extends BaseEntity {
      */
     public void updateOutsourcingEvidenceSubmitted() {
         this.outsourcingEvidenceSubmitted = evidenceFiles.stream()
+                .filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.OUTSOURCING);
     }
 
@@ -237,6 +240,7 @@ public class DailyReport extends BaseEntity {
      */
     public void updateEquipmentEvidenceSubmitted() {
         this.equipmentEvidenceSubmitted = evidenceFiles.stream()
+                .filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.EQUIPMENT);
     }
 
@@ -248,6 +252,7 @@ public class DailyReport extends BaseEntity {
                 .filter(fuel -> !fuel.isDeleted())
                 .mapToDouble(fuel -> fuel.getFuelAggregation() != null
                         ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> !info.isDeleted())
                                 .filter(info -> info.getFuelType() != null
                                         && info.getFuelType() == FuelInfoFuelType.GASOLINE)
                                 .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
@@ -264,6 +269,7 @@ public class DailyReport extends BaseEntity {
                 .filter(fuel -> !fuel.isDeleted())
                 .mapToDouble(fuel -> fuel.getFuelAggregation() != null
                         ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> !info.isDeleted())
                                 .filter(info -> info.getFuelType() != null
                                         && info.getFuelType() == FuelInfoFuelType.DIESEL)
                                 .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
@@ -280,6 +286,7 @@ public class DailyReport extends BaseEntity {
                 .filter(fuel -> !fuel.isDeleted())
                 .mapToDouble(fuel -> fuel.getFuelAggregation() != null
                         ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> !info.isDeleted())
                                 .filter(info -> info.getFuelType() != null
                                         && info.getFuelType() == FuelInfoFuelType.UREA)
                                 .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
@@ -296,6 +303,7 @@ public class DailyReport extends BaseEntity {
                 .filter(fuel -> !fuel.isDeleted())
                 .mapToDouble(fuel -> fuel.getFuelAggregation() != null
                         ? fuel.getFuelAggregation().getFuelInfos().stream()
+                                .filter(info -> !info.isDeleted())
                                 .filter(info -> info.getFuelType() != null
                                         && info.getFuelType() == FuelInfoFuelType.ETC)
                                 .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
@@ -309,6 +317,7 @@ public class DailyReport extends BaseEntity {
      */
     public void updateFuelEvidenceSubmitted() {
         this.fuelEvidenceSubmitted = evidenceFiles.stream()
+                .filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.FUEL);
     }
 
