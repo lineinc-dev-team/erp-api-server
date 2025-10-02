@@ -68,7 +68,10 @@ public class DailyReportDirectContract extends BaseEntity {
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
-    public void updateFrom(final DirectContractUpdateInfo request) {
+    public void updateFrom(final DirectContractUpdateInfo request, final Labor labor,
+            final OutsourcingCompany outsourcingCompany) {
+        this.labor = labor;
+        this.outsourcingCompany = outsourcingCompany;
         this.position = request.position();
         this.unitPrice = request.unitPrice();
         this.workContent = request.workContent();
@@ -77,10 +80,5 @@ public class DailyReportDirectContract extends BaseEntity {
         this.fileUrl = request.fileUrl();
         this.memo = request.memo();
         this.labor.updatePreviousDailyWage(this.unitPrice);
-    }
-
-    public void setEntities(final OutsourcingCompany outsourcingCompany, final Labor labor) {
-        this.outsourcingCompany = outsourcingCompany;
-        this.labor = labor;
     }
 }

@@ -828,8 +828,7 @@ public class DailyReportService {
                         .filter(dc -> dc.getId() != null && dc.getId().equals(directContractInfo.id()))
                         .findFirst()
                         .ifPresent(dc -> {
-                            dc.updateFrom(directContractInfo);
-                            dc.setEntities(company, labor);
+                            dc.updateFrom(directContractInfo, labor, company);
                         });
             }
         }
