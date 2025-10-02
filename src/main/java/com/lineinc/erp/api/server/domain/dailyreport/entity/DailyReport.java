@@ -52,15 +52,14 @@ public class DailyReport extends BaseEntity {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Site site; // 현장
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_process_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private SiteProcess siteProcess; // 공정
 
-    @Column
     private OffsetDateTime reportDate; // 출역일보 일자
 
     @Setter
@@ -71,35 +70,34 @@ public class DailyReport extends BaseEntity {
     @Builder.Default
     private DailyReportStatus status = DailyReportStatus.PENDING; // 출역일보 상태
 
-    @Column
     private OffsetDateTime completedAt; // 마감 일시
 
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportEmployee> employees = new ArrayList<>(); // 출역일보 직원 목록
 
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportDirectContract> directContracts = new ArrayList<>(); // 직영/계약직 출역일보 목록
 
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportOutsourcing> outsourcings = new ArrayList<>(); // 외주 출역일보 목록
 
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportOutsourcingEquipment> outsourcingEquipments = new ArrayList<>(); // 외주업체계약 장비 출역일보 목록
 
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportFuel> fuels = new ArrayList<>(); // 유류 출역일보 목록
 
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportFile> files = new ArrayList<>(); // 현장 사진 등록 목록
 
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportEvidenceFile> evidenceFiles = new ArrayList<>(); // 증빙 파일 목록
 
     @Setter
@@ -107,56 +105,42 @@ public class DailyReport extends BaseEntity {
     private String memo; // 비고
 
     // 직원 관련
-    @Column
     private Double employeeWorkQuantitySum; // 직원 공수합
 
-    @Column
     @Builder.Default
     private Boolean employeeEvidenceSubmitted = false; // 직원 증빙 여부
 
     // 직영/계약직 관련
-    @Column
     private Double directContractWorkQuantitySum; // 직영계약직 공수합
 
-    @Column
     @Builder.Default
     private Boolean directContractEvidenceSubmitted = false; // 직영계약직 증빙 여부
 
     // 외주 관련
-    @Column
     private Double outsourcingWorkQuantitySum; // 외주 공수합
 
-    @Column
     @Builder.Default
     private Boolean outsourcingEvidenceSubmitted = false; // 외주 증빙 여부
 
     // 장비 관련
-    @Column
     private Double equipmentTotalHours; // 장비 총 가동 시간
 
-    @Column
     @Builder.Default
     private Boolean equipmentEvidenceSubmitted = false; // 장비 증빙 여부
 
     // 현장 사진 관련
-    @Column
     @Builder.Default
     private Boolean sitePhotoSubmitted = false; // 현장 사진 여부
 
     // 유류 관련
-    @Column
     private Double gasolineTotalAmount; // 휘발유 총 주유량
 
-    @Column
     private Double dieselTotalAmount; // 경유 총 주유량
 
-    @Column
     private Double ureaTotalAmount; // 요소수 총 주유량
 
-    @Column
     private Double etcTotalAmount; // 기타 총 주유량
 
-    @Column
     @Builder.Default
     private Boolean fuelEvidenceSubmitted = false; // 유류 증빙 여부
 
