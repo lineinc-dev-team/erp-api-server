@@ -17,15 +17,15 @@ public record FuelAggregationResponse(
         @Schema(description = "날씨 코드", example = "SUNNY") String weatherCode,
         @Schema(description = "유류정보 목록") List<FuelInfoResponse> fuelInfos) {
 
-    public static FuelAggregationResponse from(FuelAggregation entity) {
-        List<FuelInfoResponse> fuelInfoResponses = entity.getFuelInfos().stream()
+    public static FuelAggregationResponse from(final FuelAggregation entity) {
+        final List<FuelInfoResponse> fuelInfoResponses = entity.getFuelInfos().stream()
                 .map(FuelInfoResponse::from)
                 .toList();
 
         return new FuelAggregationResponse(
                 entity.getId(),
-                entity.getSiteName(),
-                entity.getProcessName(),
+                entity.getSite().getName(),
+                entity.getSiteProcess().getName(),
                 entity.getDate(),
                 entity.getWeather() != null ? entity.getWeather().getLabel() : null,
                 entity.getWeather() != null ? entity.getWeather().name() : null,

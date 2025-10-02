@@ -131,6 +131,7 @@ public final class AppConstants {
     // 엔티티 매핑 관련 상수
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";
     public static final String DAILY_REPORT_MAPPED_BY = "dailyReport";
+    public static final String FUEL_AGGREGATION_MAPPED_BY = "fuelAggregation";
 
     // 빈 값 상수
     public static final String EMPTY_VALUE = "";

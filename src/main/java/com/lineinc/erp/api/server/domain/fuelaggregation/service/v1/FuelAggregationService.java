@@ -2,11 +2,9 @@ package com.lineinc.erp.api.server.domain.fuelaggregation.service.v1;
 
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
-import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -20,7 +18,6 @@ import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepos
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
-import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationChangeType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
@@ -46,7 +43,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.respons
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
-import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -281,26 +277,6 @@ public class FuelAggregationService {
         final FuelAggregation fuelAggregation = fuelAggregationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
-
-        fuelAggregation.syncTransientFields();
-        final FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
-
-        // fuelAggregation.updateFrom(request);
-        fuelAggregationRepository.save(fuelAggregation);
-
-        final Diff diff = javers.compare(oldSnapshot, fuelAggregation);
-        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-        final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
-
-        if (!simpleChanges.isEmpty()) {
-            final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
-                    .fuelAggregation(fuelAggregation)
-                    .type(FuelAggregationChangeType.BASIC)
-                    .changes(changesJson)
-                    .user(userService.getUserByIdOrThrow(userId))
-                    .build();
-            fuelAggregationChangeHistoryRepository.save(changeHistory);
-        }
 
         // 변경이력 memo 업데이트 처리
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
