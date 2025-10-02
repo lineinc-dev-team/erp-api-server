@@ -49,7 +49,7 @@ public class ClientCompanyChangeHistory extends BaseEntity {
     private ClientCompany clientCompany;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = AppConstants.USER_ID)
     private User user;
 
     @Enumerated(EnumType.STRING)

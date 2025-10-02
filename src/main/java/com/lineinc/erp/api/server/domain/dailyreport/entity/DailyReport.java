@@ -52,12 +52,12 @@ public class DailyReport extends BaseEntity {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
-    @JoinColumn(name = "site_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.SITE_ID)
     private Site site; // 현장
 
-    @JoinColumn(name = "site_process_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     private SiteProcess siteProcess; // 공정
 
     private OffsetDateTime reportDate; // 출역일보 일자
@@ -73,31 +73,31 @@ public class DailyReport extends BaseEntity {
     private OffsetDateTime completedAt; // 마감 일시
 
     @Builder.Default
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportEmployee> employees = new ArrayList<>(); // 출역일보 직원 목록
 
     @Builder.Default
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportDirectContract> directContracts = new ArrayList<>(); // 직영/계약직 출역일보 목록
 
     @Builder.Default
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportOutsourcing> outsourcings = new ArrayList<>(); // 외주 출역일보 목록
 
     @Builder.Default
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportOutsourcingEquipment> outsourcingEquipments = new ArrayList<>(); // 외주업체계약 장비 출역일보 목록
 
     @Builder.Default
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportFuel> fuels = new ArrayList<>(); // 유류 출역일보 목록
 
     @Builder.Default
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportFile> files = new ArrayList<>(); // 현장 사진 등록 목록
 
     @Builder.Default
-    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportEvidenceFile> evidenceFiles = new ArrayList<>(); // 증빙 파일 목록
 
     @Setter

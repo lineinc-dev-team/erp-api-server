@@ -115,8 +115,15 @@ public final class AppConstants {
     // JPA 시퀀스 AllocationSize 관련 상수
     public static final int SEQUENCE_ALLOCATION_DEFAULT = 1;
 
+    // 엔티티 관련 상수
     public static final String CLIENT_COMPANY_ID = "client_company_id";
+    public static final String USER_ID = "user_id";
+    public static final String SITE_ID = "site_id";
+    public static final String SITE_PROCESS_ID = "site_process_id";
+
+    // 엔티티 매핑 관련 상수
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";
+    public static final String DAILY_REPORT_MAPPED_BY = "dailyReport";
 
     // 빈 값 상수
     public static final String EMPTY_VALUE = "";
