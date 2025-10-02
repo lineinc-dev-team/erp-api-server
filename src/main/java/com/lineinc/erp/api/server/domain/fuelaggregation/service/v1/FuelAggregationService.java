@@ -1,10 +1,10 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.service.v1;
 
 import java.text.NumberFormat;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import org.javers.core.Javers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
@@ -60,7 +61,6 @@ public class FuelAggregationService {
     private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
     private final FuelInfoService fuelInfoService;
     private final UserService userService;
-    private final Javers javers;
 
     @Transactional
     public FuelAggregation createFuelAggregation(final FuelAggregationCreateRequest request, final Long userId) {
@@ -70,14 +70,12 @@ public class FuelAggregationService {
             throw new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
-        FuelAggregation fuelAggregation = FuelAggregation.builder()
+        final FuelAggregation fuelAggregation = fuelAggregationRepository.save(FuelAggregation.builder()
                 .site(site)
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
                 .weather(request.weather())
-                .build();
-
-        fuelAggregation = fuelAggregationRepository.save(fuelAggregation);
+                .build());
 
         for (final FuelInfoCreateRequest fuelInfo : request.fuelInfos()) {
             // 업체, 기사, 장비 ID 검증
@@ -105,6 +103,25 @@ public class FuelAggregationService {
             fuelAggregation.getFuelInfos().add(fuelInfoEntity);
 
         }
+
+        // 해당 현장, 공정, 일자에 맞는 출역일보 찾기
+        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(request.date());
+        dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .ifPresent(dailyReport -> {
+                    // DailyReportFuel 엔티티 생성 및 연결
+                    final DailyReportFuel dailyReportFuel = DailyReportFuel.builder()
+                            .dailyReport(dailyReport)
+                            .fuelAggregation(fuelAggregation)
+                            .build();
+                    dailyReport.getFuels().add(dailyReportFuel);
+
+                    // 출역일보의 유류 집계 데이터 업데이트
+                    dailyReport.updateGasolineTotalAmount();
+                    dailyReport.updateDieselTotalAmount();
+                    dailyReport.updateUreaTotalAmount();
+                    dailyReport.updateEtcTotalAmount();
+                    dailyReport.updateFuelEvidenceSubmitted();
+                });
 
         final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
                 .fuelAggregation(fuelAggregation)
