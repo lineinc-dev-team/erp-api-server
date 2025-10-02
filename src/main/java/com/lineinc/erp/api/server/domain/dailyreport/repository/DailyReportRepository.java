@@ -44,22 +44,6 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
             Pageable pageable);
 
     /**
-     * 특정 인력의 특정 기간 출역일보를 조회합니다.
-     * 직영/계약직 인력만 고려합니다.
-     */
-    @Query("""
-            SELECT DISTINCT dr FROM DailyReport dr \
-            LEFT JOIN dr.employees e \
-            LEFT JOIN dr.directContracts dc \
-            WHERE (e.labor.id = :laborId OR dc.labor.id = :laborId) \
-            AND dr.reportDate >= :startDate AND dr.reportDate <= :endDate \
-            AND dr.deleted = false AND (e.deleted = false OR e IS NULL) \
-            AND (dc.deleted = false OR dc IS NULL)""")
-    List<DailyReport> findByLaborIdAndDateRange(@Param("laborId") Long laborId,
-            @Param("startDate") OffsetDateTime startDate,
-            @Param("endDate") OffsetDateTime endDate);
-
-    /**
      * 같은 날짜, 현장, 공정에 대한 출역일보 존재 여부를 확인합니다.
      */
     @Query("""
@@ -84,47 +68,6 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
     Optional<DailyReport> findBySiteAndSiteProcessAndReportDate(@Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("reportDate") OffsetDateTime reportDate);
-
-    /**
-     * 특정 인력의 지정된 날짜 이후 출근 기록이 있는지 확인합니다.
-     * 계약직 인력만 대상으로 합니다.
-     */
-    @Query("""
-            SELECT COUNT(dr) > 0 FROM DailyReport dr \
-            LEFT JOIN dr.directContracts dc \
-            WHERE dc.labor.id = :laborId \
-            AND dr.reportDate >= :startDate \
-            AND dr.deleted = false AND dc.deleted = false""")
-    boolean hasWorkRecordSince(@Param("laborId") Long laborId, @Param("startDate") OffsetDateTime startDate);
-
-    /**
-     * 특정 인력의 지난달 근로시간(공수)을 계산합니다.
-     * 계약직 인력만 대상으로 합니다.
-     */
-    @Query("""
-            SELECT COALESCE(SUM(dc.workQuantity), 0) \
-            FROM DailyReport dr \
-            LEFT JOIN dr.directContracts dc \
-            WHERE dc.labor.id = :laborId \
-            AND dr.reportDate >= :startDate AND dr.reportDate < :endDate \
-            AND dr.deleted = false AND dc.deleted = false""")
-    Double calculateLastMonthWorkHours(@Param("laborId") Long laborId,
-            @Param("startDate") OffsetDateTime startDate,
-            @Param("endDate") OffsetDateTime endDate);
-
-    /**
-     * 특정 날짜 범위와 상태로 출역일보를 조회합니다.
-     * 자동 마감 배치에서 사용됩니다.
-     */
-    @Query("""
-            SELECT dr FROM DailyReport dr \
-            WHERE dr.reportDate >= :startDate \
-            AND dr.reportDate <= :endDate \
-            AND dr.status = :status \
-            AND dr.deleted = false""")
-    List<DailyReport> findByReportDateBetweenAndStatus(@Param("startDate") OffsetDateTime startDate,
-            @Param("endDate") OffsetDateTime endDate,
-            @Param("status") DailyReportStatus status);
 
     /**
      * 특정 날짜 이전의 특정 상태 출역일보를 조회합니다.
@@ -154,31 +97,5 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
-
-    /**
-     * 같은 날짜에 특정 직원이 이미 출근했는지 확인합니다. (모든 현장/공정 포함)
-     */
-    @Query("""
-            SELECT COUNT(dr) > 0 FROM DailyReport dr \
-            JOIN dr.employees e \
-            WHERE dr.reportDate = :reportDate \
-            AND e.labor.id = :laborId \
-            AND dr.deleted = false AND e.deleted = false""")
-    boolean existsByReportDateAndEmployeesLaborId(
-            @Param("reportDate") OffsetDateTime reportDate,
-            @Param("laborId") Long laborId);
-
-    /**
-     * 같은 날짜에 특정 직영/계약직 인력이 이미 출근했는지 확인합니다. (모든 현장/공정 포함)
-     */
-    @Query("""
-            SELECT COUNT(dr) > 0 FROM DailyReport dr \
-            JOIN dr.directContracts dc \
-            WHERE dr.reportDate = :reportDate \
-            AND dc.labor.id = :laborId \
-            AND dr.deleted = false AND dc.deleted = false""")
-    boolean existsByReportDateAndDirectContractsLaborId(
-            @Param("reportDate") OffsetDateTime reportDate,
-            @Param("laborId") Long laborId);
 
 }
