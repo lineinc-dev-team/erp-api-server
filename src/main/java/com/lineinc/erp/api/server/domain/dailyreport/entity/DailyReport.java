@@ -45,10 +45,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class DailyReport extends BaseEntity {
+    private static final String SEQUENCE_NAME = "daily_report_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_report_seq")
-    @SequenceGenerator(name = "daily_report_seq", sequenceName = "daily_report_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -62,8 +63,8 @@ public class DailyReport extends BaseEntity {
     @Column
     private OffsetDateTime reportDate; // 출역일보 일자
 
-    @Enumerated(EnumType.STRING)
     @Setter
+    @Enumerated(EnumType.STRING)
     private FuelAggregationWeatherType weather; // 날씨
 
     @Enumerated(EnumType.STRING)
