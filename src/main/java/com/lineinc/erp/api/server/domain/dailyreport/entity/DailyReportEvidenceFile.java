@@ -1,8 +1,6 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
 import org.hibernate.annotations.SQLRestriction;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
@@ -44,44 +42,34 @@ public class DailyReportEvidenceFile extends BaseEntity {
      * 이 증빙파일이 연결된 출역일보 엔티티
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_report_id", nullable = false)
-    @DiffIgnore
+    @JoinColumn(name = AppConstants.DAILY_REPORT_ID, nullable = false)
     private DailyReport dailyReport;
 
     /**
      * 증빙파일 타입 (어떤 탭의 파일인지 구분)
      */
     @Enumerated(EnumType.STRING)
-    @Column
-    @DiffInclude
     private DailyReportEvidenceFileType fileType;
 
     /**
      * 파일명
      */
-    @Column
-    @DiffInclude
     private String name;
 
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
-    @Column
-    @DiffIgnore
     private String fileUrl;
 
     /**
      * 업로드된 파일의 원본 파일명
      */
-    @Column
-    @DiffInclude
     private String originalFileName;
 
     /**
      * 파일에 대한 비고 또는 설명
      */
     @Column(columnDefinition = "TEXT")
-    @DiffInclude
     private String memo;
 
     public void updateFrom(final DailyReportEvidenceFileUpdateRequest.FileUpdateInfo request) {

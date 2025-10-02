@@ -5,6 +5,7 @@ import org.hibernate.annotations.SQLRestriction;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFuelUpdateRequest.FuelUpdateInfo;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,18 +29,19 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class DailyReportFuel extends BaseEntity {
+    private static final String SEQUENCE_NAME = "daily_report_fuel_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_report_fuel_seq")
-    @SequenceGenerator(name = "daily_report_fuel_seq", sequenceName = "daily_report_fuel_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_report_id", nullable = false)
+    @JoinColumn(name = AppConstants.DAILY_REPORT_ID, nullable = false)
     private DailyReport dailyReport; // 출역일보
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fuel_aggregation_id")
+    @JoinColumn(name = AppConstants.FUEL_AGGREGATION_ID)
     private FuelAggregation fuelAggregation; // 유류집계
 
     @Column(columnDefinition = "TEXT")
