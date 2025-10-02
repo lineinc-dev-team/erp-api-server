@@ -300,7 +300,7 @@ public class SteelManagementV2Service {
     private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "siteName" -> "현장명";
-            case "processName" -> "공정명";
+            case "siteProcessName" -> "공정명";
             case "incomingOwnMaterial" -> "입고 자사(톤/금액)";
             case "incomingPurchase" -> "입고 구매(톤/금액)";
             case "incomingRental" -> "입고 임대(톤/금액)";
