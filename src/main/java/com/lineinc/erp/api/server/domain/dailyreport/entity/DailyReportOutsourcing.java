@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,22 +32,23 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class DailyReportOutsourcing extends BaseEntity {
+    private static final String SEQUENCE_NAME = "daily_report_outsourcing_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_report_outsourcing_seq")
-    @SequenceGenerator(name = "daily_report_outsourcing_seq", sequenceName = "daily_report_outsourcing_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_report_id", nullable = false)
+    @JoinColumn(name = AppConstants.DAILY_REPORT_ID, nullable = false)
     private DailyReport dailyReport; // 출역일보
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     private OutsourcingCompany outsourcingCompany; // 업체
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_worker_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_WORKER_ID)
     private OutsourcingCompanyContractWorker outsourcingCompanyContractWorker; // 외주업체계약 인력
 
     @Column

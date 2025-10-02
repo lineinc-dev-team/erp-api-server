@@ -75,7 +75,7 @@ public class SteelManagementV2Service {
 
         // 현장 및 공정 검증
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.processId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         if (!siteProcess.getSite().getId().equals(site.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
