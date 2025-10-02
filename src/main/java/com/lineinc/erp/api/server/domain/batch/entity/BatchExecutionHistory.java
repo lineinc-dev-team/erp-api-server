@@ -43,14 +43,12 @@ public class BatchExecutionHistory {
     @Column(nullable = false)
     private OffsetDateTime startTime;
 
-    @Column
     private OffsetDateTime endTime;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BatchExecutionHistoryStatus status;
 
-    @Column
     private Double executionTimeSeconds;
 
     @Column(columnDefinition = "TEXT")
