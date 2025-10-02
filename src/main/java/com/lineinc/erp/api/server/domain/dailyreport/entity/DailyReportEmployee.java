@@ -1,12 +1,11 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,33 +29,30 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class DailyReportEmployee extends BaseEntity {
+    private static final String SEQUENCE_NAME = "daily_report_employee_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_report_employee_seq")
-    @SequenceGenerator(name = "daily_report_employee_seq", sequenceName = "daily_report_employee_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_report_id", nullable = false)
+    @JoinColumn(name = AppConstants.DAILY_REPORT_ID, nullable = false)
     private DailyReport dailyReport; // 출역일보
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id")
+    @JoinColumn(name = AppConstants.LABOR_ID)
     private Labor labor; // 인력
 
     @Column(columnDefinition = "TEXT")
     private String workContent; // 작업내용
 
-    @Column
     private Long unitPrice; // 단가
 
-    @Column
     private Double workQuantity; // 공수
 
-    @Column
     private String fileUrl;
 
-    @Column
     private String originalFileName;
 
     @Column(columnDefinition = "TEXT")
@@ -65,15 +61,12 @@ public class DailyReportEmployee extends BaseEntity {
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
-    public void updateFrom(final EmployeeUpdateInfo request) {
-        Optional.ofNullable(request.workContent()).ifPresent(val -> this.workContent = val);
-        Optional.ofNullable(request.workQuantity()).ifPresent(val -> this.workQuantity = val);
+    public void updateFrom(final EmployeeUpdateInfo request, final Labor labor) {
+        this.labor = labor;
+        this.workContent = request.workContent();
+        this.workQuantity = request.workQuantity();
         this.originalFileName = request.originalFileName();
         this.fileUrl = request.fileUrl();
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-    }
-
-    public void setEntities(final Labor labor) {
-        this.labor = labor;
+        this.memo = request.memo();
     }
 }

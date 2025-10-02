@@ -726,7 +726,7 @@ public class DailyReportService {
                 dailyReport.getEmployees().stream()
                         .filter(emp -> emp.getId() != null && emp.getId().equals(employeeInfo.id()))
                         .findFirst()
-                        .ifPresent(emp -> emp.setEntities(labor));
+                        .ifPresent(emp -> emp.updateFrom(employeeInfo, labor));
             }
         }
 
