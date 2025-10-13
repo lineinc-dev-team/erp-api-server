@@ -41,6 +41,7 @@ public class PermissionSeeder {
                     final Permission permission = Permission.builder()
                             .menu(menu)
                             .action(action)
+                            .order(action.getOrder())
                             .createdBy(AppConstants.SYSTEM_NAME)
                             .updatedBy(AppConstants.SYSTEM_NAME)
                             .build();
