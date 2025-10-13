@@ -128,6 +128,7 @@ public class UserController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public void downloadUserListExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final SearchUserRequest request,
             @Valid final DownloadUserListRequest downloadUserListRequest,
@@ -137,6 +138,7 @@ public class UserController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "유저 목록.xlsx");
 
         try (Workbook workbook = userService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {

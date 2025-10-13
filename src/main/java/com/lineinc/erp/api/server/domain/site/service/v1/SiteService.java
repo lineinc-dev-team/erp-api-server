@@ -18,6 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.clientcompany.service.v1.ClientCompanyService;
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteChangeHistory;
 import com.lineinc.erp.api.server.domain.site.enums.SiteChangeHistoryType;
@@ -52,6 +55,8 @@ public class SiteService {
     private final UserService userService;
     private final Javers javers;
     private final SiteChangeHistoryRepository siteChangeHistoryRepository;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     @Transactional
     public void createSite(final CreateSiteRequest request, final CustomUserDetails userEntity) {
@@ -130,11 +135,20 @@ public class SiteService {
                 .map(SiteResponse::from)
                 .toList();
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 siteResponses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.SITE.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.SITE,
+                userService.getUserByIdOrThrow(userId), fileUrl);
+
+        return workbook;
     }
 
     private String getExcelHeaderName(final String field) {
