@@ -446,7 +446,8 @@ public class RoleService {
         final List<User> foundUsers = userRepository.findAllById(userIds);
 
         return foundUsers.stream()
-                .filter(user -> user.getUserRoles().isEmpty())
+                .filter(user -> user.getUserRoles().stream()
+                        .noneMatch(userRole -> !userRole.isDeleted()))
                 .map(user -> UserRole.builder()
                         .user(user)
                         .role(role)
