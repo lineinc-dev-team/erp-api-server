@@ -15,17 +15,20 @@ public class MenuSeeder {
     private final MenuRepository menuRepository;
 
     public void seed() {
+        int order = 1;
         for (final String name : AppConstants.MENU_NAMES) {
             final boolean exists = menuRepository.findByName(name).isPresent();
             if (!exists) {
                 final Menu menu = Menu.builder()
                         .name(name)
+                        .order(order)
                         .createdBy(AppConstants.SYSTEM_NAME)
                         .updatedBy(AppConstants.SYSTEM_NAME)
                         .build();
 
                 menuRepository.save(menu);
             }
+            order++;
         }
     }
 }

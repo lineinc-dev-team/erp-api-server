@@ -37,12 +37,22 @@ public final class AppConstants {
     public static final String MENU_OUTSOURCING_COMPANY_CONTRACT = "외주업체 계약 관리";
     public static final String MENU_WORK_DAILY_REPORT = "출역일보";
 
-    // 시스템 기본 메뉴 이름 목록
-    public static final List<String> MENU_NAMES = List.of(MENU_ACCOUNT, MENU_PERMISSION,
-            MENU_CLIENT_COMPANY, MENU_SITE, MENU_MANAGEMENT_COST, MENU_STEEL_MANAGEMENT,
-            MENU_MATERIAL_MANAGEMENT, MENU_FUEL_AGGREGATION, MENU_LABOR_MANAGEMENT,
-            MENU_LABOR_PAYROLL, MENU_OUTSOURCING_COMPANY, MENU_OUTSOURCING_COMPANY_CONTRACT,
-            MENU_WORK_DAILY_REPORT);
+    // 시스템 기본 메뉴 이름 목록 (순서대로 정렬)
+    public static final List<String> MENU_NAMES = List.of(
+            MENU_CLIENT_COMPANY, // 1. 발주처 관리
+            MENU_SITE, // 2. 현장 관리
+            MENU_MATERIAL_MANAGEMENT, // 3. 자재 관리
+            MENU_STEEL_MANAGEMENT, // 4. 강재수불부 관리
+            MENU_FUEL_AGGREGATION, // 5. 유류집계 관리
+            MENU_LABOR_MANAGEMENT, // 6. 노무 관리
+            MENU_LABOR_PAYROLL, // 7. 노무명세서 관리
+            MENU_OUTSOURCING_COMPANY, // 8. 외주업체 관리
+            MENU_OUTSOURCING_COMPANY_CONTRACT, // 9. 외주업체 계약 관리
+            MENU_MANAGEMENT_COST, // 10. 관리비 관리
+            MENU_WORK_DAILY_REPORT, // 11. 출역일보
+            MENU_ACCOUNT, // 12. 계정 관리
+            MENU_PERMISSION // 13. 권한 관리
+    );
 
     // 직급(Grade) 관련 상수
     public static final String GRADE_CEO = "대표이사";
