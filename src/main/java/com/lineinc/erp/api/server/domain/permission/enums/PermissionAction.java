@@ -8,6 +8,7 @@ public enum PermissionAction {
     CREATE("등록"),
     UPDATE("수정"),
     DELETE("삭제"),
+    EXCEL_DOWNLOAD("엑셀 다운로드"),
     APPROVE("승인");
 
     private final String label;
@@ -16,12 +17,4 @@ public enum PermissionAction {
         this.label = label;
     }
 
-    public static PermissionAction fromLabel(final String label) {
-        for (final PermissionAction action : values()) {
-            if (action.label.equals(label) || action.name().equals(label)) {
-                return action;
-            }
-        }
-        throw new IllegalArgumentException("Unknown permission label: " + label);
-    }
 }

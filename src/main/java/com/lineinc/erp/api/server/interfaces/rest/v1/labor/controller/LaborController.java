@@ -167,7 +167,7 @@ public class LaborController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @GetMapping("/download")
-    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadLaborsExcel(
             @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,

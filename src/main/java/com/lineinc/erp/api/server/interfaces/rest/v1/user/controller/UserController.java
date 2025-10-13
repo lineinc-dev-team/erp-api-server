@@ -126,7 +126,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @GetMapping("/download")
-    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadUserListExcel(
             @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,

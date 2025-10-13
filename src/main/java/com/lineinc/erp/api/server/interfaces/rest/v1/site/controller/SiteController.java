@@ -105,7 +105,7 @@ public class SiteController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @GetMapping("/download")
-    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadSitesExcel(
             @AuthenticationPrincipal final CustomUserDetails userDetails,
             @Valid final SortRequest sortRequest,

@@ -90,7 +90,7 @@ public class LaborPayrollController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @GetMapping("/download")
-    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadLaborPayrollExcel(
             @AuthenticationPrincipal final CustomUserDetails user,
             @Parameter(description = "정렬 정보") @ModelAttribute final SortRequest sortRequest,

@@ -168,7 +168,7 @@ public class ManagementCostController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @GetMapping("/download")
-    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadSitesExcel(
             @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,

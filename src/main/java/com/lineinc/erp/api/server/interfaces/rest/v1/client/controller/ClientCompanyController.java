@@ -120,7 +120,7 @@ public class ClientCompanyController extends BaseController {
 
     @GetMapping("/download")
     @Operation(summary = "발주처 엑셀 다운로드")
-    @RequireMenuPermission(menu = MENU_ACCOUNT, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = MENU_ACCOUNT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadClientCompaniesExcel(
             @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,

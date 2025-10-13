@@ -314,7 +314,7 @@ public class CompanyContractController {
     @Operation(summary = "외주업체 계약 엑셀 다운로드", description = "검색 조건에 맞는 외주업체 계약 목록을 엑셀 파일로 다운로드합니다.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()) })
-    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.EXCEL_DOWNLOAD)
     @GetMapping("/download")
     public void downloadContractsExcel(
             @AuthenticationPrincipal final CustomUserDetails user,

@@ -178,7 +178,7 @@ public class CompanyController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
     })
     @GetMapping("/download")
-    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadOutsourcingCompaniesExcel(
             @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
