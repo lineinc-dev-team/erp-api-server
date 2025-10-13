@@ -44,6 +44,8 @@ public class RolesPermissionsSeeder {
                         final RolePermission rolePermission = RolePermission.builder()
                                 .role(role)
                                 .permission(permission)
+                                .createdBy(AppConstants.SYSTEM_NAME)
+                                .updatedBy(AppConstants.SYSTEM_NAME)
                                 .build();
                         role.getPermissions().add(rolePermission);
                     }

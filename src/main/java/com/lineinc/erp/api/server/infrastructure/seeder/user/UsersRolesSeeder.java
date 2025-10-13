@@ -34,6 +34,8 @@ public class UsersRolesSeeder {
                 final UserRole userRole = UserRole.builder()
                         .user(adminUser)
                         .role(adminRole)
+                        .createdBy(AppConstants.SYSTEM_NAME)
+                        .updatedBy(AppConstants.SYSTEM_NAME)
                         .build();
                 adminUser.getUserRoles().add(userRole);
                 usersRepository.save(adminUser);
