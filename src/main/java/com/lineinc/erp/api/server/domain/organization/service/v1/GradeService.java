@@ -23,8 +23,8 @@ public class GradeService {
     public List<GradeResponse> getAllGrades() {
         final List<Grade> grades = gradeRepository.findAll();
         return grades.stream()
-                .sorted(Comparator.comparing(Grade::getId))
-                .map(grade -> new GradeResponse(grade.getId(), grade.getName()))
+                .sorted(Comparator.comparing(Grade::getOrder))
+                .map(grade -> new GradeResponse(grade.getId(), grade.getName(), grade.getOrder()))
                 .collect(Collectors.toList());
     }
 }

@@ -1,10 +1,20 @@
 package com.lineinc.erp.api.server.domain.organization.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -21,4 +31,7 @@ public class Department extends BaseEntity {
 
     @Column(nullable = false)
     private String name; // 예: "경영지원팀", "개발팀", "영업팀"
+
+    @Column(name = "department_order")
+    private Integer order;
 }

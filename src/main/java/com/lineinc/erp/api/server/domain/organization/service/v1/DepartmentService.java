@@ -23,8 +23,8 @@ public class DepartmentService {
     public List<DepartmentResponse> getAllDepartments() {
         final List<Department> departments = departmentRepository.findAll();
         return departments.stream()
-                .sorted(Comparator.comparing(Department::getId))
-                .map(dept -> new DepartmentResponse(dept.getId(), dept.getName()))
+                .sorted(Comparator.comparing(Department::getOrder))
+                .map(dept -> new DepartmentResponse(dept.getId(), dept.getName(), dept.getOrder()))
                 .collect(Collectors.toList());
     }
 }

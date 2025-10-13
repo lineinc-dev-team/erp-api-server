@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.organization.service.v1;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,8 @@ public class PositionService {
     public List<PositionResponse> getAllPositions() {
         final List<Position> positions = positionRepository.findAll();
         return positions.stream()
-                .map(position -> new PositionResponse(position.getId(), position.getName()))
+                .sorted(Comparator.comparing(Position::getOrder))
+                .map(position -> new PositionResponse(position.getId(), position.getName(), position.getOrder()))
                 .collect(Collectors.toList());
     }
 }

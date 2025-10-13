@@ -30,17 +30,18 @@ public class OrganizationSeeder {
                 .map(Department::getName)
                 .collect(Collectors.toSet());
 
-        final var newDepartments = AppConstants.DEPARTMENT_NAMES.stream()
-                .filter(name -> !existingDepartmentNames.contains(name))
-                .map(name -> Department.builder()
+        int departmentOrder = 1;
+        for (final String name : AppConstants.DEPARTMENT_NAMES) {
+            if (!existingDepartmentNames.contains(name)) {
+                final Department department = Department.builder()
                         .name(name)
+                        .order(departmentOrder)
                         .createdBy(AppConstants.SYSTEM_NAME)
                         .updatedBy(AppConstants.SYSTEM_NAME)
-                        .build())
-                .collect(Collectors.toList());
-
-        if (!newDepartments.isEmpty()) {
-            departmentRepository.saveAll(newDepartments);
+                        .build();
+                departmentRepository.save(department);
+            }
+            departmentOrder++;
         }
 
         // 직책 시딩 - 없는 것만 추가
@@ -48,17 +49,18 @@ public class OrganizationSeeder {
                 .map(Position::getName)
                 .collect(Collectors.toSet());
 
-        final var newPositions = AppConstants.POSITION_NAMES.stream()
-                .filter(name -> !existingPositionNames.contains(name))
-                .map(name -> Position.builder()
+        int positionOrder = 1;
+        for (final String name : AppConstants.POSITION_NAMES) {
+            if (!existingPositionNames.contains(name)) {
+                final Position position = Position.builder()
                         .name(name)
+                        .order(positionOrder)
                         .createdBy(AppConstants.SYSTEM_NAME)
                         .updatedBy(AppConstants.SYSTEM_NAME)
-                        .build())
-                .collect(Collectors.toList());
-
-        if (!newPositions.isEmpty()) {
-            positionRepository.saveAll(newPositions);
+                        .build();
+                positionRepository.save(position);
+            }
+            positionOrder++;
         }
 
         // 직급 시딩 - 없는 것만 추가
@@ -66,17 +68,18 @@ public class OrganizationSeeder {
                 .map(Grade::getName)
                 .collect(Collectors.toSet());
 
-        final var newGrades = AppConstants.GRADE_NAMES.stream()
-                .filter(name -> !existingGradeNames.contains(name))
-                .map(name -> Grade.builder()
+        int gradeOrder = 1;
+        for (final String name : AppConstants.GRADE_NAMES) {
+            if (!existingGradeNames.contains(name)) {
+                final Grade grade = Grade.builder()
                         .name(name)
+                        .order(gradeOrder)
                         .createdBy(AppConstants.SYSTEM_NAME)
                         .updatedBy(AppConstants.SYSTEM_NAME)
-                        .build())
-                .collect(Collectors.toList());
-
-        if (!newGrades.isEmpty()) {
-            gradeRepository.saveAll(newGrades);
+                        .build();
+                gradeRepository.save(grade);
+            }
+            gradeOrder++;
         }
     }
 }
