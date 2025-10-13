@@ -107,6 +107,7 @@ public class SteelManagementV2Controller extends BaseController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public void downloadSteelManagementsExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final SteelManagementV2ListRequest request,
             @Valid final SteelManagementV2DownloadRequest downloadRequest,
@@ -115,6 +116,7 @@ public class SteelManagementV2Controller extends BaseController {
         DownloadFieldUtils.validateFields(parsed, SteelManagementV2DownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 목록.xlsx");
         try (Workbook workbook = steelManagementV2Service.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {
