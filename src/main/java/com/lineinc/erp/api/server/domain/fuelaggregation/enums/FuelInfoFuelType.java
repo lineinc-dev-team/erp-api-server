@@ -12,14 +12,4 @@ public enum FuelInfoFuelType {
     ETC("기타");
 
     private final String label;
-
-    public static FuelInfoFuelType fromLabel(final String label) {
-        return switch (label) {
-            case "휘발유" -> GASOLINE;
-            case "경유" -> DIESEL;
-            case "요소수" -> UREA;
-            case "기타" -> ETC;
-            default -> throw new IllegalArgumentException("지원하지 않는 유종입니다: " + label);
-        };
-    }
 }
