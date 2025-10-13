@@ -195,7 +195,7 @@ public class SteelManagementV2Service {
                         .filter(d -> d.getId() != null && d.getId().equals(dto.id()))
                         .findFirst()
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
+                                ValidationMessages.STEEL_MANAGEMENT_DETAIL_NOT_FOUND));
                 existingDetail.updateFrom(dto);
             } else {
                 // 신규 항목 추가

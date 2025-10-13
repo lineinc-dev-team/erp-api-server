@@ -62,6 +62,7 @@ public class ValidationMessages {
 
     // ===== 강재/자재 관련 메시지 =====
     public static final String STEEL_MANAGEMENT_NOT_FOUND = "강재 관리를 찾을 수 없습니다.";
+    public static final String STEEL_MANAGEMENT_DETAIL_NOT_FOUND = "강재 관리 상세를 찾을 수 없습니다.";
     public static final String MATERIAL_MANAGEMENT_NOT_FOUND = "존재하지 않는 자재관리입니다.";
     public static final String CANNOT_APPROVE_RELEASED_STEEL = "이미 반출된 건은 승인으로 변경할 수 없습니다.";
     public static final String CANNOT_RELEASE_NON_APPROVED_STEEL = "반출 처리는 승인된 건만 가능합니다.";
