@@ -14,8 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
@@ -32,6 +35,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.AddFuelInfoRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
@@ -61,6 +65,8 @@ public class FuelAggregationService {
     private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
     private final FuelInfoService fuelInfoService;
     private final UserService userService;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     @Transactional
     public FuelAggregation createFuelAggregation(final FuelAggregationCreateRequest request, final Long userId) {
@@ -141,16 +147,27 @@ public class FuelAggregationService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final FuelAggregationListRequest request, final Sort sort,
+    public Workbook downloadExcel(final CustomUserDetails user, final FuelAggregationListRequest request,
+            final Sort sort,
             final List<String> fields) {
         final List<FuelAggregationListResponse> responses = fuelAggregationRepository.findAllWithoutPaging(request,
                 sort);
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 responses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.FUEL_AGGREGATION.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.FUEL_AGGREGATION,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     private String getExcelHeaderName(final String field) {

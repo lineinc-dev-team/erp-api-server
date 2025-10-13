@@ -197,6 +197,7 @@ public class FuelAggregationController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public void downloadFuelAggregationsExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final FuelAggregationListRequest request,
             @Valid final FuelAggregationDownloadRequest downloadRequest,
@@ -206,6 +207,7 @@ public class FuelAggregationController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "유류집계 목록.xlsx");
 
         try (Workbook workbook = fuelAggregationService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {

@@ -122,6 +122,7 @@ public class ClientCompanyController extends BaseController {
     @Operation(summary = "발주처 엑셀 다운로드")
     @RequireMenuPermission(menu = MENU_ACCOUNT, action = PermissionAction.VIEW)
     public void downloadClientCompaniesExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final ClientCompanyListRequest request,
             @Valid final ClientCompanyDownloadRequest companyDownloadRequest,
@@ -132,6 +133,7 @@ public class ClientCompanyController extends BaseController {
                 ClientCompanyDownloadRequest.ALLOWED_FIELDS);
 
         try (Workbook workbook = clientCompanyService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 DownloadFieldUtils.parseFields(companyDownloadRequest.fields()))) {

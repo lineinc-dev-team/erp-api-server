@@ -21,6 +21,9 @@ import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyChang
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyChangeHistoryChangeType;
 import com.lineinc.erp.api.server.domain.clientcompany.repository.ClientCompanyChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.clientcompany.repository.ClientCompanyRepository;
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
@@ -50,6 +53,8 @@ public class ClientCompanyService {
     private final UserService userService;
     private final Javers javers;
     private final ClientCompanyChangeHistoryRepository clientCompanyChangeHistoryRepository;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     @Transactional
     public void createClientCompany(final ClientCompanyCreateRequest request, final CustomUserDetails userEntity) {
@@ -148,15 +153,30 @@ public class ClientCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final ClientCompanyListRequest request, final Sort sort, final List<String> fields) {
+    public Workbook downloadExcel(
+            final CustomUserDetails user,
+            final ClientCompanyListRequest request,
+            final Sort sort,
+            final List<String> fields) {
         final List<ClientCompanyResponse> clientCompanyResponses = clientCompanyRepository.findAll(request,
                 Pageable.unpaged(sort))
                 .getContent();
-        return ExcelExportUtils.generateWorkbook(
+
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 clientCompanyResponses,
                 fields,
                 ClientCompanyExcelConfig::getHeaderName,
                 ClientCompanyExcelConfig::getCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.CLIENT_COMPANY.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.CLIENT_COMPANY,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     @Transactional(readOnly = true)
