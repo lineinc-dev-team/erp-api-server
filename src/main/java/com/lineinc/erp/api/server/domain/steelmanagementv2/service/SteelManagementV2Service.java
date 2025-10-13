@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
@@ -66,6 +67,7 @@ public class SteelManagementV2Service {
     private final UserService userService;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final ExcelDownloadHistoryService excelDownloadHistoryService;
+    private final S3FileService s3FileService;
     private final Javers javers;
 
     /**
@@ -294,15 +296,23 @@ public class SteelManagementV2Service {
         final List<SteelManagementV2Response> responses = steelManagementV2Repository.findAllWithoutPaging(request,
                 sort);
 
-        excelDownloadHistoryService.recordDownload(
-                ExcelDownloadHistoryType.STEEL_MANAGEMENT,
-                userService.getUserByIdOrThrow(user.getUserId()));
-
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 responses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        // S3에 엑셀 파일 업로드
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.STEEL_MANAGEMENT.name());
+
+        // 다운로드 이력 저장
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.STEEL_MANAGEMENT,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     private String getExcelHeaderName(final String field) {

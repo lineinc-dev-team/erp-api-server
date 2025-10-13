@@ -24,12 +24,15 @@ public class ExcelDownloadHistoryService {
      * 엑셀 다운로드 이력 저장
      *
      * @param downloadType 다운로드 타입
+     * @param user         사용자
+     * @param fileUrl      S3 파일 URL
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void recordDownload(final ExcelDownloadHistoryType downloadType, final User user) {
+    public void recordDownload(final ExcelDownloadHistoryType downloadType, final User user, final String fileUrl) {
         final ExcelDownloadHistory history = ExcelDownloadHistory.builder()
                 .downloadType(downloadType)
                 .user(user)
+                .fileUrl(fileUrl)
                 .build();
 
         excelDownloadHistoryRepository.save(history);
