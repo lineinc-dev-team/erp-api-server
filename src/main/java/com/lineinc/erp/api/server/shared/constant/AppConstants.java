@@ -132,6 +132,7 @@ public final class AppConstants {
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";
     public static final String DAILY_REPORT_MAPPED_BY = "dailyReport";
     public static final String FUEL_AGGREGATION_MAPPED_BY = "fuelAggregation";
+    public static final String LABOR_MAPPED_BY = "labor";
 
     // 빈 값 상수
     public static final String EMPTY_VALUE = "";

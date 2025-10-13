@@ -52,17 +52,19 @@ import lombok.experimental.SuperBuilder;
 })
 public class Labor extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "labor_seq";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "labor_seq")
-    @SequenceGenerator(name = "labor_seq", sequenceName = "labor_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
      * 노무 구분
      */
     @DiffIgnore
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private LaborType type;
 
     /**
@@ -84,7 +86,6 @@ public class Labor extends BaseEntity {
      */
     @DiffIgnore
     @Enumerated(EnumType.STRING)
-    @Column
     private LaborWorkType workType;
 
     /**
@@ -98,15 +99,14 @@ public class Labor extends BaseEntity {
      * 본사 인력 여부
      */
     @DiffIgnore
-    @Column(nullable = false)
     @Builder.Default
+    @Column(nullable = false)
     private Boolean isHeadOffice = false;
 
     /**
      * 임시 인력 여부
      */
     @DiffIgnore
-    @Column
     @Builder.Default
     private Boolean isTemporary = false;
 
@@ -121,85 +121,74 @@ public class Labor extends BaseEntity {
      * 기준일당
      */
     @DiffInclude
-    @Column
     private Long dailyWage;
 
     /**
      * 이전단가
      */
     @DiffIgnore
-    @Column
     private Long previousDailyWage;
 
     /**
      * 근속일수
      */
-    @DiffIgnore
-    @Column
-    @Builder.Default
     @Setter
+    @DiffIgnore
+    @Builder.Default
     private Long tenureDays = 0L;
 
     /**
      * 근속개월
      */
-    @DiffIgnore
-    @Column
-    @Builder.Default
     @Setter
+    @DiffIgnore
+    @Builder.Default
     private Integer tenureMonths = 0;
 
     /**
      * 퇴직금 발생 여부
      */
-    @DiffInclude
-    @Column
-    @Builder.Default
     @Setter
+    @DiffInclude
+    @Builder.Default
     private Boolean isSeverancePayEligible = false;
 
     /**
      * 은행명
      */
     @DiffInclude
-    @Column
     private String bankName;
 
     /**
      * 계좌번호
      */
     @DiffInclude
-    @Column
     private String accountNumber;
 
     /**
      * 예금주
      */
     @DiffInclude
-    @Column
     private String accountHolder;
 
     /**
      * 입사일
      */
-    @DiffIgnore
-    @Column
     @Setter
+    @DiffIgnore
     private OffsetDateTime hireDate;
 
     /**
      * 퇴사일
      */
-    @DiffIgnore
-    @Column
     @Setter
+    @DiffIgnore
     private OffsetDateTime resignationDate;
 
     /**
      * 첫 근무 시작일
      */
     @DiffInclude
-    @Column
     private OffsetDateTime firstWorkDate;
 
     /**
@@ -207,35 +196,31 @@ public class Labor extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     private OutsourcingCompany outsourcingCompany;
 
     /**
      * 주민등록번호
      */
     @DiffIgnore
-    @Column
     private String residentNumber;
 
     /**
      * 주소
      */
     @DiffInclude
-    @Column
     private String address;
 
     /**
      * 상세주소
      */
     @DiffInclude
-    @Column
     private String detailAddress;
 
     /**
      * 휴대폰
      */
     @DiffInclude
-    @Column
     private String phoneNumber;
 
     /**
@@ -249,14 +234,14 @@ public class Labor extends BaseEntity {
      * 첨부파일 목록
      */
     @DiffIgnore
-    @OneToMany(mappedBy = "labor", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.LABOR_MAPPED_BY, fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<LaborFile> files;
 
     /**
      * 변경 이력 목록
      */
     @DiffIgnore
-    @OneToMany(mappedBy = "labor", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.LABOR_MAPPED_BY, fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<LaborChangeHistory> changeHistories;
 
     /**
