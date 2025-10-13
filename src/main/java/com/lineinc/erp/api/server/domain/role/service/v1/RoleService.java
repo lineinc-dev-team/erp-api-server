@@ -99,16 +99,19 @@ public class RoleService {
 
                     // 권한 정렬 및 DTO 변환
                     final List<MenusPermissionsResponse.PermissionDto> sortedPermissions = permissions.stream()
-                            .sorted(Comparator.comparing(Permission::getOrder))
+                            .sorted(Comparator.comparing(
+                                    perm -> perm.getOrder() != null ? perm.getOrder() : Integer.MAX_VALUE))
                             .map(MenusPermissionsResponse.PermissionDto::from)
                             .toList();
 
                     return MenusPermissionsResponse.from(menuId, menu.getName(), sortedPermissions);
                 })
-                .sorted(Comparator.comparing(response -> {
-                    // 메뉴 order로 정렬
-                    return groupedByMenu.get(response.id()).get(0).getMenu().getOrder();
-                }))
+                .sorted(Comparator.comparing(
+                        response -> {
+                            // 메뉴 order로 정렬 (null인 경우 Integer.MAX_VALUE로 처리)
+                            final Integer order = groupedByMenu.get(response.id()).get(0).getMenu().getOrder();
+                            return order != null ? order : Integer.MAX_VALUE;
+                        }))
                 .toList();
     }
 
