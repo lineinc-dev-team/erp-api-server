@@ -157,6 +157,7 @@ public class MaterialManagementController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public void downloadSitesExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final MaterialManagementListRequest request,
             @Valid final MaterialManagementDownloadRequest materialManagementDownloadRequest,
@@ -167,6 +168,7 @@ public class MaterialManagementController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "자재관리 목록.xlsx");
 
         try (Workbook workbook = materialManagementService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {

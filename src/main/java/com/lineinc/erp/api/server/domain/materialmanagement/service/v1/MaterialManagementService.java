@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementChangeHistory;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementChangeHistoryType;
@@ -62,6 +65,8 @@ public class MaterialManagementService {
     private final Javers javers;
     private final MaterialManagementChangeHistoryRepository materialManagementChangeHistoryRepository;
     private final UserService userService;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     @Transactional
     public void createMaterialManagement(final MaterialManagementCreateRequest request, final CustomUserDetails user) {
@@ -122,16 +127,27 @@ public class MaterialManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final MaterialManagementListRequest request, final Sort sort,
+    public Workbook downloadExcel(final CustomUserDetails user, final MaterialManagementListRequest request,
+            final Sort sort,
             final List<String> fields) {
         final List<MaterialManagementResponse> responses = materialManagementRepository.findAllWithoutPaging(request,
                 sort);
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 responses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.MATERIAL_MANAGEMENT.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.MATERIAL_MANAGEMENT,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     private String getExcelHeaderName(final String field) {

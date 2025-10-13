@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
@@ -39,6 +42,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
@@ -79,6 +83,8 @@ public class ManagementCostService {
 
     private final Javers javers;
     private final UserService userService;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     @Transactional
     public void createManagementCost(final ManagementCostCreateRequest request, final Long userId) {
@@ -273,18 +279,29 @@ public class ManagementCostService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final ManagementCostListRequest request, final Sort sort, final List<String> fields) {
+    public Workbook downloadExcel(final CustomUserDetails user, final ManagementCostListRequest request,
+            final Sort sort, final List<String> fields) {
         final List<ManagementCostResponse> managementCostResponses = managementCostRepository
                 .findAllWithoutPaging(request, sort)
                 .stream()
                 .map(ManagementCostResponse::from)
                 .toList();
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 managementCostResponses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.MANAGEMENT_COST.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.MANAGEMENT_COST,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     private String getExcelHeaderName(final String field) {

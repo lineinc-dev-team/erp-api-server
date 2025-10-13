@@ -170,6 +170,7 @@ public class ManagementCostController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public void downloadSitesExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final ManagementCostListRequest request,
             @Valid final ManagementCostDownloadRequest managementCostDownloadRequest,
@@ -180,6 +181,7 @@ public class ManagementCostController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "관리비 목록.xlsx");
 
         try (Workbook workbook = managementCostService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {
