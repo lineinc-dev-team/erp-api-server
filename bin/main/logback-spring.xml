@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Spring Boot 기본 로그 설정 불러오기 -->
+    <!-- Spring Boot의 기본 로그 레벨, 패턴, 색상 등을 상속받습니다 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 로그 패턴 및 디렉토리 설정 -->
+    <!-- LOG_PATTERN: 콘솔 출력용 로그 형식 (색상 포함) -->
+    <!-- LOG_DIR: 로그 파일이 저장될 디렉토리 -->
+    <!-- LOG_FILE_NAME: 로그 파일명의 기본 접두사 -->
+    <property name="LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} [%thread] %highlight(%-5level) %clr(%logger{36}){cyan} - %msg%n%xEx"/>
+    <property name="LOG_DIR" value="logs"/>
+    <property name="LOG_FILE_NAME" value="erp-api"/>
+
+    <!-- 콘솔 출력: 색상 적용 -->
+    <!-- 개발/디버깅 시 터미널에서 로그를 쉽게 읽을 수 있도록 색상을 적용합니다 -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 기본 로그 파일 (INFO 이하) -->
+    <!-- 일반적인 애플리케이션 로그를 저장하는 파일입니다 -->
+    <!-- ERROR 로그는 제외하고 INFO, WARN, DEBUG 등만 저장합니다 -->
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE_NAME}.log</file>
+        <!-- 로그 파일 롤링 정책: 일별 + 크기별로 파일을 분할합니다 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 파일명 패턴: erp-api.2024-01-15.0.log 형태로 저장 (압축 없음) -->
+            <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 개별 파일 최대 크기: 100MB 초과 시 새 파일 생성 -->
+            <maxFileSize>100MB</maxFileSize>
+            <!-- 보관 기간: 7일간 보관 -->
+            <maxHistory>7</maxHistory>
+            <!-- 전체 로그 파일 크기 제한: 1GB 초과 시 오래된 파일 자동 삭제 -->
+            <totalSizeCap>1GB</totalSizeCap>
+            <!-- 애플리케이션 시작 시 오래된 로그 파일 정리 -->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <!-- 파일 로그 형식: 색상 없이 순수 텍스트로 저장 -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!-- ERROR 레벨 로그는 이 파일에 저장하지 않음 (ErrorFile에만 저장) -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>NEUTRAL</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 오류 로그 파일 (ERROR 이상) -->
+    <!-- 에러 로그만 별도로 수집하여 문제 분석을 용이하게 합니다 -->
+    <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE_NAME}-error.log</file>
+        <!-- 에러 로그 롤링 정책: 일반 로그보다 작은 크기로 관리 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <!-- 에러 로그는 전체 크기를 500MB로 제한 -->
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!-- ERROR 레벨 이상의 로그만 수집 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- 비동기 로깅 -->
+    <!-- 파일 I/O를 비동기로 처리하여 애플리케이션 성능에 영향을 최소화합니다 -->
+    <appender name="AsyncFile" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="File"/>
+        <!-- 큐 크기: 512개의 로그 이벤트를 메모리에 버퍼링 -->
+        <queueSize>512</queueSize>
+        <!-- 큐가 가득 찰 때 로그 손실 방지 (0 = 손실 없음) -->
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="AsyncErrorFile" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ErrorFile"/>
+        <!-- 에러 로그는 일반 로그보다 작은 큐 크기 사용 -->
+        <queueSize>256</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <!-- 환경별 설정 -->
+    <!-- local 환경: 개발자 로컬 환경용 설정 -->
+    <springProfile name="local">
+        <!-- 프로젝트 패키지의 로그 레벨을 DEBUG로 설정하여 상세한 정보 확인 가능 -->
+        <logger name="com.lineinc" level="DEBUG"/>
+        <!-- Hibernate SQL 쿼리 로그를 DEBUG로 설정하여 SQL 쿼리 확인 가능 -->
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+        <!-- Hibernate SQL 바인딩 로그를 TRACE로 설정하여 쿼리 디버깅 가능 -->
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
+        
+        <!-- 루트 로거: 콘솔만 출력 (파일 로깅 없음) -->
+        <root level="DEBUG">
+            <appender-ref ref="Console"/>
+        </root>
+    </springProfile>
+
+    <!-- dev 환경: 개발 서버용 설정 -->
+    <springProfile name="dev">
+        <!-- 프로덕션과 유사하지만 콘솔 출력은 유지 -->
+        <logger name="com.lineinc" level="INFO"/>
+        <!-- Hibernate SQL 쿼리 로그를 INFO로 설정하여 SQL 쿼리 확인 가능 -->
+        <logger name="org.hibernate.SQL" level="INFO"/>
+        <!-- Hibernate SQL 바인딩 로그는 비활성화 -->
+        <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
+        
+        <!-- 루트 로거: 콘솔만 출력 (파일 로깅 없음) -->
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+        </root>
+    </springProfile>
+
+    <!-- prod 환경: 프로덕션 서버용 설정 -->
+    <springProfile name="prod">
+        <!-- 프로덕션에서는 WARN 레벨 이상만 로깅하여 성능 최적화 -->
+        <logger name="com.lineinc" level="WARN"/>
+        <!-- Hibernate SQL 쿼리 로그를 INFO로 설정하여 SQL 쿼리 확인 가능 -->
+        <logger name="org.hibernate.SQL" level="INFO"/>
+        <!-- Hibernate SQL 바인딩 로그는 보안상 비활성화 -->
+        <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
+        
+        <!-- 콘솔 출력 제거: 파일 로그만 사용하여 리소스 절약 -->
+        <root level="WARN">
+            <appender-ref ref="AsyncFile"/>
+            <appender-ref ref="AsyncErrorFile"/>
+        </root>
+    </springProfile>
+
+    <!-- 기본 설정 (프로파일이 없을 때) -->
+    <!-- spring.profiles.active가 설정되지 않은 경우의 기본값 -->
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="AsyncFile"/>
+        <appender-ref ref="AsyncErrorFile"/>
+    </root>
+</configuration>

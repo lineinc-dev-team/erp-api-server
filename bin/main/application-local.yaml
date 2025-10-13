@@ -1,0 +1,45 @@
+# 로컬 환경 설정
+spring:
+  # 세션 관리 설정
+  session:
+    jdbc:
+      initialize-schema: always  # 세션을 위한 데이터베이스 스키마를 항상 초기화
+
+  # Spring Data 웹 지원 설정
+  data:
+    web:
+      pageable:
+        max-page-size: 200  # 페이지네이션의 최대 페이지 크기 (최대 200개 항목)
+
+  # Jackson JSON 직렬화 설정
+  jackson:
+    time-zone: Asia/Seoul  # JSON 직렬화의 시간대를 Asia/Seoul로 설정
+
+  # 데이터베이스 연결 설정 (로컬 PostgreSQL)
+  datasource:
+    driver-class-name: org.postgresql.Driver  # PostgreSQL JDBC 드라이버
+    url: jdbc:postgresql://localhost:5432/erpdb  # 로컬 PostgreSQL 데이터베이스 URL
+    username: erpuser  # 데이터베이스 사용자명
+    password: erppassword  # 데이터베이스 비밀번호
+
+  # JPA 및 Hibernate 설정
+  jpa:
+    hibernate:
+      ddl-auto: update  # 테이블을 삭제하지 않고 스키마 업데이트
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC          # JDBC 시간대를 UTC로 통일
+          batch_size: 50          # INSERT/UPDATE 배치 크기
+          order_inserts: true     # 배치 최적화를 위해 INSERT 정렬
+          order_updates: true     # 배치 최적화를 위해 UPDATE 정렬
+        default_batch_fetch_size: 200  # 엔티티 컬렉션 페치(batch fetch) 크기
+        format_sql: true               # SQL을 보기 좋게 포맷팅
+    open-in-view: false  # 지연 로딩 문제 방지를 위해 Open Session in View 비활성화
+
+# 관리 엔드포인트 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health  # 시스템 모니터링을 위해 health 엔드포인트만 HTTP로 노출
