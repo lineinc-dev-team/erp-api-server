@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
@@ -22,6 +25,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCom
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
@@ -47,6 +51,8 @@ public class OutsourcingCompanyService {
     private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
     private final Javers javers;
     private final UserService userService;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     @Transactional
     public OutsourcingCompany createOutsourcingCompany(final OutsourcingCompanyCreateRequest request,
@@ -181,6 +187,7 @@ public class OutsourcingCompanyService {
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(
+            final CustomUserDetails user,
             final OutsourcingCompanyListRequest request,
             final Sort sort,
             final List<String> fields) {
@@ -189,11 +196,21 @@ public class OutsourcingCompanyService {
                 .map(CompanyResponse::from)
                 .toList();
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 companyRespons,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.OUTSOURCING_COMPANY.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.OUTSOURCING_COMPANY,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     private String getExcelHeaderName(final String field) {

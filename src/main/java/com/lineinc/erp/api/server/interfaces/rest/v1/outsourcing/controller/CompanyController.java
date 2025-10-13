@@ -180,6 +180,7 @@ public class CompanyController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public void downloadOutsourcingCompaniesExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final OutsourcingCompanyListRequest request,
             @Valid final OutsourcingCompanyDownloadRequest companyDownloadRequest,
@@ -189,6 +190,7 @@ public class CompanyController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "외주업체 목록.xlsx");
 
         try (Workbook workbook = outsourcingCompanyService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {

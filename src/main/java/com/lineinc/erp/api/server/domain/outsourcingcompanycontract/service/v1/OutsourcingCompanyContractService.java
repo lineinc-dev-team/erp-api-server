@@ -14,6 +14,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
@@ -46,6 +49,7 @@ import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.ContractListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractContactCreateRequest;
@@ -103,6 +107,8 @@ public class OutsourcingCompanyContractService {
     private final SiteProcessService siteProcessService;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final UserService userService;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     /**
      * 외주업체 계약을 생성합니다.
@@ -417,17 +423,27 @@ public class OutsourcingCompanyContractService {
      * 외주업체 계약 목록을 엑셀로 다운로드합니다.
      */
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final ContractListSearchRequest request, final Sort sort, final List<String> fields) {
+    public Workbook downloadExcel(final CustomUserDetails user, final ContractListSearchRequest request,
+            final Sort sort, final List<String> fields) {
         final List<ContractListResponse> contractResponses = contractRepository.findAllWithoutPaging(request, sort)
                 .stream()
                 .map(ContractListResponse::from)
                 .toList();
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 contractResponses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.OUTSOURCING_COMPANY_CONTRACT.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.OUTSOURCING_COMPANY_CONTRACT,
+                userService.getUserByIdOrThrow(user.getUserId()), fileUrl);
+
+        return workbook;
     }
 
     /**

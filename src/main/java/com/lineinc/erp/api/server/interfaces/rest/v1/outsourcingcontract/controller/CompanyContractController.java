@@ -316,7 +316,9 @@ public class CompanyContractController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()) })
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/download")
-    public void downloadContractsExcel(@Valid final SortRequest sortRequest,
+    public void downloadContractsExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
+            @Valid final SortRequest sortRequest,
             @Valid final ContractListSearchRequest request,
             @Valid final ContractDownloadRequest downloadRequest,
             final HttpServletResponse response) throws IOException {
@@ -324,7 +326,9 @@ public class CompanyContractController {
         DownloadFieldUtils.validateFields(parsed, ContractDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "외주업체 계약 목록.xlsx");
 
-        try (Workbook workbook = outsourcingCompanyContractService.downloadExcel(request,
+        try (Workbook workbook = outsourcingCompanyContractService.downloadExcel(
+                user,
+                request,
                 PageableUtils.parseSort(sortRequest.sort()), parsed)) {
             workbook.write(response.getOutputStream());
         }
