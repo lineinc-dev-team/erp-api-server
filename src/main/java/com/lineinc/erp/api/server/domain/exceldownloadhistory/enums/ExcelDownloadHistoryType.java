@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum ExcelDownloadType {
+public enum ExcelDownloadHistoryType {
     CLIENT_COMPANY("발주처 목록"),
     SITE("현장 목록"),
     MATERIAL_MANAGEMENT("자재관리 목록"),
@@ -18,7 +18,7 @@ public enum ExcelDownloadType {
     OUTSOURCING_COMPANY("외주업체 목록"),
     OUTSOURCING_COMPANY_CONTRACT("외주업체 계약 목록"),
     MANAGEMENT_COST("관리비 목록"),
-    ACCOUNT("계정 목록");
+    ACCOUNT("유저 목록");
 
     private final String label;
 }

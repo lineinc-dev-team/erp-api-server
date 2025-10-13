@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.entity.ExcelDownloadHistory;
-import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.repository.ExcelDownloadHistoryRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 
@@ -26,7 +26,7 @@ public class ExcelDownloadHistoryService {
      * @param downloadType 다운로드 타입
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void recordDownload(final ExcelDownloadType downloadType, final User user) {
+    public void recordDownload(final ExcelDownloadHistoryType downloadType, final User user) {
         final ExcelDownloadHistory history = ExcelDownloadHistory.builder()
                 .downloadType(downloadType)
                 .user(user)

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
@@ -295,7 +295,7 @@ public class SteelManagementV2Service {
                 sort);
 
         excelDownloadHistoryService.recordDownload(
-                ExcelDownloadType.STEEL_MANAGEMENT,
+                ExcelDownloadHistoryType.STEEL_MANAGEMENT,
                 userService.getUserByIdOrThrow(user.getUserId()));
 
         return ExcelExportUtils.generateWorkbook(

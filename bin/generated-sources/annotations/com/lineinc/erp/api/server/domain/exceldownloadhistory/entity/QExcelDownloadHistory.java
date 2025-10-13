@@ -36,7 +36,9 @@ public class QExcelDownloadHistory extends EntityPathBase<ExcelDownloadHistory> 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
-    public final EnumPath<com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadType> downloadType = createEnum("downloadType", com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadType.class);
+    public final EnumPath<com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType> downloadType = createEnum("downloadType", com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType.class);
+
+    public final StringPath fileUrl = createString("fileUrl");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

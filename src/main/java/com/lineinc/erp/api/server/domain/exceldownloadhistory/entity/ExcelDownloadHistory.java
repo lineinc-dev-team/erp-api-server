@@ -1,7 +1,7 @@
 package com.lineinc.erp.api.server.domain.exceldownloadhistory.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
@@ -49,7 +49,7 @@ public class ExcelDownloadHistory extends BaseEntity {
      */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ExcelDownloadType downloadType;
+    private ExcelDownloadHistoryType downloadType;
 
     /**
      * 사용자
@@ -57,4 +57,9 @@ public class ExcelDownloadHistory extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.USER_ID)
     private User user;
+
+    /**
+     * 파일 URL
+     */
+    private String fileUrl;
 }
