@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.javers.core.Javers;
@@ -76,18 +77,21 @@ public class FuelInfoService {
                 });
 
         // EntitySyncUtils 실행 후, 각 FuelInfo에 실제 엔티티 설정
-        for (final FuelInfo fuelInfo : fuelAggregation.getFuelInfos()) {
-            if (fuelInfo.getOutsourcingCompanyId() != null) {
-                final OutsourcingCompany company = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(fuelInfo.getOutsourcingCompanyId());
-                final OutsourcingCompanyContractDriver driver = fuelInfo.getDriverId() != null
-                        ? outsourcingCompanyContractService.getDriverByIdOrThrow(fuelInfo.getDriverId())
-                        : null;
-                final OutsourcingCompanyContractEquipment equipment = fuelInfo.getEquipmentId() != null
-                        ? outsourcingCompanyContractService.getEquipmentByIdOrThrow(fuelInfo.getEquipmentId())
-                        : null;
+        final Map<Long, FuelInfoUpdateRequest> requestMap = requests.stream()
+                .filter(r -> r.id() != null)
+                .collect(Collectors.toMap(FuelInfoUpdateRequest::id, Function.identity()));
 
-                fuelInfo.setEntities(company, driver, equipment);
+        for (final FuelInfo fuelInfo : fuelAggregation.getFuelInfos()) {
+            if (fuelInfo.getId() != null && requestMap.containsKey(fuelInfo.getId())) {
+                final FuelInfoUpdateRequest request = requestMap.get(fuelInfo.getId());
+                final OutsourcingCompany company = outsourcingCompanyService
+                        .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+                final OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
+                        .getDriverByIdOrThrow(request.driverId());
+                final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
+                        .getEquipmentByIdOrThrow(request.equipmentId());
+
+                fuelInfo.updateFrom(request, company, driver, equipment);
             }
         }
 

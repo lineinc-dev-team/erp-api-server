@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -83,14 +81,12 @@ public class FuelInfo extends BaseEntity {
      */
     @DiffIgnore
     @Enumerated(EnumType.STRING)
-    @Column
     private FuelInfoFuelType fuelType;
 
     /**
      * 주유량 (리터)
      */
     @DiffInclude
-    @Column
     private Long fuelAmount;
 
     /**
@@ -130,11 +126,9 @@ public class FuelInfo extends BaseEntity {
     @Transient
     private Long equipmentId;
 
-    @Column
     @DiffInclude
     private String fileUrl;
 
-    @Column
     @DiffInclude
     private String originalFileName;
 
@@ -149,26 +143,19 @@ public class FuelInfo extends BaseEntity {
         this.vehicleNumber = this.equipment != null ? this.equipment.getVehicleNumber() : null;
     }
 
-    public void updateFrom(final FuelInfoUpdateRequest request) {
-        // ID만 저장
+    public void updateFrom(final FuelInfoUpdateRequest request, final OutsourcingCompany outsourcingCompany,
+            final OutsourcingCompanyContractDriver driver, final OutsourcingCompanyContractEquipment equipment) {
+        this.outsourcingCompany = outsourcingCompany;
+        this.driver = driver;
+        this.equipment = equipment;
         this.outsourcingCompanyId = request.outsourcingCompanyId();
         this.driverId = request.driverId();
         this.equipmentId = request.equipmentId();
-
-        // 직접 업데이트 가능한 필드들
-        Optional.ofNullable(request.fuelType()).ifPresent(val -> this.fuelType = val);
-        Optional.ofNullable(request.fuelAmount()).ifPresent(val -> this.fuelAmount = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.fuelType = request.fuelType();
+        this.fuelAmount = request.fuelAmount();
+        this.memo = request.memo();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
     }
 
-    // ID로부터 실제 엔티티를 설정하는 메서드 (별도로 호출)
-    public void setEntities(final OutsourcingCompany outsourcingCompany,
-            final OutsourcingCompanyContractDriver driver,
-            final OutsourcingCompanyContractEquipment equipment) {
-        this.outsourcingCompany = outsourcingCompany;
-        this.driver = driver;
-        this.equipment = equipment;
-    }
 }

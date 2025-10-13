@@ -44,7 +44,6 @@ public class FuelAggregationChangeHistory extends BaseEntity {
     private FuelAggregation fuelAggregation;
 
     @Enumerated(EnumType.STRING)
-    @Column
     private FuelAggregationChangeType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -55,7 +54,6 @@ public class FuelAggregationChangeHistory extends BaseEntity {
     @JoinColumn(name = AppConstants.USER_ID)
     private User user;
 
-    @Column
     private String description;
 
     @Setter
