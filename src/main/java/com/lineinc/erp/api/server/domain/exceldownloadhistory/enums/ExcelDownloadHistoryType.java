@@ -15,6 +15,7 @@ public enum ExcelDownloadHistoryType {
     STEEL_MANAGEMENT("강재수불부 목록"),
     FUEL_AGGREGATION("유류집계 목록"),
     LABOR_MANAGEMENT("인력정보 목록"),
+    LABOR_PAYROLL("노무명세서 목록"),
     OUTSOURCING_COMPANY("외주업체 목록"),
     OUTSOURCING_COMPANY_CONTRACT("외주업체 계약 목록"),
     MANAGEMENT_COST("관리비 목록"),

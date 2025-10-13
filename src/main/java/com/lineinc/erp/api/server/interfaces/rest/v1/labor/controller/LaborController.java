@@ -169,6 +169,7 @@ public class LaborController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public void downloadLaborsExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final LaborListRequest request,
             @Valid final LaborDownloadRequest laborDownloadRequest,
@@ -178,6 +179,7 @@ public class LaborController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "인력정보 목록.xlsx");
 
         try (Workbook workbook = laborService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {

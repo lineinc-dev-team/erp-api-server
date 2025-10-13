@@ -92,6 +92,7 @@ public class LaborPayrollController {
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public void downloadLaborPayrollExcel(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Parameter(description = "정렬 정보") @ModelAttribute final SortRequest sortRequest,
             @Parameter(description = "조회 조건") @ModelAttribute final LaborPayrollSearchRequest request,
             @Parameter(description = "다운로드 필드") @ModelAttribute final LaborPayrollDownloadRequest downloadRequest,
@@ -101,6 +102,7 @@ public class LaborPayrollController {
         ResponseHeaderUtils.setExcelDownloadHeader(response, "노무명세서 목록.xlsx");
 
         try (Workbook workbook = laborPayrollService.downloadExcel(
+                user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
                 parsed)) {

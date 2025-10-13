@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.entity.LaborChangeHistory;
 import com.lineinc.erp.api.server.domain.labor.entity.LaborFile;
@@ -28,6 +31,7 @@ import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.DeleteLaborsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborFileCreateRequest;
@@ -58,6 +62,8 @@ public class LaborService {
     private final LaborFileService laborFileService;
     private final Javers javers;
     private final UserService userService;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     /**
      * 노무 등록
@@ -180,14 +186,25 @@ public class LaborService {
      * 인력정보 엑셀 다운로드
      */
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final LaborListRequest request, final Sort sort, final List<String> fields) {
+    public Workbook downloadExcel(final CustomUserDetails user, final LaborListRequest request, final Sort sort,
+            final List<String> fields) {
         final List<LaborListResponse> laborResponses = laborRepository.findAllWithoutPaging(request, sort);
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 laborResponses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.LABOR_MANAGEMENT.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.LABOR_MANAGEMENT,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     /**

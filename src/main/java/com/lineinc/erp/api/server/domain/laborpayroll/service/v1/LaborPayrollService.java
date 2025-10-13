@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.common.service.S3FileService;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
+import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollChangeHistory;
@@ -28,6 +31,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollCha
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollInfo;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollSearchRequest;
@@ -61,6 +65,8 @@ public class LaborPayrollService {
     private final LaborPayrollChangeHistoryRepository laborPayrollChangeHistoryRepository;
     private final Javers javers;
     private final UserService userService;
+    private final S3FileService s3FileService;
+    private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     /**
      * 노무명세서 월별 집계 목록 조회 (페이징)
@@ -93,18 +99,29 @@ public class LaborPayrollService {
      * 검색 조건에 맞는 노무명세서 목록을 엑셀로 내보내기
      */
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final LaborPayrollSearchRequest request, final Sort sort, final List<String> fields) {
+    public Workbook downloadExcel(final CustomUserDetails user, final LaborPayrollSearchRequest request,
+            final Sort sort, final List<String> fields) {
         final List<LaborPayrollSummaryResponse> responses = laborPayrollSummaryRepository
                 .findAllWithoutPaging(request.siteName(), request.processName(), request.yearMonth(), sort)
                 .stream()
                 .map(LaborPayrollSummaryResponse::from)
                 .toList();
 
-        return ExcelExportUtils.generateWorkbook(
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 responses,
                 fields,
                 this::getExcelHeaderName,
                 this::getExcelCellValue);
+
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.LABOR_PAYROLL.name());
+
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.LABOR_PAYROLL,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
     }
 
     /**
@@ -113,15 +130,15 @@ public class LaborPayrollService {
     private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "id" -> "No.";
-            case "siteName" -> "현장명";
-            case "processName" -> "공정명";
-            case "regularEmployeeCount" -> "정직원 수";
-            case "directContractCount" -> "직영/계약직 수";
-            case "etcCount" -> "기타 수";
+            case "siteName" -> "현장";
+            case "processName" -> "공정";
+            case "regularEmployeeCount" -> "정직원";
+            case "directContractCount" -> "직영/계약직";
+            case "etcCount" -> "기타";
             case "totalLaborCost" -> "노무비 합계";
-            case "totalDeductions" -> "공제금 합계";
-            case "totalNetPayment" -> "차감지급 합계";
-            case "yearMonth" -> "년월";
+            case "totalDeductions" -> "공제 합계";
+            case "totalNetPayment" -> "차감지급액 합계";
+            case "yearMonth" -> "조회월";
             case "memo" -> "비고";
             default -> null;
         };
