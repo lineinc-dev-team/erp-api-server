@@ -49,28 +49,16 @@ public class FuelAggregation extends BaseEntity {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
-    /**
-     * 형장 (사이트)
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.SITE_ID)
     private Site site;
 
-    /**
-     * 공정 (사이트 프로세스)
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     private SiteProcess siteProcess;
 
-    /**
-     * 일자
-     */
     private OffsetDateTime date;
 
-    /**
-     * 날씨
-     */
     @Enumerated(EnumType.STRING)
     private FuelAggregationWeatherType weather;
 
