@@ -11,6 +11,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollCal
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollInfo;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,211 +48,180 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class LaborPayroll extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "labor_payroll_seq";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "labor_payroll_seq")
-    @SequenceGenerator(name = "labor_payroll_seq", sequenceName = "labor_payroll_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     // 인력 정보
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id")
+    @JoinColumn(name = AppConstants.LABOR_ID)
     private Labor labor;
 
     // 현장 정보
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
+    @JoinColumn(name = AppConstants.SITE_ID)
     private Site site;
 
     // 공정 정보
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id")
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     private SiteProcess siteProcess;
 
     // 기본 정보
-    @Column
     private String yearMonth; // 해당 년월 (YYYY-MM 형식)
 
     // 일당
-    @Column
     @DiffInclude
     private Integer dailyWage;
 
     // 1일~31일까지의 공수 (근무시간)
-    @Column
     @DiffInclude
     private Double day01Hours;
 
-    @Column
     @DiffInclude
     private Double day02Hours;
 
-    @Column
     @DiffInclude
     private Double day03Hours;
 
-    @Column
     @DiffInclude
     private Double day04Hours;
 
-    @Column
     @DiffInclude
     private Double day05Hours;
 
-    @Column
     @DiffInclude
     private Double day06Hours;
 
-    @Column
     @DiffInclude
     private Double day07Hours;
 
-    @Column
     @DiffInclude
     private Double day08Hours;
 
-    @Column
     @DiffInclude
     private Double day09Hours;
 
-    @Column
     @DiffInclude
     private Double day10Hours;
 
-    @Column
     @DiffInclude
     private Double day11Hours;
 
-    @Column
     @DiffInclude
     private Double day12Hours;
 
-    @Column
     @DiffInclude
     private Double day13Hours;
 
-    @Column
     @DiffInclude
     private Double day14Hours;
 
-    @Column
     @DiffInclude
     private Double day15Hours;
 
-    @Column
     @DiffInclude
     private Double day16Hours;
 
-    @Column
     @DiffInclude
     private Double day17Hours;
 
-    @Column
     @DiffInclude
     private Double day18Hours;
 
-    @Column
     @DiffInclude
     private Double day19Hours;
 
-    @Column
     @DiffInclude
     private Double day20Hours;
 
-    @Column
     @DiffInclude
     private Double day21Hours;
 
-    @Column
     @DiffInclude
     private Double day22Hours;
 
-    @Column
     @DiffInclude
     private Double day23Hours;
 
-    @Column
     @DiffInclude
     private Double day24Hours;
 
-    @Column
     @DiffInclude
     private Double day25Hours;
 
-    @Column
     @DiffInclude
     private Double day26Hours;
 
-    @Column
     @DiffInclude
     private Double day27Hours;
 
-    @Column
     @DiffInclude
     private Double day28Hours;
 
-    @Column
     @DiffInclude
     private Double day29Hours;
 
-    @Column
     @DiffInclude
     private Double day30Hours;
 
-    @Column
     @DiffInclude
     private Double day31Hours;
 
     // 계산된 값들
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal totalWorkHours; // 총 근무시간
 
-    @Column(precision = 6, scale = 2)
     @DiffInclude
+    @Column(precision = 6, scale = 2)
     private BigDecimal totalWorkDays; // 총 근무일수
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal totalLaborCost; // 총 노무비
 
     // 공제 항목들
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal incomeTax; // 소득세
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal employmentInsurance; // 고용보험료
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal healthInsurance; // 건강보험료
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal localTax; // 주민세
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal nationalPension; // 국민연금
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal longTermCareInsurance; // 장기요양보험료
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal totalDeductions; // 총 공제액
 
-    @Column(precision = 15, scale = 2)
     @DiffInclude
+    @Column(precision = 15, scale = 2)
     private BigDecimal netPayment; // 차감지급액
 
-    @Column(columnDefinition = "TEXT")
     @DiffInclude
+    @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
     /**
