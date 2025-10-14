@@ -24,6 +24,10 @@ public final class ValidationUtils {
      */
     public static <T> void validateMainContactExists(final List<T> requests,
             final Function<T, Boolean> isMainExtractor) {
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
         final long mainCount = requests.stream()
                 .filter(isMainExtractor::apply)
                 .count();

@@ -138,11 +138,7 @@ public class JaversUtils {
                             return null;
                         }
 
-                        return Map.of(
-                                "property", "null",
-                                "before", beforeValue,
-                                "after", "null",
-                                "type", "삭제");
+                        return createChangeMap("null", beforeValue, "null", "삭제", vc.getAffectedObject());
                     }
 
                     // 시스템 전용 변경은 제외
@@ -160,13 +156,7 @@ public class JaversUtils {
                     }
 
                     // 수정 변경
-                    final String propertyName = vc.getPropertyName();
-
-                    return Map.of(
-                            "property", propertyName,
-                            "before", beforeValue,
-                            "after", afterValue,
-                            "type", "수정");
+                    return createChangeMap(vc.getPropertyName(), beforeValue, afterValue, "수정", vc.getAffectedObject());
                 })
                 .filter(change -> change != null) // null 제외
                 .collect(Collectors.toList());
@@ -205,11 +195,21 @@ public class JaversUtils {
             return null;
         }
 
+        return createChangeMap("null", "null", afterValue, "추가", newEntity);
+    }
+
+    /**
+     * 변경 이력 Map 생성 (중복 제거)
+     */
+    private static Map<String, String> createChangeMap(final String property, final String before,
+            final String after, final String type, final Object affectedObject) {
+        final String entityId = extractEntityId(affectedObject);
         return Map.of(
-                "property", "null",
-                "before", "null",
-                "after", afterValue,
-                "type", "추가");
+                "property", property,
+                "before", before,
+                "after", after,
+                "type", type,
+                "entityId", entityId != null ? entityId : "null");
     }
 
     // ================== 공통 유틸 ==================
@@ -225,6 +225,32 @@ public class JaversUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * 엔티티에서 ID 추출
+     */
+    private static String extractEntityId(Object entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        // Optional unwrap
+        if (entity instanceof Optional<?>) {
+            entity = ((Optional<?>) entity).orElse(null);
+            if (entity == null) {
+                return null;
+            }
+        }
+
+        try {
+            final java.lang.reflect.Method getIdMethod = entity.getClass().getMethod("getId");
+            final Object id = getIdMethod.invoke(entity);
+            return id != null ? id.toString() : null;
+        } catch (final Exception e) {
+            log.debug("ID 추출 실패: {}", entity.getClass().getSimpleName());
+            return null;
+        }
     }
 
     private static String toJsonSafe(final Javers javers, final Object obj) {
