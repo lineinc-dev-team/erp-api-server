@@ -60,10 +60,16 @@ public class Role extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RoleSiteProcess> siteProcesses = new HashSet<>();
 
+    /**
+     * 전체 현장 및 공정 접근 권한
+     */
     @Column(nullable = false)
     @Builder.Default
     private Boolean hasGlobalSiteProcessAccess = false;
 
+    /**
+     * 마스킹 해제 권한
+     */
     @Builder.Default
     private Boolean hasUnmaskPermission = false;
 
