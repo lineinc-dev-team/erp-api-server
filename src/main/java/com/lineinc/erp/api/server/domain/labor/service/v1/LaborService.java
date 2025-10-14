@@ -304,10 +304,10 @@ public class LaborService {
             case "resignationDate" -> "퇴사일";
             case "tenureDays" -> "근속일수";
             case "tenureMonths" -> "근속기간";
-            case "isSeverancePayEligible" -> "퇴직금 발생 요건 여부";
-            case "hasBankbook" -> "통장사본";
-            case "hasIdCard" -> "신분증사본";
-            case "hasSignatureImage" -> "서명이미지";
+            case "isSeverancePayEligible" -> "퇴직금 발생";
+            case "hasBankbook" -> "통장 사본";
+            case "hasIdCard" -> "신분증 사본";
+            case "hasSignatureImage" -> "서명 이미지";
             case "hasFile" -> "기타첨부";
             default -> null;
         };
