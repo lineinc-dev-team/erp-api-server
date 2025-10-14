@@ -126,7 +126,7 @@ public class FuelInfo extends BaseEntity {
     @Transient
     private Long equipmentId;
 
-    @DiffInclude
+    @DiffIgnore
     private String fileUrl;
 
     @DiffInclude
