@@ -52,7 +52,8 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        // MaterialManagementDetail을 기준으로 조회하되, MaterialManagement 기준으로만 정렬
+        // MaterialManagementDetail을 기준으로 조회, MaterialManagement 기준 정렬 후 Detail ID로 2차
+        // 정렬
         final List<MaterialManagementDetail> detailContent = queryFactory
                 .selectFrom(materialManagementDetail)
                 .innerJoin(materialManagementDetail.materialManagement, materialManagement).fetchJoin()
@@ -61,6 +62,7 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .where(condition)
                 .orderBy(orders)
+                .orderBy(materialManagementDetail.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -124,7 +126,8 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
-        // MaterialManagementDetail을 기준으로 조회하되, MaterialManagement 기준으로만 정렬
+        // MaterialManagementDetail을 기준으로 조회, MaterialManagement 기준 정렬 후 Detail ID로 2차
+        // 정렬
         final List<MaterialManagementDetail> detailContent = queryFactory
                 .selectFrom(materialManagementDetail)
                 .innerJoin(materialManagementDetail.materialManagement, materialManagement).fetchJoin()
@@ -132,7 +135,8 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .leftJoin(materialManagement.siteProcess, siteProcess).fetchJoin()
                 .leftJoin(materialManagement.outsourcingCompany, outsourcingCompany).fetchJoin()
                 .where(condition)
-                .orderBy(orders) // MaterialManagement 기준으로만 정렬
+                .orderBy(orders)
+                .orderBy(materialManagementDetail.id.asc())
                 .fetch();
 
         // 각 상세품목에 대해 MaterialManagement 정보와 해당 상세품목을 포함하여 응답 생성
