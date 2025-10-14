@@ -258,8 +258,11 @@ public class SteelManagementV2 extends BaseEntity {
                 + (this.outgoingPurchaseTotalWeight != null ? this.outgoingPurchaseTotalWeight : 0.0)
                 + (this.outgoingRentalTotalWeight != null ? this.outgoingRentalTotalWeight : 0.0);
 
-        this.onSiteRemainingWeight = incomingWeightSubtotal - outgoingWeightSubtotal
+        final double remaining = incomingWeightSubtotal - outgoingWeightSubtotal
                 - (this.scrapTotalWeight != null ? this.scrapTotalWeight : 0.0);
+
+        // 소수점 4자리에서 반올림
+        this.onSiteRemainingWeight = Math.round(remaining * 10000.0) / 10000.0;
     }
 
     /**
