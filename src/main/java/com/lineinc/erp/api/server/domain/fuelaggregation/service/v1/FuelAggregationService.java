@@ -107,7 +107,6 @@ public class FuelAggregationService {
             // FuelInfo를 저장하고 FuelAggregation의 컬렉션에도 추가
             fuelInfoRepository.save(fuelInfoEntity);
             fuelAggregation.getFuelInfos().add(fuelInfoEntity);
-
         }
 
         // 해당 현장, 공정, 일자에 맞는 출역일보 찾기
@@ -327,6 +326,19 @@ public class FuelAggregationService {
         if (request.fuelInfos() != null) {
             fuelInfoService.updateFuelInfos(fuelAggregation, request.fuelInfos(), userId);
         }
+
+        // 출역일보의 유류 집계 데이터 업데이트
+        dailyReportRepository.findBySiteAndSiteProcessAndReportDate(
+                fuelAggregation.getSite(),
+                fuelAggregation.getSiteProcess(),
+                fuelAggregation.getDate())
+                .ifPresent(dailyReport -> {
+                    dailyReport.updateGasolineTotalAmount();
+                    dailyReport.updateDieselTotalAmount();
+                    dailyReport.updateUreaTotalAmount();
+                    dailyReport.updateEtcTotalAmount();
+                    dailyReport.updateFuelEvidenceSubmitted();
+                });
     }
 
 }
