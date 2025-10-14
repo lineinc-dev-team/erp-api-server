@@ -216,7 +216,7 @@ public class SiteService {
         }
 
         final boolean hasGlobalAccess = user.getUserRoles().stream()
-                .anyMatch(r -> r.getRole().isHasGlobalSiteProcessAccess());
+                .anyMatch(r -> r.getRole().getHasGlobalSiteProcessAccess());
         if (hasGlobalAccess) {
             return true;
         }

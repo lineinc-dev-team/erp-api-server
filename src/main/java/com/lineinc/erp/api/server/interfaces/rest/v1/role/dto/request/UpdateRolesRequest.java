@@ -15,7 +15,9 @@ public record UpdateRolesRequest(
 
         @Schema(description = "권한 ID 리스트", example = "[1, 2, 3]") List<Long> permissionIds,
 
-        @Schema(description = "전체 현장 및 공정 접근 권한 여부", example = "true") Boolean hasGlobalSiteProcessAccess,
+        @Schema(description = "전체 현장 및 공정 접근 권한 여부", example = "false") Boolean hasGlobalSiteProcessAccess,
+
+        @Schema(description = "민감정보 마스킹 해제 권한 여부", example = "false") Boolean hasUnmaskPermission,
 
         @Schema(description = "현장 및 공정 접근 리스트", example = "[{\"siteId\": 1, \"processId\": 3}]") List<SiteProcessAccess> siteProcesses) {
 

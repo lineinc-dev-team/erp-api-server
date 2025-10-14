@@ -36,6 +36,8 @@ public class QRole extends EntityPathBase<Role> {
 
     public final BooleanPath hasGlobalSiteProcessAccess = createBoolean("hasGlobalSiteProcessAccess");
 
+    public final BooleanPath hasUnmaskPermission = createBoolean("hasUnmaskPermission");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");

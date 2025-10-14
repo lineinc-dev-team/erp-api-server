@@ -185,7 +185,7 @@ public class User extends BaseEntity implements UserDetails {
             return false;
         }
         return this.userRoles.stream()
-                .anyMatch(role -> role.getRole().isHasGlobalSiteProcessAccess());
+                .anyMatch(role -> role.getRole().getHasGlobalSiteProcessAccess());
     }
 
     public void syncTransientFields() {

@@ -1,18 +1,31 @@
 package com.lineinc.erp.api.server.domain.role.entity;
 
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.user.entity.UserRole;
-import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.UpdateRolesRequest;
-
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.user.entity.UserRole;
+import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.UpdateRolesRequest;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -49,15 +62,20 @@ public class Role extends BaseEntity implements Serializable {
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean hasGlobalSiteProcessAccess = false;
+    private Boolean hasGlobalSiteProcessAccess = false;
+
+    @Builder.Default
+    private Boolean hasUnmaskPermission = false;
 
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    public void updateFrom(UpdateRolesRequest request) {
+    public void updateFrom(final UpdateRolesRequest request) {
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
         Optional.ofNullable(request.hasGlobalSiteProcessAccess())
                 .ifPresent(val -> this.hasGlobalSiteProcessAccess = val);
+        Optional.ofNullable(request.hasUnmaskPermission())
+                .ifPresent(val -> this.hasUnmaskPermission = val);
     }
 }

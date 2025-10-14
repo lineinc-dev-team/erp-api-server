@@ -247,6 +247,7 @@ public class RoleService {
                 .name(request.name())
                 .memo(request.memo())
                 .hasGlobalSiteProcessAccess(Boolean.TRUE.equals(request.hasGlobalSiteProcessAccess()))
+                .hasUnmaskPermission(Boolean.TRUE.equals(request.hasUnmaskPermission()))
                 .build();
     }
 
