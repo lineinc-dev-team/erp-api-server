@@ -95,7 +95,7 @@ public class OutsourcingCompanyContact extends BaseEntity {
     /**
      * 대표 담당자인지 여부
      */
-    @DiffInclude
+    @DiffIgnore
     @Column
     @Builder.Default
     private Boolean isMain = false;
