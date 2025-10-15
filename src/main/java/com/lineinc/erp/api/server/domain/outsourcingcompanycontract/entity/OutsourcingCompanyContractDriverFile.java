@@ -55,7 +55,7 @@ public class OutsourcingCompanyContractDriverFile extends BaseEntity {
     @Column
     private String fileUrl; // 파일 URL
 
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String originalFileName; // 원본 파일명
 
