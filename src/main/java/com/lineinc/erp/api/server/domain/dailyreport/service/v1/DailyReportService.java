@@ -393,8 +393,14 @@ public class DailyReportService {
         // EntitySyncUtils.syncList를 사용하여 증빙 파일 동기화
         if (request.evidenceFiles() != null) {
             for (final DailyReportEvidenceFileUpdateRequest evidenceFileRequest : request.evidenceFiles()) {
+                // 해당 fileType의 파일들만 추출하여 별도 리스트로 동기화 (다른 fileType 보호)
+                final List<DailyReportEvidenceFile> typeSpecificFiles = new ArrayList<>(
+                        dailyReport.getEvidenceFiles().stream()
+                                .filter(file -> file.getFileType() == evidenceFileRequest.fileType())
+                                .toList());
+
                 EntitySyncUtils.syncList(
-                        dailyReport.getEvidenceFiles(),
+                        typeSpecificFiles,
                         evidenceFileRequest.files(),
                         (final DailyReportEvidenceFileUpdateRequest.FileUpdateInfo dto) -> {
                             return DailyReportEvidenceFile.builder()
@@ -406,6 +412,10 @@ public class DailyReportService {
                                     .memo(dto.memo())
                                     .build();
                         });
+
+                // 원본 리스트에서 해당 fileType 제거 후 동기화된 결과 추가
+                dailyReport.getEvidenceFiles().removeIf(file -> file.getFileType() == evidenceFileRequest.fileType());
+                dailyReport.getEvidenceFiles().addAll(typeSpecificFiles);
             }
         }
 
