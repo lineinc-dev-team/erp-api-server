@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
-import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
@@ -43,7 +42,6 @@ import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
-import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
@@ -503,14 +501,6 @@ public class ManagementCostService {
         }
 
         return resultSlice.map(result -> new ItemDescriptionResponse((Long) result[1], (String) result[0]));
-    }
-
-    /**
-     * 인력명 키워드 검색
-     */
-    public Slice<LaborNameResponse> getLaborNames(final String keyword, final List<LaborType> types,
-            final Pageable pageable) {
-        return laborService.getLaborNames(keyword, types, pageable);
     }
 
     /**

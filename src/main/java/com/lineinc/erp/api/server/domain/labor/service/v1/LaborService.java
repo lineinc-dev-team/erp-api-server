@@ -161,9 +161,10 @@ public class LaborService {
      * 인력명 키워드 검색 (노무인력 유형별 필터링 포함)
      */
     public Slice<LaborNameResponse> getLaborNames(final String keyword, final List<LaborType> types,
-            final Pageable pageable) {
+            final Long outsourcingCompanyId, final Pageable pageable) {
         final String searchKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
-        final Slice<Labor> laborSlice = laborRepository.findAllByNameAndType(searchKeyword, types, pageable);
+        final Slice<Labor> laborSlice = laborRepository.findAllByNameAndType(searchKeyword, types, outsourcingCompanyId,
+                pageable);
         return laborSlice.map(LaborNameResponse::from);
     }
 
