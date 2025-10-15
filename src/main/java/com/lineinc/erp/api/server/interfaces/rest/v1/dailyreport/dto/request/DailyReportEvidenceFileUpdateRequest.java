@@ -11,10 +11,10 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "출역일보 증빙 파일 수정 요청")
 public record DailyReportEvidenceFileUpdateRequest(
-        @Schema(description = "수정할 파일 정보 목록") List<@Valid FileUpdateInfo> files,
+        @Schema(description = "수정할 파일 정보 목록") List<@Valid EvidenceFileUpdateInfo> files,
         @Schema(description = "파일 타입", example = "EMPLOYEE") @NotNull DailyReportEvidenceFileType fileType) {
     @Schema(description = "파일 정보 수정 내용")
-    public record FileUpdateInfo(
+    public record EvidenceFileUpdateInfo(
             @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "파일명", example = "출역일보_20240115.pdf") @NotEmpty String name,
             @Schema(description = "파일 URL", example = "https://example.com/files/report.pdf") String fileUrl,

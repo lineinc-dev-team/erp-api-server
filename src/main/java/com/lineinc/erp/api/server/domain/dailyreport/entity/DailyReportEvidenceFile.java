@@ -72,7 +72,7 @@ public class DailyReportEvidenceFile extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    public void updateFrom(final DailyReportEvidenceFileUpdateRequest.FileUpdateInfo request) {
+    public void updateFrom(final DailyReportEvidenceFileUpdateRequest.EvidenceFileUpdateInfo request) {
         this.name = request.name();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();

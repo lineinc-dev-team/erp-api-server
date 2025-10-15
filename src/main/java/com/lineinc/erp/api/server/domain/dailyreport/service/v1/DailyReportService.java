@@ -402,7 +402,7 @@ public class DailyReportService {
                 EntitySyncUtils.syncList(
                         typeSpecificFiles,
                         evidenceFileRequest.files(),
-                        (final DailyReportEvidenceFileUpdateRequest.FileUpdateInfo dto) -> {
+                        (final DailyReportEvidenceFileUpdateRequest.EvidenceFileUpdateInfo dto) -> {
                             return DailyReportEvidenceFile.builder()
                                     .dailyReport(dailyReport)
                                     .fileType(evidenceFileRequest.fileType())
