@@ -11,40 +11,29 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 계약 이력 응답")
 public record ContractHistoryResponse(
-        @Schema(description = "계약 ID") Long contractId,
-
+        @Schema(description = "계약 ID") Long id,
         @Schema(description = "현장명") String siteName,
-
         @Schema(description = "공정명") String processName,
-
         @Schema(description = "외주금액") Long contractAmount,
-
         @Schema(description = "외주업체 계약 구분값") String type,
-
         @Schema(description = "담당자명") String contactName,
-
         @Schema(description = "공제항목") String defaultDeductions,
-
         @Schema(description = "첨부파일 목록") List<ContractFileResponse> files,
-
         @Schema(description = "계약 시작일") OffsetDateTime contractStartDate,
-
         @Schema(description = "계약 종료일") OffsetDateTime contractEndDate,
-
         @Schema(description = "등록일") OffsetDateTime createdAt,
-
         @Schema(description = "수정일") OffsetDateTime updatedAt) {
 
     public static ContractHistoryResponse from(final OutsourcingCompanyContractHistory history) {
         final var contract = history.getContract();
 
-        // 담당자명 (대표 담당자 우선, 없으면 첫 번째 담당자)
+        // 담당자명 (대표 담당자)
         final String contactName = contract.getContacts() != null && !contract.getContacts().isEmpty()
                 ? contract.getContacts().stream()
                         .filter(contact -> contact.getIsMain())
                         .findFirst()
-                        .orElse(contract.getContacts().get(0))
-                        .getName()
+                        .map(contact -> contact.getName())
+                        .orElse(null)
                 : null;
 
         // 첨부파일 목록
