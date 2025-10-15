@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,9 @@ import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepos
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
+import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollChangeHistory;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayrollSummary;
+import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -41,6 +44,7 @@ public class LaborPayrollSyncService {
 
     private final LaborPayrollRepository laborPayrollRepository;
     private final LaborPayrollSummaryRepository laborPayrollSummaryRepository;
+    private final LaborPayrollChangeHistoryRepository laborPayrollChangeHistoryRepository;
     private final DailyReportRepository dailyReportRepository;
 
     /**
@@ -265,13 +269,34 @@ public class LaborPayrollSyncService {
 
     /**
      * 기존 집계 데이터 삭제
+     * 집계 데이터 삭제 전에 관련된 변경 이력을 먼저 삭제
      */
     private void removeExistingSummary(final Site site, final SiteProcess siteProcess, final String yearMonth) {
         final Optional<LaborPayrollSummary> existingSummary = findExistingSummary(site, siteProcess, yearMonth);
         if (existingSummary.isPresent()) {
-            laborPayrollSummaryRepository.delete(existingSummary.get());
+            final LaborPayrollSummary summary = existingSummary.get();
+
+            // 1. 먼저 관련된 변경 이력 삭제
+            removeChangeHistoryForSummary(summary);
+
+            // 2. 집계 데이터 삭제
+            laborPayrollSummaryRepository.delete(summary);
             log.info("기존 집계 데이터 삭제: 현장={}, 공정={}, 년월={}",
                     site.getName(), siteProcess.getName(), yearMonth);
+        }
+    }
+
+    /**
+     * 집계 데이터와 관련된 변경 이력 삭제
+     */
+    private void removeChangeHistoryForSummary(final LaborPayrollSummary summary) {
+        final List<LaborPayrollChangeHistory> changeHistories = laborPayrollChangeHistoryRepository
+                .findBySummaryId(summary.getId(), Pageable.unpaged()).getContent();
+
+        if (!changeHistories.isEmpty()) {
+            laborPayrollChangeHistoryRepository.deleteAll(changeHistories);
+            log.info("집계 데이터 관련 변경 이력 {}건 삭제: 집계 ID={}",
+                    changeHistories.size(), summary.getId());
         }
     }
 
