@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractWorkerFileUpdateRequest;
@@ -44,7 +43,7 @@ public class OutsourcingCompanyContractWorkerFile extends BaseEntity {
     @Column
     private String fileUrl; // 파일 URL
 
-    @DiffInclude
+    @DiffIgnore
     @Column
     private String originalFileName; // 원본 파일명
 
