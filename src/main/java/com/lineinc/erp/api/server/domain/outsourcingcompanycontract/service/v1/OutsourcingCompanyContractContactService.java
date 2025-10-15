@@ -53,6 +53,14 @@ public class OutsourcingCompanyContractContactService {
                 .orElseThrow(
                         () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
+        if (contacts == null || contacts.isEmpty())
+            return;
+
+        final long mainCount = contacts.stream().filter(OutsourcingCompanyContractContactUpdateRequest::isMain).count();
+        if (mainCount != 1) {
+            throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
+        }
+
         // 2. 변경 전 스냅샷 생성
         final List<OutsourcingCompanyContractContact> beforeContacts = contract.getContacts().stream()
                 .map(contact -> JaversUtils.createSnapshot(javers, contact, OutsourcingCompanyContractContact.class))

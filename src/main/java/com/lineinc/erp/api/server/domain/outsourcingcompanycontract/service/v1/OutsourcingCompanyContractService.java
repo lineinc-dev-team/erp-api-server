@@ -198,6 +198,15 @@ public class OutsourcingCompanyContractService {
      */
     private void createContractContacts(final OutsourcingCompanyContract contract,
             final List<OutsourcingCompanyContractContactCreateRequest> contacts) {
+
+        if (contacts == null || contacts.isEmpty())
+            return;
+
+        final long mainCount = contacts.stream().filter(OutsourcingCompanyContractContactCreateRequest::isMain).count();
+        if (mainCount != 1) {
+            throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
+        }
+
         for (final OutsourcingCompanyContractContactCreateRequest contactRequest : contacts) {
             final OutsourcingCompanyContractContact contact = OutsourcingCompanyContractContact.builder()
                     .outsourcingCompanyContract(contract)
