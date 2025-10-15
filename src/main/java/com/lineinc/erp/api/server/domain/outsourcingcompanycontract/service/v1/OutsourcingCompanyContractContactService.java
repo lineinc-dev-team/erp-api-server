@@ -77,6 +77,7 @@ public class OutsourcingCompanyContractContactService {
                         .position(dto.position())
                         .landlineNumber(dto.landlineNumber())
                         .phoneNumber(dto.phoneNumber())
+                        .isMain(dto.isMain())
                         .email(dto.email())
                         .memo(dto.memo())
                         .outsourcingCompanyContract(contract)
