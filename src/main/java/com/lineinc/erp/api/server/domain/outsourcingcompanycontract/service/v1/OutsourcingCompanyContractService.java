@@ -474,8 +474,8 @@ public class OutsourcingCompanyContractService {
             case "createdAt" -> "작성일자";
             case "contractStatus" -> "상태";
             case "memo" -> "비고";
-            case "hasGuaranteeCertificate" -> "보증서 여부";
-            case "hasContractCertificate" -> "계약서 여부";
+            case "hasGuaranteeCertificate" -> "보증서";
+            case "hasContractCertificate" -> "계약서";
             default -> null;
         };
     }
