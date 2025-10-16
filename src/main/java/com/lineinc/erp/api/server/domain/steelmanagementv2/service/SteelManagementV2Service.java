@@ -100,8 +100,13 @@ public class SteelManagementV2Service {
 
         // 상세 항목 생성
         for (final SteelManagementDetailV2CreateRequest detailRequest : request.details()) {
-            final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
-                    .getOutsourcingCompanyByIdOrThrow(detailRequest.outsourcingCompanyId());
+            // 외주업체 설정 (선택적)
+            OutsourcingCompany outsourcingCompany = null;
+            if (detailRequest.outsourcingCompanyId() != null) {
+                outsourcingCompany = outsourcingCompanyService
+                        .getOutsourcingCompanyByIdOrThrow(detailRequest.outsourcingCompanyId());
+            }
+
             final SteelManagementDetailV2 detail = SteelManagementDetailV2.builder()
                     .steelManagementV2(steelManagementV2)
                     .outsourcingCompany(outsourcingCompany)
