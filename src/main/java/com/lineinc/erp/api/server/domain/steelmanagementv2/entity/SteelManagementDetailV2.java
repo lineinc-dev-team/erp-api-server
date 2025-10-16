@@ -119,7 +119,7 @@ public class SteelManagementDetailV2 extends BaseEntity {
     private Long unitPrice;
 
     /**
-     * 금액
+     * 공급가
      */
     @DiffIgnore
     @Column
@@ -132,7 +132,7 @@ public class SteelManagementDetailV2 extends BaseEntity {
     private Long vat;
 
     /**
-     * 합계 (금액 + 부가세)
+     * 합계 (공급가 + 부가세)
      */
     @DiffInclude
     private Long total;
