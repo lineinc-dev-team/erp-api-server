@@ -328,14 +328,14 @@ public class SteelManagementV2Service {
         return switch (field) {
             case "siteName" -> "현장명";
             case "siteProcessName" -> "공정명";
-            case "incomingOwnMaterial" -> "입고 자사(톤/금액)";
-            case "incomingPurchase" -> "입고 구매(톤/금액)";
-            case "incomingRental" -> "입고 임대(톤/금액)";
-            case "outgoingOwnMaterial" -> "출고 자사(톤/금액)";
-            case "outgoingPurchase" -> "출고 구매(톤/금액)";
-            case "outgoingRental" -> "출고 임대(톤/금액)";
+            case "incomingOwnMaterial" -> "입고 자사(톤/합계)";
+            case "incomingPurchase" -> "입고 구매(톤/합계)";
+            case "incomingRental" -> "입고 임대(톤/합계)";
+            case "outgoingOwnMaterial" -> "출고 자사(톤/합계)";
+            case "outgoingPurchase" -> "출고 구매(톤/합계)";
+            case "outgoingRental" -> "출고 임대(톤/합계)";
             case "onSiteStock" -> "사장(톤)";
-            case "scrap" -> "고철(톤/금액)";
+            case "scrap" -> "고철(톤/합계)";
             case "totalInvestmentAmount" -> "총 금액(투입비)";
             case "onSiteRemainingWeight" -> "현장보류수량(톤)";
             case "createdAt" -> "등록일";
