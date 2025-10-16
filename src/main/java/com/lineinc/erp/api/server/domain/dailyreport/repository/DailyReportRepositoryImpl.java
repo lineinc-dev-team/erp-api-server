@@ -120,20 +120,11 @@ public class DailyReportRepositoryImpl implements DailyReportRepositoryCustom {
         }
 
         // 증빙 제출 여부 필터
-        // true: 증빙이 하나라도 누락된 항목 조회 (증빙 미제출 목록)
-        // false: 증빙이 모두 제출된 항목 조회 (증빙 완료 목록)
+        // true: 증빙이 모두 제출된 항목 조회 (증빙 완료 목록)
+        // false: 증빙이 하나라도 누락된 항목 조회 (증빙 미제출 목록)
         if (request.isEvidenceSubmitted() != null) {
             if (request.isEvidenceSubmitted()) {
-                // 하나라도 false면 조회됨
-                condition = condition.and(
-                        dailyReport.employeeEvidenceSubmitted.eq(false)
-                                .or(dailyReport.directContractEvidenceSubmitted.eq(false))
-                                .or(dailyReport.outsourcingEvidenceSubmitted.eq(false))
-                                .or(dailyReport.equipmentEvidenceSubmitted.eq(false))
-                                .or(dailyReport.fuelEvidenceSubmitted.eq(false))
-                                .or(dailyReport.sitePhotoSubmitted.eq(false)));
-            } else {
-                // 모두 true여야 조회됨
+                // 모두 true여야 조회됨 (증빙 완료)
                 condition = condition.and(
                         dailyReport.employeeEvidenceSubmitted.eq(true)
                                 .and(dailyReport.directContractEvidenceSubmitted.eq(true))
@@ -141,6 +132,15 @@ public class DailyReportRepositoryImpl implements DailyReportRepositoryCustom {
                                 .and(dailyReport.equipmentEvidenceSubmitted.eq(true))
                                 .and(dailyReport.fuelEvidenceSubmitted.eq(true))
                                 .and(dailyReport.sitePhotoSubmitted.eq(true)));
+            } else {
+                // 하나라도 false면 조회됨 (증빙 미제출)
+                condition = condition.and(
+                        dailyReport.employeeEvidenceSubmitted.eq(false)
+                                .or(dailyReport.directContractEvidenceSubmitted.eq(false))
+                                .or(dailyReport.outsourcingEvidenceSubmitted.eq(false))
+                                .or(dailyReport.equipmentEvidenceSubmitted.eq(false))
+                                .or(dailyReport.fuelEvidenceSubmitted.eq(false))
+                                .or(dailyReport.sitePhotoSubmitted.eq(false)));
             }
         }
 
