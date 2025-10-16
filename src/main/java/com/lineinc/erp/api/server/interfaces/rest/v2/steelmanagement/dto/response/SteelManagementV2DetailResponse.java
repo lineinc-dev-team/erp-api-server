@@ -22,26 +22,26 @@ public record SteelManagementV2DetailResponse(
 
         // 입고 집계
         @Schema(description = "입고-자사자재 총무게", example = "1000.0") Double incomingOwnMaterialTotalWeight,
-        @Schema(description = "입고-자사자재 금액", example = "5000000") Long incomingOwnMaterialAmount,
+        @Schema(description = "입고-자사자재 합계", example = "5000000") Long incomingOwnMaterialAmount,
         @Schema(description = "입고-구매 총무게", example = "2000.0") Double incomingPurchaseTotalWeight,
-        @Schema(description = "입고-구매 금액", example = "10000000") Long incomingPurchaseAmount,
+        @Schema(description = "입고-구매 합계", example = "10000000") Long incomingPurchaseAmount,
         @Schema(description = "입고-임대 총무게", example = "500.0") Double incomingRentalTotalWeight,
-        @Schema(description = "입고-임대 금액", example = "3000000") Long incomingRentalAmount,
+        @Schema(description = "입고-임대 합계", example = "3000000") Long incomingRentalAmount,
 
         // 출고 집계
         @Schema(description = "출고-자사자재 총무게", example = "800.0") Double outgoingOwnMaterialTotalWeight,
-        @Schema(description = "출고-자사자재 금액", example = "4000000") Long outgoingOwnMaterialAmount,
+        @Schema(description = "출고-자사자재 합계", example = "4000000") Long outgoingOwnMaterialAmount,
         @Schema(description = "출고-구매 총무게", example = "1500.0") Double outgoingPurchaseTotalWeight,
-        @Schema(description = "출고-구매 금액", example = "7500000") Long outgoingPurchaseAmount,
+        @Schema(description = "출고-구매 합계", example = "7500000") Long outgoingPurchaseAmount,
         @Schema(description = "출고-임대 총무게", example = "300.0") Double outgoingRentalTotalWeight,
-        @Schema(description = "출고-임대 금액", example = "2000000") Long outgoingRentalAmount,
+        @Schema(description = "출고-임대 합계", example = "2000000") Long outgoingRentalAmount,
 
         // 사장 집계
         @Schema(description = "사장 총무게", example = "1200.0") Double onSiteStockTotalWeight,
 
         // 고철 집계
         @Schema(description = "고철 총무게", example = "100.0") Double scrapTotalWeight,
-        @Schema(description = "고철 금액", example = "500000") Long scrapAmount,
+        @Schema(description = "고철 합계", example = "500000") Long scrapAmount,
 
         // 최종 집계
         @Schema(description = "총 금액(투입비)", example = "15000000") Long totalInvestmentAmount,

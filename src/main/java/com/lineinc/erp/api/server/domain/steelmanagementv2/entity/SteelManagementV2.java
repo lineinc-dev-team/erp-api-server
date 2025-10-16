@@ -184,19 +184,19 @@ public class SteelManagementV2 extends BaseEntity {
         this.incomingOwnMaterialTotalWeight = calculateTotalWeight(
                 SteelManagementDetailV2Type.INCOMING,
                 SteelManagementDetailV2Category.OWN_MATERIAL);
-        this.incomingOwnMaterialAmount = calculateAmount(
+        this.incomingOwnMaterialAmount = calculateTotal(
                 SteelManagementDetailV2Type.INCOMING,
                 SteelManagementDetailV2Category.OWN_MATERIAL);
         this.incomingPurchaseTotalWeight = calculateTotalWeight(
                 SteelManagementDetailV2Type.INCOMING,
                 SteelManagementDetailV2Category.PURCHASE);
-        this.incomingPurchaseAmount = calculateAmount(
+        this.incomingPurchaseAmount = calculateTotal(
                 SteelManagementDetailV2Type.INCOMING,
                 SteelManagementDetailV2Category.PURCHASE);
         this.incomingRentalTotalWeight = calculateTotalWeight(
                 SteelManagementDetailV2Type.INCOMING,
                 SteelManagementDetailV2Category.RENTAL);
-        this.incomingRentalAmount = calculateAmount(
+        this.incomingRentalAmount = calculateTotal(
                 SteelManagementDetailV2Type.INCOMING,
                 SteelManagementDetailV2Category.RENTAL);
 
@@ -204,19 +204,19 @@ public class SteelManagementV2 extends BaseEntity {
         this.outgoingOwnMaterialTotalWeight = calculateTotalWeight(
                 SteelManagementDetailV2Type.OUTGOING,
                 SteelManagementDetailV2Category.OWN_MATERIAL);
-        this.outgoingOwnMaterialAmount = calculateAmount(
+        this.outgoingOwnMaterialAmount = calculateTotal(
                 SteelManagementDetailV2Type.OUTGOING,
                 SteelManagementDetailV2Category.OWN_MATERIAL);
         this.outgoingPurchaseTotalWeight = calculateTotalWeight(
                 SteelManagementDetailV2Type.OUTGOING,
                 SteelManagementDetailV2Category.PURCHASE);
-        this.outgoingPurchaseAmount = calculateAmount(
+        this.outgoingPurchaseAmount = calculateTotal(
                 SteelManagementDetailV2Type.OUTGOING,
                 SteelManagementDetailV2Category.PURCHASE);
         this.outgoingRentalTotalWeight = calculateTotalWeight(
                 SteelManagementDetailV2Type.OUTGOING,
                 SteelManagementDetailV2Category.RENTAL);
-        this.outgoingRentalAmount = calculateAmount(
+        this.outgoingRentalAmount = calculateTotal(
                 SteelManagementDetailV2Type.OUTGOING,
                 SteelManagementDetailV2Category.RENTAL);
 
@@ -227,7 +227,7 @@ public class SteelManagementV2 extends BaseEntity {
         // 고철 집계
         this.scrapTotalWeight = calculateTotalWeightByType(
                 SteelManagementDetailV2Type.SCRAP);
-        this.scrapAmount = calculateAmountByType(
+        this.scrapAmount = calculateTotalByType(
                 SteelManagementDetailV2Type.SCRAP);
 
         // 최종 집계
@@ -288,12 +288,12 @@ public class SteelManagementV2 extends BaseEntity {
      * @param category 상세 카테고리 (자사자재/구매/임대)
      * @return 총 금액
      */
-    private Long calculateAmount(
+    private Long calculateTotal(
             final SteelManagementDetailV2Type type,
             final SteelManagementDetailV2Category category) {
         return details.stream()
                 .filter(detail -> !detail.isDeleted() && detail.getType() == type && detail.getCategory() == category)
-                .mapToLong(detail -> detail.getAmount() != null ? detail.getAmount() : 0L)
+                .mapToLong(detail -> detail.getTotal() != null ? detail.getTotal() : 0L)
                 .sum();
     }
 
@@ -317,11 +317,11 @@ public class SteelManagementV2 extends BaseEntity {
      * @param type 상세 타입 (입고/출고/사장/고철)
      * @return 총 금액
      */
-    private Long calculateAmountByType(
+    private Long calculateTotalByType(
             final SteelManagementDetailV2Type type) {
         return details.stream()
                 .filter(detail -> !detail.isDeleted() && detail.getType() == type)
-                .mapToLong(detail -> detail.getAmount() != null ? detail.getAmount() : 0L)
+                .mapToLong(detail -> detail.getTotal() != null ? detail.getTotal() : 0L)
                 .sum();
     }
 }
