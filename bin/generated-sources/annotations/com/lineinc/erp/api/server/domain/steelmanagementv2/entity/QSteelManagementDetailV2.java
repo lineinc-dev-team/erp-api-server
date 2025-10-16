@@ -58,6 +58,8 @@ public class QSteelManagementDetailV2 extends EntityPathBase<SteelManagementDeta
 
     public final QSteelManagementV2 steelManagementV2;
 
+    public final NumberPath<Long> total = createNumber("total", Long.class);
+
     public final NumberPath<Double> totalWeight = createNumber("totalWeight", Double.class);
 
     public final EnumPath<com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type> type = createEnum("type", com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type.class);
@@ -69,6 +71,8 @@ public class QSteelManagementDetailV2 extends EntityPathBase<SteelManagementDeta
 
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
+
+    public final NumberPath<Long> vat = createNumber("vat", Long.class);
 
     public final NumberPath<Double> weight = createNumber("weight", Double.class);
 

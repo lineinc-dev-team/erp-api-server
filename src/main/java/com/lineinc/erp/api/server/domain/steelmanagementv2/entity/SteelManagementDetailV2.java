@@ -126,6 +126,18 @@ public class SteelManagementDetailV2 extends BaseEntity {
     private Long amount;
 
     /**
+     * 부가세
+     */
+    @DiffInclude
+    private Long vat;
+
+    /**
+     * 합계 (금액 + 부가세)
+     */
+    @DiffInclude
+    private Long total;
+
+    /**
      * 구분: 자사자재, 구매, 임대
      */
     @DiffIgnore

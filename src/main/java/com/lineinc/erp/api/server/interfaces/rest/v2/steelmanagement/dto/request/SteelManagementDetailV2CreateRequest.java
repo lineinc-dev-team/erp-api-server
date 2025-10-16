@@ -16,6 +16,8 @@ public record SteelManagementDetailV2CreateRequest(
         @Schema(description = "총무게 (톤)", example = "56.0") Double totalWeight,
         @Schema(description = "단가 (원)", example = "12000") Long unitPrice,
         @Schema(description = "금액 (원)", example = "672000") Long amount,
+        @Schema(description = "부가세 (원)", example = "120000") Long vat,
+        @Schema(description = "합계 (원)", example = "792000") Long total,
         @Schema(description = "구분 (자사자재/구매/임대)", example = "PURCHASE") SteelManagementDetailV2Category category,
         @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/bucket/file.pdf") String fileUrl,
         @Schema(description = "원본 파일명", example = "steel_report.pdf") String originalFileName,
