@@ -364,14 +364,13 @@ public class SteelManagementV2Service {
                 "total");
 
         // 워크북 생성 (여러 시트 지원, 소계 포함)
-        // 소계는 "품명"과 "규격" 컬럼을 병합하여 표시 (2개 컬럼 병합)
         final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbookWithSubtotal(
                 detailsByType,
                 fields,
                 (field, type) -> getDetailExcelHeaderName(field, type),
                 this::getDetailExcelCellValue,
                 SteelManagementDetailV2Type::getLabel,
-                2,
+                3,
                 subtotalFields);
 
         // S3에 엑셀 파일 업로드
