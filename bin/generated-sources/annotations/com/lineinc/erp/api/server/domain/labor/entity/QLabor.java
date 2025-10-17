@@ -80,8 +80,6 @@ public class QLabor extends EntityPathBase<Labor> {
 
     public final DateTimePath<java.time.OffsetDateTime> resignationDate = createDateTime("resignationDate", java.time.OffsetDateTime.class);
 
-    public final NumberPath<Long> tenureDays = createNumber("tenureDays", Long.class);
-
     public final NumberPath<Integer> tenureMonths = createNumber("tenureMonths", Integer.class);
 
     public final EnumPath<com.lineinc.erp.api.server.domain.labor.enums.LaborType> type = createEnum("type", com.lineinc.erp.api.server.domain.labor.enums.LaborType.class);

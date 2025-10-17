@@ -34,7 +34,6 @@ public record LaborListResponse(
         @Schema(description = "임시 인력 여부", example = "true") Boolean isTemporary,
         @Schema(description = "등록일") OffsetDateTime createdAt,
         @Schema(description = "수정일") OffsetDateTime updatedAt,
-        @Schema(description = "근속일수") Long tenureDays,
         @Schema(description = "근속개월") Integer tenureMonths,
         @Schema(description = "퇴직금 발생 요건 여부", example = "true") Boolean isSeverancePayEligible,
         @Schema(description = "통장사본 첨부", example = "true") Boolean hasBankbook,
@@ -42,7 +41,7 @@ public record LaborListResponse(
         @Schema(description = "서명이미지 첨부", example = "true") Boolean hasSignatureImage,
         @Schema(description = "기타 첨부", example = "true") Boolean hasFile) {
 
-    public static LaborListResponse from(Labor labor) {
+    public static LaborListResponse from(final Labor labor) {
         return new LaborListResponse(
                 labor.getId(),
                 labor.getType().getLabel(),
@@ -67,7 +66,6 @@ public record LaborListResponse(
                 labor.getIsTemporary(),
                 labor.getCreatedAt(),
                 labor.getUpdatedAt(),
-                labor.getTenureDays(),
                 labor.getTenureMonths(),
                 labor.getIsSeverancePayEligible(),
                 labor.getHasBankbook(),

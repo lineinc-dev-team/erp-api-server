@@ -130,14 +130,6 @@ public class Labor extends BaseEntity {
     private Long previousDailyWage;
 
     /**
-     * 근속일수
-     */
-    @Setter
-    @DiffIgnore
-    @Builder.Default
-    private Long tenureDays = 0L;
-
-    /**
      * 근속개월
      */
     @Setter
