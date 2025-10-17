@@ -32,6 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -104,12 +105,12 @@ public class OutsourcingCompany extends BaseEntity {
     /**
      * 기본공제 항목
      */
+    @Setter
     @DiffIgnore
-    @Column
     private String defaultDeductions; // "FOUR_INSURANCE,INCOME_TAX" 형식
 
+    @Setter
     @DiffInclude
-    @Column
     private String defaultDeductionsDescription;
 
     /**

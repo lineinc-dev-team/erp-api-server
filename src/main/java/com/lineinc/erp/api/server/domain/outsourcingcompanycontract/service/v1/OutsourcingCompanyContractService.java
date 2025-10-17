@@ -181,14 +181,19 @@ public class OutsourcingCompanyContractService {
                 .contractStartDate(contractStartDate)
                 .contractEndDate(contractEndDate)
                 .contractAmount(request.contractAmount())
-                .defaultDeductions(request.defaultDeductionsType())
-                .defaultDeductionsDescription(request.defaultDeductionsDescription())
                 .taxInvoiceCondition(request.taxInvoiceCondition())
                 .taxInvoiceIssueDayOfMonth(request.taxInvoiceIssueDayOfMonth())
                 .category(request.category())
                 .status(request.status() != null ? request.status() : OutsourcingCompanyContractStatus.IN_PROGRESS)
                 .memo(request.memo())
                 .build();
+
+        outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+
+        final OutsourcingCompany company = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+
+        company.syncTransientFields();
 
         return contractRepository.save(contract);
     }
