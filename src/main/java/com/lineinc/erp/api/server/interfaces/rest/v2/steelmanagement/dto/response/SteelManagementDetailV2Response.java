@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response;
 
+import java.time.OffsetDateTime;
+
 import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagementDetailV2;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
@@ -26,6 +28,7 @@ public record SteelManagementDetailV2Response(
         @Schema(description = "구분명", example = "구매") String categoryName,
         @Schema(description = "파일 URL") String fileUrl,
         @Schema(description = "원본 파일명") String originalFileName,
+        @Schema(description = "등록일시") OffsetDateTime createdAt,
         @Schema(description = "메모") String memo) {
     public static SteelManagementDetailV2Response from(final SteelManagementDetailV2 entity) {
         return new SteelManagementDetailV2Response(
@@ -48,6 +51,7 @@ public record SteelManagementDetailV2Response(
                 entity.getCategory() != null ? entity.getCategory().getLabel() : null,
                 entity.getFileUrl(),
                 entity.getOriginalFileName(),
+                entity.getCreatedAt(),
                 entity.getMemo());
     }
 }

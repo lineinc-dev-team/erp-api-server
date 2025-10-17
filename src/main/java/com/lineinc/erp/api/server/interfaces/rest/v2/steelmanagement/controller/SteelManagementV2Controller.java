@@ -23,6 +23,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2CreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2DetailDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2DownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2UpdateRequest;
@@ -119,6 +120,25 @@ public class SteelManagementV2Controller extends BaseController {
                 user,
                 request,
                 PageableUtils.parseSort(sortRequest.sort()),
+                parsed)) {
+            workbook.write(response.getOutputStream());
+        }
+    }
+
+    @Operation(summary = "강재수불부 상세 엑셀 다운로드")
+    @GetMapping("/{id}/download")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
+    public void downloadSteelManagementDetailExcel(
+            @PathVariable final Long id,
+            @AuthenticationPrincipal final CustomUserDetails user,
+            @Valid final SteelManagementV2DetailDownloadRequest downloadRequest,
+            final HttpServletResponse response) throws IOException {
+        final List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
+        DownloadFieldUtils.validateFields(parsed, SteelManagementV2DetailDownloadRequest.ALLOWED_FIELDS);
+        ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 상세 목록.xlsx");
+        try (Workbook workbook = steelManagementV2Service.downloadDetailExcel(
+                id,
+                user,
                 parsed)) {
             workbook.write(response.getOutputStream());
         }

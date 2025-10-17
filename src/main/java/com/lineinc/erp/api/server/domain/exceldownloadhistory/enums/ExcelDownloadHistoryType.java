@@ -13,6 +13,7 @@ public enum ExcelDownloadHistoryType {
     SITE("현장 목록"),
     MATERIAL_MANAGEMENT("자재관리 목록"),
     STEEL_MANAGEMENT("강재수불부 목록"),
+    STEEL_MANAGEMENT_DETAIL("강재수불부 상세 목록"),
     FUEL_AGGREGATION("유류집계 목록"),
     LABOR_MANAGEMENT("인력정보 목록"),
     LABOR_PAYROLL("노무명세서 목록"),

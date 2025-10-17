@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.steelmanagementv2.service;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +34,7 @@ import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagemen
 import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagementDetailV2;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagementV2;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementChangeHistoryV2Type;
+import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.repository.SteelManagementChangeHistoryV2Repository;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.repository.SteelManagementV2Repository;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
@@ -43,6 +45,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2UpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementDetailV2Response;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2DetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -158,7 +161,7 @@ public class SteelManagementV2Service {
      */
     public SteelManagementV2DetailResponse getSteelManagementV2ById(
             final Long id,
-            final com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type type) {
+            final SteelManagementDetailV2Type type) {
         final SteelManagementV2 steelManagementV2 = steelManagementV2Repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
@@ -324,6 +327,53 @@ public class SteelManagementV2Service {
         return workbook;
     }
 
+    /**
+     * 강재수불부 상세 엑셀 다운로드 (모든 타입별로 시트 구분)
+     */
+    @Transactional(readOnly = true)
+    public Workbook downloadDetailExcel(
+            final Long steelManagementId,
+            final CustomUserDetails user,
+            final List<String> fields) {
+        // 강재수불부 상세 조회 (타입 필터 없이 모든 데이터)
+        final SteelManagementV2DetailResponse detailResponse = getSteelManagementV2ById(steelManagementId, null);
+
+        // 모든 상세 항목들을 타입별로 그룹화 (순서: 입고, 출고, 사장, 고철)
+        final LinkedHashMap<SteelManagementDetailV2Type, List<SteelManagementDetailV2Response>> detailsByType = detailResponse
+                .details().stream()
+                .collect(Collectors.groupingBy(
+                        SteelManagementDetailV2Response::typeCode,
+                        () -> {
+                            final LinkedHashMap<SteelManagementDetailV2Type, List<SteelManagementDetailV2Response>> orderedMap = new LinkedHashMap<>();
+                            orderedMap.put(SteelManagementDetailV2Type.INCOMING, new ArrayList<>());
+                            orderedMap.put(SteelManagementDetailV2Type.OUTGOING, new ArrayList<>());
+                            orderedMap.put(SteelManagementDetailV2Type.ON_SITE_STOCK, new ArrayList<>());
+                            orderedMap.put(SteelManagementDetailV2Type.SCRAP, new ArrayList<>());
+                            return orderedMap;
+                        },
+                        Collectors.toList()));
+
+        // 워크북 생성 (여러 시트 지원)
+        final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbook(
+                detailsByType,
+                fields,
+                this::getDetailExcelHeaderName,
+                this::getDetailExcelCellValue,
+                SteelManagementDetailV2Type::getLabel);
+
+        // S3에 엑셀 파일 업로드
+        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
+                ExcelDownloadHistoryType.STEEL_MANAGEMENT_DETAIL.name());
+
+        // 다운로드 이력 저장
+        excelDownloadHistoryService.recordDownload(
+                ExcelDownloadHistoryType.STEEL_MANAGEMENT_DETAIL,
+                userService.getUserByIdOrThrow(user.getUserId()),
+                fileUrl);
+
+        return workbook;
+    }
+
     private String getExcelHeaderName(final String field) {
         return switch (field) {
             case "siteName" -> "현장명";
@@ -408,5 +458,49 @@ public class SteelManagementV2Service {
         final String weightStr = weight != null && weight != 0.0 ? numberFormat.format(weight) : "-";
         final String amountStr = amount != null && amount != 0L ? numberFormat.format(amount) : "-";
         return weightStr + " / " + amountStr;
+    }
+
+    private String getDetailExcelHeaderName(final String field) {
+        return switch (field) {
+            case "name" -> "품명";
+            case "specification" -> "규격";
+            case "weight" -> "무게(톤)";
+            case "count" -> "본";
+            case "totalWeight" -> "총무게(톤)";
+            case "unitPrice" -> "단가";
+            case "amount" -> "공급가";
+            case "vat" -> "부가세";
+            case "total" -> "합계";
+            case "category" -> "구분";
+            case "outsourcingCompanyName" -> "거래선";
+            case "createdAt" -> "등록";
+            case "originalFileName" -> "증빙";
+            case "memo" -> "비고";
+            default -> "";
+        };
+    }
+
+    private String getDetailExcelCellValue(final SteelManagementDetailV2Response response, final String field) {
+        final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.KOREA);
+        return switch (field) {
+            case "name" -> response.name() != null ? response.name() : "";
+            case "specification" -> response.specification() != null ? response.specification() : "";
+            case "weight" -> response.weight() != null ? numberFormat.format(response.weight()) : "";
+            case "count" -> response.count() != null ? response.count().toString() : "";
+            case "totalWeight" -> response.totalWeight() != null ? numberFormat.format(response.totalWeight()) : "";
+            case "unitPrice" -> response.unitPrice() != null ? numberFormat.format(response.unitPrice()) : "";
+            case "amount" -> response.amount() != null ? numberFormat.format(response.amount()) : "";
+            case "vat" -> response.vat() != null ? numberFormat.format(response.vat()) : "";
+            case "total" -> response.total() != null ? numberFormat.format(response.total()) : "";
+            case "category" -> response.categoryName() != null ? response.categoryName() : "";
+            case "outsourcingCompanyName" ->
+                response.outsourcingCompany() != null ? response.outsourcingCompany().name() : "";
+            case "createdAt" ->
+                response.createdAt() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
+                        : "";
+            case "originalFileName" -> response.originalFileName() != null ? response.originalFileName() : "";
+            case "memo" -> response.memo() != null ? response.memo() : "";
+            default -> "";
+        };
     }
 }
