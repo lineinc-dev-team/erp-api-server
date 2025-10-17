@@ -101,6 +101,7 @@ public record CompanyResponse(
             @Schema(description = "주소", example = "서울특별시 강남구") String address,
             @Schema(description = "공제 항목", example = "4대보험,소득세") String defaultDeductions,
             @Schema(description = "공제 항목 코드", example = "FOUR_INSURANCE,INCOME_TAX") String defaultDeductionsCode,
+            @Schema(description = "공제 항목 설명", example = "4대 보험, 소득세") String defaultDeductionsDescription,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static CompanyResponse.CompanySimpleResponse from(final OutsourcingCompany company) {
             return new CompanyResponse.CompanySimpleResponse(
@@ -120,6 +121,7 @@ public record CompanyResponse(
                                     .collect(Collectors.joining(","))
                             : null,
                     company.getDefaultDeductions(),
+                    company.getDefaultDeductionsDescription(),
                     company.isDeleted());
         }
     }
