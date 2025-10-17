@@ -51,8 +51,10 @@ public record ContractListResponse(
 
         // 공제항목을 콤마로 구분하여 각각의 label로 변환
         String defaultDeductionsLabel = null;
-        if (contract.getDefaultDeductions() != null && !contract.getDefaultDeductions().trim().isEmpty()) {
-            defaultDeductionsLabel = java.util.Arrays.stream(contract.getDefaultDeductions().split(","))
+        if (contract.getOutsourcingCompany() != null && contract.getOutsourcingCompany().getDefaultDeductions() != null
+                && !contract.getOutsourcingCompany().getDefaultDeductions().trim().isEmpty()) {
+            defaultDeductionsLabel = java.util.Arrays
+                    .stream(contract.getOutsourcingCompany().getDefaultDeductions().split(","))
                     .map(String::trim)
                     .map(OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
                     .collect(java.util.stream.Collectors.joining(","));
@@ -75,7 +77,8 @@ public record ContractListResponse(
                 contract.getContractAmount(),
                 contacts,
                 defaultDeductionsLabel,
-                contract.getDefaultDeductions() != null ? contract.getDefaultDeductions() : null,
+                contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getDefaultDeductions()
+                        : null,
                 contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().getLabel()
                         : null,
                 contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().name() : null,

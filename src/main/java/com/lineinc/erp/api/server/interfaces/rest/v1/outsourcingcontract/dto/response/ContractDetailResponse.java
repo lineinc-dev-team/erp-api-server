@@ -50,14 +50,19 @@ public record ContractDetailResponse(
                 contract.getContractStartDate(),
                 contract.getContractEndDate(),
                 contract.getContractAmount(),
-                contract.getDefaultDeductions() != null && !contract.getDefaultDeductions().trim().isEmpty()
-                        ? Arrays.stream(contract.getDefaultDeductions().split(","))
-                                .map(String::trim)
-                                .map(com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
-                                .collect(Collectors.joining(","))
+                contract.getOutsourcingCompany() != null
+                        && contract.getOutsourcingCompany().getDefaultDeductions() != null
+                        && !contract.getOutsourcingCompany().getDefaultDeductions().trim().isEmpty()
+                                ? Arrays.stream(contract.getOutsourcingCompany().getDefaultDeductions().split(","))
+                                        .map(String::trim)
+                                        .map(com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
+                                        .collect(Collectors.joining(","))
+                                : null,
+                contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getDefaultDeductions()
                         : null,
-                contract.getDefaultDeductions() != null ? contract.getDefaultDeductions() : null,
-                contract.getDefaultDeductionsDescription(),
+                contract.getOutsourcingCompany() != null
+                        ? contract.getOutsourcingCompany().getDefaultDeductionsDescription()
+                        : null,
                 contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().getLabel() : null,
                 contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().name() : null,
                 contract.getTaxInvoiceIssueDayOfMonth(),
