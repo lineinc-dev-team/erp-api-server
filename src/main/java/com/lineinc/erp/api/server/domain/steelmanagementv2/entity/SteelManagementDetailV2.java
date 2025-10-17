@@ -79,49 +79,49 @@ public class SteelManagementDetailV2 extends BaseEntity {
     /**
      * 품명
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private String name;
 
     /**
      * 규격
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private String specification;
 
     /**
      * 무게
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private Double weight;
 
     /**
      * 본
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private Integer count;
 
     /**
      * 총무게
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private Double totalWeight;
 
     /**
      * 단가
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private Long unitPrice;
 
     /**
      * 공급가
      */
-    @DiffIgnore
+    @DiffInclude
     @Column
     private Long amount;
 
@@ -171,6 +171,14 @@ public class SteelManagementDetailV2 extends BaseEntity {
      */
     public void updateFrom(
             final SteelManagementDetailV2UpdateRequest request) {
+        this.weight = request.weight();
+        this.count = request.count();
+        this.totalWeight = request.totalWeight();
+        this.unitPrice = request.unitPrice();
+        this.amount = request.amount();
+        this.vat = request.vat();
+        this.total = request.total();
+        this.category = request.category();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
         this.memo = request.memo();
