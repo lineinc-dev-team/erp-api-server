@@ -2,17 +2,14 @@ package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyTaxInvoiceConditionType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractStatus;
@@ -98,14 +95,6 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @DiffInclude
     @Column
     private Long contractAmount;
-
-    @DiffIgnore
-    @Column
-    private String defaultDeductions;
-
-    @DiffInclude
-    @Column
-    private String defaultDeductionsDescription;
 
     @DiffIgnore
     @Column
@@ -230,9 +219,6 @@ public class OutsourcingCompanyContract extends BaseEntity {
         Optional.ofNullable(request.contractEndDate())
                 .ifPresent(val -> this.contractEndDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
         Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
-        Optional.ofNullable(request.defaultDeductionsType()).ifPresent(val -> this.defaultDeductions = val);
-        Optional.ofNullable(request.defaultDeductionsDescription())
-                .ifPresent(val -> this.defaultDeductionsDescription = val);
         Optional.ofNullable(request.taxInvoiceCondition()).ifPresent(val -> this.taxInvoiceCondition = val);
         Optional.ofNullable(request.taxInvoiceIssueDayOfMonth())
                 .ifPresent(val -> this.taxInvoiceIssueDayOfMonth = val);
@@ -252,11 +238,6 @@ public class OutsourcingCompanyContract extends BaseEntity {
         this.categoryName = this.category != null ? this.category.getLabel() : null;
         this.statusName = this.status != null ? this.status.getLabel() : null;
         this.taxInvoiceConditionName = this.taxInvoiceCondition != null ? this.taxInvoiceCondition.getLabel() : null;
-        this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null
-                : Arrays.stream(this.defaultDeductions.split(","))
-                        .map(String::trim)
-                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(","));
 
         // 관련 엔티티 이름들 동기화
         this.siteName = this.site != null ? this.site.getName() : null;

@@ -44,10 +44,6 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
     //inherited
     public final StringPath createdBy = _super.createdBy;
 
-    public final StringPath defaultDeductions = createString("defaultDeductions");
-
-    public final StringPath defaultDeductionsDescription = createString("defaultDeductionsDescription");
-
     //inherited
     public final BooleanPath deleted = _super.deleted;
 
