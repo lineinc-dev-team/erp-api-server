@@ -15,22 +15,29 @@ public final class DateTimeFormatUtils {
 
     public static final DateTimeFormatter DATE_FORMATTER_YMD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static OffsetDateTime toOffsetDateTime(LocalDate localDate) {
+    public static OffsetDateTime toOffsetDateTime(final LocalDate localDate) {
         if (localDate == null) {
             return null;
         }
         return localDate.atStartOfDay().atOffset(AppConstants.KOREA_ZONE_OFFSET);
     }
 
-    public static LocalDate toKoreaLocalDate(OffsetDateTime offsetDateTime) {
+    public static LocalDate toKoreaLocalDate(final OffsetDateTime offsetDateTime) {
         if (offsetDateTime == null) {
             return null;
         }
         return offsetDateTime.atZoneSameInstant(AppConstants.KOREA_ZONE_OFFSET).toLocalDate();
     }
 
-    public static String formatKoreaLocalDate(OffsetDateTime offsetDateTime) {
-        LocalDate localDate = toKoreaLocalDate(offsetDateTime);
+    public static String formatKoreaLocalDate(final OffsetDateTime offsetDateTime) {
+        final LocalDate localDate = toKoreaLocalDate(offsetDateTime);
+        if (localDate == null) {
+            return null;
+        }
+        return DATE_FORMATTER_YMD.format(localDate);
+    }
+
+    public static String formatKoreaLocalDate(final LocalDate localDate) {
         if (localDate == null) {
             return null;
         }
@@ -41,7 +48,7 @@ public final class DateTimeFormatUtils {
      * 한국 날짜를 UTC 시작 시간으로 변환 (검색 시작용)
      * 예: 2024-12-31 -> 2024-12-30 15:00:00+00
      */
-    public static OffsetDateTime toUtcStartOfDay(LocalDate koreaLocalDate) {
+    public static OffsetDateTime toUtcStartOfDay(final LocalDate koreaLocalDate) {
         if (koreaLocalDate == null) {
             return null;
         }
@@ -54,7 +61,7 @@ public final class DateTimeFormatUtils {
      * 한국 날짜를 UTC 끝 시간으로 변환 (검색 종료용)
      * 예: 2024-12-31 -> 2025-01-01 14:59:59.999999999+00
      */
-    public static OffsetDateTime toUtcEndOfDay(LocalDate koreaLocalDate) {
+    public static OffsetDateTime toUtcEndOfDay(final LocalDate koreaLocalDate) {
         if (koreaLocalDate == null) {
             return null;
         }
@@ -69,7 +76,7 @@ public final class DateTimeFormatUtils {
      * 
      * @return [시작시간, 종료시간] 배열
      */
-    public static OffsetDateTime[] getUtcDateRange(LocalDate koreaLocalDate) {
+    public static OffsetDateTime[] getUtcDateRange(final LocalDate koreaLocalDate) {
         if (koreaLocalDate == null) {
             return new OffsetDateTime[] { null, null };
         }

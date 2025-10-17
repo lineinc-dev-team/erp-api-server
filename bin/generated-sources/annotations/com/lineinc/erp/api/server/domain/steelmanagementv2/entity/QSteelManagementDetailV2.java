@@ -46,13 +46,19 @@ public class QSteelManagementDetailV2 extends EntityPathBase<SteelManagementDeta
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final DateTimePath<java.time.OffsetDateTime> incomingDate = createDateTime("incomingDate", java.time.OffsetDateTime.class);
+
     public final StringPath memo = createString("memo");
 
     public final StringPath name = createString("name");
 
     public final StringPath originalFileName = createString("originalFileName");
 
+    public final DateTimePath<java.time.OffsetDateTime> outgoingDate = createDateTime("outgoingDate", java.time.OffsetDateTime.class);
+
     public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany outsourcingCompany;
+
+    public final DateTimePath<java.time.OffsetDateTime> salesDate = createDateTime("salesDate", java.time.OffsetDateTime.class);
 
     public final StringPath specification = createString("specification");
 

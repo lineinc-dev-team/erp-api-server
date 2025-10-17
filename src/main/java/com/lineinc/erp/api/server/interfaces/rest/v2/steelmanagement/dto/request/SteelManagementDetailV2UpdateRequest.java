@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request;
 
+import java.time.LocalDate;
+
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,5 +22,8 @@ public record SteelManagementDetailV2UpdateRequest(
         @Schema(description = "구분 (자사자재/구매/임대)", example = "PURCHASE") SteelManagementDetailV2Category category,
         @Schema(description = "파일 URL", example = "https://s3.amazonaws.com/bucket/file.pdf") String fileUrl,
         @Schema(description = "원본 파일명", example = "steel_report.pdf") String originalFileName,
+        @Schema(description = "입고일", example = "2024-01-15") LocalDate incomingDate,
+        @Schema(description = "출고일", example = "2024-01-15") LocalDate outgoingDate,
+        @Schema(description = "판매일", example = "2024-01-15") LocalDate salesDate,
         @Schema(description = "메모", example = "특별 관리 대상") String memo) {
 }

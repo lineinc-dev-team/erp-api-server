@@ -28,6 +28,9 @@ public record SteelManagementDetailV2Response(
         @Schema(description = "구분명", example = "구매") String categoryName,
         @Schema(description = "파일 URL") String fileUrl,
         @Schema(description = "원본 파일명") String originalFileName,
+        @Schema(description = "입고일") OffsetDateTime incomingDate,
+        @Schema(description = "출고일") OffsetDateTime outgoingDate,
+        @Schema(description = "판매일") OffsetDateTime salesDate,
         @Schema(description = "등록일시") OffsetDateTime createdAt,
         @Schema(description = "메모") String memo) {
     public static SteelManagementDetailV2Response from(final SteelManagementDetailV2 entity) {
@@ -51,6 +54,9 @@ public record SteelManagementDetailV2Response(
                 entity.getCategory() != null ? entity.getCategory().getLabel() : null,
                 entity.getFileUrl(),
                 entity.getOriginalFileName(),
+                entity.getIncomingDate(),
+                entity.getOutgoingDate(),
+                entity.getSalesDate(),
                 entity.getCreatedAt(),
                 entity.getMemo());
     }

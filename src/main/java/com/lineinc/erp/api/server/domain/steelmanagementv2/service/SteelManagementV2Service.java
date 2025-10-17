@@ -126,6 +126,9 @@ public class SteelManagementV2Service {
                     .category(detailRequest.category())
                     .fileUrl(detailRequest.fileUrl())
                     .originalFileName(detailRequest.originalFileName())
+                    .incomingDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.incomingDate()))
+                    .outgoingDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.outgoingDate()))
+                    .salesDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.salesDate()))
                     .memo(detailRequest.memo())
                     .build();
 
@@ -230,6 +233,9 @@ public class SteelManagementV2Service {
                         .category(dto.category())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
+                        .incomingDate(DateTimeFormatUtils.toOffsetDateTime(dto.incomingDate()))
+                        .outgoingDate(DateTimeFormatUtils.toOffsetDateTime(dto.outgoingDate()))
+                        .salesDate(DateTimeFormatUtils.toOffsetDateTime(dto.salesDate()))
                         .memo(dto.memo())
                         .build();
                 steelManagementV2.getDetails().add(newDetail);
@@ -480,6 +486,9 @@ public class SteelManagementV2Service {
             case "total" -> "합계";
             case "category" -> "구분";
             case "outsourcingCompanyName" -> "거래선";
+            case "incomingDate" -> "입고일";
+            case "outgoingDate" -> "출고일";
+            case "salesDate" -> "판매일";
             case "createdAt" -> "등록";
             case "originalFileName" -> "증빙";
             case "memo" -> "비고";
@@ -502,6 +511,15 @@ public class SteelManagementV2Service {
             case "category" -> response.categoryName() != null ? response.categoryName() : "";
             case "outsourcingCompanyName" ->
                 response.outsourcingCompany() != null ? response.outsourcingCompany().name() : "";
+            case "incomingDate" ->
+                response.incomingDate() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.incomingDate())
+                        : "";
+            case "outgoingDate" ->
+                response.outgoingDate() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.outgoingDate())
+                        : "";
+            case "salesDate" ->
+                response.salesDate() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.salesDate())
+                        : "";
             case "createdAt" ->
                 response.createdAt() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
                         : "";

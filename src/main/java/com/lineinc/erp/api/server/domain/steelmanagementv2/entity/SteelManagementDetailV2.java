@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.steelmanagementv2.entity;
 
+import java.time.OffsetDateTime;
+
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -10,6 +12,7 @@ import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagement
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementDetailV2UpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -160,6 +163,27 @@ public class SteelManagementDetailV2 extends BaseEntity {
     private String originalFileName;
 
     /**
+     * 입고일
+     */
+    @DiffIgnore
+    @Column
+    private OffsetDateTime incomingDate;
+
+    /**
+     * 출고일
+     */
+    @DiffIgnore
+    @Column
+    private OffsetDateTime outgoingDate;
+
+    /**
+     * 판매일
+     */
+    @DiffIgnore
+    @Column
+    private OffsetDateTime salesDate;
+
+    /**
      * 메모
      */
     @DiffInclude
@@ -181,6 +205,9 @@ public class SteelManagementDetailV2 extends BaseEntity {
         this.category = request.category();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
+        this.incomingDate = DateTimeFormatUtils.toOffsetDateTime(request.incomingDate());
+        this.outgoingDate = DateTimeFormatUtils.toOffsetDateTime(request.outgoingDate());
+        this.salesDate = DateTimeFormatUtils.toOffsetDateTime(request.salesDate());
         this.memo = request.memo();
     }
 }
