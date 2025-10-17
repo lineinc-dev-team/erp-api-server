@@ -368,7 +368,7 @@ public class SteelManagementV2Service {
         final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbookWithSubtotal(
                 detailsByType,
                 fields,
-                this::getDetailExcelHeaderName,
+                (field, type) -> getDetailExcelHeaderName(field, type),
                 this::getDetailExcelCellValue,
                 SteelManagementDetailV2Type::getLabel,
                 2,
@@ -473,7 +473,7 @@ public class SteelManagementV2Service {
         return weightStr + " / " + amountStr;
     }
 
-    private String getDetailExcelHeaderName(final String field) {
+    private String getDetailExcelHeaderName(final String field, final SteelManagementDetailV2Type type) {
         return switch (field) {
             case "name" -> "품명";
             case "specification" -> "규격";
@@ -486,9 +486,9 @@ public class SteelManagementV2Service {
             case "total" -> "합계";
             case "category" -> "구분";
             case "outsourcingCompanyName" -> "거래선";
-            case "incomingDate" -> "입고일";
-            case "outgoingDate" -> "출고일";
-            case "salesDate" -> "판매일";
+            case "incomingDate" -> type == SteelManagementDetailV2Type.INCOMING ? "입고일" : null;
+            case "outgoingDate" -> type == SteelManagementDetailV2Type.OUTGOING ? "출고일" : null;
+            case "salesDate" -> type == SteelManagementDetailV2Type.SCRAP ? "판매일" : null;
             case "createdAt" -> "등록";
             case "originalFileName" -> "증빙";
             case "memo" -> "비고";
