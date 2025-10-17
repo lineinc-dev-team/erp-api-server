@@ -353,13 +353,20 @@ public class SteelManagementV2Service {
                         },
                         Collectors.toList()));
 
-        // 워크북 생성 (여러 시트 지원)
-        final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbook(
+        // 소계에 포함될 필드들 정의
+        final List<String> subtotalFields = List.of("weight", "count", "totalWeight", "unitPrice", "amount", "vat",
+                "total");
+
+        // 워크북 생성 (여러 시트 지원, 소계 포함)
+        // 소계는 "품명"과 "규격" 컬럼을 병합하여 표시 (2개 컬럼 병합)
+        final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbookWithSubtotal(
                 detailsByType,
                 fields,
                 this::getDetailExcelHeaderName,
                 this::getDetailExcelCellValue,
-                SteelManagementDetailV2Type::getLabel);
+                SteelManagementDetailV2Type::getLabel,
+                2,
+                subtotalFields);
 
         // S3에 엑셀 파일 업로드
         final String fileUrl = s3FileService.uploadExcelToS3(workbook,
@@ -387,7 +394,7 @@ public class SteelManagementV2Service {
             case "onSiteStock" -> "사장(톤)";
             case "scrap" -> "고철(톤/합계)";
             case "totalInvestmentAmount" -> "총 금액(투입비)";
-            case "onSiteRemainingWeight" -> "현장보류수량(톤)";
+            case "onSiteRemainingWeight" -> "현장보유수량(톤)";
             case "createdAt" -> "등록일";
             default -> "";
         };
@@ -486,7 +493,7 @@ public class SteelManagementV2Service {
             case "name" -> response.name() != null ? response.name() : "";
             case "specification" -> response.specification() != null ? response.specification() : "";
             case "weight" -> response.weight() != null ? numberFormat.format(response.weight()) : "";
-            case "count" -> response.count() != null ? response.count().toString() : "";
+            case "count" -> response.count() != null ? numberFormat.format(response.count()) : "";
             case "totalWeight" -> response.totalWeight() != null ? numberFormat.format(response.totalWeight()) : "";
             case "unitPrice" -> response.unitPrice() != null ? numberFormat.format(response.unitPrice()) : "";
             case "amount" -> response.amount() != null ? numberFormat.format(response.amount()) : "";
