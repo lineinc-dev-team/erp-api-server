@@ -133,13 +133,13 @@ public class SteelManagementV2Controller extends BaseController {
             @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SteelManagementV2DetailDownloadRequest downloadRequest,
             final HttpServletResponse response) throws IOException {
-        final List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
-        DownloadFieldUtils.validateFields(parsed, SteelManagementV2DetailDownloadRequest.ALLOWED_FIELDS);
+        final List<String> fieldsToUse = downloadRequest.getFieldsToUse();
+        DownloadFieldUtils.validateFields(fieldsToUse, SteelManagementV2DetailDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 상세 목록.xlsx");
         try (Workbook workbook = steelManagementV2Service.downloadDetailExcel(
                 id,
                 user,
-                parsed)) {
+                fieldsToUse)) {
             workbook.write(response.getOutputStream());
         }
     }
