@@ -9,6 +9,7 @@ public enum LaborFileType {
     ID_CARD("신분증 사본"),
     BANKBOOK("통장 사본"),
     SIGNATURE_IMAGE("서명이미지"),
+    LABOR_CONTRACT("근로계약서"),
     BASIC("기본");
 
     private final String label;
