@@ -45,11 +45,19 @@ public class DailyReportRepositoryImpl implements DailyReportRepositoryCustom {
     @Override
     public Page<DailyReportListResponse> findAllBySearchConditions(
             final DailyReportListSearchRequest request,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final List<Long> accessibleSiteIds) {
 
         // 동적 검색 조건 생성
-        final BooleanExpression condition = buildCondition(request);
+        BooleanExpression condition = buildCondition(request);
 
+        // 접근 가능한 현장 필터링
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            condition = condition.and(dailyReport.site.id.in(accessibleSiteIds));
+        }
         // 정렬 조건 생성
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 

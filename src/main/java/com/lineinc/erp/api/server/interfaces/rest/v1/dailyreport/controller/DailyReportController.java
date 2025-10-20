@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,6 +38,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
 import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SliceInfo;
 import com.lineinc.erp.api.server.shared.dto.response.SliceResponse;
@@ -60,16 +62,18 @@ public class DailyReportController extends BaseController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<DailyReportListResponse>>> searchDailyReports(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final DailyReportListSearchRequest searchRequest) {
-        final org.springframework.data.domain.Page<DailyReportListResponse> page = dailyReportService
-                .searchDailyReports(
-                        searchRequest,
-                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                                sortRequest.sort()));
+        final Page<DailyReportListResponse> page = dailyReportService.searchDailyReports(
+                user.getUserId(),
+                searchRequest,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
 
-        return ResponseEntity.ok(SuccessResponse.of(PagingResponse.from(page)));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
     @Operation(summary = "출역일보 등록", description = "새로운 출역일보를 등록합니다.")

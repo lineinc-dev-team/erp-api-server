@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.dailyreport.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,5 +13,6 @@ public interface DailyReportRepositoryCustom {
     /**
      * 출역일보 목록 조회 (동적 검색 조건 지원)
      */
-    Page<DailyReportListResponse> findAllBySearchConditions(DailyReportListSearchRequest request, Pageable pageable);
+    Page<DailyReportListResponse> findAllBySearchConditions(DailyReportListSearchRequest request, Pageable pageable,
+            List<Long> accessibleSiteIds);
 }

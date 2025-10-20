@@ -1052,9 +1052,12 @@ public class DailyReportService {
      */
     @Transactional(readOnly = true)
     public Page<DailyReportListResponse> searchDailyReports(
+            final Long userId,
             final DailyReportListSearchRequest request,
             final Pageable pageable) {
-        return dailyReportRepository.findAllBySearchConditions(request, pageable);
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        return dailyReportRepository.findAllBySearchConditions(request, pageable, accessibleSiteIds);
     }
 
     @Transactional
