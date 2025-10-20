@@ -37,6 +37,7 @@ import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagement
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.repository.SteelManagementChangeHistoryV2Repository;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.repository.SteelManagementV2Repository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementDetailV2CreateRequest;
@@ -155,8 +156,11 @@ public class SteelManagementV2Service {
      */
     public Page<SteelManagementV2Response> getSteelManagementV2List(
             final SteelManagementV2ListRequest request,
+            final Long userId,
             final Pageable pageable) {
-        return steelManagementV2Repository.findAll(request, pageable);
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        return steelManagementV2Repository.findAll(request, pageable, accessibleSiteIds);
     }
 
     /**
@@ -311,8 +315,10 @@ public class SteelManagementV2Service {
             final SteelManagementV2ListRequest request,
             final Sort sort,
             final List<String> fields) {
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
         final List<SteelManagementV2Response> responses = steelManagementV2Repository.findAllWithoutPaging(request,
-                sort);
+                sort, accessibleSiteIds);
 
         final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 responses,

@@ -49,9 +49,16 @@ public class SteelManagementV2RepositoryImpl implements SteelManagementV2Reposit
     @Override
     public Page<SteelManagementV2Response> findAll(
             final SteelManagementV2ListRequest request,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final List<Long> accessibleSiteIds) {
 
         final BooleanBuilder builder = buildCondition(request);
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            builder.and(steelManagementV2.site.id.in(accessibleSiteIds));
+        }
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         final List<SteelManagementV2> content = queryFactory
@@ -83,9 +90,16 @@ public class SteelManagementV2RepositoryImpl implements SteelManagementV2Reposit
     @Override
     public List<SteelManagementV2Response> findAllWithoutPaging(
             final SteelManagementV2ListRequest request,
-            final org.springframework.data.domain.Sort sort) {
+            final org.springframework.data.domain.Sort sort,
+            final List<Long> accessibleSiteIds) {
 
         final BooleanBuilder builder = buildCondition(request);
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return List.of();
+            }
+            builder.and(steelManagementV2.site.id.in(accessibleSiteIds));
+        }
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         final List<SteelManagementV2> content = queryFactory

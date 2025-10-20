@@ -70,12 +70,13 @@ public class SteelManagementV2Controller extends BaseController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<SteelManagementV2Response>>> getSteelManagementV2List(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final SteelManagementV2ListRequest request) {
-        final Page<SteelManagementV2Response> page = steelManagementV2Service.getSteelManagementV2List(
-                request,
-                PageableUtils.createPageable(pageRequest, sortRequest));
+        final Page<SteelManagementV2Response> page = steelManagementV2Service.getSteelManagementV2List(request,
+                user.getUserId(),
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 

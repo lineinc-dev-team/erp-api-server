@@ -15,12 +15,14 @@ public interface SteelManagementV2RepositoryCustom {
      */
     Page<SteelManagementV2Response> findAll(
             SteelManagementV2ListRequest request,
-            Pageable pageable);
+            Pageable pageable,
+            List<Long> accessibleSiteIds);
 
     /**
      * 동적 조건으로 강재수불부 V2 목록을 조회합니다 (페이징 없음, 엑셀 다운로드용).
      */
     List<SteelManagementV2Response> findAllWithoutPaging(
             SteelManagementV2ListRequest request,
-            Sort sort);
+            Sort sort,
+            List<Long> accessibleSiteIds);
 }
