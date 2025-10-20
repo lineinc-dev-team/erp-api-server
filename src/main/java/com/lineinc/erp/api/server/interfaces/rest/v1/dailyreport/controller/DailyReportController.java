@@ -217,7 +217,6 @@ public class DailyReportController extends BaseController {
                         request,
                         PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                                 sortRequest.sort()));
-
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
