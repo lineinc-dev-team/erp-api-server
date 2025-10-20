@@ -46,10 +46,16 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
             "updatedAt", QManagementCost.managementCost.updatedAt);
 
     @Override
-    public Page<ManagementCostResponse> findAll(final ManagementCostListRequest request, final Pageable pageable) {
+    public Page<ManagementCostResponse> findAll(final ManagementCostListRequest request, final Pageable pageable,
+            final List<Long> accessibleSiteIds) {
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
-
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            condition.and(site.id.in(accessibleSiteIds));
+        }
         final List<ManagementCost> content = queryFactory
                 .selectFrom(managementCost)
                 .distinct()
@@ -112,10 +118,16 @@ public class ManagementCostRepositoryImpl implements ManagementCostRepositoryCus
     }
 
     @Override
-    public List<ManagementCost> findAllWithoutPaging(final ManagementCostListRequest request, final Sort sort) {
+    public List<ManagementCost> findAllWithoutPaging(final ManagementCostListRequest request, final Sort sort,
+            final List<Long> accessibleSiteIds) {
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
-
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return List.of();
+            }
+            condition.and(site.id.in(accessibleSiteIds));
+        }
         return queryFactory
                 .selectFrom(managementCost)
                 .distinct()

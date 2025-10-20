@@ -133,11 +133,13 @@ public class ManagementCostController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ManagementCostResponse>>> getManagementCosts(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final ManagementCostListRequest request) {
 
         final Page<ManagementCostResponse> page = managementCostService.getAllManagementCosts(
+                user.getUserId(),
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));

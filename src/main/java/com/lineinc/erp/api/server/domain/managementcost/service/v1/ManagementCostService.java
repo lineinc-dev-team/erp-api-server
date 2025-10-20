@@ -40,6 +40,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.DeleteManagementCostsRequest;
@@ -257,9 +258,12 @@ public class ManagementCostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ManagementCostResponse> getAllManagementCosts(final ManagementCostListRequest request,
+    public Page<ManagementCostResponse> getAllManagementCosts(final Long userId,
+            final ManagementCostListRequest request,
             final Pageable pageable) {
-        return managementCostRepository.findAll(request, pageable);
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        return managementCostRepository.findAll(request, pageable, accessibleSiteIds);
     }
 
     @Transactional
@@ -279,8 +283,10 @@ public class ManagementCostService {
     @Transactional(readOnly = true)
     public Workbook downloadExcel(final CustomUserDetails user, final ManagementCostListRequest request,
             final Sort sort, final List<String> fields) {
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
         final List<ManagementCostResponse> managementCostResponses = managementCostRepository
-                .findAllWithoutPaging(request, sort)
+                .findAllWithoutPaging(request, sort, accessibleSiteIds)
                 .stream()
                 .map(ManagementCostResponse::from)
                 .toList();
