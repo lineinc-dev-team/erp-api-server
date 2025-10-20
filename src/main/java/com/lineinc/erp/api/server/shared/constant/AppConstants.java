@@ -137,6 +137,7 @@ public final class AppConstants {
     public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_ID = "outsourcing_company_contract_worker_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_DRIVER_ID = "outsourcing_company_contract_driver_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_ID = "outsourcing_company_contract_equipment_id";
+    public static final String OUTSOURCING_COMPANY_CONSTRUCTION_ID = "outsourcing_company_construction_id";
 
     // 엔티티 매핑 관련 상수
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";
