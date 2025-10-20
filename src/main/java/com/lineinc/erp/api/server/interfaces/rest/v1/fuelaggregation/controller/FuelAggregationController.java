@@ -29,9 +29,11 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelPriceRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelPriceResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.WeatherTypeResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -189,6 +191,18 @@ public class FuelAggregationController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "유종별 가격 조회", description = "현장, 공정, 일자로 휘발유/경유/요소수 가격을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
+    })
+    @GetMapping("/fuel-prices")
+    public ResponseEntity<SuccessResponse<FuelPriceResponse>> getFuelPrice(
+            @Valid final FuelPriceRequest request) {
+        final FuelPriceResponse response = fuelAggregationService.getFuelPrice(request);
+        return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
     @Operation(summary = "유류집계 목록 엑셀 다운로드", description = "검색 조건에 맞는 유류집계 목록을 엑셀 파일로 다운로드합니다.")

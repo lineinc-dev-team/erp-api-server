@@ -46,9 +46,11 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelPriceRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelPriceResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -375,6 +377,27 @@ public class FuelAggregationService {
                     dailyReport.updateEtcTotalAmount();
                     dailyReport.updateFuelEvidenceSubmitted();
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public FuelPriceResponse getFuelPrice(final FuelPriceRequest request) {
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(request.reportDate());
+        final FuelAggregation fuelAggregation = fuelAggregationRepository
+                .findBySiteAndSiteProcessAndDate(site, siteProcess, reportDate)
+                .orElse(null);
+
+        if (fuelAggregation == null) {
+            return new FuelPriceResponse(null, null, null, null);
+        }
+
+        return new FuelPriceResponse(
+                fuelAggregation.getId(),
+                fuelAggregation.getGasolinePrice(),
+                fuelAggregation.getDieselPrice(),
+                fuelAggregation.getUreaPrice());
     }
 
 }
