@@ -282,14 +282,13 @@ public class SiteService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<SiteResponse.SiteSimpleResponse> searchSiteByName(final String keyword, final Pageable pageable) {
-        Slice<Site> siteSlice;
+    public Slice<SiteResponse.SiteSimpleResponse> searchSiteByName(final Long userId, final String keyword,
+            final Pageable pageable) {
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
 
-        if (keyword == null || keyword.isBlank()) {
-            siteSlice = siteRepository.findAllBy(pageable);
-        } else {
-            siteSlice = siteRepository.findByNameContainingIgnoreCase(keyword, pageable);
-        }
+        final Slice<Site> siteSlice = siteRepository.findByNameContainingIgnoreCaseAndIdIn(
+                keyword, accessibleSiteIds, pageable);
 
         return siteSlice.map(SiteResponse.SiteSimpleResponse::from);
     }

@@ -174,10 +174,11 @@ public class SiteController {
     })
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<SiteResponse.SiteSimpleResponse>>> searchClientCompanyByName(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final SortRequest sortRequest,
             @Valid final PageRequest pageRequest,
             @RequestParam(required = false) final String keyword) {
-        final Slice<SiteResponse.SiteSimpleResponse> slice = siteService.searchSiteByName(keyword,
+        final Slice<SiteResponse.SiteSimpleResponse> slice = siteService.searchSiteByName(user.getUserId(), keyword,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
         return ResponseEntity.ok(SuccessResponse.of(
