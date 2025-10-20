@@ -10,14 +10,17 @@ import java.util.stream.Collectors;
 
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractConstructionRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractRepository;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractConstructionUpdateRequest;
@@ -35,6 +38,7 @@ public class OutsourcingCompanyContractConstructionService {
 
     private final OutsourcingCompanyContractRepository contractRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository changeHistoryRepository;
+    private final OutsourcingCompanyContractConstructionRepository outsourcingCompanyContractConstructionRepository;
     private final Javers javers;
     private final UserService userService;
 
@@ -126,5 +130,12 @@ public class OutsourcingCompanyContractConstructionService {
                     .build();
             changeHistoryRepository.save(history);
         }
+    }
+
+    public OutsourcingCompanyContractConstruction getOutsourcingCompanyContractConstructionByIdOrThrow(
+            final Long id) {
+        return outsourcingCompanyContractConstructionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_NOT_FOUND));
     }
 }

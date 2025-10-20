@@ -23,6 +23,7 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEvidenceF
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstruction;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
@@ -40,12 +41,14 @@ import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollSyncService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractDriverRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractEquipmentRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractWorkerRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractConstructionService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
@@ -63,6 +66,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportListSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
@@ -104,6 +108,7 @@ public class DailyReportService {
     private final FuelAggregationService fuelAggregationService;
     private final FuelInfoRepository fuelInfoRepository;
     private final LaborChangeHistoryRepository laborChangeHistoryRepository;
+    private final OutsourcingCompanyContractConstructionService outsourcingCompanyContractConstructionService;
 
     @Transactional
     public void createDailyReport(final DailyReportCreateRequest request, final Long userId) {
@@ -312,6 +317,38 @@ public class DailyReportService {
                     .build();
 
             dailyReport.getFuels().add(fuel);
+        }
+
+        // 외주 공사 출역 정보 추가
+        if (request.outsourcingConstructions() != null) {
+            for (final DailyReportOutsourcingConstructionCreateRequest constructionRequest : request
+                    .outsourcingConstructions()) {
+
+                final OutsourcingCompany outsourcingCompany = constructionRequest.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(constructionRequest.outsourcingCompanyId())
+                        : null;
+
+                final OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction = constructionRequest
+                        .outsourcingCompanyContractConstructionId() != null
+                                ? outsourcingCompanyContractConstructionService
+                                        .getOutsourcingCompanyContractConstructionByIdOrThrow(
+                                                constructionRequest.outsourcingCompanyContractConstructionId())
+                                : null;
+
+                final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction.builder()
+                        .dailyReport(dailyReport)
+                        .outsourcingCompany(outsourcingCompany)
+                        .outsourcingCompanyContractConstruction(outsourcingCompanyContractConstruction)
+                        .unit(constructionRequest.unit())
+                        .quantity(constructionRequest.quantity())
+                        .contractFileUrl(constructionRequest.contractFileUrl())
+                        .contractOriginalFileName(constructionRequest.contractOriginalFileName())
+                        .memo(constructionRequest.memo())
+                        .build();
+
+                dailyReport.getOutsourcingConstructions().add(construction);
+            }
         }
 
         // 현장 사진 정보 추가
