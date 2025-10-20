@@ -10,6 +10,9 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "유류집계 수정 요청")
 public record FuelAggregationUpdateRequest(
+        @Schema(description = "휘발유 가격 (원)", example = "150000") Long gasolinePrice,
+        @Schema(description = "경유 가격 (원)", example = "200000") Long dieselPrice,
+        @Schema(description = "요소수 가격 (원)", example = "50000") Long ureaPrice,
         @Schema(description = "유류정보 수정 목록") @Valid List<FuelInfoUpdateRequest> fuelInfos,
         @Schema(description = "수정 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
     @Schema(description = "유류정보 수정 요청")

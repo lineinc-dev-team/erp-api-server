@@ -4,12 +4,14 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.CascadeType;
@@ -26,6 +28,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,16 +54,19 @@ public class FuelAggregation extends BaseEntity {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.SITE_ID)
     private Site site;
 
+    @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     private SiteProcess siteProcess;
 
     private OffsetDateTime date;
 
+    @DiffIgnore
     @Enumerated(EnumType.STRING)
     private FuelAggregationWeatherType weather;
 
@@ -89,4 +95,19 @@ public class FuelAggregation extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.FUEL_AGGREGATION_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FuelInfo> fuelInfos = new ArrayList<>();
+
+    @Transient
+    @DiffIgnore
+    private String siteName;
+
+    @Transient
+    @DiffIgnore
+    private String processName;
+
+    public void updateFrom(final FuelAggregationUpdateRequest request) {
+        this.gasolinePrice = request.gasolinePrice();
+        this.dieselPrice = request.dieselPrice();
+        this.ureaPrice = request.ureaPrice();
+    }
+
 }

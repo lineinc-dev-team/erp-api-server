@@ -21,6 +21,11 @@ public record FuelAggregationDetailResponse(
         @Schema(description = "집계일자", example = "2025-07-28T10:30:00+09:00") OffsetDateTime date,
         @Schema(description = "날씨", example = "맑음") String weather,
         @Schema(description = "날씨 코드", example = "SUNNY") String weatherCode,
+
+        @Schema(description = "휘발유 가격 (원)", example = "150000") Long gasolinePrice,
+        @Schema(description = "경유 가격 (원)", example = "200000") Long dieselPrice,
+        @Schema(description = "요소수 가격 (원)", example = "50000") Long ureaPrice,
+
         @Schema(description = "생성일", example = "2025-01-15T10:30:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2025-01-16T14:20:00+09:00") OffsetDateTime updatedAt,
         @Schema(description = "유류정보 목록") List<FuelInfoDetailResponse> fuelInfos,
@@ -49,6 +54,9 @@ public record FuelAggregationDetailResponse(
                 entity.getDate(),
                 weatherLabel,
                 weatherCode,
+                entity.getGasolinePrice(),
+                entity.getDieselPrice(),
+                entity.getUreaPrice(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getFuelInfos().stream()
