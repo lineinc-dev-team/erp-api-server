@@ -182,6 +182,8 @@ public class OutsourcingCompanyContractService {
                 .contractStartDate(contractStartDate)
                 .contractEndDate(contractEndDate)
                 .contractAmount(request.contractAmount())
+                .defaultDeductions(request.defaultDeductionsType())
+                .defaultDeductionsDescription(request.defaultDeductionsDescription())
                 .taxInvoiceCondition(request.taxInvoiceCondition())
                 .taxInvoiceIssueDayOfMonth(request.taxInvoiceIssueDayOfMonth())
                 .category(request.category())
