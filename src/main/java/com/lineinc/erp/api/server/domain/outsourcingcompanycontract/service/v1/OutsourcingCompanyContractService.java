@@ -51,6 +51,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
@@ -471,12 +472,15 @@ public class OutsourcingCompanyContractService {
      * 검색 조건에 따라 외주계약 리스트를 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Page<ContractListResponse> getContractList(final ContractListSearchRequest searchRequest,
+    public Page<ContractListResponse> getContractList(final Long userId, final ContractListSearchRequest searchRequest,
             final Pageable pageable) {
         log.info("외주계약 리스트 조회 시작: searchRequest={}, pageable={}", searchRequest, pageable);
 
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+
         final Page<OutsourcingCompanyContract> contractPage = contractRepository.findBySearchConditions(searchRequest,
-                pageable);
+                pageable, accessibleSiteIds);
 
         return contractPage.map(ContractListResponse::from);
     }
@@ -487,7 +491,10 @@ public class OutsourcingCompanyContractService {
     @Transactional(readOnly = true)
     public Workbook downloadExcel(final CustomUserDetails user, final ContractListSearchRequest request,
             final Sort sort, final List<String> fields) {
-        final List<ContractListResponse> contractResponses = contractRepository.findAllWithoutPaging(request, sort)
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
+        final List<ContractListResponse> contractResponses = contractRepository.findAllWithoutPaging(request, sort,
+                accessibleSiteIds)
                 .stream()
                 .map(ContractListResponse::from)
                 .toList();

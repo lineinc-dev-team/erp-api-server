@@ -178,11 +178,13 @@ public class CompanyContractController {
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping
     public ResponseEntity<SuccessResponse<PagingResponse<ContractListResponse>>> getContractList(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final ContractListSearchRequest searchRequest,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
 
         final Page<ContractListResponse> page = outsourcingCompanyContractService.getContractList(
+                user.getUserId(),
                 searchRequest,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));

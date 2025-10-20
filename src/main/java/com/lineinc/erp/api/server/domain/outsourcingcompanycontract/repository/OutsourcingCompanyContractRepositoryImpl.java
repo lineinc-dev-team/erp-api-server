@@ -56,11 +56,17 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
 
     @Override
     public Page<OutsourcingCompanyContract> findBySearchConditions(final ContractListSearchRequest searchRequest,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final List<Long> accessibleSiteIds) {
 
         // 검색 조건을 동적으로 구성
         final BooleanBuilder whereClause = buildSearchCondition(searchRequest);
-
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            whereClause.and(site.id.in(accessibleSiteIds));
+        }
         // 기본 쿼리 구성 - files만 fetch join (MultipleBagFetchException 회피), contacts는 배치 페치
         // 사용
         final JPAQuery<OutsourcingCompanyContract> query = queryFactory
@@ -98,10 +104,16 @@ public class OutsourcingCompanyContractRepositoryImpl implements OutsourcingComp
 
     @Override
     public List<OutsourcingCompanyContract> findAllWithoutPaging(final ContractListSearchRequest searchRequest,
-            final Sort sort) {
+            final Sort sort,
+            final List<Long> accessibleSiteIds) {
         // 검색 조건을 동적으로 구성
         final BooleanBuilder whereClause = buildSearchCondition(searchRequest);
-
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return List.of();
+            }
+            whereClause.and(site.id.in(accessibleSiteIds));
+        }
         // 정렬 적용
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
