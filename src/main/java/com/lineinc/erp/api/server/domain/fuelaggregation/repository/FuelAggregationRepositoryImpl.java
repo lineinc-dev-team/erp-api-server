@@ -53,10 +53,16 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
 
     @Override
     public Page<FuelAggregationListResponse> findAll(final FuelAggregationListRequest request,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final List<Long> accessibleSiteIds) {
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
-
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            condition.and(fuelAggregation.site.id.in(accessibleSiteIds));
+        }
         // FuelInfo를 기준으로 조회하되, FuelAggregation 기준으로만 정렬
         final List<FuelInfo> fuelInfoContent = queryFactory
                 .selectFrom(fuelInfo)
@@ -136,10 +142,16 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
 
     @Override
     public List<FuelAggregationListResponse> findAllWithoutPaging(final FuelAggregationListRequest request,
-            final Sort sort) {
+            final Sort sort,
+            final List<Long> accessibleSiteIds) {
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
-
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return List.of();
+            }
+            condition.and(fuelAggregation.site.id.in(accessibleSiteIds));
+        }
         // FuelInfo를 기준으로 조회하되, FuelAggregation 기준으로만 정렬
         final List<FuelInfo> fuelInfoContent = queryFactory
                 .selectFrom(fuelInfo)

@@ -142,11 +142,13 @@ public class FuelAggregationController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationListResponse>>> getFuelAggregations(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final FuelAggregationListRequest request) {
 
         final Page<FuelAggregationListResponse> page = fuelAggregationService.getAllFuelAggregations(
+                user.getUserId(),
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));

@@ -15,12 +15,14 @@ public interface FuelAggregationRepositoryCustom {
      */
     Page<FuelAggregationListResponse> findAll(
             FuelAggregationListRequest request,
-            Pageable pageable);
+            Pageable pageable,
+            List<Long> accessibleSiteIds);
 
     /**
      * 엑셀 다운로드용 - 페이지네이션 없이 유류집계 목록 전체 조회
      */
     List<FuelAggregationListResponse> findAllWithoutPaging(
             FuelAggregationListRequest request,
-            Sort sort);
+            Sort sort,
+            List<Long> accessibleSiteIds);
 }

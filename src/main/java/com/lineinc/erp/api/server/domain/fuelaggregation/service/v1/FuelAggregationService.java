@@ -34,6 +34,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.AddFuelInfoRequest;
@@ -140,17 +141,23 @@ public class FuelAggregationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FuelAggregationListResponse> getAllFuelAggregations(final FuelAggregationListRequest request,
+    public Page<FuelAggregationListResponse> getAllFuelAggregations(
+            final Long userId,
+            final FuelAggregationListRequest request,
             final Pageable pageable) {
-        return fuelAggregationRepository.findAll(request, pageable);
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        return fuelAggregationRepository.findAll(request, pageable, accessibleSiteIds);
     }
 
     @Transactional(readOnly = true)
     public Workbook downloadExcel(final CustomUserDetails user, final FuelAggregationListRequest request,
             final Sort sort,
             final List<String> fields) {
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
         final List<FuelAggregationListResponse> responses = fuelAggregationRepository.findAllWithoutPaging(request,
-                sort);
+                sort, accessibleSiteIds);
 
         final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 responses,
