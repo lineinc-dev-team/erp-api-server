@@ -4,6 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javers.core.metamodel.annotation.DiffInclude;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -61,6 +63,24 @@ public class FuelAggregation extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private FuelAggregationWeatherType weather;
+
+    /**
+     * 휘발유 가격
+     */
+    @DiffInclude
+    private Long gasolinePrice;
+
+    /**
+     * 경유 가격
+     */
+    @DiffInclude
+    private Long dieselPrice;
+
+    /**
+     * 요소수 가격
+     */
+    @DiffInclude
+    private Long ureaPrice;
 
     /**
      * 유류정보 목록

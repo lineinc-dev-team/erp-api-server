@@ -297,6 +297,9 @@ public class DailyReportService {
                     request.siteProcessId(),
                     request.reportDate(),
                     request.weather(),
+                    request.gasolinePrice(),
+                    request.dieselPrice(),
+                    request.ureaPrice(),
                     request.fuelInfos().stream()
                             .map(fuelInfoRequest -> new FuelInfoCreateRequest(
                                     fuelInfoRequest.outsourcingCompanyId(),

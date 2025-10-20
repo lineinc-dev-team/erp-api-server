@@ -38,7 +38,11 @@ public class QFuelAggregation extends EntityPathBase<FuelAggregation> {
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final NumberPath<Long> dieselPrice = createNumber("dieselPrice", Long.class);
+
     public final ListPath<FuelInfo, QFuelInfo> fuelInfos = this.<FuelInfo, QFuelInfo>createList("fuelInfos", FuelInfo.class, QFuelInfo.class, PathInits.DIRECT2);
+
+    public final NumberPath<Long> gasolinePrice = createNumber("gasolinePrice", Long.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -51,6 +55,8 @@ public class QFuelAggregation extends EntityPathBase<FuelAggregation> {
 
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
+
+    public final NumberPath<Long> ureaPrice = createNumber("ureaPrice", Long.class);
 
     public final EnumPath<com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType> weather = createEnum("weather", com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType.class);
 

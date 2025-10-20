@@ -82,6 +82,9 @@ public class FuelAggregationService {
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
                 .weather(request.weather())
+                .gasolinePrice(request.gasolinePrice())
+                .dieselPrice(request.dieselPrice())
+                .ureaPrice(request.ureaPrice())
                 .build());
 
         for (final FuelInfoCreateRequest fuelInfo : request.fuelInfos()) {
