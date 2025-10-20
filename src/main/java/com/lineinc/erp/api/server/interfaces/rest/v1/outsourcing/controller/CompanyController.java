@@ -266,11 +266,12 @@ public class CompanyController {
     @GetMapping("/{id}/contract-equipments")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> getContractEquipmentsByCompany(
             @PathVariable final Long id,
+            @RequestParam(required = false) final Long siteId,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
         final Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractEquipmentsByCompany(
-                        id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        id, siteId, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                                 sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
@@ -284,11 +285,13 @@ public class CompanyController {
     @GetMapping("/{id}/contract-drivers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractDriverResponse.ContractDriverSimpleResponse>>> getContractDriversByCompany(
             @PathVariable final Long id,
+            @RequestParam(required = false) final Long siteId,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
         final Slice<ContractDriverResponse.ContractDriverSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractDriversByCompany(
-                        id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+                        id, siteId,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
@@ -301,35 +304,15 @@ public class CompanyController {
     @GetMapping("/{id}/contract-workers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractWorkerResponse.ContractWorkerSimpleResponse>>> getContractWorkersByCompany(
             @PathVariable final Long id,
+            @RequestParam(required = false) final Long siteId,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
         final Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractWorkersByCompany(
-                        id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+                        id, siteId,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    // @Deprecated
-    // @Operation(summary = "장비 타입 계약을 가진 외주업체 목록 조회", description = "연결된 외주업체계약에
-    // 장비데이터가 존재하는 모든 외주업체 리스트를 반환합니다")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "조회 성공"),
-    // @ApiResponse(responseCode = "400", description = "잘못된 요청", content =
-    // @Content())
-    // })
-    // @GetMapping("/with-equipment")
-    // public
-    // ResponseEntity<SuccessResponse<SliceResponse<CompanyResponse.CompanySimpleResponse>>>
-    // getCompaniesWithEquipment(
-    // @Valid final PageRequest pageRequest,
-    // @Valid final SortRequest sortRequest) {
-    // final Page<CompanyResponse.CompanySimpleResponse> page =
-    // outsourcingCompanyService
-    // .getCompaniesWithEquipment(
-    // PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-    // sortRequest.sort()));
-    // return ResponseEntity.ok(SuccessResponse.of(
-    // new SliceResponse<>(SliceInfo.from(page), page.getContent())));
-    // }
 }

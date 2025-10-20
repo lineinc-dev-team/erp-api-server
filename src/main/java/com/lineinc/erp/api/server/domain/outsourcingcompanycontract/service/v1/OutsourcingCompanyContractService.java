@@ -589,8 +589,8 @@ public class OutsourcingCompanyContractService {
      */
     @Transactional(readOnly = true)
     public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> getContractEquipmentsByCompany(
-            final Long companyId, final Pageable pageable) {
-        final List<Long> contractIds = getContractIdsByCompany(companyId);
+            final Long companyId, final Long siteId, final Pageable pageable) {
+        final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId);
 
         // 계약 ID들로 장비 조회
         final Page<OutsourcingCompanyContractEquipment> page = equipmentRepository
@@ -603,8 +603,8 @@ public class OutsourcingCompanyContractService {
      */
     @Transactional(readOnly = true)
     public Slice<ContractDriverResponse.ContractDriverSimpleResponse> getContractDriversByCompany(final Long companyId,
-            final Pageable pageable) {
-        final List<Long> contractIds = getContractIdsByCompany(companyId);
+            final Long siteId, final Pageable pageable) {
+        final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId);
 
         // 계약 ID들로 기사 조회
         final Page<OutsourcingCompanyContractDriver> page = driverRepository
@@ -617,8 +617,8 @@ public class OutsourcingCompanyContractService {
      */
     @Transactional(readOnly = true)
     public Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> getContractWorkersByCompany(final Long companyId,
-            final Pageable pageable) {
-        final List<Long> contractIds = getContractIdsByCompany(companyId);
+            final Long siteId, final Pageable pageable) {
+        final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId);
 
         // 계약 ID들로 인력 조회
         final Page<OutsourcingCompanyContractWorker> page = workerRepository
@@ -777,6 +777,15 @@ public class OutsourcingCompanyContractService {
         // 해당 외주업체의 계약 ID들을 조회
         return contractRepository.findByOutsourcingCompanyId(companyId)
                 .stream()
+                .map(OutsourcingCompanyContract::getId)
+                .toList();
+    }
+
+    private List<Long> getContractIdsByCompanyAndSite(final Long companyId, final Long siteId) {
+        // 해당 외주업체와 현장의 계약 ID들을 조회
+        return contractRepository.findByOutsourcingCompanyId(companyId)
+                .stream()
+                .filter(contract -> siteId == null || contract.getSite().getId().equals(siteId))
                 .map(OutsourcingCompanyContract::getId)
                 .toList();
     }
