@@ -38,12 +38,14 @@ public interface LaborPayrollSummaryRepository extends JpaRepository<LaborPayrol
             WHERE (:siteName IS NULL OR lps.site.name LIKE %:siteName%)
             AND (:processName IS NULL OR lps.siteProcess.name LIKE %:processName%)
             AND (:yearMonth IS NULL OR lps.yearMonth = :yearMonth)
+            AND (:accessibleSiteIds IS NULL OR lps.site.id IN (:accessibleSiteIds))
             """)
     Page<LaborPayrollSummary> findBySearchCondition(
             @Param("siteName") String siteName,
             @Param("processName") String processName,
             @Param("yearMonth") String yearMonth,
-            Pageable pageable);
+            Pageable pageable,
+            @Param("accessibleSiteIds") List<Long> accessibleSiteIds);
 
     /**
      * 특정 년월의 모든 집계 데이터 삭제
@@ -65,17 +67,21 @@ public interface LaborPayrollSummaryRepository extends JpaRepository<LaborPayrol
             WHERE (:siteName IS NULL OR lps.site.name LIKE %:siteName%)
             AND (:processName IS NULL OR lps.siteProcess.name LIKE %:processName%)
             AND (:yearMonth IS NULL OR lps.yearMonth = :yearMonth)
+            AND (:accessibleSiteIds IS NULL OR lps.site.id IN (:accessibleSiteIds))
             """)
     List<LaborPayrollSummary> findAllWithoutPaging(
             @Param("siteName") String siteName,
             @Param("processName") String processName,
             @Param("yearMonth") String yearMonth,
-            Sort sort);
+            Sort sort,
+            @Param("accessibleSiteIds") List<Long> accessibleSiteIds);
 
     /**
      * 조건에 따른 집계 데이터 전체 조회 (페이징 없음) - Request 객체 사용
      */
-    default List<LaborPayrollSummary> findAllWithoutPaging(LaborPayrollSearchRequest request, Sort sort) {
-        return findAllWithoutPaging(request.siteName(), request.processName(), request.yearMonth(), sort);
+    default List<LaborPayrollSummary> findAllWithoutPaging(final LaborPayrollSearchRequest request, final Sort sort,
+            final List<Long> accessibleSiteIds) {
+        return findAllWithoutPaging(request.siteName(), request.processName(), request.yearMonth(), sort,
+                accessibleSiteIds);
     }
 }

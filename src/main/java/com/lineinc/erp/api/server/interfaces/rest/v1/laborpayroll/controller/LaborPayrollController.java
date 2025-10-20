@@ -71,12 +71,13 @@ public class LaborPayrollController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollSummaryResponse>>> getLaborPayrollMonthlyList(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Parameter(description = "조회 조건") @ModelAttribute final LaborPayrollSearchRequest request,
             @Parameter(description = "페이징 정보") @ModelAttribute final PageRequest pageRequest,
             @Parameter(description = "정렬 정보") @ModelAttribute final SortRequest sortRequest) {
 
         final PagingResponse<LaborPayrollSummaryResponse> result = laborPayrollService
-                .getLaborPayrollMonthlyList(request, pageRequest, sortRequest);
+                .getLaborPayrollMonthlyList(user.getUserId(), request, pageRequest, sortRequest);
         return ResponseEntity.ok(SuccessResponse.of(result));
     }
 

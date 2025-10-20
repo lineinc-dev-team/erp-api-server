@@ -30,6 +30,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.enums.LaborPayrollChangeTy
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
+import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
@@ -73,7 +74,11 @@ public class LaborPayrollService {
      * 사전에 계산된 집계 테이블에서 현장, 공정별 통계 정보 조회
      */
     public PagingResponse<LaborPayrollSummaryResponse> getLaborPayrollMonthlyList(
+            final Long userId,
             final LaborPayrollSearchRequest request, final PageRequest pageRequest, final SortRequest sortRequest) {
+
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
 
         // 페이징 및 정렬 처리
         final Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
@@ -84,7 +89,8 @@ public class LaborPayrollService {
                 request.siteName(),
                 request.processName(),
                 request.yearMonth(),
-                pageable);
+                pageable,
+                accessibleSiteIds);
 
         // 엔티티를 DTO로 변환
         final List<LaborPayrollSummaryResponse> responseList = summaryPage.getContent().stream()
@@ -101,8 +107,11 @@ public class LaborPayrollService {
     @Transactional(readOnly = true)
     public Workbook downloadExcel(final CustomUserDetails user, final LaborPayrollSearchRequest request,
             final Sort sort, final List<String> fields) {
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
+
         final List<LaborPayrollSummaryResponse> responses = laborPayrollSummaryRepository
-                .findAllWithoutPaging(request.siteName(), request.processName(), request.yearMonth(), sort)
+                .findAllWithoutPaging(request, sort, accessibleSiteIds)
                 .stream()
                 .map(LaborPayrollSummaryResponse::from)
                 .toList();
