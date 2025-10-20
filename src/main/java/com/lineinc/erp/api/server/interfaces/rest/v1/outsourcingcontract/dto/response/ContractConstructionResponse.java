@@ -36,4 +36,5 @@ public record ContractConstructionResponse(
                 construction.getCreatedAt(),
                 construction.getUpdatedAt());
     }
+
 }
