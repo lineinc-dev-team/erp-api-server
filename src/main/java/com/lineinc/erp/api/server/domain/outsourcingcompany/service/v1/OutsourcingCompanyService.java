@@ -321,12 +321,4 @@ public class OutsourcingCompanyService {
         final Page<OutsourcingCompany> page = outsourcingCompanyRepository.findCompaniesWithEquipment(pageable);
         return page.map(CompanyResponse.CompanySimpleResponse::from);
     }
-
-    /**
-     * 외주업체를 저장합니다.
-     */
-    @Transactional
-    public OutsourcingCompany saveOutsourcingCompany(final OutsourcingCompany company) {
-        return outsourcingCompanyRepository.save(company);
-    }
 }

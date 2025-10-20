@@ -18,9 +18,6 @@ import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractChangeHistory;
@@ -99,7 +96,6 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractConstructionRepository constructionRepository;
     private final OutsourcingCompanyContractHistoryRepository contractHistoryRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository contractChangeHistoryRepository;
-    private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
     private final OutsourcingCompanyContractSubEquipmentRepository subEquipmentRepository;
     private final Javers javers;
     private final OutsourcingCompanyContractContactService contractContactService;
@@ -122,7 +118,7 @@ public class OutsourcingCompanyContractService {
         log.info("외주업체 계약 생성 시작: {}", request);
 
         // 1. 기본 계약 정보 생성
-        final OutsourcingCompanyContract contract = createMainContract(request, userId);
+        final OutsourcingCompanyContract contract = createMainContract(request);
 
         // 2. 계약 담당자 생성
         if (request.contacts() != null && !request.contacts().isEmpty()) {
@@ -168,8 +164,7 @@ public class OutsourcingCompanyContractService {
     /**
      * 기본 계약 정보를 생성합니다.
      */
-    private OutsourcingCompanyContract createMainContract(final OutsourcingCompanyContractCreateRequest request,
-            final Long userId) {
+    private OutsourcingCompanyContract createMainContract(final OutsourcingCompanyContractCreateRequest request) {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
@@ -194,57 +189,14 @@ public class OutsourcingCompanyContractService {
                 .memo(request.memo())
                 .build();
 
-        // 계약서의 공제 항목 정보를 외주업체에 업데이트
-        updateOutsourcingCompanyDeductionsWithHistory(
-                request.outsourcingCompanyId(),
-                request.defaultDeductionsType(),
-                request.defaultDeductionsDescription(),
-                userId);
+        outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+
+        final OutsourcingCompany company = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+
+        company.syncTransientFields();
 
         return contractRepository.save(contract);
-    }
-
-    /**
-     * 외주업체의 공제 항목을 업데이트하고 변경 이력을 저장합니다.
-     * 계약 생성/수정 시 외주업체 공제 항목을 동기화하는 용도로 사용됩니다.
-     * 
-     * @param companyId                    외주업체 ID
-     * @param defaultDeductions            공제 항목
-     * @param defaultDeductionsDescription 공제 항목 설명
-     * @param userId                       사용자 ID
-     */
-    public void updateOutsourcingCompanyDeductionsWithHistory(
-            final Long companyId,
-            final String defaultDeductions,
-            final String defaultDeductionsDescription,
-            final Long userId) {
-
-        // 외주업체 조회
-        final OutsourcingCompany company = outsourcingCompanyService
-                .getOutsourcingCompanyByIdOrThrow(companyId);
-
-        // 변경 이력을 위한 스냅샷 생성
-        company.syncTransientFields();
-        final OutsourcingCompany oldSnapshot = JaversUtils.createSnapshot(javers, company, OutsourcingCompany.class);
-
-        // 외주업체의 공제 항목 업데이트
-        company.updateDefaultDeductions(defaultDeductions, defaultDeductionsDescription);
-        final OutsourcingCompany savedCompany = outsourcingCompanyService.saveOutsourcingCompany(company);
-
-        // 변경 이력 저장
-        final Diff diff = javers.compare(oldSnapshot, savedCompany);
-        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
-
-        if (!simpleChanges.isEmpty()) {
-            final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
-            final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
-                    .outsourcingCompany(savedCompany)
-                    .type(OutsourcingCompanyChangeHistoryType.BASIC)
-                    .changes(changesJson)
-                    .user(userService.getUserByIdOrThrow(userId))
-                    .build();
-            outsourcingCompanyChangeRepository.save(changeHistory);
-        }
     }
 
     /**
@@ -720,14 +672,7 @@ public class OutsourcingCompanyContractService {
         // 3. 기본 계약 정보 수정 (updateFrom 메서드 사용)
         contract.updateFrom(request, site, siteProcess, outsourcingCompany);
 
-        // 4. 외주업체 공제 항목 업데이트 (계약서의 공제 항목 정보로 외주업체 동기화)
-        updateOutsourcingCompanyDeductionsWithHistory(
-                request.outsourcingCompanyId(),
-                request.defaultDeductionsType(),
-                request.defaultDeductionsDescription(),
-                userId);
-
-        // 5. 변경사항 추출 및 변경 히스토리 저장
+        // 4. 변경사항 추출 및 변경 히스토리 저장
         final Diff diff = javers.compare(oldSnapshot, contract);
         final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
         final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
@@ -743,37 +688,37 @@ public class OutsourcingCompanyContractService {
             contractChangeHistoryRepository.save(changeHistory);
         }
 
-        // 6. 담당자 정보 수정
+        // 5. 담당자 정보 수정
         if (request.contacts() != null) {
             contractContactService.updateContractContacts(contract.getId(), request.contacts(), userId);
         }
 
-        // 7. 첨부파일 정보 수정
+        // 6. 첨부파일 정보 수정
         if (request.files() != null) {
             contractFileService.updateContractFiles(contract.getId(), request.files(), userId);
         }
 
-        // 8. 인력 정보 수정
+        // 7. 인력 정보 수정
         if (request.workers() != null) {
             contractWorkerService.updateContractWorkers(contract.getId(), request.workers(), userId);
         }
 
-        // 9. 장비 정보 수정
+        // 8. 장비 정보 수정
         if (request.equipments() != null) {
             contractEquipmentService.updateContractEquipments(contract.getId(), request.equipments(), userId);
         }
 
-        // 10. 운전자 정보 수정
+        // 9. 운전자 정보 수정
         if (request.drivers() != null) {
             contractDriverService.updateContractDrivers(contract.getId(), request.drivers(), userId);
         }
 
-        // 11. 공사항목 정보 수정
+        // 10. 공사항목 정보 수정
         if (request.constructions() != null) {
             contractConstructionService.updateContractConstructions(contract.getId(), request.constructions(), userId);
         }
 
-        // 12. 사용자 정의 변경 이력 저장
+        // 11. 사용자 정의 변경 이력 저장
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (final OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {

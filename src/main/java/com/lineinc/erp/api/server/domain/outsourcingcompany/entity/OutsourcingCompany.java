@@ -200,13 +200,4 @@ public class OutsourcingCompany extends BaseEntity {
         Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
         syncTransientFields();
     }
-
-    /**
-     * 외주업체 공제 항목을 업데이트합니다.
-     */
-    public void updateDefaultDeductions(final String defaultDeductions, final String defaultDeductionsDescription) {
-        Optional.ofNullable(defaultDeductions).ifPresent(val -> this.defaultDeductions = val);
-        Optional.ofNullable(defaultDeductionsDescription).ifPresent(val -> this.defaultDeductionsDescription = val);
-        syncTransientFields();
-    }
 }
