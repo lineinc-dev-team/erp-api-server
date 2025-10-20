@@ -122,11 +122,13 @@ public class MaterialManagementController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<MaterialManagementResponse>>> getMaterialManagements(
+            @AuthenticationPrincipal final CustomUserDetails user,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final MaterialManagementListRequest request) {
 
         final Page<MaterialManagementResponse> page = materialManagementService.getAllMaterialManagements(
+                user.getUserId(),
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));

@@ -106,9 +106,12 @@ public class MaterialManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MaterialManagementResponse> getAllMaterialManagements(final MaterialManagementListRequest request,
+    public Page<MaterialManagementResponse> getAllMaterialManagements(final Long userId,
+            final MaterialManagementListRequest request,
             final Pageable pageable) {
-        return materialManagementRepository.findAll(request, pageable);
+        final User user = userService.getUserByIdOrThrow(userId);
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+        return materialManagementRepository.findAll(request, pageable, accessibleSiteIds);
     }
 
     @Transactional
@@ -130,8 +133,11 @@ public class MaterialManagementService {
     public Workbook downloadExcel(final CustomUserDetails user, final MaterialManagementListRequest request,
             final Sort sort,
             final List<String> fields) {
+
+        final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
         final List<MaterialManagementResponse> responses = materialManagementRepository.findAllWithoutPaging(request,
-                sort);
+                sort, accessibleSiteIds);
 
         final Workbook workbook = ExcelExportUtils.generateWorkbook(
                 responses,

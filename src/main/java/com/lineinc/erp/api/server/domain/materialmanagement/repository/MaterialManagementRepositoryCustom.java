@@ -15,12 +15,14 @@ public interface MaterialManagementRepositoryCustom {
      */
     Page<MaterialManagementResponse> findAll(
             MaterialManagementListRequest request,
-            Pageable pageable);
+            Pageable pageable,
+            List<Long> accessibleSiteIds);
 
     /**
      * 엑셀 다운로드용 - 페이지네이션 없이 자재 관리 목록 전체 조회
      */
     List<MaterialManagementResponse> findAllWithoutPaging(
             MaterialManagementListRequest request,
-            Sort sort);
+            Sort sort,
+            List<Long> accessibleSiteIds);
 }

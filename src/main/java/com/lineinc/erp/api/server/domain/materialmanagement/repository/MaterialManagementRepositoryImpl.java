@@ -48,8 +48,15 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
 
     @Override
     public Page<MaterialManagementResponse> findAll(final MaterialManagementListRequest request,
-            final Pageable pageable) {
+            final Pageable pageable,
+            final List<Long> accessibleSiteIds) {
         final BooleanBuilder condition = buildCondition(request);
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            condition.and(materialManagement.site.id.in(accessibleSiteIds));
+        }
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         // MaterialManagementDetail을 기준으로 조회, MaterialManagement 기준 정렬 후 Detail ID로 2차
@@ -122,8 +129,15 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
 
     @Override
     public List<MaterialManagementResponse> findAllWithoutPaging(final MaterialManagementListRequest request,
-            final Sort sort) {
+            final Sort sort,
+            final List<Long> accessibleSiteIds) {
         final BooleanBuilder condition = buildCondition(request);
+        if (accessibleSiteIds != null) {
+            if (accessibleSiteIds.isEmpty()) {
+                return List.of();
+            }
+            condition.and(materialManagement.site.id.in(accessibleSiteIds));
+        }
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
         // MaterialManagementDetail을 기준으로 조회, MaterialManagement 기준 정렬 후 Detail ID로 2차
