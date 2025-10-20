@@ -91,6 +91,7 @@ public class OutsourcingCompanyContractEquipmentService {
                                             .equipment(equipment)
                                             .type(subDto.type())
                                             .description(subDto.description())
+                                            .unitPrice(subDto.unitPrice())
                                             .memo(subDto.memo())
                                             .build();
                                     return subEquipment;

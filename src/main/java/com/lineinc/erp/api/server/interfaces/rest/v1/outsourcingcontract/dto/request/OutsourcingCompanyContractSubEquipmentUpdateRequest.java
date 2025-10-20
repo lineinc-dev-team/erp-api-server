@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 public record OutsourcingCompanyContractSubEquipmentUpdateRequest(
         @Schema(description = "보조장비 ID", example = "1") @NotNull Long id,
 
+        @Schema(description = "단가", example = "10000") Long unitPrice,
+
         @Schema(description = "보조장비 구분", example = "PIPE_RENTAL") @NotNull OutsourcingCompanyContactSubEquipmentType type,
 
         @Schema(description = "설명", example = "죽통 임대료") String description,

@@ -10,6 +10,7 @@ public record ContractSubEquipmentResponse(
         @Schema(description = "구분값", example = "죽통임대") String type,
         @Schema(description = "구분값 코드", example = "BIT_USAGE_FEE") String typeCode,
         @Schema(description = "설명", example = "비트손료") String description,
+        @Schema(description = "단가", example = "10000") Long unitPrice,
         @Schema(description = "메모", example = "특수 부속장비") String memo) {
 
     public static ContractSubEquipmentResponse from(final OutsourcingCompanyContractSubEquipment subEquipment) {
@@ -18,6 +19,7 @@ public record ContractSubEquipmentResponse(
                 subEquipment.getType() != null ? subEquipment.getType().getLabel() : null,
                 subEquipment.getType() != null ? subEquipment.getType().name() : null,
                 subEquipment.getDescription(),
+                subEquipment.getUnitPrice(),
                 subEquipment.getMemo());
     }
 }

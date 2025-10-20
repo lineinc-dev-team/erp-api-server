@@ -46,6 +46,8 @@ public class QOutsourcingCompanyContractSubEquipment extends EntityPathBase<Outs
 
     public final EnumPath<com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContactSubEquipmentType> type = createEnum("type", com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContactSubEquipmentType.class);
 
+    public final NumberPath<Long> unitPrice = createNumber("unitPrice", Long.class);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 

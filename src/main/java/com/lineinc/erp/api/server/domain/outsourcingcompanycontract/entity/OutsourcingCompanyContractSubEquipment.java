@@ -54,6 +54,10 @@ public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
     private OutsourcingCompanyContractEquipment equipment;
 
     @DiffInclude
+    @Column
+    private Long unitPrice;
+
+    @DiffInclude
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
@@ -70,6 +74,9 @@ public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
         }
         if (request.description() != null) {
             this.description = request.description();
+        }
+        if (request.unitPrice() != null) {
+            this.unitPrice = request.unitPrice();
         }
         if (request.memo() != null) {
             this.memo = request.memo();
