@@ -28,7 +28,8 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportMaterialS
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstruction;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
-import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWorkContent;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWork;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWorkDetail;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
@@ -82,8 +83,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
@@ -97,7 +98,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMaterialStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingConstructionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkContentResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -386,18 +388,29 @@ public class DailyReportService {
             }
         }
 
-        // 작업내용 정보 추가
-        if (request.workContents() != null) {
-            for (final DailyReportWorkContentCreateRequest workContentRequest : request.workContents()) {
-                final DailyReportWorkContent workContent = DailyReportWorkContent.builder()
+        // 작업 정보 추가
+        if (request.works() != null) {
+            for (final DailyReportWorkCreateRequest workRequest : request.works()) {
+                final DailyReportWork work = DailyReportWork.builder()
                         .dailyReport(dailyReport)
-                        .workName(workContentRequest.workName())
-                        .content(workContentRequest.content())
-                        .personnelAndEquipment(workContentRequest.personnelAndEquipment())
-                        .isToday(workContentRequest.isToday())
+                        .workName(workRequest.workName())
+                        .isToday(workRequest.isToday())
                         .build();
 
-                dailyReport.getWorkContents().add(workContent);
+                // 작업 디테일 추가
+                if (workRequest.workDetails() != null) {
+                    for (final DailyReportWorkCreateRequest.DailyReportWorkDetailCreateRequest workDetailRequest : workRequest
+                            .workDetails()) {
+                        final DailyReportWorkDetail workDetail = DailyReportWorkDetail.builder()
+                                .work(work)
+                                .content(workDetailRequest.content())
+                                .personnelAndEquipment(workDetailRequest.personnelAndEquipment())
+                                .build();
+                        work.getWorkDetails().add(workDetail);
+                    }
+                }
+
+                dailyReport.getWorks().add(work);
             }
         }
 
@@ -1381,13 +1394,13 @@ public class DailyReportService {
     }
 
     /**
-     * 출역일보 작업내용 정보를 슬라이스로 조회합니다.
+     * 출역일보 작업 정보를 슬라이스로 조회합니다.
      * 
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
-     * @return 출역일보 작업내용 정보 슬라이스
+     * @return 출역일보 작업 정보 슬라이스
      */
-    public Slice<DailyReportWorkContentResponse> searchDailyReportWorkContents(
+    public Slice<DailyReportWorkResponse> searchDailyReportWorks(
             final DailyReportSearchRequest request, final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
@@ -1400,23 +1413,64 @@ public class DailyReportService {
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
                         null, pageable);
 
-        // DailyReport 슬라이스를 DailyReportWorkContentResponse 슬라이스로 변환
-        // 각 DailyReport의 작업내용들을 개별 항목으로 변환
-        final List<DailyReportWorkContentResponse> allWorkContents = new ArrayList<>();
+        // DailyReport 슬라이스를 DailyReportWorkResponse 슬라이스로 변환
+        // 각 DailyReport의 작업들을 개별 항목으로 변환
+        final List<DailyReportWorkResponse> allWorks = new ArrayList<>();
 
         for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
-            for (final DailyReportWorkContent workContent : dailyReport.getWorkContents()) {
-                allWorkContents.add(DailyReportWorkContentResponse.from(workContent));
+            for (final DailyReportWork work : dailyReport.getWorks()) {
+                allWorks.add(DailyReportWorkResponse.from(work));
             }
         }
 
         // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
-        final Slice<DailyReportWorkContentResponse> workContentSlice = new SliceImpl<>(
-                allWorkContents,
+        final Slice<DailyReportWorkResponse> workSlice = new SliceImpl<>(
+                allWorks,
                 pageable,
                 dailyReportSlice.hasNext());
 
-        return workContentSlice;
+        return workSlice;
+    }
+
+    /**
+     * 출역일보 작업 디테일 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 작업 디테일 정보 슬라이스
+     */
+    public Slice<DailyReportWorkDetailResponse> searchDailyReportWorkDetails(
+            final DailyReportSearchRequest request, final Pageable pageable) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        null, pageable);
+
+        // DailyReport 슬라이스를 DailyReportWorkDetailResponse 슬라이스로 변환
+        // 각 DailyReport의 작업 디테일들을 개별 항목으로 변환
+        final List<DailyReportWorkDetailResponse> allWorkDetails = new ArrayList<>();
+
+        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (final DailyReportWork work : dailyReport.getWorks()) {
+                for (final DailyReportWorkDetail workDetail : work.getWorkDetails()) {
+                    allWorkDetails.add(DailyReportWorkDetailResponse.from(workDetail));
+                }
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        final Slice<DailyReportWorkDetailResponse> workDetailSlice = new SliceImpl<>(
+                allWorkDetails,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return workDetailSlice;
     }
 
     /**
@@ -1537,32 +1591,46 @@ public class DailyReportService {
     }
 
     /**
-     * 출역일보 작업내용 정보를 수정합니다.
+     * 출역일보 작업 정보를 수정합니다.
      * 
      * @param searchRequest 출역일보 검색 요청
-     * @param request       작업내용 수정 요청
+     * @param request       작업 수정 요청
      */
     @Transactional
-    public void updateDailyReportWorkContent(final DailyReportSearchRequest searchRequest,
-            final DailyReportWorkContentUpdateRequest request) {
+    public void updateDailyReportWork(final DailyReportSearchRequest searchRequest,
+            final DailyReportWorkUpdateRequest request) {
         // 출역일보 조회
         final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
-        // EntitySyncUtils.syncList를 사용하여 작업내용 정보 동기화
+        // EntitySyncUtils.syncList를 사용하여 작업 정보 동기화
         EntitySyncUtils.syncList(
-                dailyReport.getWorkContents(),
-                request.workContents(),
-                (final DailyReportWorkContentUpdateRequest.WorkContentUpdateInfo dto) -> {
-                    return DailyReportWorkContent.builder()
+                dailyReport.getWorks(),
+                request.works(),
+                (final DailyReportWorkUpdateRequest.WorkUpdateInfo dto) -> {
+                    final DailyReportWork work = DailyReportWork.builder()
                             .dailyReport(dailyReport)
                             .workName(dto.workName())
-                            .content(dto.content())
-                            .personnelAndEquipment(dto.personnelAndEquipment())
                             .isToday(dto.isToday())
                             .build();
+
+                    // 작업 디테일도 함께 처리
+                    if (dto.workDetails() != null && !dto.workDetails().isEmpty()) {
+                        EntitySyncUtils.syncList(
+                                work.getWorkDetails(),
+                                dto.workDetails(),
+                                (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto) -> {
+                                    return DailyReportWorkDetail.builder()
+                                            .work(work)
+                                            .content(detailDto.content())
+                                            .personnelAndEquipment(detailDto.personnelAndEquipment())
+                                            .build();
+                                });
+                    }
+
+                    return work;
                 });
 
         dailyReportRepository.save(dailyReport);

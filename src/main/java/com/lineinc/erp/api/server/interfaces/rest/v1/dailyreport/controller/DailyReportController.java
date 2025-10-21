@@ -29,7 +29,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
@@ -43,7 +43,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMaterialStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingConstructionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkContentResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -303,13 +303,13 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 작업내용 수정", description = "출역일보 작업내용 정보를 수정합니다.")
-    @PatchMapping("/work-contents")
+    @Operation(summary = "출역일보 작업 수정", description = "출역일보 작업 정보를 수정합니다.")
+    @PatchMapping("/works")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateDailyReportWorkContent(
+    public ResponseEntity<Void> updateDailyReportWork(
             @Valid final DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody final DailyReportWorkContentUpdateRequest request) {
-        dailyReportService.updateDailyReportWorkContent(searchRequest, request);
+            @Valid @RequestBody final DailyReportWorkUpdateRequest request) {
+        dailyReportService.updateDailyReportWork(searchRequest, request);
         return ResponseEntity.ok().build();
     }
 
@@ -343,14 +343,14 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 작업내용 조회", description = "출역일보 작업내용 정보를 조회합니다.")
-    @GetMapping("/work-contents")
+    @Operation(summary = "출역일보 작업 조회", description = "출역일보 작업 정보를 조회합니다.")
+    @GetMapping("/works")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportWorkContentResponse>>> searchDailyReportWorkContents(
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportWorkResponse>>> searchDailyReportWorks(
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final DailyReportSearchRequest request) {
-        final Slice<DailyReportWorkContentResponse> slice = dailyReportService.searchDailyReportWorkContents(
+        final Slice<DailyReportWorkResponse> slice = dailyReportService.searchDailyReportWorks(
                 request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));

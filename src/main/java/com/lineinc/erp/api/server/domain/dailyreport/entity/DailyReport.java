@@ -107,7 +107,7 @@ public class DailyReport extends BaseEntity {
     // 공사일보 관련
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DailyReportWorkContent> workContents = new ArrayList<>(); // 작업내용 목록
+    private List<DailyReportWork> works = new ArrayList<>(); // 작업내용 목록
 
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)

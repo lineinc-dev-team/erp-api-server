@@ -11,20 +11,18 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QDailyReportWorkContent is a Querydsl query type for DailyReportWorkContent
+ * QDailyReportWork is a Querydsl query type for DailyReportWork
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QDailyReportWorkContent extends EntityPathBase<DailyReportWorkContent> {
+public class QDailyReportWork extends EntityPathBase<DailyReportWork> {
 
-    private static final long serialVersionUID = 164204790L;
+    private static final long serialVersionUID = -1288470013L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QDailyReportWorkContent dailyReportWorkContent = new QDailyReportWorkContent("dailyReportWorkContent");
+    public static final QDailyReportWork dailyReportWork = new QDailyReportWork("dailyReportWork");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
-
-    public final StringPath content = createString("content");
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
@@ -44,33 +42,33 @@ public class QDailyReportWorkContent extends EntityPathBase<DailyReportWorkConte
 
     public final BooleanPath isToday = createBoolean("isToday");
 
-    public final StringPath personnelAndEquipment = createString("personnelAndEquipment");
-
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 
     //inherited
     public final StringPath updatedBy = _super.updatedBy;
 
+    public final ListPath<DailyReportWorkDetail, QDailyReportWorkDetail> workDetails = this.<DailyReportWorkDetail, QDailyReportWorkDetail>createList("workDetails", DailyReportWorkDetail.class, QDailyReportWorkDetail.class, PathInits.DIRECT2);
+
     public final StringPath workName = createString("workName");
 
-    public QDailyReportWorkContent(String variable) {
-        this(DailyReportWorkContent.class, forVariable(variable), INITS);
+    public QDailyReportWork(String variable) {
+        this(DailyReportWork.class, forVariable(variable), INITS);
     }
 
-    public QDailyReportWorkContent(Path<? extends DailyReportWorkContent> path) {
+    public QDailyReportWork(Path<? extends DailyReportWork> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QDailyReportWorkContent(PathMetadata metadata) {
+    public QDailyReportWork(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QDailyReportWorkContent(PathMetadata metadata, PathInits inits) {
-        this(DailyReportWorkContent.class, metadata, inits);
+    public QDailyReportWork(PathMetadata metadata, PathInits inits) {
+        this(DailyReportWork.class, metadata, inits);
     }
 
-    public QDailyReportWorkContent(Class<? extends DailyReportWorkContent> type, PathMetadata metadata, PathInits inits) {
+    public QDailyReportWork(Class<? extends DailyReportWork> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.dailyReport = inits.isInitialized("dailyReport") ? new QDailyReport(forProperty("dailyReport"), inits.get("dailyReport")) : null;
     }

@@ -108,7 +108,7 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
 
     public final EnumPath<com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType> weather = createEnum("weather", com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType.class);
 
-    public final ListPath<DailyReportWorkContent, QDailyReportWorkContent> workContents = this.<DailyReportWorkContent, QDailyReportWorkContent>createList("workContents", DailyReportWorkContent.class, QDailyReportWorkContent.class, PathInits.DIRECT2);
+    public final ListPath<DailyReportWork, QDailyReportWork> works = this.<DailyReportWork, QDailyReportWork>createList("works", DailyReportWork.class, QDailyReportWork.class, PathInits.DIRECT2);
 
     public QDailyReport(String variable) {
         this(DailyReport.class, forVariable(variable), INITS);
