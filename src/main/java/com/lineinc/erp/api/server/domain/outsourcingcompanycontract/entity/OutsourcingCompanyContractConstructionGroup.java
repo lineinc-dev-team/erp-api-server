@@ -55,6 +55,7 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
     @Builder.Default
+    @DiffInclude
     @OneToMany(mappedBy = "constructionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyContractConstruction> constructions = new ArrayList<>(); // 공사항목 목록
 
