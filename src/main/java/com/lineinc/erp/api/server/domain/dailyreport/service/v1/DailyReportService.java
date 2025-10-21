@@ -1605,33 +1605,40 @@ public class DailyReportService {
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
-        // EntitySyncUtils.syncList를 사용하여 작업 정보 동기화
+        // 작업 정보만 먼저 동기화
         EntitySyncUtils.syncList(
                 dailyReport.getWorks(),
                 request.works(),
                 (final DailyReportWorkUpdateRequest.WorkUpdateInfo dto) -> {
-                    final DailyReportWork work = DailyReportWork.builder()
+                    return DailyReportWork.builder()
                             .dailyReport(dailyReport)
                             .workName(dto.workName())
                             .isToday(dto.isToday())
                             .build();
-
-                    // 작업 디테일도 함께 처리
-                    if (dto.workDetails() != null && !dto.workDetails().isEmpty()) {
-                        EntitySyncUtils.syncList(
-                                work.getWorkDetails(),
-                                dto.workDetails(),
-                                (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto) -> {
-                                    return DailyReportWorkDetail.builder()
-                                            .work(work)
-                                            .content(detailDto.content())
-                                            .personnelAndEquipment(detailDto.personnelAndEquipment())
-                                            .build();
-                                });
-                    }
-
-                    return work;
                 });
+
+        // 각 작업의 디테일을 개별적으로 동기화
+        for (final DailyReportWorkUpdateRequest.WorkUpdateInfo workDto : request.works()) {
+            if (workDto.id() != null && workDto.workDetails() != null) {
+                final DailyReportWork work = dailyReport.getWorks().stream()
+                        .filter(w -> w.getId().equals(workDto.id()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (work != null) {
+                    EntitySyncUtils.syncList(
+                            work.getWorkDetails(),
+                            workDto.workDetails(),
+                            (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto) -> {
+                                return DailyReportWorkDetail.builder()
+                                        .work(work)
+                                        .content(detailDto.content())
+                                        .personnelAndEquipment(detailDto.personnelAndEquipment())
+                                        .build();
+                            });
+                }
+            }
+        }
 
         dailyReportRepository.save(dailyReport);
     }
