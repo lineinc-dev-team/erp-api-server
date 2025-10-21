@@ -291,7 +291,7 @@ public class CompanyContractController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 공사항목 그룹 정보 조회 V2", description = "해당 계약의 공사항목 그룹 정보를 조회합니다 (V2)")
+    @Operation(summary = "외주업체 계약 공사항목 정보 조회 V2", description = "해당 계약의 공사항목 그룹 정보를 조회합니다 (V2)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "계약을 찾을 수 없음", content = @Content())
