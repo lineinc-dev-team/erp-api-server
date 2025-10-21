@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLRestriction;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -58,5 +59,19 @@ public class DailyReportWork extends BaseEntity {
     public void updateFrom(final DailyReportWorkUpdateRequest.WorkUpdateInfo request) {
         this.workName = request.workName();
         this.isToday = request.isToday();
+
+        // 디테일도 함께 동기화
+        if (request.workDetails() != null) {
+            EntitySyncUtils.syncList(
+                    this.workDetails,
+                    request.workDetails(),
+                    (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto) -> {
+                        return DailyReportWorkDetail.builder()
+                                .work(this)
+                                .content(detailDto.content())
+                                .personnelAndEquipment(detailDto.personnelAndEquipment())
+                                .build();
+                    });
+        }
     }
 }

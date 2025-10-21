@@ -1605,40 +1605,30 @@ public class DailyReportService {
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
-        // 작업 정보만 먼저 동기화
+        // 작업 정보 동기화 (디테일 포함)
         EntitySyncUtils.syncList(
                 dailyReport.getWorks(),
                 request.works(),
                 (final DailyReportWorkUpdateRequest.WorkUpdateInfo dto) -> {
-                    return DailyReportWork.builder()
+                    final DailyReportWork work = DailyReportWork.builder()
                             .dailyReport(dailyReport)
                             .workName(dto.workName())
                             .isToday(dto.isToday())
                             .build();
+
+                    // 디테일도 함께 생성
+                    for (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto : dto
+                            .workDetails()) {
+                        final DailyReportWorkDetail workDetail = DailyReportWorkDetail.builder()
+                                .work(work)
+                                .content(detailDto.content())
+                                .personnelAndEquipment(detailDto.personnelAndEquipment())
+                                .build();
+                        work.getWorkDetails().add(workDetail);
+                    }
+
+                    return work;
                 });
-
-        // 각 작업의 디테일을 개별적으로 동기화
-        for (final DailyReportWorkUpdateRequest.WorkUpdateInfo workDto : request.works()) {
-            if (workDto.id() != null && workDto.workDetails() != null) {
-                final DailyReportWork work = dailyReport.getWorks().stream()
-                        .filter(w -> w.getId().equals(workDto.id()))
-                        .findFirst()
-                        .orElse(null);
-
-                if (work != null) {
-                    EntitySyncUtils.syncList(
-                            work.getWorkDetails(),
-                            workDto.workDetails(),
-                            (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto) -> {
-                                return DailyReportWorkDetail.builder()
-                                        .work(work)
-                                        .content(detailDto.content())
-                                        .personnelAndEquipment(detailDto.personnelAndEquipment())
-                                        .build();
-                            });
-                }
-            }
-        }
 
         dailyReportRepository.save(dailyReport);
     }
