@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "외주업체 계약 공사항목 수정 요청")
 public record OutsourcingCompanyContractConstructionUpdateRequest(
-        @Schema(description = "공사항목 ID", example = "1") @NotNull Long id,
+        @Schema(description = "공사항목 ID", example = "1") Long id,
 
         @Schema(description = "공사 항목", example = "콘크리트 타설") @NotNull String item,
 

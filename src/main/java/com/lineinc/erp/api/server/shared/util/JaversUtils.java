@@ -31,6 +31,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManag
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyFile;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstructionGroup;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractContact;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriverFile;
@@ -75,6 +76,8 @@ public class JaversUtils {
                     entity -> ((OutsourcingCompanyContractDriverFile) entity).getOriginalFileName()),
             Map.entry(OutsourcingCompanyContractConstruction.class,
                     entity -> ((OutsourcingCompanyContractConstruction) entity).getItem()),
+            Map.entry(OutsourcingCompanyContractConstructionGroup.class,
+                    entity -> ((OutsourcingCompanyContractConstructionGroup) entity).getItemName()),
             Map.entry(FuelInfo.class, entity -> ((FuelInfo) entity).getOutsourcingCompanyName()),
             Map.entry(LaborFile.class, entity -> ((LaborFile) entity).getName()),
             Map.entry(ManagementCostDetail.class, entity -> ((ManagementCostDetail) entity).getName()),

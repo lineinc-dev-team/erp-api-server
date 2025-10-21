@@ -28,6 +28,8 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
 
     public final ListPath<OutsourcingCompanyContractChangeHistory, QOutsourcingCompanyContractChangeHistory> changeHistories = this.<OutsourcingCompanyContractChangeHistory, QOutsourcingCompanyContractChangeHistory>createList("changeHistories", OutsourcingCompanyContractChangeHistory.class, QOutsourcingCompanyContractChangeHistory.class, PathInits.DIRECT2);
 
+    public final ListPath<OutsourcingCompanyContractConstructionGroup, QOutsourcingCompanyContractConstructionGroup> constructionGroups = this.<OutsourcingCompanyContractConstructionGroup, QOutsourcingCompanyContractConstructionGroup>createList("constructionGroups", OutsourcingCompanyContractConstructionGroup.class, QOutsourcingCompanyContractConstructionGroup.class, PathInits.DIRECT2);
+
     public final ListPath<OutsourcingCompanyContractConstruction, QOutsourcingCompanyContractConstruction> constructions = this.<OutsourcingCompanyContractConstruction, QOutsourcingCompanyContractConstruction>createList("constructions", OutsourcingCompanyContractConstruction.class, QOutsourcingCompanyContractConstruction.class, PathInits.DIRECT2);
 
     public final ListPath<OutsourcingCompanyContractContact, QOutsourcingCompanyContractContact> contacts = this.<OutsourcingCompanyContractContact, QOutsourcingCompanyContractContact>createList("contacts", OutsourcingCompanyContractContact.class, QOutsourcingCompanyContractContact.class, PathInits.DIRECT2);

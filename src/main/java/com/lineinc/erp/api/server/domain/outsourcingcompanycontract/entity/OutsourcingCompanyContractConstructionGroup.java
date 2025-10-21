@@ -8,6 +8,8 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractConstructionUpdateRequestV2;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -38,6 +40,7 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
     static final String SEQUENCE_NAME = "outsourcing_company_contract_construction_group_seq";
 
     @Id
+    @DiffInclude
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private Long id;
@@ -55,4 +58,32 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
     @OneToMany(mappedBy = "constructionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyContractConstruction> constructions = new ArrayList<>(); // 공사항목 목록
 
+    /**
+     * 공사항목 그룹 정보를 수정합니다.
+     */
+    public void updateFrom(final OutsourcingCompanyContractConstructionUpdateRequestV2 request) {
+        if (request.itemName() != null) {
+            this.itemName = request.itemName();
+        }
+
+        // 공사항목 정보 동기화
+        if (request.constructions() != null) {
+            EntitySyncUtils.syncList(
+                    this.constructions,
+                    request.constructions(),
+                    (constructionDto) -> OutsourcingCompanyContractConstruction.builder()
+                            .outsourcingCompanyContract(this.outsourcingCompanyContract)
+                            .constructionGroup(this)
+                            .item(constructionDto.item())
+                            .specification(constructionDto.specification())
+                            .unit(constructionDto.unit())
+                            .unitPrice(constructionDto.unitPrice())
+                            .contractQuantity(constructionDto.contractQuantity())
+                            .contractPrice(constructionDto.contractPrice())
+                            .outsourcingContractQuantity(constructionDto.outsourcingContractQuantity())
+                            .outsourcingContractPrice(constructionDto.outsourcingContractPrice())
+                            .memo(constructionDto.memo())
+                            .build());
+        }
+    }
 }

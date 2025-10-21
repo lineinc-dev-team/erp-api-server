@@ -780,6 +780,12 @@ public class OutsourcingCompanyContractService {
             contractConstructionService.updateContractConstructions(contract.getId(), request.constructions(), userId);
         }
 
+        // 10. 공사항목 정보 수정 V2
+        if (request.constructions() == null && request.constructionsV2() != null) {
+            contractConstructionService.updateContractConstructionsV2(contract.getId(), request.constructionsV2(),
+                    userId);
+        }
+
         // 11. 사용자 정의 변경 이력 저장
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (final OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request

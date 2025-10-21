@@ -54,6 +54,8 @@ public record OutsourcingCompanyContractUpdateRequest(
         @Schema(description = "계약 운전자 목록") @Valid List<OutsourcingCompanyContractDriverUpdateRequest> drivers,
 
         @Schema(description = "계약 공사항목 목록") @Valid List<OutsourcingCompanyContractConstructionUpdateRequest> constructions,
+
+        @Schema(description = "계약 공사항목 목록 V2") @Valid List<OutsourcingCompanyContractConstructionUpdateRequestV2> constructionsV2,
         @Schema(description = "변경 이력 리스트") @Valid List<OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest> changeHistories) {
     public record ChangeHistoryRequest(
             @Schema(description = "수정 이력 번호", example = "1") Long id,
