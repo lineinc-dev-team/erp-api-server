@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "투입현황 등록 요청")
 public record DailyReportInputStatusCreateRequest(
         @NotBlank @Schema(description = "구분", example = "기술자") String category,
+        @NotBlank @Schema(description = "공종명", example = "콘크리트 타설") String workTypeName,
         @NotNull @Schema(description = "전일", example = "5") Long previousDayCount,
         @NotNull @Schema(description = "금일", example = "3") Long todayCount,
         @NotNull @Schema(description = "누계", example = "8") Long cumulativeCount,

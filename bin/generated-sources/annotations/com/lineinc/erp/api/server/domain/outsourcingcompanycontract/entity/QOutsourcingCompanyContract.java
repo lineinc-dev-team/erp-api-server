@@ -88,6 +88,8 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
 
     public final ListPath<OutsourcingCompanyContractWorker, QOutsourcingCompanyContractWorker> workers = this.<OutsourcingCompanyContractWorker, QOutsourcingCompanyContractWorker>createList("workers", OutsourcingCompanyContractWorker.class, QOutsourcingCompanyContractWorker.class, PathInits.DIRECT2);
 
+    public final StringPath workTypeName = createString("workTypeName");
+
     public QOutsourcingCompanyContract(String variable) {
         this(OutsourcingCompanyContract.class, forVariable(variable), INITS);
     }

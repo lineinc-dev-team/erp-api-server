@@ -187,6 +187,7 @@ public class OutsourcingCompanyContractService {
                 .taxInvoiceCondition(request.taxInvoiceCondition())
                 .taxInvoiceIssueDayOfMonth(request.taxInvoiceIssueDayOfMonth())
                 .category(request.category())
+                .workTypeName(request.workTypeName())
                 .status(request.status() != null ? request.status() : OutsourcingCompanyContractStatus.IN_PROGRESS)
                 .memo(request.memo())
                 .build();

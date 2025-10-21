@@ -120,6 +120,10 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OutsourcingCompanyContractCategoryType category;
 
+    @DiffInclude
+    @Column
+    private String workTypeName; // 공종명
+
     @DiffIgnore
     @Column
     @Enumerated(EnumType.STRING)
@@ -237,6 +241,7 @@ public class OutsourcingCompanyContract extends BaseEntity {
         Optional.ofNullable(request.taxInvoiceIssueDayOfMonth())
                 .ifPresent(val -> this.taxInvoiceIssueDayOfMonth = val);
         Optional.ofNullable(request.category()).ifPresent(val -> this.category = val);
+        Optional.ofNullable(request.workTypeName()).ifPresent(val -> this.workTypeName = val);
         Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
 

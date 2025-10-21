@@ -40,6 +40,8 @@ public record OutsourcingCompanyContractCreateRequest(
 
         @Schema(description = "계약 카테고리", example = "MONTHLY") OutsourcingCompanyContractCategoryType category,
 
+        @Schema(description = "공종명", example = "콘크리트 타설") String workTypeName,
+
         @Schema(description = "계약 상태", example = "IN_PROGRESS") @NotNull OutsourcingCompanyContractStatus status,
 
         @Schema(description = "메모", example = "특이사항 없음") String memo,
