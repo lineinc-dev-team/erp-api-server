@@ -87,9 +87,13 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEvidenceFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportInputStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMainProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMaterialStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingConstructionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkContentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -1354,6 +1358,162 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return constructionSlice;
+    }
+
+    /**
+     * 출역일보 작업내용 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 작업내용 정보 슬라이스
+     */
+    public Slice<DailyReportWorkContentResponse> searchDailyReportWorkContents(
+            final DailyReportSearchRequest request, final Pageable pageable) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        null, pageable);
+
+        // DailyReport 슬라이스를 DailyReportWorkContentResponse 슬라이스로 변환
+        // 각 DailyReport의 작업내용들을 개별 항목으로 변환
+        final List<DailyReportWorkContentResponse> allWorkContents = new ArrayList<>();
+
+        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (final DailyReportWorkContent workContent : dailyReport.getWorkContents()) {
+                allWorkContents.add(DailyReportWorkContentResponse.from(workContent));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        final Slice<DailyReportWorkContentResponse> workContentSlice = new SliceImpl<>(
+                allWorkContents,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return workContentSlice;
+    }
+
+    /**
+     * 출역일보 주요공정 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 주요공정 정보 슬라이스
+     */
+    public Slice<DailyReportMainProcessResponse> searchDailyReportMainProcesses(
+            final DailyReportSearchRequest request, final Pageable pageable) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        null, pageable);
+
+        // DailyReport 슬라이스를 DailyReportMainProcessResponse 슬라이스로 변환
+        // 각 DailyReport의 주요공정들을 개별 항목으로 변환
+        final List<DailyReportMainProcessResponse> allMainProcesses = new ArrayList<>();
+
+        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (final DailyReportMainProcess mainProcess : dailyReport.getMainProcesses()) {
+                allMainProcesses.add(DailyReportMainProcessResponse.from(mainProcess));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        final Slice<DailyReportMainProcessResponse> mainProcessSlice = new SliceImpl<>(
+                allMainProcesses,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return mainProcessSlice;
+    }
+
+    /**
+     * 출역일보 투입현황 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 투입현황 정보 슬라이스
+     */
+    public Slice<DailyReportInputStatusResponse> searchDailyReportInputStatuses(
+            final DailyReportSearchRequest request, final Pageable pageable) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        null, pageable);
+
+        // DailyReport 슬라이스를 DailyReportInputStatusResponse 슬라이스로 변환
+        // 각 DailyReport의 투입현황들을 개별 항목으로 변환
+        final List<DailyReportInputStatusResponse> allInputStatuses = new ArrayList<>();
+
+        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (final DailyReportInputStatus inputStatus : dailyReport.getInputStatuses()) {
+                allInputStatuses.add(DailyReportInputStatusResponse.from(inputStatus));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        final Slice<DailyReportInputStatusResponse> inputStatusSlice = new SliceImpl<>(
+                allInputStatuses,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return inputStatusSlice;
+    }
+
+    /**
+     * 출역일보 자재현황 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 자재현황 정보 슬라이스
+     */
+    public Slice<DailyReportMaterialStatusResponse> searchDailyReportMaterialStatuses(
+            final DailyReportSearchRequest request, final Pageable pageable) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        null, pageable);
+
+        // DailyReport 슬라이스를 DailyReportMaterialStatusResponse 슬라이스로 변환
+        // 각 DailyReport의 자재현황들을 개별 항목으로 변환
+        final List<DailyReportMaterialStatusResponse> allMaterialStatuses = new ArrayList<>();
+
+        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (final DailyReportMaterialStatus materialStatus : dailyReport.getMaterialStatuses()) {
+                allMaterialStatuses.add(DailyReportMaterialStatusResponse.from(materialStatus));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        final Slice<DailyReportMaterialStatusResponse> materialStatusSlice = new SliceImpl<>(
+                allMaterialStatuses,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return materialStatusSlice;
     }
 
 }

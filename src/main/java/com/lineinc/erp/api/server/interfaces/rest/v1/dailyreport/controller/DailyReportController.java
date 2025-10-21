@@ -33,9 +33,13 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEvidenceFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFileResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportFuelResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportInputStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMainProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMaterialStatusResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingConstructionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkContentResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -293,6 +297,70 @@ public class DailyReportController extends BaseController {
     public ResponseEntity<Void> completeDailyReport(@Valid final DailyReportSearchRequest searchRequest) {
         dailyReportService.completeDailyReport(searchRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 작업내용 조회", description = "출역일보 작업내용 정보를 조회합니다.")
+    @GetMapping("/work-contents")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportWorkContentResponse>>> searchDailyReportWorkContents(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportWorkContentResponse> slice = dailyReportService.searchDailyReportWorkContents(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "출역일보 주요공정 조회", description = "출역일보 주요공정 정보를 조회합니다.")
+    @GetMapping("/main-processes")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportMainProcessResponse>>> searchDailyReportMainProcesses(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportMainProcessResponse> slice = dailyReportService.searchDailyReportMainProcesses(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "출역일보 투입현황 조회", description = "출역일보 투입현황 정보를 조회합니다.")
+    @GetMapping("/input-statuses")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportInputStatusResponse>>> searchDailyReportInputStatuses(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportInputStatusResponse> slice = dailyReportService.searchDailyReportInputStatuses(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "출역일보 자재현황 조회", description = "출역일보 자재현황 정보를 조회합니다.")
+    @GetMapping("/material-statuses")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportMaterialStatusResponse>>> searchDailyReportMaterialStatuses(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportMaterialStatusResponse> slice = dailyReportService.searchDailyReportMaterialStatuses(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
 }

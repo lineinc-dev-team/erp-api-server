@@ -18,7 +18,7 @@ public record OutsourcingCompanyContractEquipmentUpdateRequest(
 
         @Schema(description = "단가", example = "500000") @NotNull Long unitPrice,
 
-        @Schema(description = "소계", example = "2500000") @NotNull Long subtotal,
+        @Schema(description = "소계", example = "2500000") Long subtotal,
 
         @Schema(description = "작업내용", example = "현장 내 자재 운반 및 설치") String taskDescription,
 
