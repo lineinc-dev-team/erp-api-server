@@ -382,6 +382,7 @@ public class OutsourcingCompanyContractService {
                     .type(subEquipmentRequest.type())
                     .description(subEquipmentRequest.description())
                     .unitPrice(subEquipmentRequest.unitPrice())
+                    .taskDescription(subEquipmentRequest.taskDescription())
                     .memo(subEquipmentRequest.memo())
                     .build();
 

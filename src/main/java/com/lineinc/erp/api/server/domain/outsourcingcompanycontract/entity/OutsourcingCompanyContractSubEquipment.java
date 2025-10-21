@@ -59,6 +59,10 @@ public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
 
     @DiffInclude
     @Column(columnDefinition = "TEXT")
+    private String taskDescription; // 작업내용
+
+    @DiffInclude
+    @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
     @Transient
@@ -77,6 +81,9 @@ public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
         }
         if (request.unitPrice() != null) {
             this.unitPrice = request.unitPrice();
+        }
+        if (request.taskDescription() != null) {
+            this.taskDescription = request.taskDescription();
         }
         if (request.memo() != null) {
             this.memo = request.memo();
