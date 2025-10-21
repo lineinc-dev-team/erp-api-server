@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -57,6 +58,7 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
     @Builder.Default
     @DiffInclude
     @OneToMany(mappedBy = "constructionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter
     private List<OutsourcingCompanyContractConstruction> constructions = new ArrayList<>(); // 공사항목 목록
 
     /**

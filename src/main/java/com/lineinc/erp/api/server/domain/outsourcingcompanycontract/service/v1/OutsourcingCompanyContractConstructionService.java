@@ -154,7 +154,7 @@ public class OutsourcingCompanyContractConstructionService {
                             group,
                             OutsourcingCompanyContractConstructionGroup.class);
                     // 공사항목 목록도 깊은 복사로 생성
-                    snapshot.getConstructions().addAll(group.getConstructions().stream()
+                    snapshot.setConstructions(group.getConstructions().stream()
                             .map(construction -> JaversUtils.createSnapshot(javers, construction,
                                     OutsourcingCompanyContractConstruction.class))
                             .collect(Collectors.toList()));
@@ -201,7 +201,7 @@ public class OutsourcingCompanyContractConstructionService {
         // 저장을 명시적으로 호출
         contractRepository.save(contract);
 
-        // 5. 변경사항 추출 및 변경 히스토리 저장
+        // 4. 변경사항 추출 및 변경 히스토리 저장
         final List<OutsourcingCompanyContractConstructionGroup> afterGroups = new ArrayList<>(
                 contract.getConstructionGroups());
         final Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
@@ -211,14 +211,12 @@ public class OutsourcingCompanyContractConstructionService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        // 추가된 그룹 감지
         for (final OutsourcingCompanyContractConstructionGroup after : afterGroups) {
             if (after.getId() == null || !beforeGroupIds.contains(after.getId())) {
                 allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
             }
         }
 
-        // 수정된 그룹 감지
         final Map<Long, OutsourcingCompanyContractConstructionGroup> afterMap = afterGroups.stream()
                 .filter(g -> g.getId() != null)
                 .collect(Collectors.toMap(OutsourcingCompanyContractConstructionGroup::getId, g -> g));
@@ -229,20 +227,20 @@ public class OutsourcingCompanyContractConstructionService {
 
             final OutsourcingCompanyContractConstructionGroup after = afterMap.get(before.getId());
 
-            // 그룹 변경 감지 (공사항목은 제외)
+            // 그룹 단위 변경 감지 (공사항목은 제외)
             // 공사항목을 임시로 제거하여 비교
             final List<OutsourcingCompanyContractConstruction> beforeConstructionsTemp = before.getConstructions();
             final List<OutsourcingCompanyContractConstruction> afterConstructionsTemp = after.getConstructions();
-            before.getConstructions().clear();
-            after.getConstructions().clear();
+            before.setConstructions(new ArrayList<>());
+            after.setConstructions(new ArrayList<>());
 
             final Diff diff = javers.compare(before, after);
             final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
 
             // 공사항목 목록 복원
-            before.getConstructions().addAll(beforeConstructionsTemp);
-            after.getConstructions().addAll(afterConstructionsTemp);
+            before.setConstructions(beforeConstructionsTemp);
+            after.setConstructions(afterConstructionsTemp);
 
             // 그룹이 그대로 존재하는 경우에만 공사항목 변경사항 감지
             final List<OutsourcingCompanyContractConstruction> beforeConstructions = before.getConstructions();
@@ -278,7 +276,7 @@ public class OutsourcingCompanyContractConstructionService {
             }
         }
 
-        // 변경 히스토리 저장
+        // 5. 변경 히스토리 저장
         if (!allChanges.isEmpty()) {
             final String json = javers.getJsonConverter().toJson(allChanges);
             final OutsourcingCompanyContractChangeHistory history = OutsourcingCompanyContractChangeHistory.builder()

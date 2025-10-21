@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 @SQLRestriction("deleted = false")
 public class OutsourcingCompanyContractConstruction extends BaseEntity {
     @Id
+    @DiffInclude
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_construction_seq")
     @SequenceGenerator(name = "outsourcing_company_contract_construction_seq", sequenceName = "outsourcing_company_contract_construction_seq", allocationSize = 1)
     private Long id;
