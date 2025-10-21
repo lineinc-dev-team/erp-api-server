@@ -22,9 +22,13 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEvidenceFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFuel;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportInputStatus;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportMainProcess;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportMaterialStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstruction;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWorkContent;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
@@ -65,13 +69,17 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEvidenceFileUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportInputStatusCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportListSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMainProcessCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
@@ -367,6 +375,74 @@ public class DailyReportService {
                         .build();
 
                 dailyReport.getFiles().add(file);
+            }
+        }
+
+        // 작업내용 정보 추가
+        if (request.workContents() != null) {
+            for (final DailyReportWorkContentCreateRequest workContentRequest : request.workContents()) {
+                final DailyReportWorkContent workContent = DailyReportWorkContent.builder()
+                        .dailyReport(dailyReport)
+                        .workName(workContentRequest.workName())
+                        .content(workContentRequest.content())
+                        .personnelAndEquipment(workContentRequest.personnelAndEquipment())
+                        .isToday(workContentRequest.isToday())
+                        .build();
+
+                dailyReport.getWorkContents().add(workContent);
+            }
+        }
+
+        // 주요공정 정보 추가
+        if (request.mainProcesses() != null) {
+            for (final DailyReportMainProcessCreateRequest mainProcessRequest : request.mainProcesses()) {
+                final DailyReportMainProcess mainProcess = DailyReportMainProcess.builder()
+                        .dailyReport(dailyReport)
+                        .process(mainProcessRequest.process())
+                        .unit(mainProcessRequest.unit())
+                        .contractAmount(mainProcessRequest.contractAmount())
+                        .previousDayAmount(mainProcessRequest.previousDayAmount())
+                        .todayAmount(mainProcessRequest.todayAmount())
+                        .cumulativeAmount(mainProcessRequest.cumulativeAmount())
+                        .processRate(mainProcessRequest.processRate())
+                        .build();
+
+                dailyReport.getMainProcesses().add(mainProcess);
+            }
+        }
+
+        // 투입현황 정보 추가
+        if (request.inputStatuses() != null) {
+            for (final DailyReportInputStatusCreateRequest inputStatusRequest : request.inputStatuses()) {
+                final DailyReportInputStatus inputStatus = DailyReportInputStatus.builder()
+                        .dailyReport(dailyReport)
+                        .category(inputStatusRequest.category())
+                        .previousDayCount(inputStatusRequest.previousDayCount())
+                        .todayCount(inputStatusRequest.todayCount())
+                        .cumulativeCount(inputStatusRequest.cumulativeCount())
+                        .type(inputStatusRequest.type())
+                        .build();
+
+                dailyReport.getInputStatuses().add(inputStatus);
+            }
+        }
+
+        // 자재현황 정보 추가
+        if (request.materialStatuses() != null) {
+            for (final DailyReportMaterialStatusCreateRequest materialStatusRequest : request.materialStatuses()) {
+                final DailyReportMaterialStatus materialStatus = DailyReportMaterialStatus.builder()
+                        .dailyReport(dailyReport)
+                        .materialName(materialStatusRequest.materialName())
+                        .unit(materialStatusRequest.unit())
+                        .plannedAmount(materialStatusRequest.plannedAmount())
+                        .previousDayAmount(materialStatusRequest.previousDayAmount())
+                        .todayAmount(materialStatusRequest.todayAmount())
+                        .cumulativeAmount(materialStatusRequest.cumulativeAmount())
+                        .remainingAmount(materialStatusRequest.remainingAmount())
+                        .type(materialStatusRequest.type())
+                        .build();
+
+                dailyReport.getMaterialStatuses().add(materialStatus);
             }
         }
 

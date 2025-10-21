@@ -26,5 +26,9 @@ public record DailyReportCreateRequest(
         @Schema(description = "유류 출역 정보") @Valid List<DailyReportFuelCreateRequest> fuelInfos,
         @Schema(description = "외주 공사 출역 정보") @Valid List<DailyReportOutsourcingConstructionCreateRequest> outsourcingConstructions,
         @Schema(description = "현장 사진 정보") @Valid List<DailyReportFileCreateRequest> files,
-        @Schema(description = "증빙 파일 정보") @Valid List<DailyReportEvidenceFileCreateRequest> evidenceFiles) {
+        @Schema(description = "증빙 파일 정보") @Valid List<DailyReportEvidenceFileCreateRequest> evidenceFiles,
+        @Schema(description = "작업내용 정보") @Valid List<DailyReportWorkContentCreateRequest> workContents,
+        @Schema(description = "주요공정 정보") @Valid List<DailyReportMainProcessCreateRequest> mainProcesses,
+        @Schema(description = "투입현황 정보") @Valid List<DailyReportInputStatusCreateRequest> inputStatuses,
+        @Schema(description = "자재현황 정보") @Valid List<DailyReportMaterialStatusCreateRequest> materialStatuses) {
 }
