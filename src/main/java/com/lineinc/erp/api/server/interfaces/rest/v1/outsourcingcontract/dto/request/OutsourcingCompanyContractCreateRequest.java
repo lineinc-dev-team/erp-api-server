@@ -30,7 +30,7 @@ public record OutsourcingCompanyContractCreateRequest(
 
         @Schema(description = "계약 금액", example = "50000000") @NotNull Long contractAmount,
 
-        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FOUR_INSURANCES,MEAL_COST") @NotNull String defaultDeductionsType,
+        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FOUR_INSURANCES,MEAL_COST") String defaultDeductionsType,
 
         @Schema(description = "기본 공제 항목 설명", example = "4대 보험 및 연료비") String defaultDeductionsDescription,
 
