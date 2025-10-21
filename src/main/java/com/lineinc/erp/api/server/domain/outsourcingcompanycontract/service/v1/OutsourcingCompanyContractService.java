@@ -68,6 +68,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.req
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractWorkerCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractWorkerFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionGroupResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
@@ -673,6 +674,22 @@ public class OutsourcingCompanyContractService {
         final Page<OutsourcingCompanyContractWorker> page = workerRepository
                 .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
         return page.map(ContractWorkerResponse.ContractWorkerSimpleResponse::from);
+    }
+
+    /**
+     * 외주업체 계약 공사항목 그룹 정보를 Slice로 조회합니다. (V2)
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractConstructionGroupResponse> getContractConstructionGroups(final Long contractId,
+            final Pageable pageable) {
+        // 계약이 존재하는지 확인
+        if (!contractRepository.existsById(contractId)) {
+            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+        }
+
+        final Page<OutsourcingCompanyContractConstructionGroup> page = constructionGroupRepository
+                .findByOutsourcingCompanyContractId(contractId, pageable);
+        return page.map(ContractConstructionGroupResponse::from);
     }
 
     /**

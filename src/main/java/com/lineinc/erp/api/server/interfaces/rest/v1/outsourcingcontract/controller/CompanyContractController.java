@@ -39,6 +39,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.req
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.CompanyContractDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractCategoryTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionGroupResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
@@ -286,6 +287,24 @@ public class CompanyContractController {
             @Valid final SortRequest sortRequest) {
         final Slice<ContractConstructionResponse> slice = outsourcingCompanyContractService.getContractConstructions(
                 id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "외주업체 계약 공사항목 그룹 정보 조회 V2", description = "해당 계약의 공사항목 그룹 정보를 조회합니다 (V2)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "계약을 찾을 수 없음", content = @Content())
+    })
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
+    @GetMapping("/{id}/constructions-v2")
+    public ResponseEntity<SuccessResponse<SliceResponse<ContractConstructionGroupResponse>>> getContractConstructionGroups(
+            @PathVariable final Long id,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Slice<ContractConstructionGroupResponse> slice = outsourcingCompanyContractService
+                .getContractConstructionGroups(
+                        id, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
