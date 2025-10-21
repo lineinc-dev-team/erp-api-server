@@ -24,6 +24,8 @@ public class QOutsourcingCompanyContractConstruction extends EntityPathBase<Outs
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
+    public final QOutsourcingCompanyContractConstructionGroup constructionGroup;
+
     public final NumberPath<Long> contractPrice = createNumber("contractPrice", Long.class);
 
     public final NumberPath<Integer> contractQuantity = createNumber("contractQuantity", Integer.class);
@@ -82,6 +84,7 @@ public class QOutsourcingCompanyContractConstruction extends EntityPathBase<Outs
 
     public QOutsourcingCompanyContractConstruction(Class<? extends OutsourcingCompanyContractConstruction> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.constructionGroup = inits.isInitialized("constructionGroup") ? new QOutsourcingCompanyContractConstructionGroup(forProperty("constructionGroup"), inits.get("constructionGroup")) : null;
         this.outsourcingCompanyContract = inits.isInitialized("outsourcingCompanyContract") ? new QOutsourcingCompanyContract(forProperty("outsourcingCompanyContract"), inits.get("outsourcingCompanyContract")) : null;
     }
 

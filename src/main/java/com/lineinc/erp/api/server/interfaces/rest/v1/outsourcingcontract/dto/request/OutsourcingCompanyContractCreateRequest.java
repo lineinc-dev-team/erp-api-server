@@ -56,5 +56,7 @@ public record OutsourcingCompanyContractCreateRequest(
 
         @Schema(description = "계약 운전자 목록") @Valid List<OutsourcingCompanyContractDriverCreateRequest> drivers,
 
-        @Schema(description = "계약 공사항목 목록") @Valid List<OutsourcingCompanyContractContstructionCreateRequest> constructions) {
+        @Schema(description = "계약 공사항목 목록") @Valid List<OutsourcingCompanyContractContstructionCreateRequest> constructions,
+
+        @Schema(description = "계약 공사항목 목록 V2") @Valid List<OutsourcingCompanyContractConstructionCreateRequestV2> constructionsV2) {
 }

@@ -74,6 +74,11 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
     @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
+    @DiffIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outsourcing_company_contract_construction_group_id")
+    private OutsourcingCompanyContractConstructionGroup constructionGroup;
+
     /**
      * 공사항목 정보를 수정합니다.
      */

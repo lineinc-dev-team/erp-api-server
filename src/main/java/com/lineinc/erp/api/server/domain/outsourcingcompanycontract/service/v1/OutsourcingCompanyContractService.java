@@ -22,6 +22,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.Outsourci
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstructionGroup;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractContact;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriverFile;
@@ -34,6 +35,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractStatus;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractConstructionGroupRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractConstructionRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractContactRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractDriverRepository;
@@ -53,6 +55,7 @@ import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompanyContractsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.ContractListSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractConstructionCreateRequestV2;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractContactCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractContstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractCreateRequest;
@@ -94,6 +97,7 @@ public class OutsourcingCompanyContractService {
     private final OutsourcingCompanyContractEquipmentRepository equipmentRepository;
     private final OutsourcingCompanyContractDriverRepository driverRepository;
     private final OutsourcingCompanyContractConstructionRepository constructionRepository;
+    private final OutsourcingCompanyContractConstructionGroupRepository constructionGroupRepository;
     private final OutsourcingCompanyContractHistoryRepository contractHistoryRepository;
     private final OutsourcingCompanyContractChangeHistoryRepository contractChangeHistoryRepository;
     private final OutsourcingCompanyContractSubEquipmentRepository subEquipmentRepository;
@@ -148,6 +152,8 @@ public class OutsourcingCompanyContractService {
         // 7. 계약 공사항목 생성
         if (request.constructions() != null && !request.constructions().isEmpty()) {
             createContractConstructions(contract, request.constructions());
+        } else if (request.constructionsV2() != null && !request.constructionsV2().isEmpty()) {
+            createContractConstructionsV2(contract, request.constructionsV2());
         }
 
         // 8. 계약 이력 생성
@@ -370,6 +376,46 @@ public class OutsourcingCompanyContractService {
                     .build();
 
             constructionRepository.save(construction);
+        }
+    }
+
+    /**
+     * 계약 공사항목을 생성합니다. (V2 - WorkType 포함)
+     */
+    private void createContractConstructionsV2(final OutsourcingCompanyContract contract,
+            final List<OutsourcingCompanyContractConstructionCreateRequestV2> constructionsV2) {
+        for (final OutsourcingCompanyContractConstructionCreateRequestV2 workTypeRequest : constructionsV2) {
+            // WorkType 생성
+            final OutsourcingCompanyContractConstructionGroup constructionGroup = OutsourcingCompanyContractConstructionGroup
+                    .builder()
+                    .outsourcingCompanyContract(contract)
+                    .itemName(workTypeRequest.itemName())
+                    .build();
+
+            final OutsourcingCompanyContractConstructionGroup savedConstructionGroup = constructionGroupRepository
+                    .save(constructionGroup);
+
+            // 해당 WorkType에 속하는 공사항목들 생성
+            if (workTypeRequest.items() != null) {
+                for (final OutsourcingCompanyContractContstructionCreateRequest itemRequest : workTypeRequest.items()) {
+                    final OutsourcingCompanyContractConstruction construction = OutsourcingCompanyContractConstruction
+                            .builder()
+                            .outsourcingCompanyContract(contract)
+                            .constructionGroup(savedConstructionGroup)
+                            .item(itemRequest.item())
+                            .specification(itemRequest.specification())
+                            .unit(itemRequest.unit())
+                            .unitPrice(itemRequest.unitPrice())
+                            .contractQuantity(itemRequest.contractQuantity())
+                            .contractPrice(itemRequest.contractPrice())
+                            .outsourcingContractQuantity(itemRequest.outsourcingContractQuantity())
+                            .outsourcingContractPrice(itemRequest.outsourcingContractPrice())
+                            .memo(itemRequest.memo())
+                            .build();
+
+                    constructionRepository.save(construction);
+                }
+            }
         }
     }
 
