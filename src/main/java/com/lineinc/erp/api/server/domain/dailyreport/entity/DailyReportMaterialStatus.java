@@ -1,7 +1,10 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportMaterialStatusType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -26,6 +29,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class DailyReportMaterialStatus extends BaseEntity {
     private static final String SEQUENCE_NAME = "daily_report_material_status_seq";
 
@@ -56,4 +60,19 @@ public class DailyReportMaterialStatus extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private DailyReportMaterialStatusType type; // 자재현황 타입
+
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(
+            final DailyReportMaterialStatusUpdateRequest.MaterialStatusUpdateInfo request) {
+        this.materialName = request.materialName();
+        this.unit = request.unit();
+        this.plannedAmount = request.plannedAmount();
+        this.previousDayAmount = request.previousDayAmount();
+        this.todayAmount = request.todayAmount();
+        this.cumulativeAmount = request.cumulativeAmount();
+        this.remainingAmount = request.remainingAmount();
+        this.type = request.type();
+    }
 }

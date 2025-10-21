@@ -22,10 +22,14 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportInputStatusUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportListSearchRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMainProcessUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
@@ -296,6 +300,46 @@ public class DailyReportController extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.APPROVE)
     public ResponseEntity<Void> completeDailyReport(@Valid final DailyReportSearchRequest searchRequest) {
         dailyReportService.completeDailyReport(searchRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 작업내용 수정", description = "출역일보 작업내용 정보를 수정합니다.")
+    @PatchMapping("/work-contents")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReportWorkContent(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportWorkContentUpdateRequest request) {
+        dailyReportService.updateDailyReportWorkContent(searchRequest, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 주요공정 수정", description = "출역일보 주요공정 정보를 수정합니다.")
+    @PatchMapping("/main-processes")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReportMainProcess(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportMainProcessUpdateRequest request) {
+        dailyReportService.updateDailyReportMainProcess(searchRequest, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 투입현황 수정", description = "출역일보 투입현황 정보를 수정합니다.")
+    @PatchMapping("/input-statuses")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReportInputStatus(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportInputStatusUpdateRequest request) {
+        dailyReportService.updateDailyReportInputStatus(searchRequest, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 자재현황 수정", description = "출역일보 자재현황 정보를 수정합니다.")
+    @PatchMapping("/material-statuses")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReportMaterialStatus(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportMaterialStatusUpdateRequest request) {
+        dailyReportService.updateDailyReportMaterialStatus(searchRequest, request);
         return ResponseEntity.ok().build();
     }
 

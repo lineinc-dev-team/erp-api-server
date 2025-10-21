@@ -1,6 +1,9 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMainProcessUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Entity;
@@ -22,6 +25,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class DailyReportMainProcess extends BaseEntity {
     private static final String SEQUENCE_NAME = "daily_report_main_process_seq";
 
@@ -47,4 +51,18 @@ public class DailyReportMainProcess extends BaseEntity {
     private Long cumulativeAmount; // 누계
 
     private Double processRate; // 공정율
+
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(
+            final DailyReportMainProcessUpdateRequest.MainProcessUpdateInfo request) {
+        this.process = request.process();
+        this.unit = request.unit();
+        this.contractAmount = request.contractAmount();
+        this.previousDayAmount = request.previousDayAmount();
+        this.todayAmount = request.todayAmount();
+        this.cumulativeAmount = request.cumulativeAmount();
+        this.processRate = request.processRate();
+    }
 }

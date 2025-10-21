@@ -1,7 +1,10 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportInputStatusType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportInputStatusUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -26,6 +29,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class DailyReportInputStatus extends BaseEntity {
     private static final String SEQUENCE_NAME = "daily_report_input_status_seq";
 
@@ -49,4 +53,16 @@ public class DailyReportInputStatus extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private DailyReportInputStatusType type; // 투입현황 타입
+
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(
+            final DailyReportInputStatusUpdateRequest.InputStatusUpdateInfo request) {
+        this.category = request.category();
+        this.previousDayCount = request.previousDayCount();
+        this.todayCount = request.todayCount();
+        this.cumulativeCount = request.cumulativeCount();
+        this.type = request.type();
+    }
 }

@@ -70,9 +70,12 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportInputStatusCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportInputStatusUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMainProcessCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMainProcessUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
@@ -80,6 +83,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
@@ -1228,6 +1232,22 @@ public class DailyReportService {
     }
 
     /**
+     * 출역일보 검색 요청으로 출역일보를 조회합니다.
+     */
+    private DailyReport getDailyReportBySearchRequest(final DailyReportSearchRequest searchRequest) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        return dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+    }
+
+    /**
      * 출역일보 수정 권한을 검증합니다.
      * - 본사 직원(isHeadOffice=true): 언제든 수정 가능
      * - 현장 직원(isHeadOffice=false): PENDING 상태인 경우에만 수정 가능
@@ -1514,6 +1534,142 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return materialStatusSlice;
+    }
+
+    /**
+     * 출역일보 작업내용 정보를 수정합니다.
+     * 
+     * @param searchRequest 출역일보 검색 요청
+     * @param request       작업내용 수정 요청
+     */
+    @Transactional
+    public void updateDailyReportWorkContent(final DailyReportSearchRequest searchRequest,
+            final DailyReportWorkContentUpdateRequest request) {
+        // 출역일보 조회
+        final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
+
+        // EntitySyncUtils.syncList를 사용하여 작업내용 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getWorkContents(),
+                request.workContents(),
+                (final DailyReportWorkContentUpdateRequest.WorkContentUpdateInfo dto) -> {
+                    return DailyReportWorkContent.builder()
+                            .dailyReport(dailyReport)
+                            .workName(dto.workName())
+                            .content(dto.content())
+                            .personnelAndEquipment(dto.personnelAndEquipment())
+                            .isToday(dto.isToday())
+                            .build();
+                });
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    /**
+     * 출역일보 주요공정 정보를 수정합니다.
+     * 
+     * @param searchRequest 출역일보 검색 요청
+     * @param request       주요공정 수정 요청
+     */
+    @Transactional
+    public void updateDailyReportMainProcess(final DailyReportSearchRequest searchRequest,
+            final DailyReportMainProcessUpdateRequest request) {
+        // 출역일보 조회
+        final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
+
+        // EntitySyncUtils.syncList를 사용하여 주요공정 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getMainProcesses(),
+                request.mainProcesses(),
+                (final DailyReportMainProcessUpdateRequest.MainProcessUpdateInfo dto) -> {
+                    return DailyReportMainProcess.builder()
+                            .dailyReport(dailyReport)
+                            .process(dto.process())
+                            .unit(dto.unit())
+                            .contractAmount(dto.contractAmount())
+                            .previousDayAmount(dto.previousDayAmount())
+                            .todayAmount(dto.todayAmount())
+                            .cumulativeAmount(dto.cumulativeAmount())
+                            .processRate(dto.processRate())
+                            .build();
+                });
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    /**
+     * 출역일보 투입현황 정보를 수정합니다.
+     * 
+     * @param searchRequest 출역일보 검색 요청
+     * @param request       투입현황 수정 요청
+     */
+    @Transactional
+    public void updateDailyReportInputStatus(final DailyReportSearchRequest searchRequest,
+            final DailyReportInputStatusUpdateRequest request) {
+        // 출역일보 조회
+        final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
+
+        // EntitySyncUtils.syncList를 사용하여 투입현황 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getInputStatuses(),
+                request.inputStatuses(),
+                (final DailyReportInputStatusUpdateRequest.InputStatusUpdateInfo dto) -> {
+                    return DailyReportInputStatus.builder()
+                            .dailyReport(dailyReport)
+                            .category(dto.category())
+                            .previousDayCount(dto.previousDayCount())
+                            .todayCount(dto.todayCount())
+                            .cumulativeCount(dto.cumulativeCount())
+                            .type(dto.type())
+                            .build();
+                });
+
+        dailyReportRepository.save(dailyReport);
+    }
+
+    /**
+     * 출역일보 자재현황 정보를 수정합니다.
+     * 
+     * @param searchRequest 출역일보 검색 요청
+     * @param request       자재현황 수정 요청
+     */
+    @Transactional
+    public void updateDailyReportMaterialStatus(final DailyReportSearchRequest searchRequest,
+            final DailyReportMaterialStatusUpdateRequest request) {
+        // 출역일보 조회
+        final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
+
+        // EntitySyncUtils.syncList를 사용하여 자재현황 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getMaterialStatuses(),
+                request.materialStatuses(),
+                (final DailyReportMaterialStatusUpdateRequest.MaterialStatusUpdateInfo dto) -> {
+                    return DailyReportMaterialStatus.builder()
+                            .dailyReport(dailyReport)
+                            .materialName(dto.materialName())
+                            .unit(dto.unit())
+                            .plannedAmount(dto.plannedAmount())
+                            .previousDayAmount(dto.previousDayAmount())
+                            .todayAmount(dto.todayAmount())
+                            .cumulativeAmount(dto.cumulativeAmount())
+                            .remainingAmount(dto.remainingAmount())
+                            .type(dto.type())
+                            .build();
+                });
+
+        dailyReportRepository.save(dailyReport);
     }
 
 }

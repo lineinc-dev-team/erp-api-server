@@ -1,6 +1,9 @@
 package com.lineinc.erp.api.server.domain.dailyreport.entity;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkContentUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -23,6 +26,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class DailyReportWorkContent extends BaseEntity {
     private static final String SEQUENCE_NAME = "daily_report_work_content_seq";
 
@@ -45,4 +49,15 @@ public class DailyReportWorkContent extends BaseEntity {
     private String personnelAndEquipment; // 인원 및 장비
 
     private Boolean isToday; // 금일 여부 (true: 금일, false: 명일)
+
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(
+            final DailyReportWorkContentUpdateRequest.WorkContentUpdateInfo request) {
+        this.workName = request.workName();
+        this.content = request.content();
+        this.personnelAndEquipment = request.personnelAndEquipment();
+        this.isToday = request.isToday();
+    }
 }
