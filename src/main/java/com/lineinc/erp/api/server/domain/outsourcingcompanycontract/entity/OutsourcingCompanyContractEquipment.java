@@ -7,12 +7,15 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -79,6 +83,19 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
+    @DiffIgnore
+    @Column
+    @Enumerated(EnumType.STRING)
+    private OutsourcingCompanyContractCategoryType type;
+
+    @Transient
+    @DiffInclude
+    private String typeName;
+
+    public void syncTransientFields() {
+        this.typeName = this.type != null ? this.type.getLabel() : null;
+    }
+
     /**
      * 장비 정보를 수정합니다.
      */
@@ -104,6 +121,9 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
         if (request.memo() != null) {
             this.memo = request.memo();
         }
+        if (request.type() != null) {
+            this.type = request.type();
+        }
 
         // 보조장비 정보 동기화
         if (request.subEquipments() != null) {
@@ -117,5 +137,7 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
                             .memo(subDto.memo())
                             .build());
         }
+
+        syncTransientFields();
     }
 }

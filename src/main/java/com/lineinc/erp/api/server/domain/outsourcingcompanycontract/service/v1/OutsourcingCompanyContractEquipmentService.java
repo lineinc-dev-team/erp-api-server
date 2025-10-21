@@ -76,6 +76,7 @@ public class OutsourcingCompanyContractEquipmentService {
                             .specification(dto.specification())
                             .vehicleNumber(dto.vehicleNumber())
                             .category(dto.category())
+                            .type(dto.type())
                             .unitPrice(dto.unitPrice())
                             .subtotal(dto.subtotal())
                             .taskDescription(dto.taskDescription())

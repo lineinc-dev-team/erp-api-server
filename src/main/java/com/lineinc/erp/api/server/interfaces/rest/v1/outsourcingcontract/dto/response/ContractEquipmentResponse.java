@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -16,6 +17,8 @@ public record ContractEquipmentResponse(
         @Schema(description = "단가", example = "500000") Long unitPrice,
         @Schema(description = "소계", example = "5000000") Long subtotal,
         @Schema(description = "작업내용", example = "강재 운반 및 설치") String taskDescription,
+        @Schema(description = "유형", example = "월대") String type,
+        @Schema(description = "유형 코드", example = "MONTHLY") OutsourcingCompanyContractCategoryType typeCode,
         @Schema(description = "비고", example = "특수장비 운전자 필요") String memo,
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt,
@@ -30,6 +33,8 @@ public record ContractEquipmentResponse(
                 equipment.getUnitPrice(),
                 equipment.getSubtotal(),
                 equipment.getTaskDescription(),
+                equipment.getType() != null ? equipment.getType().getLabel() : null,
+                equipment.getType(),
                 equipment.getMemo(),
                 equipment.getCreatedAt(),
                 equipment.getUpdatedAt(),

@@ -52,6 +52,8 @@ public class QOutsourcingCompanyContractEquipment extends EntityPathBase<Outsour
 
     public final StringPath taskDescription = createString("taskDescription");
 
+    public final EnumPath<com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType> type = createEnum("type", com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType.class);
+
     public final NumberPath<Long> unitPrice = createNumber("unitPrice", Long.class);
 
     //inherited

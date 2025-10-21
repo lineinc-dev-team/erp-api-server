@@ -2,6 +2,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 
 import java.util.List;
 
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +16,7 @@ public record OutsourcingCompanyContractEquipmentUpdateRequest(
         @Schema(description = "장비 구분", example = "크레인") @NotNull String category,
         @Schema(description = "단가", example = "500000") @NotNull Long unitPrice,
         @Schema(description = "소계", example = "2500000") Long subtotal,
+        @Schema(description = "유형", example = "MONTHLY") OutsourcingCompanyContractCategoryType type,
         @Schema(description = "작업내용", example = "현장 내 자재 운반 및 설치") String taskDescription,
         @Schema(description = "비고", example = "운전자 포함") String memo,
         @Schema(description = "보조장비 목록") @Valid List<OutsourcingCompanyContractSubEquipmentUpdateRequest> subEquipments) {
