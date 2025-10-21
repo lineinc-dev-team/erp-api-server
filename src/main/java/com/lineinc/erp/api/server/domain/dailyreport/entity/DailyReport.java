@@ -104,6 +104,23 @@ public class DailyReport extends BaseEntity {
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReportEvidenceFile> evidenceFiles = new ArrayList<>(); // 증빙 파일 목록
 
+    // 공사일보 관련
+    @Builder.Default
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DailyReportWorkContent> workContents = new ArrayList<>(); // 작업내용 목록
+
+    @Builder.Default
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DailyReportMainProcess> mainProcesses = new ArrayList<>(); // 주요공정 목록
+
+    @Builder.Default
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DailyReportInputStatus> inputStatuses = new ArrayList<>(); // 투입현황 목록
+
+    @Builder.Default
+    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DailyReportMaterialStatus> materialStatuses = new ArrayList<>(); // 자재현황 목록
+
     @Setter
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고

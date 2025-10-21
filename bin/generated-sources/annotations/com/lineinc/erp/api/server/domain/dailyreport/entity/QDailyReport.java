@@ -70,6 +70,12 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final ListPath<DailyReportInputStatus, QDailyReportInputStatus> inputStatuses = this.<DailyReportInputStatus, QDailyReportInputStatus>createList("inputStatuses", DailyReportInputStatus.class, QDailyReportInputStatus.class, PathInits.DIRECT2);
+
+    public final ListPath<DailyReportMainProcess, QDailyReportMainProcess> mainProcesses = this.<DailyReportMainProcess, QDailyReportMainProcess>createList("mainProcesses", DailyReportMainProcess.class, QDailyReportMainProcess.class, PathInits.DIRECT2);
+
+    public final ListPath<DailyReportMaterialStatus, QDailyReportMaterialStatus> materialStatuses = this.<DailyReportMaterialStatus, QDailyReportMaterialStatus>createList("materialStatuses", DailyReportMaterialStatus.class, QDailyReportMaterialStatus.class, PathInits.DIRECT2);
+
     public final StringPath memo = createString("memo");
 
     public final ListPath<DailyReportOutsourcingConstruction, QDailyReportOutsourcingConstruction> outsourcingConstructions = this.<DailyReportOutsourcingConstruction, QDailyReportOutsourcingConstruction>createList("outsourcingConstructions", DailyReportOutsourcingConstruction.class, QDailyReportOutsourcingConstruction.class, PathInits.DIRECT2);
@@ -101,6 +107,8 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
     public final NumberPath<Double> ureaTotalAmount = createNumber("ureaTotalAmount", Double.class);
 
     public final EnumPath<com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType> weather = createEnum("weather", com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType.class);
+
+    public final ListPath<DailyReportWorkContent, QDailyReportWorkContent> workContents = this.<DailyReportWorkContent, QDailyReportWorkContent>createList("workContents", DailyReportWorkContent.class, QDailyReportWorkContent.class, PathInits.DIRECT2);
 
     public QDailyReport(String variable) {
         this(DailyReport.class, forVariable(variable), INITS);
