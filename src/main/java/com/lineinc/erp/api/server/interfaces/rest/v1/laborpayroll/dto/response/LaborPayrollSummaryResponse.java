@@ -19,7 +19,7 @@ public record LaborPayrollSummaryResponse(
         @Schema(description = "공정 정보") SiteProcessSimpleResponse siteProcess,
         @Schema(description = "조회 년월 (YYYY-MM)") String yearMonth,
         @Schema(description = "정직원 수") Integer regularEmployeeCount,
-        @Schema(description = "직영/계약직 수") Integer directContractCount,
+        @Schema(description = "직영/용역 수") Integer directContractCount,
         @Schema(description = "기타 수") Integer etcCount,
         @Schema(description = "노무비 합계") BigDecimal totalLaborCost,
         @Schema(description = "공제금 합계") BigDecimal totalDeductions,
@@ -31,7 +31,7 @@ public record LaborPayrollSummaryResponse(
     /**
      * LaborPayrollSummary 엔티티로부터 DTO 생성
      */
-    public static LaborPayrollSummaryResponse from(LaborPayrollSummary summary) {
+    public static LaborPayrollSummaryResponse from(final LaborPayrollSummary summary) {
         return new LaborPayrollSummaryResponse(
                 summary.getId(),
                 SiteSimpleResponse.from(summary.getSite()),

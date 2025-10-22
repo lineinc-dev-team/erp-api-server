@@ -8,11 +8,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-@Schema(description = "출역일보 직영/계약직 수정 요청")
+@Schema(description = "출역일보 직영/용역 수정 요청")
 public record DailyReportDirectContractUpdateRequest(
-        @Schema(description = "수정할 직영/계약직 정보 목록") List<@Valid DirectContractUpdateInfo> directContracts) {
+        @Schema(description = "수정할 직영/용역 정보 목록") List<@Valid DirectContractUpdateInfo> directContracts) {
 
-    @Schema(description = "직영/계약직 정보 수정 내용")
+    @Schema(description = "직영/용역 정보 수정 내용")
     public record DirectContractUpdateInfo(
             @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,

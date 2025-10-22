@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DailyReportEvidenceFileType {
     EMPLOYEE("직원"),
-    DIRECT_CONTRACT("직영/계약직"),
+    DIRECT_CONTRACT("직영/용역"),
     OUTSOURCING("외주"),
     EQUIPMENT("장비"),
     FUEL("유류"),

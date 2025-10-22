@@ -20,7 +20,7 @@ public record DailyReportCreateRequest(
         @Schema(description = "요소수 가격 (원)", example = "50000") Long ureaPrice,
         @Schema(description = "비고", example = "특별 지시사항") String memo,
         @Schema(description = "직원 출역 정보") @Valid List<DailyReportEmployeeCreateRequest> employees,
-        @Schema(description = "직영/계약직 출역 정보") @Valid List<DailyReportDirectContractCreateRequest> directContracts,
+        @Schema(description = "직영/용역 출역 정보") @Valid List<DailyReportDirectContractCreateRequest> directContracts,
         @Schema(description = "외주 출역 정보") @Valid List<DailyReportOutsourcingCreateRequest> outsourcings,
         @Schema(description = "외주업체계약 장비 출역 정보") @Valid List<DailyReportOutsourcingEquipmentCreateRequest> outsourcingEquipments,
         @Schema(description = "유류 출역 정보") @Valid List<DailyReportFuelCreateRequest> fuelInfos,

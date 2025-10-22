@@ -78,7 +78,7 @@ public class DailyReport extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DailyReportDirectContract> directContracts = new ArrayList<>(); // 직영/계약직 출역일보 목록
+    private List<DailyReportDirectContract> directContracts = new ArrayList<>(); // 직영/용역 출역일보 목록
 
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -131,8 +131,8 @@ public class DailyReport extends BaseEntity {
     @Builder.Default
     private Boolean employeeEvidenceSubmitted = false; // 직원 증빙 여부
 
-    // 직영/계약직 관련
-    private Double directContractWorkQuantitySum; // 직영계약직 공수합
+    // 직영/용역 관련
+    private Double directContractWorkQuantitySum; // 직영/용역 공수합
 
     @Builder.Default
     private Boolean directContractEvidenceSubmitted = false; // 직영계약직 증빙 여부
@@ -192,7 +192,7 @@ public class DailyReport extends BaseEntity {
     }
 
     /**
-     * 직영/계약직 공수합 계산 및 업데이트
+     * 직영/용역 공수합 계산 및 업데이트
      */
     public void updateDirectContractWorkQuantitySum() {
         this.directContractWorkQuantitySum = directContracts.stream()
@@ -239,7 +239,7 @@ public class DailyReport extends BaseEntity {
     }
 
     /**
-     * 직영/계약직 증빙 여부 업데이트
+     * 직영/용역 증빙 여부 업데이트
      */
     public void updateDirectContractEvidenceSubmitted() {
         this.directContractEvidenceSubmitted = evidenceFiles.stream()

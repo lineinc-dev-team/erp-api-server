@@ -198,7 +198,7 @@ public class DailyReportService {
             }
         }
 
-        // 직영/계약직 출역 정보 추가
+        // 직영/용역 출역 정보 추가
         if (request.directContracts() != null) {
             // 중복 laborId + unitPrice 체크 (임시 인력 제외)
             validateDirectContractDuplicates(request.directContracts());
@@ -218,8 +218,9 @@ public class DailyReportService {
                     // 기존 인력 검색
                     labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
 
-                    // 직영/계약직 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
-                    if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.ETC) {
+                    // 직영/용역 출역 정보에는 DIRECT_CONTRACT 또는 OUTSOURCING 타입만 허용
+                    if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.OUTSOURCING
+                            && labor.getType() != LaborType.ETC) {
                         throw new IllegalArgumentException(
                                 ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
                     }
@@ -603,11 +604,11 @@ public class DailyReportService {
     }
 
     /**
-     * 출역일보 직영/계약직 정보를 슬라이스로 조회합니다.
+     * 출역일보 직영/용역 정보를 슬라이스로 조회합니다.
      * 
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
-     * @return 출역일보 직영/계약직 정보 슬라이스
+     * @return 출역일보 직영/용역 정보 슬라이스
      */
     public Slice<DailyReportDirectContractResponse> searchDailyReportDirectContracts(
             final DailyReportSearchRequest request,
@@ -624,7 +625,7 @@ public class DailyReportService {
                         null, pageable);
 
         // DailyReport 슬라이스를 DailyReportDirectContractResponse 슬라이스로 변환
-        // 각 DailyReport의 직영/계약직들을 개별 항목으로 변환
+        // 각 DailyReport의 직영/용역들을 개별 항목으로 변환
         final List<DailyReportDirectContractResponse> allDirectContracts = new ArrayList<>();
 
         for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
@@ -919,7 +920,7 @@ public class DailyReportService {
             }
         }
 
-        // EntitySyncUtils.syncList를 사용하여 직영/계약직 정보 동기화
+        // EntitySyncUtils.syncList를 사용하여 직영/용역 정보 동기화
         EntitySyncUtils.syncList(
                 dailyReport.getDirectContracts(),
                 request.directContracts(),
@@ -932,8 +933,9 @@ public class DailyReportService {
                         // 기존 인력 검색
                         labor = laborService.getLaborByIdOrThrow(dto.laborId());
 
-                        // 직영/계약직 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
-                        if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.ETC) {
+                        // 직영/용역 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
+                        if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.OUTSOURCING
+                                && labor.getType() != LaborType.ETC) {
                             throw new IllegalArgumentException(
                                     ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
                         }
@@ -1333,7 +1335,7 @@ public class DailyReportService {
     }
 
     /**
-     * 직영/계약직 출역 정보 중복 체크
+     * 직영/용역 출역 정보 중복 체크
      */
     private void validateDirectContractDuplicates(
             final List<? extends DailyReportDirectContractCreateRequest> directContracts) {

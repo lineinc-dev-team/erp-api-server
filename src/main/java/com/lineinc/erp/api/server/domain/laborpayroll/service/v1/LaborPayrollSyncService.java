@@ -131,7 +131,7 @@ public class LaborPayrollSyncService {
                 }
             }
 
-            // 직영/계약직 처리 (삭제되지 않은 데이터만)
+            // 직영/용역 처리 (삭제되지 않은 데이터만)
             for (final DailyReportDirectContract directContract : dailyReport.getDirectContracts()) {
                 if (!directContract.isDeleted()) {
                     processDirectContractData(laborDataMap, directContract, dayOfMonth, yearMonth,
@@ -159,7 +159,7 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 직영/계약직 데이터 처리
+     * 직영/용역 데이터 처리
      */
     private void processDirectContractData(final Map<String, LaborPayrollData> laborDataMap,
             final DailyReportDirectContract directContract, final int dayOfMonth, final String yearMonth,

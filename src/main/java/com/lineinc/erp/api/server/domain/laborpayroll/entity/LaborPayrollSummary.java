@@ -69,7 +69,7 @@ public class LaborPayrollSummary extends BaseEntity {
     private Integer regularEmployeeCount; // 정직원 수
 
     @Column
-    private Integer directContractCount; // 직영/계약직 수
+    private Integer directContractCount; // 직영/용역 수
 
     @Column
     private Integer etcCount; // 기타 수
