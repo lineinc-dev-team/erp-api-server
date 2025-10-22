@@ -243,10 +243,12 @@ public class LaborController {
             @Valid final SortRequest sortRequest,
             @RequestParam(required = false) final String keyword,
             @RequestParam(required = false) final List<LaborType> types,
-            @RequestParam(required = false) final Long outsourcingCompanyId) {
+            @RequestParam(required = false) final Long outsourcingCompanyId,
+            @RequestParam(required = false) final Boolean isHeadOffice) {
         final Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                 sortRequest.sort());
         final Slice<LaborNameResponse> slice = laborService.getLaborNames(keyword, types, outsourcingCompanyId,
+                isHeadOffice,
                 pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(

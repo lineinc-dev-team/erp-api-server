@@ -19,7 +19,8 @@ public record LaborNameResponse(
         @Schema(description = "노무인력 유형 코드", example = "REGULAR_EMPLOYEE") LaborType typeCode,
         @Schema(description = "소속업체 정보") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "주민등록번호") String residentNumber,
-        @Schema(description = "휴대폰 번호") String phoneNumber) {
+        @Schema(description = "휴대폰 번호") String phoneNumber,
+        @Schema(description = "본사 여부", example = "false") Boolean isHeadOffice) {
 
     public static LaborNameResponse from(final Labor labor) {
         return new LaborNameResponse(
@@ -34,6 +35,7 @@ public record LaborNameResponse(
                 labor.getOutsourcingCompany() != null ? CompanySimpleResponse.from(labor.getOutsourcingCompany())
                         : null,
                 PrivacyMaskingUtils.maskResidentNumber(labor.getResidentNumber()),
-                labor.getPhoneNumber());
+                labor.getPhoneNumber(),
+                labor.getIsHeadOffice());
     }
 }
