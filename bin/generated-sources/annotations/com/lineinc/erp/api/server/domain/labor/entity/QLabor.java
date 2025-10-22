@@ -54,6 +54,8 @@ public class QLabor extends EntityPathBase<Labor> {
 
     public final DateTimePath<java.time.OffsetDateTime> firstWorkDate = createDateTime("firstWorkDate", java.time.OffsetDateTime.class);
 
+    public final com.lineinc.erp.api.server.domain.organization.entity.QGrade grade;
+
     public final DateTimePath<java.time.OffsetDateTime> hireDate = createDateTime("hireDate", java.time.OffsetDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -114,6 +116,7 @@ public class QLabor extends EntityPathBase<Labor> {
 
     public QLabor(Class<? extends Labor> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.grade = inits.isInitialized("grade") ? new com.lineinc.erp.api.server.domain.organization.entity.QGrade(forProperty("grade")) : null;
         this.outsourcingCompany = inits.isInitialized("outsourcingCompany") ? new com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany(forProperty("outsourcingCompany")) : null;
     }
 

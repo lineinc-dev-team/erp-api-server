@@ -28,5 +28,6 @@ public record LaborCreateRequest(
         @NotBlank @Schema(description = "은행명", example = "신한은행") String bankName,
         @NotBlank @Schema(description = "계좌번호", example = "110-123456789") String accountNumber,
         @NotBlank @Schema(description = "예금주", example = "홍길동") String accountHolder,
+        @Schema(description = "직급 ID", example = "1") Long gradeId,
         @Schema(description = "첨부파일 목록") @Valid List<LaborFileCreateRequest> files) {
 }

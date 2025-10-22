@@ -28,6 +28,7 @@ import com.lineinc.erp.api.server.domain.labor.enums.LaborChangeType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
+import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
@@ -105,6 +106,7 @@ public class LaborService {
                 .detailAddress(request.detailAddress())
                 .phoneNumber(request.phoneNumber())
                 .memo(request.memo())
+                .grade(request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null)
                 .build();
 
         // 첨부파일 처리
