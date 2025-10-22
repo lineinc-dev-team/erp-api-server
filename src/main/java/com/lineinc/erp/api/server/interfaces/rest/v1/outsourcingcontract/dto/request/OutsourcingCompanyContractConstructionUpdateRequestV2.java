@@ -10,5 +10,5 @@ import jakarta.validation.constraints.NotBlank;
 public record OutsourcingCompanyContractConstructionUpdateRequestV2(
         @Schema(description = "그룹 ID", example = "1") Long id,
         @NotBlank @Schema(description = "항목명", example = "콘크리트 타설") String itemName,
-        @Schema(description = "공사항목 목록") @Valid List<OutsourcingCompanyContractConstructionUpdateRequest> constructions) {
+        @Schema(description = "공사항목 목록") @Valid List<OutsourcingCompanyContractConstructionUpdateRequest> items) {
 }

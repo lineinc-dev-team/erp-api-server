@@ -70,10 +70,10 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
         }
 
         // 공사항목 정보 동기화
-        if (request.constructions() != null) {
+        if (request.items() != null) {
             EntitySyncUtils.syncList(
                     this.constructions,
-                    request.constructions(),
+                    request.items(),
                     (constructionDto) -> OutsourcingCompanyContractConstruction.builder()
                             .outsourcingCompanyContract(this.outsourcingCompanyContract)
                             .constructionGroup(this)

@@ -174,8 +174,8 @@ public class OutsourcingCompanyContractConstructionService {
                             .build();
 
                     // 요청에 포함된 공사항목이 있다면 OutsourcingCompanyContractConstruction 객체로 변환하여 등록
-                    if (dto.constructions() != null && !dto.constructions().isEmpty()) {
-                        group.getConstructions().addAll(dto.constructions().stream()
+                    if (dto.items() != null && !dto.items().isEmpty()) {
+                        group.getConstructions().addAll(dto.items().stream()
                                 .map(constructionDto -> {
                                     final OutsourcingCompanyContractConstruction construction = OutsourcingCompanyContractConstruction
                                             .builder()
