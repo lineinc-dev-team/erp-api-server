@@ -142,7 +142,7 @@ public class LaborPayrollService {
             case "siteName" -> "현장";
             case "processName" -> "공정";
             case "regularEmployeeCount" -> "정직원";
-            case "directContractCount" -> "직영/계약직";
+            case "directContractCount" -> "직영";
             case "etcCount" -> "기타";
             case "totalLaborCost" -> "노무비 합계";
             case "totalDeductions" -> "공제 합계";
