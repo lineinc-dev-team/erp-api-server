@@ -256,7 +256,7 @@ public class Labor extends BaseEntity {
      * LaborUpdateRequest DTO로부터 인력정보를 업데이트합니다.
      */
     public void updateFrom(final LaborUpdateRequest request, final OutsourcingCompany outsourcingCompany,
-            final Boolean isHeadOffice) {
+            final Boolean isHeadOffice, final Grade grade) {
         Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
         Optional.ofNullable(request.residentNumber())
@@ -273,6 +273,7 @@ public class Labor extends BaseEntity {
         Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
         Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
         Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
 
         // 외주업체 정보와 본사 인력 여부 업데이트
         this.outsourcingCompany = outsourcingCompany;
@@ -280,6 +281,7 @@ public class Labor extends BaseEntity {
 
         // 업데이트가 일어나면 임시 인력해제
         this.isTemporary = false;
+        syncTransientFields();
     }
 
     /**
@@ -353,6 +355,10 @@ public class Labor extends BaseEntity {
     @DiffInclude
     private String resignationDateFormat;
 
+    @Transient
+    @DiffInclude
+    private String gradeName;
+
     /**
      * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
      */
@@ -370,5 +376,8 @@ public class Labor extends BaseEntity {
         this.resignationDateFormat = this.resignationDate != null
                 ? DateTimeFormatUtils.formatKoreaLocalDate(this.resignationDate)
                 : null;
+        this.gradeName = Optional.ofNullable(this.grade)
+                .map(Grade::getName)
+                .orElse(null);
     }
 }

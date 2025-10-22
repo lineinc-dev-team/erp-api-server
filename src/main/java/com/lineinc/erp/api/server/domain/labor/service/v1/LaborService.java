@@ -28,7 +28,7 @@ import com.lineinc.erp.api.server.domain.labor.enums.LaborChangeType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
-import com.lineinc.erp.api.server.domain.organization.entity.Grade;
+import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
@@ -65,6 +65,7 @@ public class LaborService {
     private final UserService userService;
     private final S3FileService s3FileService;
     private final ExcelDownloadHistoryService excelDownloadHistoryService;
+    private final GradeRepository gradeRepository;
 
     /**
      * 노무 등록
@@ -106,7 +107,7 @@ public class LaborService {
                 .detailAddress(request.detailAddress())
                 .phoneNumber(request.phoneNumber())
                 .memo(request.memo())
-                .grade(request.gradeId() != null ? Grade.builder().id(request.gradeId()).build() : null)
+                .grade(request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null)
                 .build();
 
         // 첨부파일 처리
@@ -252,8 +253,10 @@ public class LaborService {
         final Labor oldSnapshot = JaversUtils.createSnapshot(javers, labor, Labor.class);
 
         // 기본 정보 업데이트
-        labor.updateFrom(request, outsourcingCompany, isHeadOffice);
+        labor.updateFrom(request, outsourcingCompany, isHeadOffice,
+                request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null);
 
+        // 변경사항 추적을 위해 업데이트 후 syncTransientFields 호출
         labor.syncTransientFields();
         laborRepository.save(labor);
 
