@@ -20,7 +20,8 @@ public record LaborNameResponse(
         @Schema(description = "소속업체 정보") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "주민등록번호") String residentNumber,
         @Schema(description = "휴대폰 번호") String phoneNumber,
-        @Schema(description = "본사 여부", example = "false") Boolean isHeadOffice) {
+        @Schema(description = "본사 여부", example = "false") Boolean isHeadOffice,
+        @Schema(description = "직급") String grade) {
 
     public static LaborNameResponse from(final Labor labor) {
         return new LaborNameResponse(
@@ -36,6 +37,7 @@ public record LaborNameResponse(
                         : null,
                 PrivacyMaskingUtils.maskResidentNumber(labor.getResidentNumber()),
                 labor.getPhoneNumber(),
-                labor.getIsHeadOffice());
+                labor.getIsHeadOffice(),
+                labor.getGrade() != null ? labor.getGrade().getName() : null);
     }
 }
