@@ -41,6 +41,7 @@ public record LaborDetailResponse(
         @Schema(description = "근속개월") Integer tenureMonths,
         @Schema(description = "퇴직금 발생 요건 여부", example = "true") Boolean isSeverancePayEligible,
         @Schema(description = "임시 인력 여부", example = "true") Boolean isTemporary,
+        @Schema(description = "직급") String grade,
         @Schema(description = "첨부파일 목록") List<LaborFileResponse> files) {
 
     public static LaborDetailResponse from(final Labor labor) {
@@ -77,6 +78,7 @@ public record LaborDetailResponse(
                 labor.getTenureMonths(),
                 labor.getIsSeverancePayEligible(),
                 labor.getIsTemporary(),
+                labor.getGrade() != null ? labor.getGrade().getName() : null,
                 fileResponses
 
         );
