@@ -143,6 +143,9 @@ public class DailyReport extends BaseEntity {
     @Builder.Default
     private Boolean outsourcingEvidenceSubmitted = false; // 외주 증빙 여부
 
+    @Builder.Default
+    private Boolean isConstructionReport = false; // 공사일보 작성 여부
+
     // 장비 관련
     private Double equipmentTotalHours; // 장비 총 가동 시간
 
@@ -343,6 +346,19 @@ public class DailyReport extends BaseEntity {
     }
 
     /**
+     * 공사일보 작성 여부 업데이트
+     * 작업내용, 주요공정, 투입현황, 자재현황 중 하나라도 삭제되지 않은 데이터가 있으면 true
+     */
+    public void updateConstructionReportStatus() {
+        final boolean hasWorkContent = works.stream().anyMatch(work -> !work.isDeleted());
+        final boolean hasMainProcess = mainProcesses.stream().anyMatch(process -> !process.isDeleted());
+        final boolean hasInputStatus = inputStatuses.stream().anyMatch(status -> !status.isDeleted());
+        final boolean hasMaterialStatus = materialStatuses.stream().anyMatch(status -> !status.isDeleted());
+
+        this.isConstructionReport = hasWorkContent || hasMainProcess || hasInputStatus || hasMaterialStatus;
+    }
+
+    /**
      * 모든 집계 데이터 업데이트
      */
     public void updateAllAggregatedData() {
@@ -360,5 +376,6 @@ public class DailyReport extends BaseEntity {
         updateUreaTotalAmount();
         updateEtcTotalAmount();
         updateFuelEvidenceSubmitted();
+        updateConstructionReportStatus();
     }
 }

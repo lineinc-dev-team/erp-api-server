@@ -72,6 +72,8 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
 
     public final ListPath<DailyReportInputStatus, QDailyReportInputStatus> inputStatuses = this.<DailyReportInputStatus, QDailyReportInputStatus>createList("inputStatuses", DailyReportInputStatus.class, QDailyReportInputStatus.class, PathInits.DIRECT2);
 
+    public final BooleanPath isConstructionReport = createBoolean("isConstructionReport");
+
     public final ListPath<DailyReportMainProcess, QDailyReportMainProcess> mainProcesses = this.<DailyReportMainProcess, QDailyReportMainProcess>createList("mainProcesses", DailyReportMainProcess.class, QDailyReportMainProcess.class, PathInits.DIRECT2);
 
     public final ListPath<DailyReportMaterialStatus, QDailyReportMaterialStatus> materialStatuses = this.<DailyReportMaterialStatus, QDailyReportMaterialStatus>createList("materialStatuses", DailyReportMaterialStatus.class, QDailyReportMaterialStatus.class, PathInits.DIRECT2);
