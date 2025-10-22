@@ -1102,7 +1102,7 @@ public class DailyReportService {
                 dailyReport.getOutsourcingEquipments(),
                 request.outsourcingEquipments(),
                 (final DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo dto) -> {
-                    return DailyReportOutsourcingEquipment.builder()
+                    final DailyReportOutsourcingEquipment equipment = DailyReportOutsourcingEquipment.builder()
                             .dailyReport(dailyReport)
                             .outsourcingCompany(outsourcingCompanyService
                                     .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
@@ -1121,6 +1121,28 @@ public class DailyReportService {
                             .fileUrl(dto.fileUrl())
                             .originalFileName(dto.originalFileName())
                             .build();
+
+                    // 서브 장비 추가
+                    if (dto.outsourcingCompanyContractSubEquipments() != null) {
+                        for (final DailyReportEquipmentUpdateRequest.OutsourcingCompanyContractSubEquipmentUpdateInfo subEquipmentDto : dto
+                                .outsourcingCompanyContractSubEquipments()) {
+                            final DailyReportOutsourcingEquipmentSubEquipment subEquipment = DailyReportOutsourcingEquipmentSubEquipment
+                                    .builder()
+                                    .dailyReportOutsourcingEquipment(equipment)
+                                    .outsourcingCompanyContractSubEquipment(
+                                            OutsourcingCompanyContractSubEquipment.builder()
+                                                    .id(subEquipmentDto.outsourcingCompanyContractSubEquipmentId())
+                                                    .build())
+                                    .workContent(subEquipmentDto.workContent())
+                                    .unitPrice(subEquipmentDto.unitPrice())
+                                    .workHours(subEquipmentDto.workHours())
+                                    .memo(subEquipmentDto.memo())
+                                    .build();
+                            equipment.getSubEquipments().add(subEquipment);
+                        }
+                    }
+
+                    return equipment;
                 });
 
         // outsourcingCompany, outsourcingCompanyContractDriver,

@@ -22,6 +22,17 @@ public record DailyReportEquipmentUpdateRequest(
             @Schema(description = "작업시간", example = "1.0") @NotNull Double workHours,
             @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
             @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
-            @Schema(description = "비고", example = "정상 작동") String memo) {
+            @Schema(description = "비고", example = "정상 작동") String memo,
+            @Schema(description = "외주업체계약 서브 장비 목록") @Valid List<OutsourcingCompanyContractSubEquipmentUpdateInfo> outsourcingCompanyContractSubEquipments) {
+    }
+
+    @Schema(description = "외주업체계약 서브 장비 수정 내용")
+    public record OutsourcingCompanyContractSubEquipmentUpdateInfo(
+            @Schema(description = "ID", example = "1") Long id,
+            @Schema(description = "외주업체계약 서브 장비 ID", example = "1") @NotNull Long outsourcingCompanyContractSubEquipmentId,
+            @Schema(description = "작업내용", example = "기초공사") String workContent,
+            @Schema(description = "단가", example = "100000") @NotNull Long unitPrice,
+            @Schema(description = "시간", example = "8.0") @NotNull Double workHours,
+            @Schema(description = "비고", example = "특별 지시사항") String memo) {
     }
 }

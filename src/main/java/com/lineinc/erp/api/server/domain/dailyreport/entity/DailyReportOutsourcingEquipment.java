@@ -9,8 +9,11 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest.OutsourcingCompanyContractSubEquipmentUpdateInfo;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -93,5 +96,36 @@ public class DailyReportOutsourcingEquipment extends BaseEntity {
         this.originalFileName = request.originalFileName();
         this.fileUrl = request.fileUrl();
         this.memo = request.memo();
+
+        // 서브 장비 업데이트
+        updateSubEquipments(request.outsourcingCompanyContractSubEquipments());
+    }
+
+    /**
+     * 서브 장비 목록을 업데이트합니다.
+     */
+    private void updateSubEquipments(
+            final List<OutsourcingCompanyContractSubEquipmentUpdateInfo> subEquipmentRequests) {
+        if (subEquipmentRequests == null) {
+            return;
+        }
+
+        // EntitySyncUtils.syncList를 사용하여 서브 장비 동기화
+        EntitySyncUtils.syncList(
+                this.subEquipments,
+                subEquipmentRequests,
+                (final OutsourcingCompanyContractSubEquipmentUpdateInfo dto) -> {
+                    return DailyReportOutsourcingEquipmentSubEquipment.builder()
+                            .dailyReportOutsourcingEquipment(this)
+                            .outsourcingCompanyContractSubEquipment(
+                                    OutsourcingCompanyContractSubEquipment.builder()
+                                            .id(dto.outsourcingCompanyContractSubEquipmentId())
+                                            .build())
+                            .workContent(dto.workContent())
+                            .unitPrice(dto.unitPrice())
+                            .workHours(dto.workHours())
+                            .memo(dto.memo())
+                            .build();
+                });
     }
 }
