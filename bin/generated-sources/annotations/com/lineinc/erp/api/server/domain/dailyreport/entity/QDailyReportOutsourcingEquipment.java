@@ -52,6 +52,8 @@ public class QDailyReportOutsourcingEquipment extends EntityPathBase<DailyReport
 
     public final com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment;
 
+    public final ListPath<DailyReportOutsourcingEquipmentSubEquipment, QDailyReportOutsourcingEquipmentSubEquipment> subEquipments = this.<DailyReportOutsourcingEquipmentSubEquipment, QDailyReportOutsourcingEquipmentSubEquipment>createList("subEquipments", DailyReportOutsourcingEquipmentSubEquipment.class, QDailyReportOutsourcingEquipmentSubEquipment.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> unitPrice = createNumber("unitPrice", Long.class);
 
     //inherited

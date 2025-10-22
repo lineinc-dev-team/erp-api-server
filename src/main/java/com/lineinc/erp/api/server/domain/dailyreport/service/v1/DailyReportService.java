@@ -28,6 +28,7 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportMaterialS
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstruction;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipmentSubEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWork;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWorkDetail;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
@@ -49,6 +50,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.Outsourci
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractWorker;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractDriverRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractEquipmentRepository;
@@ -80,6 +82,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentSubEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
@@ -303,6 +306,24 @@ public class DailyReportService {
                         .fileUrl(equipmentRequest.fileUrl())
                         .originalFileName(equipmentRequest.originalFileName())
                         .build();
+
+                if (equipmentRequest.subEquipments() != null) {
+                    for (final DailyReportOutsourcingEquipmentSubEquipmentCreateRequest subEquipmentRequest : equipmentRequest
+                            .subEquipments()) {
+                        final DailyReportOutsourcingEquipmentSubEquipment subEquipment = DailyReportOutsourcingEquipmentSubEquipment
+                                .builder()
+                                .dailyReportOutsourcingEquipment(outsourcingEquipment)
+                                .workContent(subEquipmentRequest.workContent())
+                                .unitPrice(subEquipmentRequest.unitPrice())
+                                .workHours(subEquipmentRequest.workHours())
+                                .memo(subEquipmentRequest.memo())
+                                .outsourcingCompanyContractSubEquipment(OutsourcingCompanyContractSubEquipment.builder()
+                                        .id(subEquipmentRequest.outsourcingCompanyContractSubEquipmentId())
+                                        .build())
+                                .build();
+                        outsourcingEquipment.getSubEquipments().add(subEquipment);
+                    }
+                }
 
                 dailyReport.getOutsourcingEquipments().add(outsourcingEquipment);
             }
