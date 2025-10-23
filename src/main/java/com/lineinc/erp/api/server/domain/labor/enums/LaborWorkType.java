@@ -11,7 +11,8 @@ public enum LaborWorkType {
     CARPENTER("목수", 2),
     REBAR("철근", 3),
     SCAFFOLDING("가시설공", 4),
-    WELDER("용접공", 5);
+    WELDER("용접공", 5),
+    BLASTING("발파", 6);
 
     private final String label;
     private final int order;
