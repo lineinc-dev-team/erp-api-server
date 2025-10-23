@@ -53,7 +53,8 @@ public class OutsourcingCompanyContractEquipmentService {
         // 2. 변경 전 스냅샷 생성 (보조장비 포함)
         final List<OutsourcingCompanyContractEquipment> beforeEquipments = contract.getEquipments().stream()
                 .map(equipment -> {
-                    // 보조장비의 transient 필드 동기화
+                    // 장비 및 보조장비의 transient 필드 동기화
+                    equipment.syncTransientFields();
                     equipment.getSubEquipments().forEach(OutsourcingCompanyContractSubEquipment::syncTransientFields);
                     final OutsourcingCompanyContractEquipment snapshot = JaversUtils.createSnapshot(javers, equipment,
                             OutsourcingCompanyContractEquipment.class);
@@ -85,7 +86,7 @@ public class OutsourcingCompanyContractEquipmentService {
 
                     // 요청에 포함된 보조장비가 있다면 OutsourcingCompanyContractSubEquipment 객체로 변환하여 등록
                     if (dto.subEquipments() != null && !dto.subEquipments().isEmpty()) {
-                        equipment.setSubEquipments(dto.subEquipments().stream()
+                        equipment.getSubEquipments().addAll(dto.subEquipments().stream()
                                 .map(subDto -> {
                                     final OutsourcingCompanyContractSubEquipment subEquipment = OutsourcingCompanyContractSubEquipment
                                             .builder()
