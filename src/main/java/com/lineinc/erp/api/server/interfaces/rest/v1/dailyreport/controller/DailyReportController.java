@@ -26,6 +26,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportListSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMainProcessUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportUpdateRequest;
@@ -227,6 +228,16 @@ public class DailyReportController extends BaseController {
                                 sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "출역일보 외주(공사) 수정", description = "출역일보 외주(공사) 정보를 수정합니다.")
+    @PatchMapping("/outsourcing-constructions")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReportOutsourcingConstruction(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportOutsourcingConstructionUpdateRequest request) {
+        dailyReportService.updateDailyReportOutsourcingConstructions(searchRequest, request);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "출역일보 유류 조회", description = "출역일보 유류 정보를 조회합니다.")

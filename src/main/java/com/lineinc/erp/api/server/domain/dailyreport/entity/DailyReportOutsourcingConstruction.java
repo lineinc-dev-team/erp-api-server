@@ -4,6 +4,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionUpdateRequest.ConstructionItemUpdateInfo;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -57,8 +58,25 @@ public class DailyReportOutsourcingConstruction extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
+    /**
+     * 계약서 파일을 업데이트합니다.
+     */
     public void updateContractFile(final String contractFileUrl, final String contractOriginalFileName) {
         this.contractFileUrl = contractFileUrl;
         this.contractOriginalFileName = contractOriginalFileName;
+    }
+
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(final ConstructionItemUpdateInfo request,
+            final OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction) {
+        this.outsourcingCompanyContractConstruction = outsourcingCompanyContractConstruction;
+        this.specification = request.specification();
+        this.unit = request.unit();
+        this.quantity = request.quantity();
+        this.contractFileUrl = request.contractFileUrl();
+        this.contractOriginalFileName = request.contractOriginalFileName();
+        this.memo = request.memo();
     }
 }

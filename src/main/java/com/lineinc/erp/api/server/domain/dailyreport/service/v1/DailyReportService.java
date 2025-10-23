@@ -83,6 +83,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentSubEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
@@ -1205,6 +1206,93 @@ public class DailyReportService {
                             eq.updateFrom(equipmentInfo, outsourcingCompany, outsourcingCompanyContractDriver,
                                     outsourcingCompanyContractEquipment);
                         });
+            }
+        }
+
+        dailyReportRepository.save(dailyReport);
+        dailyReport.updateAllAggregatedData();
+        dailyReportRepository.save(dailyReport);
+    }
+
+    @Transactional
+    public void updateDailyReportOutsourcingConstructions(final DailyReportSearchRequest searchRequest,
+            final DailyReportOutsourcingConstructionUpdateRequest request) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        final DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
+
+        // EntitySyncUtils.syncList를 사용하여 외주(공사) 그룹 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getOutsourcingConstructionGroups(),
+                request.outsourcingConstructions(),
+                (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo dto) -> {
+                    final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                            .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
+                    final OutsourcingCompanyContractConstructionGroup contractConstructionGroup = outsourcingCompanyContractConstructionService
+                            .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
+                                    dto.outsourcingCompanyContractConstructionGroupId());
+
+                    final DailyReportOutsourcingConstructionGroup group = DailyReportOutsourcingConstructionGroup
+                            .builder()
+                            .dailyReport(dailyReport)
+                            .outsourcingCompany(outsourcingCompany)
+                            .outsourcingCompanyContractConstructionGroup(contractConstructionGroup)
+                            .build();
+
+                    // 공사항목 추가
+                    if (dto.items() != null) {
+                        for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionItemUpdateInfo itemDto : dto
+                                .items()) {
+                            final OutsourcingCompanyContractConstruction contractConstruction = outsourcingCompanyContractConstructionService
+                                    .getOutsourcingCompanyContractConstructionByIdOrThrow(
+                                            itemDto.outsourcingCompanyContractConstructionId());
+
+                            final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction
+                                    .builder()
+                                    .outsourcingConstructionGroup(group)
+                                    .outsourcingCompanyContractConstruction(contractConstruction)
+                                    .specification(itemDto.specification())
+                                    .unit(itemDto.unit())
+                                    .quantity(itemDto.quantity())
+                                    .contractFileUrl(itemDto.contractFileUrl())
+                                    .contractOriginalFileName(itemDto.contractOriginalFileName())
+                                    .memo(itemDto.memo())
+                                    .build();
+
+                            group.getConstructions().add(construction);
+                        }
+                    }
+
+                    return group;
+                });
+
+        // 기존 그룹 업데이트
+        for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo groupInfo : request
+                .outsourcingConstructions()) {
+            if (groupInfo.id() != null) { // ID가 있는 것만 처리
+                final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                        .getOutsourcingCompanyByIdOrThrow(groupInfo.outsourcingCompanyId());
+                final OutsourcingCompanyContractConstructionGroup contractConstructionGroup = outsourcingCompanyContractConstructionService
+                        .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
+                                groupInfo.outsourcingCompanyContractConstructionGroupId());
+
+                // 기존 그룹 엔티티 찾아서 업데이트
+                dailyReport.getOutsourcingConstructionGroups().stream()
+                        .filter(group -> group.getId() != null && group.getId().equals(groupInfo.id()))
+                        .findFirst()
+                        .ifPresent(group -> group.updateFrom(groupInfo, outsourcingCompany,
+                                contractConstructionGroup, outsourcingCompanyContractConstructionService));
             }
         }
 
