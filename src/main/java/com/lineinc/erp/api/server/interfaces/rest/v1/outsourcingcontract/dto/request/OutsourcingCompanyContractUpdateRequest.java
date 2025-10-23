@@ -31,9 +31,9 @@ public record OutsourcingCompanyContractUpdateRequest(
 
         @Schema(description = "기본 공제 항목 설명", example = "4대 보험 및 연료비") String defaultDeductionsDescription,
 
-        @Schema(description = "세금계산서 발행조건", example = "MONTH_END") @NotNull OutsourcingCompanyTaxInvoiceConditionType taxInvoiceCondition,
+        @Schema(description = "세금계산서 발행조건", example = "MONTH_END") OutsourcingCompanyTaxInvoiceConditionType taxInvoiceCondition,
 
-        @Schema(description = "세금계산서 발행일(월)", example = "25") @NotNull Integer taxInvoiceIssueDayOfMonth,
+        @Schema(description = "세금계산서 발행일(월)", example = "25") Integer taxInvoiceIssueDayOfMonth,
 
         @Schema(description = "계약 유형", example = "MONTHLY") OutsourcingCompanyContractCategoryType category,
 
