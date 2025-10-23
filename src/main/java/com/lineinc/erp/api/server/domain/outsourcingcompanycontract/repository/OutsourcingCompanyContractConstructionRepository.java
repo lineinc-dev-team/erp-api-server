@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +24,16 @@ public interface OutsourcingCompanyContractConstructionRepository
             AND c.deleted = false""")
     Page<OutsourcingCompanyContractConstruction> findByOutsourcingCompanyContractId(
             @Param("contractId") Long contractId,
+            Pageable pageable);
+
+    /**
+     * 외주업체 계약 ID 목록으로 공사항목명 목록을 조회합니다.
+     */
+    @Query("""
+            SELECT c FROM OutsourcingCompanyContractConstruction c \
+            WHERE c.outsourcingCompanyContract.id IN :contractIds \
+            AND c.deleted = false""")
+    Page<OutsourcingCompanyContractConstruction> findByOutsourcingCompanyContractIdIn(
+            @Param("contractIds") List<Long> contractIds,
             Pageable pageable);
 }

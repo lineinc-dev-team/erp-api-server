@@ -18,6 +18,7 @@ public record ContractConstructionResponse(
         @Schema(description = "외주계약금액 수량", example = "100") Integer outsourcingContractQuantity,
         @Schema(description = "외주계약금액 금액", example = "5000000") Long outsourcingContractPrice,
         @Schema(description = "메모", example = "특수 콘크리트") String memo,
+        @Schema(description = "삭제 여부", example = "false") Boolean deleted,
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt) {
 
@@ -33,8 +34,28 @@ public record ContractConstructionResponse(
                 construction.getOutsourcingContractQuantity(),
                 construction.getOutsourcingContractPrice(),
                 construction.getMemo(),
+                construction.isDeleted(),
                 construction.getCreatedAt(),
                 construction.getUpdatedAt());
+    }
+
+    @Schema(description = "외주업체 계약 공사항목 간단 정보 응답")
+    public record ContractConstructionSimpleResponse(
+            @Schema(description = "공사항목 ID", example = "1") Long id,
+            @Schema(description = "항목", example = "콘크리트 타설") String item,
+            @Schema(description = "규격", example = "C24") String specification,
+            @Schema(description = "단위", example = "m³") String unit,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
+
+        public static ContractConstructionSimpleResponse from(
+                final OutsourcingCompanyContractConstruction construction) {
+            return new ContractConstructionSimpleResponse(
+                    construction.getId(),
+                    construction.getItem(),
+                    construction.getSpecification(),
+                    construction.getUnit(),
+                    construction.isDeleted());
+        }
     }
 
 }
