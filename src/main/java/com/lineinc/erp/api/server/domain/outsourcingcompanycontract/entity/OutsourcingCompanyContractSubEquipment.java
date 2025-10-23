@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity;
 
+import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
@@ -30,6 +31,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
 
     @Id
