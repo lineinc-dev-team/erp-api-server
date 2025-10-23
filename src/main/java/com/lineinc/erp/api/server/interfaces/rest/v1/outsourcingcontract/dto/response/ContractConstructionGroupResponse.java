@@ -11,7 +11,7 @@ public record ContractConstructionGroupResponse(
         @Schema(description = "공사항목 그룹 ID", example = "1") Long id,
         @Schema(description = "항목명", example = "토공사") String itemName,
         @Schema(description = "삭제 여부", example = "false") Boolean deleted,
-        @Schema(description = "공사항목 목록") List<ContractConstructionResponse> constructions) {
+        @Schema(description = "공사항목 목록") List<ContractConstructionResponse> items) {
 
     public static ContractConstructionGroupResponse from(final OutsourcingCompanyContractConstructionGroup group) {
         return new ContractConstructionGroupResponse(
