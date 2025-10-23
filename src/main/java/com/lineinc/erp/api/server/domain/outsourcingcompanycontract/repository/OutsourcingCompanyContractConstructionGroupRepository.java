@@ -14,7 +14,15 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 @Repository
 public interface OutsourcingCompanyContractConstructionGroupRepository
         extends JpaRepository<OutsourcingCompanyContractConstructionGroup, Long> {
-    Page<OutsourcingCompanyContractConstructionGroup> findByOutsourcingCompanyContractId(Long contractId,
+    /**
+     * 외주업체 계약 ID로 공사항목 그룹 정보를 페이징하여 조회합니다.
+     */
+    @Query("""
+            SELECT g FROM OutsourcingCompanyContractConstructionGroup g \
+            WHERE g.outsourcingCompanyContract.id = :contractId \
+            AND g.deleted = false""")
+    Page<OutsourcingCompanyContractConstructionGroup> findByOutsourcingCompanyContractId(
+            @Param("contractId") Long contractId,
             Pageable pageable);
 
     /**

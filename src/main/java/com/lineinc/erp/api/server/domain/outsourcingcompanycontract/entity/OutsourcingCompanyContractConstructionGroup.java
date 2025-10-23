@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
@@ -35,7 +34,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@SQLRestriction("deleted = false")
 public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
 
     static final String SEQUENCE_NAME = "outsourcing_company_contract_construction_group_seq";
