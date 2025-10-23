@@ -80,7 +80,7 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
 
     public final StringPath memo = createString("memo");
 
-    public final ListPath<DailyReportOutsourcingConstruction, QDailyReportOutsourcingConstruction> outsourcingConstructions = this.<DailyReportOutsourcingConstruction, QDailyReportOutsourcingConstruction>createList("outsourcingConstructions", DailyReportOutsourcingConstruction.class, QDailyReportOutsourcingConstruction.class, PathInits.DIRECT2);
+    public final ListPath<DailyReportOutsourcingConstructionGroup, QDailyReportOutsourcingConstructionGroup> outsourcingConstructionGroups = this.<DailyReportOutsourcingConstructionGroup, QDailyReportOutsourcingConstructionGroup>createList("outsourcingConstructionGroups", DailyReportOutsourcingConstructionGroup.class, QDailyReportOutsourcingConstructionGroup.class, PathInits.DIRECT2);
 
     public final ListPath<DailyReportOutsourcingEquipment, QDailyReportOutsourcingEquipment> outsourcingEquipments = this.<DailyReportOutsourcingEquipment, QDailyReportOutsourcingEquipment>createList("outsourcingEquipments", DailyReportOutsourcingEquipment.class, QDailyReportOutsourcingEquipment.class, PathInits.DIRECT2);
 

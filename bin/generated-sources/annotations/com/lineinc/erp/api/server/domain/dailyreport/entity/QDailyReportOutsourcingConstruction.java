@@ -34,8 +34,6 @@ public class QDailyReportOutsourcingConstruction extends EntityPathBase<DailyRep
     //inherited
     public final StringPath createdBy = _super.createdBy;
 
-    public final QDailyReport dailyReport;
-
     //inherited
     public final BooleanPath deleted = _super.deleted;
 
@@ -46,11 +44,13 @@ public class QDailyReportOutsourcingConstruction extends EntityPathBase<DailyRep
 
     public final StringPath memo = createString("memo");
 
-    public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany outsourcingCompany;
-
     public final com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction;
 
+    public final QDailyReportOutsourcingConstructionGroup outsourcingConstructionGroup;
+
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
+
+    public final StringPath specification = createString("specification");
 
     public final StringPath unit = createString("unit");
 
@@ -78,9 +78,8 @@ public class QDailyReportOutsourcingConstruction extends EntityPathBase<DailyRep
 
     public QDailyReportOutsourcingConstruction(Class<? extends DailyReportOutsourcingConstruction> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.dailyReport = inits.isInitialized("dailyReport") ? new QDailyReport(forProperty("dailyReport"), inits.get("dailyReport")) : null;
-        this.outsourcingCompany = inits.isInitialized("outsourcingCompany") ? new com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany(forProperty("outsourcingCompany")) : null;
         this.outsourcingCompanyContractConstruction = inits.isInitialized("outsourcingCompanyContractConstruction") ? new com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContractConstruction(forProperty("outsourcingCompanyContractConstruction"), inits.get("outsourcingCompanyContractConstruction")) : null;
+        this.outsourcingConstructionGroup = inits.isInitialized("outsourcingConstructionGroup") ? new QDailyReportOutsourcingConstructionGroup(forProperty("outsourcingConstructionGroup"), inits.get("outsourcingConstructionGroup")) : null;
     }
 
 }

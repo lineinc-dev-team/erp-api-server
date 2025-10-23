@@ -51,6 +51,7 @@ public class ValidationMessages {
     public static final String OUTSOURCING_COMPANY_CONTRACT_SUB_EQUIPMENT_NOT_FOUND = "서브장비를 찾을 수 없습니다.";
     public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_NOT_FOUND = "인력을 찾을 수 없습니다.";
     public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_NOT_FOUND = "공사항목을 찾을 수 없습니다.";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_NOT_FOUND = "공사항목 그룹을 찾을 수 없습니다.";
 
     // ===== 노무/인력 관련 메시지 =====
     public static final String LABOR_NOT_FOUND = "존재하지 않는 노무입니다.";

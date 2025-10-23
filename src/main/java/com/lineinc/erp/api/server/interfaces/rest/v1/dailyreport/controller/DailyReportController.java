@@ -41,7 +41,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMainProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMaterialStatusResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingConstructionResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingConstructionGroupResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -216,11 +216,11 @@ public class DailyReportController extends BaseController {
     @Operation(summary = "출역일보 외주(공사) 조회", description = "출역일보 외주(공사) 정보를 조회합니다.")
     @GetMapping("/outsourcing-constructions")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportOutsourcingConstructionResponse>>> searchDailyReportOutsourcingConstructions(
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportOutsourcingConstructionGroupResponse>>> searchDailyReportOutsourcingConstructions(
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final DailyReportSearchRequest request) {
-        final Slice<DailyReportOutsourcingConstructionResponse> slice = dailyReportService
+        final Slice<DailyReportOutsourcingConstructionGroupResponse> slice = dailyReportService
                 .searchDailyReportOutsourcingConstructions(
                         request,
                         PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),

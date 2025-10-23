@@ -295,4 +295,11 @@ public class OutsourcingCompanyContractConstructionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_NOT_FOUND));
     }
+
+    public OutsourcingCompanyContractConstructionGroup getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
+            final Long id) {
+        return constructionGroupRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_NOT_FOUND));
+    }
 }
