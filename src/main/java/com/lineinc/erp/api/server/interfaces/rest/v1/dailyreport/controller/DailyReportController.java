@@ -152,6 +152,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
+    @Deprecated
     @Operation(summary = "출역일보 외주 수정", description = "출역일보 외주 정보를 수정합니다.")
     @PatchMapping("/outsourcings")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
@@ -198,6 +199,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
+    @Deprecated
     @Operation(summary = "출역일보 외주 조회", description = "출역일보 외주 정보를 조회합니다.")
     @GetMapping("/outsourcings")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
