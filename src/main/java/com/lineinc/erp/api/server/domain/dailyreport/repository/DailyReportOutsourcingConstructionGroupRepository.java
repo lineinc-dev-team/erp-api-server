@@ -28,11 +28,13 @@ public interface DailyReportOutsourcingConstructionGroupRepository
      */
     @Query("""
             SELECT g FROM DailyReportOutsourcingConstructionGroup g
-            JOIN g.dailyReport dr
+            JOIN g.dailyReportOutsourcingCompany oc
+            JOIN oc.dailyReport dr
             WHERE dr.site = :site
             AND dr.siteProcess = :siteProcess
             AND dr.reportDate = :reportDate
             AND g.deleted = false
+            AND oc.deleted = false
             AND dr.deleted = false
             ORDER BY g.createdAt DESC
             """)

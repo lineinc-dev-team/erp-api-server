@@ -6,11 +6,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-@Schema(description = "외주 공사 출역일보 등록 요청 (그룹)")
+@Schema(description = "외주 공사 출역일보 등록 요청 (3depth 구조)")
 public record DailyReportOutsourcingConstructionCreateRequest(
         @Schema(description = "업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
-        @Schema(description = "외주업체계약 공사항목 그룹 ID", example = "1") @NotNull Long outsourcingCompanyContractConstructionGroupId,
-        @Schema(description = "공사항목 목록") @Valid List<ConstructionItemCreateRequest> items) {
+        @Schema(description = "공사 그룹 목록") @Valid List<ConstructionGroupCreateRequest> groups) {
+
+    @Schema(description = "공사 그룹 정보")
+    public record ConstructionGroupCreateRequest(
+            @Schema(description = "외주업체계약 공사항목 그룹 ID", example = "1") @NotNull Long outsourcingCompanyContractConstructionGroupId,
+            @Schema(description = "공사항목 목록") @Valid List<ConstructionItemCreateRequest> items) {
+    }
 
     @Schema(description = "공사항목 정보")
     public record ConstructionItemCreateRequest(

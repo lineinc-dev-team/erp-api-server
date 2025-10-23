@@ -139,6 +139,7 @@ public final class AppConstants {
     public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_ID = "outsourcing_company_contract_equipment_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_ID = "outsourcing_company_contract_construction_id";
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_ID = "daily_report_outsourcing_construction_group_id";
+    public static final String DAILY_REPORT_OUTSOURCING_COMPANY_ID = "daily_report_outsourcing_company_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_ID = "outsourcing_company_contract_construction_group_id";
 
     // 엔티티 매핑 관련 상수
@@ -146,6 +147,7 @@ public final class AppConstants {
     public static final String DAILY_REPORT_MAPPED_BY = "dailyReport";
     public static final String FUEL_AGGREGATION_MAPPED_BY = "fuelAggregation";
     public static final String LABOR_MAPPED_BY = "labor";
+    public static final String DAILY_REPORT_OUTSOURCING_COMPANY_MAPPED_BY = "dailyReportOutsourcingCompany";
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_MAPPED_BY = "dailyReportOutsourcingConstructionGroup";
 
     // 빈 값 상수

@@ -6,14 +6,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-@Schema(description = "출역일보 외주(공사) 수정 요청")
+@Schema(description = "출역일보 외주(공사) 수정 요청 (3depth 구조)")
 public record DailyReportOutsourcingConstructionUpdateRequest(
-        @Schema(description = "수정할 외주(공사) 그룹 정보 목록") List<@Valid ConstructionGroupUpdateInfo> outsourcingConstructions) {
+        @Schema(description = "수정할 외주업체 정보 목록") List<@Valid OutsourcingCompanyUpdateInfo> outsourcingCompanies) {
+
+    @Schema(description = "외주업체 수정 정보")
+    public record OutsourcingCompanyUpdateInfo(
+            @Schema(description = "외주업체 ID (수정 시 필수, 생성 시 null)", example = "1") Long id,
+            @Schema(description = "업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
+            @Schema(description = "공사 그룹 목록") @Valid List<ConstructionGroupUpdateInfo> groups) {
+    }
 
     @Schema(description = "외주(공사) 그룹 수정 정보")
     public record ConstructionGroupUpdateInfo(
             @Schema(description = "그룹 ID (수정 시 필수, 생성 시 null)", example = "1") Long id,
-            @Schema(description = "업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
             @Schema(description = "외주업체계약 공사항목 그룹 ID", example = "1") @NotNull Long outsourcingCompanyContractConstructionGroupId,
             @Schema(description = "공사항목 목록") @Valid List<ConstructionItemUpdateInfo> items) {
     }
