@@ -1,7 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstructionGroup;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
@@ -14,7 +13,6 @@ public record DailyReportOutsourcingConstructionGroupResponse(
         @Schema(description = "ID", example = "1") Long id,
         @Schema(description = "업체 정보") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "외주업체계약 공사항목 그룹 정보") ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse outsourcingCompanyContractConstructionGroup,
-        @Schema(description = "공사항목 목록") List<DailyReportOutsourcingConstructionResponse> items,
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
 
@@ -29,11 +27,6 @@ public record DailyReportOutsourcingConstructionGroupResponse(
                         ? ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse
                                 .from(group.getOutsourcingCompanyContractConstructionGroup())
                         : null,
-                group.getConstructions() != null
-                        ? group.getConstructions().stream()
-                                .map(DailyReportOutsourcingConstructionResponse::from)
-                                .toList()
-                        : List.of(),
                 group.getCreatedAt(),
                 group.getUpdatedAt());
     }
