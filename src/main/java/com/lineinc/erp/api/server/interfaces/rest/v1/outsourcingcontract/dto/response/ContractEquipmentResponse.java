@@ -38,9 +38,11 @@ public record ContractEquipmentResponse(
                 equipment.getMemo(),
                 equipment.getCreatedAt(),
                 equipment.getUpdatedAt(),
-                equipment.getSubEquipments() != null ? equipment.getSubEquipments().stream()
-                        .map(ContractSubEquipmentResponse::from)
-                        .toList() : List.of());
+                equipment.getSubEquipments() != null
+                        ? equipment.getSubEquipments().stream().filter(subEquipment -> !subEquipment.isDeleted())
+                                .map(ContractSubEquipmentResponse::from)
+                                .toList()
+                        : List.of());
     }
 
     @Schema(description = "외주업체 계약 장비 간단 정보 응답")
