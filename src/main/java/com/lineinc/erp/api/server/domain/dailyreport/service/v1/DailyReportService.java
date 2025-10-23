@@ -80,7 +80,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportMaterialStatusUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingConstructionCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingEquipmentSubEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportOutsourcingUpdateRequest;
@@ -249,31 +248,33 @@ public class DailyReportService {
             }
         }
 
-        // 외주 출역 정보 추가
-        if (request.outsourcings() != null)
+        // // 외주 출역 정보 추가
+        // if (request.outsourcings() != null)
 
-        {
-            for (final DailyReportOutsourcingCreateRequest outsourcingRequest : request.outsourcings()) {
-                final OutsourcingCompany company = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(outsourcingRequest.outsourcingCompanyId());
-                final OutsourcingCompanyContractWorker worker = getOutsourcingCompanyContractWorkerByIdOrThrow(
-                        outsourcingRequest.outsourcingCompanyContractWorkerId());
+        // {
+        // for (final DailyReportOutsourcingCreateRequest outsourcingRequest :
+        // request.outsourcings()) {
+        // final OutsourcingCompany company = outsourcingCompanyService
+        // .getOutsourcingCompanyByIdOrThrow(outsourcingRequest.outsourcingCompanyId());
+        // final OutsourcingCompanyContractWorker worker =
+        // getOutsourcingCompanyContractWorkerByIdOrThrow(
+        // outsourcingRequest.outsourcingCompanyContractWorkerId());
 
-                final DailyReportOutsourcing outsourcing = DailyReportOutsourcing.builder()
-                        .dailyReport(dailyReport)
-                        .outsourcingCompany(company)
-                        .outsourcingCompanyContractWorker(worker)
-                        .category(outsourcingRequest.category())
-                        .workContent(outsourcingRequest.workContent())
-                        .workQuantity(outsourcingRequest.workQuantity())
-                        .memo(outsourcingRequest.memo())
-                        .fileUrl(outsourcingRequest.fileUrl())
-                        .originalFileName(outsourcingRequest.originalFileName())
-                        .build();
+        // final DailyReportOutsourcing outsourcing = DailyReportOutsourcing.builder()
+        // .dailyReport(dailyReport)
+        // .outsourcingCompany(company)
+        // .outsourcingCompanyContractWorker(worker)
+        // .category(outsourcingRequest.category())
+        // .workContent(outsourcingRequest.workContent())
+        // .workQuantity(outsourcingRequest.workQuantity())
+        // .memo(outsourcingRequest.memo())
+        // .fileUrl(outsourcingRequest.fileUrl())
+        // .originalFileName(outsourcingRequest.originalFileName())
+        // .build();
 
-                dailyReport.getOutsourcings().add(outsourcing);
-            }
-        }
+        // dailyReport.getOutsourcings().add(outsourcing);
+        // }
+        // }
 
         // 외주업체계약 장비 출역 정보 추가
         if (request.outsourcingEquipments() != null) {
