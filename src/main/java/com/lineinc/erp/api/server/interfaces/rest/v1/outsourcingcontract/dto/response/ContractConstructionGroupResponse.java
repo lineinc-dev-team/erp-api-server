@@ -19,6 +19,7 @@ public record ContractConstructionGroupResponse(
                 group.getItemName(),
                 group.isDeleted(),
                 group.getConstructions() != null ? group.getConstructions().stream()
+                        .filter(construction -> !construction.isDeleted())
                         .map(ContractConstructionResponse::from)
                         .toList() : List.of());
     }
