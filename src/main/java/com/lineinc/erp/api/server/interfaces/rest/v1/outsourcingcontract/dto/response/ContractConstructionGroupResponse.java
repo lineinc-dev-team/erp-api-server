@@ -40,4 +40,17 @@ public record ContractConstructionGroupResponse(
         }
     }
 
+    @Schema(description = "출역일보 외주(공사) 그룹 간단 정보 응답")
+    public record ContractConstructionGroupSimpleResponseForDailyReport(
+            @Schema(description = "공사항목 그룹 ID", example = "1") Long id,
+            @Schema(description = "항목명", example = "토공사") String itemName,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
+
+        public static ContractConstructionGroupSimpleResponseForDailyReport from(
+                final OutsourcingCompanyContractConstructionGroup group) {
+            return new ContractConstructionGroupSimpleResponseForDailyReport(group.getId(), group.getItemName(),
+                    group.isDeleted());
+        }
+    }
+
 }
