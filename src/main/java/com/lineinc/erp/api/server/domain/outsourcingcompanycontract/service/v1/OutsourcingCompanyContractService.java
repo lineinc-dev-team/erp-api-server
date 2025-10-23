@@ -680,14 +680,14 @@ public class OutsourcingCompanyContractService {
      * 외주업체별 계약 공사항목 그룹 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Slice<ContractConstructionGroupResponse> getContractConstructionGroupsByCompany(
+    public Slice<ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse> getContractConstructionGroupsByCompany(
             final Long companyId, final Long siteId, final Pageable pageable) {
         final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId);
 
         // 계약 ID들로 공사항목 그룹 조회
         final Page<OutsourcingCompanyContractConstructionGroup> page = constructionGroupRepository
                 .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
-        return page.map(ContractConstructionGroupResponse::from);
+        return page.map(group -> ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse.from(group));
     }
 
     /**

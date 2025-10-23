@@ -43,7 +43,6 @@ public record ContractConstructionResponse(
     public record ContractConstructionSimpleResponse(
             @Schema(description = "공사항목 ID", example = "1") Long id,
             @Schema(description = "항목", example = "콘크리트 타설") String item,
-            @Schema(description = "규격", example = "C24") String specification,
             @Schema(description = "단위", example = "m³") String unit,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
@@ -52,7 +51,6 @@ public record ContractConstructionResponse(
             return new ContractConstructionSimpleResponse(
                     construction.getId(),
                     construction.getItem(),
-                    construction.getSpecification(),
                     construction.getUnit(),
                     construction.isDeleted());
         }

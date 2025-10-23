@@ -322,12 +322,12 @@ public class CompanyController {
             @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
     })
     @GetMapping("/{id}/contract-construction-groups")
-    public ResponseEntity<SuccessResponse<SliceResponse<ContractConstructionGroupResponse>>> getContractConstructionGroupsByCompany(
+    public ResponseEntity<SuccessResponse<SliceResponse<ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse>>> getContractConstructionGroupsByCompany(
             @PathVariable final Long id,
             @RequestParam(required = false) final Long siteId,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-        final Slice<ContractConstructionGroupResponse> slice = outsourcingCompanyContractService
+        final Slice<ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractConstructionGroupsByCompany(
                         id, siteId,
                         PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));

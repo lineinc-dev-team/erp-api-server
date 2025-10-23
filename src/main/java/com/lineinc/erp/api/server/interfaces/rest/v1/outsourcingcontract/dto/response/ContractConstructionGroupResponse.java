@@ -24,4 +24,20 @@ public record ContractConstructionGroupResponse(
                         .toList() : List.of());
     }
 
+    @Schema(description = "외주업체 계약 공사항목 그룹 간단 정보 응답")
+    public record ContractConstructionGroupSimpleResponse(
+            @Schema(description = "공사항목 그룹 ID", example = "1") Long id,
+            @Schema(description = "항목명", example = "토공사") String itemName,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted,
+            @Schema(description = "공사항목 목록") List<ContractConstructionResponse.ContractConstructionSimpleResponse> items) {
+        public static ContractConstructionGroupSimpleResponse from(
+                final OutsourcingCompanyContractConstructionGroup group) {
+            return new ContractConstructionGroupSimpleResponse(group.getId(), group.getItemName(), group.isDeleted(),
+                    group.getConstructions() != null ? group.getConstructions().stream()
+                            .filter(construction -> !construction.isDeleted())
+                            .map(ContractConstructionResponse.ContractConstructionSimpleResponse::from)
+                            .toList() : List.of());
+        }
+    }
+
 }
