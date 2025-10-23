@@ -36,4 +36,21 @@ public interface OutsourcingCompanyContractConstructionRepository
     Page<OutsourcingCompanyContractConstruction> findByOutsourcingCompanyContractIdIn(
             @Param("contractIds") List<Long> contractIds,
             Pageable pageable);
+
+    /**
+     * 외주업체 ID, 항목 그룹 ID, 공사항목 이름으로 규격 목록을 조회합니다.
+     */
+    @Query("""
+            SELECT DISTINCT c.specification FROM OutsourcingCompanyContractConstruction c \
+            WHERE (:itemName IS NULL OR c.item = :itemName) \
+            AND (:constructionGroupId IS NULL OR c.constructionGroup.id = :constructionGroupId) \
+            AND c.outsourcingCompanyContract.outsourcingCompany.id = :outsourcingCompanyId \
+            AND c.specification IS NOT NULL \
+            AND c.specification != '' \
+            AND c.deleted = false \
+            ORDER BY c.specification""")
+    List<String> findDistinctSpecificationsByConditions(
+            @Param("itemName") String itemName,
+            @Param("constructionGroupId") Long constructionGroupId,
+            @Param("outsourcingCompanyId") Long outsourcingCompanyId);
 }

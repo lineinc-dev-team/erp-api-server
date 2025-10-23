@@ -335,4 +335,19 @@ public class CompanyController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
+    @Operation(summary = "외주업체별 공사항목 규격 목록 조회", description = "외주업체 ID, 항목 그룹 ID, 공사항목 이름을 받아서 해당 조건의 규격 목록을 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content())
+    })
+    @GetMapping("/{id}/specifications")
+    public ResponseEntity<SuccessResponse<List<String>>> getSpecificationsByConditions(
+            @PathVariable final Long id,
+            @RequestParam(required = false) final String itemName,
+            @RequestParam(required = false) final Long constructionGroupId) {
+        final List<String> specifications = outsourcingCompanyContractService
+                .getSpecificationsByConditions(itemName, constructionGroupId, id);
+        return ResponseEntity.ok(SuccessResponse.of(specifications));
+    }
+
 }

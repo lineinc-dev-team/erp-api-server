@@ -691,6 +691,16 @@ public class OutsourcingCompanyContractService {
     }
 
     /**
+     * 외주업체 ID, 항목 그룹 ID, 공사항목 이름으로 규격 목록을 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public List<String> getSpecificationsByConditions(final String itemName, final Long constructionGroupId,
+            final Long outsourcingCompanyId) {
+        return constructionRepository.findDistinctSpecificationsByConditions(itemName, constructionGroupId,
+                outsourcingCompanyId);
+    }
+
+    /**
      * 외주업체 계약 공사항목 그룹 정보를 Slice로 조회합니다. (V2)
      */
     @Transactional(readOnly = true)
