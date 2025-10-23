@@ -37,6 +37,8 @@ public record DailyReportListResponse(
         @Schema(description = "기타 총 주유량", example = "10.0") Double etcTotalAmount,
         @Schema(description = "유류 증빙 여부", example = "true") Boolean fuelEvidenceSubmitted,
         @Schema(description = "공사일보 작성 여부", example = "true") Boolean isConstructionReport,
+        @Schema(description = "외주(공사) 항목 개수", example = "10") Integer outsourcingConstructionItemCount,
+        @Schema(description = "외주(공사) 증빙 여부", example = "true") Boolean outsourcingConstructionEvidenceSubmitted,
 
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
@@ -67,6 +69,8 @@ public record DailyReportListResponse(
                 dailyReport.getEtcTotalAmount(),
                 dailyReport.getFuelEvidenceSubmitted(),
                 dailyReport.getIsConstructionReport(),
+                dailyReport.getOutsourcingConstructionItemCount(),
+                dailyReport.getOutsourcingConstructionEvidenceSubmitted(),
                 dailyReport.getCreatedAt(),
                 dailyReport.getUpdatedAt());
     }

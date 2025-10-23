@@ -152,6 +152,12 @@ public class DailyReport extends BaseEntity {
     @Builder.Default
     private Boolean equipmentEvidenceSubmitted = false; // 장비 증빙 여부
 
+    // 외주(공사) 관련
+    private Integer outsourcingConstructionItemCount; // 외주(공사) 항목 개수
+
+    @Builder.Default
+    private Boolean outsourcingConstructionEvidenceSubmitted = false; // 외주(공사) 증빙 여부
+
     // 현장 사진 관련
     @Builder.Default
     private Boolean sitePhotoSubmitted = false; // 현장 사진 여부
@@ -269,6 +275,28 @@ public class DailyReport extends BaseEntity {
     }
 
     /**
+     * 외주(공사) 항목 개수 계산 및 업데이트
+     */
+    public void updateOutsourcingConstructionItemCount() {
+        this.outsourcingConstructionItemCount = (int) outsourcingCompanies.stream()
+                .filter(company -> !company.isDeleted())
+                .flatMap(company -> company.getConstructionGroups().stream())
+                .filter(group -> !group.isDeleted())
+                .flatMap(group -> group.getConstructions().stream())
+                .filter(construction -> !construction.isDeleted())
+                .count();
+    }
+
+    /**
+     * 외주(공사) 증빙 여부 업데이트
+     */
+    public void updateOutsourcingConstructionEvidenceSubmitted() {
+        this.outsourcingConstructionEvidenceSubmitted = evidenceFiles.stream()
+                .filter(file -> !file.isDeleted())
+                .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.OUTSOURCING_CONSTRUCTION);
+    }
+
+    /**
      * 휘발유 총 주유량 계산 및 업데이트
      */
     public void updateGasolineTotalAmount() {
@@ -366,11 +394,13 @@ public class DailyReport extends BaseEntity {
         updateDirectContractWorkQuantitySum();
         updateOutsourcingWorkQuantitySum();
         updateEquipmentTotalHours();
+        updateOutsourcingConstructionItemCount();
         updateSitePhotoSubmitted();
         updateEmployeeEvidenceSubmitted();
         updateDirectContractEvidenceSubmitted();
         updateOutsourcingEvidenceSubmitted();
         updateEquipmentEvidenceSubmitted();
+        updateOutsourcingConstructionEvidenceSubmitted();
         updateGasolineTotalAmount();
         updateDieselTotalAmount();
         updateUreaTotalAmount();

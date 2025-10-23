@@ -82,6 +82,10 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
 
     public final ListPath<DailyReportOutsourcingCompany, QDailyReportOutsourcingCompany> outsourcingCompanies = this.<DailyReportOutsourcingCompany, QDailyReportOutsourcingCompany>createList("outsourcingCompanies", DailyReportOutsourcingCompany.class, QDailyReportOutsourcingCompany.class, PathInits.DIRECT2);
 
+    public final BooleanPath outsourcingConstructionEvidenceSubmitted = createBoolean("outsourcingConstructionEvidenceSubmitted");
+
+    public final NumberPath<Integer> outsourcingConstructionItemCount = createNumber("outsourcingConstructionItemCount", Integer.class);
+
     public final ListPath<DailyReportOutsourcingEquipment, QDailyReportOutsourcingEquipment> outsourcingEquipments = this.<DailyReportOutsourcingEquipment, QDailyReportOutsourcingEquipment>createList("outsourcingEquipments", DailyReportOutsourcingEquipment.class, QDailyReportOutsourcingEquipment.class, PathInits.DIRECT2);
 
     public final BooleanPath outsourcingEvidenceSubmitted = createBoolean("outsourcingEvidenceSubmitted");
