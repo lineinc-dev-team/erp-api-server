@@ -22,6 +22,7 @@ public record ContractEquipmentResponse(
         @Schema(description = "비고", example = "특수장비 운전자 필요") String memo,
         @Schema(description = "생성일시") OffsetDateTime createdAt,
         @Schema(description = "수정일시") OffsetDateTime updatedAt,
+        @Schema(description = "삭제 여부", example = "false") Boolean deleted,
         @Schema(description = "부속장비 목록") List<ContractSubEquipmentResponse> subEquipments) {
 
     public static ContractEquipmentResponse from(final OutsourcingCompanyContractEquipment equipment) {
@@ -38,6 +39,7 @@ public record ContractEquipmentResponse(
                 equipment.getMemo(),
                 equipment.getCreatedAt(),
                 equipment.getUpdatedAt(),
+                equipment.isDeleted(),
                 equipment.getSubEquipments() != null
                         ? equipment.getSubEquipments().stream().filter(subEquipment -> !subEquipment.isDeleted())
                                 .map(ContractSubEquipmentResponse::from)
