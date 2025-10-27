@@ -23,6 +23,7 @@ public final class AppConstants {
     public static final String LINE_INC_NAME = "라인공영";
 
     // 시스템 기본 메뉴 이름 관련 상수
+    public static final String MENU_AGGREGATION_MANAGEMENT = "집계 관리";
     public static final String MENU_ACCOUNT = "계정 관리";
     public static final String MENU_PERMISSION = "권한 관리";
     public static final String MENU_CLIENT_COMPANY = "발주처 관리";
@@ -40,20 +41,21 @@ public final class AppConstants {
 
     // 시스템 기본 메뉴 이름 목록 (순서대로 정렬)
     public static final List<String> MENU_NAMES = List.of(
-            MENU_CLIENT_COMPANY, // 1. 발주처 관리
-            MENU_SITE, // 2. 현장 관리
-            MENU_MATERIAL_MANAGEMENT, // 3. 자재 관리
-            MENU_STEEL_MANAGEMENT, // 4. 강재수불부 관리
-            MENU_FUEL_AGGREGATION, // 5. 유류집계 관리
-            MENU_LABOR_MANAGEMENT, // 6. 노무 관리
-            MENU_LABOR_PAYROLL, // 7. 노무명세서 관리
-            MENU_OUTSOURCING_COMPANY, // 8. 외주업체 관리
-            MENU_OUTSOURCING_COMPANY_CONTRACT, // 9. 외주업체 계약 관리
-            MENU_SITE_MANAGEMENT_COST, // 10. 현장/본사 관리비 관리
-            MENU_MANAGEMENT_COST, // 11. 관리비 관리
-            MENU_WORK_DAILY_REPORT, // 12. 출역일보
-            MENU_ACCOUNT, // 13. 계정 관리
-            MENU_PERMISSION // 14. 권한 관리
+            MENU_AGGREGATION_MANAGEMENT, // 1. 집계 관리
+            MENU_CLIENT_COMPANY, // 2. 발주처 관리
+            MENU_SITE, // 3. 현장 관리
+            MENU_MATERIAL_MANAGEMENT, // 4. 자재 관리
+            MENU_STEEL_MANAGEMENT, // 5. 강재수불부 관리
+            MENU_FUEL_AGGREGATION, // 6. 유류집계 관리
+            MENU_LABOR_MANAGEMENT, // 7. 노무 관리
+            MENU_LABOR_PAYROLL, // 8. 노무명세서 관리
+            MENU_OUTSOURCING_COMPANY, // 9. 외주업체 관리
+            MENU_OUTSOURCING_COMPANY_CONTRACT, // 10. 외주업체 계약 관리
+            MENU_SITE_MANAGEMENT_COST, // 11. 현장/본사 관리비 관리
+            MENU_MANAGEMENT_COST, // 12. 관리비 관리
+            MENU_WORK_DAILY_REPORT, // 13. 출역일보
+            MENU_ACCOUNT, // 14. 계정 관리
+            MENU_PERMISSION // 15. 권한 관리
     );
 
     // 직급(Grade) 관련 상수
