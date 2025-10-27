@@ -13,11 +13,12 @@ public enum FileUploadTarget {
     MATERIAL_MANAGEMENT("material-management"),
     FUEL_AGGREGATION("fuel-aggregation"),
     LABOR_MANAGEMENT("labor-management"),
-    WORK_DAILY_REPORT("work-daily-report");
+    WORK_DAILY_REPORT("work-daily-report"),
+    SITE_MANAGEMENT_COST("site-management-cost");
 
     private final String directory;
 
-    FileUploadTarget(String directory) {
+    FileUploadTarget(final String directory) {
         this.directory = directory;
     }
 }
