@@ -26,6 +26,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.requ
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -128,5 +129,21 @@ public class SiteManagementCostController extends BaseController {
                 parsed)) {
             workbook.write(response.getOutputStream());
         }
+    }
+
+    @GetMapping("/{id}/change-histories")
+    @Operation(summary = "현장관리비 변경 이력 조회", description = "현장관리비 변경 이력을 페이징하여 조회합니다.")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<SiteManagementCostChangeHistoryResponse>>> getSiteManagementCostChangeHistories(
+            @PathVariable final Long id,
+            @AuthenticationPrincipal final CustomUserDetails loginUser,
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest) {
+        final Page<SiteManagementCostChangeHistoryResponse> page = siteManagementCostService
+                .getSiteManagementCostChangeHistoriesWithPaging(
+                        id, loginUser,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 }

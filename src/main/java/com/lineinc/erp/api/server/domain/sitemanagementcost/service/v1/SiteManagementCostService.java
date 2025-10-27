@@ -33,6 +33,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
@@ -373,5 +374,22 @@ public class SiteManagementCostService {
             }
             default -> null;
         };
+    }
+
+    /**
+     * 현장관리비 ID로 변경 이력을 페이징하여 조회합니다.
+     * 
+     * @param siteManagementCostId 현장관리비 ID
+     * @param loginUser            로그인 사용자
+     * @param pageable             페이징 정보
+     * @return 현장관리비 변경 이력 페이지
+     */
+    public Page<SiteManagementCostChangeHistoryResponse> getSiteManagementCostChangeHistoriesWithPaging(
+            final Long siteManagementCostId,
+            final CustomUserDetails loginUser,
+            final Pageable pageable) {
+        final Page<SiteManagementCostChangeHistory> historyPage = siteManagementCostChangeHistoryRepository
+                .findBySiteManagementCostIdWithPaging(siteManagementCostId, pageable);
+        return historyPage.map(history -> SiteManagementCostChangeHistoryResponse.from(history, loginUser.getUserId()));
     }
 }
