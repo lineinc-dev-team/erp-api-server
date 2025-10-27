@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.sitemanagementcost.service.v1;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
@@ -40,7 +43,7 @@ public class SiteManagementCostService {
      * 현장관리비 생성
      */
     @Transactional
-    public SiteManagementCostResponse createSiteManagementCost(
+    public void createSiteManagementCost(
             final SiteManagementCostCreateRequest request,
             final CustomUserDetails userDetails) {
 
@@ -97,6 +100,15 @@ public class SiteManagementCostService {
                 .build();
         siteManagementCostChangeHistoryRepository.save(changeHistory);
 
-        return SiteManagementCostResponse.from(savedEntity);
+    }
+
+    /**
+     * 현장관리비 목록 조회 (페이징)
+     */
+    @Transactional(readOnly = true)
+    public Page<SiteManagementCostResponse> getSiteManagementCostList(
+            final SiteManagementCostListRequest request,
+            final Pageable pageable) {
+        return siteManagementCostRepository.findAll(request, pageable);
     }
 }

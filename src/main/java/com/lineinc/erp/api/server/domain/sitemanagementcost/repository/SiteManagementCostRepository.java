@@ -16,7 +16,7 @@ import com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagemen
  */
 @Repository
 public interface SiteManagementCostRepository
-        extends JpaRepository<SiteManagementCost, Long> {
+        extends JpaRepository<SiteManagementCost, Long>, SiteManagementCostRepositoryCustom {
 
     /**
      * 년월, 현장, 공정으로 현장관리비 존재 여부 확인

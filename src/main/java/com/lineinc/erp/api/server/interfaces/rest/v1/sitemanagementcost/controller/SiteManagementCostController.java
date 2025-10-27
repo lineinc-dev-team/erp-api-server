@@ -1,7 +1,9 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +15,15 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
+import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
+import com.lineinc.erp.api.server.shared.dto.response.PagingInfo;
+import com.lineinc.erp.api.server.shared.dto.response.PagingResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+import com.lineinc.erp.api.server.shared.util.PageableUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,13 +41,27 @@ public class SiteManagementCostController extends BaseController {
 
     private final SiteManagementCostService siteManagementCostService;
 
+    @GetMapping
+    @Operation(summary = "현장관리비 목록 조회", description = "현장관리비 목록을 조회합니다.")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<PagingResponse<SiteManagementCostResponse>>> getSiteManagementCostList(
+            @Valid final SiteManagementCostListRequest request,
+            @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest) {
+        final Page<SiteManagementCostResponse> page = siteManagementCostService.getSiteManagementCostList(
+                request,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        return ResponseEntity.ok(SuccessResponse.of(
+                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+
     @PostMapping
     @Operation(summary = "현장관리비 생성", description = "년월별 현장/공정 관리비를 생성합니다.")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.CREATE)
-    public ResponseEntity<SuccessResponse<SiteManagementCostResponse>> createSiteManagementCost(
+    public ResponseEntity<Void> createSiteManagementCost(
             @Valid @RequestBody final SiteManagementCostCreateRequest request,
             @AuthenticationPrincipal final CustomUserDetails user) {
-        final SiteManagementCostResponse response = siteManagementCostService.createSiteManagementCost(request, user);
-        return ResponseEntity.ok(SuccessResponse.of(response));
+        siteManagementCostService.createSiteManagementCost(request, user);
+        return ResponseEntity.ok().build();
     }
 }

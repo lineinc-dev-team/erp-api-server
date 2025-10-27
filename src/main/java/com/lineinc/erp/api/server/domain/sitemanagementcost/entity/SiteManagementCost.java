@@ -222,13 +222,4 @@ public class SiteManagementCost extends BaseEntity {
         return total;
     }
 
-    /**
-     * 전체 관리비 합계 계산 (현장관리비 + 본사관리비)
-     */
-    public Long calculateTotalManagementCost() {
-        long total = calculateSiteManagementTotal();
-        if (headquartersManagementCost != null)
-            total += headquartersManagementCost;
-        return total;
-    }
 }
