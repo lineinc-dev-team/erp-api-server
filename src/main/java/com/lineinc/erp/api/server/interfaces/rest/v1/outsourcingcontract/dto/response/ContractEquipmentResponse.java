@@ -52,6 +52,8 @@ public record ContractEquipmentResponse(
             @Schema(description = "장비 ID", example = "1") Long id,
             @Schema(description = "규격", example = "25톤 크레인") String specification,
             @Schema(description = "차량번호", example = "12가3456") String vehicleNumber,
+            @Schema(description = "단가", example = "500000") Long unitPrice,
+            @Schema(description = "작업내용", example = "강재 운반 및 설치") String taskDescription,
             @Schema(description = "카테고리", example = "크레인") String category,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted,
             @Schema(description = "부속장비 목록") List<ContractSubEquipmentResponse> subEquipments) {
@@ -61,6 +63,8 @@ public record ContractEquipmentResponse(
                     equipment.getId(),
                     equipment.getSpecification(),
                     equipment.getVehicleNumber(),
+                    equipment.getUnitPrice(),
+                    equipment.getTaskDescription(),
                     equipment.getCategory(),
                     equipment.isDeleted(),
                     equipment.getSubEquipments() != null
