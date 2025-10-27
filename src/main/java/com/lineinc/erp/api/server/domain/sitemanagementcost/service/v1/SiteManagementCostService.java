@@ -127,6 +127,8 @@ public class SiteManagementCostService {
                 .build();
         siteManagementCostChangeHistoryRepository.save(changeHistory);
 
+        // 노무명세서 기준으로 4대보험(일용) 동기화
+        syncMajorInsuranceDailyFromLaborPayroll(site, siteProcess, request.yearMonth(), userDetails.getUserId());
     }
 
     /**
