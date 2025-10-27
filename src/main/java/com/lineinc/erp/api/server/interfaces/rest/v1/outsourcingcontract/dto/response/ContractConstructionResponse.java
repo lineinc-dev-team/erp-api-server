@@ -41,7 +41,7 @@ public record ContractConstructionResponse(
 
     @Schema(description = "외주업체 계약 공사항목 간단 정보 응답")
     public record ContractConstructionSimpleResponse(
-            @Schema(description = "공사항목 ID", example = "1") Long id,
+            @Schema(description = "공사항목 ID", example = "1") Long outsourcingCompanyContractConstructionId,
             @Schema(description = "항목", example = "콘크리트 타설") String item,
             @Schema(description = "단위", example = "m³") String unit,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
