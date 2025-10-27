@@ -46,6 +46,8 @@ public class QSiteManagementCostChangeHistory extends EntityPathBase<SiteManagem
 
     public final QSiteManagementCost siteManagementCost;
 
+    public final EnumPath<com.lineinc.erp.api.server.domain.sitemanagementcost.enums.SiteManagementCostChangeHistoryType> type = createEnum("type", com.lineinc.erp.api.server.domain.sitemanagementcost.enums.SiteManagementCostChangeHistoryType.class);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 
