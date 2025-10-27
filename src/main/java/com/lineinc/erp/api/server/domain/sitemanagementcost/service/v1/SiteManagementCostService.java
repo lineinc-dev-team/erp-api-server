@@ -231,6 +231,18 @@ public class SiteManagementCostService {
                 siteManagementCostChangeHistoryRepository.save(headquartersChangeHistory);
             }
         }
+
+        // 변경이력 메모 수정 처리
+        if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
+            for (final SiteManagementCostUpdateRequest.ChangeHistoryRequest historyRequest : request
+                    .changeHistories()) {
+                siteManagementCostChangeHistoryRepository.findById(historyRequest.id())
+                        .filter(history -> history.getSiteManagementCost().getId().equals(siteManagementCost.getId()))
+                        .ifPresent(history -> {
+                            history.setMemo(historyRequest.memo());
+                        });
+            }
+        }
     }
 
     /**
