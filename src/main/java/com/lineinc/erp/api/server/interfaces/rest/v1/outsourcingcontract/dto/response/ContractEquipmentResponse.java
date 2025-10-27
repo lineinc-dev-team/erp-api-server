@@ -51,7 +51,8 @@ public record ContractEquipmentResponse(
             @Schema(description = "규격", example = "25톤 크레인") String specification,
             @Schema(description = "차량번호", example = "12가3456") String vehicleNumber,
             @Schema(description = "카테고리", example = "크레인") String category,
-            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted,
+            @Schema(description = "부속장비 목록") List<ContractSubEquipmentResponse> subEquipments) {
 
         public static ContractEquipmentSimpleResponse from(final OutsourcingCompanyContractEquipment equipment) {
             return new ContractEquipmentSimpleResponse(
@@ -59,7 +60,12 @@ public record ContractEquipmentResponse(
                     equipment.getSpecification(),
                     equipment.getVehicleNumber(),
                     equipment.getCategory(),
-                    equipment.isDeleted());
+                    equipment.isDeleted(),
+                    equipment.getSubEquipments() != null
+                            ? equipment.getSubEquipments().stream().filter(subEquipment -> !subEquipment.isDeleted())
+                                    .map(ContractSubEquipmentResponse::from)
+                                    .toList()
+                            : List.of());
 
         }
     }

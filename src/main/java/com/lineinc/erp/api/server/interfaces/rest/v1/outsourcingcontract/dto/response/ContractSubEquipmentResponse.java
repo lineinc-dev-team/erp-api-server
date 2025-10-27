@@ -12,7 +12,8 @@ public record ContractSubEquipmentResponse(
         @Schema(description = "설명", example = "비트손료") String description,
         @Schema(description = "단가", example = "10000") Long unitPrice,
         @Schema(description = "작업내용", example = "죽통 임대료") String taskDescription,
-        @Schema(description = "메모", example = "특수 부속장비") String memo) {
+        @Schema(description = "메모", example = "특수 부속장비") String memo,
+        @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
     public static ContractSubEquipmentResponse from(final OutsourcingCompanyContractSubEquipment subEquipment) {
         return new ContractSubEquipmentResponse(
@@ -22,6 +23,7 @@ public record ContractSubEquipmentResponse(
                 subEquipment.getDescription(),
                 subEquipment.getUnitPrice(),
                 subEquipment.getTaskDescription(),
-                subEquipment.getMemo());
+                subEquipment.getMemo(),
+                subEquipment.isDeleted());
     }
 }
