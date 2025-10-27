@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
@@ -85,6 +86,26 @@ public class SiteManagementCostRepositoryImpl implements SiteManagementCostRepos
                 .toList();
 
         return new PageImpl<>(responses, pageable, total);
+    }
+
+    @Override
+    public List<SiteManagementCost> findAllWithoutPaging(
+            final SiteManagementCostListRequest request,
+            final Sort sort) {
+
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
+
+        return queryFactory
+                .selectFrom(siteManagementCost)
+                .leftJoin(siteManagementCost.site, site).fetchJoin()
+                .leftJoin(siteManagementCost.siteProcess, siteProcess).fetchJoin()
+                .where(
+                        yearMonthBetween(request.startYearMonth(), request.endYearMonth()),
+                        siteNameContains(request.siteName()),
+                        siteProcessNameContains(request.siteProcessName()),
+                        siteManagementCost.deleted.eq(false))
+                .orderBy(orders)
+                .fetch();
     }
 
     // 동적 쿼리 조건 메서드들

@@ -20,6 +20,7 @@ public enum ExcelDownloadHistoryType {
     OUTSOURCING_COMPANY("외주업체 목록"),
     OUTSOURCING_COMPANY_CONTRACT("외주업체 계약 목록"),
     MANAGEMENT_COST("관리비 목록"),
+    SITE_MANAGEMENT_COST("현장관리비 목록"),
     ACCOUNT("유저 목록");
 
     private final String label;

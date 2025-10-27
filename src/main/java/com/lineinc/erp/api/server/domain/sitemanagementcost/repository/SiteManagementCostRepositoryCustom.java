@@ -1,8 +1,12 @@
 package com.lineinc.erp.api.server.domain.sitemanagementcost.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagementCost;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 
@@ -15,4 +19,9 @@ public interface SiteManagementCostRepositoryCustom {
      * 현장관리비 목록 조회 (페이징)
      */
     Page<SiteManagementCostResponse> findAll(SiteManagementCostListRequest request, Pageable pageable);
+
+    /**
+     * 현장관리비 목록 조회 (페이징 없음, 엑셀 다운로드용)
+     */
+    List<SiteManagementCost> findAllWithoutPaging(SiteManagementCostListRequest request, Sort sort);
 }
