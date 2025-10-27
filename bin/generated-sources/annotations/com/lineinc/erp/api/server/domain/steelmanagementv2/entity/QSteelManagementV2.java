@@ -78,6 +78,10 @@ public class QSteelManagementV2 extends EntityPathBase<SteelManagementV2> {
 
     public final NumberPath<Long> totalInvestmentAmount = createNumber("totalInvestmentAmount", Long.class);
 
+    public final NumberPath<Long> totalSupplyPrice = createNumber("totalSupplyPrice", Long.class);
+
+    public final NumberPath<Long> totalVat = createNumber("totalVat", Long.class);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 

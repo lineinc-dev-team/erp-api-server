@@ -170,6 +170,18 @@ public class SteelManagementV2 extends BaseEntity {
     @Column
     private Long totalInvestmentAmount;
     /**
+     * 총 공급가
+     * 계산식: 총 금액(투입비) / 1.1 (VAT 10% 제외)
+     */
+    @Column
+    private Long totalSupplyPrice;
+    /**
+     * 부가세 (VAT)
+     * 계산식: 총 공급가 * 10%
+     */
+    @Column
+    private Long totalVat;
+    /**
      * 현장보류수량 (톤)
      * 계산식: 입고 소계 총무게 - 출고 소계 총무게 - 고철 총무게
      */
@@ -244,6 +256,12 @@ public class SteelManagementV2 extends BaseEntity {
         // 총 금액(투입비) = 입고 소계(금액) + 출고 소계(금액) - 고철(금액)
         this.totalInvestmentAmount = incomingSubtotal + outgoingSubtotal
                 - (this.scrapAmount != null ? this.scrapAmount : 0L);
+
+        // 총 공급가 = 총 금액(투입비) / 1.1 (VAT 10% 제외)
+        this.totalSupplyPrice = Math.round(this.totalInvestmentAmount / 1.1);
+
+        // 부가세 = 총 금액(투입비) - 총 공급가
+        this.totalVat = this.totalInvestmentAmount - this.totalSupplyPrice;
 
         // 현장보류수량(톤) = 입고 소계(총무게) - 출고 소계(총무게) - 고철(총무게)
         final double incomingWeightSubtotal = (this.incomingOwnMaterialTotalWeight != null
