@@ -2,8 +2,11 @@ package com.lineinc.erp.api.server.domain.sitemanagementcost.service.v1;
 
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.javers.core.Javers;
+import org.javers.core.diff.Diff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +24,7 @@ import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
 import com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagementCost;
 import com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagementCostChangeHistory;
+import com.lineinc.erp.api.server.domain.sitemanagementcost.enums.SiteManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.sitemanagementcost.repository.SiteManagementCostChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.sitemanagementcost.repository.SiteManagementCostRepository;
 import com.lineinc.erp.api.server.domain.user.entity.User;
@@ -28,10 +32,12 @@ import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
+import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,6 +56,7 @@ public class SiteManagementCostService {
     private final UserService userService;
     private final S3FileService s3FileService;
     private final ExcelDownloadHistoryService excelDownloadHistoryService;
+    private final Javers javers;
 
     /**
      * 현장관리비 생성
@@ -135,6 +142,99 @@ public class SiteManagementCostService {
                         ValidationMessages.SITE_MANAGEMENT_COST_NOT_FOUND));
 
         return SiteManagementCostDetailResponse.from(siteManagementCost);
+    }
+
+    /**
+     * 현장관리비 수정
+     */
+    @Transactional
+    public void updateSiteManagementCost(
+            final Long id,
+            final SiteManagementCostUpdateRequest request,
+            final CustomUserDetails userDetails) {
+
+        // 현장관리비 조회
+        final SiteManagementCost siteManagementCost = siteManagementCostRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        ValidationMessages.SITE_MANAGEMENT_COST_NOT_FOUND));
+
+        // 수정 전 스냅샷 생성
+        final SiteManagementCost oldSnapshot = JaversUtils.createSnapshot(javers, siteManagementCost,
+                SiteManagementCost.class);
+        siteManagementCost.updateFrom(request);
+
+        siteManagementCostRepository.save(siteManagementCost);
+
+        // 변경 이력 저장
+        final Diff diff = javers.compare(oldSnapshot, siteManagementCost);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+
+        System.out.println("simpleChanges: " + simpleChanges);
+
+        if (!simpleChanges.isEmpty()) {
+            final User user = userService.getUserByIdOrThrow(userDetails.getUserId());
+
+            // 현장관리비 관련 필드
+            final List<String> siteManagementFields = List.of(
+                    "employeeSalary", "employeeSalaryMemo",
+                    "regularRetirementPension", "regularRetirementPensionMemo",
+                    "retirementDeduction", "retirementDeductionMemo",
+                    "majorInsuranceRegular", "majorInsuranceRegularMemo",
+                    "majorInsuranceDaily", "majorInsuranceDailyMemo",
+                    "contractGuaranteeFee", "contractGuaranteeFeeMemo",
+                    "equipmentGuaranteeFee", "equipmentGuaranteeFeeMemo",
+                    "nationalTaxPayment", "nationalTaxPaymentMemo");
+
+            // 본사관리비 관련 필드
+            final List<String> headquartersManagementFields = List.of(
+                    "headquartersManagementCost", "headquartersManagementCostMemo");
+
+            // 현장관리비 변경 내역 필터링
+            final List<Map<String, String>> siteManagementChanges = simpleChanges.stream()
+                    .filter(change -> {
+                        final String property = change.get("property");
+                        return property != null && siteManagementFields.contains(property);
+                    })
+                    .toList();
+
+            // 본사관리비 변경 내역 필터링
+            final List<Map<String, String>> headquartersManagementChanges = simpleChanges.stream()
+                    .filter(change -> {
+                        final String property = change.get("property");
+                        return property != null && headquartersManagementFields.contains(property);
+                    })
+                    .toList();
+
+            System.out.println("siteManagementChanges: " + siteManagementChanges);
+            System.out.println("headquartersManagementChanges: " + headquartersManagementChanges);
+
+            // 현장관리비 변경 이력 생성
+            if (!siteManagementChanges.isEmpty()) {
+                final String siteManagementChangesJson = javers.getJsonConverter().toJson(siteManagementChanges);
+                final SiteManagementCostChangeHistory siteChangeHistory = SiteManagementCostChangeHistory.builder()
+                        .siteManagementCost(siteManagementCost)
+                        .type(SiteManagementCostChangeHistoryType.SITE_MANAGEMENT_COST)
+                        .changes(siteManagementChangesJson)
+                        .user(user)
+                        .build();
+                siteManagementCostChangeHistoryRepository.save(siteChangeHistory);
+            }
+
+            // 본사관리비 변경 이력 생성
+            if (!headquartersManagementChanges.isEmpty()) {
+                final String headquartersManagementChangesJson = javers.getJsonConverter()
+                        .toJson(headquartersManagementChanges);
+                final SiteManagementCostChangeHistory headquartersChangeHistory = SiteManagementCostChangeHistory
+                        .builder()
+                        .siteManagementCost(siteManagementCost)
+                        .type(SiteManagementCostChangeHistoryType.HEADQUARTERS_MANAGEMENT_COST)
+                        .changes(headquartersManagementChangesJson)
+                        .user(user)
+                        .build();
+                siteManagementCostChangeHistoryRepository.save(headquartersChangeHistory);
+            }
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.requ
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostDeleteRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -83,6 +85,17 @@ public class SiteManagementCostController extends BaseController {
             @Valid @RequestBody final SiteManagementCostCreateRequest request,
             @AuthenticationPrincipal final CustomUserDetails user) {
         siteManagementCostService.createSiteManagementCost(request, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "현장관리비 수정", description = "현장관리비 정보를 수정합니다.")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateSiteManagementCost(
+            @PathVariable final Long id,
+            @Valid @RequestBody final SiteManagementCostUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        siteManagementCostService.updateSiteManagementCost(id, request, user);
         return ResponseEntity.ok().build();
     }
 

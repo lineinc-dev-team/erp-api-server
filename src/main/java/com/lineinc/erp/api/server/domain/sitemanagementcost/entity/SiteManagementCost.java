@@ -6,6 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -220,6 +221,28 @@ public class SiteManagementCost extends BaseEntity {
         if (nationalTaxPayment != null)
             total += nationalTaxPayment;
         return total;
+    }
+
+    public void updateFrom(
+            final SiteManagementCostUpdateRequest request) {
+        this.employeeSalary = request.employeeSalary();
+        this.employeeSalaryMemo = request.employeeSalaryMemo();
+        this.regularRetirementPension = request.regularRetirementPension();
+        this.regularRetirementPensionMemo = request.regularRetirementPensionMemo();
+        this.retirementDeduction = request.retirementDeduction();
+        this.retirementDeductionMemo = request.retirementDeductionMemo();
+        this.majorInsuranceRegular = request.majorInsuranceRegular();
+        this.majorInsuranceRegularMemo = request.majorInsuranceRegularMemo();
+        this.majorInsuranceDaily = request.majorInsuranceDaily();
+        this.majorInsuranceDailyMemo = request.majorInsuranceDailyMemo();
+        this.contractGuaranteeFee = request.contractGuaranteeFee();
+        this.contractGuaranteeFeeMemo = request.contractGuaranteeFeeMemo();
+        this.equipmentGuaranteeFee = request.equipmentGuaranteeFee();
+        this.equipmentGuaranteeFeeMemo = request.equipmentGuaranteeFeeMemo();
+        this.nationalTaxPayment = request.nationalTaxPayment();
+        this.nationalTaxPaymentMemo = request.nationalTaxPaymentMemo();
+        this.headquartersManagementCost = request.headquartersManagementCost();
+        this.headquartersManagementCostMemo = request.headquartersManagementCostMemo();
     }
 
 }
