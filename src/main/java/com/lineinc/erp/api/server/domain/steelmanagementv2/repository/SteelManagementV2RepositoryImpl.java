@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.steelmanagementv2.repository;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,8 @@ import org.springframework.util.StringUtils;
 
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.QSteelManagementDetailV2;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.QSteelManagementV2;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagementV2;
@@ -143,5 +147,32 @@ public class SteelManagementV2RepositoryImpl implements SteelManagementV2Reposit
             builder.and(steelManagementV2.createdAt.lt(dateRange[1]));
         }
         return builder;
+    }
+
+    @Override
+    public List<SteelManagementV2> findBySiteAndSiteProcessAndYearMonthLessThanEqual(
+            final Site site,
+            final SiteProcess siteProcess,
+            final String yearMonth) {
+        final BooleanBuilder builder = new BooleanBuilder();
+        builder.and(steelManagementV2.deleted.isFalse());
+        builder.and(steelManagementV2.site.eq(site));
+        builder.and(steelManagementV2.siteProcess.eq(siteProcess));
+
+        // 년월 파싱하여 UTC 기준 다음 달 1일 00:00로 변환
+        final YearMonth ym = YearMonth.parse(yearMonth);
+        final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
+        final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
+
+        // createdAt이 조회월 이하인 데이터 조회 (UTC 기준 다음 달 1일 미만)
+        builder.and(steelManagementV2.createdAt.lt(endDateTime));
+
+        return queryFactory
+                .selectFrom(steelManagementV2)
+                .leftJoin(steelManagementV2.site, this.site).fetchJoin()
+                .leftJoin(steelManagementV2.siteProcess, this.siteProcess).fetchJoin()
+                .where(builder)
+                .orderBy(steelManagementV2.createdAt.asc())
+                .fetch();
     }
 }

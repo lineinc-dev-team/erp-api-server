@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.repository;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.QFuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.QFuelInfo;
@@ -21,6 +24,8 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOuts
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -169,5 +174,32 @@ public class FuelAggregationRepositoryImpl implements FuelAggregationRepositoryC
         return fuelInfoContent.stream()
                 .map(info -> FuelAggregationListResponse.from(info.getFuelAggregation(), info))
                 .toList();
+    }
+
+    @Override
+    public List<FuelAggregation> findBySiteAndSiteProcessAndYearMonthLessThanEqual(
+            final Site site,
+            final SiteProcess siteProcess,
+            final String yearMonth) {
+        final BooleanBuilder builder = new BooleanBuilder();
+        builder.and(fuelAggregation.deleted.eq(false));
+        builder.and(fuelAggregation.site.eq(site));
+        builder.and(fuelAggregation.siteProcess.eq(siteProcess));
+
+        // 년월 파싱하여 UTC 기준 다음 달 1일 00:00로 변환
+        final YearMonth ym = YearMonth.parse(yearMonth);
+        final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
+        final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
+
+        // date가 조회월 이하인 데이터 조회 (UTC 기준 다음 달 1일 미만)
+        builder.and(fuelAggregation.date.lt(endDateTime));
+
+        return queryFactory
+                .selectFrom(fuelAggregation)
+                .leftJoin(fuelAggregation.site, this.site).fetchJoin()
+                .leftJoin(fuelAggregation.siteProcess, this.siteProcess).fetchJoin()
+                .where(builder)
+                .orderBy(fuelAggregation.date.asc())
+                .fetch();
     }
 }

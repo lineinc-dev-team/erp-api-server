@@ -24,4 +24,10 @@ public interface SiteRepository extends JpaRepository<Site, Long>, SiteRepositor
             AND (:siteIds IS NULL OR s.id IN :siteIds)""")
     Slice<Site> findByNameContainingIgnoreCaseAndIdIn(@Param("keyword") String keyword,
             @Param("siteIds") List<Long> siteIds, Pageable pageable);
+
+    /**
+     * 현장명으로 조회
+     */
+    @Query("SELECT s FROM Site s WHERE s.name = :name AND s.deleted = false")
+    java.util.Optional<Site> findByName(@Param("name") String name);
 }

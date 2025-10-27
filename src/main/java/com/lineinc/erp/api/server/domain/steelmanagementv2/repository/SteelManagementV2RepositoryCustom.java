@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagementV2;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request.SteelManagementV2ListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
 
@@ -25,4 +28,17 @@ public interface SteelManagementV2RepositoryCustom {
             SteelManagementV2ListRequest request,
             Sort sort,
             List<Long> accessibleSiteIds);
+
+    /**
+     * 현장, 공정, 조회월 이하로 강재수불부 V2 목록을 조회합니다.
+     * 
+     * @param site        현장
+     * @param siteProcess 공정
+     * @param yearMonth   조회월 (YYYY-MM)
+     * @return 강재수불부 V2 목록
+     */
+    List<SteelManagementV2> findBySiteAndSiteProcessAndYearMonthLessThanEqual(
+            Site site,
+            SiteProcess siteProcess,
+            String yearMonth);
 }

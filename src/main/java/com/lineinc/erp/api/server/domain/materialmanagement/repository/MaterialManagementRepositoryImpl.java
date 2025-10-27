@@ -1,6 +1,8 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.repository;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,12 +14,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.QMaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.response.MaterialManagementResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -159,6 +164,34 @@ public class MaterialManagementRepositoryImpl implements MaterialManagementRepos
                 .toList();
 
         return responses;
+    }
+
+    @Override
+    public List<MaterialManagement> findBySiteAndSiteProcessAndYearMonthLessThanEqual(
+            final Site site,
+            final SiteProcess siteProcess,
+            final String yearMonth) {
+        final BooleanBuilder builder = new BooleanBuilder();
+        builder.and(materialManagement.deleted.eq(false));
+        builder.and(materialManagement.site.eq(site));
+        builder.and(materialManagement.siteProcess.eq(siteProcess));
+
+        // 년월 파싱하여 UTC 기준 다음 달 1일 00:00로 변환
+        final YearMonth ym = YearMonth.parse(yearMonth);
+        final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
+        final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
+
+        // deliveryDate가 조회월 이하인 데이터 조회 (UTC 기준 다음 달 1일 미만)
+        builder.and(materialManagement.deliveryDate.lt(endDateTime));
+
+        return queryFactory
+                .selectFrom(materialManagement)
+                .leftJoin(materialManagement.site, this.site).fetchJoin()
+                .leftJoin(materialManagement.siteProcess, this.siteProcess).fetchJoin()
+                .leftJoin(materialManagement.outsourcingCompany, this.outsourcingCompany).fetchJoin()
+                .where(builder)
+                .orderBy(materialManagement.deliveryDate.asc())
+                .fetch();
     }
 
 }

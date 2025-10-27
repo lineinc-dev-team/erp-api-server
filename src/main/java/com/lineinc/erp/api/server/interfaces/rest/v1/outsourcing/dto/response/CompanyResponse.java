@@ -102,6 +102,8 @@ public record CompanyResponse(
             @Schema(description = "공제 항목", example = "4대보험,소득세") String defaultDeductions,
             @Schema(description = "공제 항목 코드", example = "FOUR_INSURANCE,INCOME_TAX") String defaultDeductionsCode,
             @Schema(description = "공제 항목 설명", example = "4대 보험, 소득세") String defaultDeductionsDescription,
+            @Schema(description = "전화번호", example = "02-1234-5678") String landlineNumber,
+            @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static CompanyResponse.CompanySimpleResponse from(final OutsourcingCompany company) {
             return new CompanyResponse.CompanySimpleResponse(
@@ -122,6 +124,8 @@ public record CompanyResponse(
                             : null,
                     company.getDefaultDeductions(),
                     company.getDefaultDeductionsDescription(),
+                    company.getLandlineNumber(),
+                    company.getPhoneNumber(),
                     company.isDeleted());
         }
     }
