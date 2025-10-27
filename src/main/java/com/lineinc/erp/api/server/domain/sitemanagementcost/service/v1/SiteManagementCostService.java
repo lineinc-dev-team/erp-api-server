@@ -28,6 +28,7 @@ import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -121,6 +122,19 @@ public class SiteManagementCostService {
             final SiteManagementCostListRequest request,
             final Pageable pageable) {
         return siteManagementCostRepository.findAll(request, pageable);
+    }
+
+    /**
+     * 현장관리비 상세 조회
+     */
+    @Transactional(readOnly = true)
+    public SiteManagementCostDetailResponse getSiteManagementCostDetail(final Long id) {
+        final SiteManagementCost siteManagementCost = siteManagementCostRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        ValidationMessages.SITE_MANAGEMENT_COST_NOT_FOUND));
+
+        return SiteManagementCostDetailResponse.from(siteManagementCost);
     }
 
     /**

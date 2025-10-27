@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.requ
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostDeleteRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
@@ -63,6 +65,15 @@ public class SiteManagementCostController extends BaseController {
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "현장관리비 상세 조회", description = "ID로 현장관리비 상세 정보를 조회합니다.")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SiteManagementCostDetailResponse>> getSiteManagementCostDetail(
+            @PathVariable final Long id) {
+        final SiteManagementCostDetailResponse response = siteManagementCostService.getSiteManagementCostDetail(id);
+        return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
     @PostMapping
