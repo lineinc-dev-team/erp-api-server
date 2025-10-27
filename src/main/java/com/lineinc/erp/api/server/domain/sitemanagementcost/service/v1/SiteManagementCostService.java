@@ -170,8 +170,6 @@ public class SiteManagementCostService {
         final Diff diff = javers.compare(oldSnapshot, siteManagementCost);
         final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
 
-        System.out.println("simpleChanges: " + simpleChanges);
-
         if (!simpleChanges.isEmpty()) {
             final User user = userService.getUserByIdOrThrow(userDetails.getUserId());
 
@@ -205,9 +203,6 @@ public class SiteManagementCostService {
                         return property != null && headquartersManagementFields.contains(property);
                     })
                     .toList();
-
-            System.out.println("siteManagementChanges: " + siteManagementChanges);
-            System.out.println("headquartersManagementChanges: " + headquartersManagementChanges);
 
             // 현장관리비 변경 이력 생성
             if (!siteManagementChanges.isEmpty()) {
