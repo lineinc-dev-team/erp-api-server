@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.sitemanagementcost.service.v1;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -110,5 +112,26 @@ public class SiteManagementCostService {
             final SiteManagementCostListRequest request,
             final Pageable pageable) {
         return siteManagementCostRepository.findAll(request, pageable);
+    }
+
+    /**
+     * 현장관리비 삭제
+     */
+    @Transactional
+    public void deleteSiteManagementCosts(final List<Long> siteManagementCostIds) {
+        // 현장관리비들이 존재하는지 확인
+        final List<SiteManagementCost> siteManagementCosts = siteManagementCostRepository
+                .findAllById(siteManagementCostIds);
+
+        if (siteManagementCosts.size() != siteManagementCostIds.size()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    ValidationMessages.SITE_MANAGEMENT_COST_NOT_FOUND);
+        }
+
+        // 각 현장관리비에 대해 소프트 삭제 처리
+        for (final SiteManagementCost siteManagementCost : siteManagementCosts) {
+            siteManagementCost.markAsDeleted();
+        }
     }
 }

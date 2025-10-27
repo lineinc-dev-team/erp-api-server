@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.control
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostDeleteRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.request.SiteManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.sitemanagementcost.dto.response.SiteManagementCostResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -62,6 +64,15 @@ public class SiteManagementCostController extends BaseController {
             @Valid @RequestBody final SiteManagementCostCreateRequest request,
             @AuthenticationPrincipal final CustomUserDetails user) {
         siteManagementCostService.createSiteManagementCost(request, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping
+    @Operation(summary = "현장관리비 삭제", description = "하나 이상의 현장관리비 ID를 받아 해당 관리비를 삭제합니다.")
+    @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.DELETE)
+    public ResponseEntity<Void> deleteSiteManagementCosts(
+            @Valid @RequestBody final SiteManagementCostDeleteRequest request) {
+        siteManagementCostService.deleteSiteManagementCosts(request.siteManagementCostIds());
         return ResponseEntity.ok().build();
     }
 }

@@ -89,6 +89,7 @@ public class ValidationMessages {
 
     // ===== 현장관리비 관련 메시지 =====
     public static final String SITE_MANAGEMENT_COST_ALREADY_EXISTS = "해당 년월, 현장, 공정에 대한 현장관리비 데이터가 이미 존재합니다.";
+    public static final String SITE_MANAGEMENT_COST_NOT_FOUND = "존재하지 않는 현장관리비입니다.";
 
     // ===== 입력값 검증 관련 메시지 =====
     public static final String INVALID_PHONE = "유효한 휴대폰 번호 형식이 아닙니다.";
