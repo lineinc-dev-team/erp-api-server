@@ -27,6 +27,7 @@ public final class AppConstants {
     public static final String MENU_PERMISSION = "권한 관리";
     public static final String MENU_CLIENT_COMPANY = "발주처 관리";
     public static final String MENU_SITE = "현장 관리";
+    public static final String MENU_SITE_MANAGEMENT_COST = "현장/본사 관리비 관리";
     public static final String MENU_MANAGEMENT_COST = "관리비 관리";
     public static final String MENU_STEEL_MANAGEMENT = "강재수불부 관리";
     public static final String MENU_MATERIAL_MANAGEMENT = "자재 관리";
@@ -48,10 +49,11 @@ public final class AppConstants {
             MENU_LABOR_PAYROLL, // 7. 노무명세서 관리
             MENU_OUTSOURCING_COMPANY, // 8. 외주업체 관리
             MENU_OUTSOURCING_COMPANY_CONTRACT, // 9. 외주업체 계약 관리
-            MENU_MANAGEMENT_COST, // 10. 관리비 관리
-            MENU_WORK_DAILY_REPORT, // 11. 출역일보
-            MENU_ACCOUNT, // 12. 계정 관리
-            MENU_PERMISSION // 13. 권한 관리
+            MENU_SITE_MANAGEMENT_COST, // 10. 현장/본사 관리비 관리
+            MENU_MANAGEMENT_COST, // 11. 관리비 관리
+            MENU_WORK_DAILY_REPORT, // 12. 출역일보
+            MENU_ACCOUNT, // 13. 계정 관리
+            MENU_PERMISSION // 14. 권한 관리
     );
 
     // 직급(Grade) 관련 상수
