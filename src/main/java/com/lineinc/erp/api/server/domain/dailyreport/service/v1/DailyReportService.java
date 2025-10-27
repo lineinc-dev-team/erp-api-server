@@ -35,7 +35,6 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWork;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportWorkDetail;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
-import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportOutsourcingConstructionGroupRepository;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
@@ -121,7 +120,6 @@ import lombok.RequiredArgsConstructor;
 public class DailyReportService {
 
     private final DailyReportRepository dailyReportRepository;
-    private final DailyReportOutsourcingConstructionGroupRepository dailyReportOutsourcingConstructionGroupRepository;
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
     private final LaborService laborService;
