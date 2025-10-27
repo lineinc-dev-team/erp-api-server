@@ -541,7 +541,7 @@ public class DailyReportService {
         dailyReportRepository.save(savedDailyReport);
 
         // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
     }
 
     public DailyReport getDailyReportById(final Long id) {
@@ -883,7 +883,7 @@ public class DailyReportService {
 
     @Transactional
     public void updateDailyReportEmployees(final DailyReportSearchRequest searchRequest,
-            final DailyReportEmployeeUpdateRequest request) {
+            final DailyReportEmployeeUpdateRequest request, final Long userId) {
 
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
@@ -952,7 +952,7 @@ public class DailyReportService {
         dailyReportRepository.save(savedDailyReport);
 
         // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
     }
 
     @Transactional
@@ -1056,7 +1056,7 @@ public class DailyReportService {
         dailyReportRepository.save(savedDailyReport);
 
         // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport);
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
     }
 
     @Transactional

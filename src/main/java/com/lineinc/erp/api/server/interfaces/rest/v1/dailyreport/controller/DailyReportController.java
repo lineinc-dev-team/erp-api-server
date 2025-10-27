@@ -136,8 +136,9 @@ public class DailyReportController extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportEmployee(
             @Valid final DailyReportSearchRequest searchRequest,
-            @Valid @RequestBody final DailyReportEmployeeUpdateRequest request) {
-        dailyReportService.updateDailyReportEmployees(searchRequest, request);
+            @Valid @RequestBody final DailyReportEmployeeUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        dailyReportService.updateDailyReportEmployees(searchRequest, request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 

@@ -27,6 +27,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRep
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollSummaryRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.sitemanagementcost.service.v1.SiteManagementCostService;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -46,12 +47,13 @@ public class LaborPayrollSyncService {
     private final LaborPayrollSummaryRepository laborPayrollSummaryRepository;
     private final LaborPayrollChangeHistoryRepository laborPayrollChangeHistoryRepository;
     private final DailyReportRepository dailyReportRepository;
+    private final SiteManagementCostService siteManagementCostService;
 
     /**
      * 출역일보 변경 시 노무비 명세서 동기화
      * 해당 현장/공정의 해당 월 데이터를 재생성
      */
-    public void syncLaborPayrollFromDailyReport(final DailyReport dailyReport) {
+    public void syncLaborPayrollFromDailyReport(final DailyReport dailyReport, final Long userId) {
         final LocalDate reportDate = DateTimeFormatUtils.toKoreaLocalDate(dailyReport.getReportDate());
         final String yearMonth = String.format("%04d-%02d", reportDate.getYear(), reportDate.getMonthValue());
 
@@ -71,6 +73,10 @@ public class LaborPayrollSyncService {
         // 4. 집계 테이블 재생성
         regenerateSummaryTable(dailyReport.getSite(), dailyReport.getSiteProcess(),
                 yearMonth);
+
+        // 5. 현장관리비 4대보험(일용) 동기화
+        siteManagementCostService.syncMajorInsuranceDailyFromLaborPayroll(
+                dailyReport.getSite(), dailyReport.getSiteProcess(), yearMonth, userId);
 
         log.info("노무비 명세서 동기화 완료: 출역일보 ID={}", dailyReport.getId());
     }

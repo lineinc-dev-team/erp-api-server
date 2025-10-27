@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.sitemanagementcost.service.v1;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
+import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
@@ -41,10 +45,12 @@ import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 현장관리비 Service
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SiteManagementCostService {
@@ -57,6 +63,7 @@ public class SiteManagementCostService {
     private final UserService userService;
     private final S3FileService s3FileService;
     private final ExcelDownloadHistoryService excelDownloadHistoryService;
+    private final LaborPayrollRepository laborPayrollRepository;
     private final Javers javers;
 
     /**
@@ -403,5 +410,83 @@ public class SiteManagementCostService {
         final Page<SiteManagementCostChangeHistory> historyPage = siteManagementCostChangeHistoryRepository
                 .findBySiteManagementCostIdWithPaging(siteManagementCostId, pageable);
         return historyPage.map(history -> SiteManagementCostChangeHistoryResponse.from(history, loginUser.getUserId()));
+    }
+
+    /**
+     * 노무명세서 기준으로 4대보험(일용) 동기화
+     * 직영, 용역, 기타(정직원 제외) 총 공제액 합계를 현장관리비 4대보험(일용)에 반영
+     * 
+     * @param site        현장
+     * @param siteProcess 공정
+     * @param yearMonth   년월
+     */
+    @Transactional
+    public void syncMajorInsuranceDailyFromLaborPayroll(
+            final Site site,
+            final SiteProcess siteProcess,
+            final String yearMonth,
+            final Long userId) {
+
+        log.info("현장/공정({}/{})의 {}월 4대보험(일용) 동기화 시작",
+                site.getName(), siteProcess.getName(), yearMonth);
+
+        // 1. 해당 현장/공정/년월의 노무명세서 조회
+        final List<LaborPayroll> payrolls = laborPayrollRepository
+                .findBySiteAndSiteProcessAndYearMonth(site, siteProcess, yearMonth);
+
+        // 2. 정직원 제외한(직영, 용역, 기타) 총 공제액 합계 계산
+        final BigDecimal totalDeductions = payrolls.stream()
+                .filter(payroll -> payroll.getLabor() != null
+                        && payroll.getLabor().getType() != LaborType.REGULAR_EMPLOYEE)
+                .map(LaborPayroll::getTotalDeductions)
+                .filter(deductions -> deductions != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 3. 현장관리비 조회
+        final SiteManagementCost siteManagementCost = siteManagementCostRepository
+                .findByYearMonthAndSiteAndSiteProcess(yearMonth, site, siteProcess)
+                .orElse(null);
+
+        // 현장관리비가 없으면 동기화 건너뜀
+        if (siteManagementCost == null) {
+            return;
+        }
+
+        // 4. 4대보험(일용) 업데이트
+        final Long oldValue = siteManagementCost.getMajorInsuranceDaily();
+        final Long newValue = totalDeductions.longValue();
+
+        // 값이 변경되지 않았으면 업데이트 건너뜀
+        if (oldValue != null && oldValue.equals(newValue)) {
+            log.debug("4대보험(일용) 값이 동일하여 업데이트를 건너뜁니다: {} (현장={}, 공정={}, 년월={})",
+                    oldValue, site.getName(), siteProcess.getName(), yearMonth);
+            return;
+        }
+
+        // 변경 전 스냅샷 생성
+        final SiteManagementCost oldSnapshot = JaversUtils.createSnapshot(javers, siteManagementCost,
+                SiteManagementCost.class);
+
+        // 값 업데이트
+        siteManagementCost.setMajorInsuranceDaily(newValue);
+        siteManagementCostRepository.save(siteManagementCost);
+
+        // 변경 이력 저장
+        final Diff diff = javers.compare(oldSnapshot, siteManagementCost);
+        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+
+        if (!simpleChanges.isEmpty()) {
+            final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
+            final SiteManagementCostChangeHistory changeHistory = SiteManagementCostChangeHistory.builder()
+                    .siteManagementCost(siteManagementCost)
+                    .type(SiteManagementCostChangeHistoryType.SITE_MANAGEMENT_COST)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
+            siteManagementCostChangeHistoryRepository.save(changeHistory);
+        }
+
+        log.info("4대보험(일용) 업데이트 완료: {} -> {} (현장={}, 공정={}, 년월={})",
+                oldValue, newValue, site.getName(), siteProcess.getName(), yearMonth);
     }
 }

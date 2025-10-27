@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -130,6 +131,7 @@ public class SiteManagementCost extends BaseEntity {
     /**
      * 4대보험(일용)
      */
+    @Setter
     @Column
     @DiffInclude
     private Long majorInsuranceDaily;
