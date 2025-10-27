@@ -1,8 +1,14 @@
 package com.lineinc.erp.api.server.domain.sitemanagementcost.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagementCost;
 
 /**
@@ -12,4 +18,17 @@ import com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagemen
 public interface SiteManagementCostRepository
         extends JpaRepository<SiteManagementCost, Long> {
 
+    /**
+     * 년월, 현장, 공정으로 현장관리비 존재 여부 확인
+     */
+    @Query("""
+            SELECT smc FROM SiteManagementCost smc \
+            WHERE smc.yearMonth = :yearMonth \
+            AND smc.site = :site \
+            AND smc.siteProcess = :siteProcess \
+            AND smc.deleted = false""")
+    Optional<SiteManagementCost> findByYearMonthAndSiteAndSiteProcess(
+            @Param("yearMonth") String yearMonth,
+            @Param("site") Site site,
+            @Param("siteProcess") SiteProcess siteProcess);
 }

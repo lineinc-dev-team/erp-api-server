@@ -26,6 +26,8 @@ public class QSiteManagementCost extends EntityPathBase<SiteManagementCost> {
 
     public final NumberPath<Long> contractGuaranteeFee = createNumber("contractGuaranteeFee", Long.class);
 
+    public final StringPath contractGuaranteeFeeMemo = createString("contractGuaranteeFeeMemo");
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
 
@@ -40,23 +42,37 @@ public class QSiteManagementCost extends EntityPathBase<SiteManagementCost> {
 
     public final NumberPath<Long> employeeSalary = createNumber("employeeSalary", Long.class);
 
+    public final StringPath employeeSalaryMemo = createString("employeeSalaryMemo");
+
     public final NumberPath<Long> equipmentGuaranteeFee = createNumber("equipmentGuaranteeFee", Long.class);
 
+    public final StringPath equipmentGuaranteeFeeMemo = createString("equipmentGuaranteeFeeMemo");
+
     public final NumberPath<Long> headquartersManagementCost = createNumber("headquartersManagementCost", Long.class);
+
+    public final StringPath headquartersManagementCostMemo = createString("headquartersManagementCostMemo");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final NumberPath<Long> majorInsuranceDaily = createNumber("majorInsuranceDaily", Long.class);
 
+    public final StringPath majorInsuranceDailyMemo = createString("majorInsuranceDailyMemo");
+
     public final NumberPath<Long> majorInsuranceRegular = createNumber("majorInsuranceRegular", Long.class);
 
-    public final StringPath memo = createString("memo");
+    public final StringPath majorInsuranceRegularMemo = createString("majorInsuranceRegularMemo");
 
     public final NumberPath<Long> nationalTaxPayment = createNumber("nationalTaxPayment", Long.class);
 
+    public final StringPath nationalTaxPaymentMemo = createString("nationalTaxPaymentMemo");
+
     public final NumberPath<Long> regularRetirementPension = createNumber("regularRetirementPension", Long.class);
 
+    public final StringPath regularRetirementPensionMemo = createString("regularRetirementPensionMemo");
+
     public final NumberPath<Long> retirementDeduction = createNumber("retirementDeduction", Long.class);
+
+    public final StringPath retirementDeductionMemo = createString("retirementDeductionMemo");
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
 

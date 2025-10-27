@@ -19,7 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -79,11 +78,25 @@ public class SiteManagementCost extends BaseEntity {
     private Long employeeSalary;
 
     /**
+     * 직원급여 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String employeeSalaryMemo;
+
+    /**
      * 퇴직연금(정규직)
      */
     @Column
     @DiffInclude
     private Long regularRetirementPension;
+
+    /**
+     * 퇴직연금(정규직) 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String regularRetirementPensionMemo;
 
     /**
      * 퇴직공제부금
@@ -93,11 +106,25 @@ public class SiteManagementCost extends BaseEntity {
     private Long retirementDeduction;
 
     /**
+     * 퇴직공제부금 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String retirementDeductionMemo;
+
+    /**
      * 4대보험(상용)
      */
     @Column
     @DiffInclude
     private Long majorInsuranceRegular;
+
+    /**
+     * 4대보험(상용) 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String majorInsuranceRegularMemo;
 
     /**
      * 4대보험(일용)
@@ -107,11 +134,25 @@ public class SiteManagementCost extends BaseEntity {
     private Long majorInsuranceDaily;
 
     /**
+     * 4대보험(일용) 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String majorInsuranceDailyMemo;
+
+    /**
      * 보증수수료(계약보증)
      */
     @Column
     @DiffInclude
     private Long contractGuaranteeFee;
+
+    /**
+     * 보증수수료(계약보증) 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String contractGuaranteeFeeMemo;
 
     /**
      * 보증수수료(현장별건설기계)
@@ -121,11 +162,25 @@ public class SiteManagementCost extends BaseEntity {
     private Long equipmentGuaranteeFee;
 
     /**
+     * 보증수수료(현장별건설기계) 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String equipmentGuaranteeFeeMemo;
+
+    /**
      * 국세납부
      */
     @Column
     @DiffInclude
     private Long nationalTaxPayment;
+
+    /**
+     * 국세납부 메모
+     */
+    @Column(columnDefinition = "TEXT")
+    @DiffInclude
+    private String nationalTaxPaymentMemo;
 
     // === 본사관리비 ===
 
@@ -137,29 +192,11 @@ public class SiteManagementCost extends BaseEntity {
     private Long headquartersManagementCost;
 
     /**
-     * 비고
+     * 본사관리비 메모
      */
     @Column(columnDefinition = "TEXT")
     @DiffInclude
-    private String memo;
-
-    // === Transient 필드 (Javers 감사 로그용) ===
-
-    @Transient
-    @DiffInclude
-    private String siteName;
-
-    @Transient
-    @DiffInclude
-    private String processName;
-
-    /**
-     * Javers 감사 로그를 위한 transient 필드 동기화
-     */
-    public void syncTransientFields() {
-        this.siteName = this.site != null ? this.site.getName() : null;
-        this.processName = this.siteProcess != null ? this.siteProcess.getName() : null;
-    }
+    private String headquartersManagementCostMemo;
 
     /**
      * 현장관리비 합계 계산

@@ -87,6 +87,9 @@ public class ValidationMessages {
     public static final String DAILY_REPORT_CANNOT_EDIT_PAST_DATE = "당일까지만 출역일보를 수정할 수 있습니다.";
     public static final String DAILY_REPORT_EDIT_NOT_ALLOWED = "출역일보 수정 기한이 지났거나 권한이 없습니다.";
 
+    // ===== 현장관리비 관련 메시지 =====
+    public static final String SITE_MANAGEMENT_COST_ALREADY_EXISTS = "해당 년월, 현장, 공정에 대한 현장관리비 데이터가 이미 존재합니다.";
+
     // ===== 입력값 검증 관련 메시지 =====
     public static final String INVALID_PHONE = "유효한 휴대폰 번호 형식이 아닙니다.";
     public static final String INVALID_LANDLINE = "유효한 유선 전화번호 형식이 아닙니다.";
