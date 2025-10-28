@@ -143,6 +143,7 @@ public class LaborPayrollService {
             case "processName" -> "공정";
             case "regularEmployeeCount" -> "정직원";
             case "directContractCount" -> "직영";
+            case "outsourcingCount" -> "용역";
             case "etcCount" -> "기타";
             case "totalLaborCost" -> "노무비 합계";
             case "totalDeductions" -> "공제 합계";
@@ -170,6 +171,12 @@ public class LaborPayrollService {
             case "directContractCount" -> {
                 if (response.directContractCount() != null) {
                     yield NumberFormat.getNumberInstance().format(response.directContractCount());
+                }
+                yield "";
+            }
+            case "outsourcingCount" -> {
+                if (response.outsourcingCount() != null) {
+                    yield NumberFormat.getNumberInstance().format(response.outsourcingCount());
                 }
                 yield "";
             }
@@ -415,6 +422,7 @@ public class LaborPayrollService {
             summary.updateSummary(
                     summary.getRegularEmployeeCount(), // 기존 값 유지
                     summary.getDirectContractCount(), // 기존 값 유지
+                    summary.getOutsourcingCount(), // 기존 값 유지
                     summary.getEtcCount(), // 기존 값 유지
                     totalLaborCost,
                     totalDeductions,

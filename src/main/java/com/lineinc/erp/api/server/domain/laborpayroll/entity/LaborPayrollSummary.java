@@ -69,7 +69,10 @@ public class LaborPayrollSummary extends BaseEntity {
     private Integer regularEmployeeCount; // 정직원 수
 
     @Column
-    private Integer directContractCount; // 직영/용역 수
+    private Integer directContractCount; // 직영 수
+
+    @Column
+    private Integer outsourcingCount; // 용역 수
 
     @Column
     private Integer etcCount; // 기타 수
@@ -96,6 +99,7 @@ public class LaborPayrollSummary extends BaseEntity {
     public void updateSummary(
             final Integer regularEmployeeCount,
             final Integer directContractCount,
+            final Integer outsourcingCount,
             final Integer etcCount,
             final BigDecimal totalLaborCost,
             final BigDecimal totalDeductions,
@@ -104,6 +108,7 @@ public class LaborPayrollSummary extends BaseEntity {
 
         this.regularEmployeeCount = regularEmployeeCount;
         this.directContractCount = directContractCount;
+        this.outsourcingCount = outsourcingCount;
         this.etcCount = etcCount;
         this.totalLaborCost = totalLaborCost;
         this.totalDeductions = totalDeductions;

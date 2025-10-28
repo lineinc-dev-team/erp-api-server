@@ -44,6 +44,8 @@ public class QLaborPayrollSummary extends EntityPathBase<LaborPayrollSummary> {
 
     public final StringPath memo = createString("memo");
 
+    public final NumberPath<Integer> outsourcingCount = createNumber("outsourcingCount", Integer.class);
+
     public final NumberPath<Integer> regularEmployeeCount = createNumber("regularEmployeeCount", Integer.class);
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
