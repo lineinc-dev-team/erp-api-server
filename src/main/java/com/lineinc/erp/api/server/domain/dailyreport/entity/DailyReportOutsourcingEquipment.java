@@ -98,7 +98,7 @@ public class DailyReportOutsourcingEquipment extends BaseEntity {
         this.memo = request.memo();
 
         // 서브 장비 업데이트
-        updateSubEquipments(request.outsourcingCompanyContractSubEquipments());
+        updateSubEquipments(request.subEquipments());
     }
 
     /**

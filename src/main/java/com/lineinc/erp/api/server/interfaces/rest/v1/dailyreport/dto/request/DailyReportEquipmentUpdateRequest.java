@@ -23,7 +23,7 @@ public record DailyReportEquipmentUpdateRequest(
             @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
             @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
             @Schema(description = "비고", example = "정상 작동") String memo,
-            @Schema(description = "외주업체계약 서브 장비 목록") @Valid List<OutsourcingCompanyContractSubEquipmentUpdateInfo> outsourcingCompanyContractSubEquipments) {
+            @Schema(description = "외주업체계약 서브 장비 목록") @Valid List<OutsourcingCompanyContractSubEquipmentUpdateInfo> subEquipments) {
     }
 
     @Schema(description = "외주업체계약 서브 장비 수정 내용")

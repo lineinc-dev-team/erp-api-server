@@ -1169,9 +1169,9 @@ public class DailyReportService {
                             .build();
 
                     // 서브 장비 추가
-                    if (dto.outsourcingCompanyContractSubEquipments() != null) {
+                    if (dto.subEquipments() != null) {
                         for (final DailyReportEquipmentUpdateRequest.OutsourcingCompanyContractSubEquipmentUpdateInfo subEquipmentDto : dto
-                                .outsourcingCompanyContractSubEquipments()) {
+                                .subEquipments()) {
                             final DailyReportOutsourcingEquipmentSubEquipment subEquipment = DailyReportOutsourcingEquipmentSubEquipment
                                     .builder()
                                     .dailyReportOutsourcingEquipment(equipment)
