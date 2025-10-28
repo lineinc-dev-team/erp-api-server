@@ -133,6 +133,8 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
                     (subDto) -> OutsourcingCompanyContractSubEquipment.builder()
                             .equipment(this)
                             .type(subDto.type())
+                            .taskDescription(subDto.taskDescription())
+                            .unitPrice(subDto.unitPrice())
                             .description(subDto.description())
                             .memo(subDto.memo())
                             .build());
