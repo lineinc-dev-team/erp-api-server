@@ -87,7 +87,7 @@ public class MaterialCostAggregationService {
         final List<MaterialManagementItemResponse> materialManagementResponses = aggregateMaterialManagements(
                 materialManagements, yearMonth);
 
-        // 강재수불부 응답 생성 (입고탭만, 업체+품명별로 그룹핑하여 전회까지/금회 집계)
+        // 강재수불부 응답 생성 (입고+출고+고철, 업체+품명별로 그룹핑하여 전회까지/금회 집계)
         final List<SteelManagementItemResponse> steelManagementResponses = aggregateSteelManagements(
                 steelManagements, yearMonth);
 
@@ -230,7 +230,7 @@ public class MaterialCostAggregationService {
     }
 
     /**
-     * 강재수불부 데이터를 업체+품명별로 그룹핑하여 전회까지/금회 청구내역 집계 (입고탭만)
+     * 강재수불부 데이터를 업체+품명별로 그룹핑하여 전회까지/금회 청구내역 집계 (입고 + 출고 + 고철)
      * 
      * @param steelManagements 강재수불부 목록
      * @param yearMonth        조회월 (YYYY-MM)
@@ -242,11 +242,13 @@ public class MaterialCostAggregationService {
 
         final OffsetDateTime currentMonthStartDateTime = calculateMonthStartDateTime(yearMonth);
 
-        // 업체+품명별로 그룹핑 (입고탭만, 자사자재 포함)
+        // 업체+품명별로 그룹핑 (입고 + 출고 + 고철, 자사자재 포함)
         final Map<String, List<Map.Entry<SteelManagementV2, SteelManagementDetailV2>>> groupedByCompanyAndItem = steelManagements
                 .stream()
                 .flatMap(sm -> sm.getDetails().stream()
-                        .filter(detail -> detail.getType() == SteelManagementDetailV2Type.INCOMING) // 입고탭만
+                        .filter(detail -> detail.getType() == SteelManagementDetailV2Type.INCOMING ||
+                                detail.getType() == SteelManagementDetailV2Type.OUTGOING ||
+                                detail.getType() == SteelManagementDetailV2Type.SCRAP) // 입고 + 출고 + 고철
                         .map(detail -> Map.entry(sm, detail)))
                 .collect(Collectors.groupingBy(this::createSteelGroupingKey));
 
@@ -304,19 +306,20 @@ public class MaterialCostAggregationService {
 
         long supplyPrice = 0;
         long vat = 0;
-        long total = 0;
 
         for (final Map.Entry<SteelManagementV2, SteelManagementDetailV2> entry : group) {
             final SteelManagementDetailV2 detail = entry.getValue();
 
-            // 입고일 기준으로 전회까지 집계
-            if (detail.getIncomingDate() != null && detail.getIncomingDate().isBefore(currentMonthStartDateTime)) {
+            // 각 타입별 날짜 기준으로 전회까지 집계
+            final OffsetDateTime targetDate = getDetailDate(detail);
+            if (targetDate != null && targetDate.isBefore(currentMonthStartDateTime)) {
                 supplyPrice += getValueOrZero(detail.getAmount()); // 공급가
                 vat += getValueOrZero(detail.getVat());
-                total += getValueOrZero(detail.getTotal());
             }
         }
 
+        // total은 supplyPrice + vat로 직접 계산 (자사자재의 경우 detail.total이 0일 수 있음)
+        final long total = supplyPrice + vat;
         return new BillingDetail(supplyPrice, vat, 0L, total);
     }
 
@@ -333,16 +336,37 @@ public class MaterialCostAggregationService {
         for (final Map.Entry<SteelManagementV2, SteelManagementDetailV2> entry : group) {
             final SteelManagementDetailV2 detail = entry.getValue();
 
-            // 입고일 기준으로 금회 집계
-            if (detail.getIncomingDate() != null && !detail.getIncomingDate().isBefore(currentMonthStartDateTime)) {
+            // 각 타입별 날짜 기준으로 금회 집계
+            final OffsetDateTime targetDate = getDetailDate(detail);
+            if (targetDate != null && !targetDate.isBefore(currentMonthStartDateTime)) {
+                log.debug("강재수불부 금회 집계 - 타입: {}, 품명: {}, 날짜: {}, 공급가: {}, 부가세: {}",
+                        detail.getType(), detail.getName(), targetDate, detail.getAmount(), detail.getVat());
                 supplyPrice += getValueOrZero(detail.getAmount()); // 공급가
                 vat += getValueOrZero(detail.getVat());
             }
         }
 
+        log.debug("강재수불부 금회 집계 최종 - 공급가: {}, 부가세: {}", supplyPrice, vat);
+
         // total은 supplyPrice + vat로 직접 계산 (자사자재의 경우 detail.total이 0일 수 있음)
         final long total = supplyPrice + vat;
         return new BillingDetail(supplyPrice, vat, 0L, total);
+    }
+
+    /**
+     * Detail 타입별 적절한 날짜 반환
+     * - INCOMING: incomingDate (입고일)
+     * - OUTGOING: outgoingDate (출고일)
+     * - SCRAP: salesDate (판매일)
+     * - ON_SITE_STOCK: null (사장은 제외)
+     */
+    private OffsetDateTime getDetailDate(final SteelManagementDetailV2 detail) {
+        return switch (detail.getType()) {
+            case INCOMING -> detail.getIncomingDate();
+            case OUTGOING -> detail.getOutgoingDate();
+            case SCRAP -> detail.getSalesDate();
+            case ON_SITE_STOCK -> null; // 사장은 날짜 없음
+        };
     }
 
     /**
