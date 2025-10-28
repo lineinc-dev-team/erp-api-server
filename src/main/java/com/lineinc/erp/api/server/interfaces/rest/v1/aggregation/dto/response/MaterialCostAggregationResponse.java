@@ -55,13 +55,9 @@ public record MaterialCostAggregationResponse(
      */
     @Schema(description = "유류집계 항목 응답")
     public record FuelAggregationItemResponse(
-            @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
+            @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
             @Schema(description = "품명", example = "경유") String itemName,
-            @Schema(description = "업체명", example = "GHI유통") String companyName,
-            @Schema(description = "대표자", example = "이영희") String representative,
-            @Schema(description = "연락처", example = "010-5555-6666") String phoneNumber,
-            @Schema(description = "은행", example = "하나은행") String bankName,
-            @Schema(description = "계좌번호", example = "111-222-333444") String accountNumber,
-            @Schema(description = "계좌명", example = "이영희") String accountHolder) {
+            @Schema(description = "전회까지 청구내역") MaterialManagementItemResponse.BillingDetail previousBilling,
+            @Schema(description = "금회 청구내역") MaterialManagementItemResponse.BillingDetail currentBilling) {
     }
 }

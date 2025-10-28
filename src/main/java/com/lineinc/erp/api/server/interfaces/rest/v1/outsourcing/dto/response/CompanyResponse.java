@@ -99,9 +99,6 @@ public record CompanyResponse(
             @Schema(description = "계좌번호", example = "123-456-789012") String accountNumber,
             @Schema(description = "예금주", example = "홍길동") String accountHolder,
             @Schema(description = "주소", example = "서울특별시 강남구") String address,
-            @Schema(description = "공제 항목", example = "4대보험,소득세") String defaultDeductions,
-            @Schema(description = "공제 항목 코드", example = "FOUR_INSURANCE,INCOME_TAX") String defaultDeductionsCode,
-            @Schema(description = "공제 항목 설명", example = "4대 보험, 소득세") String defaultDeductionsDescription,
             @Schema(description = "전화번호", example = "02-1234-5678") String landlineNumber,
             @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
@@ -117,13 +114,6 @@ public record CompanyResponse(
                     company.getAccountNumber(),
                     company.getAccountHolder(),
                     company.getAddress(),
-                    company.getDefaultDeductions() != null && !company.getDefaultDeductions().isEmpty()
-                            ? Arrays.stream(company.getDefaultDeductions().split(","))
-                                    .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                                    .collect(Collectors.joining(","))
-                            : null,
-                    company.getDefaultDeductions(),
-                    company.getDefaultDeductionsDescription(),
                     company.getLandlineNumber(),
                     company.getPhoneNumber(),
                     company.isDeleted());

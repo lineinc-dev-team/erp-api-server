@@ -1,6 +1,14 @@
 package com.lineinc.erp.api.server.infrastructure.config.web;
 
+import java.io.IOException;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import com.lineinc.erp.api.server.domain.common.service.RateLimitService;
+
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,12 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 /**
  * Rate Limiting 필터
@@ -29,16 +31,16 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private final RateLimitService rateLimitService;
 
     // Rate Limiting 설정
-    private static final int AUTHENTICATED_REQUESTS_PER_MINUTE = 300; // 로그인 사용자: 1분당 최대 요청 수
+    private static final int AUTHENTICATED_REQUESTS_PER_MINUTE = 400; // 로그인 사용자: 1분당 최대 요청 수
     private static final int ANONYMOUS_REQUESTS_PER_MINUTE = 50; // 비로그인 사용자: 1분당 최대 요청 수
     private static final int TIME_WINDOW_SECONDS = 60; // 시간 윈도우 (초)
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
+            final FilterChain filterChain) throws ServletException, IOException {
 
         // 제외할 경로들 (Swagger, Actuator 등)
-        String requestURI = request.getRequestURI();
+        final String requestURI = request.getRequestURI();
         if (shouldSkipRateLimit(requestURI)) {
             filterChain.doFilter(request, response);
             return;
@@ -49,7 +51,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         int limitPerMinute;
 
         // 로그인된 사용자인지 확인
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             // 로그인된 사용자: 사용자명 기준
             identifier = "user:" + auth.getName();
@@ -61,7 +63,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
 
         // Rate Limiting 버킷 조회
-        Bucket bucket = rateLimitService.resolveBucket(identifier, limitPerMinute, TIME_WINDOW_SECONDS);
+        final Bucket bucket = rateLimitService.resolveBucket(identifier, limitPerMinute, TIME_WINDOW_SECONDS);
 
         // 토큰 소비 시도
         if (bucket.tryConsume(1)) {
@@ -80,13 +82,13 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     /**
      * 클라이언트 IP 주소 추출
      */
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
+    private String getClientIpAddress(final HttpServletRequest request) {
+        final String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return xForwardedFor.split(",")[0].trim();
         }
 
-        String xRealIp = request.getHeader("X-Real-IP");
+        final String xRealIp = request.getHeader("X-Real-IP");
         if (xRealIp != null && !xRealIp.isEmpty()) {
             return xRealIp;
         }
@@ -97,11 +99,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     /**
      * Rate Limiting을 건너뛸 경로들
      */
-    private boolean shouldSkipRateLimit(String requestURI) {
+    private boolean shouldSkipRateLimit(final String requestURI) {
         return requestURI.startsWith("/swagger-ui") ||
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/actuator") ||
-                requestURI.equals("/favicon.ico") ||
-                requestURI.equals("/");
+                "/favicon.ico".equals(requestURI) ||
+                "/".equals(requestURI);
     }
 }
