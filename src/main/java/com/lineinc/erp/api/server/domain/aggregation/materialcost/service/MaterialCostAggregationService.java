@@ -83,17 +83,23 @@ public class MaterialCostAggregationService {
         final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
                 .findBySiteAndSiteProcessAndYearMonthLessThanEqual(site, siteProcess, yearMonth);
 
-        // 자재관리 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계)
+        // 자재관리 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<MaterialManagementItemResponse> materialManagementResponses = aggregateMaterialManagements(
-                materialManagements, yearMonth);
+                materialManagements, yearMonth).stream()
+                .filter(this::hasNonZeroBilling)
+                .toList();
 
-        // 강재수불부 응답 생성 (입고+출고+고철, 업체+품명별로 그룹핑하여 전회까지/금회 집계)
+        // 강재수불부 응답 생성 (입고+출고+고철, 업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<SteelManagementItemResponse> steelManagementResponses = aggregateSteelManagements(
-                steelManagements, yearMonth);
+                steelManagements, yearMonth).stream()
+                .filter(this::hasNonZeroSteel)
+                .toList();
 
-        // 유류집계 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계)
+        // 유류집계 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<FuelAggregationItemResponse> fuelAggregationResponses = aggregateFuelAggregations(
-                fuelAggregations, yearMonth);
+                fuelAggregations, yearMonth).stream()
+                .filter(this::hasNonZeroFuel)
+                .toList();
 
         return new MaterialCostAggregationResponse(
                 materialManagementResponses,
@@ -192,11 +198,16 @@ public class MaterialCostAggregationService {
         long vat = 0;
         long total = 0;
 
+        // 조회월의 다음 달 1일 계산 (조회월 범위: currentMonthStart <= date < nextMonthStart)
+        final OffsetDateTime nextMonthStartDateTime = currentMonthStartDateTime.plusMonths(1);
+
         for (final Map.Entry<MaterialManagement, MaterialManagementDetail> entry : group) {
             final MaterialManagement mm = entry.getKey();
             final MaterialManagementDetail detail = entry.getValue();
 
-            if (!mm.getDeliveryDate().isBefore(currentMonthStartDateTime)) {
+            // 조회월 범위 내 데이터만 집계
+            if (!mm.getDeliveryDate().isBefore(currentMonthStartDateTime)
+                    && mm.getDeliveryDate().isBefore(nextMonthStartDateTime)) {
                 supplyPrice += getValueOrZero(detail.getSupplyPrice());
                 vat += getValueOrZero(detail.getVat());
                 total += getValueOrZero(detail.getTotal());
@@ -333,12 +344,17 @@ public class MaterialCostAggregationService {
         long supplyPrice = 0;
         long vat = 0;
 
+        // 조회월의 다음 달 1일 계산 (조회월 범위: currentMonthStart <= date < nextMonthStart)
+        final OffsetDateTime nextMonthStartDateTime = currentMonthStartDateTime.plusMonths(1);
+
         for (final Map.Entry<SteelManagementV2, SteelManagementDetailV2> entry : group) {
             final SteelManagementDetailV2 detail = entry.getValue();
 
-            // 각 타입별 날짜 기준으로 금회 집계
+            // 각 타입별 날짜 기준으로 금회 집계 (조회월 범위 내)
             final OffsetDateTime targetDate = getDetailDate(detail);
-            if (targetDate != null && !targetDate.isBefore(currentMonthStartDateTime)) {
+            if (targetDate != null
+                    && !targetDate.isBefore(currentMonthStartDateTime)
+                    && targetDate.isBefore(nextMonthStartDateTime)) {
                 log.debug("강재수불부 금회 집계 - 타입: {}, 품명: {}, 날짜: {}, 공급가: {}, 부가세: {}",
                         detail.getType(), detail.getName(), targetDate, detail.getAmount(), detail.getVat());
                 supplyPrice += getValueOrZero(detail.getAmount()); // 공급가
@@ -459,12 +475,17 @@ public class MaterialCostAggregationService {
 
         long supplyPrice = 0;
 
+        // 조회월의 다음 달 1일 계산 (조회월 범위: currentMonthStart <= date < nextMonthStart)
+        final OffsetDateTime nextMonthStartDateTime = currentMonthStartDateTime.plusMonths(1);
+
         for (final Map.Entry<FuelAggregation, FuelInfo> entry : group) {
             final FuelAggregation fa = entry.getKey();
             final FuelInfo fi = entry.getValue();
 
-            // date 기준으로 금회 집계
-            if (fa.getDate() != null && !fa.getDate().isBefore(currentMonthStartDateTime)) {
+            // date 기준으로 금회 집계 (조회월 범위 내)
+            if (fa.getDate() != null
+                    && !fa.getDate().isBefore(currentMonthStartDateTime)
+                    && fa.getDate().isBefore(nextMonthStartDateTime)) {
                 supplyPrice += calculateFuelCost(fa, fi);
             }
         }
@@ -492,5 +513,26 @@ public class MaterialCostAggregationService {
             case UREA -> getValueOrZero(fa.getUreaPrice()) * fuelAmount;
             default -> 0L;
         };
+    }
+
+    /**
+     * 자재관리 항목이 0이 아닌 청구내역을 가지고 있는지 확인
+     */
+    private boolean hasNonZeroBilling(final MaterialManagementItemResponse item) {
+        return item.previousBilling().total() != 0 || item.currentBilling().total() != 0;
+    }
+
+    /**
+     * 강재수불부 항목이 0이 아닌 청구내역을 가지고 있는지 확인
+     */
+    private boolean hasNonZeroSteel(final SteelManagementItemResponse item) {
+        return item.previousBilling().total() != 0 || item.currentBilling().total() != 0;
+    }
+
+    /**
+     * 유류집계 항목이 0이 아닌 청구내역을 가지고 있는지 확인
+     */
+    private boolean hasNonZeroFuel(final FuelAggregationItemResponse item) {
+        return item.previousBilling().total() != 0 || item.currentBilling().total() != 0;
     }
 }

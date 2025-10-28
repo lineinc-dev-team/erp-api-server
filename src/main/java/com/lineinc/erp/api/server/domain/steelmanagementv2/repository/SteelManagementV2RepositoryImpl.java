@@ -1,8 +1,6 @@
 package com.lineinc.erp.api.server.domain.steelmanagementv2.repository;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 
@@ -159,24 +157,12 @@ public class SteelManagementV2RepositoryImpl implements SteelManagementV2Reposit
         builder.and(steelManagementV2.site.eq(site));
         builder.and(steelManagementV2.siteProcess.eq(siteProcess));
 
-        // 년월 파싱하여 UTC 기준 다음 달 1일 00:00로 변환
-        final YearMonth ym = YearMonth.parse(yearMonth);
-        final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
-        final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
-
-        // detail의 날짜 필터링 (입고일, 출고일, 판매일 중 하나라도 조회월 이하인 경우)
-        // 입고: incomingDate, 출고: outgoingDate, 고철: salesDate
-        builder.and(
-                detail.incomingDate.isNotNull().and(detail.incomingDate.lt(endDateTime))
-                        .or(detail.outgoingDate.isNotNull().and(detail.outgoingDate.lt(endDateTime)))
-                        .or(detail.salesDate.isNotNull().and(detail.salesDate.lt(endDateTime))));
-
+        // 날짜 필터링은 서비스 레이어에서 수행 (detail 단위로 정확하게 필터링하기 위함)
+        // Repository에서는 현장과 공정에 해당하는 모든 SteelManagementV2를 조회
         return queryFactory
                 .selectFrom(steelManagementV2)
-                .distinct() // detail join으로 인한 중복 제거
                 .leftJoin(steelManagementV2.site, this.site).fetchJoin()
                 .leftJoin(steelManagementV2.siteProcess, this.siteProcess).fetchJoin()
-                .leftJoin(steelManagementV2.details, detail)
                 .where(builder)
                 .orderBy(steelManagementV2.createdAt.asc())
                 .fetch();
