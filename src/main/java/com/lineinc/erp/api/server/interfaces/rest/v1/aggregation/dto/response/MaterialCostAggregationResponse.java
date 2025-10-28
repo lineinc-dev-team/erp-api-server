@@ -42,14 +42,12 @@ public record MaterialCostAggregationResponse(
      */
     @Schema(description = "강재수불부 항목 응답")
     public record SteelManagementItemResponse(
-            @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
+            @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
             @Schema(description = "품명", example = "H빔") String itemName,
-            @Schema(description = "업체명", example = "DEF철강") String companyName,
-            @Schema(description = "대표자", example = "김철수") String representative,
-            @Schema(description = "연락처", example = "010-9876-5432") String phoneNumber,
-            @Schema(description = "은행", example = "신한은행") String bankName,
-            @Schema(description = "계좌번호", example = "987-654-321098") String accountNumber,
-            @Schema(description = "계좌명", example = "김철수") String accountHolder) {
+            @Schema(description = "카테고리", example = "자사자재") String category,
+            @Schema(description = "카테고리 코드", example = "OWN_MATERIAL") String categoryCode,
+            @Schema(description = "전회까지 청구내역") MaterialManagementItemResponse.BillingDetail previousBilling,
+            @Schema(description = "금회 청구내역") MaterialManagementItemResponse.BillingDetail currentBilling) {
     }
 
     /**

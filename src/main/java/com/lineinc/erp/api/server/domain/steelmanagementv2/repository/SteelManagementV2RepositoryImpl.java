@@ -164,13 +164,17 @@ public class SteelManagementV2RepositoryImpl implements SteelManagementV2Reposit
         final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
         final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
 
-        // createdAt이 조회월 이하인 데이터 조회 (UTC 기준 다음 달 1일 미만)
-        builder.and(steelManagementV2.createdAt.lt(endDateTime));
+        // detail의 incomingDate가 조회월 이하인 데이터 조회 (UTC 기준 다음 달 1일 미만)
+        // detail을 join하여 incomingDate 기준으로 필터링
+        builder.and(detail.incomingDate.isNotNull());
+        builder.and(detail.incomingDate.lt(endDateTime));
 
         return queryFactory
                 .selectFrom(steelManagementV2)
+                .distinct() // detail join으로 인한 중복 제거
                 .leftJoin(steelManagementV2.site, this.site).fetchJoin()
                 .leftJoin(steelManagementV2.siteProcess, this.siteProcess).fetchJoin()
+                .leftJoin(steelManagementV2.details, detail)
                 .where(builder)
                 .orderBy(steelManagementV2.createdAt.asc())
                 .fetch();
