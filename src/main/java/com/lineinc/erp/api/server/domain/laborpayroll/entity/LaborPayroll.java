@@ -7,6 +7,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollCalculator;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -308,6 +309,17 @@ public class LaborPayroll extends BaseEntity {
      * 공제액 계산 (엑셀 수식 기준)
      */
     private void calculateDeductions() {
+        // 정직원은 모든 공제 항목을 계산하지 않음
+        if (labor.getType() == LaborType.REGULAR_EMPLOYEE) {
+            this.incomeTax = BigDecimal.ZERO;
+            this.employmentInsurance = BigDecimal.ZERO;
+            this.healthInsurance = BigDecimal.ZERO;
+            this.localTax = BigDecimal.ZERO;
+            this.nationalPension = BigDecimal.ZERO;
+            this.longTermCareInsurance = BigDecimal.ZERO;
+            return;
+        }
+
         // 주민번호로 나이 계산
         final int age = LaborPayrollCalculator.calculateAge(labor);
 
