@@ -80,65 +80,9 @@ public class MaterialCostAggregationService {
         final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
                 .findBySiteAndSiteProcessAndYearMonthLessThanEqual(site, siteProcess, yearMonth);
 
-        // 조회월의 시작일과 끝일 계산
-        final YearMonth ym = YearMonth.parse(yearMonth);
-        final LocalDate currentMonthStart = ym.atDay(1);
-        final OffsetDateTime currentMonthStartDateTime = DateTimeFormatUtils.toUtcStartOfDay(currentMonthStart);
-
         // 자재관리 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계)
-        final List<MaterialManagementItemResponse> materialManagementResponses = materialManagements.stream()
-                .flatMap(mm -> mm.getDetails().stream()
-                        .map(detail -> Map.entry(mm, detail)))
-                .collect(Collectors.groupingBy(
-                        entry -> entry.getKey().getOutsourcingCompany().getId() + "_" + entry.getValue().getName()))
-                .values().stream()
-                .map(group -> {
-                    // 그룹의 첫번째 항목에서 업체와 품명 정보 가져오기
-                    final MaterialManagement firstMm = group.get(0).getKey();
-                    final MaterialManagementDetail firstDetail = group.get(0).getValue();
-
-                    // 전회까지 청구내역 계산 (조회월 이전)
-                    long prevSupplyPrice = 0;
-                    long prevVat = 0;
-                    final long prevDeduction = 0;
-                    long prevTotal = 0;
-
-                    // 금회 청구내역 계산 (조회월)
-                    long currSupplyPrice = 0;
-                    long currVat = 0;
-                    final long currDeduction = 0;
-                    long currTotal = 0;
-
-                    for (final Map.Entry<MaterialManagement, MaterialManagementDetail> entry : group) {
-                        final MaterialManagement mm = entry.getKey();
-                        final MaterialManagementDetail detail = entry.getValue();
-
-                        // 날짜 기준으로 전회/금회 분류
-                        if (mm.getDeliveryDate().isBefore(currentMonthStartDateTime)) {
-                            // 전회까지
-                            prevSupplyPrice += (detail.getSupplyPrice() != null ? detail.getSupplyPrice() : 0);
-                            prevVat += (detail.getVat() != null ? detail.getVat() : 0);
-                            prevTotal += (detail.getTotal() != null ? detail.getTotal() : 0);
-                        } else {
-                            // 금회
-                            currSupplyPrice += (detail.getSupplyPrice() != null ? detail.getSupplyPrice() : 0);
-                            currVat += (detail.getVat() != null ? detail.getVat() : 0);
-                            currTotal += (detail.getTotal() != null ? detail.getTotal() : 0);
-                        }
-                    }
-
-                    final BillingDetail previousBilling = new BillingDetail(
-                            prevSupplyPrice, prevVat, prevDeduction, prevTotal);
-                    final BillingDetail currentBilling = new BillingDetail(
-                            currSupplyPrice, currVat, currDeduction, currTotal);
-
-                    return new MaterialManagementItemResponse(
-                            CompanyResponse.CompanySimpleResponse.from(firstMm.getOutsourcingCompany()),
-                            firstDetail.getName(),
-                            previousBilling,
-                            currentBilling);
-                })
-                .toList();
+        final List<MaterialManagementItemResponse> materialManagementResponses = aggregateMaterialManagements(
+                materialManagements, yearMonth);
 
         // 강재수불부 응답 생성 (detail의 업체 정보 기반)
         final List<SteelManagementItemResponse> steelManagementResponses = steelManagements.stream()
@@ -180,5 +124,126 @@ public class MaterialCostAggregationService {
                 materialManagementResponses,
                 steelManagementResponses,
                 fuelAggregationResponses);
+    }
+
+    /**
+     * 자재관리 데이터를 업체+품명별로 그룹핑하여 전회까지/금회 청구내역 집계
+     * 
+     * @param materialManagements 자재관리 목록
+     * @param yearMonth           조회월 (YYYY-MM)
+     * @return 집계된 자재관리 응답 목록
+     */
+    private List<MaterialManagementItemResponse> aggregateMaterialManagements(
+            final List<MaterialManagement> materialManagements,
+            final String yearMonth) {
+
+        final OffsetDateTime currentMonthStartDateTime = calculateMonthStartDateTime(yearMonth);
+
+        // 업체+품명별로 그룹핑
+        final Map<String, List<Map.Entry<MaterialManagement, MaterialManagementDetail>>> groupedByCompanyAndItem = materialManagements
+                .stream()
+                .flatMap(mm -> mm.getDetails().stream()
+                        .map(detail -> Map.entry(mm, detail)))
+                .collect(Collectors.groupingBy(this::createGroupingKey));
+
+        // 각 그룹별로 전회까지/금회 집계하여 응답 생성
+        return groupedByCompanyAndItem.values().stream()
+                .map(group -> createMaterialManagementItemResponse(group, currentMonthStartDateTime))
+                .toList();
+    }
+
+    /**
+     * 그룹핑 키 생성: 업체ID_품명
+     */
+    private String createGroupingKey(final Map.Entry<MaterialManagement, MaterialManagementDetail> entry) {
+        return entry.getKey().getOutsourcingCompany().getId() + "_" + entry.getValue().getName();
+    }
+
+    /**
+     * 그룹에서 자재관리 응답 생성 (전회까지/금회 집계)
+     */
+    private MaterialManagementItemResponse createMaterialManagementItemResponse(
+            final List<Map.Entry<MaterialManagement, MaterialManagementDetail>> group,
+            final OffsetDateTime currentMonthStartDateTime) {
+
+        // 그룹의 첫번째 항목에서 업체와 품명 정보 가져오기
+        final MaterialManagement firstMm = group.get(0).getKey();
+        final MaterialManagementDetail firstDetail = group.get(0).getValue();
+
+        // 전회까지/금회 청구내역 집계
+        final BillingDetail previousBilling = aggregatePreviousBilling(group, currentMonthStartDateTime);
+        final BillingDetail currentBilling = aggregateCurrentBilling(group, currentMonthStartDateTime);
+
+        return new MaterialManagementItemResponse(
+                CompanyResponse.CompanySimpleResponse.from(firstMm.getOutsourcingCompany()),
+                firstDetail.getName(),
+                previousBilling,
+                currentBilling);
+    }
+
+    /**
+     * 전회까지 청구내역 집계 (조회월 이전)
+     */
+    private BillingDetail aggregatePreviousBilling(
+            final List<Map.Entry<MaterialManagement, MaterialManagementDetail>> group,
+            final OffsetDateTime currentMonthStartDateTime) {
+
+        long supplyPrice = 0;
+        long vat = 0;
+        long total = 0;
+
+        for (final Map.Entry<MaterialManagement, MaterialManagementDetail> entry : group) {
+            final MaterialManagement mm = entry.getKey();
+            final MaterialManagementDetail detail = entry.getValue();
+
+            if (mm.getDeliveryDate().isBefore(currentMonthStartDateTime)) {
+                supplyPrice += getValueOrZero(detail.getSupplyPrice());
+                vat += getValueOrZero(detail.getVat());
+                total += getValueOrZero(detail.getTotal());
+            }
+        }
+
+        return new BillingDetail(supplyPrice, vat, 0L, total);
+    }
+
+    /**
+     * 금회 청구내역 집계 (조회월)
+     */
+    private BillingDetail aggregateCurrentBilling(
+            final List<Map.Entry<MaterialManagement, MaterialManagementDetail>> group,
+            final OffsetDateTime currentMonthStartDateTime) {
+
+        long supplyPrice = 0;
+        long vat = 0;
+        long total = 0;
+
+        for (final Map.Entry<MaterialManagement, MaterialManagementDetail> entry : group) {
+            final MaterialManagement mm = entry.getKey();
+            final MaterialManagementDetail detail = entry.getValue();
+
+            if (!mm.getDeliveryDate().isBefore(currentMonthStartDateTime)) {
+                supplyPrice += getValueOrZero(detail.getSupplyPrice());
+                vat += getValueOrZero(detail.getVat());
+                total += getValueOrZero(detail.getTotal());
+            }
+        }
+
+        return new BillingDetail(supplyPrice, vat, 0L, total);
+    }
+
+    /**
+     * 조회월의 시작일(UTC) 계산
+     */
+    private OffsetDateTime calculateMonthStartDateTime(final String yearMonth) {
+        final YearMonth ym = YearMonth.parse(yearMonth);
+        final LocalDate monthStart = ym.atDay(1);
+        return DateTimeFormatUtils.toUtcStartOfDay(monthStart);
+    }
+
+    /**
+     * Integer 값을 long으로 변환 (null 처리)
+     */
+    private long getValueOrZero(final Integer value) {
+        return value != null ? value.longValue() : 0L;
     }
 }
