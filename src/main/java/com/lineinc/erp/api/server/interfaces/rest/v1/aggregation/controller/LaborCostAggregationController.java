@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/aggregation")
 @RequiredArgsConstructor
-@Tag(name = "노무비 집계", description = "노무비 집계 API")
+@Tag(name = "집계")
 public class LaborCostAggregationController extends BaseController {
 
     private final LaborCostAggregationService laborCostAggregationService;

@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/aggregation/material-cost")
 @RequiredArgsConstructor
-@Tag(name = "재료비 집계", description = "재료비 집계 API")
+@Tag(name = "집계")
 public class MaterialCostAggregationController extends BaseController {
 
     private final MaterialCostAggregationService materialCostAggregationService;

@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/aggregation/fuel")
 @RequiredArgsConstructor
-@Tag(name = "유류비 집계", description = "유류비 집계 상세 API")
+@Tag(name = "집계")
 public class FuelAggregationDetailController extends BaseController {
 
     private final FuelAggregationDetailService fuelAggregationDetailService;
