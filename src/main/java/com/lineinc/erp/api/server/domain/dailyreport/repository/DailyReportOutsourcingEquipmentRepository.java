@@ -25,6 +25,7 @@ public interface DailyReportOutsourcingEquipmentRepository
             SELECT DISTINCT droe FROM DailyReportOutsourcingEquipment droe
             JOIN FETCH droe.dailyReport dr
             LEFT JOIN FETCH droe.outsourcingCompany oc
+            LEFT JOIN FETCH droe.outsourcingCompanyContractDriver driver
             LEFT JOIN FETCH droe.subEquipments se
             WHERE dr.site.id = :siteId
             AND dr.siteProcess.id = :siteProcessId
