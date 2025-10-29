@@ -19,9 +19,9 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteService;
-import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelAggregationDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelAggregationDetailResponse.FuelAggregationDetailItem;
-import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelAggregationDetailResponse.FuelAggregationDetailItem.DailyFuelUsage;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelCostAggregationDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelCostAggregationDetailResponse.FuelCostAggregationDetailItem;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelCostAggregationDetailResponse.FuelCostAggregationDetailItem.DailyFuelUsage;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractEquipmentResponse;
@@ -51,7 +51,7 @@ public class FuelAggregationDetailService {
      * @param fuelType      유종
      * @return 유류집계 상세 응답
      */
-    public FuelAggregationDetailResponse getFuelAggregationDetail(
+    public FuelCostAggregationDetailResponse getFuelAggregationDetail(
             final Long siteId,
             final Long siteProcessId,
             final String yearMonth,
@@ -68,16 +68,16 @@ public class FuelAggregationDetailService {
                 .findBySiteAndSiteProcessAndYearMonthLessThanEqual(site, siteProcess, yearMonth);
 
         // 장비별로 그룹핑하여 일별 사용량 집계
-        final List<FuelAggregationDetailItem> items = aggregateFuelByEquipment(
+        final List<FuelCostAggregationDetailItem> items = aggregateFuelByEquipment(
                 fuelAggregations, yearMonth, fuelType);
 
-        return new FuelAggregationDetailResponse(items);
+        return new FuelCostAggregationDetailResponse(items);
     }
 
     /**
      * 장비별로 유류 사용량 집계
      */
-    private List<FuelAggregationDetailItem> aggregateFuelByEquipment(
+    private List<FuelCostAggregationDetailItem> aggregateFuelByEquipment(
             final List<FuelAggregation> fuelAggregations,
             final String yearMonth,
             final FuelInfoFuelType fuelType) {
@@ -103,7 +103,7 @@ public class FuelAggregationDetailService {
     /**
      * 장비별 유류집계 상세 항목 생성
      */
-    private FuelAggregationDetailItem createFuelAggregationDetailItem(
+    private FuelCostAggregationDetailItem createFuelAggregationDetailItem(
             final List<Map.Entry<FuelAggregation, FuelInfo>> group,
             final YearMonth ym,
             final int daysInMonth) {
@@ -141,7 +141,7 @@ public class FuelAggregationDetailService {
             }
         }
 
-        return new FuelAggregationDetailItem(
+        return new FuelCostAggregationDetailItem(
                 fuelType != null ? fuelType.getLabel() : "",
                 fuelType != null ? fuelType.name() : "",
                 firstFuelInfo.getOutsourcingCompany() != null

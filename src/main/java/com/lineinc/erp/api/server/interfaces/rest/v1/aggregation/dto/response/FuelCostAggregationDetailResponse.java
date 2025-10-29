@@ -12,14 +12,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 유류집계 상세 응답
  */
 @Schema(description = "유류집계 상세 응답")
-public record FuelAggregationDetailResponse(
-        @Schema(description = "유류집계 항목 목록") List<FuelAggregationDetailItem> items) {
+public record FuelCostAggregationDetailResponse(
+        @Schema(description = "유류집계 항목 목록") List<FuelCostAggregationDetailItem> items) {
 
     /**
      * 유류집계 상세 항목
      */
     @Schema(description = "유류집계 상세 항목")
-    public record FuelAggregationDetailItem(
+    public record FuelCostAggregationDetailItem(
             @Schema(description = "유종", example = "경유") String fuelType,
             @Schema(description = "유종 코드", example = "DIESEL") String fuelTypeCode,
             @Schema(description = "업체 간단 응답", example = "ABC유류") CompanyResponse.CompanySimpleResponse outsourcingCompany,
@@ -56,8 +56,8 @@ public record FuelAggregationDetailResponse(
             @Schema(description = "29일") DailyFuelUsage day29,
             @Schema(description = "30일") DailyFuelUsage day30,
             @Schema(description = "31일") DailyFuelUsage day31) {
-        public static FuelAggregationDetailItem from(final FuelAggregationDetailItem item) {
-            return new FuelAggregationDetailItem(
+        public static FuelCostAggregationDetailItem from(final FuelCostAggregationDetailItem item) {
+            return new FuelCostAggregationDetailItem(
                     item.fuelType(),
                     item.fuelTypeCode(),
                     item.outsourcingCompany(),

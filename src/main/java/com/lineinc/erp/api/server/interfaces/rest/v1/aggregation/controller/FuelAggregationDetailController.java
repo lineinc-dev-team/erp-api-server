@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lineinc.erp.api.server.domain.aggregation.fuelaggregation.service.FuelAggregationDetailService;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.FuelAggregationDetailRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelAggregationDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.FuelCostAggregationDetailResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,9 +29,9 @@ public class FuelAggregationDetailController extends BaseController {
 
     @GetMapping
     @Operation(summary = "유류비 집계 조회")
-    public ResponseEntity<SuccessResponse<FuelAggregationDetailResponse>> getFuelAggregationDetail(
+    public ResponseEntity<SuccessResponse<FuelCostAggregationDetailResponse>> getFuelAggregationDetail(
             @Valid final FuelAggregationDetailRequest request) {
-        final FuelAggregationDetailResponse response = fuelAggregationDetailService.getFuelAggregationDetail(
+        final FuelCostAggregationDetailResponse response = fuelAggregationDetailService.getFuelAggregationDetail(
                 request.siteId(),
                 request.siteProcessId(),
                 request.yearMonth(),
