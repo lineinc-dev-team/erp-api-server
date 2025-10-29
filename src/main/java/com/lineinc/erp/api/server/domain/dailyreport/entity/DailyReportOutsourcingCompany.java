@@ -115,8 +115,8 @@ public class DailyReportOutsourcingCompany extends BaseEntity {
                                     .specification(itemDto.specification())
                                     .unit(itemDto.unit())
                                     .quantity(itemDto.quantity())
-                                    .contractFileUrl(itemDto.contractFileUrl())
-                                    .contractOriginalFileName(itemDto.contractOriginalFileName())
+                                    .fileUrl(itemDto.fileUrl())
+                                    .originalFileName(itemDto.originalFileName())
                                     .memo(itemDto.memo())
                                     .build();
 

@@ -23,8 +23,8 @@ public record DailyReportOutsourcingConstructionCreateRequest(
             @Schema(description = "규격", example = "C24") String specification,
             @Schema(description = "단위", example = "m2") String unit,
             @Schema(description = "수량", example = "100") Integer quantity,
-            @Schema(description = "계약서 파일 URL", example = "https://example.com/photo.jpg") String contractFileUrl,
-            @Schema(description = "계약서 원본 파일명", example = "photo.jpg") String contractOriginalFileName,
+            @Schema(description = "계약서 파일 URL", example = "https://example.com/photo.jpg") String fileUrl,
+            @Schema(description = "계약서 원본 파일명", example = "photo.jpg") String originalFileName,
             @Schema(description = "비고", example = "특별 지시사항") String memo) {
     }
 }

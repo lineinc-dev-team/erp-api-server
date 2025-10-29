@@ -424,8 +424,8 @@ public class DailyReportService {
                                         .specification(itemRequest.specification())
                                         .unit(itemRequest.unit())
                                         .quantity(itemRequest.quantity())
-                                        .contractFileUrl(itemRequest.contractFileUrl())
-                                        .contractOriginalFileName(itemRequest.contractOriginalFileName())
+                                        .fileUrl(itemRequest.fileUrl())
+                                        .originalFileName(itemRequest.originalFileName())
                                         .memo(itemRequest.memo())
                                         .build();
 
@@ -1289,8 +1289,8 @@ public class DailyReportService {
                                             .specification(itemDto.specification())
                                             .unit(itemDto.unit())
                                             .quantity(itemDto.quantity())
-                                            .contractFileUrl(itemDto.contractFileUrl())
-                                            .contractOriginalFileName(itemDto.contractOriginalFileName())
+                                            .fileUrl(itemDto.fileUrl())
+                                            .originalFileName(itemDto.originalFileName())
                                             .memo(itemDto.memo())
                                             .build();
 

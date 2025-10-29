@@ -99,8 +99,8 @@ public class DailyReportOutsourcingConstructionGroup extends BaseEntity {
                             .specification(dto.specification())
                             .unit(dto.unit())
                             .quantity(dto.quantity())
-                            .contractFileUrl(dto.contractFileUrl())
-                            .contractOriginalFileName(dto.contractOriginalFileName())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
                             .memo(dto.memo())
                             .build();
                 });

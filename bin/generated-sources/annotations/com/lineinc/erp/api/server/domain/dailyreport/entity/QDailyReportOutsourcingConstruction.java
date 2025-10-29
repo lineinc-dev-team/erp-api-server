@@ -24,10 +24,6 @@ public class QDailyReportOutsourcingConstruction extends EntityPathBase<DailyRep
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
-    public final StringPath contractFileUrl = createString("contractFileUrl");
-
-    public final StringPath contractOriginalFileName = createString("contractOriginalFileName");
-
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
 
@@ -40,9 +36,13 @@ public class QDailyReportOutsourcingConstruction extends EntityPathBase<DailyRep
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final StringPath fileUrl = createString("fileUrl");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");
+
+    public final StringPath originalFileName = createString("originalFileName");
 
     public final com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction;
 

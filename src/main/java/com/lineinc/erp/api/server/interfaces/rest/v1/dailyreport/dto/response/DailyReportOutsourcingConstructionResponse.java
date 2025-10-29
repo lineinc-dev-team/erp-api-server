@@ -14,8 +14,8 @@ public record DailyReportOutsourcingConstructionResponse(
         @Schema(description = "규격", example = "C24") String specification,
         @Schema(description = "단위", example = "m²") String unit,
         @Schema(description = "수량", example = "100") Integer quantity,
-        @Schema(description = "계약서 파일 URL", example = "https://example.com/contract.pdf") String contractFileUrl,
-        @Schema(description = "계약서 원본 파일명", example = "contract.pdf") String contractOriginalFileName,
+        @Schema(description = "파일 URL", example = "https://example.com/contract.pdf") String fileUrl,
+        @Schema(description = "원본 파일명", example = "contract.pdf") String originalFileName,
         @Schema(description = "비고", example = "1층 기초공사") String memo,
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
@@ -31,8 +31,8 @@ public record DailyReportOutsourcingConstructionResponse(
                 construction.getSpecification(),
                 construction.getUnit(),
                 construction.getQuantity(),
-                construction.getContractFileUrl(),
-                construction.getContractOriginalFileName(),
+                construction.getFileUrl(),
+                construction.getOriginalFileName(),
                 construction.getMemo(),
                 construction.getCreatedAt(),
                 construction.getUpdatedAt());

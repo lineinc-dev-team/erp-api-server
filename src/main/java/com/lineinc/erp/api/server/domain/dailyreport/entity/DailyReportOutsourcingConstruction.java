@@ -52,8 +52,8 @@ public class DailyReportOutsourcingConstruction extends BaseEntity {
     private String specification; // 규격
     private String unit; // 단위
     private Integer quantity; // 수량
-    private String contractFileUrl; // 계약서 파일 URL
-    private String contractOriginalFileName; // 계약서 원본 파일명
+    private String fileUrl; // 계약서 파일 URL
+    private String originalFileName; // 계약서 원본 파일명
 
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
@@ -61,9 +61,9 @@ public class DailyReportOutsourcingConstruction extends BaseEntity {
     /**
      * 계약서 파일을 업데이트합니다.
      */
-    public void updateContractFile(final String contractFileUrl, final String contractOriginalFileName) {
-        this.contractFileUrl = contractFileUrl;
-        this.contractOriginalFileName = contractOriginalFileName;
+    public void updateContractFile(final String fileUrl, final String originalFileName) {
+        this.fileUrl = fileUrl;
+        this.originalFileName = originalFileName;
     }
 
     /**
@@ -75,8 +75,8 @@ public class DailyReportOutsourcingConstruction extends BaseEntity {
         this.specification = request.specification();
         this.unit = request.unit();
         this.quantity = request.quantity();
-        this.contractFileUrl = request.contractFileUrl();
-        this.contractOriginalFileName = request.contractOriginalFileName();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
         this.memo = request.memo();
     }
 }
