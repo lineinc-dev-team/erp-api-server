@@ -28,7 +28,7 @@ public class EquipmentCostAggregationController extends BaseController {
     private final EquipmentCostAggregationService equipmentCostAggregationService;
 
     @GetMapping
-    @Operation(summary = "장비비 집계 조회 (외주업체별)")
+    @Operation(summary = "장비비 조회")
     public ResponseEntity<SuccessResponse<EquipmentCostAggregationResponse>> getEquipmentCostAggregation(
             @Valid final EquipmentCostAggregationRequest request) {
         final EquipmentCostAggregationResponse response = equipmentCostAggregationService

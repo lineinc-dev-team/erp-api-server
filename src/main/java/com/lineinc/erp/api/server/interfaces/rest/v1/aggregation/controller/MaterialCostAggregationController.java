@@ -28,7 +28,7 @@ public class MaterialCostAggregationController extends BaseController {
     private final MaterialCostAggregationService materialCostAggregationService;
 
     @GetMapping
-    @Operation(summary = "재료비 집계 조회")
+    @Operation(summary = "재료비 조회")
     public ResponseEntity<SuccessResponse<MaterialCostAggregationResponse>> getMaterialCostAggregation(
             @Valid final MaterialCostAggregationRequest request) {
         final MaterialCostAggregationResponse response = materialCostAggregationService

@@ -32,7 +32,7 @@ public class LaborCostAggregationController extends BaseController {
     private final OutsourcingLaborCostAggregationService outsourcingLaborCostAggregationService;
 
     @GetMapping("/labor-cost")
-    @Operation(summary = "노무비 집계 조회")
+    @Operation(summary = "노무비 조회")
     public ResponseEntity<SuccessResponse<LaborCostAggregationResponse>> getLaborCostAggregation(
             @Valid final LaborCostAggregationRequest request) {
         final LaborCostAggregationResponse response = laborCostAggregationService.getLaborCostAggregation(
@@ -41,7 +41,7 @@ public class LaborCostAggregationController extends BaseController {
     }
 
     @GetMapping("/outsourcing-labor-cost")
-    @Operation(summary = "용역업체별 노무비 집계 조회")
+    @Operation(summary = "용역업체별 노무비 조회")
     public ResponseEntity<SuccessResponse<OutsourcingLaborCostAggregationResponse>> getOutsourcingLaborCostAggregation(
             @Valid final OutsourcingLaborCostAggregationRequest request) {
         final OutsourcingLaborCostAggregationResponse response = outsourcingLaborCostAggregationService

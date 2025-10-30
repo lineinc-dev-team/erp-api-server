@@ -28,7 +28,7 @@ public class FuelAggregationDetailController extends BaseController {
     private final FuelAggregationDetailService fuelAggregationDetailService;
 
     @GetMapping
-    @Operation(summary = "유류비 집계 조회")
+    @Operation(summary = "유류집계 조회")
     public ResponseEntity<SuccessResponse<FuelCostAggregationDetailResponse>> getFuelAggregationDetail(
             @Valid final FuelAggregationDetailRequest request) {
         final FuelCostAggregationDetailResponse response = fuelAggregationDetailService.getFuelAggregationDetail(
