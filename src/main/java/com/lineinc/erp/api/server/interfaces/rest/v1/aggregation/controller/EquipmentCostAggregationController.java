@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.aggregation.equipmentcost.service.EquipmentCostAggregationService;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.EquipmentCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +32,7 @@ public class EquipmentCostAggregationController extends BaseController {
 
     @GetMapping
     @Operation(summary = "장비비 조회")
+    @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<EquipmentCostAggregationResponse>> getEquipmentCostAggregation(
             @Valid final EquipmentCostAggregationRequest request) {
         final EquipmentCostAggregationResponse response = equipmentCostAggregationService

@@ -7,11 +7,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.aggregation.laborcost.service.LaborCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.outsourcinglaborcost.service.OutsourcingLaborCostAggregationService;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.LaborCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.OutsourcingLaborCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.LaborCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.OutsourcingLaborCostAggregationResponse;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +36,7 @@ public class LaborCostAggregationController extends BaseController {
 
     @GetMapping("/labor-cost")
     @Operation(summary = "노무비 조회")
+    @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<LaborCostAggregationResponse>> getLaborCostAggregation(
             @Valid final LaborCostAggregationRequest request) {
         final LaborCostAggregationResponse response = laborCostAggregationService.getLaborCostAggregation(
@@ -42,6 +46,7 @@ public class LaborCostAggregationController extends BaseController {
 
     @GetMapping("/outsourcing-labor-cost")
     @Operation(summary = "노무비 조회 (용역업체별)")
+    @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<OutsourcingLaborCostAggregationResponse>> getOutsourcingLaborCostAggregation(
             @Valid final OutsourcingLaborCostAggregationRequest request) {
         final OutsourcingLaborCostAggregationResponse response = outsourcingLaborCostAggregationService

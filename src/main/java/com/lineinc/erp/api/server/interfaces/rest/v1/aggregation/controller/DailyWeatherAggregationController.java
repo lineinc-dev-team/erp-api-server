@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.aggregation.weather.service.WeatherAggregationService;
+import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.DailyWeatherAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.DailyWeatherAggregationResponse;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +29,7 @@ public class DailyWeatherAggregationController extends BaseController {
 
     @GetMapping
     @Operation(summary = "월별 일자별 날씨 조회")
+    @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<DailyWeatherAggregationResponse>> getDailyWeather(
             @Valid final DailyWeatherAggregationRequest request) {
         final DailyWeatherAggregationResponse response = weatherAggregationService.getDailyWeather(request);
