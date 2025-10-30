@@ -117,21 +117,21 @@ public class OutsourcingCompany extends BaseEntity {
      * 계좌 정보 - 은행
      */
     @DiffInclude
-    @Column(nullable = false)
+    @Column
     private String bankName;
 
     /**
      * 계좌 정보 - 계좌번호
      */
     @DiffInclude
-    @Column(nullable = false)
+    @Column
     private String accountNumber;
 
     /**
      * 계좌 정보 - 예금주
      */
     @DiffInclude
-    @Column(nullable = false)
+    @Column
     private String accountHolder;
 
     @DiffInclude
