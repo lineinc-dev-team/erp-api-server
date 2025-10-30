@@ -86,19 +86,19 @@ public class MaterialCostAggregationService {
         // 자재관리 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<MaterialManagementItemResponse> materialManagementResponses = aggregateMaterialManagements(
                 materialManagements, yearMonth).stream()
-                .filter(this::hasNonZeroBilling)
+                .filter(this::hasNonZeroCurrentBilling)
                 .toList();
 
         // 강재수불부 응답 생성 (입고+출고+고철, 업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<SteelManagementItemResponse> steelManagementResponses = aggregateSteelManagements(
                 steelManagements, yearMonth).stream()
-                .filter(this::hasNonZeroSteel)
+                .filter(this::hasNonZeroSteelCurrent)
                 .toList();
 
         // 유류집계 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<FuelAggregationItemResponse> fuelAggregationResponses = aggregateFuelAggregations(
                 fuelAggregations, yearMonth).stream()
-                .filter(this::hasNonZeroFuel)
+                .filter(this::hasNonZeroFuelCurrent)
                 .toList();
 
         return new MaterialCostAggregationResponse(
@@ -518,21 +518,21 @@ public class MaterialCostAggregationService {
     /**
      * 자재관리 항목이 0이 아닌 청구내역을 가지고 있는지 확인
      */
-    private boolean hasNonZeroBilling(final MaterialManagementItemResponse item) {
-        return item.previousBilling().total() != 0 || item.currentBilling().total() != 0;
+    private boolean hasNonZeroCurrentBilling(final MaterialManagementItemResponse item) {
+        return item.currentBilling().total() != 0;
     }
 
     /**
      * 강재수불부 항목이 0이 아닌 청구내역을 가지고 있는지 확인
      */
-    private boolean hasNonZeroSteel(final SteelManagementItemResponse item) {
-        return item.previousBilling().total() != 0 || item.currentBilling().total() != 0;
+    private boolean hasNonZeroSteelCurrent(final SteelManagementItemResponse item) {
+        return item.currentBilling().total() != 0;
     }
 
     /**
      * 유류집계 항목이 0이 아닌 청구내역을 가지고 있는지 확인
      */
-    private boolean hasNonZeroFuel(final FuelAggregationItemResponse item) {
-        return item.previousBilling().total() != 0 || item.currentBilling().total() != 0;
+    private boolean hasNonZeroFuelCurrent(final FuelAggregationItemResponse item) {
+        return item.currentBilling().total() != 0;
     }
 }
