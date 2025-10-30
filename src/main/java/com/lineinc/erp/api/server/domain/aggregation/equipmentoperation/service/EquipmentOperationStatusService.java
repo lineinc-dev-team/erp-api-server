@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipmentSubEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportOutsourcingEquipmentRepository;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContactSubEquipmentType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
@@ -25,6 +28,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.Eq
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentOperationStatusResponse.DailyUsage;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentOperationStatusResponse.EquipmentDailyUsage;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentOperationStatusResponse.EquipmentOperationStatusItem;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentOperationStatusResponse.FuelDailyUsage;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentOperationStatusResponse.FuelUsage;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentOperationStatusResponse.SubEquipmentTypeItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
@@ -43,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EquipmentOperationStatusService {
 
     private final DailyReportOutsourcingEquipmentRepository equipmentRepository;
+    private final FuelAggregationRepository fuelAggregationRepository;
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
 
@@ -66,8 +72,18 @@ public class EquipmentOperationStatusService {
         final List<DailyReportOutsourcingEquipment> allEquipments = findEquipmentsUpToMonth(site, siteProcess,
                 yearMonth);
 
+        // 해당 월의 유류집계 데이터 조회 후 장비별 일자 사용량 Map 구성
+        final YearMonth ym = YearMonth.parse(yearMonth);
+        final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
+        final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
+        final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
+                .findBySiteAndSiteProcessAndDateLessThanAndDeletedFalse(site, siteProcess, endExclusive);
+        final Map<Long, Map<Integer, Long>> fuelUsageByEquipment = buildFuelUsageByEquipmentForMonth(
+                fuelAggregations, YearMonth.parse(yearMonth));
+
         // 외주업체별로 그룹핑
-        final List<EquipmentOperationStatusItem> items = aggregateByOutsourcingCompany(allEquipments, yearMonth);
+        final List<EquipmentOperationStatusItem> items = aggregateByOutsourcingCompany(allEquipments, yearMonth,
+                fuelUsageByEquipment);
 
         return new EquipmentOperationStatusResponse(items);
     }
@@ -95,7 +111,8 @@ public class EquipmentOperationStatusService {
      */
     private List<EquipmentOperationStatusItem> aggregateByOutsourcingCompany(
             final List<DailyReportOutsourcingEquipment> allEquipments,
-            final String currentYearMonth) {
+            final String currentYearMonth,
+            final Map<Long, Map<Integer, Long>> fuelUsageByEquipment) {
 
         final YearMonth currentYm = YearMonth.parse(currentYearMonth);
 
@@ -111,7 +128,7 @@ public class EquipmentOperationStatusService {
                 }));
 
         return groupedByCompanyAndSpecification.entrySet().stream()
-                .map(entry -> createEquipmentOperationStatusItem(entry.getValue(), currentYm))
+                .map(entry -> createEquipmentOperationStatusItem(entry.getValue(), currentYm, fuelUsageByEquipment))
                 .toList();
     }
 
@@ -120,7 +137,8 @@ public class EquipmentOperationStatusService {
      */
     private EquipmentOperationStatusItem createEquipmentOperationStatusItem(
             final List<DailyReportOutsourcingEquipment> equipments,
-            final YearMonth currentYm) {
+            final YearMonth currentYm,
+            final Map<Long, Map<Integer, Long>> fuelUsageByEquipment) {
 
         final DailyReportOutsourcingEquipment firstEquipment = equipments.get(0);
 
@@ -166,8 +184,14 @@ public class EquipmentOperationStatusService {
                 .map(entry -> createSubEquipmentTypeItem(entry.getKey(), entry.getValue(), currentYm))
                 .toList();
 
+        // 유류 사용량 (해당 장비의 ContractEquipment ID 기준)
+        final Long equipmentId = firstEquipment.getOutsourcingCompanyContractEquipment() != null
+                ? firstEquipment.getOutsourcingCompanyContractEquipment().getId()
+                : null;
+        final FuelUsage fuelUsage = createFuelUsage(fuelUsageByEquipment.get(equipmentId));
+
         return new EquipmentOperationStatusItem(outsourcingCompany, specification, driver, equipmentDailyUsage,
-                subEquipmentItems);
+                fuelUsage, subEquipmentItems);
     }
 
     /**
@@ -268,6 +292,67 @@ public class EquipmentOperationStatusService {
                 subEquipmentType.getLabel(),
                 subEquipmentType.name(),
                 dailyUsageMap);
+    }
+
+    /**
+     * 유류 사용량 Map 구성 (장비별, 일자별 합계) - 해당 월만 포함
+     */
+    private Map<Long, Map<Integer, Long>> buildFuelUsageByEquipmentForMonth(
+            final List<FuelAggregation> fuelAggregations,
+            final YearMonth ym) {
+        final Map<Long, Map<Integer, Long>> result = new HashMap<>();
+
+        for (final FuelAggregation fa : fuelAggregations) {
+            if (fa.getDate() == null || fa.getFuelInfos() == null) {
+                continue;
+            }
+            final LocalDate date = DateTimeFormatUtils.toKoreaLocalDate(fa.getDate());
+            if (!(date.getYear() == ym.getYear() && date.getMonthValue() == ym.getMonthValue())) {
+                continue;
+            }
+
+            final int day = date.getDayOfMonth();
+            for (final FuelInfo fi : fa.getFuelInfos()) {
+                if (fi.getEquipment() == null || fi.getFuelAmount() == null) {
+                    continue;
+                }
+                final Long equipmentId = fi.getEquipment().getId();
+                result.computeIfAbsent(equipmentId, k -> new HashMap<>());
+                final Map<Integer, Long> daily = result.get(equipmentId);
+                daily.put(day, (daily.getOrDefault(day, 0L) + fi.getFuelAmount()));
+            }
+        }
+        return result;
+    }
+
+    private FuelUsage createFuelUsage(final Map<Integer, Long> dailyAmountMap) {
+        if (dailyAmountMap == null) {
+            return new FuelUsage(null, null, null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null);
+        }
+
+        return new FuelUsage(
+                toFuelDaily(dailyAmountMap.get(1)), toFuelDaily(dailyAmountMap.get(2)),
+                toFuelDaily(dailyAmountMap.get(3)), toFuelDaily(dailyAmountMap.get(4)),
+                toFuelDaily(dailyAmountMap.get(5)), toFuelDaily(dailyAmountMap.get(6)),
+                toFuelDaily(dailyAmountMap.get(7)), toFuelDaily(dailyAmountMap.get(8)),
+                toFuelDaily(dailyAmountMap.get(9)), toFuelDaily(dailyAmountMap.get(10)),
+                toFuelDaily(dailyAmountMap.get(11)), toFuelDaily(dailyAmountMap.get(12)),
+                toFuelDaily(dailyAmountMap.get(13)), toFuelDaily(dailyAmountMap.get(14)),
+                toFuelDaily(dailyAmountMap.get(15)), toFuelDaily(dailyAmountMap.get(16)),
+                toFuelDaily(dailyAmountMap.get(17)), toFuelDaily(dailyAmountMap.get(18)),
+                toFuelDaily(dailyAmountMap.get(19)), toFuelDaily(dailyAmountMap.get(20)),
+                toFuelDaily(dailyAmountMap.get(21)), toFuelDaily(dailyAmountMap.get(22)),
+                toFuelDaily(dailyAmountMap.get(23)), toFuelDaily(dailyAmountMap.get(24)),
+                toFuelDaily(dailyAmountMap.get(25)), toFuelDaily(dailyAmountMap.get(26)),
+                toFuelDaily(dailyAmountMap.get(27)), toFuelDaily(dailyAmountMap.get(28)),
+                toFuelDaily(dailyAmountMap.get(29)), toFuelDaily(dailyAmountMap.get(30)),
+                toFuelDaily(dailyAmountMap.get(31)));
+    }
+
+    private FuelDailyUsage toFuelDaily(final Long amount) {
+        return amount == null ? null : new FuelDailyUsage(amount);
     }
 
     /**

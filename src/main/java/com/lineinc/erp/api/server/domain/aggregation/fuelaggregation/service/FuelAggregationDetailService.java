@@ -63,9 +63,13 @@ public class FuelAggregationDetailService {
         // 공정 조회
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(siteProcessId);
 
-        // 유류집계 데이터 조회
+        // 유류집계 데이터 조회 (다음 달 1일 00:00 UTC 미만)
+        final YearMonth ym = YearMonth.parse(yearMonth);
+        final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
+        final java.time.OffsetDateTime endExclusive = com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils
+                .toUtcStartOfDay(nextMonthFirstDay);
         final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
-                .findBySiteAndSiteProcessAndYearMonthLessThanEqual(site, siteProcess, yearMonth);
+                .findBySiteAndSiteProcessAndDateLessThanAndDeletedFalse(site, siteProcess, endExclusive);
 
         // 장비별로 그룹핑하여 일별 사용량 집계
         final List<FuelCostAggregationDetailItem> items = aggregateFuelByEquipment(
