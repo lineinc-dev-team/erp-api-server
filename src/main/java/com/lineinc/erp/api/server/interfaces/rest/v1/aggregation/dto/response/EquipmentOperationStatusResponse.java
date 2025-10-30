@@ -23,7 +23,7 @@ public record EquipmentOperationStatusResponse(
             @Schema(description = "장비 규격", example = "25톤") String specification,
             @Schema(description = "기사 정보") ContractDriverSimpleResponse driver,
             @Schema(description = "장비 정보") EquipmentDailyUsage equipment,
-            @Schema(description = "서브장비 구분값 목록") List<SubEquipmentTypeItem> subEquipmentItems) {
+            @Schema(description = "서브장비 구분값 목록") List<SubEquipmentTypeItem> subEquipments) {
     }
 
     /**
