@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDet
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostMealFeeOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse.BillingDetail;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse.ManagementCostAggregationItem;
@@ -82,6 +83,29 @@ public class ManagementCostAggregationService {
                 items.add(agg);
         }
         return new ManagementCostAggregationResponse(items);
+    }
+
+    public List<CompanyResponse.CompanySimpleResponse> getMealFeeOutsourcingCompanies(
+            final ManagementCostMealFeeOutsourcingCompaniesRequest req) {
+        final YearMonth ym = YearMonth.parse(req.yearMonth());
+        final LocalDate startMonth = ym.atDay(1);
+        final LocalDate nextMonthStart = ym.plusMonths(1).atDay(1);
+        final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startMonth);
+        final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthStart);
+
+        return managementCostRepository
+                .findMealFeeCosts(
+                        req.siteId(),
+                        req.siteProcessId(),
+                        ManagementCostItemType.MEAL_FEE,
+                        startInclusive, endExclusive)
+                .stream()
+                .map(ManagementCost::getOutsourcingCompany)
+                .filter(Objects::nonNull)
+                .map(CompanyResponse.CompanySimpleResponse::from)
+                .distinct()
+                .sorted((a, b) -> a.name().compareToIgnoreCase(b.name()))
+                .toList();
     }
 
     private ManagementCostAggregationItem toAggregationItem(

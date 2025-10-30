@@ -1,5 +1,8 @@
 package com.lineinc.erp.api.server.domain.managementcost.repository;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,9 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
-
-import java.time.OffsetDateTime;
-import java.util.List;
 
 @Repository
 public interface ManagementCostRepository extends JpaRepository<ManagementCost, Long>, ManagementCostRepositoryCustom {
@@ -32,7 +32,24 @@ public interface ManagementCostRepository extends JpaRepository<ManagementCost, 
 
     // site, siteProcess, paymentDate < endExclusive, deleted = false
     List<ManagementCost> findBySiteIdAndSiteProcessIdAndPaymentDateLessThanAndDeletedFalse(
-        Long siteId,
-        Long siteProcessId,
-        OffsetDateTime endExclusive);
+            Long siteId,
+            Long siteProcessId,
+            OffsetDateTime endExclusive);
+
+    // 식대조회용 명시적 쿼리
+    @Query("""
+                SELECT m FROM ManagementCost m
+                WHERE m.site.id = :siteId
+                  AND m.siteProcess.id = :siteProcessId
+                  AND m.itemType = :itemType
+                  AND m.paymentDate >= :startInclusive
+                  AND m.paymentDate < :endExclusive
+                  AND m.deleted = false
+            """)
+    List<ManagementCost> findMealFeeCosts(
+            @Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId,
+            @Param("itemType") ManagementCostItemType itemType,
+            @Param("startInclusive") OffsetDateTime startInclusive,
+            @Param("endExclusive") OffsetDateTime endExclusive);
 }

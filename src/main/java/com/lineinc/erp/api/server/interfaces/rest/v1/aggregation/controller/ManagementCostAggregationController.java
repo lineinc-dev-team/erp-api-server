@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +12,9 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostMealFeeOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
@@ -35,5 +39,13 @@ public class ManagementCostAggregationController extends BaseController {
         final ManagementCostAggregationResponse response = managementCostAggregationService
                 .getManagementCostAggregation(request);
         return SuccessResponse.ok(response);
+    }
+
+    @GetMapping("/meal-fee-outsourcing-companies")
+    @Operation(summary = "식대 외주업체 목록 조회")
+    public ResponseEntity<SuccessResponse<List<CompanyResponse.CompanySimpleResponse>>> getMealFeeOutsourcingCompanies(
+            @Valid final ManagementCostMealFeeOutsourcingCompaniesRequest request) {
+        final var responseList = managementCostAggregationService.getMealFeeOutsourcingCompanies(request);
+        return SuccessResponse.ok(responseList);
     }
 }
