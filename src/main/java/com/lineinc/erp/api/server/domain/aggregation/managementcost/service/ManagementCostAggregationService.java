@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
@@ -48,7 +49,7 @@ public class ManagementCostAggregationService {
                         request.siteProcessId(),
                         endExclusive);
 
-        // 각 그룹별로 세부 집계 (식대는 mealFeeDetails, 그 외는 details 사용)
+        // 각 그룹별로 세부 집계 (식대/전도금은 전용 상세 사용, 그 외는 details 사용)
         final Map<GroupKey, GroupBucket> grouped = new HashMap<>();
         for (final ManagementCost mc : costs) {
             final CompanyResponse.CompanySimpleResponse companySimple = mc.getOutsourcingCompany() != null
@@ -62,6 +63,11 @@ public class ManagementCostAggregationService {
                 for (final ManagementCostMealFeeDetail meal : mc.getMealFeeDetails()) {
                     if (meal != null)
                         bucket.mealFeeDetails.add(meal);
+                }
+            } else if (itemType == ManagementCostItemType.KEY_MONEY) {
+                for (final ManagementCostKeyMoneyDetail km : mc.getKeyMoneyDetails()) {
+                    if (km != null)
+                        bucket.keyMoneyDetails.add(km);
                 }
             } else {
                 for (final ManagementCostDetail detail : mc.getDetails()) {
@@ -150,7 +156,36 @@ public class ManagementCostAggregationService {
                     new BillingDetail(currSupply, currVat, 0, currTotal));
         }
 
-        // 기본(식대 제외) 로직: detail의 공급가/부가세/공제 사용
+        if (key.itemType() == ManagementCostItemType.KEY_MONEY) {
+            // 전도금: 부가세/공제 없음. amount를 공급가와 총계에 동일 반영
+            long prevSupply = 0, prevTotal = 0;
+            long currSupply = 0, currTotal = 0;
+            for (final var km : bucket.keyMoneyDetails) {
+                final ManagementCost mc = km.getManagementCost();
+                if (mc == null || mc.getPaymentDate() == null)
+                    continue;
+                final OffsetDateTime paymentDate = mc.getPaymentDate();
+                final long amount = safe(km.getAmount());
+                if (paymentDate.isBefore(startInclusive)) {
+                    prevSupply += amount;
+                    prevTotal += amount;
+                } else if (!paymentDate.isBefore(startInclusive) && paymentDate.isBefore(endExclusive)) {
+                    currSupply += amount;
+                    currTotal += amount;
+                }
+            }
+            if (prevTotal + currTotal == 0)
+                return null;
+            return new ManagementCostAggregationItem(
+                    key.company(),
+                    key.itemType() != null ? key.itemType().getLabel() : null,
+                    key.itemType(),
+                    description,
+                    new BillingDetail(prevSupply, 0, 0, prevTotal),
+                    new BillingDetail(currSupply, 0, 0, currTotal));
+        }
+
+        // 기본(식대/전도금 제외) 로직: detail의 공급가/부가세/공제 사용
         long prevSupply = 0, prevVat = 0, prevDeduction = 0;
         long currSupply = 0, currVat = 0, currDeduction = 0;
         for (final var detail : bucket.details) {
@@ -213,6 +248,7 @@ public class ManagementCostAggregationService {
     private static final class GroupBucket {
         private final List<ManagementCostDetail> details = new ArrayList<>();
         private final List<ManagementCostMealFeeDetail> mealFeeDetails = new ArrayList<>();
+        private final List<ManagementCostKeyMoneyDetail> keyMoneyDetails = new ArrayList<>();
 
         private List<ManagementCost> allRelatedManagementCosts() {
             final List<ManagementCost> list = new ArrayList<>();
@@ -223,6 +259,10 @@ public class ManagementCostAggregationService {
             for (final var m : mealFeeDetails) {
                 if (m != null && m.getManagementCost() != null)
                     list.add(m.getManagementCost());
+            }
+            for (final var k : keyMoneyDetails) {
+                if (k != null && k.getManagementCost() != null)
+                    list.add(k.getManagementCost());
             }
             return list;
         }
