@@ -98,4 +98,21 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
 
+    /**
+     * 특정 현장, 공정, 월 구간(포함/미만)으로 출역일보 조회 (날씨 수집용)
+     */
+    @Query("""
+            SELECT dr FROM DailyReport dr \
+            WHERE dr.site.id = :siteId \
+            AND dr.siteProcess.id = :siteProcessId \
+            AND dr.reportDate >= :startDate \
+            AND dr.reportDate < :endDate \
+            AND dr.deleted = false \
+            ORDER BY dr.reportDate ASC""")
+    List<DailyReport> findBySiteIdAndSiteProcessIdAndReportDateBetweenMonth(
+            @Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId,
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate);
+
 }
