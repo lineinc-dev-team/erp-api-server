@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+
 @Repository
 public interface ManagementCostRepository extends JpaRepository<ManagementCost, Long>, ManagementCostRepositoryCustom {
 
@@ -26,4 +29,10 @@ public interface ManagementCostRepository extends JpaRepository<ManagementCost, 
     @Query("SELECT DISTINCT mc.itemTypeDescription, mc.id FROM ManagementCost mc WHERE mc.itemType = :itemType AND mc.itemTypeDescription IS NOT NULL AND mc.itemTypeDescription LIKE %:keyword% AND mc.deleted = false")
     Slice<Object[]> findDistinctItemDescriptionsByKeyword(@Param("itemType") ManagementCostItemType itemType,
             @Param("keyword") String keyword, Pageable pageable);
+
+    // site, siteProcess, paymentDate < endExclusive, deleted = false
+    List<ManagementCost> findBySiteIdAndSiteProcessIdAndPaymentDateLessThanAndDeletedFalse(
+        Long siteId,
+        Long siteProcessId,
+        OffsetDateTime endExclusive);
 }
