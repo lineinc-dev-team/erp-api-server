@@ -36,4 +36,27 @@ public interface DailyReportOutsourcingEquipmentRepository
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
             @Param("endDate") OffsetDateTime endDate);
+
+    /**
+     * 현장, 공정, 월 구간(포함/미만)으로 외주업체 장비 조회 (집계용)
+     * - startDate: 조회월 1일 00:00 UTC 이상
+     * - endDate : 다음달 1일 00:00 UTC 미만
+     */
+    @Query("""
+            SELECT DISTINCT droe FROM DailyReportOutsourcingEquipment droe
+            JOIN FETCH droe.dailyReport dr
+            LEFT JOIN FETCH droe.outsourcingCompany oc
+            LEFT JOIN FETCH droe.outsourcingCompanyContractDriver driver
+            LEFT JOIN FETCH droe.subEquipments se
+            WHERE dr.site.id = :siteId
+            AND dr.siteProcess.id = :siteProcessId
+            AND dr.reportDate >= :startDate
+            AND dr.reportDate < :endDate
+            AND droe.outsourcingCompany IS NOT NULL
+            """)
+    List<DailyReportOutsourcingEquipment> findBySiteAndSiteProcessAndReportDateBetweenMonth(
+            @Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId,
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate);
 }

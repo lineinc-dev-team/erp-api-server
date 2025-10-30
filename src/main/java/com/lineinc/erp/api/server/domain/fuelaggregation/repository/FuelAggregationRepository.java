@@ -29,4 +29,15 @@ public interface FuelAggregationRepository
             SiteProcess siteProcess,
             OffsetDateTime yearMonth);
 
+    /**
+     * 현장, 공정, 월 구간(포함/미만)으로 "삭제되지 않은" 유류집계 목록 조회
+     * - startInclusive: 조회월 1일 00:00 UTC 이상
+     * - endExclusive : 다음달 1일 00:00 UTC 미만
+     */
+    List<FuelAggregation> findBySiteAndSiteProcessAndDateGreaterThanEqualAndDateLessThanAndDeletedFalse(
+            Site site,
+            SiteProcess siteProcess,
+            OffsetDateTime startInclusive,
+            OffsetDateTime endExclusive);
+
 }

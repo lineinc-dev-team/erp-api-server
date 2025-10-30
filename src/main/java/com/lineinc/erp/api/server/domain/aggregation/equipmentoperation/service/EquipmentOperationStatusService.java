@@ -72,12 +72,15 @@ public class EquipmentOperationStatusService {
         final List<DailyReportOutsourcingEquipment> allEquipments = findEquipmentsUpToMonth(site, siteProcess,
                 yearMonth);
 
-        // 해당 월의 유류집계 데이터 조회 후 장비별 일자 사용량 Map 구성
+        // 해당 월의 유류집계 데이터 조회 후 장비별 일자 사용량 Map 구성 (해당 월만)
         final YearMonth ym = YearMonth.parse(yearMonth);
+        final LocalDate startOfMonth = ym.atDay(1);
         final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
+        final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startOfMonth);
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
         final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
-                .findBySiteAndSiteProcessAndDateLessThanAndDeletedFalse(site, siteProcess, endExclusive);
+                .findBySiteAndSiteProcessAndDateGreaterThanEqualAndDateLessThanAndDeletedFalse(
+                        site, siteProcess, startInclusive, endExclusive);
         final Map<Long, Map<Integer, Long>> fuelUsageByEquipment = buildFuelUsageByEquipmentForMonth(
                 fuelAggregations, YearMonth.parse(yearMonth));
 
@@ -97,13 +100,16 @@ public class EquipmentOperationStatusService {
             final String yearMonth) {
 
         final YearMonth ym = YearMonth.parse(yearMonth);
-        final LocalDate lastDay = ym.atEndOfMonth();
-        final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcEndOfDay(lastDay);
+        final LocalDate startOfMonth = ym.atDay(1);
+        final LocalDate nextMonthFirstDay = ym.plusMonths(1).atDay(1);
+        final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startOfMonth);
+        final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
 
-        return equipmentRepository.findBySiteAndSiteProcessAndReportDateLessThanEqual(
+        return equipmentRepository.findBySiteAndSiteProcessAndReportDateBetweenMonth(
                 site.getId(),
                 siteProcess.getId(),
-                endDateTime);
+                startInclusive,
+                endExclusive);
     }
 
     /**
