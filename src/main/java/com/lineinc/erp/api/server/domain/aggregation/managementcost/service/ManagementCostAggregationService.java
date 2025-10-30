@@ -157,20 +157,23 @@ public class ManagementCostAggregationService {
         }
 
         if (key.itemType() == ManagementCostItemType.KEY_MONEY) {
-            // 전도금: 부가세/공제 없음. amount를 공급가와 총계에 동일 반영
-            long prevSupply = 0, prevTotal = 0;
-            long currSupply = 0, currTotal = 0;
+            // 전도금: 부가세 없음. amount를 공급가와 총계에 동일 반영, 공제는 isDeductible일 때 amount
+            long prevSupply = 0, prevDeduction = 0, prevTotal = 0;
+            long currSupply = 0, currDeduction = 0, currTotal = 0;
             for (final var km : bucket.keyMoneyDetails) {
                 final ManagementCost mc = km.getManagementCost();
                 if (mc == null || mc.getPaymentDate() == null)
                     continue;
                 final OffsetDateTime paymentDate = mc.getPaymentDate();
                 final long amount = safe(km.getAmount());
+                final long deduction = Boolean.TRUE.equals(km.getIsDeductible()) ? amount : 0L;
                 if (paymentDate.isBefore(startInclusive)) {
                     prevSupply += amount;
+                    prevDeduction += deduction;
                     prevTotal += amount;
                 } else if (!paymentDate.isBefore(startInclusive) && paymentDate.isBefore(endExclusive)) {
                     currSupply += amount;
+                    currDeduction += deduction;
                     currTotal += amount;
                 }
             }
@@ -181,8 +184,8 @@ public class ManagementCostAggregationService {
                     key.itemType() != null ? key.itemType().getLabel() : null,
                     key.itemType(),
                     description,
-                    new BillingDetail(prevSupply, 0, 0, prevTotal),
-                    new BillingDetail(currSupply, 0, 0, currTotal));
+                    new BillingDetail(prevSupply, 0, prevDeduction, prevTotal),
+                    new BillingDetail(currSupply, 0, currDeduction, currTotal));
         }
 
         // 기본(식대/전도금 제외) 로직: detail의 공급가/부가세/공제 사용
