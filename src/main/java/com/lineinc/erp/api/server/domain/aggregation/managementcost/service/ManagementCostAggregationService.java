@@ -106,8 +106,8 @@ public class ManagementCostAggregationService {
                 currDeduction += deduction;
             }
         }
-        final long prevTotal = prevSupply + prevVat - prevDeduction;
-        final long currTotal = currSupply + currVat - currDeduction;
+        final long prevTotal = prevSupply + prevVat;
+        final long currTotal = currSupply + currVat;
         if (prevSupply + prevVat + prevDeduction + prevTotal + currSupply + currVat + currDeduction + currTotal == 0)
             return null;
         return new ManagementCostAggregationItem(
