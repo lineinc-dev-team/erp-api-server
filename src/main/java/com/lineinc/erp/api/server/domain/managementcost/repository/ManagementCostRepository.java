@@ -52,4 +52,23 @@ public interface ManagementCostRepository extends JpaRepository<ManagementCost, 
             @Param("itemType") ManagementCostItemType itemType,
             @Param("startInclusive") OffsetDateTime startInclusive,
             @Param("endExclusive") OffsetDateTime endExclusive);
+
+    // 식대 집계 상세 조회용 쿼리 (업체 ID 포함)
+    @Query("""
+                SELECT m FROM ManagementCost m
+                WHERE m.site.id = :siteId
+                  AND m.siteProcess.id = :siteProcessId
+                  AND m.itemType = :itemType
+                  AND m.outsourcingCompany.id = :outsourcingCompanyId
+                  AND m.paymentDate >= :startInclusive
+                  AND m.paymentDate < :endExclusive
+                  AND m.deleted = false
+            """)
+    List<ManagementCost> findMealFeeCostsByCompany(
+            @Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId,
+            @Param("itemType") ManagementCostItemType itemType,
+            @Param("outsourcingCompanyId") Long outsourcingCompanyId,
+            @Param("startInclusive") OffsetDateTime startInclusive,
+            @Param("endExclusive") OffsetDateTime endExclusive);
 }

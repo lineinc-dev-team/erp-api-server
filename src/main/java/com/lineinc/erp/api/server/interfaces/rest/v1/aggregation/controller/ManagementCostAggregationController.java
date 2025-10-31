@@ -13,7 +13,9 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostMealFeeOutsourcingCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.MealFeeAggregationDetailRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -47,5 +49,15 @@ public class ManagementCostAggregationController extends BaseController {
             @Valid final ManagementCostMealFeeOutsourcingCompaniesRequest request) {
         final var responseList = managementCostAggregationService.getMealFeeOutsourcingCompanies(request);
         return SuccessResponse.ok(responseList);
+    }
+
+    @GetMapping("/meal-fee-detail")
+    @Operation(summary = "식대 상세 조회")
+    @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<MealFeeAggregationDetailResponse>> getMealFeeAggregationDetail(
+            @Valid final MealFeeAggregationDetailRequest request) {
+        final MealFeeAggregationDetailResponse response = managementCostAggregationService
+                .getMealFeeAggregationDetail(request);
+        return SuccessResponse.ok(response);
     }
 }

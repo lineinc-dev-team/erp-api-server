@@ -3,11 +3,13 @@ package com.lineinc.erp.api.server.domain.aggregation.managementcost.service;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +22,13 @@ import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItem
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostMealFeeOutsourcingCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.MealFeeAggregationDetailRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse.BillingDetail;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse.ManagementCostAggregationItem;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse.DailyMealFeeUsage;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse.MealFeeAggregationDetailItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
@@ -115,6 +121,139 @@ public class ManagementCostAggregationService {
                 .distinct()
                 .sorted((a, b) -> a.name().compareToIgnoreCase(b.name()))
                 .toList();
+    }
+
+    /**
+     * 식대 집계 상세 조회 (일별, 인원별)
+     */
+    public MealFeeAggregationDetailResponse getMealFeeAggregationDetail(
+            final MealFeeAggregationDetailRequest request) {
+        final YearMonth ym = YearMonth.parse(request.yearMonth());
+        final LocalDate startMonth = ym.atDay(1);
+        final LocalDate nextMonthStart = ym.plusMonths(1).atDay(1);
+
+        // 한국 시간 기준으로 날짜 범위를 UTC로 변환
+        // 해당 월 1일 00:00 (한국) = 전월 말일 15:00 (UTC)
+        final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startMonth);
+        // 다음 월 1일 00:00 (한국) = 해당 월 말일 15:00 (UTC)
+        final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthStart);
+
+        // DB 레벨에서 모든 조건 필터링: siteId, siteProcessId, itemType, outsourcingCompanyId, 날짜
+        // 범위
+        final List<ManagementCost> mealFeeCosts = managementCostRepository
+                .findMealFeeCostsByCompany(
+                        request.siteId(),
+                        request.siteProcessId(),
+                        ManagementCostItemType.MEAL_FEE,
+                        request.outsourcingCompanyId(),
+                        startInclusive,
+                        endExclusive);
+
+        // 인원별로 그룹핑 (이름 + 직종 조합으로 그룹핑)
+        final Map<PersonKey, List<ManagementCostMealFeeDetail>> groupedByPerson = mealFeeCosts
+                .stream()
+                .flatMap(mc -> mc.getMealFeeDetails().stream()
+                        .map(meal -> Map.entry(meal, mc)))
+                .filter(entry -> {
+                    // labor가 있으면 labor 이름 확인, 없으면 meal name 확인
+                    final String personName = getPersonName(entry.getKey());
+                    return personName != null && !personName.isBlank();
+                })
+                .collect(Collectors.groupingBy(
+                        entry -> new PersonKey(getPersonName(entry.getKey()), getWorkType(entry.getKey())),
+                        Collectors.mapping(Map.Entry::getKey, Collectors.toList())));
+
+        // 각 인원별로 일별 집계 생성
+        final List<MealFeeAggregationDetailItem> items = groupedByPerson.entrySet()
+                .stream()
+                .map(entry -> createMealFeeDetailItem(entry.getKey().name(), entry.getKey().workType(),
+                        entry.getValue(), ym))
+                .toList();
+
+        return new MealFeeAggregationDetailResponse(items);
+    }
+
+    /**
+     * 인원별 식대 집계 상세 항목 생성
+     */
+    private MealFeeAggregationDetailItem createMealFeeDetailItem(
+            final String name,
+            final String workType,
+            final List<ManagementCostMealFeeDetail> mealFeeDetails,
+            final YearMonth ym) {
+
+        // 일별 사용량 초기화 (1일 ~ 31일까지)
+        final Map<Integer, DailyMealFeeUsage> dailyUsageMap = new HashMap<>();
+        for (int day = 1; day <= 31; day++) {
+            dailyUsageMap.put(day, null); // 데이터가 없는 날은 null
+        }
+
+        // 각 식대 상세의 날짜에 해당하는 일자에 집계
+        for (final ManagementCostMealFeeDetail meal : mealFeeDetails) {
+            final ManagementCost mc = meal.getManagementCost();
+            if (mc == null || mc.getPaymentDate() == null)
+                continue;
+
+            final LocalDate paymentDate = mc.getPaymentDate().atZoneSameInstant(ZoneOffset.of("+09:00"))
+                    .toLocalDate();
+
+            // 조회월에 해당하는 날짜만 집계
+            if (paymentDate.getYear() == ym.getYear() && paymentDate.getMonthValue() == ym.getMonthValue()) {
+                final int day = paymentDate.getDayOfMonth();
+
+                // 해당 일자에 이미 데이터가 있으면 합산
+                final DailyMealFeeUsage currentUsage = dailyUsageMap.get(day);
+                final int breakfastCount = safeInteger(meal.getBreakfastCount())
+                        + (currentUsage != null ? safeInteger(currentUsage.breakfastCount()) : 0);
+                final int lunchCount = safeInteger(meal.getLunchCount())
+                        + (currentUsage != null ? safeInteger(currentUsage.lunchCount()) : 0);
+                final long unitPrice = meal.getUnitPrice() != null ? meal.getUnitPrice()
+                        : (currentUsage != null ? currentUsage.unitPrice() : 0L);
+                final long amount = safe(meal.getAmount()) + (currentUsage != null ? currentUsage.amount() : 0L);
+
+                dailyUsageMap.put(day, new DailyMealFeeUsage(breakfastCount, lunchCount, unitPrice, amount));
+            }
+        }
+
+        return new MealFeeAggregationDetailItem(
+                workType,
+                name,
+                dailyUsageMap.get(1), dailyUsageMap.get(2), dailyUsageMap.get(3), dailyUsageMap.get(4),
+                dailyUsageMap.get(5), dailyUsageMap.get(6), dailyUsageMap.get(7), dailyUsageMap.get(8),
+                dailyUsageMap.get(9), dailyUsageMap.get(10), dailyUsageMap.get(11), dailyUsageMap.get(12),
+                dailyUsageMap.get(13), dailyUsageMap.get(14), dailyUsageMap.get(15), dailyUsageMap.get(16),
+                dailyUsageMap.get(17), dailyUsageMap.get(18), dailyUsageMap.get(19), dailyUsageMap.get(20),
+                dailyUsageMap.get(21), dailyUsageMap.get(22), dailyUsageMap.get(23), dailyUsageMap.get(24),
+                dailyUsageMap.get(25), dailyUsageMap.get(26), dailyUsageMap.get(27), dailyUsageMap.get(28),
+                dailyUsageMap.get(29), dailyUsageMap.get(30), dailyUsageMap.get(31));
+    }
+
+    private static int safeInteger(final Integer v) {
+        return v != null ? v : 0;
+    }
+
+    /**
+     * 인원 이름 결정: labor가 있으면 labor 이름, 없으면 meal name
+     */
+    private static String getPersonName(final ManagementCostMealFeeDetail meal) {
+        if (meal.getLabor() != null && meal.getLabor().getName() != null
+                && !meal.getLabor().getName().isBlank()) {
+            return meal.getLabor().getName();
+        }
+        return meal.getName();
+    }
+
+    /**
+     * 직종 결정: workType 필드에서 가져오기
+     */
+    private static String getWorkType(final ManagementCostMealFeeDetail meal) {
+        return meal.getWorkType() != null ? meal.getWorkType() : "";
+    }
+
+    /**
+     * 인원 그룹핑 키 (이름 + 직종)
+     */
+    private record PersonKey(String name, String workType) {
     }
 
     private ManagementCostAggregationItem toAggregationItem(
