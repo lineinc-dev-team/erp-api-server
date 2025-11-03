@@ -24,6 +24,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.service.v1.FuelAggregat
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.DeleteFuelAggregationsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationDownloadRequest;
@@ -49,9 +50,6 @@ import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -61,15 +59,11 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/fuel-aggregations")
 @RequiredArgsConstructor
 @Tag(name = "유류집계 관리", description = "유류집계 관리 API")
-public class FuelAggregationController {
+public class FuelAggregationController extends BaseController {
 
     private final FuelAggregationService fuelAggregationService;
 
     @Operation(summary = "날씨 타입 조회", description = "사용 가능한 날씨 타입 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/weather-types")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WeatherTypeResponse>>> getWeatherTypes() {
@@ -80,10 +74,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유종 타입 조회", description = "사용 가능한 유종 타입 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/fuel-types")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<FuelTypeResponse>>> getFuelTypes() {
@@ -94,10 +84,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유류집계 등록", description = "유류집계 정보를 등록합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "성공", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.CREATE)
     public ResponseEntity<SuccessResponse<Void>> createFuelAggregation(
@@ -108,10 +94,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유류집계 삭제", description = "하나 이상의 유류집계 ID를 받아 해당 유류집계를 삭제합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "유류집계를 찾을 수 없음")
-    })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteFuelAggregations(
@@ -121,11 +103,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유류집계 수정", description = "유류집계 정보를 수정합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "유류집계를 찾을 수 없음")
-    })
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateFuelAggregation(
@@ -137,10 +114,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유류집계 목록 조회", description = "필터 조건에 맞는 유류집계 목록을 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유류집계 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationListResponse>>> getFuelAggregations(
@@ -160,10 +133,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유류집계 상세 조회", description = "유류집계 상세 정보를 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유류집계 상세 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유류집계를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<FuelAggregationDetailResponse>> getFuelAggregationById(
@@ -173,10 +142,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유류집계 수정이력 조회", description = "유류집계의 수정이력을 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유류집계를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<FuelAggregationChangeHistoryResponse>>> getFuelAggregationChangeHistories(
@@ -194,10 +159,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유종별 가격 조회", description = "현장, 공정, 일자로 휘발유/경유/요소수 가격을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/fuel-prices")
     public ResponseEntity<SuccessResponse<FuelPriceResponse>> getFuelPrice(
             @Valid final FuelPriceRequest request) {
@@ -206,10 +167,6 @@ public class FuelAggregationController {
     }
 
     @Operation(summary = "유류집계 목록 엑셀 다운로드", description = "검색 조건에 맞는 유류집계 목록을 엑셀 파일로 다운로드합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadFuelAggregationsExcel(

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.request.LoginRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.request.PasswordChangeRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.auth.dto.response.UserResponse;
@@ -26,8 +27,6 @@ import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,17 +38,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value = "/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "인증 관리", description = "인증 관련 API")
-public class AuthController {
+public class AuthController extends BaseController {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
 
     @Operation(summary = "로그인", description = "사용자 로그인 후 세션 생성 및 쿠키 발급")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400"),
-            @ApiResponse(responseCode = "401")
-    })
     @PostMapping("/login")
     public ResponseEntity<Void> login(
             @Valid @RequestBody final LoginRequest request,
@@ -91,10 +85,6 @@ public class AuthController {
     }
 
     @Operation(summary = "비밀번호 변경", description = "새 비밀번호로 변경합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400"),
-    })
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal final CustomUserDetails userDetails,
@@ -104,9 +94,6 @@ public class AuthController {
     }
 
     @Operation(summary = "로그아웃", description = "세션 만료를 통한 사용자 로그아웃 처리")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200"),
-    })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(final HttpSession session) {
         session.invalidate();
@@ -114,10 +101,6 @@ public class AuthController {
     }
 
     @Operation(summary = "내 정보 조회", description = "현재 로그인된 사용자 정보를 반환")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "404")
-    })
     @GetMapping("/me")
     public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(
             @AuthenticationPrincipal final CustomUserDetails userDetails) {

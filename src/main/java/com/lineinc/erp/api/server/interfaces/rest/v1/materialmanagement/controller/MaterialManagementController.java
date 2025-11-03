@@ -27,6 +27,7 @@ import com.lineinc.erp.api.server.domain.materialmanagement.service.v1.MaterialM
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.DeleteMaterialManagementsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementDownloadRequest;
@@ -50,9 +51,6 @@ import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -62,17 +60,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/material-managements")
 @RequiredArgsConstructor
 @Tag(name = "자재 관리", description = "자재관리 관련 API")
-public class MaterialManagementController {
+public class MaterialManagementController extends BaseController {
 
     private final MaterialManagementService materialManagementService;
     private final MaterialManagementChangeHistoryService changeHistoryService;
 
     @Operation(summary = "자재관리 등록", description = "자재관리 정보를 등록합니다")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "자재관리 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 현장 또는 공정을 등록하려는경우", content = @Content())
-    })
-
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createMaterialManagement(
@@ -83,7 +76,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 투입구분 목록 조회", description = "자재관리 투입구분 목록을 반환합니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     @GetMapping("/input-types")
     public ResponseEntity<SuccessResponse<List<MaterialManagementInputTypeResponse>>> getMaterialManagementInputTypes() {
@@ -96,9 +88,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 상세 품명 키워드 검색", description = "상세 품명으로 간단한 검색을 수행합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
     @GetMapping("/detail-names/search")
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementNameResponse>>> getMaterialManagementDetailNames(
             @Valid final PageRequest pageRequest,
@@ -115,10 +104,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 목록 조회", description = "필터 조건에 맞는 자재관리 목록을 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "자재관리 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<MaterialManagementResponse>>> getMaterialManagements(
@@ -138,11 +123,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 삭제", description = "하나 이상의 자재관리 ID를 받아 해당 데이터를삭제합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음")
-    })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteMaterialManagements(
@@ -152,10 +132,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 목록 엑셀 다운로드", description = "검색 조건에 맞는 자재관리 목록을 엑셀 파일로 다운로드합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadSitesExcel(
@@ -179,10 +155,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 상세 조회", description = "자재관리 상세 정보를 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<MaterialManagementDetailViewResponse>> getMaterialManagementDetail(
@@ -193,11 +165,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 정보 수정", description = "자재관리 정보를 수정합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "해당 자재관리를 찾을 수 없음", content = @Content())
-    })
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateMaterialManagement(
@@ -209,10 +176,6 @@ public class MaterialManagementController {
     }
 
     @Operation(summary = "자재관리 수정이력 조회", description = "자재관리의 수정이력을 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "자재관리를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementChangeHistoryResponse>>> getMaterialManagementChangeHistories(

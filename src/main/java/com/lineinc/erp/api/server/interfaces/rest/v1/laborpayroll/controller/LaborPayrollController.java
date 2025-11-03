@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollSer
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollChangeHistoryUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDetailSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDownloadRequest;
@@ -40,9 +41,6 @@ import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -55,7 +53,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/labor-payrolls")
 @RequiredArgsConstructor
-public class LaborPayrollController {
+public class LaborPayrollController extends BaseController {
 
     private final LaborPayrollService laborPayrollService;
 
@@ -64,10 +62,6 @@ public class LaborPayrollController {
      * 현장별, 공정별, 월별로 그룹핑된 노무비 통계 정보 조회
      */
     @Operation(summary = "노무명세서 목록 조회", description = "월별로 그룹핑된 노무명세서 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollSummaryResponse>>> getLaborPayrollMonthlyList(
@@ -86,10 +80,6 @@ public class LaborPayrollController {
      * 검색 조건에 맞는 노무명세서 목록을 엑셀 파일로 다운로드
      */
     @Operation(summary = "노무명세서 엑셀 다운로드", description = "검색 조건에 맞는 노무명세서 목록을 엑셀 파일로 다운로드합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadLaborPayrollExcel(
@@ -116,10 +106,6 @@ public class LaborPayrollController {
      * 현장, 공정, 년월, 노무인력 타입, 일자로 필터링하여 조회
      */
     @Operation(summary = "노무명세서 상세 조회", description = "현장, 공정, 년월, 노무인력 타입, 일자로 필터링하여 노무명세서 상세 정보를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 조건의 노무명세서를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/details")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborPayrollDetailResponse>>> getLaborPayrollDetails(
@@ -133,11 +119,6 @@ public class LaborPayrollController {
      * 노무명세서 집계 상세 조회
      */
     @Operation(summary = "노무명세서 집계 상세 조회", description = "노무명세서 집계 데이터를 조회합니다.")
-
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 집계 데이터를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/summary/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<LaborPayrollSummaryResponse>> getLaborPayrollSummaryDetail(
@@ -150,11 +131,6 @@ public class LaborPayrollController {
      * 노무명세서 집계 테이블 수정
      */
     @Operation(summary = "노무명세서 집계 테이블 수정", description = "노무명세서 집계 테이블을 수정합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 집계 데이터를 찾을 수 없음", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @PatchMapping("/summary/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrollSummary(
@@ -169,11 +145,6 @@ public class LaborPayrollController {
      * 노무명세서 수정
      */
     @Operation(summary = "노무명세서 수정", description = "노무명세서들을 수정합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 노무명세서를 찾을 수 없음", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @PatchMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrolls(
@@ -187,10 +158,6 @@ public class LaborPayrollController {
      * 노무명세서 변경이력 조회
      */
     @Operation(summary = "노무명세서 변경이력 조회", description = "특정 노무명세서 집계와 관련된 변경이력을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/summary/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<LaborPayrollChangeHistoryResponse>>> getLaborPayrollChangeHistories(
@@ -212,11 +179,6 @@ public class LaborPayrollController {
      * 노무명세서 변경이력 수정
      */
     @Operation(summary = "노무명세서 변경이력 수정", description = "특정 변경이력의 메모를 수정합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 변경이력을 찾을 수 없음", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @PatchMapping("/change-histories/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrollChangeHistory(
