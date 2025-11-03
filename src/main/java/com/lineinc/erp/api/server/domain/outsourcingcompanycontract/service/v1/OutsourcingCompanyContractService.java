@@ -34,6 +34,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractWorkerFile;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractChangeType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractStatus;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractConstructionGroupRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractConstructionRepository;
@@ -908,6 +909,19 @@ public class OutsourcingCompanyContractService {
                 .findAllByVehicleNumber(searchKeyword, pageable);
 
         return equipmentSlice.map(ContractEquipmentResponse.ContractEquipmentSimpleResponse::from);
+    }
+
+    /**
+     * 외주업체 계약 이름(계약 구분 설명)으로 키워드 검색
+     */
+    @Transactional(readOnly = true)
+    public Slice<ContractListResponse.ContractSimpleResponse> searchByName(final String keyword,
+            final OutsourcingCompanyContractType type, final Pageable pageable) {
+        final String searchKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        final Slice<OutsourcingCompanyContract> contracts = contractRepository
+                .findByTypeDescriptionAndKeyword(searchKeyword, type, pageable);
+
+        return contracts.map(ContractListResponse.ContractSimpleResponse::from);
     }
 
     @Transactional(readOnly = true)

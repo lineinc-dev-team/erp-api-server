@@ -7,6 +7,9 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContactResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -91,5 +94,41 @@ public record ContractListResponse(
                 contract.getFiles().stream()
                         .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().isBlank()
                                 && file.getType() == OutsourcingCompanyContractFileType.CONTRACT));
+    }
+
+    @Schema(description = "간단한 외주업체 계약 응답")
+    public static record ContractSimpleResponse(
+            @Schema(description = "계약 ID", example = "123") Long id,
+            @Schema(description = "계약 구분 설명", example = "토목공사 계약") String typeDescription,
+            @Schema(description = "간단한 외주업체 응답") CompanyResponse.CompanySimpleResponse company,
+            @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
+            @Schema(description = "간단한 현장 응답") SiteResponse.SiteSimpleResponse site,
+            @Schema(description = "간단한 공정 응답") SiteProcessResponse.SiteProcessSimpleResponse siteProcess,
+            @Schema(description = "계약 구분", example = "외주") String contractType,
+            @Schema(description = "계약 구분 코드", example = "CONSTRUCTION") String contractTypeCode,
+            @Schema(description = "계약 상태", example = "진행중") String contractStatus,
+            @Schema(description = "계약 상태 코드", example = "IN_PROGRESS") String contractStatusCode,
+            @Schema(description = "외주금액", example = "50000000") Long contractAmount,
+            @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
+        public static ContractSimpleResponse from(final OutsourcingCompanyContract contract) {
+            return new ContractSimpleResponse(
+                    contract.getId(),
+                    contract.getTypeDescription(),
+                    contract.getOutsourcingCompany() != null
+                            ? CompanyResponse.CompanySimpleResponse.from(contract.getOutsourcingCompany())
+                            : null,
+                    contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getBusinessNumber()
+                            : null,
+                    contract.getSite() != null ? SiteResponse.SiteSimpleResponse.from(contract.getSite()) : null,
+                    contract.getSiteProcess() != null
+                            ? SiteProcessResponse.SiteProcessSimpleResponse.from(contract.getSiteProcess())
+                            : null,
+                    contract.getType() != null ? contract.getType().getLabel() : null,
+                    contract.getType() != null ? contract.getType().name() : null,
+                    contract.getStatus() != null ? contract.getStatus().getLabel() : null,
+                    contract.getStatus() != null ? contract.getStatus().name() : null,
+                    contract.getContractAmount(),
+                    contract.isDeleted());
+        }
     }
 }
