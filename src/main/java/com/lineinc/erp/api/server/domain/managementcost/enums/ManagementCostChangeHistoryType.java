@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 public enum ManagementCostChangeHistoryType {
 
     BASIC("기본정보"),
-    MEAL_FEE("식대"),
+    MEAL_FEE("직원"),
+    MEAL_FEE_OUTSOURCING("직영/용역"),
+    MEAL_FEE_EQUIPMENT("장비"),
+    MEAL_FEE_CONSTRUCTION("공사"),
     ITEM_DETAIL("품목상세"),
     KEY_MONEY_DETAIL("전도금 상세"),
     ATTACHMENT("증빙서류");
