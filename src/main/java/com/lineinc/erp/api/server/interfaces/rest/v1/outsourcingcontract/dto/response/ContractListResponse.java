@@ -100,7 +100,7 @@ public record ContractListResponse(
     public static record ContractSimpleResponse(
             @Schema(description = "계약 ID", example = "123") Long id,
             @Schema(description = "계약 구분 설명", example = "토목공사 계약") String typeDescription,
-            @Schema(description = "간단한 외주업체 응답") CompanyResponse.CompanySimpleResponse company,
+            @Schema(description = "간단한 외주업체 응답") CompanyResponse.CompanySimpleResponse outsourcingCompany,
             @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
             @Schema(description = "간단한 현장 응답") SiteResponse.SiteSimpleResponse site,
             @Schema(description = "간단한 공정 응답") SiteProcessResponse.SiteProcessSimpleResponse siteProcess,
