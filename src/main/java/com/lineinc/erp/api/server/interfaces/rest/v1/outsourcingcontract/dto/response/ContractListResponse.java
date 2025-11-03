@@ -99,7 +99,7 @@ public record ContractListResponse(
     @Schema(description = "간단한 외주업체 계약 응답")
     public static record ContractSimpleResponse(
             @Schema(description = "계약 ID", example = "123") Long id,
-            @Schema(description = "계약명", example = "2025년 1월 계약") String name,
+            @Schema(description = "계약명", example = "2025년 1월 계약") String contractName,
             @Schema(description = "간단한 외주업체 응답") CompanyResponse.CompanySimpleResponse outsourcingCompany,
             @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
             @Schema(description = "간단한 현장 응답") SiteResponse.SiteSimpleResponse site,
@@ -113,7 +113,7 @@ public record ContractListResponse(
         public static ContractSimpleResponse from(final OutsourcingCompanyContract contract) {
             return new ContractSimpleResponse(
                     contract.getId(),
-                    contract.getName(),
+                    contract.getContractName(),
                     contract.getOutsourcingCompany() != null
                             ? CompanyResponse.CompanySimpleResponse.from(contract.getOutsourcingCompany())
                             : null,

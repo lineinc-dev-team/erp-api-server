@@ -29,7 +29,7 @@ public interface OutsourcingCompanyContractRepository
      */
     @Query("""
             SELECT oc FROM OutsourcingCompanyContract oc WHERE \
-            (:keyword IS NULL OR LOWER(oc.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS text), '%'))) AND \
+            (:keyword IS NULL OR LOWER(oc.contractName) LIKE LOWER(CONCAT('%', CAST(:keyword AS text), '%'))) AND \
             oc.deleted = false AND \
             (:type IS NULL OR oc.type = :type) AND \
             (:outsourcingCompanyId IS NULL OR oc.outsourcingCompany.id = :outsourcingCompanyId)""")

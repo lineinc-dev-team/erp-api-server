@@ -64,7 +64,7 @@ public class OutsourcingCompanyContract extends BaseEntity {
 
     @DiffInclude
     @Column
-    private String name;
+    private String contractName;
 
     @DiffIgnore
     @ManyToOne
@@ -232,11 +232,10 @@ public class OutsourcingCompanyContract extends BaseEntity {
             final OutsourcingCompany outsourcingCompany) {
 
         // 현장, 공정, 외주업체 수정
-        this.name = request.name();
+        this.contractName = request.contractName();
         this.site = site;
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
-        this.name = request.name();
         this.typeDescription = request.typeDescription();
         this.contractStartDate = request.contractStartDate().atStartOfDay().atOffset(java.time.ZoneOffset.UTC);
         this.contractEndDate = request.contractEndDate().atStartOfDay().atOffset(java.time.ZoneOffset.UTC);

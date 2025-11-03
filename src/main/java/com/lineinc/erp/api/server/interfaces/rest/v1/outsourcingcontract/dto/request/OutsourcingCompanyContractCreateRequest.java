@@ -14,7 +14,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "외주업체 계약 등록 요청")
 public record OutsourcingCompanyContractCreateRequest(
-        @Schema(description = "계약 이름", example = "2025년 1월 계약") String name,
+        @Schema(description = "계약 이름", example = "2025년 1월 계약") String contractName,
         @Schema(description = "현장 ID", example = "1") @NotNull Long siteId,
         @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
         @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,

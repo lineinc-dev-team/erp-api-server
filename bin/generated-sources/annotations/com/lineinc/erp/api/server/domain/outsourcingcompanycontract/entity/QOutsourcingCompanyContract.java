@@ -38,6 +38,8 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
 
     public final DateTimePath<java.time.OffsetDateTime> contractEndDate = createDateTime("contractEndDate", java.time.OffsetDateTime.class);
 
+    public final StringPath contractName = createString("contractName");
+
     public final DateTimePath<java.time.OffsetDateTime> contractStartDate = createDateTime("contractStartDate", java.time.OffsetDateTime.class);
 
     //inherited
@@ -65,8 +67,6 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath memo = createString("memo");
-
-    public final StringPath name = createString("name");
 
     public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany outsourcingCompany;
 
