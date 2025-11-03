@@ -182,6 +182,7 @@ public class OutsourcingCompanyContractService {
         final OffsetDateTime contractEndDate = DateTimeFormatUtils.toOffsetDateTime(request.contractEndDate());
 
         final OutsourcingCompanyContract contract = OutsourcingCompanyContract.builder()
+                .name(request.name())
                 .site(site)
                 .siteProcess(siteProcess)
                 .outsourcingCompany(outsourcingCompany)

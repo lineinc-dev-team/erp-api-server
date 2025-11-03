@@ -66,6 +66,8 @@ public class QOutsourcingCompanyContract extends EntityPathBase<OutsourcingCompa
 
     public final StringPath memo = createString("memo");
 
+    public final StringPath name = createString("name");
+
     public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany outsourcingCompany;
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;

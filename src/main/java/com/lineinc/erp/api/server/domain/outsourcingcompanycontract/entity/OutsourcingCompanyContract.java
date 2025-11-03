@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -62,6 +61,10 @@ public class OutsourcingCompanyContract extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_seq")
     @SequenceGenerator(name = "outsourcing_company_contract_seq", sequenceName = "outsourcing_company_contract_seq", allocationSize = 1)
     private Long id;
+
+    @DiffInclude
+    @Column
+    private String name;
 
     @DiffIgnore
     @ManyToOne
@@ -229,27 +232,23 @@ public class OutsourcingCompanyContract extends BaseEntity {
             final OutsourcingCompany outsourcingCompany) {
 
         // 현장, 공정, 외주업체 수정
+        this.name = request.name();
         this.site = site;
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
-
-        // 기존 필드들 수정
-        Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
-        Optional.ofNullable(request.contractStartDate())
-                .ifPresent(val -> this.contractStartDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
-        Optional.ofNullable(request.contractEndDate())
-                .ifPresent(val -> this.contractEndDate = val.atStartOfDay().atOffset(java.time.ZoneOffset.UTC));
-        Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
-        Optional.ofNullable(request.defaultDeductionsType()).ifPresent(val -> this.defaultDeductions = val);
-        Optional.ofNullable(request.defaultDeductionsDescription())
-                .ifPresent(val -> this.defaultDeductionsDescription = val);
-        Optional.ofNullable(request.taxInvoiceCondition()).ifPresent(val -> this.taxInvoiceCondition = val);
-        Optional.ofNullable(request.taxInvoiceIssueDayOfMonth())
-                .ifPresent(val -> this.taxInvoiceIssueDayOfMonth = val);
-        Optional.ofNullable(request.category()).ifPresent(val -> this.category = val);
-        Optional.ofNullable(request.workTypeName()).ifPresent(val -> this.workTypeName = val);
-        Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.name = request.name();
+        this.typeDescription = request.typeDescription();
+        this.contractStartDate = request.contractStartDate().atStartOfDay().atOffset(java.time.ZoneOffset.UTC);
+        this.contractEndDate = request.contractEndDate().atStartOfDay().atOffset(java.time.ZoneOffset.UTC);
+        this.contractAmount = request.contractAmount();
+        this.defaultDeductions = request.defaultDeductionsType();
+        this.defaultDeductionsDescription = request.defaultDeductionsDescription();
+        this.taxInvoiceCondition = request.taxInvoiceCondition();
+        this.taxInvoiceIssueDayOfMonth = request.taxInvoiceIssueDayOfMonth();
+        this.category = request.category();
+        this.workTypeName = request.workTypeName();
+        this.status = request.status();
+        this.memo = request.memo();
 
         // transient 필드 동기화
         syncTransientFields();

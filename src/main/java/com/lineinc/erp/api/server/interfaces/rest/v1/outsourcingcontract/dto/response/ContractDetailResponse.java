@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "외주업체 계약 상세 응답")
 public record ContractDetailResponse(
         @Schema(description = "계약 ID", example = "1") Long id,
+        @Schema(description = "계약 이름", example = "2025년 1월 계약") String name,
         @Schema(description = "계약 구분", example = "토목공사") String type,
         @Schema(description = "계약 구분 코드", example = "CIVIL_ENGINEERING") String typeCode,
         @Schema(description = "계약 구분 설명", example = "토목공사 계약") String typeDescription,
@@ -45,6 +46,7 @@ public record ContractDetailResponse(
     public static ContractDetailResponse from(final OutsourcingCompanyContract contract) {
         return new ContractDetailResponse(
                 contract.getId(),
+                contract.getName(),
                 contract.getType() != null ? contract.getType().getLabel() : null,
                 contract.getType() != null ? contract.getType().name() : null,
                 contract.getTypeDescription(),
