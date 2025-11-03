@@ -913,14 +913,17 @@ public class OutsourcingCompanyContractService {
     }
 
     /**
-     * 외주업체 계약 이름(계약 구분 설명)으로 키워드 검색
+     * 외주업체 계약 이름(계약명)으로 키워드 검색
      */
     @Transactional(readOnly = true)
     public Slice<ContractListResponse.ContractSimpleResponse> searchByName(final String keyword,
-            final OutsourcingCompanyContractType type, final Long outsourcingCompanyId, final Pageable pageable) {
+            final List<OutsourcingCompanyContractType> types, final Long outsourcingCompanyId,
+            final Pageable pageable) {
         final String searchKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        // 빈 리스트인 경우 null로 변환 (쿼리에서 모든 타입 검색하도록)
+        final List<OutsourcingCompanyContractType> searchTypes = (types == null || types.isEmpty()) ? null : types;
         final Slice<OutsourcingCompanyContract> contracts = contractRepository
-                .findByTypeDescriptionAndKeyword(searchKeyword, type, outsourcingCompanyId, pageable);
+                .findByTypeDescriptionAndKeyword(searchKeyword, searchTypes, outsourcingCompanyId, pageable);
 
         return contracts.map(ContractListResponse.ContractSimpleResponse::from);
     }

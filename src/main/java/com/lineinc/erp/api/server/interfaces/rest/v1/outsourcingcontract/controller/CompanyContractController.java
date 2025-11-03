@@ -146,16 +146,16 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 이름 키워드 검색", description = "외주업체 계약 이름(계약 구분 설명)으로 간단한 검색을 수행합니다.")
+    @Operation(summary = "외주업체 계약 이름 키워드 검색", description = "외주업체 계약 이름(계약명)으로 간단한 검색을 수행합니다.")
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractListResponse.ContractSimpleResponse>>> searchContractByName(
             @Valid final SortRequest sortRequest,
             @Valid final PageRequest pageRequest,
             @RequestParam(required = false) final String keyword,
-            @RequestParam(required = false) final OutsourcingCompanyContractType type,
+            @RequestParam(required = false) final List<OutsourcingCompanyContractType> types,
             @RequestParam(required = false) final Long outsourcingCompanyId) {
         final Slice<ContractListResponse.ContractSimpleResponse> slice = outsourcingCompanyContractService.searchByName(
-                keyword, type, outsourcingCompanyId,
+                keyword, types, outsourcingCompanyId,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
 
