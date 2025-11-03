@@ -8,18 +8,11 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "외주업체 담당자 등록 요청")
 public record OutsourcingCompanyContactCreateRequest(
         @Schema(description = "담당자명", example = "홍길동") @NotBlank String name,
-
         @Schema(description = "부서", example = "시공팀") @NotBlank String department,
-
         @Schema(description = "직급", example = "대리") @NotBlank String position,
-
         @Schema(description = "전화번호", example = "02-123-4567") @NotBlank String landlineNumber,
-
         @Schema(description = "개인 휴대폰", example = "010-1234-5678") @NotBlank String phoneNumber,
-
         @Schema(description = "이메일", example = "contact@outsourcing.com") @NotBlank @Email String email,
-
         @Schema(description = "비고", example = "안전관리 담당") String memo,
-
         @Schema(description = "대표 담당자 여부", example = "true") @NotNull Boolean isMain) {
 }
