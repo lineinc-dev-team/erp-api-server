@@ -58,8 +58,9 @@ public class FuelInfoService {
                     // 업체, 기사, 장비 ID 검증
                     final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                             .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
-                    final OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
-                            .getDriverByIdOrThrow(dto.driverId());
+                    final OutsourcingCompanyContractDriver driver = dto.driverId() != null
+                            ? outsourcingCompanyContractService.getDriverByIdOrThrow(dto.driverId())
+                            : null;
                     final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
                             .getEquipmentByIdOrThrow(dto.equipmentId());
 
@@ -87,8 +88,9 @@ public class FuelInfoService {
                 final FuelInfoUpdateRequest request = requestMap.get(fuelInfo.getId());
                 final OutsourcingCompany company = outsourcingCompanyService
                         .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
-                final OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
-                        .getDriverByIdOrThrow(request.driverId());
+                final OutsourcingCompanyContractDriver driver = request.driverId() != null
+                        ? outsourcingCompanyContractService.getDriverByIdOrThrow(request.driverId())
+                        : null;
                 final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
                         .getEquipmentByIdOrThrow(request.equipmentId());
 
