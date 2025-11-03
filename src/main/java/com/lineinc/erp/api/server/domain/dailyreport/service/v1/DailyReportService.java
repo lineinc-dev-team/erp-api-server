@@ -97,6 +97,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
@@ -714,6 +715,48 @@ public class DailyReportService {
                 dailyReportSlice.hasNext());
 
         return directContractSlice;
+    }
+
+    /**
+     * 출역일보 직영/용역 외주 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 직영/용역 외주 정보 슬라이스
+     */
+    public Slice<DailyReportDirectContractOutsourcingResponse> searchDailyReportDirectContractOutsourcings(
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        null, pageable);
+
+        // DailyReport 슬라이스를 DailyReportDirectContractOutsourcingResponse 슬라이스로 변환
+        // 각 DailyReport의 직영/용역 외주들을 개별 항목으로 변환
+        final List<DailyReportDirectContractOutsourcingResponse> allDirectContractOutsourcings = new ArrayList<>();
+
+        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (final DailyReportDirectContractOutsourcing directContractOutsourcing : dailyReport
+                    .getDirectContractOutsourcings()) {
+                allDirectContractOutsourcings
+                        .add(DailyReportDirectContractOutsourcingResponse.from(directContractOutsourcing));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        final Slice<DailyReportDirectContractOutsourcingResponse> directContractOutsourcingSlice = new SliceImpl<>(
+                allDirectContractOutsourcings,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return directContractOutsourcingSlice;
     }
 
     /**
