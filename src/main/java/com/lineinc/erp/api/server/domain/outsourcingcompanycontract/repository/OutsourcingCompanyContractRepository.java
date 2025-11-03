@@ -19,10 +19,28 @@ public interface OutsourcingCompanyContractRepository
     List<OutsourcingCompanyContract> findByOutsourcingCompanyId(Long outsourcingCompanyId);
 
     /**
+     * 외주업체 ID, 현장 ID, 계약 구분으로 계약 ID 목록을 조회합니다.
+     * 
+     * @param outsourcingCompanyId 외주업체 ID (필수)
+     * @param siteId               현장 ID (null 가능)
+     * @param types                계약 구분 목록 (null 또는 빈 리스트 가능)
+     * @return 계약 ID 목록
+     */
+    @Query("""
+            SELECT oc.id FROM OutsourcingCompanyContract oc WHERE \
+            oc.outsourcingCompany.id = :outsourcingCompanyId AND \
+            oc.deleted = false AND \
+            (:siteId IS NULL OR oc.site.id = :siteId) AND \
+            (:types IS NULL OR oc.type IN :types)""")
+    List<Long> findContractIdsByCompanyAndSiteAndTypes(@Param("outsourcingCompanyId") Long outsourcingCompanyId,
+            @Param("siteId") Long siteId,
+            @Param("types") List<OutsourcingCompanyContractType> types);
+
+    /**
      * 계약명으로 검색하는 메서드
      * 
      * @param keyword              검색할 계약명 키워드 (null 가능)
-     * @param types                 계약 구분 목록 (null 또는 빈 리스트 가능)
+     * @param types                계약 구분 목록 (null 또는 빈 리스트 가능)
      * @param outsourcingCompanyId 외주업체 ID (null 가능)
      * @param pageable             페이징 정보
      * @return 외주업체 계약 슬라이스

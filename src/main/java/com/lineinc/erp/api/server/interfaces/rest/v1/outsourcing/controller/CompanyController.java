@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
@@ -225,11 +226,12 @@ public class CompanyController extends BaseController {
     public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> getContractEquipmentsByCompany(
             @PathVariable final Long id,
             @RequestParam(required = false) final Long siteId,
+            @RequestParam(required = false) final List<OutsourcingCompanyContractType> types,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
         final Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> slice = outsourcingCompanyContractService
                 .getContractEquipmentsByCompany(
-                        id, siteId, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                        id, siteId, types, PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                                 sortRequest.sort()));
         return ResponseEntity.ok(SuccessResponse.of(
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
