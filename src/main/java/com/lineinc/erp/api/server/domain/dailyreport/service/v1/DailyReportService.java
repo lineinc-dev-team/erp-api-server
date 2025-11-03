@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEvidenceFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
@@ -49,6 +50,7 @@ import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollSyncService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstructionGroup;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
@@ -59,6 +61,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.O
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractEquipmentRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractWorkerRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractConstructionService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
@@ -68,6 +71,7 @@ import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
@@ -134,6 +138,7 @@ public class DailyReportService {
     private final FuelInfoRepository fuelInfoRepository;
     private final LaborChangeHistoryRepository laborChangeHistoryRepository;
     private final OutsourcingCompanyContractConstructionService outsourcingCompanyContractConstructionService;
+    private final OutsourcingCompanyContractService outsourcingCompanyContractService;
 
     @Transactional
     public void createDailyReport(final DailyReportCreateRequest request, final Long userId) {
@@ -249,6 +254,33 @@ public class DailyReportService {
                 labor.updatePreviousDailyWage(directContractRequest.unitPrice());
 
                 dailyReport.getDirectContracts().add(directContract);
+            }
+        }
+
+        // 직영/용역 외주업체계약 출역 정보 추가
+        if (request.directContractOutsourcings() != null) {
+            for (final DailyReportDirectContractOutsourcingCreateRequest directContractOutsourcingRequest : request
+                    .directContractOutsourcings()) {
+                final OutsourcingCompany company = outsourcingCompanyService
+                        .getOutsourcingCompanyByIdOrThrow(
+                                directContractOutsourcingRequest.outsourcingCompanyId());
+                final OutsourcingCompanyContract contract = outsourcingCompanyContractService
+                        .getContractByIdOrThrow(directContractOutsourcingRequest.outsourcingCompanyContractId());
+                final Labor labor = laborService.getLaborByIdOrThrow(directContractOutsourcingRequest.laborId());
+
+                final DailyReportDirectContractOutsourcing directContractOutsourcing = DailyReportDirectContractOutsourcing
+                        .builder()
+                        .dailyReport(dailyReport)
+                        .outsourcingCompany(company)
+                        .outsourcingCompanyContract(contract)
+                        .labor(labor)
+                        .workQuantity(directContractOutsourcingRequest.workQuantity())
+                        .fileUrl(directContractOutsourcingRequest.fileUrl())
+                        .originalFileName(directContractOutsourcingRequest.originalFileName())
+                        .memo(directContractOutsourcingRequest.memo())
+                        .build();
+
+                dailyReport.getDirectContractOutsourcings().add(directContractOutsourcing);
             }
         }
 
