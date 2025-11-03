@@ -57,10 +57,12 @@ public interface LaborRepository extends JpaRepository<Labor, Long>, LaborReposi
             AND (:name IS NULL OR l.name LIKE %:name%) \
             AND (:types IS NULL OR l.type IN :types) \
             AND (:outsourcingCompanyId IS NULL OR l.outsourcingCompany.id = :outsourcingCompanyId) \
+            AND (:outsourcingCompanyContractId IS NULL OR l.outsourcingCompanyContract.id = :outsourcingCompanyContractId) \
             AND (:isHeadOffice IS NULL OR l.isHeadOffice = :isHeadOffice)""")
     Slice<Labor> findAllByNameAndType(@Param("name") String name,
             @Param("types") List<LaborType> types,
             @Param("outsourcingCompanyId") Long outsourcingCompanyId,
+            @Param("outsourcingCompanyContractId") Long outsourcingCompanyContractId,
             @Param("isHeadOffice") Boolean isHeadOffice,
             Pageable pageable);
 
