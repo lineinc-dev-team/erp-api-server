@@ -6,6 +6,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -62,17 +63,19 @@ public class DailyReportDirectContractOutsourcing extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo; // 비고
 
-    // /**
-    // * 요청 객체로부터 엔티티를 업데이트합니다.
-    // */
-    // public void updateFrom(final DirectContractOutsourcingUpdateInfo request,
-    // final OutsourcingCompanyContract outsourcingCompanyContract,
-    // final OutsourcingCompany outsourcingCompany) {
-    // this.outsourcingCompany = outsourcingCompany;
-    // this.outsourcingCompanyContract = outsourcingCompanyContract;
-    // this.workQuantity = request.workQuantity();
-    // this.originalFileName = request.originalFileName();
-    // this.fileUrl = request.fileUrl();
-    // this.memo = request.memo();
-    // }
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     */
+    public void updateFrom(final DirectContractOutsourcingUpdateInfo request,
+            final OutsourcingCompanyContract outsourcingCompanyContract,
+            final OutsourcingCompany outsourcingCompany,
+            final Labor labor) {
+        this.outsourcingCompany = outsourcingCompany;
+        this.outsourcingCompanyContract = outsourcingCompanyContract;
+        this.labor = labor;
+        this.workQuantity = request.workQuantity();
+        this.originalFileName = request.originalFileName();
+        this.fileUrl = request.fileUrl();
+        this.memo = request.memo();
+    }
 }

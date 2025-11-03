@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportFileUpdateRequest;
@@ -148,6 +149,16 @@ public class DailyReportController extends BaseController {
             @Valid @RequestBody final DailyReportDirectContractUpdateRequest request,
             @AuthenticationPrincipal final CustomUserDetails user) {
         dailyReportService.updateDailyReportDirectContracts(searchRequest, request, user.getUserId());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 직영/용역 외주 수정", description = "출역일보 직영/용역 외주 정보를 수정합니다.")
+    @PatchMapping("/direct-contract-outsourcings")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReportDirectContractOutsourcing(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportDirectContractOutsourcingUpdateRequest request) {
+        dailyReportService.updateDailyReportDirectContractOutsourcings(searchRequest, request);
         return ResponseEntity.ok().build();
     }
 
