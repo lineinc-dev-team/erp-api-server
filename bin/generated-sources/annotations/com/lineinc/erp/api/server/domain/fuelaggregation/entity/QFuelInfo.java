@@ -24,6 +24,8 @@ public class QFuelInfo extends EntityPathBase<FuelInfo> {
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
+    public final EnumPath<com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType> categoryType = createEnum("categoryType", com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType.class);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
 

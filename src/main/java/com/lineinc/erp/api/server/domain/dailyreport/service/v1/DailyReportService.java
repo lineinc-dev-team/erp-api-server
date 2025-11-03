@@ -320,6 +320,7 @@ public class DailyReportService {
                     request.fuelInfos().stream()
                             .map(fuelInfoRequest -> new FuelInfoCreateRequest(
                                     fuelInfoRequest.outsourcingCompanyId(),
+                                    fuelInfoRequest.categoryType(),
                                     fuelInfoRequest.driverId(),
                                     fuelInfoRequest.equipmentId(),
                                     fuelInfoRequest.fuelType(),

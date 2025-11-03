@@ -68,6 +68,7 @@ public class FuelInfoService {
                             .outsourcingCompany(outsourcingCompany)
                             .driver(driver)
                             .equipment(equipment)
+                            .categoryType(dto.categoryType())
                             .fuelType(dto.fuelType())
                             .fuelAmount(dto.fuelAmount())
                             .memo(dto.memo())

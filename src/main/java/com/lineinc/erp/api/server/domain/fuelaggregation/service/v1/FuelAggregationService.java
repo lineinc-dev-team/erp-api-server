@@ -107,6 +107,7 @@ public class FuelAggregationService {
                     .equipment(fuelInfo.equipmentId() != null
                             ? outsourcingCompanyContractService.getEquipmentByIdOrThrow(fuelInfo.equipmentId())
                             : null)
+                    .categoryType(fuelInfo.categoryType())
                     .fuelType(fuelInfo.fuelType())
                     .fuelAmount(fuelInfo.fuelAmount())
                     .fileUrl(fuelInfo.fileUrl())

@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
@@ -77,6 +78,13 @@ public class FuelInfo extends BaseEntity {
     private OutsourcingCompanyContractEquipment equipment;
 
     /**
+     * 구분 (장비/외주)
+     */
+    @DiffIgnore
+    @Enumerated(EnumType.STRING)
+    private FuelInfoCategoryType categoryType;
+
+    /**
      * 유종
      */
     @DiffIgnore
@@ -112,6 +120,10 @@ public class FuelInfo extends BaseEntity {
     @DiffInclude
     private String fuelTypeName;
 
+    @Transient
+    @DiffInclude
+    private String categoryTypeName;
+
     // ID만 저장할 필드들 추가
     @Transient
     private Long outsourcingCompanyId;
@@ -140,6 +152,7 @@ public class FuelInfo extends BaseEntity {
         this.driverName = this.driver != null ? this.driver.getName() : null;
         this.equipmentSpecification = this.equipment != null ? this.equipment.getSpecification() : null;
         this.fuelTypeName = this.fuelType != null ? this.fuelType.getLabel() : null;
+        this.categoryTypeName = this.categoryType != null ? this.categoryType.getLabel() : null;
         this.vehicleNumber = this.equipment != null ? this.equipment.getVehicleNumber() : null;
     }
 
@@ -151,6 +164,7 @@ public class FuelInfo extends BaseEntity {
         this.outsourcingCompanyId = request.outsourcingCompanyId();
         this.driverId = request.driverId();
         this.equipmentId = request.equipmentId();
+        this.categoryType = request.categoryType();
         this.fuelType = request.fuelType();
         this.fuelAmount = request.fuelAmount();
         this.memo = request.memo();

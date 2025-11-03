@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request;
 
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "유류정보 생성 요청")
 public record FuelInfoCreateRequest(
         @Schema(description = "업체 ID", example = "1") Long outsourcingCompanyId,
+        @Schema(description = "구분", example = "EQUIPMENT") FuelInfoCategoryType categoryType,
         @Schema(description = "기사 ID", example = "1") Long driverId,
         @Schema(description = "장비 ID", example = "1") Long equipmentId,
         @Schema(description = "유종", example = "GASOLINE") FuelInfoFuelType fuelType,

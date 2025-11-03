@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request;
 
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "유류 출역일보 등록 요청")
 public record DailyReportFuelCreateRequest(
         @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
+        @Schema(description = "구분", example = "EQUIPMENT") FuelInfoCategoryType categoryType,
         @Schema(description = "외주업체계약 기사 ID", example = "1") Long driverId,
         @Schema(description = "외주업체계약 장비 ID", example = "1") @NotNull Long equipmentId,
         @Schema(description = "유종", example = "GASOLINE") @NotNull FuelInfoFuelType fuelType,

@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record DailyReportFuelResponse(
         @Schema(description = "유류집계 ID", example = "1") Long fuelAggregationId,
         @Schema(description = "유류집계 info id", example = "1") Long fuelInfoId,
+        @Schema(description = "구분", example = "장비") String categoryType,
+        @Schema(description = "구분 코드", example = "EQUIPMENT") String categoryTypeCode,
         @Schema(description = "유종", example = "경유") String fuelType,
         @Schema(description = "유종 타입 코드", example = "DIESEL") FuelInfoFuelType fuelTypeCode,
         @Schema(description = "주유량", example = "100") Long fuelAmount,
@@ -30,6 +32,8 @@ public record DailyReportFuelResponse(
         return new DailyReportFuelResponse(
                 fuelInfo.getFuelAggregation() != null ? fuelInfo.getFuelAggregation().getId() : null,
                 fuelInfo.getId(),
+                fuelInfo.getCategoryType() != null ? fuelInfo.getCategoryType().getLabel() : null,
+                fuelInfo.getCategoryType() != null ? fuelInfo.getCategoryType().name() : null,
                 fuelInfo.getFuelType() != null ? fuelInfo.getFuelType().getLabel() : null,
                 fuelInfo.getFuelType() != null ? fuelInfo.getFuelType() : null,
                 fuelInfo.getFuelAmount(),

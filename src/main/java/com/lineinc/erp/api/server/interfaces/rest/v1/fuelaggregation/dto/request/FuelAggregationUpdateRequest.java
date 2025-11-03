@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.reques
 
 import java.util.List;
 
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +22,7 @@ public record FuelAggregationUpdateRequest(
             @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
             @Schema(description = "기사 ID", example = "1") Long driverId,
             @Schema(description = "장비 ID", example = "1") @NotNull Long equipmentId,
+            @Schema(description = "구분", example = "EQUIPMENT") FuelInfoCategoryType categoryType,
             @Schema(description = "유종", example = "DIESEL") @NotNull FuelInfoFuelType fuelType,
             @Schema(description = "주유량 (리터)", example = "50") @NotNull Long fuelAmount,
             @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
