@@ -31,9 +31,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class ManagementCostMealFeeDetailOutsourcing extends BaseEntity {
+public class ManagementCostMealFeeDetailEquipment extends BaseEntity {
 
-    private static final String SEQUENCE_NAME = "management_cost_meal_fee_detail_outsourcing_seq";
+    private static final String SEQUENCE_NAME = "management_cost_meal_fee_detail_equipment_seq";
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
