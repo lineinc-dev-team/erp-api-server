@@ -29,6 +29,7 @@ import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollSer
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.DeleteLaborsRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborDownloadRequest;
@@ -55,9 +56,6 @@ import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -67,16 +65,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/labors")
 @RequiredArgsConstructor
 @Tag(name = "노무 관리", description = "노무 관련 API")
-public class LaborController {
+public class LaborController extends BaseController {
 
     private final LaborService laborService;
     private final LaborPayrollService laborPayrollService;
 
     @Operation(summary = "노무 인력정보 등록", description = "노무 인력정보를 등록합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "노무 등록 성공", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-    })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createLabor(@Valid @RequestBody final LaborCreateRequest request,
@@ -86,10 +80,6 @@ public class LaborController {
     }
 
     @Operation(summary = "노무 구분 조회", description = "사용 가능한 노무 구분 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/labor-types")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborTypeResponse>>> getLaborTypes() {
@@ -100,10 +90,6 @@ public class LaborController {
     }
 
     @Operation(summary = "공종 구분 조회", description = "사용 가능한 공종 구분 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/work-types")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WorkTypeResponse>>> getWorkTypes() {
@@ -115,10 +101,6 @@ public class LaborController {
     }
 
     @Operation(summary = "인력정보 목록 조회", description = "조건에 따른 인력정보 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborListResponse>>> getLaborList(
@@ -133,10 +115,6 @@ public class LaborController {
     }
 
     @Operation(summary = "ETC 노무 구분 설명 키워드 검색", description = "type이 ETC인 모든 노무의 구분 설명을 키워드로 검색합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/etc-type-descriptions/search")
     public ResponseEntity<SuccessResponse<SliceResponse<TypeDescriptionResponse>>> searchEtcTypeDescriptions(
             @RequestParam(required = false) final String keyword,
@@ -149,11 +127,6 @@ public class LaborController {
     }
 
     @Operation(summary = "인력정보 삭제", description = "하나 이상의 인력정보 ID를 받아 해당 인력정보를 삭제합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "일부 인력정보를 찾을 수 없음", content = @Content())
-    })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteLabors(@Valid @RequestBody final DeleteLaborsRequest request) {
@@ -162,10 +135,6 @@ public class LaborController {
     }
 
     @Operation(summary = "인력정보 목록 엑셀 다운로드", description = "검색 조건에 맞는 인력정보 목록을 엑셀 파일로 다운로드합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadLaborsExcel(
@@ -188,10 +157,6 @@ public class LaborController {
     }
 
     @Operation(summary = "인력정보 상세 조회", description = "특정 인력정보의 상세 정보를 반환합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "인력정보 상세 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "인력정보를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<LaborDetailResponse>> getLaborDetail(@PathVariable final Long id) {
@@ -200,11 +165,6 @@ public class LaborController {
     }
 
     @Operation(summary = "인력정보 수정", description = "기존 인력정보를 수정합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "수정 대상 인력정보를 찾을 수 없음", content = @Content())
-    })
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLabor(
@@ -216,10 +176,6 @@ public class LaborController {
     }
 
     @Operation(summary = "인력정보 변경 이력 조회", description = "특정 인력정보의 변경 이력을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "인력정보를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<LaborChangeHistoryResponse>>> getLaborChangeHistories(
@@ -234,9 +190,6 @@ public class LaborController {
     }
 
     @Operation(summary = "인력명 키워드 검색", description = "인력명과 노무인력 검색을 수행합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
             @Valid final PageRequest pageRequest,
@@ -256,10 +209,6 @@ public class LaborController {
     }
 
     @Operation(summary = "노무인력 명세서 이력 조회", description = "특정 노무인력의 명세서 이력을 조회합니다. (연월, 현장, 공정 정보 포함)")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "노무인력을 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/payrolls")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollHistoryResponse>>> getLaborPayrolls(
