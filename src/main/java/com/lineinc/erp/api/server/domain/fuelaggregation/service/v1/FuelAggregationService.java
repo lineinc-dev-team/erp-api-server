@@ -98,16 +98,15 @@ public class FuelAggregationService {
             // 업체, 기사, 장비 ID 검증
             final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                     .getOutsourcingCompanyByIdOrThrow(fuelInfo.outsourcingCompanyId());
-            final OutsourcingCompanyContractDriver driver = outsourcingCompanyContractService
-                    .getDriverByIdOrThrow(fuelInfo.driverId());
-            final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
-                    .getEquipmentByIdOrThrow(fuelInfo.equipmentId());
-
             final FuelInfo fuelInfoEntity = FuelInfo.builder()
                     .fuelAggregation(fuelAggregation)
                     .outsourcingCompany(outsourcingCompany)
-                    .driver(driver)
-                    .equipment(equipment)
+                    .driver(fuelInfo.driverId() != null
+                            ? outsourcingCompanyContractService.getDriverByIdOrThrow(fuelInfo.driverId())
+                            : null)
+                    .equipment(fuelInfo.equipmentId() != null
+                            ? outsourcingCompanyContractService.getEquipmentByIdOrThrow(fuelInfo.equipmentId())
+                            : null)
                     .fuelType(fuelInfo.fuelType())
                     .fuelAmount(fuelInfo.fuelAmount())
                     .fileUrl(fuelInfo.fileUrl())

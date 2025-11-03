@@ -19,7 +19,7 @@ public record FuelAggregationUpdateRequest(
     public record FuelInfoUpdateRequest(
             @Schema(description = "유류정보 ID (수정 시)", example = "1") @NotNull Long id,
             @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
-            @Schema(description = "기사 ID", example = "1") @NotNull Long driverId,
+            @Schema(description = "기사 ID", example = "1") Long driverId,
             @Schema(description = "장비 ID", example = "1") @NotNull Long equipmentId,
             @Schema(description = "유종", example = "DIESEL") @NotNull FuelInfoFuelType fuelType,
             @Schema(description = "주유량 (리터)", example = "50") @NotNull Long fuelAmount,

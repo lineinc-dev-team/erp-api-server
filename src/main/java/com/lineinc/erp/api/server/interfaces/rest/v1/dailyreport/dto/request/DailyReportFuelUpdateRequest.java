@@ -15,7 +15,7 @@ public record DailyReportFuelUpdateRequest(
     public record FuelUpdateInfo(
             @Schema(description = "ID", example = "1") Long id,
             @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
-            @Schema(description = "외주업체계약 기사 ID", example = "1") @NotNull Long outsourcingCompanyContractDriverId,
+            @Schema(description = "외주업체계약 기사 ID", example = "1") Long outsourcingCompanyContractDriverId,
             @Schema(description = "외주업체계약 장비 ID", example = "1") @NotNull Long outsourcingCompanyContractEquipmentId,
             @Schema(description = "유종", example = "경유") @NotBlank String fuelType,
             @Schema(description = "주유량", example = "100") @NotNull Long fuelAmount,

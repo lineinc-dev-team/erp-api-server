@@ -252,34 +252,6 @@ public class DailyReportService {
             }
         }
 
-        // // 외주 출역 정보 추가
-        // if (request.outsourcings() != null)
-
-        // {
-        // for (final DailyReportOutsourcingCreateRequest outsourcingRequest :
-        // request.outsourcings()) {
-        // final OutsourcingCompany company = outsourcingCompanyService
-        // .getOutsourcingCompanyByIdOrThrow(outsourcingRequest.outsourcingCompanyId());
-        // final OutsourcingCompanyContractWorker worker =
-        // getOutsourcingCompanyContractWorkerByIdOrThrow(
-        // outsourcingRequest.outsourcingCompanyContractWorkerId());
-
-        // final DailyReportOutsourcing outsourcing = DailyReportOutsourcing.builder()
-        // .dailyReport(dailyReport)
-        // .outsourcingCompany(company)
-        // .outsourcingCompanyContractWorker(worker)
-        // .category(outsourcingRequest.category())
-        // .workContent(outsourcingRequest.workContent())
-        // .workQuantity(outsourcingRequest.workQuantity())
-        // .memo(outsourcingRequest.memo())
-        // .fileUrl(outsourcingRequest.fileUrl())
-        // .originalFileName(outsourcingRequest.originalFileName())
-        // .build();
-
-        // dailyReport.getOutsourcings().add(outsourcing);
-        // }
-        // }
-
         // 외주업체계약 장비 출역 정보 추가
         if (request.outsourcingEquipments() != null) {
             for (final DailyReportOutsourcingEquipmentCreateRequest equipmentRequest : request
