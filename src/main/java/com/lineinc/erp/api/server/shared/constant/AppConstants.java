@@ -145,6 +145,7 @@ public final class AppConstants {
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_ID = "daily_report_outsourcing_construction_group_id";
     public static final String DAILY_REPORT_OUTSOURCING_COMPANY_ID = "daily_report_outsourcing_company_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_ID = "outsourcing_company_contract_construction_group_id";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_ID = "outsourcing_company_contract_id";
 
     // 엔티티 매핑 관련 상수
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";

@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -193,6 +194,14 @@ public class Labor extends BaseEntity {
     private OutsourcingCompany outsourcingCompany;
 
     /**
+     * 외주업체 계약 연결 (외주계약직인 경우)
+     */
+    @DiffIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID)
+    private OutsourcingCompanyContract outsourcingCompanyContract;
+
+    /**
      * 주민등록번호
      */
     @DiffIgnore
@@ -255,7 +264,10 @@ public class Labor extends BaseEntity {
     /**
      * LaborUpdateRequest DTO로부터 인력정보를 업데이트합니다.
      */
-    public void updateFrom(final LaborUpdateRequest request, final OutsourcingCompany outsourcingCompany,
+    public void updateFrom(
+            final LaborUpdateRequest request,
+            final OutsourcingCompany outsourcingCompany,
+            final OutsourcingCompanyContract outsourcingCompanyContract,
             final Boolean isHeadOffice, final Grade grade) {
         Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
         Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
@@ -278,6 +290,7 @@ public class Labor extends BaseEntity {
         // 외주업체 정보와 본사 인력 여부 업데이트
         this.outsourcingCompany = outsourcingCompany;
         Optional.ofNullable(isHeadOffice).ifPresent(val -> this.isHeadOffice = val);
+        Optional.ofNullable(outsourcingCompanyContract).ifPresent(val -> this.outsourcingCompanyContract = val);
 
         // 업데이트가 일어나면 임시 인력해제
         this.isTemporary = false;

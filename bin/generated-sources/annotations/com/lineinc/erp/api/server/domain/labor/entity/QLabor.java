@@ -74,6 +74,8 @@ public class QLabor extends EntityPathBase<Labor> {
 
     public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany outsourcingCompany;
 
+    public final com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContract outsourcingCompanyContract;
+
     public final StringPath phoneNumber = createString("phoneNumber");
 
     public final NumberPath<Long> previousDailyWage = createNumber("previousDailyWage", Long.class);
@@ -118,6 +120,7 @@ public class QLabor extends EntityPathBase<Labor> {
         super(type, metadata, inits);
         this.grade = inits.isInitialized("grade") ? new com.lineinc.erp.api.server.domain.organization.entity.QGrade(forProperty("grade")) : null;
         this.outsourcingCompany = inits.isInitialized("outsourcingCompany") ? new com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany(forProperty("outsourcingCompany")) : null;
+        this.outsourcingCompanyContract = inits.isInitialized("outsourcingCompanyContract") ? new com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContract(forProperty("outsourcingCompanyContract"), inits.get("outsourcingCompanyContract")) : null;
     }
 
 }

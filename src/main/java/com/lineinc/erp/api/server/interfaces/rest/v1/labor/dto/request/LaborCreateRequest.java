@@ -15,6 +15,7 @@ public record LaborCreateRequest(
         @NotNull @Schema(description = "노무 구분", example = "DIRECT_CONTRACT") LaborType type,
         @Schema(description = "구분 설명", example = "현장 작업용역") String typeDescription,
         @Schema(description = "소속업체 ID", example = "1") Long outsourcingCompanyId,
+        @Schema(description = "외주업체 계약 ID", example = "1") Long outsourcingCompanyContractId,
         @NotBlank @Schema(description = "이름", example = "홍길동") String name,
         @NotBlank @Schema(description = "주민등록번호", example = "123456-1234567") String residentNumber,
         @Schema(description = "주소", example = "서울시 강남구") String address,

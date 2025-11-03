@@ -31,6 +31,8 @@ import com.lineinc.erp.api.server.domain.labor.repository.LaborRepository;
 import com.lineinc.erp.api.server.domain.organization.repository.GradeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.DeleteLaborsRequest;
@@ -66,6 +68,7 @@ public class LaborService {
     private final S3FileService s3FileService;
     private final ExcelDownloadHistoryService excelDownloadHistoryService;
     private final GradeRepository gradeRepository;
+    private final OutsourcingCompanyContractService outsourcingCompanyContractService;
 
     /**
      * 노무 등록
@@ -89,6 +92,10 @@ public class LaborService {
             isHeadOffice = true;
         }
 
+        // 외주업체 계약 조회
+        final OutsourcingCompanyContract outsourcingCompanyContract = outsourcingCompanyContractService
+                .getContractByIdOrThrow(request.outsourcingCompanyContractId());
+
         final Labor labor = Labor.builder()
                 .type(request.type())
                 .typeDescription(request.typeDescription())
@@ -101,6 +108,7 @@ public class LaborService {
                 .accountNumber(request.accountNumber())
                 .accountHolder(request.accountHolder())
                 .outsourcingCompany(outsourcingCompany)
+                .outsourcingCompanyContract(outsourcingCompanyContract)
                 .name(request.name())
                 .residentNumber(request.residentNumber())
                 .address(request.address())
@@ -248,12 +256,16 @@ public class LaborService {
             outsourcingCompany = null;
         }
 
+        // 외주업체 계약 조회
+        final OutsourcingCompanyContract outsourcingCompanyContract = outsourcingCompanyContractService
+                .getContractByIdOrThrow(request.outsourcingCompanyContractId());
+
         // 변경 전 상태 저장 (Javers 스냅샷)
         labor.syncTransientFields();
         final Labor oldSnapshot = JaversUtils.createSnapshot(javers, labor, Labor.class);
 
         // 기본 정보 업데이트
-        labor.updateFrom(request, outsourcingCompany, isHeadOffice,
+        labor.updateFrom(request, outsourcingCompany, outsourcingCompanyContract, isHeadOffice,
                 request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null);
 
         // 변경사항 추적을 위해 업데이트 후 syncTransientFields 호출

@@ -19,6 +19,7 @@ public record LaborUpdateRequest(
         @Schema(description = "계좌번호", example = "123-456-789012") String accountNumber,
         @Schema(description = "예금주", example = "홍길동") String accountHolder,
         @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
+        @Schema(description = "외주업체 계약 ID", example = "1") Long outsourcingCompanyContractId,
         @Schema(description = "주소", example = "서울시 강남구") String address,
         @Schema(description = "상세주소", example = "역삼동 123-45") String detailAddress,
         @Schema(description = "휴대폰", example = "010-1234-5678") String phoneNumber,
