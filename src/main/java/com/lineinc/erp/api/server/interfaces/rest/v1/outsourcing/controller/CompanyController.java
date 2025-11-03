@@ -27,6 +27,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.O
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.DeleteOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyDownloadRequest;
@@ -55,9 +56,6 @@ import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -67,16 +65,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/outsourcing-companies")
 @RequiredArgsConstructor
 @Tag(name = "외주업체 관리", description = "외주업체 관련 API")
-public class CompanyController {
+public class CompanyController extends BaseController {
 
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
 
     @Operation(summary = "외주업체 목록 조회", description = "등록된 모든 외주업체 정보를 반환합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "외주업체 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-    })
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<CompanyResponse>>> getAllOutsourcingCompanies(
@@ -93,7 +87,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/default-deductions")
     public ResponseEntity<SuccessResponse<List<CompanyDefaultDeductionsResponse>>> getDeductionItems() {
@@ -105,7 +98,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "구분 목록 조회", description = "외주업체 구분 목록을 반환합니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/types")
     public ResponseEntity<SuccessResponse<List<CompanyTypeResponse>>> getSeparations() {
@@ -118,10 +110,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체 등록", description = "외주업체 정보를 등록합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content()),
-    })
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createOutsourcingCompany(
@@ -132,10 +120,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체 상세 조회", description = "외주업체 상세 정보를 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content()),
-    })
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<CompanyDetailResponse>> getOutsourcingCompanyById(
@@ -145,11 +129,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체 수정", description = "특정 외주업체 정보를 수정합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류"),
-            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음"),
-    })
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateOutsourcingCompany(
@@ -161,10 +140,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체 삭제", description = "하나 이상의 외주업체 ID를 받아 해당 외주업체를 삭제합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "외주업체 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음"),
-    })
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteOutsourcingCompanies(
@@ -174,10 +149,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체 엑셀 다운로드", description = "검색 조건에 맞는 외주업체 목록을 엑셀 파일로 다운로드합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadOutsourcingCompaniesExcel(
@@ -200,9 +171,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체 변경 이력 조회", description = "특정 외주업체의 변경 히스토리를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<CompanyChangeHistoryResponse>>> getOutsourcingCompanyChangeHistories(
@@ -221,9 +189,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체 이름 키워드 검색", description = "외주업체 이름으로 간단한 검색을 수행합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "검색 성공")
-    })
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<CompanyResponse.CompanySimpleResponse>>> searchClientCompanyByName(
             @Valid final SortRequest sortRequest,
@@ -239,10 +204,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체별 계약 이력 히스토리 조회", description = "특정 외주업체의 계약 변경 이력 히스토리를 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
     @GetMapping("/{id}/contract-history")
     public ResponseEntity<SuccessResponse<PagingResponse<ContractHistoryResponse>>> getContractHistoryByCompany(
@@ -260,10 +221,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체별 계약 장비 정보 조회", description = "해당 외주업체와 계약된 계약의 장비 정보를 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/contract-equipments")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> getContractEquipmentsByCompany(
             @PathVariable final Long id,
@@ -279,10 +236,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체별 계약 기사(운전자) 정보 조회", description = "해당 외주업체와 계약된 계약의 기사(운전자) 정보를 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/contract-drivers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractDriverResponse.ContractDriverSimpleResponse>>> getContractDriversByCompany(
             @PathVariable final Long id,
@@ -298,10 +251,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체별 계약 인력 정보 조회", description = "해당 외주업체와 계약된 계약의 인력 정보를 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/contract-workers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractWorkerResponse.ContractWorkerSimpleResponse>>> getContractWorkersByCompany(
             @PathVariable final Long id,
@@ -317,10 +266,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체별 계약 공사항목 그룹 정보 조회", description = "해당 외주업체와 계약된 계약의 공사항목 그룹 정보를 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "외주업체를 찾을 수 없음", content = @Content())
-    })
     @GetMapping("/{id}/contract-construction-groups")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse>>> getContractConstructionGroupsByCompany(
             @PathVariable final Long id,
@@ -336,10 +281,6 @@ public class CompanyController {
     }
 
     @Operation(summary = "외주업체별 공사항목 규격 목록 조회", description = "외주업체 ID, 항목 그룹 ID, 공사항목 이름을 받아서 해당 조건의 규격 목록을 조회합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content())
-    })
     @GetMapping("/{id}/specifications")
     public ResponseEntity<SuccessResponse<List<String>>> getSpecificationsByConditions(
             @PathVariable final Long id,
