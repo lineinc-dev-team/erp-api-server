@@ -21,16 +21,19 @@ public interface OutsourcingCompanyContractRepository
     /**
      * 계약 구분 설명으로 검색하는 메서드
      * 
-     * @param keyword  검색할 계약 구분 설명 키워드 (null 가능)
-     * @param type     계약 구분 (null 가능)
-     * @param pageable 페이징 정보
+     * @param keyword              검색할 계약명 키워드 (null 가능)
+     * @param type                 계약 구분 (null 가능)
+     * @param outsourcingCompanyId 외주업체 ID (null 가능)
+     * @param pageable             페이징 정보
      * @return 외주업체 계약 슬라이스
      */
     @Query("""
             SELECT oc FROM OutsourcingCompanyContract oc WHERE \
-            (:keyword IS NULL OR LOWER(oc.typeDescription) LIKE LOWER(CONCAT('%', CAST(:keyword AS text), '%'))) AND \
+            (:keyword IS NULL OR LOWER(oc.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS text), '%'))) AND \
             oc.deleted = false AND \
-            (:type IS NULL OR oc.type = :type)""")
+            (:type IS NULL OR oc.type = :type) AND \
+            (:outsourcingCompanyId IS NULL OR oc.outsourcingCompany.id = :outsourcingCompanyId)""")
     Slice<OutsourcingCompanyContract> findByTypeDescriptionAndKeyword(@Param("keyword") String keyword,
-            @Param("type") OutsourcingCompanyContractType type, Pageable pageable);
+            @Param("type") OutsourcingCompanyContractType type,
+            @Param("outsourcingCompanyId") Long outsourcingCompanyId, Pageable pageable);
 }

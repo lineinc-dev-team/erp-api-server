@@ -917,10 +917,10 @@ public class OutsourcingCompanyContractService {
      */
     @Transactional(readOnly = true)
     public Slice<ContractListResponse.ContractSimpleResponse> searchByName(final String keyword,
-            final OutsourcingCompanyContractType type, final Pageable pageable) {
+            final OutsourcingCompanyContractType type, final Long outsourcingCompanyId, final Pageable pageable) {
         final String searchKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
         final Slice<OutsourcingCompanyContract> contracts = contractRepository
-                .findByTypeDescriptionAndKeyword(searchKeyword, type, pageable);
+                .findByTypeDescriptionAndKeyword(searchKeyword, type, outsourcingCompanyId, pageable);
 
         return contracts.map(ContractListResponse.ContractSimpleResponse::from);
     }

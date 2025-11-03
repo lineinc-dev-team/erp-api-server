@@ -152,9 +152,10 @@ public class CompanyContractController extends BaseController {
             @Valid final SortRequest sortRequest,
             @Valid final PageRequest pageRequest,
             @RequestParam(required = false) final String keyword,
-            @RequestParam(required = false) final OutsourcingCompanyContractType type) {
+            @RequestParam(required = false) final OutsourcingCompanyContractType type,
+            @RequestParam(required = false) final Long outsourcingCompanyId) {
         final Slice<ContractListResponse.ContractSimpleResponse> slice = outsourcingCompanyContractService.searchByName(
-                keyword, type,
+                keyword, type, outsourcingCompanyId,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                         sortRequest.sort()));
 
