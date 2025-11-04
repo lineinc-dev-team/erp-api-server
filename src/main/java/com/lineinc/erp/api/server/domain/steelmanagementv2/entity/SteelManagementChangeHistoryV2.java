@@ -48,7 +48,7 @@ public class SteelManagementChangeHistoryV2 extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "steel_management_v2_id", nullable = false)
+    @JoinColumn(name = AppConstants.STEEL_MANAGEMENT_V2_ID, nullable = false)
     private SteelManagementV2 steelManagementV2;
 
     @Enumerated(EnumType.STRING)
@@ -60,7 +60,7 @@ public class SteelManagementChangeHistoryV2 extends BaseEntity {
     private String changes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = AppConstants.USER_ID)
     private User user;
 
     @Column

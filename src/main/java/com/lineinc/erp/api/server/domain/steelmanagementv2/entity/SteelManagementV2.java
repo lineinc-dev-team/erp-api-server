@@ -58,7 +58,7 @@ public class SteelManagementV2 extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
+    @JoinColumn(name = AppConstants.SITE_ID)
     private Site site;
 
     /**
@@ -66,7 +66,7 @@ public class SteelManagementV2 extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id")
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     private SiteProcess siteProcess;
 
     /**

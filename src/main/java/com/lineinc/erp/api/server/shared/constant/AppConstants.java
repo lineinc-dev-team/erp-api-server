@@ -196,6 +196,7 @@ public final class AppConstants {
     public static final String GRADE_ID = "grade_id";
     public static final String POSITION_ID = "position_id";
     public static final String ROLE_ID = "role_id";
+    public static final String STEEL_MANAGEMENT_V2_ID = "steel_management_v2_id";
 
     // ==================== JPA 엔티티 매핑 속성명 ====================
     /**
@@ -208,6 +209,7 @@ public final class AppConstants {
     public static final String DAILY_REPORT_OUTSOURCING_COMPANY_MAPPED_BY = "dailyReportOutsourcingCompany";
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_MAPPED_BY = "dailyReportOutsourcingConstructionGroup";
     public static final String USER_MAPPED_BY = "user";
+    public static final String STEEL_MANAGEMENT_V2_MAPPED_BY = "steelManagementV2";
 
     // ==================== 기타 상수 ====================
     /**

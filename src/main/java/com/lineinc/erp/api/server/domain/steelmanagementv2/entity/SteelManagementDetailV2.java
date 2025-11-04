@@ -60,7 +60,7 @@ public class SteelManagementDetailV2 extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "steel_management_v2_id", nullable = false)
+    @JoinColumn(name = AppConstants.STEEL_MANAGEMENT_V2_ID, nullable = false)
     private SteelManagementV2 steelManagementV2;
 
     /**
@@ -68,7 +68,7 @@ public class SteelManagementDetailV2 extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     private OutsourcingCompany outsourcingCompany;
 
     /**
