@@ -44,12 +44,23 @@ public class FuelInfoService {
     @Transactional
     public void updateFuelInfos(final FuelAggregation fuelAggregation, final List<FuelInfoUpdateRequest> requests,
             final Long userId) {
-        // 모든 FuelInfo의 transient 필드 동기화
-        fuelAggregation.getFuelInfos().forEach(FuelInfo::syncTransientFields);
+        // 모든 FuelInfo와 서브장비의 transient 필드 동기화
+        fuelAggregation.getFuelInfos().forEach(fuelInfo -> {
+            fuelInfo.syncTransientFields();
+            fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
+        });
 
         // 변경 전 상태 저장 (Javers 스냅샷) - syncTransientFields 호출 후
         final List<FuelInfo> beforeFuelInfos = fuelAggregation.getFuelInfos().stream()
-                .map(fuelInfo -> JaversUtils.createSnapshot(javers, fuelInfo, FuelInfo.class))
+                .map(fuelInfo -> {
+                    final FuelInfo snapshot = JaversUtils.createSnapshot(javers, fuelInfo, FuelInfo.class);
+                    // 서브장비 목록도 깊은 복사로 생성
+                    snapshot.setSubEquipments(fuelInfo.getSubEquipments().stream()
+                            .map(subEquipment -> JaversUtils.createSnapshot(javers, subEquipment,
+                                    FuelInfoSubEquipment.class))
+                            .collect(Collectors.toList()));
+                    return snapshot;
+                })
                 .toList();
 
         // EntitySyncUtils를 사용하여 유류정보 목록 동기화
@@ -119,13 +130,43 @@ public class FuelInfoService {
                                         .memo(dto.memo())
                                         .build();
                             });
+
+                    // EntitySyncUtils 실행 후, 각 서브장비에 실제 서브장비 엔티티 설정
+                    final Map<Long, FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest> subEquipmentRequestMap = request
+                            .subEquipments().stream()
+                            .filter(r -> r.id() != null)
+                            .collect(Collectors.toMap(
+                                    FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest::id,
+                                    Function.identity()));
+
+                    for (final FuelInfoSubEquipment fuelInfoSubEquipment : fuelInfo.getSubEquipments()) {
+                        if (fuelInfoSubEquipment.getId() != null
+                                && subEquipmentRequestMap.containsKey(fuelInfoSubEquipment.getId())) {
+                            final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest subEquipmentRequest = subEquipmentRequestMap
+                                    .get(fuelInfoSubEquipment.getId());
+                            final OutsourcingCompanyContractSubEquipment subEquipment = subEquipmentRequest
+                                    .outsourcingCompanyContractSubEquipmentId() != null
+                                            ? outsourcingCompanyContractService
+                                                    .getSubEquipmentByIdOrThrow(
+                                                            subEquipmentRequest
+                                                                    .outsourcingCompanyContractSubEquipmentId())
+                                            : null;
+
+                            // 실제 서브장비 엔티티로 업데이트
+                            fuelInfoSubEquipment.updateFrom(subEquipmentRequest, subEquipment);
+                        }
+                    }
+
                     fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
                 }
             }
         }
 
         // 새로 생성된 엔티티들도 transient 필드 동기화
-        fuelAggregation.getFuelInfos().forEach(FuelInfo::syncTransientFields);
+        fuelAggregation.getFuelInfos().forEach(fuelInfo -> {
+            fuelInfo.syncTransientFields();
+            fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
+        });
 
         // 변경사항 감지 및 이력 저장
         final List<FuelInfo> afterFuelInfos = new ArrayList<>(fuelAggregation.getFuelInfos());
@@ -153,9 +194,53 @@ public class FuelInfoService {
                 continue;
 
             final FuelInfo after = afterMap.get(before.getId());
+
+            // 유류정보 단위 변경 감지 (서브장비는 제외)
+            // 서브장비를 임시로 제거하여 비교
+            final List<FuelInfoSubEquipment> beforeSubEquipmentsTemp = before.getSubEquipments();
+            final List<FuelInfoSubEquipment> afterSubEquipmentsTemp = after.getSubEquipments();
+            before.setSubEquipments(new ArrayList<>());
+            after.setSubEquipments(new ArrayList<>());
+
             final Diff diff = javers.compare(before, after);
             final List<Map<String, String>> modified = JaversUtils.extractModifiedChanges(javers, diff);
             allChanges.addAll(modified);
+
+            // 서브장비 목록 복원
+            before.setSubEquipments(beforeSubEquipmentsTemp);
+            after.setSubEquipments(afterSubEquipmentsTemp);
+
+            // 유류정보가 그대로 존재하는 경우에만 서브장비 변경사항 감지
+            final List<FuelInfoSubEquipment> beforeSubEquipments = before.getSubEquipments();
+            final List<FuelInfoSubEquipment> afterSubEquipments = after.getSubEquipments();
+            final Set<Long> beforeSubEquipmentIds = beforeSubEquipments.stream()
+                    .map(FuelInfoSubEquipment::getId)
+                    .filter(id -> id != null)
+                    .collect(Collectors.toSet());
+
+            // 서브장비 추가 감지
+            for (final FuelInfoSubEquipment afterSubEquipment : afterSubEquipments) {
+                if (afterSubEquipment.getId() == null || !beforeSubEquipmentIds.contains(afterSubEquipment.getId())) {
+                    allChanges.add(JaversUtils.extractAddedEntityChange(javers, afterSubEquipment));
+                }
+            }
+
+            // 서브장비 수정 감지
+            final Map<Long, FuelInfoSubEquipment> afterSubEquipmentMap = afterSubEquipments.stream()
+                    .filter(s -> s.getId() != null)
+                    .collect(Collectors.toMap(FuelInfoSubEquipment::getId, s -> s));
+
+            for (final FuelInfoSubEquipment beforeSubEquipment : beforeSubEquipments) {
+                if (beforeSubEquipment.getId() == null || !afterSubEquipmentMap.containsKey(beforeSubEquipment.getId()))
+                    continue;
+
+                final FuelInfoSubEquipment afterSubEquipment = afterSubEquipmentMap.get(beforeSubEquipment.getId());
+
+                final Diff subEquipmentDiff = javers.compare(beforeSubEquipment, afterSubEquipment);
+                final List<Map<String, String>> subEquipmentModified = JaversUtils.extractModifiedChanges(javers,
+                        subEquipmentDiff);
+                allChanges.addAll(subEquipmentModified);
+            }
         }
 
         // 변경사항이 있다면 이력 저장

@@ -88,6 +88,27 @@ public class FuelInfoSubEquipment extends BaseEntity {
 
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
+     * EntitySyncUtils에서 사용하기 위한 단일 파라미터 버전
+     */
+    public void updateFrom(final FuelInfoSubEquipmentUpdateRequest request) {
+        // 서브장비 ID로 조회하여 설정
+        final OutsourcingCompanyContractSubEquipment subEquipment = request
+                .outsourcingCompanyContractSubEquipmentId() != null
+                        ? OutsourcingCompanyContractSubEquipment.builder()
+                                .id(request.outsourcingCompanyContractSubEquipmentId())
+                                .build()
+                        : null;
+
+        this.outsourcingCompanyContractSubEquipment = subEquipment;
+        this.fuelType = request.fuelType();
+        this.fuelAmount = request.fuelAmount();
+        this.memo = request.memo();
+
+        syncTransientFields();
+    }
+
+    /**
+     * 요청 객체와 서브장비 엔티티로부터 엔티티를 업데이트합니다.
      */
     public void updateFrom(final FuelInfoSubEquipmentUpdateRequest request,
             final OutsourcingCompanyContractSubEquipment subEquipment) {
