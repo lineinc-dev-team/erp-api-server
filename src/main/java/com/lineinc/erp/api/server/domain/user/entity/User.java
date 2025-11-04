@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.domain.organization.entity.Department;
 import com.lineinc.erp.api.server.domain.organization.entity.Grade;
 import com.lineinc.erp.api.server.domain.organization.entity.Position;
 import com.lineinc.erp.api.server.interfaces.rest.v1.user.dto.request.UpdateUserRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -53,13 +54,13 @@ import lombok.experimental.SuperBuilder;
 public class User extends BaseEntity implements UserDetails {
 
     private static final long serialVersionUID = 1L;
+    static final String SEQUENCE_NAME = "user_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
-    @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
-    // ===== 기본 계정 정보 (변경 추적 대상) =====
     @Column
     @DiffInclude
     private String username;
@@ -90,7 +91,6 @@ public class User extends BaseEntity implements UserDetails {
     @DiffInclude
     private boolean isHeadOffice = false;
 
-    // ===== 보안/시스템 정보 (변경 추적 제외) =====
     @Column(nullable = false)
     @DiffIgnore
     private String loginId;
@@ -110,24 +110,23 @@ public class User extends BaseEntity implements UserDetails {
     @Setter
     private boolean requirePasswordReset = true;
 
-    // ===== 조직 정보 (변경 추적 제외) =====
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
+    @JoinColumn(name = AppConstants.DEPARTMENT_ID)
     @DiffIgnore
     private Department department;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "grade_id")
+    @JoinColumn(name = AppConstants.GRADE_ID)
     @DiffIgnore
     private Grade grade;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position_id")
+    @JoinColumn(name = AppConstants.POSITION_ID)
     @DiffIgnore
     private Position position;
 
     @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.USER_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @DiffIgnore
     private Set<UserRole> userRoles = new HashSet<>();
 
