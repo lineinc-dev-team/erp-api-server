@@ -26,6 +26,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfoSubEquipment;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationChangeType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
@@ -377,6 +378,7 @@ public class FuelAggregationService {
             final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
                     .fuelAggregation(fuelAggregation)
                     .user(userService.getUserByIdOrThrow(userId))
+                    .type(FuelAggregationChangeType.BASIC)
                     .changes(changesJson)
                     .build();
             fuelAggregationChangeHistoryRepository.save(changeHistory);
