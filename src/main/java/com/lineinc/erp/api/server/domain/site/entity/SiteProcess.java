@@ -1,17 +1,32 @@
 package com.lineinc.erp.api.server.domain.site.entity;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.enums.SiteProcessStatus;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteProcessRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -24,14 +39,16 @@ import java.util.Optional;
 })
 public class SiteProcess extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "site_process_seq";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_process_seq")
-    @SequenceGenerator(name = "site_process_seq", sequenceName = "site_process_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id", nullable = false)
+    @JoinColumn(name = AppConstants.SITE_ID, nullable = false)
     private Site site; // 현장
 
     @DiffInclude
@@ -69,12 +86,12 @@ public class SiteProcess extends BaseEntity {
         this.statusName = this.status != null ? this.status.getLabel() : null;
     }
 
-    public void updateFrom(UpdateSiteProcessRequest request, User user) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.officePhone()).ifPresent(val -> this.officePhone = val);
-        Optional.ofNullable(request.status()).ifPresent(val -> this.status = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(user).ifPresent(val -> this.manager = val);
+    public void updateFrom(final UpdateSiteProcessRequest request, final User user) {
+        this.name = request.name();
+        this.officePhone = request.officePhone();
+        this.status = request.status();
+        this.memo = request.memo();
+        this.manager = user;
         syncTransientFields();
     }
 }

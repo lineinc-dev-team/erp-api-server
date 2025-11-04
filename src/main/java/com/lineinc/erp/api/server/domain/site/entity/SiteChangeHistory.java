@@ -6,6 +6,7 @@ import org.hibernate.type.SqlTypes;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.enums.SiteChangeHistoryType;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,18 +37,19 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class SiteChangeHistory extends BaseEntity {
+    private static final String SEQUENCE_NAME = "site_change_history_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_change_history_seq")
-    @SequenceGenerator(name = "site_change_history_seq", sequenceName = "site_change_history_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id", nullable = false)
+    @JoinColumn(name = AppConstants.SITE_ID, nullable = false)
     private Site site;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = AppConstants.USER_ID)
     private User user; // 수정자
 
     @Enumerated(EnumType.STRING)

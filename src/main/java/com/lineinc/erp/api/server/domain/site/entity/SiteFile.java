@@ -7,6 +7,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.enums.SiteFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.request.UpdateSiteFileRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,15 +40,17 @@ import lombok.experimental.SuperBuilder;
 })
 public class SiteFile extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "site_file_seq";
+
     @Id
     @DiffInclude
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_file_seq")
-    @SequenceGenerator(name = "site_file_seq", sequenceName = "site_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_contract_id")
+    @JoinColumn(name = AppConstants.SITE_CONTRACT_ID)
     private SiteContract siteContract;
 
     /**
