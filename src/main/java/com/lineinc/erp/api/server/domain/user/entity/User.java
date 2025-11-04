@@ -130,19 +130,6 @@ public class User extends BaseEntity implements UserDetails {
     @DiffIgnore
     private Set<UserRole> userRoles = new HashSet<>();
 
-    // ===== 화면 표시용 필드 (변경 추적 대상) =====
-    @Transient
-    @DiffInclude
-    private String departmentName;
-
-    @Transient
-    @DiffInclude
-    private String gradeName;
-
-    @Transient
-    @DiffInclude
-    private String positionName;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -187,6 +174,35 @@ public class User extends BaseEntity implements UserDetails {
                 .anyMatch(role -> role.getRole().getHasGlobalSiteProcessAccess());
     }
 
+    public void updateFrom(final UpdateUserRequest request, final Department department, final Grade grade) {
+        this.username = request.username();
+        this.email = request.email();
+        this.landlineNumber = request.landlineNumber();
+        this.phoneNumber = request.phoneNumber();
+        this.memo = request.memo();
+        this.isActive = request.isActive();
+        this.isHeadOffice = request.isHeadOffice();
+        this.department = department;
+        this.grade = grade;
+        syncTransientFields();
+    }
+
+    /**
+     * 수정이력용 필드
+     */
+
+    @Transient
+    @DiffInclude
+    private String departmentName;
+
+    @Transient
+    @DiffInclude
+    private String gradeName;
+
+    @Transient
+    @DiffInclude
+    private String positionName;
+
     public void syncTransientFields() {
         this.departmentName = Optional.ofNullable(this.department)
                 .map(Department::getName)
@@ -197,20 +213,6 @@ public class User extends BaseEntity implements UserDetails {
         this.positionName = Optional.ofNullable(this.position)
                 .map(Position::getName)
                 .orElse(null);
-    }
-
-    // ===== 업데이트 메서드 =====
-    public void updateFrom(final UpdateUserRequest request, final Department department, final Grade grade) {
-        Optional.ofNullable(request.username()).ifPresent(val -> this.username = val);
-        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
-        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
-        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-        Optional.ofNullable(request.isHeadOffice()).ifPresent(val -> this.isHeadOffice = val);
-        Optional.ofNullable(department).ifPresent(val -> this.department = val);
-        Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
-        syncTransientFields();
     }
 
 }

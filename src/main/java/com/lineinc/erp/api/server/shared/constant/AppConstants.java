@@ -132,6 +132,7 @@ public final class AppConstants {
     // 엔티티 관련 상수
     public static final String CLIENT_COMPANY_ID = "client_company_id";
     public static final String USER_ID = "user_id";
+    public static final String UPDATED_BY_USER_ID = "updated_by_id";
     public static final String SITE_ID = "site_id";
     public static final String SITE_PROCESS_ID = "site_process_id";
     public static final String DAILY_REPORT_ID = "daily_report_id";
@@ -151,6 +152,7 @@ public final class AppConstants {
     public static final String DEPARTMENT_ID = "department_id";
     public static final String GRADE_ID = "grade_id";
     public static final String POSITION_ID = "position_id";
+    public static final String ROLE_ID = "role_id";
 
     // 엔티티 매핑 관련 상수
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";

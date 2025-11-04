@@ -5,6 +5,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.enums.UserChangeHistoryType;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,13 +35,15 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class UserChangeHistory extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "user_change_history_seq";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_change_history_seq")
-    @SequenceGenerator(name = "user_change_history_seq", sequenceName = "user_change_history_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = AppConstants.USER_ID)
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -55,7 +58,7 @@ public class UserChangeHistory extends BaseEntity {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by_id")
+    @JoinColumn(name = AppConstants.UPDATED_BY_USER_ID)
     private User updatedByUser;
 
     @Setter
