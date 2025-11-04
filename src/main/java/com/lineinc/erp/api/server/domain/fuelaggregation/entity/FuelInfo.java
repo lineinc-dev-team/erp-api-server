@@ -171,6 +171,27 @@ public class FuelInfo extends BaseEntity {
         this.vehicleNumber = this.equipment != null ? this.equipment.getVehicleNumber() : null;
     }
 
+    /**
+     * 요청 객체로부터 엔티티를 업데이트합니다.
+     * EntitySyncUtils에서 사용하기 위한 단일 파라미터 버전
+     * 실제 엔티티는 나중에 설정해야 합니다.
+     */
+    public void updateFrom(final FuelInfoUpdateRequest request) {
+        // ID만 설정하고, 실제 엔티티는 나중에 설정해야 함
+        this.outsourcingCompanyId = request.outsourcingCompanyId();
+        this.driverId = request.driverId();
+        this.equipmentId = request.equipmentId();
+        this.categoryType = request.categoryType();
+        this.fuelType = request.fuelType();
+        this.fuelAmount = request.fuelAmount();
+        this.memo = request.memo();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+    }
+
+    /**
+     * 요청 객체와 관련 엔티티로부터 엔티티를 업데이트합니다.
+     */
     public void updateFrom(final FuelInfoUpdateRequest request, final OutsourcingCompany outsourcingCompany,
             final OutsourcingCompanyContractDriver driver, final OutsourcingCompanyContractEquipment equipment) {
         this.outsourcingCompany = outsourcingCompany;

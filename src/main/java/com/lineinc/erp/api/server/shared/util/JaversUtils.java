@@ -21,6 +21,7 @@ import org.javers.core.diff.changetype.ValueChange;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyContact;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompanyFile;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfoSubEquipment;
 import com.lineinc.erp.api.server.domain.labor.entity.LaborFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
@@ -97,6 +98,29 @@ public class JaversUtils {
                 return null;
             }),
             Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getName()),
+            Map.entry(FuelInfoSubEquipment.class, entity -> {
+                final FuelInfoSubEquipment subEquipment = (FuelInfoSubEquipment) entity;
+                // subEquipmentDescription이 있으면 사용 (이미 syncTransientFields가 호출된 경우)
+                if (subEquipment.getSubEquipmentDescription() != null
+                        && !subEquipment.getSubEquipmentDescription().trim().isEmpty()) {
+                    return subEquipment.getSubEquipmentDescription();
+                }
+                // 없으면 직접 조회
+                if (subEquipment.getOutsourcingCompanyContractSubEquipment() != null) {
+                    final String description = subEquipment.getOutsourcingCompanyContractSubEquipment()
+                            .getDescription();
+                    if (description != null && !description.trim().isEmpty()) {
+                        return description;
+                    }
+                }
+                // 유종과 주유량으로 대체
+                final String fuelType = subEquipment.getFuelTypeName() != null ? subEquipment.getFuelTypeName() : "";
+                final String fuelAmount = subEquipment.getFuelAmount() != null
+                        ? subEquipment.getFuelAmount().toString() + "L"
+                        : "";
+                final String result = (fuelType + " " + fuelAmount).trim();
+                return result.isEmpty() ? null : result;
+            }),
             Map.entry(SteelManagementDetailV2.class, entity -> {
                 final SteelManagementDetailV2 detail = (SteelManagementDetailV2) entity;
                 // specification이 없으면 name 사용

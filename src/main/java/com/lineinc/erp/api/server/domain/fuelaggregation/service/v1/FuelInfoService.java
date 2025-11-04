@@ -221,7 +221,11 @@ public class FuelInfoService {
             // 서브장비 추가 감지
             for (final FuelInfoSubEquipment afterSubEquipment : afterSubEquipments) {
                 if (afterSubEquipment.getId() == null || !beforeSubEquipmentIds.contains(afterSubEquipment.getId())) {
-                    allChanges.add(JaversUtils.extractAddedEntityChange(javers, afterSubEquipment));
+                    final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers,
+                            afterSubEquipment);
+                    if (addedChange != null) {
+                        allChanges.add(addedChange);
+                    }
                 }
             }
 
