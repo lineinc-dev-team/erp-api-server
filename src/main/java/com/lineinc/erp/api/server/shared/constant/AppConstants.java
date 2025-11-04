@@ -197,6 +197,7 @@ public final class AppConstants {
     public static final String POSITION_ID = "position_id";
     public static final String ROLE_ID = "role_id";
     public static final String STEEL_MANAGEMENT_V2_ID = "steel_management_v2_id";
+    public static final String SITE_MANAGEMENT_COST_ID = "site_management_cost_id";
 
     // ==================== JPA 엔티티 매핑 속성명 ====================
     /**

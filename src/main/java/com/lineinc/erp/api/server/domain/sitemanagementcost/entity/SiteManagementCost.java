@@ -58,7 +58,7 @@ public class SiteManagementCost extends BaseEntity {
      * 현장
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
+    @JoinColumn(name = AppConstants.SITE_ID)
     @DiffIgnore
     private Site site;
 
@@ -66,7 +66,7 @@ public class SiteManagementCost extends BaseEntity {
      * 공정
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id")
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     @DiffIgnore
     private SiteProcess siteProcess;
 

@@ -45,7 +45,7 @@ public class SiteManagementCostChangeHistory extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_management_cost_id")
+    @JoinColumn(name = AppConstants.SITE_MANAGEMENT_COST_ID)
     private SiteManagementCost siteManagementCost;
 
     @Enumerated(EnumType.STRING)
