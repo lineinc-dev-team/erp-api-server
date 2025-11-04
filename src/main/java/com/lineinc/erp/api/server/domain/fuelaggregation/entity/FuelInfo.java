@@ -13,8 +13,10 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest.FuelInfoUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -172,24 +174,6 @@ public class FuelInfo extends BaseEntity {
     }
 
     /**
-     * 요청 객체로부터 엔티티를 업데이트합니다.
-     * EntitySyncUtils에서 사용하기 위한 단일 파라미터 버전
-     * 실제 엔티티는 나중에 설정해야 합니다.
-     */
-    public void updateFrom(final FuelInfoUpdateRequest request) {
-        // ID만 설정하고, 실제 엔티티는 나중에 설정해야 함
-        this.outsourcingCompanyId = request.outsourcingCompanyId();
-        this.driverId = request.driverId();
-        this.equipmentId = request.equipmentId();
-        this.categoryType = request.categoryType();
-        this.fuelType = request.fuelType();
-        this.fuelAmount = request.fuelAmount();
-        this.memo = request.memo();
-        this.fileUrl = request.fileUrl();
-        this.originalFileName = request.originalFileName();
-    }
-
-    /**
      * 요청 객체와 관련 엔티티로부터 엔티티를 업데이트합니다.
      */
     public void updateFrom(final FuelInfoUpdateRequest request, final OutsourcingCompany outsourcingCompany,
@@ -206,6 +190,25 @@ public class FuelInfo extends BaseEntity {
         this.memo = request.memo();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
+
+        // 서브장비 목록 동기화
+        if (request.subEquipments() != null) {
+            EntitySyncUtils.syncList(
+                    this.subEquipments,
+                    request.subEquipments(),
+                    (subEquipmentDto) -> FuelInfoSubEquipment.builder()
+                            .fuelInfo(this)
+                            .outsourcingCompanyContractSubEquipment(
+                                    subEquipmentDto.outsourcingCompanyContractSubEquipmentId() != null
+                                            ? OutsourcingCompanyContractSubEquipment.builder()
+                                                    .id(subEquipmentDto.outsourcingCompanyContractSubEquipmentId())
+                                                    .build()
+                                            : null)
+                            .fuelType(subEquipmentDto.fuelType())
+                            .fuelAmount(subEquipmentDto.fuelAmount())
+                            .memo(subEquipmentDto.memo())
+                            .build());
+        }
     }
 
 }

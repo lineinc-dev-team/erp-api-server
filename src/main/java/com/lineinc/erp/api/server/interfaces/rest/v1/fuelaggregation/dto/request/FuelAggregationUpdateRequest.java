@@ -19,7 +19,7 @@ public record FuelAggregationUpdateRequest(
         @Schema(description = "수정 이력 리스트") @Valid List<ChangeHistoryRequest> changeHistories) {
     @Schema(description = "유류정보 수정 요청")
     public record FuelInfoUpdateRequest(
-            @Schema(description = "유류정보 ID (수정 시)", example = "1") @NotNull Long id,
+            @Schema(description = "유류정보 ID (수정 시)", example = "1") Long id,
             @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
             @Schema(description = "기사 ID", example = "1") Long driverId,
             @Schema(description = "장비 ID", example = "1") @NotNull Long equipmentId,
