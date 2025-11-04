@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.Outsou
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -57,9 +58,10 @@ import lombok.experimental.SuperBuilder;
 })
 public class OutsourcingCompanyContract extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_seq", sequenceName = "outsourcing_company_contract_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -68,17 +70,17 @@ public class OutsourcingCompanyContract extends BaseEntity {
 
     @DiffIgnore
     @ManyToOne
-    @JoinColumn(name = "site_id")
+    @JoinColumn(name = AppConstants.SITE_ID)
     private Site site;
 
     @DiffIgnore
     @ManyToOne
-    @JoinColumn(name = "site_process_id")
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     private SiteProcess siteProcess;
 
     @DiffIgnore
     @ManyToOne
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     private OutsourcingCompany outsourcingCompany;
 
     @DiffIgnore
@@ -138,7 +140,7 @@ public class OutsourcingCompanyContract extends BaseEntity {
 
     // 계약 담당자 목록
     @DiffIgnore
-    @OneToMany(mappedBy = "outsourcingCompanyContract", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractContact> contacts = new ArrayList<>();
 
