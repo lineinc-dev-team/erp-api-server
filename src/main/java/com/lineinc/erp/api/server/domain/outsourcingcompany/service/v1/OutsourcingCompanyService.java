@@ -20,9 +20,11 @@ import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloa
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyContactRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
@@ -46,6 +48,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OutsourcingCompanyService {
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
+    private final OutsourcingCompanyContactRepository contactRepository;
     private final OutsourcingCompanyContactService outsourcingCompanyContactService;
     private final OutsourcingCompanyFileService outsourcingCompanyFileService;
     private final OutsourcingCompanyChangeRepository outsourcingCompanyChangeRepository;
@@ -320,5 +323,14 @@ public class OutsourcingCompanyService {
     public Page<CompanyResponse.CompanySimpleResponse> getCompaniesWithEquipment(final Pageable pageable) {
         final Page<OutsourcingCompany> page = outsourcingCompanyRepository.findCompaniesWithEquipment(pageable);
         return page.map(CompanyResponse.CompanySimpleResponse::from);
+    }
+
+    /**
+     * 외주업체 ID로 담당자 목록을 조회합니다.
+     */
+    @Transactional(readOnly = true)
+    public List<CompanyContactResponse> getContactsByCompany(final Long companyId) {
+        final List<OutsourcingCompanyContact> contacts = contactRepository.findByOutsourcingCompanyId(companyId);
+        return contacts.stream().map(CompanyContactResponse::from).toList();
     }
 }

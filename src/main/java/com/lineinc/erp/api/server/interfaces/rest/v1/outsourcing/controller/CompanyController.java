@@ -35,6 +35,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyChangeHistoryResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyContactResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyDefaultDeductionsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
@@ -291,6 +292,14 @@ public class CompanyController extends BaseController {
         final List<String> specifications = outsourcingCompanyContractService
                 .getSpecificationsByConditions(itemName, constructionGroupId, id);
         return ResponseEntity.ok(SuccessResponse.of(specifications));
+    }
+
+    @Operation(summary = "외주업체 담당자 정보 조회", description = "특정 외주업체의 담당자 정보를 전체 반환합니다")
+    @GetMapping("/{id}/contacts")
+    public ResponseEntity<SuccessResponse<List<CompanyContactResponse>>> getContactsByCompany(
+            @PathVariable final Long id) {
+        final List<CompanyContactResponse> contacts = outsourcingCompanyService.getContactsByCompany(id);
+        return ResponseEntity.ok(SuccessResponse.of(contacts));
     }
 
 }
