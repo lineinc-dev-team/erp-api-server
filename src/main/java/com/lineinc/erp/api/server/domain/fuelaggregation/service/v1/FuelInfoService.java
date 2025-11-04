@@ -91,14 +91,25 @@ public class FuelInfoService {
                             .build();
                 });
 
-        // EntitySyncUtils 실행 후, 각 FuelInfo에 실제 엔티티 설정
-        final Map<Long, FuelInfoUpdateRequest> requestMap = requests.stream()
+        // EntitySyncUtils 실행 후, 각 FuelInfo에 실제 엔티티 설정 및 서브장비 처리
+        final Map<Long, FuelInfoUpdateRequest> requestMapById = requests.stream()
                 .filter(r -> r.id() != null)
                 .collect(Collectors.toMap(FuelInfoUpdateRequest::id, Function.identity()));
 
+        // ID가 없는 요청 목록 (새로 생성될 항목)
+        final List<FuelInfoUpdateRequest> newRequests = requests.stream()
+                .filter(r -> r.id() == null)
+                .collect(Collectors.toList());
+
+        // 새로 생성된 FuelInfo 목록 (ID가 null)
+        final List<FuelInfo> newFuelInfos = fuelAggregation.getFuelInfos().stream()
+                .filter(f -> f.getId() == null)
+                .collect(Collectors.toList());
+
+        // 기존 FuelInfo 처리
         for (final FuelInfo fuelInfo : fuelAggregation.getFuelInfos()) {
-            if (fuelInfo.getId() != null && requestMap.containsKey(fuelInfo.getId())) {
-                final FuelInfoUpdateRequest request = requestMap.get(fuelInfo.getId());
+            if (fuelInfo.getId() != null && requestMapById.containsKey(fuelInfo.getId())) {
+                final FuelInfoUpdateRequest request = requestMapById.get(fuelInfo.getId());
                 final OutsourcingCompany company = outsourcingCompanyService
                         .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
                 final OutsourcingCompanyContractDriver driver = request.driverId() != null
@@ -108,57 +119,63 @@ public class FuelInfoService {
                         .getEquipmentByIdOrThrow(request.equipmentId());
 
                 fuelInfo.updateFrom(request, company, driver, equipment);
+            }
+        }
 
-                // 서브장비 정보 동기화
-                if (request.subEquipments() != null) {
-                    EntitySyncUtils.syncList(
-                            fuelInfo.getSubEquipments(),
-                            request.subEquipments(),
-                            (final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest dto) -> {
-                                final OutsourcingCompanyContractSubEquipment subEquipment = dto
-                                        .outsourcingCompanyContractSubEquipmentId() != null
-                                                ? outsourcingCompanyContractService
-                                                        .getSubEquipmentByIdOrThrow(
-                                                                dto.outsourcingCompanyContractSubEquipmentId())
-                                                : null;
+        // 새로 생성된 FuelInfo 처리 (순서대로 매칭)
+        for (int i = 0; i < newFuelInfos.size() && i < newRequests.size(); i++) {
+            final FuelInfo fuelInfo = newFuelInfos.get(i);
+            final FuelInfoUpdateRequest request = newRequests.get(i);
 
-                                return FuelInfoSubEquipment.builder()
-                                        .fuelInfo(fuelInfo)
-                                        .outsourcingCompanyContractSubEquipment(subEquipment)
-                                        .fuelType(dto.fuelType())
-                                        .fuelAmount(dto.fuelAmount())
-                                        .memo(dto.memo())
-                                        .build();
-                            });
-
-                    // EntitySyncUtils 실행 후, 각 서브장비에 실제 서브장비 엔티티 설정
-                    final Map<Long, FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest> subEquipmentRequestMap = request
-                            .subEquipments().stream()
-                            .filter(r -> r.id() != null)
-                            .collect(Collectors.toMap(
-                                    FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest::id,
-                                    Function.identity()));
-
-                    for (final FuelInfoSubEquipment fuelInfoSubEquipment : fuelInfo.getSubEquipments()) {
-                        if (fuelInfoSubEquipment.getId() != null
-                                && subEquipmentRequestMap.containsKey(fuelInfoSubEquipment.getId())) {
-                            final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest subEquipmentRequest = subEquipmentRequestMap
-                                    .get(fuelInfoSubEquipment.getId());
-                            final OutsourcingCompanyContractSubEquipment subEquipment = subEquipmentRequest
+            // 새로 생성된 FuelInfo에도 서브장비 처리
+            if (request.subEquipments() != null) {
+                EntitySyncUtils.syncList(
+                        fuelInfo.getSubEquipments(),
+                        request.subEquipments(),
+                        (final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest dto) -> {
+                            final OutsourcingCompanyContractSubEquipment subEquipment = dto
                                     .outsourcingCompanyContractSubEquipmentId() != null
                                             ? outsourcingCompanyContractService
                                                     .getSubEquipmentByIdOrThrow(
-                                                            subEquipmentRequest
-                                                                    .outsourcingCompanyContractSubEquipmentId())
+                                                            dto.outsourcingCompanyContractSubEquipmentId())
                                             : null;
 
-                            // 실제 서브장비 엔티티로 업데이트
-                            fuelInfoSubEquipment.updateFrom(subEquipmentRequest, subEquipment);
-                        }
-                    }
+                            return FuelInfoSubEquipment.builder()
+                                    .fuelInfo(fuelInfo)
+                                    .outsourcingCompanyContractSubEquipment(subEquipment)
+                                    .fuelType(dto.fuelType())
+                                    .fuelAmount(dto.fuelAmount())
+                                    .memo(dto.memo())
+                                    .build();
+                        });
 
-                    fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
+                // EntitySyncUtils 실행 후, 각 서브장비에 실제 서브장비 엔티티 설정
+                final Map<Long, FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest> subEquipmentRequestMap = request
+                        .subEquipments().stream()
+                        .filter(r -> r.id() != null)
+                        .collect(Collectors.toMap(
+                                FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest::id,
+                                Function.identity()));
+
+                for (final FuelInfoSubEquipment fuelInfoSubEquipment : fuelInfo.getSubEquipments()) {
+                    if (fuelInfoSubEquipment.getId() != null
+                            && subEquipmentRequestMap.containsKey(fuelInfoSubEquipment.getId())) {
+                        final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest subEquipmentRequest = subEquipmentRequestMap
+                                .get(fuelInfoSubEquipment.getId());
+                        final OutsourcingCompanyContractSubEquipment subEquipment = subEquipmentRequest
+                                .outsourcingCompanyContractSubEquipmentId() != null
+                                        ? outsourcingCompanyContractService
+                                                .getSubEquipmentByIdOrThrow(
+                                                        subEquipmentRequest
+                                                                .outsourcingCompanyContractSubEquipmentId())
+                                        : null;
+
+                        // 실제 서브장비 엔티티로 업데이트
+                        fuelInfoSubEquipment.updateFrom(subEquipmentRequest, subEquipment);
+                    }
                 }
+
+                fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
             }
         }
 
