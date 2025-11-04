@@ -152,7 +152,30 @@ public class FuelInfoService {
 
         for (final FuelInfo after : afterFuelInfos) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
-                allChanges.add(JaversUtils.extractAddedEntityChange(javers, after));
+                final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                if (addedChange != null) {
+                    allChanges.add(addedChange);
+                }
+            }
+        }
+
+        // 삭제된 유류정보 감지
+        final Set<Long> afterIds = afterFuelInfos.stream()
+                .map(FuelInfo::getId)
+                .filter(id -> id != null)
+                .collect(Collectors.toSet());
+
+        for (final FuelInfo before : beforeFuelInfos) {
+            if (before.getId() != null && !afterIds.contains(before.getId())) {
+                // 삭제된 항목: before에는 있지만 after에는 없음
+                // 삭제된 항목을 나타내는 스냅샷 생성
+                final FuelInfo deletedSnapshot = JaversUtils.createSnapshot(javers, before, FuelInfo.class);
+                deletedSnapshot.markAsDeleted();
+                final FuelInfo beforeSnapshot = JaversUtils.createSnapshot(javers, before, FuelInfo.class);
+                final Diff deletedDiff = javers.compare(beforeSnapshot, deletedSnapshot);
+                final List<Map<String, String>> deletedChanges = JaversUtils.extractModifiedChanges(javers,
+                        deletedDiff);
+                allChanges.addAll(deletedChanges);
             }
         }
 
@@ -193,7 +216,34 @@ public class FuelInfoService {
             // 서브장비 추가 감지
             for (final FuelInfoSubEquipment afterSubEquipment : afterSubEquipments) {
                 if (afterSubEquipment.getId() == null || !beforeSubEquipmentIds.contains(afterSubEquipment.getId())) {
-                    allChanges.add(JaversUtils.extractAddedEntityChange(javers, afterSubEquipment));
+                    final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers,
+                            afterSubEquipment);
+                    if (addedChange != null) {
+                        allChanges.add(addedChange);
+                    }
+                }
+            }
+
+            // 서브장비 삭제 감지
+            final Set<Long> afterSubEquipmentIds = afterSubEquipments.stream()
+                    .map(FuelInfoSubEquipment::getId)
+                    .filter(id -> id != null)
+                    .collect(Collectors.toSet());
+
+            for (final FuelInfoSubEquipment beforeSubEquipment : beforeSubEquipments) {
+                if (beforeSubEquipment.getId() != null && !afterSubEquipmentIds.contains(beforeSubEquipment.getId())) {
+                    // 삭제된 서브장비: before에는 있지만 after에는 없음
+                    final FuelInfoSubEquipment deletedSubSnapshot = JaversUtils.createSnapshot(javers,
+                            beforeSubEquipment,
+                            FuelInfoSubEquipment.class);
+                    deletedSubSnapshot.markAsDeleted();
+                    final FuelInfoSubEquipment beforeSubSnapshot = JaversUtils.createSnapshot(javers,
+                            beforeSubEquipment,
+                            FuelInfoSubEquipment.class);
+                    final Diff deletedSubDiff = javers.compare(beforeSubSnapshot, deletedSubSnapshot);
+                    final List<Map<String, String>> deletedSubChanges = JaversUtils.extractModifiedChanges(javers,
+                            deletedSubDiff);
+                    allChanges.addAll(deletedSubChanges);
                 }
             }
 
