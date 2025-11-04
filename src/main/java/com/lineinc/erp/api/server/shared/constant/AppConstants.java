@@ -6,23 +6,40 @@ import java.util.List;
 
 import lombok.experimental.UtilityClass;
 
+/**
+ * 애플리케이션 전역 상수 정의
+ */
 @UtilityClass
 public final class AppConstants {
-    // 권한 그룹명 관련 상수
+
+    // ==================== 인증 및 권한 ====================
+    /**
+     * 권한 그룹명
+     */
     public static final String ROLE_ADMIN_NAME = "전체권한";
 
-    // 관리자 계정 관련 상수
+    /**
+     * 관리자 계정 정보
+     */
     public static final String ADMIN_LOGIN_ID = "admin";
     public static final String ADMIN_EMAIL = "admin@example.com";
     public static final String ADMIN_USERNAME = "관리자";
 
-    // 시스템 관련 상수
+    /**
+     * 시스템 계정명
+     */
     public static final String SYSTEM_NAME = "system";
 
-    // 회사명 관련 상수
+    // ==================== 회사 정보 ====================
+    /**
+     * 회사명
+     */
     public static final String LINE_INC_NAME = "라인공영";
 
-    // 시스템 기본 메뉴 이름 관련 상수
+    // ==================== 메뉴 관리 ====================
+    /**
+     * 시스템 메뉴 이름
+     */
     public static final String MENU_AGGREGATION_MANAGEMENT = "집계 관리";
     public static final String MENU_ACCOUNT = "계정 관리";
     public static final String MENU_PERMISSION = "권한 관리";
@@ -39,7 +56,9 @@ public final class AppConstants {
     public static final String MENU_OUTSOURCING_COMPANY_CONTRACT = "외주업체 계약 관리";
     public static final String MENU_WORK_DAILY_REPORT = "출역일보";
 
-    // 시스템 기본 메뉴 이름 목록 (순서대로 정렬)
+    /**
+     * 시스템 메뉴 이름 목록 (표시 순서)
+     */
     public static final List<String> MENU_NAMES = List.of(
             MENU_AGGREGATION_MANAGEMENT, // 1. 집계 관리
             MENU_CLIENT_COMPANY, // 2. 발주처 관리
@@ -58,7 +77,10 @@ public final class AppConstants {
             MENU_PERMISSION // 15. 권한 관리
     );
 
-    // 직급(Grade) 관련 상수
+    // ==================== 조직 관리 ====================
+    /**
+     * 직급(Grade) 상수
+     */
     public static final String GRADE_CEO = "대표이사";
     public static final String GRADE_VICE_CHAIRMAN = "부회장";
     public static final String GRADE_EXECUTIVE_VICE_PRESIDENT = "전무";
@@ -73,12 +95,16 @@ public final class AppConstants {
     public static final String GRADE_FOREMAN = "반장";
     public static final String GRADE_TECHNICIAN = "기사";
 
-    // 직책(Position) 관련 상수
+    /**
+     * 직책(Position) 상수
+     */
     public static final String POSITION_TEAM_LEADER = "팀장";
     public static final String POSITION_PART_LEADER = "파트장";
     public static final String POSITION_HEAD = "실장";
 
-    // 부서(Department) 관련 상수
+    /**
+     * 부서(Department) 상수
+     */
     public static final String DEPT_CEO = "대표이사";
     public static final String DEPT_LEGAL_AUDIT = "법무감사실";
     public static final String DEPT_MANAGEMENT = "관리부";
@@ -87,7 +113,9 @@ public final class AppConstants {
     public static final String DEPT_CIVIL_ENGINEERING = "토목공사팀";
     public static final String DEPT_DUSON_INTERNATIONAL = "두손인터내셔널";
 
-    // 직급 전체 목록 (직급 순서대로)
+    /**
+     * 직급 목록 (계급 순서)
+     */
     public static final List<String> GRADE_NAMES = List.of(
             GRADE_CEO,
             GRADE_VICE_CHAIRMAN,
@@ -103,11 +131,17 @@ public final class AppConstants {
             GRADE_FOREMAN,
             GRADE_TECHNICIAN);
 
-    // 직책 전체 목록
-    public static final List<String> POSITION_NAMES = List.of(POSITION_TEAM_LEADER, POSITION_PART_LEADER,
+    /**
+     * 직책 목록
+     */
+    public static final List<String> POSITION_NAMES = List.of(
+            POSITION_TEAM_LEADER,
+            POSITION_PART_LEADER,
             POSITION_HEAD);
 
-    // 부서 전체 목록
+    /**
+     * 부서 목록
+     */
     public static final List<String> DEPARTMENT_NAMES = List.of(
             DEPT_CEO,
             DEPT_LEGAL_AUDIT,
@@ -117,19 +151,28 @@ public final class AppConstants {
             DEPT_CIVIL_ENGINEERING,
             DEPT_DUSON_INTERNATIONAL);
 
-    // 시간 관련 상수
+    // ==================== 시간 및 지역 설정 ====================
+    /**
+     * 한국 시간대 설정
+     */
     public static final ZoneOffset KOREA_ZONE_OFFSET = ZoneOffset.ofHours(9);
-
-    // 한국 시간대
     public static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
-    // 세션 타임아웃 기본값 (초 단위, 예: 1800초 = 30분)
+    // ==================== 시스템 설정 ====================
+    /**
+     * 세션 타임아웃 (초 단위, 1800초 = 30분)
+     */
     public static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 1800;
 
-    // JPA 시퀀스 AllocationSize 관련 상수
+    /**
+     * JPA 시퀀스 AllocationSize 기본값
+     */
     public static final int SEQUENCE_ALLOCATION_DEFAULT = 1;
 
-    // 엔티티 관련 상수
+    // ==================== JPA 엔티티 컬럼명 ====================
+    /**
+     * 외래키 컬럼명
+     */
     public static final String CLIENT_COMPANY_ID = "client_company_id";
     public static final String USER_ID = "user_id";
     public static final String UPDATED_BY_USER_ID = "updated_by_id";
@@ -154,7 +197,10 @@ public final class AppConstants {
     public static final String POSITION_ID = "position_id";
     public static final String ROLE_ID = "role_id";
 
-    // 엔티티 매핑 관련 상수
+    // ==================== JPA 엔티티 매핑 속성명 ====================
+    /**
+     * @OneToMany mappedBy 속성값
+     */
     public static final String CLIENT_COMPANY_MAPPED_BY = "clientCompany";
     public static final String DAILY_REPORT_MAPPED_BY = "dailyReport";
     public static final String FUEL_AGGREGATION_MAPPED_BY = "fuelAggregation";
@@ -163,6 +209,9 @@ public final class AppConstants {
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_MAPPED_BY = "dailyReportOutsourcingConstructionGroup";
     public static final String USER_MAPPED_BY = "user";
 
-    // 빈 값 상수
+    // ==================== 기타 상수 ====================
+    /**
+     * 빈 값
+     */
     public static final String EMPTY_VALUE = "";
 }
