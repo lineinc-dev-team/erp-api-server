@@ -141,6 +141,12 @@ public class FuelInfoService {
         fuelAggregationRepository.save(fuelAggregation);
 
         // 3. 변경사항 추출 및 변경 히스토리 저장
+        // 모든 FuelInfo의 transient 필드 동기화 (추가 감지를 위해 필요)
+        fuelAggregation.getFuelInfos().forEach(fuelInfo -> {
+            fuelInfo.syncTransientFields();
+            fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
+        });
+
         final List<FuelInfo> afterFuelInfos = new ArrayList<>(fuelAggregation.getFuelInfos());
         final Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
 
@@ -152,48 +158,36 @@ public class FuelInfoService {
 
         for (final FuelInfo after : afterFuelInfos) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
-                final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
-                if (addedChange != null) {
-                    allChanges.add(addedChange);
+                // deleted = false인 새 항목만 추가로 감지
+                if (!after.isDeleted()) {
+                    final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                    if (addedChange != null) {
+                        allChanges.add(addedChange);
+                    }
                 }
             }
         }
 
-        // 삭제된 유류정보 감지
-        final Set<Long> afterIds = afterFuelInfos.stream()
-                .map(FuelInfo::getId)
-                .filter(id -> id != null)
-                .collect(Collectors.toSet());
-
-        // afterFuelInfos에서 deleted = true인 항목도 감지
-        final Set<Long> deletedAfterIds = afterFuelInfos.stream()
-                .filter(f -> f.getId() != null && f.isDeleted())
-                .map(FuelInfo::getId)
-                .collect(Collectors.toSet());
-
-        for (final FuelInfo before : beforeFuelInfos) {
-            final Long beforeId = before.getId();
-            if (beforeId != null && (!afterIds.contains(beforeId) || deletedAfterIds.contains(beforeId))) {
-                // 삭제된 항목: before에는 있지만 after에는 없거나, after에서 deleted = true
-                // 삭제된 항목을 나타내는 스냅샷 생성
-                final FuelInfo deletedSnapshot = JaversUtils.createSnapshot(javers, before, FuelInfo.class);
-                deletedSnapshot.markAsDeleted();
-                final FuelInfo beforeSnapshot = JaversUtils.createSnapshot(javers, before, FuelInfo.class);
-                final Diff deletedDiff = javers.compare(beforeSnapshot, deletedSnapshot);
-                final List<Map<String, String>> deletedChanges = JaversUtils.extractModifiedChanges(javers,
-                        deletedDiff);
-                allChanges.addAll(deletedChanges);
-            }
-        }
-
-        // 수정된 유류정보
+        // 수정된 유류정보 (deleted = false인 항목만 포함)
         final Map<Long, FuelInfo> afterMap = afterFuelInfos.stream()
-                .filter(f -> f.getId() != null)
+                .filter(f -> f.getId() != null && !f.isDeleted())
                 .collect(Collectors.toMap(FuelInfo::getId, f -> f));
 
         for (final FuelInfo before : beforeFuelInfos) {
-            if (before.getId() == null || !afterMap.containsKey(before.getId()))
+            if (before.getId() == null || !afterMap.containsKey(before.getId())) {
+                // 삭제된 항목: before에는 있지만 afterMap에 없음 (deleted = true이거나 리스트에서 제거됨)
+                if (before.getId() != null) {
+                    // 삭제된 항목을 나타내는 스냅샷 생성
+                    final FuelInfo deletedSnapshot = JaversUtils.createSnapshot(javers, before, FuelInfo.class);
+                    deletedSnapshot.markAsDeleted();
+                    final FuelInfo beforeSnapshot = JaversUtils.createSnapshot(javers, before, FuelInfo.class);
+                    final Diff deletedDiff = javers.compare(beforeSnapshot, deletedSnapshot);
+                    final List<Map<String, String>> deletedChanges = JaversUtils.extractModifiedChanges(javers,
+                            deletedDiff);
+                    allChanges.addAll(deletedChanges);
+                }
                 continue;
+            }
 
             final FuelInfo after = afterMap.get(before.getId());
 
