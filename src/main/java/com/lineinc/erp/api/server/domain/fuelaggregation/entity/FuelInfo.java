@@ -68,6 +68,7 @@ public class FuelInfo extends BaseEntity {
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
+    @Setter
     private OutsourcingCompany outsourcingCompany;
 
     /**
@@ -76,6 +77,7 @@ public class FuelInfo extends BaseEntity {
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_DRIVER_ID)
+    @Setter
     private OutsourcingCompanyContractDriver driver;
 
     /**
@@ -84,6 +86,7 @@ public class FuelInfo extends BaseEntity {
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_ID)
+    @Setter
     private OutsourcingCompanyContractEquipment equipment;
 
     /**
@@ -181,6 +184,42 @@ public class FuelInfo extends BaseEntity {
         this.outsourcingCompany = outsourcingCompany;
         this.driver = driver;
         this.equipment = equipment;
+        this.outsourcingCompanyId = request.outsourcingCompanyId();
+        this.driverId = request.driverId();
+        this.equipmentId = request.equipmentId();
+        this.categoryType = request.categoryType();
+        this.fuelType = request.fuelType();
+        this.fuelAmount = request.fuelAmount();
+        this.memo = request.memo();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+
+        // 서브장비 목록 동기화
+        if (request.subEquipments() != null) {
+            EntitySyncUtils.syncList(
+                    this.subEquipments,
+                    request.subEquipments(),
+                    (subEquipmentDto) -> FuelInfoSubEquipment.builder()
+                            .fuelInfo(this)
+                            .outsourcingCompanyContractSubEquipment(
+                                    subEquipmentDto.outsourcingCompanyContractSubEquipmentId() != null
+                                            ? OutsourcingCompanyContractSubEquipment.builder()
+                                                    .id(subEquipmentDto.outsourcingCompanyContractSubEquipmentId())
+                                                    .build()
+                                            : null)
+                            .fuelType(subEquipmentDto.fuelType())
+                            .fuelAmount(subEquipmentDto.fuelAmount())
+                            .memo(subEquipmentDto.memo())
+                            .build());
+        }
+    }
+
+    /**
+     * EntitySyncUtils에서 사용하기 위한 단일 파라미터 updateFrom 메서드
+     * outsourcingCompany, driver, equipment는 ID만 저장하고, 서브장비는 동기화합니다.
+     */
+    public void updateFrom(final FuelInfoUpdateRequest request) {
+        // ID만 저장 (실제 엔티티는 서비스 레이어에서 설정)
         this.outsourcingCompanyId = request.outsourcingCompanyId();
         this.driverId = request.driverId();
         this.equipmentId = request.equipmentId();

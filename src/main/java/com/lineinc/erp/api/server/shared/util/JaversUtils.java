@@ -100,26 +100,7 @@ public class JaversUtils {
             Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getName()),
             Map.entry(FuelInfoSubEquipment.class, entity -> {
                 final FuelInfoSubEquipment subEquipment = (FuelInfoSubEquipment) entity;
-                // subEquipmentDescription이 있으면 사용 (이미 syncTransientFields가 호출된 경우)
-                if (subEquipment.getSubEquipmentDescription() != null
-                        && !subEquipment.getSubEquipmentDescription().trim().isEmpty()) {
-                    return subEquipment.getSubEquipmentDescription();
-                }
-                // 없으면 직접 조회
-                if (subEquipment.getOutsourcingCompanyContractSubEquipment() != null) {
-                    final String description = subEquipment.getOutsourcingCompanyContractSubEquipment()
-                            .getDescription();
-                    if (description != null && !description.trim().isEmpty()) {
-                        return description;
-                    }
-                }
-                // 유종과 주유량으로 대체
-                final String fuelType = subEquipment.getFuelTypeName() != null ? subEquipment.getFuelTypeName() : "";
-                final String fuelAmount = subEquipment.getFuelAmount() != null
-                        ? subEquipment.getFuelAmount().toString() + "L"
-                        : "";
-                final String result = (fuelType + " " + fuelAmount).trim();
-                return result.isEmpty() ? null : result;
+                return subEquipment.getOutsourcingCompanyContractSubEquipment().getType().getLabel();
             }),
             Map.entry(SteelManagementDetailV2.class, entity -> {
                 final SteelManagementDetailV2 detail = (SteelManagementDetailV2) entity;

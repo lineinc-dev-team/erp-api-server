@@ -1,6 +1,7 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.service.v1;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfoSubEquipment;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationChangeType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
+import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
@@ -35,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FuelInfoService {
 
+    private final FuelAggregationRepository fuelAggregationRepository;
     private final FuelAggregationChangeHistoryRepository fuelAggregationChangeHistoryRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
@@ -44,15 +47,12 @@ public class FuelInfoService {
     @Transactional
     public void updateFuelInfos(final FuelAggregation fuelAggregation, final List<FuelInfoUpdateRequest> requests,
             final Long userId) {
-        // 모든 FuelInfo와 서브장비의 transient 필드 동기화
-        fuelAggregation.getFuelInfos().forEach(fuelInfo -> {
-            fuelInfo.syncTransientFields();
-            fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
-        });
-
-        // 변경 전 상태 저장 (Javers 스냅샷) - syncTransientFields 호출 후
+        // 1. 변경 전 스냅샷 생성 (서브장비 포함)
         final List<FuelInfo> beforeFuelInfos = fuelAggregation.getFuelInfos().stream()
                 .map(fuelInfo -> {
+                    // 유류정보 및 서브장비의 transient 필드 동기화
+                    fuelInfo.syncTransientFields();
+                    fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
                     final FuelInfo snapshot = JaversUtils.createSnapshot(javers, fuelInfo, FuelInfo.class);
                     // 서브장비 목록도 깊은 복사로 생성
                     snapshot.setSubEquipments(fuelInfo.getSubEquipments().stream()
@@ -63,7 +63,7 @@ public class FuelInfoService {
                 })
                 .toList();
 
-        // EntitySyncUtils를 사용하여 유류정보 목록 동기화
+        // 2. 유류정보 동기화 (EntitySyncUtils 사용)
         EntitySyncUtils.syncList(
                 fuelAggregation.getFuelInfos(),
                 requests,
@@ -77,7 +77,7 @@ public class FuelInfoService {
                     final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
                             .getEquipmentByIdOrThrow(dto.equipmentId());
 
-                    return FuelInfo.builder()
+                    final FuelInfo fuelInfo = FuelInfo.builder()
                             .fuelAggregation(fuelAggregation)
                             .outsourcingCompany(outsourcingCompany)
                             .driver(driver)
@@ -89,24 +89,36 @@ public class FuelInfoService {
                             .fileUrl(dto.fileUrl())
                             .originalFileName(dto.originalFileName())
                             .build();
+
+                    // 요청에 포함된 서브장비가 있다면 FuelInfoSubEquipment 객체로 변환하여 등록
+                    if (dto.subEquipments() != null && !dto.subEquipments().isEmpty()) {
+                        fuelInfo.getSubEquipments().addAll(dto.subEquipments().stream()
+                                .map(subDto -> {
+                                    final OutsourcingCompanyContractSubEquipment subEquipment = subDto
+                                            .outsourcingCompanyContractSubEquipmentId() != null
+                                                    ? outsourcingCompanyContractService
+                                                            .getSubEquipmentByIdOrThrow(
+                                                                    subDto.outsourcingCompanyContractSubEquipmentId())
+                                                    : null;
+
+                                    return FuelInfoSubEquipment.builder()
+                                            .fuelInfo(fuelInfo)
+                                            .outsourcingCompanyContractSubEquipment(subEquipment)
+                                            .fuelType(subDto.fuelType())
+                                            .fuelAmount(subDto.fuelAmount())
+                                            .memo(subDto.memo())
+                                            .build();
+                                })
+                                .collect(Collectors.toList()));
+                    }
+                    return fuelInfo;
                 });
 
-        // EntitySyncUtils 실행 후, 각 FuelInfo에 실제 엔티티 설정 및 서브장비 처리
+        // EntitySyncUtils 실행 후, 기존 FuelInfo에 실제 엔티티 설정
         final Map<Long, FuelInfoUpdateRequest> requestMapById = requests.stream()
                 .filter(r -> r.id() != null)
                 .collect(Collectors.toMap(FuelInfoUpdateRequest::id, Function.identity()));
 
-        // ID가 없는 요청 목록 (새로 생성될 항목)
-        final List<FuelInfoUpdateRequest> newRequests = requests.stream()
-                .filter(r -> r.id() == null)
-                .collect(Collectors.toList());
-
-        // 새로 생성된 FuelInfo 목록 (ID가 null)
-        final List<FuelInfo> newFuelInfos = fuelAggregation.getFuelInfos().stream()
-                .filter(f -> f.getId() == null)
-                .collect(Collectors.toList());
-
-        // 기존 FuelInfo 처리
         for (final FuelInfo fuelInfo : fuelAggregation.getFuelInfos()) {
             if (fuelInfo.getId() != null && requestMapById.containsKey(fuelInfo.getId())) {
                 final FuelInfoUpdateRequest request = requestMapById.get(fuelInfo.getId());
@@ -118,76 +130,19 @@ public class FuelInfoService {
                 final OutsourcingCompanyContractEquipment equipment = outsourcingCompanyContractService
                         .getEquipmentByIdOrThrow(request.equipmentId());
 
-                fuelInfo.updateFrom(request, company, driver, equipment);
+                // 실제 엔티티 설정
+                fuelInfo.setOutsourcingCompany(company);
+                fuelInfo.setDriver(driver);
+                fuelInfo.setEquipment(equipment);
             }
         }
 
-        // 새로 생성된 FuelInfo 처리 (순서대로 매칭)
-        for (int i = 0; i < newFuelInfos.size() && i < newRequests.size(); i++) {
-            final FuelInfo fuelInfo = newFuelInfos.get(i);
-            final FuelInfoUpdateRequest request = newRequests.get(i);
+        // 저장을 명시적으로 호출
+        fuelAggregationRepository.save(fuelAggregation);
 
-            // 새로 생성된 FuelInfo에도 서브장비 처리
-            if (request.subEquipments() != null) {
-                EntitySyncUtils.syncList(
-                        fuelInfo.getSubEquipments(),
-                        request.subEquipments(),
-                        (final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest dto) -> {
-                            final OutsourcingCompanyContractSubEquipment subEquipment = dto
-                                    .outsourcingCompanyContractSubEquipmentId() != null
-                                            ? outsourcingCompanyContractService
-                                                    .getSubEquipmentByIdOrThrow(
-                                                            dto.outsourcingCompanyContractSubEquipmentId())
-                                            : null;
-
-                            return FuelInfoSubEquipment.builder()
-                                    .fuelInfo(fuelInfo)
-                                    .outsourcingCompanyContractSubEquipment(subEquipment)
-                                    .fuelType(dto.fuelType())
-                                    .fuelAmount(dto.fuelAmount())
-                                    .memo(dto.memo())
-                                    .build();
-                        });
-
-                // EntitySyncUtils 실행 후, 각 서브장비에 실제 서브장비 엔티티 설정
-                final Map<Long, FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest> subEquipmentRequestMap = request
-                        .subEquipments().stream()
-                        .filter(r -> r.id() != null)
-                        .collect(Collectors.toMap(
-                                FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest::id,
-                                Function.identity()));
-
-                for (final FuelInfoSubEquipment fuelInfoSubEquipment : fuelInfo.getSubEquipments()) {
-                    if (fuelInfoSubEquipment.getId() != null
-                            && subEquipmentRequestMap.containsKey(fuelInfoSubEquipment.getId())) {
-                        final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest subEquipmentRequest = subEquipmentRequestMap
-                                .get(fuelInfoSubEquipment.getId());
-                        final OutsourcingCompanyContractSubEquipment subEquipment = subEquipmentRequest
-                                .outsourcingCompanyContractSubEquipmentId() != null
-                                        ? outsourcingCompanyContractService
-                                                .getSubEquipmentByIdOrThrow(
-                                                        subEquipmentRequest
-                                                                .outsourcingCompanyContractSubEquipmentId())
-                                        : null;
-
-                        // 실제 서브장비 엔티티로 업데이트
-                        fuelInfoSubEquipment.updateFrom(subEquipmentRequest, subEquipment);
-                    }
-                }
-
-                fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
-            }
-        }
-
-        // 새로 생성된 엔티티들도 transient 필드 동기화
-        fuelAggregation.getFuelInfos().forEach(fuelInfo -> {
-            fuelInfo.syncTransientFields();
-            fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
-        });
-
-        // 변경사항 감지 및 이력 저장
+        // 3. 변경사항 추출 및 변경 히스토리 저장
         final List<FuelInfo> afterFuelInfos = new ArrayList<>(fuelAggregation.getFuelInfos());
-        final List<Map<String, String>> allChanges = new ArrayList<>();
+        final Set<Map<String, String>> allChanges = new LinkedHashSet<>(); // 중복 제거를 위해 Set 사용
 
         // 추가된 유류정보
         final Set<Long> beforeIds = beforeFuelInfos.stream()
@@ -238,11 +193,7 @@ public class FuelInfoService {
             // 서브장비 추가 감지
             for (final FuelInfoSubEquipment afterSubEquipment : afterSubEquipments) {
                 if (afterSubEquipment.getId() == null || !beforeSubEquipmentIds.contains(afterSubEquipment.getId())) {
-                    final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers,
-                            afterSubEquipment);
-                    if (addedChange != null) {
-                        allChanges.add(addedChange);
-                    }
+                    allChanges.add(JaversUtils.extractAddedEntityChange(javers, afterSubEquipment));
                 }
             }
 
@@ -264,16 +215,16 @@ public class FuelInfoService {
             }
         }
 
-        // 변경사항이 있다면 이력 저장
+        // 4. 변경 히스토리 저장
         if (!allChanges.isEmpty()) {
-            final String changesJson = javers.getJsonConverter().toJson(allChanges);
-            final FuelAggregationChangeHistory changeHistory = FuelAggregationChangeHistory.builder()
+            final String json = javers.getJsonConverter().toJson(allChanges);
+            final FuelAggregationChangeHistory history = FuelAggregationChangeHistory.builder()
                     .fuelAggregation(fuelAggregation)
                     .type(FuelAggregationChangeType.FUEL_INFO)
-                    .changes(changesJson)
+                    .changes(json)
                     .user(userService.getUserByIdOrThrow(userId))
                     .build();
-            fuelAggregationChangeHistoryRepository.save(changeHistory);
+            fuelAggregationChangeHistoryRepository.save(history);
         }
     }
 }
