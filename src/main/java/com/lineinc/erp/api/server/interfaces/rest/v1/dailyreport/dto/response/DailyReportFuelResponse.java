@@ -1,20 +1,20 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelInfoSubEquipmentResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse.ContractDriverSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractEquipmentResponse.ContractEquipmentSimpleResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "출역일보 유류 응답")
 public record DailyReportFuelResponse(
         @Schema(description = "유류집계 ID", example = "1") Long fuelAggregationId,
-        @Schema(description = "유류업체 계약 간단 응답", example = "1") ContractSimpleResponse outsourcingCompanyContract,
         @Schema(description = "유류집계 info id", example = "1") Long fuelInfoId,
         @Schema(description = "구분", example = "장비") String categoryType,
         @Schema(description = "구분 코드", example = "EQUIPMENT") String categoryTypeCode,
@@ -27,15 +27,13 @@ public record DailyReportFuelResponse(
         @Schema(description = "업체 정보") CompanySimpleResponse outsourcingCompany,
         @Schema(description = "기사 정보") ContractDriverSimpleResponse outsourcingCompanyDriver,
         @Schema(description = "장비 정보") ContractEquipmentSimpleResponse outsourcingCompanyEquipment,
+        @Schema(description = "서브장비 목록") List<FuelInfoSubEquipmentResponse> subEquipments,
         @Schema(description = "등록일", example = "2024-01-15T10:00:00+09:00") OffsetDateTime createdAt,
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
 
     public static DailyReportFuelResponse from(final FuelInfo fuelInfo) {
         return new DailyReportFuelResponse(
                 fuelInfo.getFuelAggregation() != null ? fuelInfo.getFuelAggregation().getId() : null,
-                fuelInfo.getFuelAggregation() != null
-                        ? ContractSimpleResponse.from(fuelInfo.getFuelAggregation().getOutsourcingCompanyContract())
-                        : null,
                 fuelInfo.getId(),
                 fuelInfo.getCategoryType() != null ? fuelInfo.getCategoryType().getLabel() : null,
                 fuelInfo.getCategoryType() != null ? fuelInfo.getCategoryType().name() : null,
@@ -54,6 +52,9 @@ public record DailyReportFuelResponse(
                 fuelInfo.getEquipment() != null
                         ? ContractEquipmentSimpleResponse.from(fuelInfo.getEquipment())
                         : null,
+                fuelInfo.getSubEquipments().stream()
+                        .map(FuelInfoSubEquipmentResponse::from)
+                        .toList(),
                 fuelInfo.getCreatedAt(),
                 fuelInfo.getUpdatedAt());
     }

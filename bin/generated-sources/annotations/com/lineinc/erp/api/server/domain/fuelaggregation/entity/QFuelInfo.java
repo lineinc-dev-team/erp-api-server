@@ -58,6 +58,8 @@ public class QFuelInfo extends EntityPathBase<FuelInfo> {
 
     public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany outsourcingCompany;
 
+    public final ListPath<FuelInfoSubEquipment, QFuelInfoSubEquipment> subEquipments = this.<FuelInfoSubEquipment, QFuelInfoSubEquipment>createList("subEquipments", FuelInfoSubEquipment.class, QFuelInfoSubEquipment.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 

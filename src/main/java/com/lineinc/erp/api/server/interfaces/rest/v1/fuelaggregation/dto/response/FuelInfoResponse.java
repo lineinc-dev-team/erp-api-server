@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response;
 
+import java.util.List;
+
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,7 +19,8 @@ public record FuelInfoResponse(
         @Schema(description = "주유량 (리터)", example = "50") Long fuelAmount,
         @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
         @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
-        @Schema(description = "비고", example = "오전 주유") String memo) {
+        @Schema(description = "비고", example = "오전 주유") String memo,
+        @Schema(description = "서브장비 목록") List<FuelInfoSubEquipmentResponse> subEquipments) {
 
     public static FuelInfoResponse from(final FuelInfo entity) {
         String equipmentInfo = null;
@@ -44,6 +47,9 @@ public record FuelInfoResponse(
                 entity.getFuelAmount(),
                 entity.getFileUrl(),
                 entity.getOriginalFileName(),
-                entity.getMemo());
+                entity.getMemo(),
+                entity.getSubEquipments().stream()
+                        .map(FuelInfoSubEquipmentResponse::from)
+                        .toList());
     }
 }

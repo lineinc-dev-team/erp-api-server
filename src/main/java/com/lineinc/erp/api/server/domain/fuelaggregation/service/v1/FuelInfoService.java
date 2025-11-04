@@ -15,12 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfoSubEquipment;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationChangeType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest.FuelInfoUpdateRequest;
@@ -95,6 +97,30 @@ public class FuelInfoService {
                         .getEquipmentByIdOrThrow(request.equipmentId());
 
                 fuelInfo.updateFrom(request, company, driver, equipment);
+
+                // 서브장비 정보 동기화
+                if (request.subEquipments() != null) {
+                    EntitySyncUtils.syncList(
+                            fuelInfo.getSubEquipments(),
+                            request.subEquipments(),
+                            (final FuelInfoUpdateRequest.FuelInfoSubEquipmentUpdateRequest dto) -> {
+                                final OutsourcingCompanyContractSubEquipment subEquipment = dto
+                                        .outsourcingCompanyContractSubEquipmentId() != null
+                                                ? outsourcingCompanyContractService
+                                                        .getSubEquipmentByIdOrThrow(
+                                                                dto.outsourcingCompanyContractSubEquipmentId())
+                                                : null;
+
+                                return FuelInfoSubEquipment.builder()
+                                        .fuelInfo(fuelInfo)
+                                        .outsourcingCompanyContractSubEquipment(subEquipment)
+                                        .fuelType(dto.fuelType())
+                                        .fuelAmount(dto.fuelAmount())
+                                        .memo(dto.memo())
+                                        .build();
+                            });
+                    fuelInfo.getSubEquipments().forEach(FuelInfoSubEquipment::syncTransientFields);
+                }
             }
         }
 

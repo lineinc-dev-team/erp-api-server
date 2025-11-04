@@ -25,6 +25,7 @@ import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownl
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregationChangeHistory;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfoSubEquipment;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationChangeHistoryRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
@@ -33,6 +34,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.Outsourci
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -123,6 +125,29 @@ public class FuelAggregationService {
             // FuelInfo를 저장하고 FuelAggregation의 컬렉션에도 추가
             fuelInfoRepository.save(fuelInfoEntity);
             fuelAggregation.getFuelInfos().add(fuelInfoEntity);
+
+            // 서브장비 정보 추가
+            if (fuelInfo.subEquipments() != null) {
+                for (final FuelInfoCreateRequest.FuelInfoSubEquipmentCreateRequest subEquipmentRequest : fuelInfo
+                        .subEquipments()) {
+                    final OutsourcingCompanyContractSubEquipment subEquipment = subEquipmentRequest
+                            .outsourcingCompanyContractSubEquipmentId() != null
+                                    ? outsourcingCompanyContractService
+                                            .getSubEquipmentByIdOrThrow(
+                                                    subEquipmentRequest.outsourcingCompanyContractSubEquipmentId())
+                                    : null;
+
+                    final FuelInfoSubEquipment fuelInfoSubEquipment = FuelInfoSubEquipment.builder()
+                            .fuelInfo(fuelInfoEntity)
+                            .outsourcingCompanyContractSubEquipment(subEquipment)
+                            .fuelType(subEquipmentRequest.fuelType())
+                            .fuelAmount(subEquipmentRequest.fuelAmount())
+                            .memo(subEquipmentRequest.memo())
+                            .build();
+
+                    fuelInfoEntity.getSubEquipments().add(fuelInfoSubEquipment);
+                }
+            }
         }
 
         // 해당 현장, 공정, 일자에 맞는 출역일보 찾기

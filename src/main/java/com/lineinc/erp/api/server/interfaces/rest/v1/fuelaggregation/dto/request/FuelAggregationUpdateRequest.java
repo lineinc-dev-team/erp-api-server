@@ -28,7 +28,17 @@ public record FuelAggregationUpdateRequest(
             @Schema(description = "주유량 (리터)", example = "50") @NotNull Long fuelAmount,
             @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
             @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
-            @Schema(description = "비고", example = "오전 주유") String memo) {
+            @Schema(description = "비고", example = "오전 주유") String memo,
+            @Schema(description = "서브장비 목록") @Valid List<FuelInfoSubEquipmentUpdateRequest> subEquipments) {
+
+        @Schema(description = "유류정보 서브장비 수정 요청")
+        public record FuelInfoSubEquipmentUpdateRequest(
+                @Schema(description = "서브장비 ID (수정 시)", example = "1") Long id,
+                @Schema(description = "서브장비 ID", example = "1") Long outsourcingCompanyContractSubEquipmentId,
+                @Schema(description = "유종", example = "DIESEL") FuelInfoFuelType fuelType,
+                @Schema(description = "주유량 (리터)", example = "30") Long fuelAmount,
+                @Schema(description = "비고", example = "서브장비 주유") String memo) {
+        }
     }
 
     @Schema(description = "변경 이력 수정 요청")

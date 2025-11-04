@@ -1,5 +1,8 @@
 package com.lineinc.erp.api.server.domain.fuelaggregation.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -13,6 +16,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.Outso
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest.FuelInfoUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,12 +27,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -143,6 +150,14 @@ public class FuelInfo extends BaseEntity {
 
     @DiffInclude
     private String originalFileName;
+
+    /**
+     * 서브장비 목록
+     */
+    @Setter
+    @Builder.Default
+    @OneToMany(mappedBy = "fuelInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FuelInfoSubEquipment> subEquipments = new ArrayList<>();
 
     /**
      * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅

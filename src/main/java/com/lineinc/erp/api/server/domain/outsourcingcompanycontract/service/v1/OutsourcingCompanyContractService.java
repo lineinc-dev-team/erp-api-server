@@ -892,6 +892,12 @@ public class OutsourcingCompanyContractService {
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND));
     }
 
+    public OutsourcingCompanyContractSubEquipment getSubEquipmentByIdOrThrow(final Long subEquipmentId) {
+        return subEquipmentRepository.findById(subEquipmentId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_SUB_EQUIPMENT_NOT_FOUND));
+    }
+
     @Transactional(readOnly = true)
     public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> searchVehicleNumber(final String keyword,
             final Pageable pageable) {

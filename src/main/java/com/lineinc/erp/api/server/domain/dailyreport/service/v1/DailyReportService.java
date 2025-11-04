@@ -362,7 +362,7 @@ public class DailyReportService {
                                     fuelInfoRequest.fuelAmount(),
                                     fuelInfoRequest.fileUrl(),
                                     fuelInfoRequest.originalFileName(),
-                                    fuelInfoRequest.memo()))
+                                    fuelInfoRequest.memo(), fuelInfoRequest.subEquipments()))
                             .toList());
             final FuelAggregation fuelAggregation = fuelAggregationService
                     .createFuelAggregation(fuelAggregationRequest, userId);
