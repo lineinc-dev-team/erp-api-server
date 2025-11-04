@@ -200,6 +200,7 @@ public final class AppConstants {
     public static final String SITE_MANAGEMENT_COST_ID = "site_management_cost_id";
     public static final String SITE_CONTRACT_ID = "site_contract_id";
     public static final String PERMISSION_ID = "permission_id";
+    public static final String MENU_ID = "menu_id";
 
     // ==================== JPA 엔티티 매핑 속성명 ====================
     /**
@@ -222,4 +223,5 @@ public final class AppConstants {
      * 빈 값
      */
     public static final String EMPTY_VALUE = "";
+    public static final String PERMISSION_ORDER = "permission_order";
 }

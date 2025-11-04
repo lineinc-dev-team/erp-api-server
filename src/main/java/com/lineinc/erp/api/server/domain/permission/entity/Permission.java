@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.permission.entity;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.menu.entity.Menu;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,21 +31,22 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Permission extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "permission_seq";
     @Id
     @EqualsAndHashCode.Include
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_seq")
-    @SequenceGenerator(name = "permission_seq", sequenceName = "permission_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id", nullable = false)
+    @JoinColumn(name = AppConstants.MENU_ID, nullable = false)
     private Menu menu;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PermissionAction action;
 
-    @Column(name = "permission_order")
+    @Column(name = AppConstants.PERMISSION_ORDER)
     private Integer order; // 권한 순서
 
 }

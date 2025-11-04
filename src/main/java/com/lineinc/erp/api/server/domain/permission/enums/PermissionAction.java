@@ -1,8 +1,10 @@
 package com.lineinc.erp.api.server.domain.permission.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum PermissionAction {
     CREATE("등록", 1),
     VIEW("조회", 2),
@@ -13,10 +15,5 @@ public enum PermissionAction {
 
     private final String label;
     private final int order;
-
-    PermissionAction(final String label, final int order) {
-        this.label = label;
-        this.order = order;
-    }
 
 }
