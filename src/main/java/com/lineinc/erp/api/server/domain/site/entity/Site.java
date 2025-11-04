@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.domain.site.entity;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -53,10 +52,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class Site extends BaseEntity {
+    private static final String SEQUENCE_NAME = "site_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_seq")
-    @SequenceGenerator(name = "site_seq", sequenceName = "site_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -108,12 +108,12 @@ public class Site extends BaseEntity {
 
     @Builder.Default
     @DiffIgnore
-    @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.SITE_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SiteContract> contracts = new ArrayList<>();
 
     @Builder.Default
     @DiffIgnore
-    @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.SITE_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SiteProcess> processes = new ArrayList<>();
 
     @DiffInclude
@@ -152,20 +152,18 @@ public class Site extends BaseEntity {
     }
 
     public void updateFrom(final UpdateSiteRequest request, final User user, final ClientCompany clientCompany) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
-        Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
-        Optional.ofNullable(request.city()).ifPresent(val -> this.city = val);
-        Optional.ofNullable(request.district()).ifPresent(val -> this.district = val);
-        Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
-        Optional.ofNullable(request.startedAt()).map(DateTimeFormatUtils::toOffsetDateTime)
-                .ifPresent(val -> this.startedAt = val);
-        Optional.ofNullable(request.endedAt()).map(DateTimeFormatUtils::toOffsetDateTime)
-                .ifPresent(val -> this.endedAt = val);
-        Optional.ofNullable(request.contractAmount()).ifPresent(val -> this.contractAmount = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(user).ifPresent(val -> this.user = val);
-        Optional.ofNullable(clientCompany).ifPresent(val -> this.clientCompany = val);
+        this.name = request.name();
+        this.address = request.address();
+        this.detailAddress = request.detailAddress();
+        this.city = request.city();
+        this.district = request.district();
+        this.type = request.type();
+        this.startedAt = DateTimeFormatUtils.toOffsetDateTime(request.startedAt());
+        this.endedAt = DateTimeFormatUtils.toOffsetDateTime(request.endedAt());
+        this.contractAmount = request.contractAmount();
+        this.memo = request.memo();
+        this.user = user;
+        this.clientCompany = clientCompany;
         syncTransientFields();
     }
 }

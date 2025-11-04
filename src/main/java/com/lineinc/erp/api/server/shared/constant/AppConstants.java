@@ -211,6 +211,7 @@ public final class AppConstants {
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_MAPPED_BY = "dailyReportOutsourcingConstructionGroup";
     public static final String USER_MAPPED_BY = "user";
     public static final String STEEL_MANAGEMENT_V2_MAPPED_BY = "steelManagementV2";
+    public static final String SITE_MAPPED_BY = "site";
 
     // ==================== 기타 상수 ====================
     /**

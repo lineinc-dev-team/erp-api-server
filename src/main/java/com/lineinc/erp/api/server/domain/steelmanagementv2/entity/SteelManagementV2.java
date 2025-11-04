@@ -73,7 +73,7 @@ public class SteelManagementV2 extends BaseEntity {
      * 강재수불부 상세 항목 목록
      */
     @DiffIgnore
-    @OneToMany(mappedBy = "steelManagementV2", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.STEEL_MANAGEMENT_V2_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SteelManagementDetailV2> details = new ArrayList<>();
 
