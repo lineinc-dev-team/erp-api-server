@@ -165,9 +165,16 @@ public class FuelInfoService {
                 .filter(id -> id != null)
                 .collect(Collectors.toSet());
 
+        // afterFuelInfos에서 deleted = true인 항목도 감지
+        final Set<Long> deletedAfterIds = afterFuelInfos.stream()
+                .filter(f -> f.getId() != null && f.isDeleted())
+                .map(FuelInfo::getId)
+                .collect(Collectors.toSet());
+
         for (final FuelInfo before : beforeFuelInfos) {
-            if (before.getId() != null && !afterIds.contains(before.getId())) {
-                // 삭제된 항목: before에는 있지만 after에는 없음
+            final Long beforeId = before.getId();
+            if (beforeId != null && (!afterIds.contains(beforeId) || deletedAfterIds.contains(beforeId))) {
+                // 삭제된 항목: before에는 있지만 after에는 없거나, after에서 deleted = true
                 // 삭제된 항목을 나타내는 스냅샷 생성
                 final FuelInfo deletedSnapshot = JaversUtils.createSnapshot(javers, before, FuelInfo.class);
                 deletedSnapshot.markAsDeleted();
