@@ -188,6 +188,8 @@ public class OutsourcingCompanyContractConstructionService {
                                             .contractQuantity(constructionDto.contractQuantity())
                                             .contractPrice(constructionDto.contractPrice())
                                             .outsourcingContractQuantity(constructionDto.outsourcingContractQuantity())
+                                            .outsourcingContractUnitPrice(
+                                                    constructionDto.outsourcingContractUnitPrice())
                                             .outsourcingContractPrice(constructionDto.outsourcingContractPrice())
                                             .memo(constructionDto.memo())
                                             .build();

@@ -63,9 +63,7 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
      * 공사항목 그룹 정보를 수정합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractConstructionUpdateRequestV2 request) {
-        if (request.itemName() != null) {
-            this.itemName = request.itemName();
-        }
+        this.itemName = request.itemName();
 
         // 공사항목 정보 동기화
         if (request.items() != null) {
@@ -82,6 +80,7 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
                             .contractQuantity(constructionDto.contractQuantity())
                             .contractPrice(constructionDto.contractPrice())
                             .outsourcingContractQuantity(constructionDto.outsourcingContractQuantity())
+                            .outsourcingContractUnitPrice(constructionDto.outsourcingContractUnitPrice())
                             .outsourcingContractPrice(constructionDto.outsourcingContractPrice())
                             .memo(constructionDto.memo())
                             .build());

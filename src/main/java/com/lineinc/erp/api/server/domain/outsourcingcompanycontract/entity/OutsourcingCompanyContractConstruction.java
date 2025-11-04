@@ -62,6 +62,10 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
 
     @DiffInclude
     @Column
+    private Long outsourcingContractUnitPrice; // 외주계약금액 단가
+
+    @DiffInclude
+    @Column
     private Long outsourcingContractPrice; // 외주계약금액 금액
 
     @DiffInclude
@@ -82,32 +86,15 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
      * 공사항목 정보를 수정합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractConstructionUpdateRequest request) {
-        if (request.item() != null) {
-            this.item = request.item();
-        }
-        if (request.specification() != null) {
-            this.specification = request.specification();
-        }
-        if (request.unit() != null) {
-            this.unit = request.unit();
-        }
-        if (request.unitPrice() != null) {
-            this.unitPrice = request.unitPrice();
-        }
-        if (request.contractQuantity() != null) {
-            this.contractQuantity = request.contractQuantity();
-        }
-        if (request.contractPrice() != null) {
-            this.contractPrice = request.contractPrice();
-        }
-        if (request.outsourcingContractQuantity() != null) {
-            this.outsourcingContractQuantity = request.outsourcingContractQuantity();
-        }
-        if (request.outsourcingContractPrice() != null) {
-            this.outsourcingContractPrice = request.outsourcingContractPrice();
-        }
-        if (request.memo() != null) {
-            this.memo = request.memo();
-        }
+        this.item = request.item();
+        this.specification = request.specification();
+        this.unit = request.unit();
+        this.unitPrice = request.unitPrice();
+        this.contractQuantity = request.contractQuantity();
+        this.contractPrice = request.contractPrice();
+        this.outsourcingContractQuantity = request.outsourcingContractQuantity();
+        this.outsourcingContractUnitPrice = request.outsourcingContractUnitPrice();
+        this.outsourcingContractPrice = request.outsourcingContractPrice();
+        this.memo = request.memo();
     }
 }

@@ -54,6 +54,8 @@ public class QOutsourcingCompanyContractConstruction extends EntityPathBase<Outs
 
     public final NumberPath<Integer> outsourcingContractQuantity = createNumber("outsourcingContractQuantity", Integer.class);
 
+    public final NumberPath<Long> outsourcingContractUnitPrice = createNumber("outsourcingContractUnitPrice", Long.class);
+
     public final StringPath specification = createString("specification");
 
     public final StringPath unit = createString("unit");

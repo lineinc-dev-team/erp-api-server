@@ -374,6 +374,7 @@ public class OutsourcingCompanyContractService {
                     .contractQuantity(constructionRequest.contractQuantity())
                     .contractPrice(constructionRequest.contractPrice())
                     .outsourcingContractQuantity(constructionRequest.outsourcingContractQuantity())
+                    .outsourcingContractUnitPrice(constructionRequest.outsourcingContractUnitPrice())
                     .outsourcingContractPrice(constructionRequest.outsourcingContractPrice())
                     .memo(constructionRequest.memo())
                     .build();
@@ -412,6 +413,7 @@ public class OutsourcingCompanyContractService {
                             .contractQuantity(itemRequest.contractQuantity())
                             .contractPrice(itemRequest.contractPrice())
                             .outsourcingContractQuantity(itemRequest.outsourcingContractQuantity())
+                            .outsourcingContractUnitPrice(itemRequest.outsourcingContractUnitPrice())
                             .outsourcingContractPrice(itemRequest.outsourcingContractPrice())
                             .memo(itemRequest.memo())
                             .build();
