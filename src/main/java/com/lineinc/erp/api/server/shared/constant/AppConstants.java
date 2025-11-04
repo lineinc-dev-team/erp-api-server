@@ -199,6 +199,7 @@ public final class AppConstants {
     public static final String STEEL_MANAGEMENT_V2_ID = "steel_management_v2_id";
     public static final String SITE_MANAGEMENT_COST_ID = "site_management_cost_id";
     public static final String SITE_CONTRACT_ID = "site_contract_id";
+    public static final String PERMISSION_ID = "permission_id";
 
     // ==================== JPA 엔티티 매핑 속성명 ====================
     /**
@@ -214,6 +215,7 @@ public final class AppConstants {
     public static final String STEEL_MANAGEMENT_V2_MAPPED_BY = "steelManagementV2";
     public static final String SITE_MAPPED_BY = "site";
     public static final String SITE_CONTRACT_MAPPED_BY = "siteContract";
+    public static final String ROLE_MAPPED_BY = "role";
 
     // ==================== 기타 상수 ====================
     /**

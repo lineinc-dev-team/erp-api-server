@@ -3,12 +3,12 @@ package com.lineinc.erp.api.server.domain.role.entity;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.user.entity.UserRole;
 import com.lineinc.erp.api.server.interfaces.rest.v1.role.dto.request.UpdateRolesRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -39,25 +39,26 @@ import lombok.experimental.SuperBuilder;
 public class Role extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+    private static final String SEQUENCE_NAME = "role_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")
-    @SequenceGenerator(name = "role_seq", sequenceName = "role_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @Column(nullable = false)
     private String name;
 
     @Builder.Default
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.ROLE_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RolePermission> permissions = new HashSet<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.ROLE_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> userRoles = new HashSet<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.ROLE_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RoleSiteProcess> siteProcesses = new HashSet<>();
 
     /**
@@ -77,11 +78,9 @@ public class Role extends BaseEntity implements Serializable {
     private String memo;
 
     public void updateFrom(final UpdateRolesRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(request.hasGlobalSiteProcessAccess())
-                .ifPresent(val -> this.hasGlobalSiteProcessAccess = val);
-        Optional.ofNullable(request.hasUnmaskPermission())
-                .ifPresent(val -> this.hasUnmaskPermission = val);
+        this.name = request.name();
+        this.memo = request.memo();
+        this.hasGlobalSiteProcessAccess = request.hasGlobalSiteProcessAccess();
+        this.hasUnmaskPermission = request.hasUnmaskPermission();
     }
 }
