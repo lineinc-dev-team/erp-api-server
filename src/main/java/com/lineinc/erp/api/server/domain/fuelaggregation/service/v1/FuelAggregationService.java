@@ -362,8 +362,9 @@ public class FuelAggregationService {
         fuelAggregation.syncTransientFields();
         final FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
 
-        final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
-                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+        final OutsourcingCompany outsourcingCompany = request.outsourcingCompanyId() != null
+                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
+                : null;
 
         // 엔티티 업데이트
         fuelAggregation.updateFrom(request, outsourcingCompany);
