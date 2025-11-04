@@ -30,10 +30,12 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationDownloadRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelCompanyRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelPriceRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelCompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelPriceResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.WeatherTypeResponse;
@@ -163,6 +165,14 @@ public class FuelAggregationController extends BaseController {
     public ResponseEntity<SuccessResponse<FuelPriceResponse>> getFuelPrice(
             @Valid final FuelPriceRequest request) {
         final FuelPriceResponse response = fuelAggregationService.getFuelPrice(request);
+        return ResponseEntity.ok(SuccessResponse.of(response));
+    }
+
+    @Operation(summary = "유류업체 조회", description = "현장, 공정, 일자로 유류업체 계약 정보를 조회합니다.")
+    @GetMapping("/fuel-company")
+    public ResponseEntity<SuccessResponse<FuelCompanyResponse>> getFuelCompany(
+            @Valid final FuelCompanyRequest request) {
+        final FuelCompanyResponse response = fuelAggregationService.getFuelCompany(request);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 

@@ -46,11 +46,13 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelCompanyRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelInfoCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelPriceRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationChangeHistoryResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelAggregationListResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelCompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.response.FuelPriceResponse;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
@@ -405,6 +407,19 @@ public class FuelAggregationService {
                 fuelAggregation.getGasolinePrice(),
                 fuelAggregation.getDieselPrice(),
                 fuelAggregation.getUreaPrice());
+    }
+
+    @Transactional(readOnly = true)
+    public FuelCompanyResponse getFuelCompany(final FuelCompanyRequest request) {
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(request.reportDate());
+        final FuelAggregation fuelAggregation = fuelAggregationRepository
+                .findBySiteAndSiteProcessAndDate(site, siteProcess, reportDate)
+                .orElse(null);
+
+        return FuelCompanyResponse.from(fuelAggregation);
     }
 
 }
