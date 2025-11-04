@@ -86,7 +86,8 @@ public record FuelAggregationDetailResponse(
             @Schema(description = "비고", example = "오전 주유") String memo,
             @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
             @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
-            @Schema(description = "업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany) {
+            @Schema(description = "업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
+            @Schema(description = "서브장비 목록") List<FuelInfoSubEquipmentResponse> subEquipments) {
 
         public static FuelInfoDetailResponse from(final FuelInfo entity) {
             return new FuelInfoDetailResponse(
@@ -109,7 +110,10 @@ public record FuelAggregationDetailResponse(
                     entity.getOriginalFileName(),
                     entity.getOutsourcingCompany() != null
                             ? CompanyResponse.CompanySimpleResponse.from(entity.getOutsourcingCompany())
-                            : null);
+                            : null,
+                    entity.getSubEquipments().stream()
+                            .map(FuelInfoSubEquipmentResponse::from)
+                            .toList());
         }
     }
 }
