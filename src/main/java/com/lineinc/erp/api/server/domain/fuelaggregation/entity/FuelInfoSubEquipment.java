@@ -122,7 +122,7 @@ public class FuelInfoSubEquipment extends BaseEntity {
 
     public void syncTransientFields() {
         this.subEquipmentDescription = this.outsourcingCompanyContractSubEquipment != null
-                ? this.outsourcingCompanyContractSubEquipment.getDescription()
+                ? this.outsourcingCompanyContractSubEquipment.getTypeName()
                 : null;
         this.fuelTypeName = this.fuelType != null ? this.fuelType.getLabel() : null;
     }
