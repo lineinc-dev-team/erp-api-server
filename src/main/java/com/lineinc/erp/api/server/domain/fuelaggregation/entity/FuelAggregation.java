@@ -9,7 +9,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
-import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
@@ -90,12 +90,12 @@ public class FuelAggregation extends BaseEntity {
     private Long ureaPrice;
 
     /**
-     * 유류업체 계약
+     * 유류업체
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID)
-    private OutsourcingCompanyContract outsourcingCompanyContract;
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
+    private OutsourcingCompany outsourcingCompany;
 
     /**
      * 유류정보 목록
@@ -110,17 +110,17 @@ public class FuelAggregation extends BaseEntity {
     private String outsourcingCompanyName;
 
     public void updateFrom(final FuelAggregationUpdateRequest request,
-            final OutsourcingCompanyContract outsourcingCompanyContract) {
+            final OutsourcingCompany outsourcingCompany) {
         this.gasolinePrice = request.gasolinePrice();
         this.dieselPrice = request.dieselPrice();
         this.ureaPrice = request.ureaPrice();
-        this.outsourcingCompanyContract = outsourcingCompanyContract;
+        this.outsourcingCompany = outsourcingCompany;
         syncTransientFields();
     }
 
     public void syncTransientFields() {
-        this.outsourcingCompanyName = this.outsourcingCompanyContract != null
-                ? this.outsourcingCompanyContract.getOutsourcingCompany().getName()
+        this.outsourcingCompanyName = this.outsourcingCompany != null
+                ? this.outsourcingCompany.getName()
                 : null;
     }
 }

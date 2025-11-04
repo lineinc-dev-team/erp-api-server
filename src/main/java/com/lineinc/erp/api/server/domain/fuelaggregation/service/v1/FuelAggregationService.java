@@ -31,7 +31,6 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregat
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
-import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
@@ -94,8 +93,8 @@ public class FuelAggregationService {
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
                 .weather(request.weather())
-                .outsourcingCompanyContract(outsourcingCompanyContractService
-                        .getContractByIdOrThrow(request.outsourcingCompanyContractId()))
+                .outsourcingCompany(outsourcingCompanyService
+                        .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId()))
                 .gasolinePrice(request.gasolinePrice())
                 .dieselPrice(request.dieselPrice())
                 .ureaPrice(request.ureaPrice())
@@ -362,11 +361,11 @@ public class FuelAggregationService {
         fuelAggregation.syncTransientFields();
         final FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
 
-        final OutsourcingCompanyContract outsourcingCompanyContract = outsourcingCompanyContractService
-                .getContractByIdOrThrow(request.outsourcingCompanyContractId());
+        final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
 
         // 엔티티 업데이트
-        fuelAggregation.updateFrom(request, outsourcingCompanyContract);
+        fuelAggregation.updateFrom(request, outsourcingCompany);
         fuelAggregationRepository.save(fuelAggregation);
 
         // 변경 이력 추적
