@@ -93,8 +93,10 @@ public class LaborService {
         }
 
         // 외주업체 계약 조회
-        final OutsourcingCompanyContract outsourcingCompanyContract = outsourcingCompanyContractService
-                .getContractByIdOrThrow(request.outsourcingCompanyContractId());
+        final OutsourcingCompanyContract outsourcingCompanyContract = request.outsourcingCompanyContractId() != null
+                ? outsourcingCompanyContractService
+                        .getContractByIdOrThrow(request.outsourcingCompanyContractId())
+                : null;
 
         final Labor labor = Labor.builder()
                 .type(request.type())
@@ -258,8 +260,10 @@ public class LaborService {
         }
 
         // 외주업체 계약 조회
-        final OutsourcingCompanyContract outsourcingCompanyContract = outsourcingCompanyContractService
-                .getContractByIdOrThrow(request.outsourcingCompanyContractId());
+        final OutsourcingCompanyContract outsourcingCompanyContract = request.outsourcingCompanyContractId() != null
+                ? outsourcingCompanyContractService
+                        .getContractByIdOrThrow(request.outsourcingCompanyContractId())
+                : null;
 
         // 변경 전 상태 저장 (Javers 스냅샷)
         labor.syncTransientFields();
