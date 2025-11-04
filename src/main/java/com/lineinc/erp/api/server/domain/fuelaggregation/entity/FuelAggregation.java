@@ -28,7 +28,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -95,14 +94,6 @@ public class FuelAggregation extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.FUEL_AGGREGATION_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FuelInfo> fuelInfos = new ArrayList<>();
-
-    @Transient
-    @DiffIgnore
-    private String siteName;
-
-    @Transient
-    @DiffIgnore
-    private String processName;
 
     public void updateFrom(final FuelAggregationUpdateRequest request) {
         this.gasolinePrice = request.gasolinePrice();
