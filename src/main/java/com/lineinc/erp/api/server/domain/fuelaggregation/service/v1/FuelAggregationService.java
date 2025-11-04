@@ -332,6 +332,7 @@ public class FuelAggregationService {
                         ValidationMessages.FUEL_AGGREGATION_NOT_FOUND));
 
         // 수정 전 스냅샷 생성
+        fuelAggregation.syncTransientFields();
         final FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
 
         final OutsourcingCompanyContract outsourcingCompanyContract = outsourcingCompanyContractService

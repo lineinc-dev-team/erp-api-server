@@ -10,6 +10,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractEquipmentResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "유류집계 상세 정보 응답")
 public record FuelAggregationDetailResponse(
         @Schema(description = "유류집계 ID", example = "1") Long id,
+        @Schema(description = "유류업체 계약 간단 응답", example = "1") ContractSimpleResponse outsourcingCompanyContract,
         @Schema(description = "집계일자", example = "2025-07-28T10:30:00+09:00") OffsetDateTime date,
         @Schema(description = "날씨", example = "맑음") String weather,
         @Schema(description = "날씨 코드", example = "SUNNY") String weatherCode,
@@ -51,6 +53,9 @@ public record FuelAggregationDetailResponse(
 
         return new FuelAggregationDetailResponse(
                 entity.getId(),
+                entity.getOutsourcingCompanyContract() != null
+                        ? ContractSimpleResponse.from(entity.getOutsourcingCompanyContract())
+                        : null,
                 entity.getDate(),
                 weatherLabel,
                 weatherCode,
