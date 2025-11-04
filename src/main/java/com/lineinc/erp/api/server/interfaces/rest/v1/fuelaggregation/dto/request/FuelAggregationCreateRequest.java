@@ -14,6 +14,7 @@ public record FuelAggregationCreateRequest(
         @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
         @Schema(description = "일자", example = "2025-01-15") @NotNull LocalDate date,
         @Schema(description = "날씨", example = "SUNNY") @NotNull FuelAggregationWeatherType weather,
+        @Schema(description = "유류업체 계약 ID", example = "1") Long outsourcingCompanyContractId,
         @Schema(description = "휘발유 가격 (원)", example = "150000") Long gasolinePrice,
         @Schema(description = "경유 가격 (원)", example = "200000") Long dieselPrice,
         @Schema(description = "요소수 가격 (원)", example = "50000") Long ureaPrice,

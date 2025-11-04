@@ -9,6 +9,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request.FuelAggregationUpdateRequest;
@@ -88,6 +89,14 @@ public class FuelAggregation extends BaseEntity {
     private Long ureaPrice;
 
     /**
+     * 유류업체 계약
+     */
+    @DiffIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID)
+    private OutsourcingCompanyContract outsourcingCompanyContract;
+
+    /**
      * 유류정보 목록
      */
     @Setter
@@ -95,10 +104,11 @@ public class FuelAggregation extends BaseEntity {
     @OneToMany(mappedBy = AppConstants.FUEL_AGGREGATION_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FuelInfo> fuelInfos = new ArrayList<>();
 
-    public void updateFrom(final FuelAggregationUpdateRequest request) {
+    public void updateFrom(final FuelAggregationUpdateRequest request,
+            final OutsourcingCompanyContract outsourcingCompanyContract) {
         this.gasolinePrice = request.gasolinePrice();
         this.dieselPrice = request.dieselPrice();
         this.ureaPrice = request.ureaPrice();
+        this.outsourcingCompanyContract = outsourcingCompanyContract;
     }
-
 }

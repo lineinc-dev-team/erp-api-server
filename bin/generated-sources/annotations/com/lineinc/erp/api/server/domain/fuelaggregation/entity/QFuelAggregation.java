@@ -46,6 +46,8 @@ public class QFuelAggregation extends EntityPathBase<FuelAggregation> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContract outsourcingCompanyContract;
+
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSiteProcess siteProcess;
@@ -78,6 +80,7 @@ public class QFuelAggregation extends EntityPathBase<FuelAggregation> {
 
     public QFuelAggregation(Class<? extends FuelAggregation> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.outsourcingCompanyContract = inits.isInitialized("outsourcingCompanyContract") ? new com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContract(forProperty("outsourcingCompanyContract"), inits.get("outsourcingCompanyContract")) : null;
         this.site = inits.isInitialized("site") ? new com.lineinc.erp.api.server.domain.site.entity.QSite(forProperty("site"), inits.get("site")) : null;
         this.siteProcess = inits.isInitialized("siteProcess") ? new com.lineinc.erp.api.server.domain.site.entity.QSiteProcess(forProperty("siteProcess"), inits.get("siteProcess")) : null;
     }

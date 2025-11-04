@@ -7,12 +7,14 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse.ContractDriverSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractEquipmentResponse.ContractEquipmentSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "출역일보 유류 응답")
 public record DailyReportFuelResponse(
         @Schema(description = "유류집계 ID", example = "1") Long fuelAggregationId,
+        @Schema(description = "유류업체 계약 간단 응답", example = "1") ContractSimpleResponse outsourcingCompanyContract,
         @Schema(description = "유류집계 info id", example = "1") Long fuelInfoId,
         @Schema(description = "구분", example = "장비") String categoryType,
         @Schema(description = "구분 코드", example = "EQUIPMENT") String categoryTypeCode,
@@ -31,6 +33,9 @@ public record DailyReportFuelResponse(
     public static DailyReportFuelResponse from(final FuelInfo fuelInfo) {
         return new DailyReportFuelResponse(
                 fuelInfo.getFuelAggregation() != null ? fuelInfo.getFuelAggregation().getId() : null,
+                fuelInfo.getFuelAggregation() != null
+                        ? ContractSimpleResponse.from(fuelInfo.getFuelAggregation().getOutsourcingCompanyContract())
+                        : null,
                 fuelInfo.getId(),
                 fuelInfo.getCategoryType() != null ? fuelInfo.getCategoryType().getLabel() : null,
                 fuelInfo.getCategoryType() != null ? fuelInfo.getCategoryType().name() : null,

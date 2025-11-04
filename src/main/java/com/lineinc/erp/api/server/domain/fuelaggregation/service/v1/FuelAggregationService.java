@@ -30,6 +30,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregat
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
@@ -89,6 +90,8 @@ public class FuelAggregationService {
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
                 .weather(request.weather())
+                .outsourcingCompanyContract(outsourcingCompanyContractService
+                        .getContractByIdOrThrow(request.outsourcingCompanyContractId()))
                 .gasolinePrice(request.gasolinePrice())
                 .dieselPrice(request.dieselPrice())
                 .ureaPrice(request.ureaPrice())
@@ -331,8 +334,11 @@ public class FuelAggregationService {
         // 수정 전 스냅샷 생성
         final FuelAggregation oldSnapshot = JaversUtils.createSnapshot(javers, fuelAggregation, FuelAggregation.class);
 
+        final OutsourcingCompanyContract outsourcingCompanyContract = outsourcingCompanyContractService
+                .getContractByIdOrThrow(request.outsourcingCompanyContractId());
+
         // 엔티티 업데이트
-        fuelAggregation.updateFrom(request);
+        fuelAggregation.updateFrom(request, outsourcingCompanyContract);
         fuelAggregationRepository.save(fuelAggregation);
 
         // 변경 이력 추적
