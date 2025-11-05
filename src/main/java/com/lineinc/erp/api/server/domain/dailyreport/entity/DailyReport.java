@@ -82,15 +82,13 @@ public class DailyReport extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DailyReportDirectContractOutsourcing> directContractOutsourcings = new ArrayList<>(); // 직영/용역 용역 출역일보
-                                                                                                       // 목록
+    private List<DailyReportDirectContractOutsourcing> directContractOutsourcings = new ArrayList<>();
+    // 직영/용역 용역 출역일보 목록
 
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DailyReportDirectContractOutsourcingContract> directContractOutsourcingContracts = new ArrayList<>(); // 직영/용역
-                                                                                                                       // 외주
-                                                                                                                       // 출역일보
-                                                                                                                       // 목록
+    private List<DailyReportDirectContractOutsourcingContract> directContractOutsourcingContracts = new ArrayList<>();
+    // 직영/용역 외주 출역일보 목록
 
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
