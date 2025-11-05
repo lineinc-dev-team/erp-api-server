@@ -1035,13 +1035,6 @@ public class DailyReportService {
                         // 기존 인력 검색
                         labor = laborService.getLaborByIdOrThrow(dto.laborId());
 
-                        // 직영/용역 출역 정보에는 DIRECT_CONTRACT 또는 ETC 타입만 허용
-                        if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.OUTSOURCING
-                                && labor.getType() != LaborType.ETC) {
-                            throw new IllegalArgumentException(
-                                    ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
-                        }
-
                         labor.updatePreviousDailyWage(dto.unitPrice());
                     }
 
