@@ -334,7 +334,6 @@ public class LaborPayrollSyncService {
                 .regularEmployeeCount(calculatedData.regularEmployeeCount())
                 .directContractCount(calculatedData.directContractCount())
                 .outsourcingCount(calculatedData.outsourcingCount())
-                .etcCount(calculatedData.etcCount())
                 .totalLaborCost(calculatedData.totalLaborCost())
                 .totalDeductions(calculatedData.totalDeductions())
                 .totalNetPayment(calculatedData.totalNetPayment())
@@ -381,13 +380,11 @@ public class LaborPayrollSyncService {
         final Integer regularEmployeeCount = laborTypeCount.getOrDefault(LaborType.REGULAR_EMPLOYEE, 0L).intValue();
         final Integer directContractCount = laborTypeCount.getOrDefault(LaborType.DIRECT_CONTRACT, 0L).intValue();
         final Integer outsourcingCount = laborTypeCount.getOrDefault(LaborType.OUTSOURCING, 0L).intValue();
-        final Integer etcCount = laborTypeCount.getOrDefault(LaborType.ETC, 0L).intValue();
 
         return new SummaryData(
                 regularEmployeeCount,
                 directContractCount,
                 outsourcingCount,
-                etcCount,
                 totalLaborCost,
                 totalDeductions,
                 totalNetPayment);
@@ -400,7 +397,6 @@ public class LaborPayrollSyncService {
             Integer regularEmployeeCount,
             Integer directContractCount,
             Integer outsourcingCount,
-            Integer etcCount,
             BigDecimal totalLaborCost,
             BigDecimal totalDeductions,
             BigDecimal totalNetPayment) {

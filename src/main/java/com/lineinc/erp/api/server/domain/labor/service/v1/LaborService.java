@@ -159,15 +159,8 @@ public class LaborService {
      * ETC 노무 구분 설명 목록 조회
      */
     public Slice<TypeDescriptionResponse> getEtcTypeDescriptions(final String keyword, final Pageable pageable) {
-        Slice<Object[]> resultSlice;
-
-        if (keyword == null || keyword.isBlank()) {
-            resultSlice = laborRepository.findAllDistinctTypeDescriptions(LaborType.ETC, pageable);
-        } else {
-            resultSlice = laborRepository.findDistinctTypeDescriptionsByKeyword(LaborType.ETC, keyword, pageable);
-        }
-
-        return resultSlice.map(result -> new TypeDescriptionResponse((Long) result[1], (String) result[0]));
+        return laborRepository.findAllDistinctTypeDescriptions(LaborType.OUTSOURCING, pageable)
+                .map(result -> new TypeDescriptionResponse((Long) result[1], (String) result[0]));
     }
 
     /**
