@@ -64,13 +64,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/labors")
 @RequiredArgsConstructor
-@Tag(name = "노무 관리", description = "노무 관련 API")
+@Tag(name = "노무 관리")
 public class LaborController extends BaseController {
 
     private final LaborService laborService;
     private final LaborPayrollService laborPayrollService;
 
-    @Operation(summary = "노무 인력정보 등록", description = "노무 인력정보를 등록합니다")
+    @Operation(summary = "노무 인력정보 등록")
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createLabor(@Valid @RequestBody final LaborCreateRequest request,
@@ -79,7 +79,7 @@ public class LaborController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "노무 구분 조회", description = "사용 가능한 노무 구분 목록을 조회합니다.")
+    @Operation(summary = "노무 구분 조회")
     @GetMapping("/labor-types")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborTypeResponse>>> getLaborTypes() {
@@ -89,7 +89,7 @@ public class LaborController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(laborTypes));
     }
 
-    @Operation(summary = "공종 구분 조회", description = "사용 가능한 공종 구분 목록을 조회합니다.")
+    @Operation(summary = "공종 구분 조회")
     @GetMapping("/work-types")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WorkTypeResponse>>> getWorkTypes() {
@@ -100,7 +100,7 @@ public class LaborController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(workTypes));
     }
 
-    @Operation(summary = "인력정보 목록 조회", description = "조건에 따른 인력정보 목록을 조회합니다.")
+    @Operation(summary = "인력정보 목록 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborListResponse>>> getLaborList(
@@ -114,7 +114,7 @@ public class LaborController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "ETC 노무 구분 설명 키워드 검색", description = "type이 ETC인 모든 노무의 구분 설명을 키워드로 검색합니다.")
+    @Operation(summary = "ETC 노무 구분 설명 키워드 검색")
     @GetMapping("/etc-type-descriptions/search")
     public ResponseEntity<SuccessResponse<SliceResponse<TypeDescriptionResponse>>> searchEtcTypeDescriptions(
             @RequestParam(required = false) final String keyword,
@@ -126,7 +126,7 @@ public class LaborController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "인력정보 삭제", description = "하나 이상의 인력정보 ID를 받아 해당 인력정보를 삭제합니다.")
+    @Operation(summary = "인력정보 삭제")
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteLabors(@Valid @RequestBody final DeleteLaborsRequest request) {
@@ -134,7 +134,7 @@ public class LaborController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "인력정보 목록 엑셀 다운로드", description = "검색 조건에 맞는 인력정보 목록을 엑셀 파일로 다운로드합니다.")
+    @Operation(summary = "인력정보 목록 엑셀 다운로드")
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadLaborsExcel(
@@ -156,7 +156,7 @@ public class LaborController extends BaseController {
         }
     }
 
-    @Operation(summary = "인력정보 상세 조회", description = "특정 인력정보의 상세 정보를 반환합니다.")
+    @Operation(summary = "인력정보 상세 조회")
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<LaborDetailResponse>> getLaborDetail(@PathVariable final Long id) {
@@ -164,7 +164,7 @@ public class LaborController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(laborResponse));
     }
 
-    @Operation(summary = "인력정보 수정", description = "기존 인력정보를 수정합니다.")
+    @Operation(summary = "인력정보 수정")
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLabor(
@@ -175,7 +175,7 @@ public class LaborController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "인력정보 변경 이력 조회", description = "특정 인력정보의 변경 이력을 조회합니다.")
+    @Operation(summary = "인력정보 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<LaborChangeHistoryResponse>>> getLaborChangeHistories(
@@ -189,7 +189,7 @@ public class LaborController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "인력명 키워드 검색", description = "인력명과 노무인력 검색을 수행합니다.")
+    @Operation(summary = "인력명 키워드 검색")
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
             @Valid final PageRequest pageRequest,
@@ -209,7 +209,7 @@ public class LaborController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "노무인력 명세서 이력 조회", description = "특정 노무인력의 명세서 이력을 조회합니다. (연월, 현장, 공정 정보 포함)")
+    @Operation(summary = "노무인력 명세서 이력 조회")
     @GetMapping("/{id}/payrolls")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollHistoryResponse>>> getLaborPayrolls(
