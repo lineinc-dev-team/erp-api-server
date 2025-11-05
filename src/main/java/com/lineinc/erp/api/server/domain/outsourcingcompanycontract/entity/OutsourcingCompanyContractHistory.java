@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,23 +30,24 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Builder
 public class OutsourcingCompanyContractHistory extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_history_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_history_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_history_seq", sequenceName = "outsourcing_company_contract_history_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
      * 외주업체
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID, nullable = false)
     private OutsourcingCompany outsourcingCompany;
 
     /**
      * 외주계약
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID, nullable = false)
     private OutsourcingCompanyContract contract;
 }

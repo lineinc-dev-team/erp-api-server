@@ -6,6 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContactSubEquipmentType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractSubEquipmentUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,10 +32,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_contact_sub_equipment_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contact_sub_equipment_seq")
-    @SequenceGenerator(name = "outsourcing_company_contact_sub_equipment_seq", sequenceName = "outsourcing_company_contact_sub_equipment_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
@@ -48,7 +50,7 @@ public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_equipment_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_ID, nullable = false)
     private OutsourcingCompanyContractEquipment equipment;
 
     @DiffInclude
@@ -71,21 +73,11 @@ public class OutsourcingCompanyContractSubEquipment extends BaseEntity {
      * 보조장비 정보를 수정합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractSubEquipmentUpdateRequest request) {
-        if (request.type() != null) {
-            this.type = request.type();
-        }
-        if (request.description() != null) {
-            this.description = request.description();
-        }
-        if (request.unitPrice() != null) {
-            this.unitPrice = request.unitPrice();
-        }
-        if (request.taskDescription() != null) {
-            this.taskDescription = request.taskDescription();
-        }
-        if (request.memo() != null) {
-            this.memo = request.memo();
-        }
+        this.type = request.type();
+        this.description = request.description();
+        this.unitPrice = request.unitPrice();
+        this.taskDescription = request.taskDescription();
+        this.memo = request.memo();
 
         // transient 필드 동기화
         syncTransientFields();
