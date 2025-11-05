@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.domain.outsourcingcompany.entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -13,6 +12,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,10 +50,11 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "created_at"),
 })
 public class OutsourcingCompany extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_seq")
-    @SequenceGenerator(name = "outsourcing_company_seq", sequenceName = "outsourcing_company_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -140,12 +141,12 @@ public class OutsourcingCompany extends BaseEntity {
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyContact> contacts = new ArrayList<>();
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(mappedBy = "outsourcingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutsourcingCompanyFile> files = new ArrayList<>();
 
     @Transient
@@ -166,23 +167,22 @@ public class OutsourcingCompany extends BaseEntity {
     }
 
     public void updateFrom(final OutsourcingCompanyUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.businessNumber()).ifPresent(val -> this.businessNumber = val);
-        Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
-        Optional.ofNullable(request.ceoName()).ifPresent(val -> this.ceoName = val);
-        Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
-        Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
-        Optional.ofNullable(request.landlineNumber()).ifPresent(val -> this.landlineNumber = val);
-        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
-        Optional.ofNullable(request.email()).ifPresent(val -> this.email = val);
-        Optional.ofNullable(request.isActive()).ifPresent(val -> this.isActive = val);
-        Optional.ofNullable(request.defaultDeductions()).ifPresent(val -> this.defaultDeductions = val);
-        Optional.ofNullable(request.defaultDeductionsDescription())
-                .ifPresent(val -> this.defaultDeductionsDescription = val);
-        Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
-        Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
-        Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.name = request.name();
+        this.businessNumber = request.businessNumber();
+        this.typeDescription = request.typeDescription();
+        this.ceoName = request.ceoName();
+        this.address = request.address();
+        this.detailAddress = request.detailAddress();
+        this.landlineNumber = request.landlineNumber();
+        this.phoneNumber = request.phoneNumber();
+        this.email = request.email();
+        this.isActive = request.isActive();
+        this.defaultDeductions = request.defaultDeductions();
+        this.defaultDeductionsDescription = request.defaultDeductionsDescription();
+        this.bankName = request.bankName();
+        this.accountNumber = request.accountNumber();
+        this.accountHolder = request.accountHolder();
+        this.memo = request.memo();
         syncTransientFields();
     }
 
@@ -191,13 +191,13 @@ public class OutsourcingCompany extends BaseEntity {
      */
     public void updateOutsourcingCompanyInfo(final String name, final String businessNumber, final String ceoName,
             final String bankName, final String accountNumber, final String accountHolder, final String memo) {
-        Optional.ofNullable(name).ifPresent(val -> this.name = val);
-        Optional.ofNullable(businessNumber).ifPresent(val -> this.businessNumber = val);
-        Optional.ofNullable(ceoName).ifPresent(val -> this.ceoName = val);
-        Optional.ofNullable(bankName).ifPresent(val -> this.bankName = val);
-        Optional.ofNullable(accountNumber).ifPresent(val -> this.accountNumber = val);
-        Optional.ofNullable(accountHolder).ifPresent(val -> this.accountHolder = val);
-        Optional.ofNullable(memo).ifPresent(val -> this.memo = val);
+        this.name = name;
+        this.businessNumber = businessNumber;
+        this.ceoName = ceoName;
+        this.bankName = bankName;
+        this.accountNumber = accountNumber;
+        this.accountHolder = accountHolder;
+        this.memo = memo;
         syncTransientFields();
     }
 }

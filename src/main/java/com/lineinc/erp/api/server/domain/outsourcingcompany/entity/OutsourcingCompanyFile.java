@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.outsourcingcompany.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -9,6 +7,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyFileType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,10 +40,11 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "created_at")
 })
 public class OutsourcingCompanyFile extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_file_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_file_seq")
-    @SequenceGenerator(name = "outsourcing_company_file_seq", sequenceName = "outsourcing_company_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
@@ -52,7 +52,7 @@ public class OutsourcingCompanyFile extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID, nullable = false)
     private OutsourcingCompany outsourcingCompany;
 
     /**
@@ -92,10 +92,10 @@ public class OutsourcingCompanyFile extends BaseEntity {
     private String memo; // 비고 / 메모
 
     public void updateFrom(final OutsourcingCompanyFileUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.type()).ifPresent(val -> this.type = val);
-        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.name = request.name();
+        this.type = request.type();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.memo = request.memo();
     }
 }

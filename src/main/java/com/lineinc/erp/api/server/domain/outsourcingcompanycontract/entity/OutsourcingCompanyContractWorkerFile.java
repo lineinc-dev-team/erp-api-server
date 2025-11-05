@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractWorkerFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,15 +29,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class OutsourcingCompanyContractWorkerFile extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_worker_file_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_worker_file_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_worker_file_seq", sequenceName = "outsourcing_company_contract_worker_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_worker_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_WORKER_ID, nullable = false)
     private OutsourcingCompanyContractWorker worker;
 
     @DiffIgnore
@@ -51,11 +53,7 @@ public class OutsourcingCompanyContractWorkerFile extends BaseEntity {
      * DTO의 정보로 엔티티를 업데이트합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractWorkerFileUpdateRequest request) {
-        if (request.fileUrl() != null) {
-            this.fileUrl = request.fileUrl();
-        }
-        if (request.originalFileName() != null) {
-            this.originalFileName = request.originalFileName();
-        }
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
     }
 }

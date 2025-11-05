@@ -6,6 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyContactUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,10 +39,11 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "created_at"),
 })
 public class OutsourcingCompanyContact extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_contact_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contact_seq")
-    @SequenceGenerator(name = "outsourcing_company_contact_seq", sequenceName = "outsourcing_company_contact_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
@@ -49,7 +51,7 @@ public class OutsourcingCompanyContact extends BaseEntity {
      */
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID, nullable = false)
     private OutsourcingCompany outsourcingCompany;
 
     /**
