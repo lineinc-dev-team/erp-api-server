@@ -60,12 +60,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/fuel-aggregations")
 @RequiredArgsConstructor
-@Tag(name = "유류집계 관리", description = "유류집계 관리 API")
+@Tag(name = "유류집계 관리")
 public class FuelAggregationController extends BaseController {
 
     private final FuelAggregationService fuelAggregationService;
 
-    @Operation(summary = "날씨 타입 조회", description = "사용 가능한 날씨 타입 목록을 조회합니다.")
+    @Operation(summary = "날씨 타입 조회")
     @GetMapping("/weather-types")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<WeatherTypeResponse>>> getWeatherTypes() {
@@ -75,7 +75,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(weatherTypes));
     }
 
-    @Operation(summary = "유종 타입 조회", description = "사용 가능한 유종 타입 목록을 조회합니다.")
+    @Operation(summary = "유종 타입 조회")
     @GetMapping("/fuel-types")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<FuelTypeResponse>>> getFuelTypes() {
@@ -85,7 +85,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(fuelTypes));
     }
 
-    @Operation(summary = "유류집계 등록", description = "유류집계 정보를 등록합니다.")
+    @Operation(summary = "유류집계 등록")
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.CREATE)
     public ResponseEntity<SuccessResponse<Void>> createFuelAggregation(
@@ -95,7 +95,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유류집계 삭제", description = "하나 이상의 유류집계 ID를 받아 해당 유류집계를 삭제합니다.")
+    @Operation(summary = "유류집계 삭제")
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteFuelAggregations(
@@ -104,7 +104,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유류집계 수정", description = "유류집계 정보를 수정합니다.")
+    @Operation(summary = "유류집계 수정")
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateFuelAggregation(
@@ -115,7 +115,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유류집계 목록 조회", description = "필터 조건에 맞는 유류집계 목록을 조회합니다")
+    @Operation(summary = "유류집계 목록 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<FuelAggregationListResponse>>> getFuelAggregations(
@@ -134,7 +134,7 @@ public class FuelAggregationController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "유류집계 상세 조회", description = "유류집계 상세 정보를 반환합니다.")
+    @Operation(summary = "유류집계 상세 조회")
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<FuelAggregationDetailResponse>> getFuelAggregationById(
@@ -143,7 +143,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "유류집계 수정이력 조회", description = "유류집계의 수정이력을 조회합니다")
+    @Operation(summary = "유류집계 수정이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<FuelAggregationChangeHistoryResponse>>> getFuelAggregationChangeHistories(
@@ -160,7 +160,7 @@ public class FuelAggregationController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "유종별 가격 조회", description = "현장, 공정, 일자로 휘발유/경유/요소수 가격을 조회합니다.")
+    @Operation(summary = "유종별 가격 조회")
     @GetMapping("/fuel-prices")
     public ResponseEntity<SuccessResponse<FuelPriceResponse>> getFuelPrice(
             @Valid final FuelPriceRequest request) {
@@ -168,7 +168,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "유류업체 조회", description = "현장, 공정, 일자로 유류업체 계약 정보를 조회합니다.")
+    @Operation(summary = "유류업체 조회")
     @GetMapping("/fuel-company")
     public ResponseEntity<SuccessResponse<FuelCompanyResponse>> getFuelCompany(
             @Valid final FuelCompanyRequest request) {
@@ -176,7 +176,7 @@ public class FuelAggregationController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "유류집계 목록 엑셀 다운로드", description = "검색 조건에 맞는 유류집계 목록을 엑셀 파일로 다운로드합니다.")
+    @Operation(summary = "유류집계 목록 엑셀 다운로드")
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_FUEL_AGGREGATION, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadFuelAggregationsExcel(

@@ -25,7 +25,7 @@ public class FileController extends BaseController {
 
     private final S3FileService s3FileService;
 
-    @Operation(summary = "S3 Presigned URL 발급", description = "AWS S3 업로드용 presigned URL을 발급합니다")
+    @Operation(summary = "S3 Presigned URL 발급")
     @PostMapping("/upload-url")
     public ResponseEntity<SuccessResponse<PresignedUrlResponse>> getPresignedUrl(
             @Valid @RequestBody final PresignedUrlRequest request) {
