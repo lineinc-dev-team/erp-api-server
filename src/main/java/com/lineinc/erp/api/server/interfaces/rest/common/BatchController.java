@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/common/batch")
 @RequiredArgsConstructor
-@Tag(name = "배치 관리", description = "배치 작업 실행 및 관리 API")
+@Tag(name = "배치 관리")
 public class BatchController extends BaseController {
 
     private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;

@@ -37,13 +37,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping(value = "/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "인증 관리", description = "인증 관련 API")
+@Tag(name = "인증 관리")
 public class AuthController extends BaseController {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
 
-    @Operation(summary = "로그인", description = "사용자 로그인 후 세션 생성 및 쿠키 발급")
+    @Operation(summary = "로그인")
     @PostMapping("/login")
     public ResponseEntity<Void> login(
             @Valid @RequestBody final LoginRequest request,
@@ -84,7 +84,7 @@ public class AuthController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "비밀번호 변경", description = "새 비밀번호로 변경합니다.")
+    @Operation(summary = "비밀번호 변경")
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal final CustomUserDetails userDetails,
@@ -93,14 +93,14 @@ public class AuthController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "로그아웃", description = "세션 만료를 통한 사용자 로그아웃 처리")
+    @Operation(summary = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(final HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "내 정보 조회", description = "현재 로그인된 사용자 정보를 반환")
+    @Operation(summary = "내 정보 조회")
     @GetMapping("/me")
     public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser(
             @AuthenticationPrincipal final CustomUserDetails userDetails) {
