@@ -19,6 +19,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPerm
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingContractUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEquipmentUpdateRequest;
@@ -33,6 +34,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractOutsourcingContractResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
@@ -154,12 +156,23 @@ public class DailyReportController extends BaseController {
     }
 
     @Operation(summary = "출역일보 직영/용역 외주 수정")
-    @PatchMapping("/direct-contract-outsourcings")
+    @PatchMapping("/direct-contract-outsourcings-contract")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateDailyReportDirectContractOutsourcing(
+    public ResponseEntity<Void> updateDailyReportDirectContractOutsourcingContract(
             @Valid final DailyReportSearchRequest searchRequest,
             @Valid @RequestBody final DailyReportDirectContractOutsourcingContractUpdateRequest request) {
         dailyReportService.updateDailyReportDirectContractOutsourcingContracts(searchRequest, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "출역일보 직영/용역 용역 수정")
+    @PatchMapping("/direct-contract-outsourcings")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
+    public ResponseEntity<Void> updateDailyReportDirectContractOutsourcingV2(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @Valid @RequestBody final DailyReportDirectContractOutsourcingUpdateRequest request,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        dailyReportService.updateDailyReportDirectContractOutsourcings(searchRequest, request, user.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -200,14 +213,31 @@ public class DailyReportController extends BaseController {
     }
 
     @Operation(summary = "출역일보 직영/용역 외주 조회")
-    @GetMapping("/direct-contract-outsourcings")
+    @GetMapping("/direct-contract-outsourcings-contract")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractOutsourcingContractResponse>>> searchDailyReportDirectContractOutsourcings(
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractOutsourcingContractResponse>>> searchDailyReportDirectContractOutsourcingContracts(
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final DailyReportSearchRequest request) {
         final Slice<DailyReportDirectContractOutsourcingContractResponse> slice = dailyReportService
                 .searchDailyReportDirectContractOutsourcingContracts(
+                        request,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
+                                sortRequest.sort()));
+
+        return ResponseEntity.ok(SuccessResponse.of(
+                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+    }
+
+    @Operation(summary = "출역일보 직영/용역 용역 조회")
+    @GetMapping("/direct-contract-outsourcings")
+    @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractOutsourcingResponse>>> searchDailyReportDirectContractOutsourcingsV2(
+            @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest,
+            @Valid final DailyReportSearchRequest request) {
+        final Slice<DailyReportDirectContractOutsourcingResponse> slice = dailyReportService
+                .searchDailyReportDirectContractOutsourcings(
                         request,
                         PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
                                 sortRequest.sort()));

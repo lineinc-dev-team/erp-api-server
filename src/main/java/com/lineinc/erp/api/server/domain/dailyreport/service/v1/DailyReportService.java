@@ -73,8 +73,9 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingContractCreateRequest;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingContractUpdateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeUpdateRequest;
@@ -100,6 +101,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.Dai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportWorkUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractOutsourcingContractResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportDirectContractResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEmployeeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportEquipmentResponse;
@@ -218,7 +220,7 @@ public class DailyReportService {
                 // 임시 인력인 경우 새로운 인력을 생성
                 if (Boolean.TRUE.equals(directContractRequest.isTemporary())) {
                     labor = createTemporaryLabor(directContractRequest.temporaryLaborName(),
-                            directContractRequest.unitPrice(), userId);
+                            directContractRequest.unitPrice(), userId, LaborType.DIRECT_CONTRACT);
                 } else {
                     // 기존 인력 검색
                     labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
@@ -279,11 +281,20 @@ public class DailyReportService {
                     .directContractOutsourcings()) {
                 final OutsourcingCompany company = directContractOutsourcingRequest.outsourcingCompanyId() != null
                         ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(directContractOutsourcingRequest.outsourcingCompanyId())
+                                .getOutsourcingCompanyByIdOrThrow(
+                                        directContractOutsourcingRequest.outsourcingCompanyId())
                         : null;
 
-                final Labor labor = laborService
-                        .getLaborByIdOrThrow(directContractOutsourcingRequest.laborId());
+                Labor labor;
+                // 임시 인력인 경우 새로운 인력을 생성
+                if (Boolean.TRUE.equals(directContractOutsourcingRequest.isTemporary())) {
+                    labor = createTemporaryLabor(directContractOutsourcingRequest.temporaryLaborName(),
+                            directContractOutsourcingRequest.unitPrice(), userId, LaborType.OUTSOURCING);
+                } else {
+                    // 기존 인력 검색
+                    labor = laborService
+                            .getLaborByIdOrThrow(directContractOutsourcingRequest.laborId());
+                }
 
                 final DailyReportDirectContractOutsourcing directContractOutsourcing = DailyReportDirectContractOutsourcing
                         .builder()
@@ -738,6 +749,48 @@ public class DailyReportService {
     }
 
     /**
+     * 출역일보 직영/용역 용역 정보를 슬라이스로 조회합니다.
+     * 
+     * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
+     * @param pageable 페이징 정보
+     * @return 출역일보 직영/용역 용역 정보 슬라이스
+     */
+    public Slice<DailyReportDirectContractOutsourcingResponse> searchDailyReportDirectContractOutsourcings(
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(request.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+
+        // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
+        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
+                        site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
+                        null, pageable);
+
+        // DailyReport 슬라이스를 DailyReportDirectContractOutsourcingResponse 슬라이스로 변환
+        // 각 DailyReport의 직영/용역 용역들을 개별 항목으로 변환
+        final List<DailyReportDirectContractOutsourcingResponse> allDirectContractOutsourcings = new ArrayList<>();
+
+        for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
+            for (final DailyReportDirectContractOutsourcing directContractOutsourcing : dailyReport
+                    .getDirectContractOutsourcings()) {
+                allDirectContractOutsourcings
+                        .add(DailyReportDirectContractOutsourcingResponse.from(directContractOutsourcing));
+            }
+        }
+
+        // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
+        final Slice<DailyReportDirectContractOutsourcingResponse> directContractOutsourcingSlice = new SliceImpl<>(
+                allDirectContractOutsourcings,
+                pageable,
+                dailyReportSlice.hasNext());
+
+        return directContractOutsourcingSlice;
+    }
+
+    /**
      * 출역일보 직영/용역 외주 정보를 슬라이스로 조회합니다.
      * 
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
@@ -1065,7 +1118,8 @@ public class DailyReportService {
                     Labor labor;
                     // 임시 인력인 경우 새로운 인력을 생성
                     if (Boolean.TRUE.equals(dto.isTemporary())) {
-                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId);
+                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId,
+                                LaborType.DIRECT_CONTRACT);
                     } else {
                         // 기존 인력 검색
                         labor = laborService.getLaborByIdOrThrow(dto.laborId());
@@ -1183,6 +1237,106 @@ public class DailyReportService {
                         });
             }
         }
+    }
+
+    @Transactional
+    public void updateDailyReportDirectContractOutsourcings(final DailyReportSearchRequest searchRequest,
+            final DailyReportDirectContractOutsourcingUpdateRequest request, final Long userId) {
+        // 현장과 공정 조회
+        final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
+
+        // 해당 날짜의 출역일보 조회
+        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
+
+        final DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+
+        // 출역일보 수정 권한 검증
+        validateDailyReportEditPermission(dailyReport);
+
+        // 중복 laborId + unitPrice 체크 (임시 인력 제외)
+        final Set<String> directContractOutsourcingKeys = new HashSet<>();
+        for (final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo directContractOutsourcing : request
+                .directContractOutsourcings()) {
+            if (!Boolean.TRUE.equals(directContractOutsourcing.isTemporary()) &&
+                    directContractOutsourcing.laborId() != null) {
+                final String key = directContractOutsourcing.laborId() + "_" + directContractOutsourcing.unitPrice();
+                if (!directContractOutsourcingKeys.add(key)) {
+                    throw new IllegalArgumentException(
+                            ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_DUPLICATE_LABOR_ID);
+                }
+            }
+        }
+
+        // EntitySyncUtils.syncList를 사용하여 직영/용역 용역 정보 동기화
+        EntitySyncUtils.syncList(
+                dailyReport.getDirectContractOutsourcings(),
+                request.directContractOutsourcings(),
+                (final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo dto) -> {
+                    Labor labor;
+                    // 임시 인력인 경우 새로운 인력을 생성
+                    if (Boolean.TRUE.equals(dto.isTemporary())) {
+                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId,
+                                LaborType.OUTSOURCING);
+                    } else {
+                        // 기존 인력 검색
+                        labor = laborService.getLaborByIdOrThrow(dto.laborId());
+
+                        labor.updatePreviousDailyWage(dto.unitPrice());
+                    }
+
+                    final OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
+                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                            : null;
+
+                    return DailyReportDirectContractOutsourcing.builder()
+                            .dailyReport(dailyReport)
+                            .outsourcingCompany(outsourcingCompany)
+                            .labor(labor)
+                            .position(dto.position())
+                            .workContent(dto.workContent())
+                            .unitPrice(dto.unitPrice())
+                            .workQuantity(dto.workQuantity())
+                            .memo(dto.memo())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
+                            .build();
+                });
+
+        // company와 labor 업데이트를 위해 추가 처리 (한 번만 반복)
+        for (final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo directContractOutsourcingInfo : request
+                .directContractOutsourcings()) {
+            if (directContractOutsourcingInfo.id() != null) { // ID가 있는 것만 처리
+                final OutsourcingCompany company = directContractOutsourcingInfo.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(directContractOutsourcingInfo.outsourcingCompanyId())
+                        : null;
+                final Labor labor = (!Boolean.TRUE.equals(directContractOutsourcingInfo.isTemporary()) &&
+                        directContractOutsourcingInfo.laborId() != null)
+                                ? laborService.getLaborByIdOrThrow(directContractOutsourcingInfo.laborId())
+                                : null;
+
+                // 기존 엔티티만 찾아서 company와 labor 설정 (ID가 null이 아닌 것만)
+                dailyReport.getDirectContractOutsourcings().stream()
+                        .filter(dco -> dco.getId() != null
+                                && dco.getId().equals(directContractOutsourcingInfo.id()))
+                        .findFirst()
+                        .ifPresent(dco -> {
+                            dco.updateFrom(directContractOutsourcingInfo, labor, company);
+                        });
+            }
+        }
+
+        final DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
+
+        savedDailyReport.updateAllAggregatedData();
+        dailyReportRepository.save(savedDailyReport);
+
+        // 노무비 명세서 동기화
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
     }
 
     @Transactional
@@ -1604,7 +1758,8 @@ public class DailyReportService {
     /**
      * 임시 인력 생성 메서드
      */
-    private Labor createTemporaryLabor(final String temporaryLaborName, final Long unitPrice, final Long userId) {
+    private Labor createTemporaryLabor(final String temporaryLaborName, final Long unitPrice, final Long userId,
+            final LaborType laborType) {
         // 임시 인력 이름이 필수
         if (temporaryLaborName == null || temporaryLaborName.trim().isEmpty()) {
             throw new IllegalArgumentException(ValidationMessages.TEMPORARY_LABOR_NAME_REQUIRED);
@@ -1613,7 +1768,7 @@ public class DailyReportService {
         // 임시 인력 생성
         final Labor temporaryLabor = Labor.builder()
                 .name(temporaryLaborName)
-                .type(LaborType.DIRECT_CONTRACT)
+                .type(laborType)
                 .isTemporary(true)
                 .isHeadOffice(true)
                 .dailyWage(unitPrice)
