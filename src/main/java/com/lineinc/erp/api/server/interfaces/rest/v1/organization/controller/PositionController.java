@@ -19,12 +19,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/positions")
 @RequiredArgsConstructor
-@Tag(name = "직책 관리", description = "직책 관련 API")
+@Tag(name = "직책 관리")
 public class PositionController extends BaseController {
 
     private final PositionService positionService;
 
-    @Operation(summary = "직책 목록 조회", description = "모든 직책 목록을 조회합니다")
+    @Operation(summary = "직책 목록 조회")
     @GetMapping
     public ResponseEntity<SuccessResponse<List<PositionResponse>>> getAllPositions() {
         final List<PositionResponse> positions = positionService.getAllPositions();

@@ -19,12 +19,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/menus")
 @RequiredArgsConstructor
-@Tag(name = "메뉴 관리", description = "메뉴 관련 API")
+@Tag(name = "메뉴 관리")
 public class MenuController extends BaseController {
 
     private final MenuService menuService;
 
-    @Operation(summary = "메뉴 및 권한 전체 조회", description = "등록된 모든 메뉴와 각 메뉴에 대한 권한 정보를 반환합니다")
+    @Operation(summary = "메뉴 및 권한 전체 조회")
     @GetMapping("/permissions")
     public ResponseEntity<SuccessResponse<List<MenuWithPermissionsResponse>>> getMenusWithPermissions() {
         final List<MenuWithPermissionsResponse> responseList = menuService.getMenusWithPermissions();

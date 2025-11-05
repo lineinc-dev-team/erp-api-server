@@ -72,12 +72,12 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/v1/outsourcing-company-contracts")
 @RequiredArgsConstructor
-@Tag(name = "외주업체 계약 관리", description = "외주업체 계약 관련 API")
+@Tag(name = "외주업체 계약 관리")
 public class CompanyContractController extends BaseController {
 
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
 
-    @Operation(summary = "공제 항목 목록 조회", description = "공제 항목 목록을 반환합니다.")
+    @Operation(summary = "공제 항목 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/default-deductions")
     public ResponseEntity<SuccessResponse<List<CompanyContractDefaultDeductionsResponse>>> getDeductionItems() {
@@ -88,7 +88,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "세금계산서 발행조건 목록 조회", description = "세금계산서 발행조건 목록을 반환합니다.")
+    @Operation(summary = "세금계산서 발행조건 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/tax-invoice-conditions")
     public ResponseEntity<SuccessResponse<List<TaxInvoiceConditionResponse>>> getTaxInvoiceConditions() {
@@ -100,7 +100,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "계약 상태 목록 조회", description = "외주업체 계약 상태 목록을 반환합니다.")
+    @Operation(summary = "계약 상태 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/statuses")
     public ResponseEntity<SuccessResponse<List<ContractStatusResponse>>> getContractStatuses() {

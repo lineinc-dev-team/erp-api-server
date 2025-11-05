@@ -19,12 +19,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/grades")
 @RequiredArgsConstructor
-@Tag(name = "직급 관리", description = "직급 관련 API")
+@Tag(name = "직급 관리")
 public class GradeController extends BaseController {
 
     private final GradeService gradeService;
 
-    @Operation(summary = "직급 목록 조회", description = "모든 직급 목록을 조회합니다")
+    @Operation(summary = "직급 목록 조회")
     @GetMapping
     public ResponseEntity<SuccessResponse<List<GradeResponse>>> getAllGrades() {
         final List<GradeResponse> grades = gradeService.getAllGrades();

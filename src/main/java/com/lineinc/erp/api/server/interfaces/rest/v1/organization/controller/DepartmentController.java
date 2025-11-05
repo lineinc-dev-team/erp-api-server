@@ -19,12 +19,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/departments")
 @RequiredArgsConstructor
-@Tag(name = "부서 관리", description = "부서 관련 API")
+@Tag(name = "부서 관리")
 public class DepartmentController extends BaseController {
 
     private final DepartmentService departmentService;
 
-    @Operation(summary = "부서 목록 조회", description = "모든 부서 목록을 조회합니다")
+    @Operation(summary = "부서 목록 조회")
     @GetMapping
     public ResponseEntity<SuccessResponse<List<DepartmentResponse>>> getAllDepartments() {
         final List<DepartmentResponse> departments = departmentService.getAllDepartments();
