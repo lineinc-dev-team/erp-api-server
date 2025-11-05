@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcingContract;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEvidenceFile;
@@ -72,6 +73,7 @@ import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetai
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingContractCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportEmployeeCreateRequest;
@@ -268,6 +270,38 @@ public class DailyReportService {
                         .build();
 
                 dailyReport.getDirectContractOutsourcingContracts().add(directContractOutsourcingContract);
+            }
+        }
+
+        // 직영/용역 용역 출역 정보 추가
+        if (request.directContractOutsourcings() != null) {
+            for (final DailyReportDirectContractOutsourcingCreateRequest directContractOutsourcingRequest : request
+                    .directContractOutsourcings()) {
+                final OutsourcingCompany company = directContractOutsourcingRequest.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(directContractOutsourcingRequest.outsourcingCompanyId())
+                        : null;
+
+                final Labor labor = laborService
+                        .getLaborByIdOrThrow(directContractOutsourcingRequest.laborId());
+
+                final DailyReportDirectContractOutsourcing directContractOutsourcing = DailyReportDirectContractOutsourcing
+                        .builder()
+                        .dailyReport(dailyReport)
+                        .outsourcingCompany(company)
+                        .labor(labor)
+                        .position(directContractOutsourcingRequest.position())
+                        .workContent(directContractOutsourcingRequest.workContent())
+                        .unitPrice(directContractOutsourcingRequest.unitPrice())
+                        .workQuantity(directContractOutsourcingRequest.workQuantity())
+                        .memo(directContractOutsourcingRequest.memo())
+                        .fileUrl(directContractOutsourcingRequest.fileUrl())
+                        .originalFileName(directContractOutsourcingRequest.originalFileName())
+                        .build();
+
+                labor.updatePreviousDailyWage(directContractOutsourcingRequest.unitPrice());
+
+                dailyReport.getDirectContractOutsourcings().add(directContractOutsourcing);
             }
         }
 
