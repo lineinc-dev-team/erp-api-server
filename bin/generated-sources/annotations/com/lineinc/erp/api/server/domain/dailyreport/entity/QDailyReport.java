@@ -46,6 +46,8 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
 
     public final ListPath<DailyReportDirectContractOutsourcing, QDailyReportDirectContractOutsourcing> directContractOutsourcings = this.<DailyReportDirectContractOutsourcing, QDailyReportDirectContractOutsourcing>createList("directContractOutsourcings", DailyReportDirectContractOutsourcing.class, QDailyReportDirectContractOutsourcing.class, PathInits.DIRECT2);
 
+    public final NumberPath<Double> directContractOutsourcingWorkQuantitySum = createNumber("directContractOutsourcingWorkQuantitySum", Double.class);
+
     public final ListPath<DailyReportDirectContract, QDailyReportDirectContract> directContracts = this.<DailyReportDirectContract, QDailyReportDirectContract>createList("directContracts", DailyReportDirectContract.class, QDailyReportDirectContract.class, PathInits.DIRECT2);
 
     public final NumberPath<Double> directContractWorkQuantitySum = createNumber("directContractWorkQuantitySum", Double.class);
