@@ -10,10 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 @ParameterObject
 @Schema(description = "외주업체 계약 엑셀 다운로드 요청")
 public record ContractDownloadRequest(
-        @NotEmpty @Schema(description = "허용 필드: id, siteName, processName, companyName, businessNumber, contractType, contractPeriod, contractAmount, defaultDeductions, taxInvoiceCondition, contactName, createdAt, contractStatus, memo, hasGuaranteeCertificate, hasContractCertificate", example = "id,siteName,processName") String fields) {
-
-    public static final List<String> ALLOWED_FIELDS = List.of(
-            "id", "siteName", "processName", "companyName", "businessNumber", "contractType",
-            "contractPeriod", "contractAmount", "defaultDeductions", "taxInvoiceCondition",
-            "contactName", "createdAt", "contractStatus", "memo", "hasGuaranteeCertificate", "hasContractCertificate");
+        @NotEmpty @Schema(description = "다운로드할 필드들을 쉼표로 구분", example = EXAMPLE_FIELDS) String fields) {
+    private static final String EXAMPLE_FIELDS = "id,siteName,processName,companyName,businessNumber,contractType,contractPeriod,contractAmount,defaultDeductions,taxInvoiceCondition,contactName,createdAt,contractStatus,memo,hasGuaranteeCertificate,hasContractCertificate";
+    public static final List<String> ALLOWED_FIELDS = List.of(EXAMPLE_FIELDS.split(","));
 }
