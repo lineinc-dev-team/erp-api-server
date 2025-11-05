@@ -8,6 +8,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractConstructionUpdateRequestV2;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
@@ -50,12 +51,12 @@ public class OutsourcingCompanyContractConstructionGroup extends BaseEntity {
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID, nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
     @Builder.Default
     @DiffInclude
-    @OneToMany(mappedBy = "constructionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter
     private List<OutsourcingCompanyContractConstruction> constructions = new ArrayList<>(); // 공사항목 목록
 
