@@ -39,6 +39,7 @@ public record LaborListResponse(
         @Schema(description = "통장사본 첨부", example = "true") Boolean hasBankbook,
         @Schema(description = "신분증 사본 첨부", example = "true") Boolean hasIdCard,
         @Schema(description = "서명이미지 첨부", example = "true") Boolean hasSignatureImage,
+        @Schema(description = "근로계약서 첨부", example = "true") Boolean hasLaborContract,
         @Schema(description = "기타 첨부", example = "true") Boolean hasFile) {
 
     public static LaborListResponse from(final Labor labor) {
@@ -71,6 +72,7 @@ public record LaborListResponse(
                 labor.getHasBankbook(),
                 labor.getHasIdCard(),
                 labor.getHasSignatureImage(),
+                labor.getHasLaborContract(),
                 labor.getHasFile());
     }
 }

@@ -52,21 +52,18 @@ public class LaborFile extends BaseEntity {
      * 문서명 (사용자가 지정하는 파일 이름)
      */
     @DiffInclude
-    @Column
     private String name;
 
     /**
      * S3 또는 외부 스토리지에 저장된 파일의 URL
      */
     @DiffIgnore
-    @Column
     private String fileUrl; // S3 경로
 
     /**
      * 업로드된 파일의 원본 파일명
      */
     @DiffInclude
-    @Column
     private String originalFileName;
 
     /**
@@ -74,7 +71,6 @@ public class LaborFile extends BaseEntity {
      */
     @DiffIgnore
     @Enumerated(EnumType.STRING)
-    @Column
     private LaborFileType type;
 
     /**

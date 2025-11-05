@@ -346,6 +346,15 @@ public class Labor extends BaseEntity {
                         file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
     }
 
+    /**
+     * 근로계약서 첨부파일 존재 여부를 반환합니다.
+     */
+    public Boolean getHasLaborContract() {
+        return files != null && files.stream()
+                .anyMatch(file -> LaborFileType.LABOR_CONTRACT.equals(file.getType()) &&
+                        file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
+    }
+
     @Transient
     @DiffInclude
     private String outsourcingCompanyName;
