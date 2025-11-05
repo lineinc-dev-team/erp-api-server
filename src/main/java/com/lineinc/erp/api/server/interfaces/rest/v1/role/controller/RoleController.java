@@ -43,12 +43,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/roles")
 @RequiredArgsConstructor
-@Tag(name = "권한 그룹 관리", description = "권한 그룹 관련 API")
+@Tag(name = "권한 그룹 관리")
 public class RoleController extends BaseController {
 
     private final RoleService roleService;
 
-    @Operation(summary = "권한 그룹 전체 조회", description = "등록된 모든 권한 그룹 정보를 반환합니다")
+    @Operation(summary = "권한 그룹 전체 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<RolesResponse>>> getAllRoles(
@@ -62,7 +62,7 @@ public class RoleController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "권한 그룹명 키워드 검색", description = "권한 그룹명으로 키워드 검색을 수행합니다")
+    @Operation(summary = "권한 그룹명 키워드 검색")
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<PagingResponse<RoleSummaryResponse>>> searchRolesByName(
             @Valid final SortRequest sortRequest,
@@ -74,7 +74,7 @@ public class RoleController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "단일 권한 그룹 조회", description = "권한 그룹 ID로 단일 권한 그룹 정보를 조회합니다")
+    @Operation(summary = "단일 권한 그룹 조회")
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<RolesResponse>> getRoleById(@PathVariable final Long id) {
@@ -82,7 +82,7 @@ public class RoleController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "권한 그룹 메뉴별 권한 조회", description = "권한 그룹 ID로 해당 권한 그룹이 가지고 있는 메뉴별 권한 정보를 조회합니다")
+    @Operation(summary = "권한 그룹 메뉴별 권한 조회")
     @GetMapping("/{id}/menu-permissions")
     public ResponseEntity<SuccessResponse<List<MenusPermissionsResponse>>> getMenusPermissionsById(
             @PathVariable final Long id) {
@@ -90,7 +90,7 @@ public class RoleController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "권한 그룹에 속한 유저 목록 조회", description = "지정된 권한 그룹 ID에 속한 유저 목록을 반환합니다")
+    @Operation(summary = "권한 그룹에 속한 유저 목록 조회")
     @GetMapping("/{id}/users")
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<RoleUserListResponse>>> getUsersByRoleId(
@@ -106,7 +106,7 @@ public class RoleController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "권한 그룹 생성", description = "새로운 권한 그룹을 생성합니다")
+    @Operation(summary = "권한 그룹 생성")
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createRole(
@@ -115,7 +115,7 @@ public class RoleController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "권한 그룹 수정", description = "권한 그룹 정보를 수정합니다")
+    @Operation(summary = "권한 그룹 수정")
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateRole(
@@ -125,7 +125,7 @@ public class RoleController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "여러 권한 그룹 삭제", description = "권한 그룹 ID 리스트로 여러 권한 그룹을 삭제합니다")
+    @Operation(summary = "여러 권한 그룹 삭제")
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_PERMISSION, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteRoles(@RequestBody final DeleteRolesRequest request) {
