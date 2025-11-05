@@ -8,6 +8,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractDriverUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
@@ -40,9 +41,11 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "name")
 })
 public class OutsourcingCompanyContractDriver extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_driver_seq";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_driver_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_driver_seq", sequenceName = "outsourcing_company_contract_driver_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -51,7 +54,7 @@ public class OutsourcingCompanyContractDriver extends BaseEntity {
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID, nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
     @DiffInclude
@@ -60,7 +63,7 @@ public class OutsourcingCompanyContractDriver extends BaseEntity {
 
     // 드라이버 서류 목록
     @DiffInclude
-    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_DRIVER_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @Setter
     private List<OutsourcingCompanyContractDriverFile> files = new ArrayList<>();
@@ -69,12 +72,8 @@ public class OutsourcingCompanyContractDriver extends BaseEntity {
      * 운전자 정보를 수정합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractDriverUpdateRequest request) {
-        if (request.name() != null) {
-            this.name = request.name();
-        }
-        if (request.memo() != null) {
-            this.memo = request.memo();
-        }
+        this.name = request.name();
+        this.memo = request.memo();
 
         // 파일 정보 동기화
         if (request.files() != null) {

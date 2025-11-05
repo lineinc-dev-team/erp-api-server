@@ -219,6 +219,8 @@ public final class AppConstants {
     public static final String ROLE_MAPPED_BY = "role";
     public static final String OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY = "outsourcingCompanyContract";
     public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_MAPPED_BY = "constructionGroup";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_DRIVER_MAPPED_BY = "driver";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_MAPPED_BY = "equipment";
 
     // ==================== 기타 상수 ====================
     /**

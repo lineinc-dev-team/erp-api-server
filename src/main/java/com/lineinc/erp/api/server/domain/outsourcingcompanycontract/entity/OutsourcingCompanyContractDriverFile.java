@@ -7,6 +7,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDriverDocumentType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractDriverFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,14 +37,15 @@ import lombok.experimental.SuperBuilder;
 @SQLRestriction("deleted = false")
 public class OutsourcingCompanyContractDriverFile extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_driver_file_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_driver_file_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_driver_file_seq", sequenceName = "outsourcing_company_contract_driver_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_driver_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_DRIVER_ID, nullable = false)
     private OutsourcingCompanyContractDriver driver;
 
     @DiffIgnore
@@ -67,15 +69,9 @@ public class OutsourcingCompanyContractDriverFile extends BaseEntity {
      * 파일 정보를 수정합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractDriverFileUpdateRequest request) {
-        if (request.documentType() != null) {
-            this.documentType = request.documentType();
-        }
-        if (request.fileUrl() != null) {
-            this.fileUrl = request.fileUrl();
-        }
-        if (request.originalFileName() != null) {
-            this.originalFileName = request.originalFileName();
-        }
+        this.documentType = request.documentType();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
 
         // transient 필드 동기화
         syncTransientFields();

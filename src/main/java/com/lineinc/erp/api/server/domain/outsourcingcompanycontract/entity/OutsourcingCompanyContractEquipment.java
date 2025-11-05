@@ -9,6 +9,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractEquipmentUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
@@ -39,9 +40,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class OutsourcingCompanyContractEquipment extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_equipment_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_equipment_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_equipment_seq", sequenceName = "outsourcing_company_contract_equipment_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -58,12 +60,12 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID, nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
     @DiffInclude
     @Builder.Default
-    @OneToMany(mappedBy = "equipment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter
     private List<OutsourcingCompanyContractSubEquipment> subEquipments = new ArrayList<>();
 
@@ -100,30 +102,14 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
      * 장비 정보를 수정합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractEquipmentUpdateRequest request) {
-        if (request.specification() != null) {
-            this.specification = request.specification();
-        }
-        if (request.vehicleNumber() != null) {
-            this.vehicleNumber = request.vehicleNumber();
-        }
-        if (request.category() != null) {
-            this.category = request.category();
-        }
-        if (request.unitPrice() != null) {
-            this.unitPrice = request.unitPrice();
-        }
-        if (request.subtotal() != null) {
-            this.subtotal = request.subtotal();
-        }
-        if (request.taskDescription() != null) {
-            this.taskDescription = request.taskDescription();
-        }
-        if (request.memo() != null) {
-            this.memo = request.memo();
-        }
-        if (request.type() != null) {
-            this.type = request.type();
-        }
+        this.specification = request.specification();
+        this.vehicleNumber = request.vehicleNumber();
+        this.category = request.category();
+        this.unitPrice = request.unitPrice();
+        this.subtotal = request.subtotal();
+        this.taskDescription = request.taskDescription();
+        this.memo = request.memo();
+        this.type = request.type();
 
         // 보조장비 정보 동기화
         if (request.subEquipments() != null) {
