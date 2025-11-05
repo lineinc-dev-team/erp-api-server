@@ -11,16 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QDailyReportDirectContractOutsourcing is a Querydsl query type for DailyReportDirectContractOutsourcing
+ * QDailyReportDirectContractOutsourcingContract is a Querydsl query type for DailyReportDirectContractOutsourcingContract
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QDailyReportDirectContractOutsourcing extends EntityPathBase<DailyReportDirectContractOutsourcing> {
+public class QDailyReportDirectContractOutsourcingContract extends EntityPathBase<DailyReportDirectContractOutsourcingContract> {
 
-    private static final long serialVersionUID = 1003642009L;
+    private static final long serialVersionUID = 1621895371L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QDailyReportDirectContractOutsourcing dailyReportDirectContractOutsourcing = new QDailyReportDirectContractOutsourcing("dailyReportDirectContractOutsourcing");
+    public static final QDailyReportDirectContractOutsourcingContract dailyReportDirectContractOutsourcingContract = new QDailyReportDirectContractOutsourcingContract("dailyReportDirectContractOutsourcingContract");
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
@@ -60,23 +60,23 @@ public class QDailyReportDirectContractOutsourcing extends EntityPathBase<DailyR
 
     public final NumberPath<Double> workQuantity = createNumber("workQuantity", Double.class);
 
-    public QDailyReportDirectContractOutsourcing(String variable) {
-        this(DailyReportDirectContractOutsourcing.class, forVariable(variable), INITS);
+    public QDailyReportDirectContractOutsourcingContract(String variable) {
+        this(DailyReportDirectContractOutsourcingContract.class, forVariable(variable), INITS);
     }
 
-    public QDailyReportDirectContractOutsourcing(Path<? extends DailyReportDirectContractOutsourcing> path) {
+    public QDailyReportDirectContractOutsourcingContract(Path<? extends DailyReportDirectContractOutsourcingContract> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QDailyReportDirectContractOutsourcing(PathMetadata metadata) {
+    public QDailyReportDirectContractOutsourcingContract(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QDailyReportDirectContractOutsourcing(PathMetadata metadata, PathInits inits) {
-        this(DailyReportDirectContractOutsourcing.class, metadata, inits);
+    public QDailyReportDirectContractOutsourcingContract(PathMetadata metadata, PathInits inits) {
+        this(DailyReportDirectContractOutsourcingContract.class, metadata, inits);
     }
 
-    public QDailyReportDirectContractOutsourcing(Class<? extends DailyReportDirectContractOutsourcing> type, PathMetadata metadata, PathInits inits) {
+    public QDailyReportDirectContractOutsourcingContract(Class<? extends DailyReportDirectContractOutsourcingContract> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.dailyReport = inits.isInitialized("dailyReport") ? new QDailyReport(forProperty("dailyReport"), inits.get("dailyReport")) : null;
         this.labor = inits.isInitialized("labor") ? new com.lineinc.erp.api.server.domain.labor.entity.QLabor(forProperty("labor"), inits.get("labor")) : null;

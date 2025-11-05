@@ -2,7 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import java.time.OffsetDateTime;
 
-import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcing;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcingContract;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
@@ -23,23 +23,23 @@ public record DailyReportDirectContractOutsourcingResponse(
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
 
     public static DailyReportDirectContractOutsourcingResponse from(
-            final DailyReportDirectContractOutsourcing directContractOutsourcing) {
+            final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract) {
         return new DailyReportDirectContractOutsourcingResponse(
-                directContractOutsourcing.getId(),
-                directContractOutsourcing.getWorkQuantity(),
-                directContractOutsourcing.getMemo(),
-                directContractOutsourcing.getLabor() != null
-                        ? LaborNameResponse.from(directContractOutsourcing.getLabor())
+                directContractOutsourcingContract.getId(),
+                directContractOutsourcingContract.getWorkQuantity(),
+                directContractOutsourcingContract.getMemo(),
+                directContractOutsourcingContract.getLabor() != null
+                        ? LaborNameResponse.from(directContractOutsourcingContract.getLabor())
                         : null,
-                directContractOutsourcing.getOutsourcingCompany() != null
-                        ? CompanySimpleResponse.from(directContractOutsourcing.getOutsourcingCompany())
+                directContractOutsourcingContract.getOutsourcingCompany() != null
+                        ? CompanySimpleResponse.from(directContractOutsourcingContract.getOutsourcingCompany())
                         : null,
-                directContractOutsourcing.getOutsourcingCompanyContract() != null
-                        ? ContractSimpleResponse.from(directContractOutsourcing.getOutsourcingCompanyContract())
+                directContractOutsourcingContract.getOutsourcingCompanyContract() != null
+                        ? ContractSimpleResponse.from(directContractOutsourcingContract.getOutsourcingCompanyContract())
                         : null,
-                directContractOutsourcing.getFileUrl(),
-                directContractOutsourcing.getOriginalFileName(),
-                directContractOutsourcing.getCreatedAt(),
-                directContractOutsourcing.getUpdatedAt());
+                directContractOutsourcingContract.getFileUrl(),
+                directContractOutsourcingContract.getOriginalFileName(),
+                directContractOutsourcingContract.getCreatedAt(),
+                directContractOutsourcingContract.getUpdatedAt());
     }
 }

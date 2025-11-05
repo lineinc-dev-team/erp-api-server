@@ -30,8 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
-public class DailyReportDirectContractOutsourcing extends BaseEntity {
-    private static final String SEQUENCE_NAME = "daily_report_direct_contract_outsourcing_seq";
+public class DailyReportDirectContractOutsourcingContract extends BaseEntity {
+    private static final String SEQUENCE_NAME = "daily_report_direct_contract_outsourcing_contract_seq";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)

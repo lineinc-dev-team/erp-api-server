@@ -18,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
-import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcing;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcingContract;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEvidenceFile;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportFile;
@@ -253,7 +253,7 @@ public class DailyReportService {
                         .getContractByIdOrThrow(directContractOutsourcingRequest.outsourcingCompanyContractId());
                 final Labor labor = laborService.getLaborByIdOrThrow(directContractOutsourcingRequest.laborId());
 
-                final DailyReportDirectContractOutsourcing directContractOutsourcing = DailyReportDirectContractOutsourcing
+                final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract = DailyReportDirectContractOutsourcingContract
                         .builder()
                         .dailyReport(dailyReport)
                         .outsourcingCompany(company)
@@ -265,7 +265,7 @@ public class DailyReportService {
                         .memo(directContractOutsourcingRequest.memo())
                         .build();
 
-                dailyReport.getDirectContractOutsourcings().add(directContractOutsourcing);
+                dailyReport.getDirectContractOutsourcingContracts().add(directContractOutsourcingContract);
             }
         }
 
@@ -727,10 +727,10 @@ public class DailyReportService {
         final List<DailyReportDirectContractOutsourcingResponse> allDirectContractOutsourcings = new ArrayList<>();
 
         for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
-            for (final DailyReportDirectContractOutsourcing directContractOutsourcing : dailyReport
-                    .getDirectContractOutsourcings()) {
+            for (final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract : dailyReport
+                    .getDirectContractOutsourcingContracts()) {
                 allDirectContractOutsourcings
-                        .add(DailyReportDirectContractOutsourcingResponse.from(directContractOutsourcing));
+                        .add(DailyReportDirectContractOutsourcingResponse.from(directContractOutsourcingContract));
             }
         }
 
@@ -1105,7 +1105,7 @@ public class DailyReportService {
 
         // EntitySyncUtils.syncList를 사용하여 직영/용역 외주 정보 동기화
         EntitySyncUtils.syncList(
-                dailyReport.getDirectContractOutsourcings(),
+                dailyReport.getDirectContractOutsourcingContracts(),
                 request.directContractOutsourcings(),
                 (final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo dto) -> {
                     final OutsourcingCompany company = outsourcingCompanyService
@@ -1114,7 +1114,7 @@ public class DailyReportService {
                             .getContractByIdOrThrow(dto.outsourcingCompanyContractId());
                     final Labor labor = laborService.getLaborByIdOrThrow(dto.laborId());
 
-                    return DailyReportDirectContractOutsourcing.builder()
+                    return DailyReportDirectContractOutsourcingContract.builder()
                             .dailyReport(dailyReport)
                             .outsourcingCompany(company)
                             .outsourcingCompanyContract(contract)
@@ -1137,7 +1137,7 @@ public class DailyReportService {
                 final Labor labor = laborService.getLaborByIdOrThrow(directContractOutsourcingInfo.laborId());
 
                 // 기존 엔티티만 찾아서 업데이트
-                dailyReport.getDirectContractOutsourcings().stream()
+                dailyReport.getDirectContractOutsourcingContracts().stream()
                         .filter(dco -> dco.getId() != null && dco.getId().equals(directContractOutsourcingInfo.id()))
                         .findFirst()
                         .ifPresent(dco -> {
