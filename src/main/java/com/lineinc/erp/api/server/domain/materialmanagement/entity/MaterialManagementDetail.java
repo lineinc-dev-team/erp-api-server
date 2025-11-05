@@ -6,6 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementDetailUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,14 +36,15 @@ import lombok.experimental.SuperBuilder;
 @SQLRestriction("deleted = false")
 public class MaterialManagementDetail extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "material_management_detail_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_management_detail_seq")
-    @SequenceGenerator(name = "material_management_detail_seq", sequenceName = "material_management_detail_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "material_management_id", nullable = false)
+    @JoinColumn(name = AppConstants.MATERIAL_MANAGEMENT_ID, nullable = false)
     private MaterialManagement materialManagement;
 
     /**
@@ -109,14 +111,14 @@ public class MaterialManagementDetail extends BaseEntity {
     private String memo;
 
     public void updateFrom(final MaterialManagementDetailUpdateRequest request) {
-        java.util.Optional.ofNullable(request.name()).ifPresent(v -> this.name = v);
-        java.util.Optional.ofNullable(request.standard()).ifPresent(v -> this.standard = v);
-        java.util.Optional.ofNullable(request.usage()).ifPresent(v -> this.usage = v);
-        java.util.Optional.ofNullable(request.quantity()).ifPresent(v -> this.quantity = v);
-        java.util.Optional.ofNullable(request.unitPrice()).ifPresent(v -> this.unitPrice = v);
-        java.util.Optional.ofNullable(request.supplyPrice()).ifPresent(v -> this.supplyPrice = v);
-        java.util.Optional.ofNullable(request.vat()).ifPresent(v -> this.vat = v);
-        java.util.Optional.ofNullable(request.total()).ifPresent(v -> this.total = v);
-        java.util.Optional.ofNullable(request.memo()).ifPresent(v -> this.memo = v);
+        this.name = request.name();
+        this.standard = request.standard();
+        this.usage = request.usage();
+        this.quantity = request.quantity();
+        this.unitPrice = request.unitPrice();
+        this.supplyPrice = request.supplyPrice();
+        this.vat = request.vat();
+        this.total = request.total();
+        this.memo = request.memo();
     }
 }

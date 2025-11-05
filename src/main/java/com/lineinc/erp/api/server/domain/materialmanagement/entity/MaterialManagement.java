@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -14,6 +13,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import jakarta.persistence.CascadeType;
@@ -50,24 +50,25 @@ import lombok.experimental.SuperBuilder;
 })
 public class MaterialManagement extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "material_management_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_management_seq")
-    @SequenceGenerator(name = "material_management_seq", sequenceName = "material_management_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
+    @JoinColumn(name = AppConstants.SITE_ID)
     private Site site;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id")
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     private SiteProcess siteProcess;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     private OutsourcingCompany outsourcingCompany;
 
     @DiffIgnore
@@ -97,17 +98,17 @@ public class MaterialManagement extends BaseEntity {
     private String memo;
 
     @DiffIgnore
-    @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.MATERIAL_MANAGEMENT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MaterialManagementDetail> details = new ArrayList<>();
 
     @DiffIgnore
-    @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.MATERIAL_MANAGEMENT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MaterialManagementFile> files = new ArrayList<>();
 
     @DiffIgnore
-    @OneToMany(mappedBy = "materialManagement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.MATERIAL_MANAGEMENT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MaterialManagementChangeHistory> changeHistories = new ArrayList<>();
 
@@ -150,15 +151,10 @@ public class MaterialManagement extends BaseEntity {
         this.site = site;
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
-
-        Optional.ofNullable(request.inputTypeDescription())
-                .ifPresent(value -> this.inputTypeDescription = value);
-        Optional.ofNullable(request.deliveryDate())
-                .ifPresent(value -> this.deliveryDate = DateTimeFormatUtils.toOffsetDateTime(value));
-        Optional.ofNullable(request.memo())
-                .ifPresent(value -> this.memo = value);
-        Optional.ofNullable(request.inputType())
-                .ifPresent(value -> this.inputType = value);
+        this.inputTypeDescription = request.inputTypeDescription();
+        this.deliveryDate = DateTimeFormatUtils.toOffsetDateTime(request.deliveryDate());
+        this.memo = request.memo();
+        this.inputType = request.inputType();
 
         syncTransientFields();
     }

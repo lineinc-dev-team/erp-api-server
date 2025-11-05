@@ -1,13 +1,12 @@
 package com.lineinc.erp.api.server.domain.materialmanagement.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,14 +31,15 @@ import lombok.experimental.SuperBuilder;
 @SQLRestriction("deleted = false")
 public class MaterialManagementFile extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "material_management_file_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_management_file_seq")
-    @SequenceGenerator(name = "material_management_file_seq", sequenceName = "material_management_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "material_management_id", nullable = false)
+    @JoinColumn(name = AppConstants.MATERIAL_MANAGEMENT_ID, nullable = false)
     private MaterialManagement materialManagement;
 
     /**
@@ -71,9 +71,9 @@ public class MaterialManagementFile extends BaseEntity {
     private String memo;
 
     public void updateFrom(final MaterialManagementFileUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(value -> this.name = value);
-        Optional.ofNullable(request.fileUrl()).ifPresent(value -> this.fileUrl = value);
-        Optional.ofNullable(request.originalFileName()).ifPresent(value -> this.originalFileName = value);
-        Optional.ofNullable(request.memo()).ifPresent(value -> this.memo = value);
+        this.name = request.name();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.memo = request.memo();
     }
 }
