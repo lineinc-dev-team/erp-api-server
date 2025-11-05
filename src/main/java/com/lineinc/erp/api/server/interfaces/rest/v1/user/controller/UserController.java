@@ -52,12 +52,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping(value = "/api/v1/users")
 @RequiredArgsConstructor
-@Tag(name = "유저 관리", description = "유저 관련 API")
+@Tag(name = "유저 관리")
 public class UserController extends BaseController {
 
     private final UserService userService;
 
-    @Operation(summary = "비밀번호 초기화", description = "유저 로그인 비밀번호 초기화")
+    @Operation(summary = "비밀번호 초기화")
     @PostMapping("/{id}/reset-password")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> resetPassword(@PathVariable final Long id) {
@@ -65,7 +65,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유저 목록 조회", description = "모든 유저 정보를 반환합니다")
+    @Operation(summary = "유저 목록 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<UserResponse>>> getAllUsers(
@@ -94,7 +94,7 @@ public class UserController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "유저 생성", description = "새로운 유저를 생성합니다")
+    @Operation(summary = "유저 생성")
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createUser(@Valid @RequestBody final CreateUserRequest request,
@@ -103,7 +103,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유저 목록 엑셀 다운로드", description = "검색 조건에 맞는 유저 목록을 엑셀 파일로 다운로드합니다")
+    @Operation(summary = "유저 목록 엑셀 다운로드")
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadUserListExcel(
@@ -125,7 +125,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @Operation(summary = "유저 계정 삭제", description = "선택한 유저 계정들을 삭제합니다")
+    @Operation(summary = "유저 계정 삭제")
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteUsers(@RequestBody final BulkDeleteUsersRequest userIds) {
@@ -133,7 +133,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유저 정보 수정", description = "기존 유저 정보를 수정합니다")
+    @Operation(summary = "유저 정보 수정")
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateUser(
@@ -144,7 +144,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "유저 상세 조회", description = "유저 ID로 상세 정보를 조회합니다")
+    @Operation(summary = "유저 상세 조회")
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<UserInfoResponse>> getUserDetail(@PathVariable final Long id) {
@@ -152,7 +152,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "유저 변경 이력 조회", description = "특정 유저의 변경 히스토리를 조회합니다")
+    @Operation(summary = "유저 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_ACCOUNT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<UserChangeHistoryResponse>>> getUserChangeHistories(

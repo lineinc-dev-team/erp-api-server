@@ -25,12 +25,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/site-process")
 @RequiredArgsConstructor
-@Tag(name = "현장 공정 관리", description = "현장 공정 관련 API")
+@Tag(name = "현장 공정 관리")
 public class SiteProcessController extends BaseController {
 
     private final SiteProcessService siteProcessService;
 
-    @Operation(summary = "현장 공정 키워드 검색", description = "현장 공정 키워드로 간단한 검색을 수행합니다.")
+    @Operation(summary = "현장 공정 키워드 검색")
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<SiteProcessResponse.SiteProcessSimpleResponse>>> searchSiteProcessByKeyword(
             @Valid final SortRequest sortRequest,

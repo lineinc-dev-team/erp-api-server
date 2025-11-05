@@ -51,13 +51,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/site-management-costs")
 @RequiredArgsConstructor
-@Tag(name = "현장관리비", description = "현장관리비 관련 API")
+@Tag(name = "현장관리비")
 public class SiteManagementCostController extends BaseController {
 
     private final SiteManagementCostService siteManagementCostService;
 
     @GetMapping
-    @Operation(summary = "현장관리비 목록 조회", description = "현장관리비 목록을 조회합니다.")
+    @Operation(summary = "현장관리비 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<SiteManagementCostResponse>>> getSiteManagementCostList(
             @Valid final SiteManagementCostListRequest request,
@@ -71,7 +71,7 @@ public class SiteManagementCostController extends BaseController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "현장관리비 상세 조회", description = "ID로 현장관리비 상세 정보를 조회합니다.")
+    @Operation(summary = "현장관리비 상세 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SiteManagementCostDetailResponse>> getSiteManagementCostDetail(
             @PathVariable final Long id) {
@@ -80,7 +80,7 @@ public class SiteManagementCostController extends BaseController {
     }
 
     @PostMapping
-    @Operation(summary = "현장관리비 생성", description = "년월별 현장/공정 관리비를 생성합니다.")
+    @Operation(summary = "현장관리비 생성")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createSiteManagementCost(
             @Valid @RequestBody final SiteManagementCostCreateRequest request,
@@ -90,7 +90,7 @@ public class SiteManagementCostController extends BaseController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "현장관리비 수정", description = "현장관리비 정보를 수정합니다.")
+    @Operation(summary = "현장관리비 수정")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateSiteManagementCost(
             @PathVariable final Long id,
@@ -101,7 +101,7 @@ public class SiteManagementCostController extends BaseController {
     }
 
     @DeleteMapping
-    @Operation(summary = "현장관리비 삭제", description = "하나 이상의 현장관리비 ID를 받아 해당 관리비를 삭제합니다.")
+    @Operation(summary = "현장관리비 삭제")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteSiteManagementCosts(
             @Valid @RequestBody final SiteManagementCostDeleteRequest request) {
@@ -110,7 +110,7 @@ public class SiteManagementCostController extends BaseController {
     }
 
     @GetMapping("/download")
-    @Operation(summary = "현장관리비 목록 엑셀 다운로드", description = "검색 조건에 맞는 현장관리비 목록을 엑셀 파일로 다운로드합니다.")
+    @Operation(summary = "현장관리비 목록 엑셀 다운로드")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadSiteManagementCostsExcel(
             @AuthenticationPrincipal final CustomUserDetails user,
@@ -132,7 +132,7 @@ public class SiteManagementCostController extends BaseController {
     }
 
     @GetMapping("/{id}/change-histories")
-    @Operation(summary = "현장관리비 변경 이력 조회", description = "현장관리비 변경 이력을 페이징하여 조회합니다.")
+    @Operation(summary = "현장관리비 변경 이력 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_SITE_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<SiteManagementCostChangeHistoryResponse>>> getSiteManagementCostChangeHistories(
             @PathVariable final Long id,
