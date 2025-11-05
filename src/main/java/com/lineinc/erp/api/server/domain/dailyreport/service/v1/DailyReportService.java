@@ -184,8 +184,6 @@ public class DailyReportService {
 
         // 직원 출역 정보 추가
         if (request.employees() != null) {
-            // 중복 laborId 체크
-            validateEmployeeDuplicates(request.employees());
 
             for (final DailyReportEmployeeCreateRequest employeeRequest : request.employees()) {
                 final Labor labor = laborService.getLaborByIdOrThrow(employeeRequest.laborId());
