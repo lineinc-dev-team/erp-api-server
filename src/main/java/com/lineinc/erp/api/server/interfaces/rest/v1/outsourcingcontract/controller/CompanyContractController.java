@@ -110,7 +110,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "계약 구분 목록 조회", description = "외주업체 계약 구분 목록을 반환합니다.")
+    @Operation(summary = "계약 구분 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/types")
     public ResponseEntity<SuccessResponse<List<ContractTypeResponse>>> getContractTypes() {
@@ -121,7 +121,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "계약 유형 카테고리 목록 조회", description = "외주업체 계약 유형 카테고리 목록을 반환합니다.")
+    @Operation(summary = "계약 유형 카테고리 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/category-types")
     public ResponseEntity<SuccessResponse<List<ContractCategoryTypeResponse>>> getContractCategoryTypes() {
@@ -132,7 +132,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
-    @Operation(summary = "차량번호 키워드 검색", description = "차량번호로 간단한 검색을 수행합니다.")
+    @Operation(summary = "차량번호 키워드 검색")
     @GetMapping("/equipments/vehicle-numbers/search")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse.ContractEquipmentSimpleResponse>>> searchVehicleNumber(
             @Valid final PageRequest pageRequest,
@@ -146,7 +146,7 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 이름 키워드 검색", description = "외주업체 계약 이름(계약명)으로 간단한 검색을 수행합니다.")
+    @Operation(summary = "외주업체 계약 이름 키워드 검색")
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractListResponse.ContractSimpleResponse>>> searchContractByName(
             @Valid final SortRequest sortRequest,
@@ -163,7 +163,7 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 등록", description = "외주업체 계약 정보를 등록합니다")
+    @Operation(summary = "외주업체 계약 등록")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.CREATE)
     @PostMapping
     public ResponseEntity<Void> createOutsourcingCompanyContract(
@@ -173,7 +173,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "외주계약 목록 조회", description = "외주계약 목록을 조회합니다")
+    @Operation(summary = "외주계약 목록 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping
     public ResponseEntity<SuccessResponse<PagingResponse<ContractListResponse>>> getContractList(
@@ -192,7 +192,7 @@ public class CompanyContractController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 상세조회", description = "외주업체 계약 ID로 상세 정보를 조회합니다")
+    @Operation(summary = "외주업체 계약 상세조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/{id}")
     public ResponseEntity<SuccessResponse<ContractDetailResponse>> getContractDetail(
@@ -201,7 +201,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "외주업체 계약 수정", description = "외주업체 계약 정보를 수정합니다")
+    @Operation(summary = "외주업체 계약 수정")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.UPDATE)
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateOutsourcingCompanyContract(
@@ -212,7 +212,7 @@ public class CompanyContractController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "외주업체 계약 인력 정보 조회", description = "해당 계약의 인력 정보를 조회합니다")
+    @Operation(summary = "외주업체 계약 인력 정보 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/{id}/workers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractWorkerResponse>>> getContractWorkers(
@@ -225,7 +225,7 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 장비 정보 조회", description = "해당 계약의 장비 정보를 조회합니다")
+    @Operation(summary = "외주업체 계약 장비 정보 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/{id}/equipments")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractEquipmentResponse>>> getContractEquipments(
@@ -238,7 +238,7 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 기사(운전자) 정보 조회", description = "해당 계약의 기사(운전자) 정보를 조회합니다")
+    @Operation(summary = "외주업체 계약 기사(운전자) 정보 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/{id}/drivers")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractDriverResponse>>> getContractDrivers(
@@ -251,7 +251,7 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 공사항목 정보 조회", description = "해당 계약의 공사항목 정보를 조회합니다")
+    @Operation(summary = "외주업체 계약 공사항목 정보 조회")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/{id}/constructions")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractConstructionResponse>>> getContractConstructions(
@@ -264,7 +264,7 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 공사항목 정보 조회 V2", description = "해당 계약의 공사항목 그룹 정보를 조회합니다 (V2)")
+    @Operation(summary = "외주업체 계약 공사항목 정보 조회 V2")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     @GetMapping("/{id}/constructions-v2")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractConstructionGroupResponse>>> getContractConstructionGroups(
@@ -278,7 +278,7 @@ public class CompanyContractController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "외주업체 계약 변경 이력 조회", description = "특정 계약의 변경 히스토리를 조회합니다.")
+    @Operation(summary = "외주업체 계약 변경 이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<ContractChangeHistoryResponse>>> getContractChangeHistories(
@@ -298,7 +298,7 @@ public class CompanyContractController extends BaseController {
                                 .toList())));
     }
 
-    @Operation(summary = "외주업체 계약 엑셀 다운로드", description = "검색 조건에 맞는 외주업체 계약 목록을 엑셀 파일로 다운로드합니다.")
+    @Operation(summary = "외주업체 계약 엑셀 다운로드")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.EXCEL_DOWNLOAD)
     @GetMapping("/download")
     public void downloadContractsExcel(
@@ -319,7 +319,7 @@ public class CompanyContractController extends BaseController {
         }
     }
 
-    @Operation(summary = "외주업체 계약 삭제", description = "하나 이상의 외주업체 계약 ID를 받아 해당 계약을 삭제합니다")
+    @Operation(summary = "외주업체 계약 삭제")
     @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY_CONTRACT, action = PermissionAction.DELETE)
     @DeleteMapping
     public ResponseEntity<Void> deleteOutsourcingCompanyContracts(
