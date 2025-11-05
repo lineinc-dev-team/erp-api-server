@@ -63,12 +63,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/daily-reports")
 @RequiredArgsConstructor
-@Tag(name = "출역일보", description = "출역일보 관련 API")
+@Tag(name = "출역일보")
 public class DailyReportController extends BaseController {
 
     private final DailyReportService dailyReportService;
 
-    @Operation(summary = "출역일보 목록 조회", description = "출역일보 목록을 조회합니다. 모든 필터는 선택사항입니다.")
+    @Operation(summary = "출역일보 목록 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<DailyReportListResponse>>> searchDailyReports(
@@ -86,7 +86,7 @@ public class DailyReportController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "출역일보 등록", description = "새로운 출역일보를 등록합니다.")
+    @Operation(summary = "출역일보 등록")
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createDailyReport(
@@ -96,7 +96,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 수정", description = "출역일보 기본 정보를 수정합니다. (현재: 날씨 데이터)")
+    @Operation(summary = "출역일보 수정")
     @PatchMapping
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReport(
@@ -106,7 +106,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 상세 조회", description = "출역일보의 모든 정보를 통합 조회합니다.")
+    @Operation(summary = "출역일보 상세 조회")
     @GetMapping("/detail")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<DailyReportDetailResponse>> getDailyReportDetail(
@@ -115,7 +115,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
-    @Operation(summary = "출역일보 직원정보 조회", description = "출역일보 직원정보를 조회합니다.")
+    @Operation(summary = "출역일보 직원정보 조회")
     @GetMapping("/employees")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportEmployeeResponse>>> searchDailyReportEmployees(
@@ -131,7 +131,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 직원정보 수정", description = "출역일보 직원정보를 수정합니다.")
+    @Operation(summary = "출역일보 직원정보 수정")
     @PatchMapping("/employees")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportEmployee(
@@ -142,7 +142,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 직영/용역 수정", description = "출역일보 직영/용역 정보를 수정합니다.")
+    @Operation(summary = "출역일보 직영/용역 수정")
     @PatchMapping("/direct-contracts")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportDirectContract(
@@ -153,7 +153,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 직영/용역 외주 수정", description = "출역일보 직영/용역 외주 정보를 수정합니다.")
+    @Operation(summary = "출역일보 직영/용역 외주 수정")
     @PatchMapping("/direct-contract-outsourcings")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportDirectContractOutsourcing(
@@ -163,7 +163,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 장비 수정", description = "출역일보 장비 정보를 수정합니다.")
+    @Operation(summary = "출역일보 장비 수정")
     @PatchMapping("/equipments")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportEquipment(
@@ -173,7 +173,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 파일 수정", description = "출역일보 파일 정보를 수정합니다.")
+    @Operation(summary = "출역일보 파일 수정")
     @PatchMapping("/files")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportFile(
@@ -183,7 +183,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 직영/용역 조회", description = "출역일보 직영/용역 정보를 조회합니다.")
+    @Operation(summary = "출역일보 직영/용역 조회")
     @GetMapping("/direct-contracts")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractResponse>>> searchDailyReportDirectContracts(
@@ -199,7 +199,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 직영/용역 외주 조회", description = "출역일보 직영/용역 외주 정보를 조회합니다.")
+    @Operation(summary = "출역일보 직영/용역 외주 조회")
     @GetMapping("/direct-contract-outsourcings")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractOutsourcingResponse>>> searchDailyReportDirectContractOutsourcings(
@@ -216,7 +216,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 외주(공사) 조회", description = "출역일보 외주(공사) 정보를 3depth 구조로 조회합니다.")
+    @Operation(summary = "출역일보 외주(공사) 조회")
     @GetMapping("/outsourcing-constructions")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportOutsourcingCompanyResponse>>> searchDailyReportOutsourcingConstructions(
@@ -232,7 +232,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 외주(공사) 수정", description = "출역일보 외주(공사) 정보를 수정합니다.")
+    @Operation(summary = "출역일보 외주(공사) 수정")
     @PatchMapping("/outsourcing-constructions")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportOutsourcingConstruction(
@@ -242,7 +242,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 유류 조회", description = "출역일보 유류 정보를 조회합니다.")
+    @Operation(summary = "출역일보 유류 조회")
     @GetMapping("/fuels")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportFuelResponse>>> searchDailyReportFuels(
@@ -258,7 +258,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 장비 조회", description = "출역일보 장비 정보를 조회합니다.")
+    @Operation(summary = "출역일보 장비 조회")
     @GetMapping("/equipments")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportEquipmentResponse>>> searchDailyReportEquipments(
@@ -274,7 +274,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 파일 조회", description = "출역일보 파일 정보를 조회합니다.")
+    @Operation(summary = "출역일보 파일 조회")
     @GetMapping("/files")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportFileResponse>>> searchDailyReportFiles(
@@ -290,7 +290,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 증빙 파일 조회", description = "출역일보 증빙 파일 정보를 조회합니다.")
+    @Operation(summary = "출역일보 증빙 파일 조회")
     @GetMapping("/evidence-files")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportEvidenceFileResponse>>> searchDailyReportEvidenceFiles(
@@ -308,7 +308,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 마감", description = "출역일보를 마감 처리합니다.")
+    @Operation(summary = "출역일보 마감")
     @PatchMapping("/complete")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.APPROVE)
     public ResponseEntity<Void> completeDailyReport(@Valid final DailyReportSearchRequest searchRequest) {
@@ -316,7 +316,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 작업 수정", description = "출역일보 작업 정보를 수정합니다.")
+    @Operation(summary = "출역일보 작업 수정")
     @PatchMapping("/works")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportWork(
@@ -326,7 +326,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 주요공정 수정", description = "출역일보 주요공정 정보를 수정합니다.")
+    @Operation(summary = "출역일보 주요공정 수정")
     @PatchMapping("/main-processes")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportMainProcess(
@@ -336,7 +336,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 투입현황 수정", description = "출역일보 투입현황 정보를 수정합니다.")
+    @Operation(summary = "출역일보 투입현황 수정")
     @PatchMapping("/input-statuses")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportInputStatus(
@@ -346,7 +346,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 자재현황 수정", description = "출역일보 자재현황 정보를 수정합니다.")
+    @Operation(summary = "출역일보 자재현황 수정")
     @PatchMapping("/material-statuses")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportMaterialStatus(
@@ -356,7 +356,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 작업 조회", description = "출역일보 작업 정보를 조회합니다.")
+    @Operation(summary = "출역일보 작업 조회")
     @GetMapping("/works")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportWorkResponse>>> searchDailyReportWorks(
@@ -372,7 +372,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 주요공정 조회", description = "출역일보 주요공정 정보를 조회합니다.")
+    @Operation(summary = "출역일보 주요공정 조회")
     @GetMapping("/main-processes")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportMainProcessResponse>>> searchDailyReportMainProcesses(
@@ -388,7 +388,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 투입현황 조회", description = "출역일보 투입현황 정보를 조회합니다.")
+    @Operation(summary = "출역일보 투입현황 조회")
     @GetMapping("/input-statuses")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportInputStatusResponse>>> searchDailyReportInputStatuses(
@@ -404,7 +404,7 @@ public class DailyReportController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "출역일보 자재현황 조회", description = "출역일보 자재현황 정보를 조회합니다.")
+    @Operation(summary = "출역일보 자재현황 조회")
     @GetMapping("/material-statuses")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportMaterialStatusResponse>>> searchDailyReportMaterialStatuses(
