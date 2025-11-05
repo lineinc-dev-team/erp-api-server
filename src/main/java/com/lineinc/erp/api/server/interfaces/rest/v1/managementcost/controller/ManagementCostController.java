@@ -58,12 +58,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/management-costs")
 @RequiredArgsConstructor
-@Tag(name = "관리비 관리", description = "관리비 관련 API")
+@Tag(name = "관리비 관리")
 public class ManagementCostController extends BaseController {
 
     private final ManagementCostService managementCostService;
 
-    @Operation(summary = "관리비 등록", description = "관리비 정보를 등록합니다")
+    @Operation(summary = "관리비 등록")
     @PostMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.CREATE)
     public ResponseEntity<Void> createManagementCost(
@@ -73,7 +73,7 @@ public class ManagementCostController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "관리비 항목 구분 조회", description = "사용 가능한 관리비 항목 구분 목록을 조회합니다.")
+    @Operation(summary = "관리비 항목 구분 조회")
     @GetMapping("/item-types")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<ItemTypeResponse>>> getItemTypes() {
@@ -84,7 +84,7 @@ public class ManagementCostController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(itemTypes));
     }
 
-    @Operation(summary = "관리비 ETC 항목 설명 키워드 검색", description = "itemType이 ETC인 모든 관리비의 항목 설명을 키워드로 검색합니다.")
+    @Operation(summary = "관리비 ETC 항목 설명 키워드 검색")
     @GetMapping("/etc-item-type-descriptions/search")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<ItemDescriptionResponse>>> searchEtcItemDescriptions(
@@ -97,7 +97,7 @@ public class ManagementCostController extends BaseController {
                 new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
-    @Operation(summary = "관리비 삭제", description = "하나 이상의 관리비 ID를 받아 해당 데이터를 삭제합니다.")
+    @Operation(summary = "관리비 삭제")
     @DeleteMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.DELETE)
     public ResponseEntity<Void> deleteManagementCosts(
@@ -106,7 +106,7 @@ public class ManagementCostController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "관리비 목록 조회", description = "필터 조건에 맞는 관리비 목록을 조회합니다")
+    @Operation(summary = "관리비 목록 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<ManagementCostResponse>>> getManagementCosts(
@@ -125,7 +125,7 @@ public class ManagementCostController extends BaseController {
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
-    @Operation(summary = "관리비 상세 조회", description = "관리비 상세 정보를 조회합니다")
+    @Operation(summary = "관리비 상세 조회")
     @GetMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<ManagementCostDetailViewResponse>> getManagementCostDetail(
@@ -136,7 +136,7 @@ public class ManagementCostController extends BaseController {
                 SuccessResponse.of(response));
     }
 
-    @Operation(summary = "관리비 목록 엑셀 다운로드", description = "검색 조건에 맞는 관리비 목록을 엑셀 파일로 다운로드합니다.")
+    @Operation(summary = "관리비 목록 엑셀 다운로드")
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadSitesExcel(
@@ -159,7 +159,7 @@ public class ManagementCostController extends BaseController {
         }
     }
 
-    @Operation(summary = "관리비 정보 수정", description = "관리비 정보를 수정합니다")
+    @Operation(summary = "관리비 정보 수정")
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateManagementCost(
@@ -170,7 +170,7 @@ public class ManagementCostController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "관리비 수정이력 조회", description = "관리비의 수정이력을 조회합니다")
+    @Operation(summary = "관리비 수정이력 조회")
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_MANAGEMENT_COST, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<ManagementCostChangeHistoryResponse>>> getManagementCostChangeHistories(
