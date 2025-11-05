@@ -6,7 +6,7 @@ import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.request.DailyReportDirectContractOutsourcingContractUpdateRequest.DirectContractOutsourcingContractUpdateInfo;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -66,7 +66,7 @@ public class DailyReportDirectContractOutsourcingContract extends BaseEntity {
     /**
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
-    public void updateFrom(final DirectContractOutsourcingUpdateInfo request,
+    public void updateFrom(final DirectContractOutsourcingContractUpdateInfo request,
             final OutsourcingCompanyContract outsourcingCompanyContract,
             final OutsourcingCompany outsourcingCompany,
             final Labor labor) {

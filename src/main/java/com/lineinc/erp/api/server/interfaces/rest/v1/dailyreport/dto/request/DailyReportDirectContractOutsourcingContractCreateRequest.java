@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 @Schema(description = "직영/용역 외주업체계약 출역일보 등록 요청")
-public record DailyReportDirectContractOutsourcingCreateRequest(
+public record DailyReportDirectContractOutsourcingContractCreateRequest(
         @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
         @Schema(description = "외주업체 계약 ID", example = "1") @NotNull Long outsourcingCompanyContractId,
         @Schema(description = "노무인력 ID", example = "1") @NotNull Long laborId,
