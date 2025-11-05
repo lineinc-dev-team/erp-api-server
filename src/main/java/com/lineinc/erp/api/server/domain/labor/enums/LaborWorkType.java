@@ -7,12 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum LaborWorkType {
     ETC("기타", 0),
-    FOREMAN("반장", 1),
-    CARPENTER("목수", 2),
-    REBAR("철근", 3),
-    SCAFFOLDING("가시설공", 4),
-    WELDER("용접공", 5),
-    BLASTING("발파", 6);
+    OUTSOURCING("용역", 1),
+    GAS_WELDER("가스용접공", 2),
+    SCAFFOLDING("가시설공", 3);
 
     private final String label;
     private final int order;
