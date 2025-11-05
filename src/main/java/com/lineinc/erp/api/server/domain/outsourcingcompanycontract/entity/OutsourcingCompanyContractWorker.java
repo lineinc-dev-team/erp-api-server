@@ -8,6 +8,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractWorkerUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 
 import jakarta.persistence.CascadeType;
@@ -41,14 +42,15 @@ import lombok.experimental.SuperBuilder;
 })
 public class OutsourcingCompanyContractWorker extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_worker_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_worker_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_worker_seq", sequenceName = "outsourcing_company_contract_worker_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID, nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
     @DiffInclude
@@ -70,7 +72,7 @@ public class OutsourcingCompanyContractWorker extends BaseEntity {
     // 인력 서류 목록
     @DiffInclude
     @Setter
-    @OneToMany(mappedBy = "worker", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_WORKER_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractWorkerFile> files = new ArrayList<>();
 
@@ -78,18 +80,10 @@ public class OutsourcingCompanyContractWorker extends BaseEntity {
      * DTO의 정보로 엔티티를 업데이트합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractWorkerUpdateRequest request) {
-        if (request.name() != null) {
-            this.name = request.name();
-        }
-        if (request.category() != null) {
-            this.category = request.category();
-        }
-        if (request.taskDescription() != null) {
-            this.taskDescription = request.taskDescription();
-        }
-        if (request.memo() != null) {
-            this.memo = request.memo();
-        }
+        this.name = request.name();
+        this.category = request.category();
+        this.taskDescription = request.taskDescription();
+        this.memo = request.memo();
 
         // 파일 정보 동기화
         if (request.files() != null) {
