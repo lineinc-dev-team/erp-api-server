@@ -103,37 +103,39 @@ public class SteelManagementV2Service {
         steelManagementV2 = steelManagementV2Repository.save(steelManagementV2);
 
         // 상세 항목 생성
-        for (final SteelManagementDetailV2CreateRequest detailRequest : request.details()) {
-            // 외주업체 설정 (선택적)
-            OutsourcingCompany outsourcingCompany = null;
-            if (detailRequest.outsourcingCompanyId() != null) {
-                outsourcingCompany = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(detailRequest.outsourcingCompanyId());
+        if (request.details() != null) {
+            for (final SteelManagementDetailV2CreateRequest detailRequest : request.details()) {
+                // 외주업체 설정 (선택적)
+                OutsourcingCompany outsourcingCompany = null;
+                if (detailRequest.outsourcingCompanyId() != null) {
+                    outsourcingCompany = outsourcingCompanyService
+                            .getOutsourcingCompanyByIdOrThrow(detailRequest.outsourcingCompanyId());
+                }
+
+                final SteelManagementDetailV2 detail = SteelManagementDetailV2.builder()
+                        .steelManagementV2(steelManagementV2)
+                        .outsourcingCompany(outsourcingCompany)
+                        .type(detailRequest.type())
+                        .name(detailRequest.name())
+                        .specification(detailRequest.specification())
+                        .weight(detailRequest.weight())
+                        .count(detailRequest.count())
+                        .totalWeight(detailRequest.totalWeight())
+                        .unitPrice(detailRequest.unitPrice())
+                        .amount(detailRequest.amount())
+                        .vat(detailRequest.vat())
+                        .total(detailRequest.total())
+                        .category(detailRequest.category())
+                        .fileUrl(detailRequest.fileUrl())
+                        .originalFileName(detailRequest.originalFileName())
+                        .incomingDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.incomingDate()))
+                        .outgoingDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.outgoingDate()))
+                        .salesDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.salesDate()))
+                        .memo(detailRequest.memo())
+                        .build();
+
+                steelManagementV2.getDetails().add(detail);
             }
-
-            final SteelManagementDetailV2 detail = SteelManagementDetailV2.builder()
-                    .steelManagementV2(steelManagementV2)
-                    .outsourcingCompany(outsourcingCompany)
-                    .type(detailRequest.type())
-                    .name(detailRequest.name())
-                    .specification(detailRequest.specification())
-                    .weight(detailRequest.weight())
-                    .count(detailRequest.count())
-                    .totalWeight(detailRequest.totalWeight())
-                    .unitPrice(detailRequest.unitPrice())
-                    .amount(detailRequest.amount())
-                    .vat(detailRequest.vat())
-                    .total(detailRequest.total())
-                    .category(detailRequest.category())
-                    .fileUrl(detailRequest.fileUrl())
-                    .originalFileName(detailRequest.originalFileName())
-                    .incomingDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.incomingDate()))
-                    .outgoingDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.outgoingDate()))
-                    .salesDate(DateTimeFormatUtils.toOffsetDateTime(detailRequest.salesDate()))
-                    .memo(detailRequest.memo())
-                    .build();
-
-            steelManagementV2.getDetails().add(detail);
         }
 
         steelManagementV2 = steelManagementV2Repository.save(steelManagementV2);
