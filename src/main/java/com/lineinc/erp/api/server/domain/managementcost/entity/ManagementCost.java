@@ -13,6 +13,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import jakarta.persistence.CascadeType;
@@ -48,24 +49,25 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class ManagementCost extends BaseEntity {
+    private static final String SEQUENCE_NAME = "management_cost_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_seq")
-    @SequenceGenerator(name = "management_cost_seq", sequenceName = "management_cost_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
+    @JoinColumn(name = AppConstants.SITE_ID)
     @DiffIgnore
     private Site site;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id")
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID)
     @DiffIgnore
     private SiteProcess siteProcess;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     @DiffIgnore
     private OutsourcingCompany outsourcingCompany;
 
@@ -93,22 +95,22 @@ public class ManagementCost extends BaseEntity {
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "managementCost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = AppConstants.MANAGEMENT_COST_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagementCostFile> files = new ArrayList<>();
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "managementCost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = AppConstants.MANAGEMENT_COST_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagementCostDetail> details = new ArrayList<>();
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "managementCost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = AppConstants.MANAGEMENT_COST_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagementCostKeyMoneyDetail> keyMoneyDetails = new ArrayList<>();
 
     @DiffIgnore
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "managementCost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = AppConstants.MANAGEMENT_COST_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagementCostMealFeeDetail> mealFeeDetails = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
@@ -140,17 +142,9 @@ public class ManagementCost extends BaseEntity {
         this.site = site;
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
-
-        if (request.itemTypeDescription() != null) {
-            this.itemTypeDescription = request.itemTypeDescription();
-        }
-        if (request.paymentDate() != null) {
-            this.paymentDate = DateTimeFormatUtils.toOffsetDateTime(request.paymentDate());
-        }
-        if (request.memo() != null) {
-            this.memo = request.memo();
-        }
-
+        this.itemTypeDescription = request.itemTypeDescription();
+        this.paymentDate = DateTimeFormatUtils.toOffsetDateTime(request.paymentDate());
+        this.memo = request.memo();
         syncTransientFields();
     }
 

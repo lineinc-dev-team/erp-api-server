@@ -224,17 +224,23 @@ public final class AppConstants {
     public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_MAPPED_BY = "equipment";
     public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_MAPPED_BY = "worker";
     public static final String OUTSOURCING_COMPANY_MAPPED_BY = "outsourcingCompany";
+    public static final String MENU_MAPPED_BY = "menu";
+    public static final String MATERIAL_MANAGEMENT_MAPPED_BY = "materialManagement";
+    public static final String MANAGEMENT_COST_MAPPED_BY = "managementCost";
+
+    // ==================== JPA 엔티티 정렬 순서 컬럼명 ====================
+    /**
+     * 정렬 순서 컬럼명
+     */
     public static final String DEPARTMENT_ORDER = "department_order";
     public static final String GRADE_ORDER = "grade_order";
     public static final String POSITION_ORDER = "position_order";
     public static final String MENU_ORDER = "menu_order";
-    public static final String MENU_MAPPED_BY = "menu";
-    public static final String MATERIAL_MANAGEMENT_MAPPED_BY = "materialManagement";
+    public static final String PERMISSION_ORDER = "permission_order";
 
     // ==================== 기타 상수 ====================
     /**
      * 빈 값
      */
     public static final String EMPTY_VALUE = "";
-    public static final String PERMISSION_ORDER = "permission_order";
 }
