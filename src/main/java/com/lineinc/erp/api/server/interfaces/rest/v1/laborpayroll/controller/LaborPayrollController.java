@@ -49,7 +49,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * 노무명세서 관리 API Controller
  */
-@Tag(name = "노무명세서 관리", description = "노무명세서 조회 관련 API")
+@Tag(name = "노무명세서 관리")
 @RestController
 @RequestMapping("/api/v1/labor-payrolls")
 @RequiredArgsConstructor
@@ -61,7 +61,7 @@ public class LaborPayrollController extends BaseController {
      * 노무명세서 목록 조회
      * 현장별, 공정별, 월별로 그룹핑된 노무비 통계 정보 조회
      */
-    @Operation(summary = "노무명세서 목록 조회", description = "월별로 그룹핑된 노무명세서 목록을 조회합니다.")
+    @Operation(summary = "노무명세서 목록 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollSummaryResponse>>> getLaborPayrollMonthlyList(
@@ -79,7 +79,7 @@ public class LaborPayrollController extends BaseController {
      * 노무명세서 엑셀 다운로드
      * 검색 조건에 맞는 노무명세서 목록을 엑셀 파일로 다운로드
      */
-    @Operation(summary = "노무명세서 엑셀 다운로드", description = "검색 조건에 맞는 노무명세서 목록을 엑셀 파일로 다운로드합니다.")
+    @Operation(summary = "노무명세서 엑셀 다운로드")
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadLaborPayrollExcel(
@@ -105,7 +105,7 @@ public class LaborPayrollController extends BaseController {
      * 노무명세서 상세 조회
      * 현장, 공정, 년월, 노무인력 타입, 일자로 필터링하여 조회
      */
-    @Operation(summary = "노무명세서 상세 조회", description = "현장, 공정, 년월, 노무인력 타입, 일자로 필터링하여 노무명세서 상세 정보를 조회합니다.")
+    @Operation(summary = "노무명세서 상세 조회")
     @GetMapping("/details")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborPayrollDetailResponse>>> getLaborPayrollDetails(
@@ -118,7 +118,7 @@ public class LaborPayrollController extends BaseController {
     /**
      * 노무명세서 집계 상세 조회
      */
-    @Operation(summary = "노무명세서 집계 상세 조회", description = "노무명세서 집계 데이터를 조회합니다.")
+    @Operation(summary = "노무명세서 집계 상세 조회")
     @GetMapping("/summary/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<LaborPayrollSummaryResponse>> getLaborPayrollSummaryDetail(
@@ -130,7 +130,7 @@ public class LaborPayrollController extends BaseController {
     /**
      * 노무명세서 집계 테이블 수정
      */
-    @Operation(summary = "노무명세서 집계 테이블 수정", description = "노무명세서 집계 테이블을 수정합니다.")
+    @Operation(summary = "노무명세서 집계 테이블 수정")
     @PatchMapping("/summary/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrollSummary(
@@ -144,7 +144,7 @@ public class LaborPayrollController extends BaseController {
     /**
      * 노무명세서 수정
      */
-    @Operation(summary = "노무명세서 수정", description = "노무명세서들을 수정합니다.")
+    @Operation(summary = "노무명세서 수정")
     @PatchMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrolls(
@@ -157,7 +157,7 @@ public class LaborPayrollController extends BaseController {
     /**
      * 노무명세서 변경이력 조회
      */
-    @Operation(summary = "노무명세서 변경이력 조회", description = "특정 노무명세서 집계와 관련된 변경이력을 조회합니다.")
+    @Operation(summary = "노무명세서 변경이력 조회")
     @GetMapping("/summary/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<LaborPayrollChangeHistoryResponse>>> getLaborPayrollChangeHistories(
@@ -178,7 +178,7 @@ public class LaborPayrollController extends BaseController {
     /**
      * 노무명세서 변경이력 수정
      */
-    @Operation(summary = "노무명세서 변경이력 수정", description = "특정 변경이력의 메모를 수정합니다.")
+    @Operation(summary = "노무명세서 변경이력 수정")
     @PatchMapping("/change-histories/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_PAYROLL, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateLaborPayrollChangeHistory(
