@@ -223,6 +223,9 @@ public final class AppConstants {
     public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_MAPPED_BY = "equipment";
     public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_MAPPED_BY = "worker";
     public static final String OUTSOURCING_COMPANY_MAPPED_BY = "outsourcingCompany";
+    public static final String DEPARTMENT_ORDER = "department_order";
+    public static final String GRADE_ORDER = "grade_order";
+    public static final String POSITION_ORDER = "position_order";
 
     // ==================== 기타 상수 ====================
     /**

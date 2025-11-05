@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.domain.organization.entity;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,15 +24,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class Department extends BaseEntity {
+    private static final String SEQUENCE_NAME = "department_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "department_seq")
-    @SequenceGenerator(name = "department_seq", sequenceName = "department_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @Column(nullable = false)
     private String name; // 예: "경영지원팀", "개발팀", "영업팀"
 
-    @Column(name = "department_order")
+    @Column(name = AppConstants.DEPARTMENT_ORDER)
     private Integer order;
 }
