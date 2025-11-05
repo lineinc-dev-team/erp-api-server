@@ -1,13 +1,12 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,16 +31,17 @@ import lombok.experimental.SuperBuilder;
 @SQLRestriction("deleted = false")
 public class ManagementCostFile extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "management_cost_file_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_file_seq")
-    @SequenceGenerator(name = "management_cost_file_seq", sequenceName = "management_cost_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
      * 이 파일이 연결된 관리비 엔티티
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "management_cost_id", nullable = false)
+    @JoinColumn(name = AppConstants.MANAGEMENT_COST_ID, nullable = false)
     @DiffIgnore
     private ManagementCost managementCost;
 
@@ -74,9 +74,9 @@ public class ManagementCostFile extends BaseEntity {
     private String memo;
 
     public void updateFrom(final ManagementCostFileUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.fileUrl()).ifPresent(val -> this.fileUrl = val);
-        Optional.ofNullable(request.originalFileName()).ifPresent(val -> this.originalFileName = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.name = request.name();
+        this.fileUrl = request.fileUrl();
+        this.originalFileName = request.originalFileName();
+        this.memo = request.memo();
     }
 }

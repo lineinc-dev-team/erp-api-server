@@ -1,13 +1,12 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostDetailUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,14 +37,15 @@ import lombok.experimental.SuperBuilder;
 @SQLRestriction("deleted = false")
 public class ManagementCostDetail extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "management_cost_detail_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_detail_seq")
-    @SequenceGenerator(name = "management_cost_detail_seq", sequenceName = "management_cost_detail_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "management_cost_id", nullable = false)
+    @JoinColumn(name = AppConstants.MANAGEMENT_COST_ID, nullable = false)
     private ManagementCost managementCost;
 
     /**
@@ -103,14 +103,14 @@ public class ManagementCostDetail extends BaseEntity {
     private String memo;
 
     public void updateFrom(final ManagementCostDetailUpdateRequest request) {
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.quantity()).ifPresent(val -> this.quantity = val);
-        Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
-        Optional.ofNullable(request.supplyPrice()).ifPresent(val -> this.supplyPrice = val);
-        Optional.ofNullable(request.vat()).ifPresent(val -> this.vat = val);
-        Optional.ofNullable(request.total()).ifPresent(val -> this.total = val);
-        Optional.ofNullable(request.isDeductible()).ifPresent(val -> this.isDeductible = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.name = request.name();
+        this.quantity = request.quantity();
+        this.unitPrice = request.unitPrice();
+        this.supplyPrice = request.supplyPrice();
+        this.vat = request.vat();
+        this.total = request.total();
+        this.isDeductible = request.isDeductible();
+        this.memo = request.memo();
     }
 
     /**

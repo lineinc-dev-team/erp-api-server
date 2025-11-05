@@ -1,13 +1,12 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,14 +32,15 @@ import lombok.experimental.SuperBuilder;
 @SQLRestriction("deleted = false")
 public class ManagementCostKeyMoneyDetail extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "management_cost_key_money_detail_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_key_money_detail_seq")
-    @SequenceGenerator(name = "management_cost_key_money_detail_seq", sequenceName = "management_cost_key_money_detail_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "management_cost_id", nullable = false)
+    @JoinColumn(name = AppConstants.MANAGEMENT_COST_ID, nullable = false)
     private ManagementCost managementCost;
 
     /**
@@ -87,11 +87,11 @@ public class ManagementCostKeyMoneyDetail extends BaseEntity {
     private String memo;
 
     public void updateFrom(final ManagementCostKeyMoneyDetailUpdateRequest request) {
-        Optional.ofNullable(request.account()).ifPresent(val -> this.account = val);
-        Optional.ofNullable(request.purpose()).ifPresent(val -> this.purpose = val);
-        Optional.ofNullable(request.personnelCount()).ifPresent(val -> this.personnelCount = val);
-        Optional.ofNullable(request.amount()).ifPresent(val -> this.amount = val);
-        Optional.ofNullable(request.isDeductible()).ifPresent(val -> this.isDeductible = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.account = request.account();
+        this.purpose = request.purpose();
+        this.personnelCount = request.personnelCount();
+        this.amount = request.amount();
+        this.isDeductible = request.isDeductible();
+        this.memo = request.memo();
     }
 }

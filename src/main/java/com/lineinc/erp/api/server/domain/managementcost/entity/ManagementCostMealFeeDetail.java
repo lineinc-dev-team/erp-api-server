@@ -1,7 +1,5 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
-import java.util.Optional;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
@@ -9,6 +7,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,13 +33,15 @@ import lombok.experimental.SuperBuilder;
 @SQLRestriction("deleted = false")
 public class ManagementCostMealFeeDetail extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "management_cost_meal_fee_detail_seq";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_meal_fee_detail_seq")
-    @SequenceGenerator(name = "management_cost_meal_fee_detail_seq", sequenceName = "management_cost_meal_fee_detail_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "management_cost_id", nullable = false)
+    @JoinColumn(name = AppConstants.MANAGEMENT_COST_ID, nullable = false)
     @DiffIgnore
     private ManagementCost managementCost;
 
@@ -55,7 +56,7 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
      * 인력 테이블과 연결
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id")
+    @JoinColumn(name = AppConstants.LABOR_ID)
     @DiffIgnore
     private Labor labor;
 
@@ -116,23 +117,21 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
         this.laborName = this.labor != null ? this.labor.getName() : null;
     }
 
-    public void updateFrom(ManagementCostMealFeeDetailUpdateRequest request) {
+    public void updateFrom(final ManagementCostMealFeeDetailUpdateRequest request) {
         this.laborId = request.laborId();
-
-        // 직접 업데이트 가능한 필드들
-        Optional.ofNullable(request.workType()).ifPresent(val -> this.workType = val);
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.breakfastCount()).ifPresent(val -> this.breakfastCount = val);
-        Optional.ofNullable(request.lunchCount()).ifPresent(val -> this.lunchCount = val);
-        Optional.ofNullable(request.unitPrice()).ifPresent(val -> this.unitPrice = val);
-        Optional.ofNullable(request.amount()).ifPresent(val -> this.amount = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
+        this.workType = request.workType();
+        this.name = request.name();
+        this.breakfastCount = request.breakfastCount();
+        this.lunchCount = request.lunchCount();
+        this.unitPrice = request.unitPrice();
+        this.amount = request.amount();
+        this.memo = request.memo();
     }
 
     /**
      * 연관 엔티티를 설정하고 transient 필드를 동기화합니다.
      */
-    public void setEntities(Labor labor) {
+    public void setEntities(final Labor labor) {
         this.labor = labor;
         syncTransientFields();
     }

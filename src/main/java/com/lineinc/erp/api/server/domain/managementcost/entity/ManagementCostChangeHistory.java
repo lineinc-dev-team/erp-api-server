@@ -7,6 +7,7 @@ import org.hibernate.type.SqlTypes;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,17 +33,18 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @SQLRestriction("deleted = false")
 public class ManagementCostChangeHistory extends BaseEntity {
+    private static final String SEQUENCE_NAME = "management_cost_change_history_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "management_cost_change_history_seq")
-    @SequenceGenerator(name = "management_cost_change_history_seq", sequenceName = "management_cost_change_history_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
      * 관리비 참조
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "management_cost_id")
+    @JoinColumn(name = AppConstants.MANAGEMENT_COST_ID)
     private ManagementCost managementCost;
 
     /**
@@ -66,7 +68,7 @@ public class ManagementCostChangeHistory extends BaseEntity {
     private String memo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = AppConstants.USER_ID)
     private User user;
 
     /**

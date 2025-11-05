@@ -34,23 +34,24 @@ import lombok.experimental.SuperBuilder;
 public class ManagementCostMealFeeDetailOutsourcing extends BaseEntity {
 
     private static final String SEQUENCE_NAME = "management_cost_meal_fee_detail_outsourcing_seq";
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "management_cost_id", nullable = false)
+    @JoinColumn(name = AppConstants.MANAGEMENT_COST_ID, nullable = false)
     @DiffIgnore
     private ManagementCost managementCost;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     @DiffIgnore
     private OutsourcingCompany outsourcingCompany;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_id")
+    @JoinColumn(name = AppConstants.LABOR_ID)
     @DiffIgnore
     private Labor labor;
 

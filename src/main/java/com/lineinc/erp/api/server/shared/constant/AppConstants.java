@@ -202,6 +202,7 @@ public final class AppConstants {
     public static final String PERMISSION_ID = "permission_id";
     public static final String MENU_ID = "menu_id";
     public static final String MATERIAL_MANAGEMENT_ID = "material_management_id";
+    public static final String MANAGEMENT_COST_ID = "management_cost_id";
 
     // ==================== JPA 엔티티 매핑 속성명 ====================
     /**
