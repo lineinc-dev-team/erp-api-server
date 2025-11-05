@@ -1594,44 +1594,6 @@ public class DailyReportService {
     }
 
     /**
-     * 직원 출역 정보 중복 체크
-     */
-    private void validateEmployeeDuplicates(final List<? extends DailyReportEmployeeCreateRequest> employees) {
-        if (employees == null || employees.isEmpty()) {
-            return;
-        }
-
-        final Set<Long> laborIds = new HashSet<>();
-        for (final DailyReportEmployeeCreateRequest employeeRequest : employees) {
-            if (!laborIds.add(employeeRequest.laborId())) {
-                throw new IllegalArgumentException(ValidationMessages.DAILY_REPORT_EMPLOYEE_DUPLICATE_LABOR_ID);
-            }
-        }
-    }
-
-    /**
-     * 직영/용역 출역 정보 중복 체크
-     */
-    private void validateDirectContractDuplicates(
-            final List<? extends DailyReportDirectContractCreateRequest> directContracts) {
-        if (directContracts == null || directContracts.isEmpty()) {
-            return;
-        }
-
-        final Set<String> directContractKeys = new HashSet<>();
-        for (final DailyReportDirectContractCreateRequest directContractRequest : directContracts) {
-            if (!Boolean.TRUE.equals(directContractRequest.isTemporary()) &&
-                    directContractRequest.laborId() != null) {
-                final String key = directContractRequest.laborId() + "_" + directContractRequest.unitPrice();
-                if (!directContractKeys.add(key)) {
-                    throw new IllegalArgumentException(
-                            ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_DUPLICATE_LABOR_ID);
-                }
-            }
-        }
-    }
-
-    /**
      * 출역일보 외주(공사) 그룹 정보를 슬라이스로 조회합니다.
      * 
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
