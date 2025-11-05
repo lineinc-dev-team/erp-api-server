@@ -226,7 +226,8 @@ public final class AppConstants {
     public static final String DEPARTMENT_ORDER = "department_order";
     public static final String GRADE_ORDER = "grade_order";
     public static final String POSITION_ORDER = "position_order";
-
+    public static final String MENU_ORDER = "menu_order";
+    public static final String MENU_MAPPED_BY = "menu";
     // ==================== 기타 상수 ====================
     /**
      * 빈 값

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.permission.entity.Permission;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,17 +32,18 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class Menu extends BaseEntity {
+    private static final String SEQUENCE_NAME = "menu_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menu_seq")
-    @SequenceGenerator(name = "menu_seq", sequenceName = "menu_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @Column(nullable = false)
     private String name; // 예: "계약관리"
 
-    @Column(name = "menu_order")
+    @Column(name = AppConstants.MENU_ORDER)
     private Integer order; // 메뉴 순서
 
-    @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = AppConstants.MENU_MAPPED_BY, fetch = FetchType.LAZY)
     private List<Permission> permissions;
 }
