@@ -324,6 +324,7 @@ public class LaborService {
             case "hasIdCard" -> "신분증 사본";
             case "hasSignatureImage" -> "서명 이미지";
             case "hasFile" -> "기타첨부";
+            case "hasLaborContract" -> "근로계약서";
             default -> null;
         };
     }
@@ -377,6 +378,7 @@ public class LaborService {
             case "hasSignatureImage" ->
                 labor.hasSignatureImage() != null ? (labor.hasSignatureImage() ? "Y" : "N") : "";
             case "hasFile" -> labor.hasFile() != null ? (labor.hasFile() ? "Y" : "N") : "";
+            case "hasLaborContract" -> labor.hasLaborContract() != null ? (labor.hasLaborContract() ? "Y" : "N") : "";
             default -> "";
         };
     }
