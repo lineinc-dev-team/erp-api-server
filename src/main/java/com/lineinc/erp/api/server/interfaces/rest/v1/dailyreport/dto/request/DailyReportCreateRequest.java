@@ -18,7 +18,7 @@ public record DailyReportCreateRequest(
         @Schema(description = "휘발유 가격 (원)", example = "150000") Long gasolinePrice,
         @Schema(description = "경유 가격 (원)", example = "200000") Long dieselPrice,
         @Schema(description = "요소수 가격 (원)", example = "50000") Long ureaPrice,
-        @Schema(description = "유류업체 계약 ID", example = "1") Long outsourcingCompanyContractId,
+        @Schema(description = "유류업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "비고", example = "특별 지시사항") String memo,
         @Schema(description = "직원 출역 정보") @Valid List<DailyReportEmployeeCreateRequest> employees,
         @Schema(description = "직영/용역 출역 정보") @Valid List<DailyReportDirectContractCreateRequest> directContracts,

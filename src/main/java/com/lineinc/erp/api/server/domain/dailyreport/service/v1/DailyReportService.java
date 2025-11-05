@@ -348,7 +348,7 @@ public class DailyReportService {
                     request.siteProcessId(),
                     request.reportDate(),
                     request.weather(),
-                    request.outsourcingCompanyContractId(),
+                    request.outsourcingCompanyId(),
                     request.gasolinePrice(),
                     request.dieselPrice(),
                     request.ureaPrice(),
