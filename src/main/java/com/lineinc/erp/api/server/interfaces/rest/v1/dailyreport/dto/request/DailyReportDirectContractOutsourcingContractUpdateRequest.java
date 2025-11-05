@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Positive;
 @Schema(description = "출역일보 직영/용역 외주 수정 요청")
 public record DailyReportDirectContractOutsourcingContractUpdateRequest(
         @Schema(description = "수정할 직영/용역 외주 정보 목록") List<@Valid DirectContractOutsourcingContractUpdateInfo> directContractOutsourcingContracts) {
-            directContractOutsourcings
     @Schema(description = "직영/용역 외주 정보 수정 내용")
     public record DirectContractOutsourcingContractUpdateInfo(
             @Schema(description = "ID", example = "1") Long id,

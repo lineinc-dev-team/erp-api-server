@@ -30,6 +30,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @SQLRestriction("deleted = false")
+/**
+ * 직영/용역 외주 정보
+ */
 public class DailyReportDirectContractOutsourcingContract extends BaseEntity {
     private static final String SEQUENCE_NAME = "daily_report_direct_contract_outsourcing_contract_seq";
 
