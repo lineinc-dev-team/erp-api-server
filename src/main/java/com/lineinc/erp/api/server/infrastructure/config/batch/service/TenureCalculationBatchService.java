@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 import com.lineinc.erp.api.server.domain.laborpayroll.repository.LaborPayrollRepository;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 근속기간 계산 배치 서비스
  * 매월 2일에 실행되어 전월 노무비명세서 데이터를 기반으로 근속기간을 업데이트합니다.
+ * 직영, 용역 인력만 근속기간 계산 대상입니다.
  */
 @Slf4j
 @Service
@@ -60,8 +62,14 @@ public class TenureCalculationBatchService implements BatchService {
                 continue;
             }
 
-            final Long laborId = payroll.getLabor().getId();
             final Labor labor = payroll.getLabor();
+
+            // 직영, 용역만 근속기간 계산 대상
+            if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.OUTSOURCING) {
+                continue;
+            }
+
+            final Long laborId = labor.getId();
 
             // 인력 정보 저장
             laborMap.put(laborId, labor);
