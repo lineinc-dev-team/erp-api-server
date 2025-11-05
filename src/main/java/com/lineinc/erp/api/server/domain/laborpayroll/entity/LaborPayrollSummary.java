@@ -8,6 +8,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,22 +43,23 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class LaborPayrollSummary extends BaseEntity {
+    private static final String SEQUENCE_NAME = "labor_payroll_summary_seq";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "labor_payroll_summary_seq")
-    @SequenceGenerator(name = "labor_payroll_summary_seq", sequenceName = "labor_payroll_summary_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     // 현장 정보
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id", nullable = false)
+    @JoinColumn(name = AppConstants.SITE_ID, nullable = false)
     private Site site;
 
     // 공정 정보
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_process_id", nullable = false)
+    @JoinColumn(name = AppConstants.SITE_PROCESS_ID, nullable = false)
     private SiteProcess siteProcess;
 
     // 기본 정보

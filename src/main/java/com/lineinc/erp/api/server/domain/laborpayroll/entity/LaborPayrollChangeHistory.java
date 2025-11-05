@@ -6,6 +6,7 @@ import org.hibernate.type.SqlTypes;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.laborpayroll.enums.LaborPayrollChangeType;
 import com.lineinc.erp.api.server.domain.user.entity.User;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,9 +43,10 @@ import lombok.Setter;
 @Builder
 public class LaborPayrollChangeHistory extends BaseEntity {
 
+    private static final String SEQUENCE_NAME = "labor_payroll_change_history_seq";
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "labor_payroll_change_history_seq")
-    @SequenceGenerator(name = "labor_payroll_change_history_seq", sequenceName = "labor_payroll_change_history_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     // 변경 정보
@@ -61,7 +63,7 @@ public class LaborPayrollChangeHistory extends BaseEntity {
     private String memo; // 비고
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = AppConstants.USER_ID)
     private User user;
 
     @Column
@@ -69,7 +71,7 @@ public class LaborPayrollChangeHistory extends BaseEntity {
 
     // 노무명세서 집계 테이블과의 연관관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor_payroll_summary_id")
+    @JoinColumn(name = AppConstants.LABOR_PAYROLL_SUMMARY_ID)
     private LaborPayrollSummary laborPayrollSummary;
 
 }

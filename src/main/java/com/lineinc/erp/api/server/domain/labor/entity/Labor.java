@@ -269,28 +269,26 @@ public class Labor extends BaseEntity {
             final OutsourcingCompany outsourcingCompany,
             final OutsourcingCompanyContract outsourcingCompanyContract,
             final Boolean isHeadOffice, final Grade grade) {
-        Optional.ofNullable(request.typeDescription()).ifPresent(val -> this.typeDescription = val);
-        Optional.ofNullable(request.name()).ifPresent(val -> this.name = val);
-        Optional.ofNullable(request.residentNumber())
-                .filter(val -> !val.contains("*"))
-                .ifPresent(val -> this.residentNumber = val);
-        Optional.ofNullable(request.workType()).ifPresent(val -> this.workType = val);
-        Optional.ofNullable(request.workTypeDescription()).ifPresent(val -> this.workTypeDescription = val);
-        Optional.ofNullable(request.mainWork()).ifPresent(val -> this.mainWork = val);
-        Optional.ofNullable(request.dailyWage()).ifPresent(val -> this.dailyWage = val);
-        Optional.ofNullable(request.bankName()).ifPresent(val -> this.bankName = val);
-        Optional.ofNullable(request.accountNumber()).ifPresent(val -> this.accountNumber = val);
-        Optional.ofNullable(request.accountHolder()).ifPresent(val -> this.accountHolder = val);
-        Optional.ofNullable(request.address()).ifPresent(val -> this.address = val);
-        Optional.ofNullable(request.detailAddress()).ifPresent(val -> this.detailAddress = val);
-        Optional.ofNullable(request.phoneNumber()).ifPresent(val -> this.phoneNumber = val);
-        Optional.ofNullable(request.memo()).ifPresent(val -> this.memo = val);
-        Optional.ofNullable(grade).ifPresent(val -> this.grade = val);
+        this.typeDescription = request.typeDescription();
+        this.name = request.name();
+        this.residentNumber = request.residentNumber();
+        this.workType = request.workType();
+        this.workTypeDescription = request.workTypeDescription();
+        this.mainWork = request.mainWork();
+        this.dailyWage = request.dailyWage();
+        this.bankName = request.bankName();
+        this.accountNumber = request.accountNumber();
+        this.accountHolder = request.accountHolder();
+        this.address = request.address();
+        this.detailAddress = request.detailAddress();
+        this.phoneNumber = request.phoneNumber();
+        this.memo = request.memo();
+        this.grade = grade;
 
         // 외주업체 정보와 본사 인력 여부 업데이트
         this.outsourcingCompany = outsourcingCompany;
-        Optional.ofNullable(isHeadOffice).ifPresent(val -> this.isHeadOffice = val);
-        Optional.ofNullable(outsourcingCompanyContract).ifPresent(val -> this.outsourcingCompanyContract = val);
+        this.isHeadOffice = isHeadOffice;
+        this.outsourcingCompanyContract = outsourcingCompanyContract;
 
         // 업데이트가 일어나면 임시 인력해제
         this.isTemporary = false;

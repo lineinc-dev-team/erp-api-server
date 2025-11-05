@@ -203,6 +203,7 @@ public final class AppConstants {
     public static final String MENU_ID = "menu_id";
     public static final String MATERIAL_MANAGEMENT_ID = "material_management_id";
     public static final String MANAGEMENT_COST_ID = "management_cost_id";
+    public static final String LABOR_PAYROLL_SUMMARY_ID = "labor_payroll_summary_id";
 
     // ==================== JPA 엔티티 매핑 속성명 ====================
     /**
