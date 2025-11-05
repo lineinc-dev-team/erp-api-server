@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractConstructionUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,10 +27,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OutsourcingCompanyContractConstruction extends BaseEntity {
+    private static final String SEQUENCE_NAME = "outsourcing_company_contract_construction_seq";
+
     @Id
     @DiffInclude
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outsourcing_company_contract_construction_seq")
-    @SequenceGenerator(name = "outsourcing_company_contract_construction_seq", sequenceName = "outsourcing_company_contract_construction_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -74,12 +77,12 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_id", nullable = false)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_ID, nullable = false)
     private OutsourcingCompanyContract outsourcingCompanyContract;
 
     @DiffIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing_company_contract_construction_group_id")
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_ID)
     private OutsourcingCompanyContractConstructionGroup constructionGroup;
 
     /**
