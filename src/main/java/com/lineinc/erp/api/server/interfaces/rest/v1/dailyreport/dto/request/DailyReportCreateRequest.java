@@ -21,7 +21,7 @@ public record DailyReportCreateRequest(
         @Schema(description = "유류업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "비고", example = "특별 지시사항") String memo,
         @Schema(description = "직원 출역 정보") @Valid List<DailyReportEmployeeCreateRequest> employees,
-        @Schema(description = "직영/용역 출역 정보") @Valid List<DailyReportDirectContractCreateRequest> directContracts,
+        @Schema(description = "직영/용역 직영 출역 정보") @Valid List<DailyReportDirectContractCreateRequest> directContracts,
         @Schema(description = "직영/용역 외주 출역 정보") @Valid List<DailyReportDirectContractOutsourcingCreateRequest> directContractOutsourcings,
         @Schema(description = "장비 출역 정보") @Valid List<DailyReportOutsourcingEquipmentCreateRequest> outsourcingEquipments,
         @Schema(description = "유류 출역 정보") @Valid List<DailyReportFuelCreateRequest> fuelInfos,

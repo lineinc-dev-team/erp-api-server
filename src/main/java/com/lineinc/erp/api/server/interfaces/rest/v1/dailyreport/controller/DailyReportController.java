@@ -142,7 +142,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 직영/용역 수정")
+    @Operation(summary = "출역일보 직영/용역 직영 수정")
     @PatchMapping("/direct-contracts")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.UPDATE)
     public ResponseEntity<Void> updateDailyReportDirectContract(
@@ -183,7 +183,7 @@ public class DailyReportController extends BaseController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "출역일보 직영/용역 조회")
+    @Operation(summary = "출역일보 직영/용역 직영 조회")
     @GetMapping("/direct-contracts")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<DailyReportDirectContractResponse>>> searchDailyReportDirectContracts(

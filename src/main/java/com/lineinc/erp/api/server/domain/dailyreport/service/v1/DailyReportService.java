@@ -205,7 +205,7 @@ public class DailyReportService {
             }
         }
 
-        // 직영/용역 출역 정보 추가
+        // 직영/용역 직영 출역 정보 추가
         if (request.directContracts() != null) {
 
             for (final DailyReportDirectContractCreateRequest directContractRequest : request.directContracts()) {

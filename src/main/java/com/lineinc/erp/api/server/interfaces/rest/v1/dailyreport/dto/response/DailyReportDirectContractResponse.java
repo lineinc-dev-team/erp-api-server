@@ -8,7 +8,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "출역일보 직영/용역 응답")
+@Schema(description = "출역일보 직영/용역 직영 응답")
 public record DailyReportDirectContractResponse(
         @Schema(description = "ID", example = "1") Long id,
         @Schema(description = "직종", example = "토목공") String position,
