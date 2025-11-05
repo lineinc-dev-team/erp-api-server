@@ -190,12 +190,6 @@ public class DailyReportService {
             for (final DailyReportEmployeeCreateRequest employeeRequest : request.employees()) {
                 final Labor labor = laborService.getLaborByIdOrThrow(employeeRequest.laborId());
 
-                // 정규직원만 직원 출역 정보에 추가 가능
-                if (labor.getType() != LaborType.REGULAR_EMPLOYEE) {
-                    throw new IllegalArgumentException(
-                            ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
-                }
-
                 final DailyReportEmployee employee = DailyReportEmployee.builder()
                         .dailyReport(dailyReport)
                         .labor(labor)
@@ -213,8 +207,6 @@ public class DailyReportService {
 
         // 직영/용역 출역 정보 추가
         if (request.directContracts() != null) {
-            // 중복 laborId + unitPrice 체크 (임시 인력 제외)
-            validateDirectContractDuplicates(request.directContracts());
 
             for (final DailyReportDirectContractCreateRequest directContractRequest : request.directContracts()) {
                 final OutsourcingCompany company = directContractRequest.outsourcingCompanyId() != null
@@ -230,13 +222,6 @@ public class DailyReportService {
                 } else {
                     // 기존 인력 검색
                     labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
-
-                    // 직영/용역 출역 정보에는 DIRECT_CONTRACT 또는 OUTSOURCING 타입만 허용
-                    if (labor.getType() != LaborType.DIRECT_CONTRACT && labor.getType() != LaborType.OUTSOURCING
-                            && labor.getType() != LaborType.ETC) {
-                        throw new IllegalArgumentException(
-                                ValidationMessages.DAILY_REPORT_DIRECT_CONTRACT_INVALID_TYPE);
-                    }
 
                 }
 
