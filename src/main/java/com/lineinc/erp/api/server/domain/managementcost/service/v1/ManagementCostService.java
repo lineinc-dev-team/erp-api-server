@@ -1,8 +1,11 @@
 package com.lineinc.erp.api.server.domain.managementcost.service.v1;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -20,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
@@ -40,6 +44,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCom
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -54,9 +59,13 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailDirectContractCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailEquipmentCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailEquipmentUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailOutsourcingContractCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailOutsourcingContractUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailOutsourcingCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostChangeHistoryResponse;
@@ -66,6 +75,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.Out
 import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
+import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 
@@ -644,6 +654,27 @@ public class ManagementCostService {
                     request.mealFeeDetails(), userId);
         }
 
+        // 식대 상세 정보 업데이트 - 직영
+        if (request.mealFeeDetailDirectContracts() != null) {
+            updateMealFeeDetailDirectContracts(managementCost, request.mealFeeDetailDirectContracts(), userId);
+        }
+
+        // 식대 상세 정보 업데이트 - 용역
+        if (request.mealFeeDetailOutsourcings() != null) {
+            updateMealFeeDetailOutsourcings(managementCost, request.mealFeeDetailOutsourcings(), userId);
+        }
+
+        // 식대 상세 정보 업데이트 - 장비기사
+        if (request.mealFeeDetailEquipments() != null) {
+            updateMealFeeDetailEquipments(managementCost, request.mealFeeDetailEquipments(), userId);
+        }
+
+        // 식대 상세 정보 업데이트 - 외주인력
+        if (request.mealFeeDetailOutsourcingContracts() != null) {
+            updateMealFeeDetailOutsourcingContracts(managementCost, request.mealFeeDetailOutsourcingContracts(),
+                    userId);
+        }
+
         // 파일 업데이트
         if (request.files() != null) {
             managementCostFileService.updateManagementCostFiles(managementCost,
@@ -694,5 +725,409 @@ public class ManagementCostService {
         final Page<ManagementCostChangeHistory> historyPage = managementCostChangeHistoryRepository
                 .findAllByManagementCostWithPaging(managementCost, pageable);
         return historyPage.map(history -> ManagementCostChangeHistoryResponse.from(history, userId));
+    }
+
+    /**
+     * 식대 상세 목록 수정 - 직영
+     */
+    private void updateMealFeeDetailDirectContracts(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailDirectContractUpdateRequest> requests, final Long userId) {
+        managementCost.getMealFeeDetailDirectContracts().forEach(detail -> {
+            detail.syncTransientFields();
+        });
+
+        // 수정 전 스냅샷 생성
+        final List<ManagementCostMealFeeDetailDirectContract> beforeDetails = managementCost
+                .getMealFeeDetailDirectContracts().stream()
+                .map(detail -> JaversUtils.createSnapshot(javers, detail,
+                        ManagementCostMealFeeDetailDirectContract.class))
+                .toList();
+
+        // 식대 상세 정보 업데이트
+        EntitySyncUtils.syncList(
+                managementCost.getMealFeeDetailDirectContracts(),
+                requests,
+                (final ManagementCostMealFeeDetailDirectContractUpdateRequest dto) -> {
+                    final Labor labor = (dto.laborId() != null)
+                            ? laborService.getLaborByIdOrThrow(dto.laborId())
+                            : null;
+                    final ManagementCostMealFeeDetailDirectContract detail = ManagementCostMealFeeDetailDirectContract
+                            .builder()
+                            .managementCost(managementCost)
+                            .labor(labor)
+                            .breakfastCount(dto.breakfastCount())
+                            .lunchCount(dto.lunchCount())
+                            .dinnerCount(dto.dinnerCount())
+                            .unitPrice(dto.unitPrice())
+                            .amount(dto.amount())
+                            .memo(dto.memo())
+                            .build();
+                    detail.updateFrom(dto);
+                    detail.syncTransientFields();
+                    return detail;
+                });
+
+        // 수정된 항목들의 Labor 엔티티 재설정
+        for (final ManagementCostMealFeeDetailDirectContract detail : managementCost
+                .getMealFeeDetailDirectContracts()) {
+            if (detail.getLaborId() != null) {
+                final Labor labor = laborService.getLaborByIdOrThrow(detail.getLaborId());
+                detail.setEntities(labor);
+            } else {
+                detail.setEntities(null);
+            }
+        }
+
+        // 변경 이력 추적 및 저장
+        final List<ManagementCostMealFeeDetailDirectContract> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailDirectContracts());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
+
+        // 추가된 식대 상세 항목
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailDirectContract::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (final ManagementCostMealFeeDetailDirectContract after : afterDetails) {
+            if (after.getId() == null || !beforeIds.contains(after.getId())) {
+                final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                if (addedChange != null) {
+                    allChanges.add(addedChange);
+                }
+            }
+        }
+
+        // 수정된 식대 상세 항목
+        final Map<Long, ManagementCostMealFeeDetailDirectContract> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailDirectContract::getId, d -> d));
+
+        for (final ManagementCostMealFeeDetailDirectContract before : beforeDetails) {
+            if (before.getId() != null && afterMap.containsKey(before.getId())) {
+                final ManagementCostMealFeeDetailDirectContract after = afterMap.get(before.getId());
+                final Diff diff = javers.compare(before, after);
+                final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+                allChanges.addAll(simpleChanges);
+            }
+        }
+
+        // 변경 이력이 있으면 저장
+        if (!allChanges.isEmpty()) {
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_DIRECT_CONTRACT)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
+            managementCostChangeHistoryRepository.save(changeHistory);
+        }
+    }
+
+    /**
+     * 식대 상세 목록 수정 - 용역
+     */
+    private void updateMealFeeDetailOutsourcings(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailOutsourcingUpdateRequest> requests, final Long userId) {
+        managementCost.getMealFeeDetailOutsourcings().forEach(detail -> {
+            detail.syncTransientFields();
+        });
+
+        // 수정 전 스냅샷 생성
+        final List<ManagementCostMealFeeDetailOutsourcing> beforeDetails = managementCost
+                .getMealFeeDetailOutsourcings().stream()
+                .map(detail -> JaversUtils.createSnapshot(javers, detail, ManagementCostMealFeeDetailOutsourcing.class))
+                .toList();
+
+        // 식대 상세 정보 업데이트
+        EntitySyncUtils.syncList(
+                managementCost.getMealFeeDetailOutsourcings(),
+                requests,
+                (final ManagementCostMealFeeDetailOutsourcingUpdateRequest dto) -> {
+                    final OutsourcingCompany outsourcingCompany = (dto.outsourcingCompanyId() != null)
+                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                            : null;
+                    final Labor labor = (dto.laborId() != null)
+                            ? laborService.getLaborByIdOrThrow(dto.laborId())
+                            : null;
+                    final ManagementCostMealFeeDetailOutsourcing detail = ManagementCostMealFeeDetailOutsourcing
+                            .builder()
+                            .managementCost(managementCost)
+                            .outsourcingCompany(outsourcingCompany)
+                            .labor(labor)
+                            .breakfastCount(dto.breakfastCount())
+                            .lunchCount(dto.lunchCount())
+                            .dinnerCount(dto.dinnerCount())
+                            .unitPrice(dto.unitPrice())
+                            .amount(dto.amount())
+                            .memo(dto.memo())
+                            .build();
+                    detail.updateFrom(dto);
+                    detail.syncTransientFields();
+                    return detail;
+                });
+
+        // 수정된 항목들의 엔티티 재설정
+        for (final ManagementCostMealFeeDetailOutsourcing detail : managementCost.getMealFeeDetailOutsourcings()) {
+            final OutsourcingCompany outsourcingCompany = (detail.getOutsourcingCompanyId() != null)
+                    ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(detail.getOutsourcingCompanyId())
+                    : null;
+            final Labor labor = (detail.getLaborId() != null)
+                    ? laborService.getLaborByIdOrThrow(detail.getLaborId())
+                    : null;
+            detail.setEntities(outsourcingCompany, labor);
+        }
+
+        // 변경 이력 추적 및 저장
+        final List<ManagementCostMealFeeDetailOutsourcing> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailOutsourcings());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
+
+        // 추가된 식대 상세 항목
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailOutsourcing::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (final ManagementCostMealFeeDetailOutsourcing after : afterDetails) {
+            if (after.getId() == null || !beforeIds.contains(after.getId())) {
+                final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                if (addedChange != null) {
+                    allChanges.add(addedChange);
+                }
+            }
+        }
+
+        // 수정된 식대 상세 항목
+        final Map<Long, ManagementCostMealFeeDetailOutsourcing> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailOutsourcing::getId, d -> d));
+
+        for (final ManagementCostMealFeeDetailOutsourcing before : beforeDetails) {
+            if (before.getId() != null && afterMap.containsKey(before.getId())) {
+                final ManagementCostMealFeeDetailOutsourcing after = afterMap.get(before.getId());
+                final Diff diff = javers.compare(before, after);
+                final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+                allChanges.addAll(simpleChanges);
+            }
+        }
+
+        // 변경 이력이 있으면 저장
+        if (!allChanges.isEmpty()) {
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_OUTSOURCING)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
+            managementCostChangeHistoryRepository.save(changeHistory);
+        }
+    }
+
+    /**
+     * 식대 상세 목록 수정 - 장비기사
+     */
+    private void updateMealFeeDetailEquipments(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailEquipmentUpdateRequest> requests, final Long userId) {
+        managementCost.getMealFeeDetailEquipments().forEach(detail -> {
+            detail.syncTransientFields();
+        });
+
+        // 수정 전 스냅샷 생성
+        final List<ManagementCostMealFeeDetailEquipment> beforeDetails = managementCost.getMealFeeDetailEquipments()
+                .stream()
+                .map(detail -> JaversUtils.createSnapshot(javers, detail, ManagementCostMealFeeDetailEquipment.class))
+                .toList();
+
+        // 식대 상세 정보 업데이트
+        EntitySyncUtils.syncList(
+                managementCost.getMealFeeDetailEquipments(),
+                requests,
+                (final ManagementCostMealFeeDetailEquipmentUpdateRequest dto) -> {
+                    final OutsourcingCompany outsourcingCompany = (dto.outsourcingCompanyId() != null)
+                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                            : null;
+                    final OutsourcingCompanyContractDriver driver = (dto.outsourcingCompanyContractDriverId() != null)
+                            ? outsourcingCompanyContractService
+                                    .getDriverByIdOrThrow(dto.outsourcingCompanyContractDriverId())
+                            : null;
+                    final ManagementCostMealFeeDetailEquipment detail = ManagementCostMealFeeDetailEquipment.builder()
+                            .managementCost(managementCost)
+                            .outsourcingCompany(outsourcingCompany)
+                            .outsourcingCompanyContractDriver(driver)
+                            .breakfastCount(dto.breakfastCount())
+                            .lunchCount(dto.lunchCount())
+                            .dinnerCount(dto.dinnerCount())
+                            .unitPrice(dto.unitPrice())
+                            .amount(dto.amount())
+                            .memo(dto.memo())
+                            .build();
+                    detail.updateFrom(dto);
+                    detail.syncTransientFields();
+                    return detail;
+                });
+
+        // 수정된 항목들의 엔티티 재설정
+        for (final ManagementCostMealFeeDetailEquipment detail : managementCost.getMealFeeDetailEquipments()) {
+            final OutsourcingCompany outsourcingCompany = (detail.getOutsourcingCompanyId() != null)
+                    ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(detail.getOutsourcingCompanyId())
+                    : null;
+            final OutsourcingCompanyContractDriver driver = (detail.getOutsourcingCompanyContractDriverId() != null)
+                    ? outsourcingCompanyContractService
+                            .getDriverByIdOrThrow(detail.getOutsourcingCompanyContractDriverId())
+                    : null;
+            detail.setEntities(outsourcingCompany, driver);
+        }
+
+        // 변경 이력 추적 및 저장
+        final List<ManagementCostMealFeeDetailEquipment> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailEquipments());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
+
+        // 추가된 식대 상세 항목
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailEquipment::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (final ManagementCostMealFeeDetailEquipment after : afterDetails) {
+            if (after.getId() == null || !beforeIds.contains(after.getId())) {
+                final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                if (addedChange != null) {
+                    allChanges.add(addedChange);
+                }
+            }
+        }
+
+        // 수정된 식대 상세 항목
+        final Map<Long, ManagementCostMealFeeDetailEquipment> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailEquipment::getId, d -> d));
+
+        for (final ManagementCostMealFeeDetailEquipment before : beforeDetails) {
+            if (before.getId() != null && afterMap.containsKey(before.getId())) {
+                final ManagementCostMealFeeDetailEquipment after = afterMap.get(before.getId());
+                final Diff diff = javers.compare(before, after);
+                final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+                allChanges.addAll(simpleChanges);
+            }
+        }
+
+        // 변경 이력이 있으면 저장
+        if (!allChanges.isEmpty()) {
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_EQUIPMENT)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
+            managementCostChangeHistoryRepository.save(changeHistory);
+        }
+    }
+
+    /**
+     * 식대 상세 목록 수정 - 외주인력
+     */
+    private void updateMealFeeDetailOutsourcingContracts(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailOutsourcingContractUpdateRequest> requests, final Long userId) {
+        managementCost.getMealFeeDetailOutsourcingContracts().forEach(detail -> {
+            detail.syncTransientFields();
+        });
+
+        // 수정 전 스냅샷 생성
+        final List<ManagementCostMealFeeDetailOutsourcingContract> beforeDetails = managementCost
+                .getMealFeeDetailOutsourcingContracts().stream()
+                .map(detail -> JaversUtils.createSnapshot(javers, detail,
+                        ManagementCostMealFeeDetailOutsourcingContract.class))
+                .toList();
+
+        // 식대 상세 정보 업데이트
+        EntitySyncUtils.syncList(
+                managementCost.getMealFeeDetailOutsourcingContracts(),
+                requests,
+                (final ManagementCostMealFeeDetailOutsourcingContractUpdateRequest dto) -> {
+                    final OutsourcingCompany outsourcingCompany = (dto.outsourcingCompanyId() != null)
+                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                            : null;
+                    final Labor labor = (dto.laborId() != null)
+                            ? laborService.getLaborByIdOrThrow(dto.laborId())
+                            : null;
+                    final ManagementCostMealFeeDetailOutsourcingContract detail = ManagementCostMealFeeDetailOutsourcingContract
+                            .builder()
+                            .managementCost(managementCost)
+                            .outsourcingCompany(outsourcingCompany)
+                            .labor(labor)
+                            .breakfastCount(dto.breakfastCount())
+                            .lunchCount(dto.lunchCount())
+                            .dinnerCount(dto.dinnerCount())
+                            .unitPrice(dto.unitPrice())
+                            .amount(dto.amount())
+                            .memo(dto.memo())
+                            .build();
+                    detail.updateFrom(dto);
+                    detail.syncTransientFields();
+                    return detail;
+                });
+
+        // 수정된 항목들의 엔티티 재설정
+        for (final ManagementCostMealFeeDetailOutsourcingContract detail : managementCost
+                .getMealFeeDetailOutsourcingContracts()) {
+            final OutsourcingCompany outsourcingCompany = (detail.getOutsourcingCompanyId() != null)
+                    ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(detail.getOutsourcingCompanyId())
+                    : null;
+            final Labor labor = (detail.getLaborId() != null)
+                    ? laborService.getLaborByIdOrThrow(detail.getLaborId())
+                    : null;
+            detail.setEntities(outsourcingCompany, labor);
+        }
+
+        // 변경 이력 추적 및 저장
+        final List<ManagementCostMealFeeDetailOutsourcingContract> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailOutsourcingContracts());
+        final List<Map<String, String>> allChanges = new ArrayList<>();
+
+        // 추가된 식대 상세 항목
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailOutsourcingContract::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (final ManagementCostMealFeeDetailOutsourcingContract after : afterDetails) {
+            if (after.getId() == null || !beforeIds.contains(after.getId())) {
+                final Map<String, String> addedChange = JaversUtils.extractAddedEntityChange(javers, after);
+                if (addedChange != null) {
+                    allChanges.add(addedChange);
+                }
+            }
+        }
+
+        // 수정된 식대 상세 항목
+        final Map<Long, ManagementCostMealFeeDetailOutsourcingContract> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailOutsourcingContract::getId, d -> d));
+
+        for (final ManagementCostMealFeeDetailOutsourcingContract before : beforeDetails) {
+            if (before.getId() != null && afterMap.containsKey(before.getId())) {
+                final ManagementCostMealFeeDetailOutsourcingContract after = afterMap.get(before.getId());
+                final Diff diff = javers.compare(before, after);
+                final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+                allChanges.addAll(simpleChanges);
+            }
+        }
+
+        // 변경 이력이 있으면 저장
+        if (!allChanges.isEmpty()) {
+            final String changesJson = javers.getJsonConverter().toJson(allChanges);
+            final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_OUTSOURCING_CONTRACT)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
+            managementCostChangeHistoryRepository.save(changeHistory);
+        }
     }
 }

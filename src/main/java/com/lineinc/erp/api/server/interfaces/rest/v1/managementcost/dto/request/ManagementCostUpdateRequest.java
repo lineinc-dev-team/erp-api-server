@@ -9,7 +9,6 @@ import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 @Schema(description = "관리비 수정 요청")
 public record ManagementCostUpdateRequest(
@@ -21,8 +20,12 @@ public record ManagementCostUpdateRequest(
         @Schema(description = "비고", example = "기성 1회차 비용") String memo,
         @Schema(description = "관리비 상세 품목 목록") @Valid List<ManagementCostDetailUpdateRequest> details,
         @Schema(description = "관리비 전도금 상세 목록") @Valid List<ManagementCostKeyMoneyDetailUpdateRequest> keyMoneyDetails,
-        @Schema(description = "관리비 식대 상세 목록") @Valid List<ManagementCostMealFeeDetailUpdateRequest> mealFeeDetails,
-        @Schema(description = "관리비 파일 목록") @NotNull @Valid @Size(min = 1) List<ManagementCostFileUpdateRequest> files,
+        @Schema(description = "관리비 식대 상세 목록 - 직원") @Valid List<ManagementCostMealFeeDetailUpdateRequest> mealFeeDetails,
+        @Schema(description = "관리비 식대 상세 목록 - 직영") @Valid List<ManagementCostMealFeeDetailDirectContractUpdateRequest> mealFeeDetailDirectContracts,
+        @Schema(description = "관리비 식대 상세 목록 - 용역") @Valid List<ManagementCostMealFeeDetailOutsourcingUpdateRequest> mealFeeDetailOutsourcings,
+        @Schema(description = "관리비 식대 상세 목록 - 장비기사") @Valid List<ManagementCostMealFeeDetailEquipmentUpdateRequest> mealFeeDetailEquipments,
+        @Schema(description = "관리비 식대 상세 목록 - 외주인력") @Valid List<ManagementCostMealFeeDetailOutsourcingContractUpdateRequest> mealFeeDetailOutsourcingContracts,
+        @Schema(description = "관리비 파일 목록") @Valid List<ManagementCostFileUpdateRequest> files,
         @Schema(description = "외주업체 정보 (신규 등록 또는 수정용)") @Valid OutsourcingCompanyBasicInfoRequest outsourcingCompanyInfo,
         @Schema(description = "변경이력 메모 수정 목록") List<ChangeHistoryRequest> changeHistories) {
 }

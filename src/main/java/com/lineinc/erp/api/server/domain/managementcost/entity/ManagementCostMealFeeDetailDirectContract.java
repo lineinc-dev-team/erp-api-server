@@ -5,6 +5,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailDirectContractUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -105,5 +106,23 @@ public class ManagementCostMealFeeDetailDirectContract extends BaseEntity {
      */
     public void syncTransientFields() {
         this.laborName = this.labor != null ? this.labor.getName() : null;
+    }
+
+    public void updateFrom(final ManagementCostMealFeeDetailDirectContractUpdateRequest request) {
+        this.laborId = request.laborId();
+        this.breakfastCount = request.breakfastCount();
+        this.lunchCount = request.lunchCount();
+        this.dinnerCount = request.dinnerCount();
+        this.unitPrice = request.unitPrice();
+        this.amount = request.amount();
+        this.memo = request.memo();
+    }
+
+    /**
+     * 연관 엔티티를 설정하고 transient 필드를 동기화합니다.
+     */
+    public void setEntities(final Labor labor) {
+        this.labor = labor;
+        syncTransientFields();
     }
 }

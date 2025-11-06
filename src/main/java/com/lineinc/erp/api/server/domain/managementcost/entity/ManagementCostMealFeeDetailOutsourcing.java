@@ -6,6 +6,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailOutsourcingUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -113,11 +114,34 @@ public class ManagementCostMealFeeDetailOutsourcing extends BaseEntity {
     @Transient
     private Long laborId;
 
+    @Transient
+    private Long outsourcingCompanyId;
+
     /**
      * Javers 감사 로그를 위한 transient 필드 동기화
      */
     public void syncTransientFields() {
         this.laborName = this.labor != null ? this.labor.getName() : null;
         this.outsourcingCompanyName = this.outsourcingCompany != null ? this.outsourcingCompany.getName() : null;
+    }
+
+    public void updateFrom(final ManagementCostMealFeeDetailOutsourcingUpdateRequest request) {
+        this.laborId = request.laborId();
+        this.outsourcingCompanyId = request.outsourcingCompanyId();
+        this.breakfastCount = request.breakfastCount();
+        this.lunchCount = request.lunchCount();
+        this.dinnerCount = request.dinnerCount();
+        this.unitPrice = request.unitPrice();
+        this.amount = request.amount();
+        this.memo = request.memo();
+    }
+
+    /**
+     * 연관 엔티티를 설정하고 transient 필드를 동기화합니다.
+     */
+    public void setEntities(final OutsourcingCompany outsourcingCompany, final Labor labor) {
+        this.outsourcingCompany = outsourcingCompany;
+        this.labor = labor;
+        syncTransientFields();
     }
 }
