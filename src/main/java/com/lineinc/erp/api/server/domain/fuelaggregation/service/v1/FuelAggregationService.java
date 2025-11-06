@@ -94,8 +94,10 @@ public class FuelAggregationService {
                 .siteProcess(siteProcess)
                 .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
                 .weather(request.weather())
-                .outsourcingCompany(outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId()))
+                .outsourcingCompany(request.outsourcingCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
+                        : null)
                 .gasolinePrice(request.gasolinePrice())
                 .dieselPrice(request.dieselPrice())
                 .ureaPrice(request.ureaPrice())
