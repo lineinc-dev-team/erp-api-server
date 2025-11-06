@@ -147,7 +147,7 @@ public class ManagementCostMealFeeDetailService {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
                     .managementCost(managementCost)
-                    .type(ManagementCostChangeHistoryType.MEAL_FEE)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_REGULAR_EMPLOYEE)
                     .changes(changesJson)
                     .user(userService.getUserByIdOrThrow(userId))
                     .build();
