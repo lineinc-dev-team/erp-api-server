@@ -26,6 +26,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostCha
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailDirectContract;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailEquipment;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailOutsourcing;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
@@ -38,6 +39,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCom
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
@@ -51,6 +53,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailDirectContractCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailEquipmentCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailOutsourcingCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
@@ -73,6 +76,7 @@ public class ManagementCostService {
     private final ManagementCostRepository managementCostRepository;
     private final OutsourcingCompanyService outsourcingCompanyService;
     private final OutsourcingCompanyRepository outsourcingCompanyRepository;
+    private final OutsourcingCompanyContractService outsourcingCompanyContractService;
     private final LaborService laborService;
 
     private final SiteService siteService;
@@ -139,6 +143,11 @@ public class ManagementCostService {
         // 6-2. 식대 상세 - 용역 목록 저장
         if (request.mealFeeDetailOutsourcings() != null && !request.mealFeeDetailOutsourcings().isEmpty()) {
             createMealFeeDetailOutsourcings(managementCost, request.mealFeeDetailOutsourcings());
+        }
+
+        // 6-3. 식대 상세 - 장비 목록 저장
+        if (request.mealFeeDetailEquipments() != null && !request.mealFeeDetailEquipments().isEmpty()) {
+            createMealFeeDetailEquipments(managementCost, request.mealFeeDetailEquipments());
         }
 
         // 7. 파일 목록 저장
@@ -323,6 +332,39 @@ public class ManagementCostService {
                 .collect(Collectors.toList());
 
         managementCost.getMealFeeDetailOutsourcings().addAll(details);
+    }
+
+    /**
+     * 식대 상세 목록 생성 - 장비
+     */
+    private void createMealFeeDetailEquipments(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailEquipmentCreateRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        final List<ManagementCostMealFeeDetailEquipment> details = requests.stream()
+                .<ManagementCostMealFeeDetailEquipment>map(request -> ManagementCostMealFeeDetailEquipment
+                        .builder()
+                        .managementCost(managementCost)
+                        .outsourcingCompany(request.outsourcingCompanyId() != null
+                                ? outsourcingCompanyService
+                                        .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
+                                : null)
+                        .outsourcingCompanyContractDriver(
+                                request.outsourcingCompanyContractDriverId() != null
+                                        ? outsourcingCompanyContractService
+                                                .getDriverByIdOrThrow(request.outsourcingCompanyContractDriverId())
+                                        : null)
+                        .breakfastCount(request.breakfastCount())
+                        .lunchCount(request.lunchCount())
+                        .unitPrice(request.unitPrice())
+                        .amount(request.amount())
+                        .memo(request.memo())
+                        .build())
+                .collect(Collectors.toList());
+
+        managementCost.getMealFeeDetailEquipments().addAll(details);
     }
 
     @Transactional(readOnly = true)
