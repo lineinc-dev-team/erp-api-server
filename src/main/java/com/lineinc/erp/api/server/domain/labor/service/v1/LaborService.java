@@ -45,7 +45,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborDet
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.TypeDescriptionResponse;
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
@@ -339,13 +338,8 @@ public class LaborService {
             case "name" -> labor.name() != null ? labor.name() : "";
             case "residentNumber" ->
                 labor.residentNumber() != null ? PrivacyMaskingUtils.maskResidentNumber(labor.residentNumber()) : "";
-            case "outsourcingCompanyName" -> {
-                if (labor.isHeadOffice() != null && labor.isHeadOffice()) {
-                    yield AppConstants.LINE_INC_NAME;
-                } else {
-                    yield labor.outsourcingCompany() != null ? labor.outsourcingCompany().name() : "";
-                }
-            }
+            case "outsourcingCompanyName" ->
+                labor.outsourcingCompany() != null ? labor.outsourcingCompany().name() : "";
             case "workType" -> labor.workType() != null ? labor.workType() : "";
             case "mainWork" -> labor.mainWork() != null ? labor.mainWork() : "";
             case "phoneNumber" -> labor.phoneNumber() != null ? labor.phoneNumber() : "";
