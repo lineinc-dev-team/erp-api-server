@@ -85,6 +85,7 @@ public class FuelInfoService {
                             .categoryType(dto.categoryType())
                             .fuelType(dto.fuelType())
                             .fuelAmount(dto.fuelAmount())
+                            .amount(dto.amount())
                             .memo(dto.memo())
                             .fileUrl(dto.fileUrl())
                             .originalFileName(dto.originalFileName())
@@ -106,6 +107,7 @@ public class FuelInfoService {
                                             .outsourcingCompanyContractSubEquipment(subEquipment)
                                             .fuelType(subDto.fuelType())
                                             .fuelAmount(subDto.fuelAmount())
+                                            .amount(subDto.amount())
                                             .memo(subDto.memo())
                                             .build();
                                 })

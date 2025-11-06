@@ -216,6 +216,7 @@ public class FuelInfo extends BaseEntity {
                                             : null)
                             .fuelType(subEquipmentDto.fuelType())
                             .fuelAmount(subEquipmentDto.fuelAmount())
+                            .amount(subEquipmentDto.amount())
                             .memo(subEquipmentDto.memo())
                             .build());
         }
