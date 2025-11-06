@@ -1771,7 +1771,6 @@ public class DailyReportService {
                 .name(temporaryLaborName)
                 .type(laborType)
                 .isTemporary(true)
-                .isHeadOffice(true)
                 .dailyWage(unitPrice)
                 .build();
 
