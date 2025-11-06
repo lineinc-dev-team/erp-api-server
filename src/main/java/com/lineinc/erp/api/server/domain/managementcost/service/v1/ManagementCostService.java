@@ -335,7 +335,13 @@ public class ManagementCostService {
             case "id" -> String.valueOf(managementCost.id());
             case "siteName" -> managementCost.site().name();
             case "processName" -> managementCost.process().name();
-            case "itemType" -> managementCost.itemType();
+            case "itemType" -> {
+                // 기타 항목인 경우 타입 설명 반환
+                if ("ETC".equals(managementCost.itemTypeCode())) {
+                    yield managementCost.itemTypeDescription() != null ? managementCost.itemTypeDescription() : "";
+                }
+                yield managementCost.itemType();
+            }
             case "paymentDate" -> DateTimeFormatUtils.formatKoreaLocalDate(managementCost.paymentDate());
             case "outsourcingCompanyName" -> managementCost.outsourcingCompany() != null
                     ? managementCost.outsourcingCompany().name()
