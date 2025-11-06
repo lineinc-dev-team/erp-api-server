@@ -122,7 +122,7 @@ public class ManagementCostService {
             createKeyMoneyDetails(managementCost, request.keyMoneyDetails());
         }
 
-        // 6. 식대 상세 목록 저장
+        // 6. 식대 상세 - 직원 목록 저장
         if (request.mealFeeDetails() != null && !request.mealFeeDetails().isEmpty()) {
             createMealFeeDetails(managementCost, request.mealFeeDetails());
         }
