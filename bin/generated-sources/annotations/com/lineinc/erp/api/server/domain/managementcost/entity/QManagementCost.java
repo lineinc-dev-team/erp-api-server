@@ -52,6 +52,8 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
 
     public final ListPath<ManagementCostMealFeeDetailEquipment, QManagementCostMealFeeDetailEquipment> mealFeeDetailEquipments = this.<ManagementCostMealFeeDetailEquipment, QManagementCostMealFeeDetailEquipment>createList("mealFeeDetailEquipments", ManagementCostMealFeeDetailEquipment.class, QManagementCostMealFeeDetailEquipment.class, PathInits.DIRECT2);
 
+    public final ListPath<ManagementCostMealFeeDetailOutsourcingContract, QManagementCostMealFeeDetailOutsourcingContract> mealFeeDetailOutsourcingContracts = this.<ManagementCostMealFeeDetailOutsourcingContract, QManagementCostMealFeeDetailOutsourcingContract>createList("mealFeeDetailOutsourcingContracts", ManagementCostMealFeeDetailOutsourcingContract.class, QManagementCostMealFeeDetailOutsourcingContract.class, PathInits.DIRECT2);
+
     public final ListPath<ManagementCostMealFeeDetailOutsourcing, QManagementCostMealFeeDetailOutsourcing> mealFeeDetailOutsourcings = this.<ManagementCostMealFeeDetailOutsourcing, QManagementCostMealFeeDetailOutsourcing>createList("mealFeeDetailOutsourcings", ManagementCostMealFeeDetailOutsourcing.class, QManagementCostMealFeeDetailOutsourcing.class, PathInits.DIRECT2);
 
     public final ListPath<ManagementCostMealFeeDetail, QManagementCostMealFeeDetail> mealFeeDetails = this.<ManagementCostMealFeeDetail, QManagementCostMealFeeDetail>createList("mealFeeDetails", ManagementCostMealFeeDetail.class, QManagementCostMealFeeDetail.class, PathInits.DIRECT2);

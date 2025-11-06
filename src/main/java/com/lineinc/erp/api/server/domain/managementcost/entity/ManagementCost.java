@@ -128,6 +128,11 @@ public class ManagementCost extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = AppConstants.MANAGEMENT_COST_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagementCostMealFeeDetailEquipment> mealFeeDetailEquipments = new ArrayList<>();
 
+    @DiffIgnore
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = AppConstants.MANAGEMENT_COST_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManagementCostMealFeeDetailOutsourcingContract> mealFeeDetailOutsourcingContracts = new ArrayList<>();
+
     @Column(columnDefinition = "TEXT")
     @DiffInclude
     private String memo;
