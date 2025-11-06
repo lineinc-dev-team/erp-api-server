@@ -81,14 +81,10 @@ public class LaborService {
 
         // 외주업체 조회 및 본사 인력 여부 판단
         OutsourcingCompany outsourcingCompany = null;
-        Boolean isHeadOffice = false;
 
         if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() != 0) {
             outsourcingCompany = outsourcingCompanyService
                     .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
-        } else if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() == 0) {
-            // outsourcingCompanyId가 0인 경우 본사 인력으로 처리
-            isHeadOffice = true;
         }
 
         // 외주업체 계약 조회
@@ -102,7 +98,6 @@ public class LaborService {
                 .typeDescription(request.typeDescription())
                 .workType(request.workType())
                 .workTypeDescription(request.workTypeDescription())
-                .isHeadOffice(isHeadOffice)
                 .mainWork(request.mainWork())
                 .dailyWage(request.dailyWage())
                 .bankName(request.bankName())
@@ -240,15 +235,10 @@ public class LaborService {
 
         // 외주업체 조회 및 본사 인력 여부 판단
         OutsourcingCompany outsourcingCompany = null;
-        Boolean isHeadOffice = false;
 
         if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() != 0) {
             outsourcingCompany = outsourcingCompanyService
                     .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
-        } else if (request.outsourcingCompanyId() != null && request.outsourcingCompanyId() == 0) {
-            // outsourcingCompanyId가 0인 경우 본사 인력으로 처리
-            isHeadOffice = true;
-            outsourcingCompany = null;
         }
 
         // 외주업체 계약 조회
@@ -262,7 +252,7 @@ public class LaborService {
         final Labor oldSnapshot = JaversUtils.createSnapshot(javers, labor, Labor.class);
 
         // 기본 정보 업데이트
-        labor.updateFrom(request, outsourcingCompany, outsourcingCompanyContract, isHeadOffice,
+        labor.updateFrom(request, outsourcingCompany, outsourcingCompanyContract,
                 request.gradeId() != null ? gradeRepository.findById(request.gradeId()).orElse(null) : null);
 
         // 변경사항 추적을 위해 업데이트 후 syncTransientFields 호출

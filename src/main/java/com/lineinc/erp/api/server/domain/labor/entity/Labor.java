@@ -268,7 +268,7 @@ public class Labor extends BaseEntity {
             final LaborUpdateRequest request,
             final OutsourcingCompany outsourcingCompany,
             final OutsourcingCompanyContract outsourcingCompanyContract,
-            final Boolean isHeadOffice, final Grade grade) {
+            final Grade grade) {
         this.typeDescription = request.typeDescription();
         this.name = request.name();
         this.residentNumber = request.residentNumber();
@@ -287,7 +287,6 @@ public class Labor extends BaseEntity {
 
         // 외주업체 정보와 본사 인력 여부 업데이트
         this.outsourcingCompany = outsourcingCompany;
-        this.isHeadOffice = isHeadOffice;
         this.outsourcingCompanyContract = outsourcingCompanyContract;
 
         // 업데이트가 일어나면 임시 인력해제
