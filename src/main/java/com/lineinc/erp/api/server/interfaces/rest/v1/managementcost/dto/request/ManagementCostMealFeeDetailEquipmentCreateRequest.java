@@ -3,7 +3,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-@Schema(description = "관리비 식대 상세 - 장비 등록 요청")
+@Schema(description = "관리비 식대 상세 - 장비기사 등록 요청")
 public record ManagementCostMealFeeDetailEquipmentCreateRequest(
         @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "기사 ID", example = "1") Long outsourcingCompanyContractDriverId,
