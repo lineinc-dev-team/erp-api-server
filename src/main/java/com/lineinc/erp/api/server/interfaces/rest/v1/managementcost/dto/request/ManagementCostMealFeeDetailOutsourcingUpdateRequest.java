@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "식대 상세 - 용역 수정 요청")
 public record ManagementCostMealFeeDetailOutsourcingUpdateRequest(
-        @Schema(description = "식대 상세 ID", example = "1") @NotNull Long id,
+        @Schema(description = "식대 상세 ID", example = "1") Long id,
         @Schema(description = "외주업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "인력 ID", example = "1") Long laborId,
         @Schema(description = "조식 개수", example = "3") @NotNull Integer breakfastCount,
