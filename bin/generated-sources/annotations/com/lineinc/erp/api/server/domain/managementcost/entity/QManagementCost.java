@@ -48,6 +48,8 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
 
     public final ListPath<ManagementCostKeyMoneyDetail, QManagementCostKeyMoneyDetail> keyMoneyDetails = this.<ManagementCostKeyMoneyDetail, QManagementCostKeyMoneyDetail>createList("keyMoneyDetails", ManagementCostKeyMoneyDetail.class, QManagementCostKeyMoneyDetail.class, PathInits.DIRECT2);
 
+    public final ListPath<ManagementCostMealFeeDetailDirectContract, QManagementCostMealFeeDetailDirectContract> mealFeeDetailDirectContracts = this.<ManagementCostMealFeeDetailDirectContract, QManagementCostMealFeeDetailDirectContract>createList("mealFeeDetailDirectContracts", ManagementCostMealFeeDetailDirectContract.class, QManagementCostMealFeeDetailDirectContract.class, PathInits.DIRECT2);
+
     public final ListPath<ManagementCostMealFeeDetail, QManagementCostMealFeeDetail> mealFeeDetails = this.<ManagementCostMealFeeDetail, QManagementCostMealFeeDetail>createList("mealFeeDetails", ManagementCostMealFeeDetail.class, QManagementCostMealFeeDetail.class, PathInits.DIRECT2);
 
     public final StringPath memo = createString("memo");

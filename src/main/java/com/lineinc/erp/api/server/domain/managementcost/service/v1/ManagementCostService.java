@@ -25,6 +25,7 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailDirectContract;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostChangeHistoryType;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostChangeHistoryRepository;
@@ -48,6 +49,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostKeyMoneyDetailCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostListRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailCreateRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailDirectContractCreateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ItemDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.response.ManagementCostChangeHistoryResponse;
@@ -125,6 +127,11 @@ public class ManagementCostService {
         // 6. 식대 상세 - 직원 목록 저장
         if (request.mealFeeDetails() != null && !request.mealFeeDetails().isEmpty()) {
             createMealFeeDetails(managementCost, request.mealFeeDetails());
+        }
+
+        // 6-1. 식대 상세 - 직영 목록 저장
+        if (request.mealFeeDetailDirectContracts() != null && !request.mealFeeDetailDirectContracts().isEmpty()) {
+            createMealFeeDetailDirectContracts(managementCost, request.mealFeeDetailDirectContracts());
         }
 
         // 7. 파일 목록 저장
@@ -255,6 +262,31 @@ public class ManagementCostService {
                 .collect(Collectors.toList());
 
         managementCost.getMealFeeDetails().addAll(details);
+    }
+
+    /**
+     * 식대 상세 목록 생성 - 직영
+     */
+    private void createMealFeeDetailDirectContracts(final ManagementCost managementCost,
+            final List<ManagementCostMealFeeDetailDirectContractCreateRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        final List<ManagementCostMealFeeDetailDirectContract> details = requests.stream()
+                .<ManagementCostMealFeeDetailDirectContract>map(request -> ManagementCostMealFeeDetailDirectContract
+                        .builder()
+                        .managementCost(managementCost)
+                        .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId()) : null)
+                        .breakfastCount(request.breakfastCount())
+                        .lunchCount(request.lunchCount())
+                        .unitPrice(request.unitPrice())
+                        .amount(request.amount())
+                        .memo(request.memo())
+                        .build())
+                .collect(Collectors.toList());
+
+        managementCost.getMealFeeDetailDirectContracts().addAll(details);
     }
 
     @Transactional(readOnly = true)

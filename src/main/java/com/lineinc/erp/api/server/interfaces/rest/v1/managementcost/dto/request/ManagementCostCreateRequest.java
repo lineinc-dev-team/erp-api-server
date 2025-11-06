@@ -22,6 +22,7 @@ public record ManagementCostCreateRequest(
         @Schema(description = "관리비 상세 품목 목록") @Valid List<ManagementCostDetailCreateRequest> details,
         @Schema(description = "관리비 전도금 상세 목록") @Valid List<ManagementCostKeyMoneyDetailCreateRequest> keyMoneyDetails,
         @Schema(description = "관리비 식대 상세 목록 - 직원") @Valid List<ManagementCostMealFeeDetailCreateRequest> mealFeeDetails,
+        @Schema(description = "관리비 식대 상세 목록 - 직영") @Valid List<ManagementCostMealFeeDetailDirectContractCreateRequest> mealFeeDetailDirectContracts,
         @Schema(description = "관리비 파일 목록") @Valid List<ManagementCostFileCreateRequest> files,
         @Schema(description = "외주업체 정보 (신규 등록 또는 수정용)") @Valid OutsourcingCompanyBasicInfoRequest outsourcingCompanyInfo) {
 }
