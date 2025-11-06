@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 
@@ -24,6 +25,8 @@ public record ManagementCostDetailViewResponse(
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
         @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
+        @Schema(description = "공제업체 요약 정보") CompanyResponse.CompanySimpleResponse deductionCompany,
+        @Schema(description = "공제업체 계약 요약 정보") ContractSimpleResponse deductionCompanyContract,
         @Schema(description = "전도금 상세 목록") List<ManagementCostKeyMoneyDetailResponse> keyMoneyDetails,
         @Schema(description = "식대 상세 목록 - 직원") List<ManagementCostMealFeeDetailResponse> mealFeeDetails,
         @Schema(description = "식대 상세 목록 - 직영") List<ManagementCostMealFeeDetailDirectContractResponse> mealFeeDetailDirectContracts,
@@ -49,6 +52,12 @@ public record ManagementCostDetailViewResponse(
                 SiteProcessResponse.SiteProcessSimpleResponse.from(cost.getSiteProcess()),
                 cost.getOutsourcingCompany() != null
                         ? CompanyResponse.CompanySimpleResponse.from(cost.getOutsourcingCompany())
+                        : null,
+                cost.getDeductionCompany() != null
+                        ? CompanyResponse.CompanySimpleResponse.from(cost.getDeductionCompany())
+                        : null,
+                cost.getDeductionCompanyContract() != null
+                        ? ContractSimpleResponse.from(cost.getDeductionCompanyContract())
                         : null,
                 cost.getKeyMoneyDetails().stream().map(ManagementCostKeyMoneyDetailResponse::from)
                         .sorted(Comparator.comparing(ManagementCostKeyMoneyDetailResponse::id))
