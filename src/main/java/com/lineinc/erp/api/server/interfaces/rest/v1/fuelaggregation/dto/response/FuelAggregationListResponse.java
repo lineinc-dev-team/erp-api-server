@@ -20,7 +20,8 @@ public record FuelAggregationListResponse(
         @Schema(description = "수정일", example = "2025-01-16T14:20:00+09:00") OffsetDateTime updatedAt,
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
-        @Schema(description = "유류정보") FuelInfoListResponse fuelInfo) {
+        @Schema(description = "유류정보") FuelInfoListResponse fuelInfo,
+        @Schema(description = "유류 업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany) {
 
     public static FuelAggregationListResponse from(final FuelAggregation entity, final FuelInfo fuelInfo) {
         return new FuelAggregationListResponse(
@@ -30,7 +31,10 @@ public record FuelAggregationListResponse(
                 entity.getUpdatedAt(),
                 SiteResponse.SiteSimpleResponse.from(entity.getSite()),
                 SiteProcessResponse.SiteProcessSimpleResponse.from(entity.getSiteProcess()),
-                FuelInfoListResponse.from(fuelInfo));
+                FuelInfoListResponse.from(fuelInfo),
+                entity.getOutsourcingCompany() != null
+                        ? CompanyResponse.CompanySimpleResponse.from(entity.getOutsourcingCompany())
+                        : null);
     }
 
     @Schema(description = "유류정보 응답")

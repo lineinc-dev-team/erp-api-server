@@ -235,6 +235,7 @@ public class FuelAggregationService {
             case "amount" -> "금액";
             case "createdAtAndUpdatedAt" -> "등록/수정일";
             case "memo" -> "비고";
+            case "fuelOutsourcingCompanyName" -> "유류 업체명";
             default -> null;
         };
     }
@@ -271,6 +272,8 @@ public class FuelAggregationService {
                         + DateTimeFormatUtils.formatKoreaLocalDate(response.updatedAt())
                         : "";
             case "memo" -> response.fuelInfo() != null ? response.fuelInfo().memo() : "";
+            case "fuelOutsourcingCompanyName" ->
+                response.outsourcingCompany() != null ? response.outsourcingCompany().name() : "";
             default -> "";
         };
     }
