@@ -14,7 +14,8 @@ public enum ManagementCostItemType {
     UTILITY_WATER("공과금(수도)", 5),
     PARKING_FEE("주차비", 6),
     MEAL_FEE("식대", 7),
-    KEY_MONEY("전도금", 8);
+    KEY_MONEY("전도금", 8),
+    SNACK_FEE("간식비", 9);
 
     private final String label;
     private final int order;
