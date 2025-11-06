@@ -44,6 +44,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCom
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractDriver;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -124,6 +125,14 @@ public class ManagementCostService {
                 .site(site)
                 .siteProcess(siteProcess)
                 .outsourcingCompany(outsourcingCompany)
+                .deductionCompany(request.deductionCompanyId() != null
+                        ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
+                        : null)
+                .deductionCompanyContract(
+                        request.deductionCompanyContractId() != null
+                                ? outsourcingCompanyContractService
+                                        .getContractByIdOrThrow(request.deductionCompanyContractId())
+                                : null)
                 .itemType(request.itemType())
                 .itemTypeDescription(request.itemTypeDescription())
                 .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
@@ -606,9 +615,17 @@ public class ManagementCostService {
         managementCost.syncTransientFields();
         final ManagementCost oldSnapshot = JaversUtils.createSnapshot(javers, managementCost, ManagementCost.class);
 
-        // 엔티티 업데이트
-        managementCost.updateFrom(request, site, siteProcess, outsourcingCompany);
-        managementCostRepository.save(managementCost);
+        final OutsourcingCompany deductionCompany = request.deductionCompanyId() != null
+                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
+                : null;
+
+        final OutsourcingCompanyContract deductionCompanyContract = request.deductionCompanyContractId() != null
+                ? outsourcingCompanyContractService
+                        .getContractByIdOrThrow(request.deductionCompanyContractId())
+                : null;
+
+        managementCost.updateFrom(request, site, siteProcess, outsourcingCompany, deductionCompany,
+                deductionCompanyContract);
 
         // 변경 이력 추적
         final Diff diff = javers.compare(oldSnapshot, managementCost);

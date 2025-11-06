@@ -180,6 +180,8 @@ public final class AppConstants {
     public static final String SITE_PROCESS_ID = "site_process_id";
     public static final String DAILY_REPORT_ID = "daily_report_id";
     public static final String OUTSOURCING_COMPANY_ID = "outsourcing_company_id";
+    public static final String DEDUCTION_COMPANY_ID = "deduction_company_id";
+    public static final String DEDUCTION_COMPANY_CONTRACT_ID = "deduction_company_contract_id";
     public static final String LABOR_ID = "labor_id";
     public static final String FUEL_AGGREGATION_ID = "fuel_aggregation_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_ID = "outsourcing_company_contract_worker_id";

@@ -15,6 +15,8 @@ public record ManagementCostCreateRequest(
         @Schema(description = "현장 ID", example = "1") @NotNull Long siteId,
         @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
         @Schema(description = "외주 업체 ID", example = "1") Long outsourcingCompanyId,
+        @Schema(description = "공제 업체 ID", example = "1") Long deductionCompanyId,
+        @Schema(description = "공제 업체 계약 ID", example = "1") Long deductionCompanyContractId,
         @Schema(description = "관리비 항목 구분", example = "DEPOSIT") @NotNull ManagementCostItemType itemType,
         @Schema(description = "관리비 항목 설명", example = "6월 전기요금") String itemTypeDescription,
         @Schema(description = "결제일자", example = "2024-07-15") @NotNull LocalDate paymentDate,

@@ -10,6 +10,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostUpdateRequest;
@@ -66,10 +67,29 @@ public class ManagementCost extends BaseEntity {
     @DiffIgnore
     private SiteProcess siteProcess;
 
+    /**
+     * 구매처
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     @DiffIgnore
     private OutsourcingCompany outsourcingCompany;
+
+    /**
+     * 공제업체
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.DEDUCTION_COMPANY_ID)
+    @DiffIgnore
+    private OutsourcingCompany deductionCompany;
+
+    /**
+     * 공제업체계약
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.DEDUCTION_COMPANY_CONTRACT_ID)
+    @DiffIgnore
+    private OutsourcingCompanyContract deductionCompanyContract;
 
     /**
      * 항목 타입 (예: 전기, 수도 등)
@@ -157,11 +177,22 @@ public class ManagementCost extends BaseEntity {
     @DiffInclude
     private String itemTypeName;
 
+    @Transient
+    @DiffInclude
+    private String deductionCompanyName;
+
+    @Transient
+    @DiffInclude
+    private String deductionCompanyContractName;
+
     public void updateFrom(final ManagementCostUpdateRequest request, final Site site, final SiteProcess siteProcess,
-            final OutsourcingCompany outsourcingCompany) {
+            final OutsourcingCompany outsourcingCompany, final OutsourcingCompany deductionCompany,
+            final OutsourcingCompanyContract deductionCompanyContract) {
         this.site = site;
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
+        this.deductionCompany = deductionCompany;
+        this.deductionCompanyContract = deductionCompanyContract;
         this.itemTypeDescription = request.itemTypeDescription();
         this.paymentDate = DateTimeFormatUtils.toOffsetDateTime(request.paymentDate());
         this.memo = request.memo();
@@ -178,5 +209,9 @@ public class ManagementCost extends BaseEntity {
         this.paymentDateFormat = this.paymentDate != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.paymentDate)
                 : null;
         this.itemTypeName = this.itemType != null ? this.itemType.getLabel() : null;
+        this.deductionCompanyName = this.deductionCompany != null ? this.deductionCompany.getName() : null;
+        this.deductionCompanyContractName = this.deductionCompanyContract != null
+                ? this.deductionCompanyContract.getContractName()
+                : null;
     }
 }

@@ -30,6 +30,10 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
     //inherited
     public final StringPath createdBy = _super.createdBy;
 
+    public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany deductionCompany;
+
+    public final com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContract deductionCompanyContract;
+
     //inherited
     public final BooleanPath deleted = _super.deleted;
 
@@ -92,6 +96,8 @@ public class QManagementCost extends EntityPathBase<ManagementCost> {
 
     public QManagementCost(Class<? extends ManagementCost> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.deductionCompany = inits.isInitialized("deductionCompany") ? new com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany(forProperty("deductionCompany")) : null;
+        this.deductionCompanyContract = inits.isInitialized("deductionCompanyContract") ? new com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContract(forProperty("deductionCompanyContract"), inits.get("deductionCompanyContract")) : null;
         this.outsourcingCompany = inits.isInitialized("outsourcingCompany") ? new com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany(forProperty("outsourcingCompany")) : null;
         this.site = inits.isInitialized("site") ? new com.lineinc.erp.api.server.domain.site.entity.QSite(forProperty("site"), inits.get("site")) : null;
         this.siteProcess = inits.isInitialized("siteProcess") ? new com.lineinc.erp.api.server.domain.site.entity.QSiteProcess(forProperty("siteProcess"), inits.get("siteProcess")) : null;
