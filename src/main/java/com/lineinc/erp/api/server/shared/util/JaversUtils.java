@@ -27,6 +27,10 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDet
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetail;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailDirectContract;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailEquipment;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailOutsourcing;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailOutsourcingContract;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementFile;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyContact;
@@ -84,19 +88,17 @@ public class JaversUtils {
             Map.entry(ManagementCostDetail.class, entity -> ((ManagementCostDetail) entity).getName()),
             Map.entry(ManagementCostKeyMoneyDetail.class,
                     entity -> ((ManagementCostKeyMoneyDetail) entity).getAccount()),
-            Map.entry(ManagementCostMealFeeDetail.class, entity -> {
-                final ManagementCostMealFeeDetail detail = (ManagementCostMealFeeDetail) entity;
-                final String name = detail.getName();
-                if (name != null && !name.trim().isEmpty()) {
-                    return name;
-                }
-                // name이 비어있으면 labor의 name 사용
-                if (detail.getLabor() != null && detail.getLabor().getName() != null
-                        && !detail.getLabor().getName().trim().isEmpty()) {
-                    return detail.getLabor().getName();
-                }
-                return null;
-            }),
+            Map.entry(ManagementCostMealFeeDetail.class,
+                    entity -> ((ManagementCostMealFeeDetail) entity).getLabor().getName()),
+            Map.entry(ManagementCostMealFeeDetailDirectContract.class,
+                    entity -> ((ManagementCostMealFeeDetailDirectContract) entity).getLabor().getName()),
+            Map.entry(ManagementCostMealFeeDetailOutsourcing.class,
+                    entity -> ((ManagementCostMealFeeDetailOutsourcing) entity).getOutsourcingCompany().getName()),
+            Map.entry(ManagementCostMealFeeDetailEquipment.class,
+                    entity -> ((ManagementCostMealFeeDetailEquipment) entity).getOutsourcingCompanyContractDriver()
+                            .getName()),
+            Map.entry(ManagementCostMealFeeDetailOutsourcingContract.class,
+                    entity -> ((ManagementCostMealFeeDetailOutsourcingContract) entity).getLabor().getName()),
             Map.entry(ManagementCostFile.class, entity -> ((ManagementCostFile) entity).getName()),
             Map.entry(FuelInfoSubEquipment.class, entity -> {
                 final FuelInfoSubEquipment subEquipment = (FuelInfoSubEquipment) entity;
