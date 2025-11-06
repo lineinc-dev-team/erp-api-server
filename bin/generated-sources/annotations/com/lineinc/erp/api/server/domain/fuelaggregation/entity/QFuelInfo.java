@@ -24,6 +24,8 @@ public class QFuelInfo extends EntityPathBase<FuelInfo> {
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
+    public final NumberPath<Long> amount = createNumber("amount", Long.class);
+
     public final EnumPath<com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType> categoryType = createEnum("categoryType", com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoCategoryType.class);
 
     //inherited

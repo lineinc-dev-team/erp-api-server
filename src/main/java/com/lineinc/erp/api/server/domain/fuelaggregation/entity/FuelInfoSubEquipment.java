@@ -72,6 +72,12 @@ public class FuelInfoSubEquipment extends BaseEntity {
     private Long fuelAmount;
 
     /**
+     * 금액 (원)
+     */
+    @DiffInclude
+    private Long amount;
+
+    /**
      * 비고 (메모)
      */
     @DiffInclude
@@ -102,6 +108,7 @@ public class FuelInfoSubEquipment extends BaseEntity {
         this.outsourcingCompanyContractSubEquipment = subEquipment;
         this.fuelType = request.fuelType();
         this.fuelAmount = request.fuelAmount();
+        this.amount = request.amount();
         this.memo = request.memo();
 
         syncTransientFields();
@@ -115,6 +122,7 @@ public class FuelInfoSubEquipment extends BaseEntity {
         this.outsourcingCompanyContractSubEquipment = subEquipment;
         this.fuelType = request.fuelType();
         this.fuelAmount = request.fuelAmount();
+        this.amount = request.amount();
         this.memo = request.memo();
 
         syncTransientFields();

@@ -24,6 +24,8 @@ public class QFuelInfoSubEquipment extends EntityPathBase<FuelInfoSubEquipment> 
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
+    public final NumberPath<Long> amount = createNumber("amount", Long.class);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
 

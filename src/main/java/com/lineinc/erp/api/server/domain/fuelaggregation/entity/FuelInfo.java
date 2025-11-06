@@ -110,6 +110,12 @@ public class FuelInfo extends BaseEntity {
     private Long fuelAmount;
 
     /**
+     * 금액
+     */
+    @DiffInclude
+    private Long amount;
+
+    /**
      * 비고 (메모)
      */
     @DiffInclude
@@ -190,6 +196,7 @@ public class FuelInfo extends BaseEntity {
         this.categoryType = request.categoryType();
         this.fuelType = request.fuelType();
         this.fuelAmount = request.fuelAmount();
+        this.amount = request.amount();
         this.memo = request.memo();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
@@ -226,6 +233,7 @@ public class FuelInfo extends BaseEntity {
         this.categoryType = request.categoryType();
         this.fuelType = request.fuelType();
         this.fuelAmount = request.fuelAmount();
+        this.amount = request.amount();
         this.memo = request.memo();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();

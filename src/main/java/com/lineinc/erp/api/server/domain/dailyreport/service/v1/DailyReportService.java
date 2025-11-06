@@ -390,6 +390,7 @@ public class DailyReportService {
                                     fuelInfoRequest.equipmentId(),
                                     fuelInfoRequest.fuelType(),
                                     fuelInfoRequest.fuelAmount(),
+                                    fuelInfoRequest.amount(),
                                     fuelInfoRequest.fileUrl(),
                                     fuelInfoRequest.originalFileName(),
                                     fuelInfoRequest.memo(), fuelInfoRequest.subEquipments()))

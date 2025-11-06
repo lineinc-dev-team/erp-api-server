@@ -12,6 +12,7 @@ public record FuelInfoSubEquipmentResponse(
         @Schema(description = "유종", example = "경유") String fuelType,
         @Schema(description = "유종 코드", example = "DIESEL") String fuelTypeCode,
         @Schema(description = "주유량 (리터)", example = "30") Long fuelAmount,
+        @Schema(description = "금액 (원)", example = "100000") Long amount,
         @Schema(description = "비고", example = "서브장비 주유") String memo) {
 
     public static FuelInfoSubEquipmentResponse from(final FuelInfoSubEquipment entity) {
@@ -23,6 +24,7 @@ public record FuelInfoSubEquipmentResponse(
                 entity.getFuelType() != null ? entity.getFuelType().getLabel() : null,
                 entity.getFuelType() != null ? entity.getFuelType().name() : null,
                 entity.getFuelAmount(),
+                entity.getAmount(),
                 entity.getMemo());
     }
 

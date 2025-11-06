@@ -119,6 +119,7 @@ public class FuelAggregationService {
                     .categoryType(fuelInfo.categoryType())
                     .fuelType(fuelInfo.fuelType())
                     .fuelAmount(fuelInfo.fuelAmount())
+                    .amount(fuelInfo.amount())
                     .fileUrl(fuelInfo.fileUrl())
                     .originalFileName(fuelInfo.originalFileName())
                     .memo(fuelInfo.memo())
@@ -144,6 +145,7 @@ public class FuelAggregationService {
                             .outsourcingCompanyContractSubEquipment(subEquipment)
                             .fuelType(subEquipmentRequest.fuelType())
                             .fuelAmount(subEquipmentRequest.fuelAmount())
+                            .amount(subEquipmentRequest.amount())
                             .memo(subEquipmentRequest.memo())
                             .build();
 

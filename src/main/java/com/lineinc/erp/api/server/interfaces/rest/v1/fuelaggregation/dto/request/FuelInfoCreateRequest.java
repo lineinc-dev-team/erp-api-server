@@ -16,6 +16,7 @@ public record FuelInfoCreateRequest(
         @Schema(description = "장비 ID", example = "1") Long equipmentId,
         @Schema(description = "유종", example = "GASOLINE") FuelInfoFuelType fuelType,
         @Schema(description = "주유량 (리터)", example = "50") Long fuelAmount,
+        @Schema(description = "금액 (원)", example = "100000") Long amount,
         @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
         @Schema(description = "사진 원본 파일명", example = "photo.jpg") String originalFileName,
         @Schema(description = "비고", example = "오전 주유") String memo,
@@ -26,6 +27,7 @@ public record FuelInfoCreateRequest(
             @Schema(description = "서브장비 ID", example = "1") Long outsourcingCompanyContractSubEquipmentId,
             @Schema(description = "유종", example = "DIESEL") FuelInfoFuelType fuelType,
             @Schema(description = "주유량 (리터)", example = "30") Long fuelAmount,
+            @Schema(description = "금액 (원)", example = "100000") Long amount,
             @Schema(description = "비고", example = "서브장비 주유") String memo) {
     }
 }
