@@ -40,6 +40,8 @@ public class QManagementCostMealFeeDetailOutsourcingContract extends EntityPathB
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
+    public final NumberPath<Integer> dinnerCount = createNumber("dinnerCount", Integer.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final com.lineinc.erp.api.server.domain.labor.entity.QLabor labor;

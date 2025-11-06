@@ -65,6 +65,13 @@ public class ManagementCostMealFeeDetailDirectContract extends BaseEntity {
     private Integer lunchCount;
 
     /**
+     * 석식 개수
+     */
+    @Column
+    @DiffInclude
+    private Integer dinnerCount;
+
+    /**
      * 단가
      */
     @Column
