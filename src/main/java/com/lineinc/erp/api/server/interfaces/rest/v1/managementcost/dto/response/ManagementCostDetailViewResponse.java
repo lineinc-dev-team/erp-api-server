@@ -25,7 +25,11 @@ public record ManagementCostDetailViewResponse(
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
         @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
         @Schema(description = "전도금 상세 목록") List<ManagementCostKeyMoneyDetailResponse> keyMoneyDetails,
-        @Schema(description = "식대 상세 목록") List<ManagementCostMealFeeDetailResponse> mealFeeDetails) {
+        @Schema(description = "식대 상세 목록 - 직원") List<ManagementCostMealFeeDetailResponse> mealFeeDetails,
+        @Schema(description = "식대 상세 목록 - 직영") List<ManagementCostMealFeeDetailDirectContractResponse> mealFeeDetailDirectContracts,
+        @Schema(description = "식대 상세 목록 - 용역") List<ManagementCostMealFeeDetailOutsourcingResponse> mealFeeDetailOutsourcings,
+        @Schema(description = "식대 상세 목록 - 장비기사") List<ManagementCostMealFeeDetailEquipmentResponse> mealFeeDetailEquipments,
+        @Schema(description = "식대 상세 목록 - 외주인력") List<ManagementCostMealFeeDetailOutsourcingContractResponse> mealFeeDetailOutsourcingContracts) {
 
     public static ManagementCostDetailViewResponse from(final ManagementCost cost) {
         return new ManagementCostDetailViewResponse(
@@ -53,6 +57,26 @@ public record ManagementCostDetailViewResponse(
                         .filter(detail -> !detail.isDeleted())
                         .map(ManagementCostMealFeeDetailResponse::from)
                         .sorted(Comparator.comparing(ManagementCostMealFeeDetailResponse::id))
+                        .toList(),
+                cost.getMealFeeDetailDirectContracts().stream()
+                        .filter(detail -> !detail.isDeleted())
+                        .map(ManagementCostMealFeeDetailDirectContractResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostMealFeeDetailDirectContractResponse::id))
+                        .toList(),
+                cost.getMealFeeDetailOutsourcings().stream()
+                        .filter(detail -> !detail.isDeleted())
+                        .map(ManagementCostMealFeeDetailOutsourcingResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostMealFeeDetailOutsourcingResponse::id))
+                        .toList(),
+                cost.getMealFeeDetailEquipments().stream()
+                        .filter(detail -> !detail.isDeleted())
+                        .map(ManagementCostMealFeeDetailEquipmentResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostMealFeeDetailEquipmentResponse::id))
+                        .toList(),
+                cost.getMealFeeDetailOutsourcingContracts().stream()
+                        .filter(detail -> !detail.isDeleted())
+                        .map(ManagementCostMealFeeDetailOutsourcingContractResponse::from)
+                        .sorted(Comparator.comparing(ManagementCostMealFeeDetailOutsourcingContractResponse::id))
                         .toList());
     }
 }
