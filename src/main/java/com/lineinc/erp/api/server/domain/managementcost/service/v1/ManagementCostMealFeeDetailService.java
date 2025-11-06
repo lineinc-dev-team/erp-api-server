@@ -88,6 +88,7 @@ public class ManagementCostMealFeeDetailService {
                             .name(dto.name())
                             .breakfastCount(dto.breakfastCount())
                             .lunchCount(dto.lunchCount())
+                            .dinnerCount(dto.dinnerCount())
                             .unitPrice(dto.unitPrice())
                             .amount(dto.amount())
                             .memo(dto.memo())

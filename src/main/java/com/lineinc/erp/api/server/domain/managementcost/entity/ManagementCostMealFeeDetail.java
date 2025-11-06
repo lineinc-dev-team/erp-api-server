@@ -80,6 +80,13 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
     private Integer lunchCount;
 
     /**
+     * 석식 개수
+     */
+    @Column
+    @DiffInclude
+    private Integer dinnerCount;
+
+    /**
      * 단가
      */
     @Column
@@ -121,6 +128,7 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
         this.name = request.name();
         this.breakfastCount = request.breakfastCount();
         this.lunchCount = request.lunchCount();
+        this.dinnerCount = request.dinnerCount();
         this.unitPrice = request.unitPrice();
         this.amount = request.amount();
         this.memo = request.memo();

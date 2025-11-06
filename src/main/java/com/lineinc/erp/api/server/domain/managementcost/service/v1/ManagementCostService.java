@@ -153,7 +153,8 @@ public class ManagementCostService {
         }
 
         // 6-4. 식대 상세 - 용역 계약 목록 저장
-        if (request.mealFeeDetailOutsourcingContracts() != null && !request.mealFeeDetailOutsourcingContracts().isEmpty()) {
+        if (request.mealFeeDetailOutsourcingContracts() != null
+                && !request.mealFeeDetailOutsourcingContracts().isEmpty()) {
             createMealFeeDetailOutsourcingContracts(managementCost, request.mealFeeDetailOutsourcingContracts());
         }
 
@@ -278,6 +279,7 @@ public class ManagementCostService {
                         .name(request.name())
                         .breakfastCount(request.breakfastCount())
                         .lunchCount(request.lunchCount())
+                        .dinnerCount(request.dinnerCount())
                         .unitPrice(request.unitPrice())
                         .amount(request.amount())
                         .memo(request.memo())
@@ -384,20 +386,22 @@ public class ManagementCostService {
         }
 
         final List<ManagementCostMealFeeDetailOutsourcingContract> details = requests.stream()
-                .<ManagementCostMealFeeDetailOutsourcingContract>map(request -> ManagementCostMealFeeDetailOutsourcingContract
-                        .builder()
-                        .managementCost(managementCost)
-                        .outsourcingCompany(request.outsourcingCompanyId() != null
-                                ? outsourcingCompanyService
-                                        .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
-                                : null)
-                        .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId()) : null)
-                        .breakfastCount(request.breakfastCount())
-                        .lunchCount(request.lunchCount())
-                        .unitPrice(request.unitPrice())
-                        .amount(request.amount())
-                        .memo(request.memo())
-                        .build())
+                .<ManagementCostMealFeeDetailOutsourcingContract>map(
+                        request -> ManagementCostMealFeeDetailOutsourcingContract
+                                .builder()
+                                .managementCost(managementCost)
+                                .outsourcingCompany(request.outsourcingCompanyId() != null
+                                        ? outsourcingCompanyService
+                                                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
+                                        : null)
+                                .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId())
+                                        : null)
+                                .breakfastCount(request.breakfastCount())
+                                .lunchCount(request.lunchCount())
+                                .unitPrice(request.unitPrice())
+                                .amount(request.amount())
+                                .memo(request.memo())
+                                .build())
                 .collect(Collectors.toList());
 
         managementCost.getMealFeeDetailOutsourcingContracts().addAll(details);
