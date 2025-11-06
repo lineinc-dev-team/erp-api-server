@@ -5,7 +5,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostMealFeeDetailUpdateRequest;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -29,9 +29,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-public class ManagementCostMealFeeDetail extends BaseEntity {
+public class ManagementCostMealFeeDetailOutsourcingContract extends BaseEntity {
 
-    private static final String SEQUENCE_NAME = "management_cost_meal_fee_detail_seq";
+    private static final String SEQUENCE_NAME = "management_cost_meal_fee_detail_outsourcing_contract_seq";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
@@ -44,11 +44,12 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
     private ManagementCost managementCost;
 
     /**
-     * 직종
+     * 외주업체 테이블과 연결
      */
-    @Column
-    @DiffInclude
-    private String workType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
+    @DiffIgnore
+    private OutsourcingCompany outsourcingCompany;
 
     /**
      * 인력 테이블과 연결
@@ -57,13 +58,6 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
     @JoinColumn(name = AppConstants.LABOR_ID)
     @DiffIgnore
     private Labor labor;
-
-    /**
-     * 이름
-     */
-    @Column
-    @DiffInclude
-    private String name;
 
     /**
      * 조식 개수
@@ -104,6 +98,10 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
     @DiffInclude
     private String laborName;
 
+    @Transient
+    @DiffInclude
+    private String outsourcingCompanyName;
+
     // ID만 저장할 필드 추가
     @Transient
     private Long laborId;
@@ -113,25 +111,6 @@ public class ManagementCostMealFeeDetail extends BaseEntity {
      */
     public void syncTransientFields() {
         this.laborName = this.labor != null ? this.labor.getName() : null;
+        this.outsourcingCompanyName = this.outsourcingCompany != null ? this.outsourcingCompany.getName() : null;
     }
-
-    public void updateFrom(final ManagementCostMealFeeDetailUpdateRequest request) {
-        this.laborId = request.laborId();
-        this.workType = request.workType();
-        this.name = request.name();
-        this.breakfastCount = request.breakfastCount();
-        this.lunchCount = request.lunchCount();
-        this.unitPrice = request.unitPrice();
-        this.amount = request.amount();
-        this.memo = request.memo();
-    }
-
-    /**
-     * 연관 엔티티를 설정하고 transient 필드를 동기화합니다.
-     */
-    public void setEntities(final Labor labor) {
-        this.labor = labor;
-        syncTransientFields();
-    }
-
 }
