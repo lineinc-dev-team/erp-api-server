@@ -232,6 +232,7 @@ public class FuelAggregationService {
             case "specification" -> "규격";
             case "fuelType" -> "유종";
             case "fuelAmount" -> "주유량";
+            case "amount" -> "금액";
             case "createdAtAndUpdatedAt" -> "등록/수정일";
             case "memo" -> "비고";
             default -> null;
@@ -260,6 +261,9 @@ public class FuelAggregationService {
             case "fuelType" -> response.fuelInfo() != null ? response.fuelInfo().fuelType() : "";
             case "fuelAmount" -> response.fuelInfo() != null && response.fuelInfo().fuelAmount() != null
                     ? NumberFormat.getNumberInstance().format(response.fuelInfo().fuelAmount())
+                    : "";
+            case "amount" -> response.fuelInfo() != null && response.fuelInfo().amount() != null
+                    ? NumberFormat.getNumberInstance().format(response.fuelInfo().amount())
                     : "";
             case "createdAtAndUpdatedAt" ->
                 response.createdAt() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
