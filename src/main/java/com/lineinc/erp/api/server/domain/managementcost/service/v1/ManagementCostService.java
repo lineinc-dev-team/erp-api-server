@@ -383,7 +383,7 @@ public class ManagementCostService {
             case "processName" -> "공정명";
             case "itemType" -> "항목";
             case "paymentDate" -> "일자";
-            case "outsourcingCompanyName" -> "업체명";
+            case "outsourcingCompanyName" -> "구매처";
             case "outsourcingCompanyBusinessNumber" -> "사업자번호";
             case "outsourcingCompanyCeoName" -> "대표자";
             case "outsourcingCompanyAccountNumber" -> "청구계좌";
