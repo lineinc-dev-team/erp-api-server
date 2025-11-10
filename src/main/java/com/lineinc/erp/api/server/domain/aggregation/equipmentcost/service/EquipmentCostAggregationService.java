@@ -59,8 +59,8 @@ public class EquipmentCostAggregationService {
         final List<DailyReportOutsourcingEquipment> allEquipments = findEquipmentsUpToMonth(site, siteProcess,
                 yearMonth);
 
-        // 외주업체별로 그룹핑하여 집계
-        final List<EquipmentCostAggregationItem> items = aggregateByOutsourcingCompany(allEquipments, yearMonth);
+        // 장비(규격)별로 그룹핑하여 집계
+        final List<EquipmentCostAggregationItem> items = aggregateByEquipment(allEquipments, yearMonth);
 
         return new EquipmentCostAggregationResponse(items);
     }
@@ -85,31 +85,23 @@ public class EquipmentCostAggregationService {
     }
 
     /**
-     * 장비, 규격별로 장비비 집계
+     * 장비(규격)별로 장비비 집계
      */
-    private List<EquipmentCostAggregationItem> aggregateByOutsourcingCompany(
+    private List<EquipmentCostAggregationItem> aggregateByEquipment(
             final List<DailyReportOutsourcingEquipment> allEquipments,
             final String currentYearMonth) {
 
-        // 외주업체 ID + 장비 ID로 그룹핑 (장비, 규격별)
-        final Map<String, List<DailyReportOutsourcingEquipment>> groupedByEquipment = allEquipments.stream()
+        // 장비 ID로 그룹핑 (장비, 규격별)
+        final Map<Long, List<DailyReportOutsourcingEquipment>> groupedByEquipment = allEquipments.stream()
                 .filter(equipment -> equipment.getOutsourcingCompany() != null)
                 .filter(equipment -> equipment.getOutsourcingCompanyContractEquipment() != null)
-                .collect(Collectors.groupingBy(equipment -> createEquipmentGroupKey(equipment)));
+                .collect(
+                        Collectors.groupingBy(equipment -> equipment.getOutsourcingCompanyContractEquipment().getId()));
 
         return groupedByEquipment.entrySet().stream()
                 .map(entry -> createEquipmentCostAggregationItem(entry.getValue(), currentYearMonth))
                 .filter(this::hasNonZeroBilling)
                 .toList();
-    }
-
-    /**
-     * 장비별 그룹핑 키 생성 (외주업체 ID + 장비 ID)
-     */
-    private String createEquipmentGroupKey(final DailyReportOutsourcingEquipment equipment) {
-        final Long companyId = equipment.getOutsourcingCompany().getId();
-        final Long equipmentId = equipment.getOutsourcingCompanyContractEquipment().getId();
-        return companyId + "_" + equipmentId;
     }
 
     /**

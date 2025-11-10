@@ -87,8 +87,8 @@ public class EquipmentOperationStatusService {
         final Map<Long, Map<Integer, Long>> fuelUsageByEquipment = buildFuelUsageByEquipmentForMonth(
                 fuelAggregations, YearMonth.parse(yearMonth));
 
-        // 규격별로 그룹핑
-        final List<EquipmentOperationStatusItem> items = aggregateBySpecification(allEquipments, yearMonth,
+        // 장비(규격)별로 그룹핑
+        final List<EquipmentOperationStatusItem> items = aggregateByEquipment(allEquipments, yearMonth,
                 fuelUsageByEquipment);
 
         return new EquipmentOperationStatusResponse(items);
@@ -116,32 +116,31 @@ public class EquipmentOperationStatusService {
     }
 
     /**
-     * 규격별로 그룹핑 (1:1 매핑)
+     * 장비(규격)별로 그룹핑 (1:1 매핑)
      */
-    private List<EquipmentOperationStatusItem> aggregateBySpecification(
+    private List<EquipmentOperationStatusItem> aggregateByEquipment(
             final List<DailyReportOutsourcingEquipment> allEquipments,
             final String currentYearMonth,
             final Map<Long, Map<Integer, Long>> fuelUsageByEquipment) {
 
         final YearMonth currentYm = YearMonth.parse(currentYearMonth);
 
-        // 규격별로 그룹핑
-        final Map<String, List<DailyReportOutsourcingEquipment>> groupedBySpecification = allEquipments
+        // 장비 ID(규격)별로 그룹핑
+        final Map<Long, List<DailyReportOutsourcingEquipment>> groupedByEquipment = allEquipments
                 .stream()
-                .collect(Collectors.groupingBy(equipment -> extractSpecification(equipment)));
+                .filter(equipment -> equipment.getOutsourcingCompanyContractEquipment() != null)
+                .collect(Collectors.groupingBy(equipment -> extractEquipmentId(equipment)));
 
-        return groupedBySpecification.entrySet().stream()
+        return groupedByEquipment.entrySet().stream()
                 .map(entry -> createEquipmentOperationStatusItem(entry.getValue(), currentYm, fuelUsageByEquipment))
                 .toList();
     }
 
     /**
-     * 규격 추출
+     * 장비 ID 추출
      */
-    private String extractSpecification(final DailyReportOutsourcingEquipment equipment) {
-        return Optional.ofNullable(equipment.getOutsourcingCompanyContractEquipment())
-                .map(OutsourcingCompanyContractEquipment::getSpecification)
-                .orElse("");
+    private Long extractEquipmentId(final DailyReportOutsourcingEquipment equipment) {
+        return equipment.getOutsourcingCompanyContractEquipment().getId();
     }
 
     /**
