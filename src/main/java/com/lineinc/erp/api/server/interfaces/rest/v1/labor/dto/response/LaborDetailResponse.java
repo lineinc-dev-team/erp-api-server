@@ -8,6 +8,7 @@ import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDetailResponse;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,6 +32,7 @@ public record LaborDetailResponse(
         @Schema(description = "입사일") OffsetDateTime hireDate,
         @Schema(description = "퇴사일") OffsetDateTime resignationDate,
         @Schema(description = "소속업체 정보") CompanySimpleResponse outsourcingCompany,
+        @Schema(description = "외주업체 계약 정보") ContractDetailResponse outsourcingCompanyContract,
         @Schema(description = "주민등록번호") String residentNumber,
         @Schema(description = "주소") String address,
         @Schema(description = "상세주소") String detailAddress,
@@ -67,6 +69,9 @@ public record LaborDetailResponse(
                 labor.getHireDate(),
                 labor.getResignationDate(),
                 labor.getOutsourcingCompany() != null ? CompanySimpleResponse.from(labor.getOutsourcingCompany())
+                        : null,
+                labor.getOutsourcingCompanyContract() != null
+                        ? ContractDetailResponse.from(labor.getOutsourcingCompanyContract())
                         : null,
                 PrivacyMaskingUtils.maskResidentNumber(labor.getResidentNumber()),
                 labor.getAddress(),
