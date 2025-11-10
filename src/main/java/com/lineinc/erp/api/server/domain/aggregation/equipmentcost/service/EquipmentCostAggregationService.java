@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.aggregation.equipmentcost.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
@@ -38,6 +40,8 @@ public class EquipmentCostAggregationService {
     private final DailyReportOutsourcingEquipmentRepository equipmentRepository;
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
+    private static final BigDecimal VAT_RATE = BigDecimal.valueOf(0.1);
+    private static final BigDecimal ONE_PLUS_VAT = BigDecimal.ONE.add(VAT_RATE);
 
     /**
      * 장비비 집계 조회 (외주업체별)
@@ -184,34 +188,35 @@ public class EquipmentCostAggregationService {
      * 계 = 공급가 + 부가세
      */
     private BillingDetail calculateBillingDetail(final List<DailyReportOutsourcingEquipment> equipments) {
-        long supplyPrice = 0L;
+        long totalGross = 0L;
 
         for (final DailyReportOutsourcingEquipment equipment : equipments) {
-            // 장비 비용 = 단가 × 시간
-            final long equipmentCost = calculateEquipmentCost(equipment);
-            supplyPrice += equipmentCost;
+            // 장비 총액(부가세 포함)을 단가 × 시간으로 추정
+            final long equipmentTotalCost = calculateEquipmentCost(equipment);
+            totalGross += equipmentTotalCost;
 
             // 서브장비 비용 합산
             for (final DailyReportOutsourcingEquipmentSubEquipment subEquipment : equipment.getSubEquipments()) {
-                final long subEquipmentCost = calculateSubEquipmentCost(subEquipment);
-                supplyPrice += subEquipmentCost;
+                final long subEquipmentTotalCost = calculateSubEquipmentCost(subEquipment);
+                totalGross += subEquipmentTotalCost;
             }
         }
 
-        // 부가세 = 공급가 × 10%
-        final long vat = Math.round(supplyPrice * 0.1);
+        // 공급가와 부가세를 역산
+        final long supplyPrice = calculateSupplyPriceFromTotal(totalGross);
+        final long vat = totalGross - supplyPrice;
 
         // 공제금액 = 0 (장비비는 공제 없음)
         final long deductionAmount = 0L;
 
-        // 계 = 공급가 + 부가세
-        final long total = supplyPrice + vat;
+        // 계 = 총액 (부가세 포함)
+        final long total = totalGross;
 
         return new BillingDetail(supplyPrice, vat, deductionAmount, total);
     }
 
     /**
-     * 장비 비용 계산 (단가 × 시간)
+     * 장비 총액(부가세 포함) 계산 (단가 × 시간)
      */
     private long calculateEquipmentCost(final DailyReportOutsourcingEquipment equipment) {
         final long unitPrice = equipment.getUnitPrice() != null ? equipment.getUnitPrice() : 0L;
@@ -220,12 +225,25 @@ public class EquipmentCostAggregationService {
     }
 
     /**
-     * 서브장비 비용 계산 (단가 × 시간)
+     * 서브장비 총액(부가세 포함) 계산 (단가 × 시간)
      */
     private long calculateSubEquipmentCost(final DailyReportOutsourcingEquipmentSubEquipment subEquipment) {
         final long unitPrice = subEquipment.getUnitPrice() != null ? subEquipment.getUnitPrice() : 0L;
         final double workHours = subEquipment.getWorkHours() != null ? subEquipment.getWorkHours() : 0.0;
         return Math.round(unitPrice * workHours);
+    }
+
+    /**
+     * 총액(부가세 포함)을 기준으로 공급가를 역산
+     */
+    private long calculateSupplyPriceFromTotal(final long totalGross) {
+        if (totalGross <= 0) {
+            return 0L;
+        }
+
+        return BigDecimal.valueOf(totalGross)
+                .divide(ONE_PLUS_VAT, 0, RoundingMode.HALF_UP)
+                .longValueExact();
     }
 
     /**
