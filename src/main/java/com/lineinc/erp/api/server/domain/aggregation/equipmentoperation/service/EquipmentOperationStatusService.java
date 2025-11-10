@@ -6,6 +6,7 @@ import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportOutso
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractSubEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContactSubEquipmentType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractCategoryType;
@@ -84,8 +87,8 @@ public class EquipmentOperationStatusService {
         final Map<Long, Map<Integer, Long>> fuelUsageByEquipment = buildFuelUsageByEquipmentForMonth(
                 fuelAggregations, YearMonth.parse(yearMonth));
 
-        // 외주업체별로 그룹핑
-        final List<EquipmentOperationStatusItem> items = aggregateByOutsourcingCompany(allEquipments, yearMonth,
+        // 규격별로 그룹핑
+        final List<EquipmentOperationStatusItem> items = aggregateBySpecification(allEquipments, yearMonth,
                 fuelUsageByEquipment);
 
         return new EquipmentOperationStatusResponse(items);
@@ -113,29 +116,32 @@ public class EquipmentOperationStatusService {
     }
 
     /**
-     * 외주업체 + 규격별로 그룹핑 (1:1 매핑)
+     * 규격별로 그룹핑 (1:1 매핑)
      */
-    private List<EquipmentOperationStatusItem> aggregateByOutsourcingCompany(
+    private List<EquipmentOperationStatusItem> aggregateBySpecification(
             final List<DailyReportOutsourcingEquipment> allEquipments,
             final String currentYearMonth,
             final Map<Long, Map<Integer, Long>> fuelUsageByEquipment) {
 
         final YearMonth currentYm = YearMonth.parse(currentYearMonth);
 
-        // 외주업체 ID + 규격별로 그룹핑
-        final Map<String, List<DailyReportOutsourcingEquipment>> groupedByCompanyAndSpecification = allEquipments
+        // 규격별로 그룹핑
+        final Map<String, List<DailyReportOutsourcingEquipment>> groupedBySpecification = allEquipments
                 .stream()
-                .filter(equipment -> equipment.getOutsourcingCompany() != null)
-                .filter(equipment -> equipment.getOutsourcingCompanyContractEquipment() != null)
-                .collect(Collectors.groupingBy(equipment -> {
-                    final Long companyId = equipment.getOutsourcingCompany().getId();
-                    final String specification = equipment.getOutsourcingCompanyContractEquipment().getSpecification();
-                    return companyId + "_" + (specification != null ? specification : "");
-                }));
+                .collect(Collectors.groupingBy(equipment -> extractSpecification(equipment)));
 
-        return groupedByCompanyAndSpecification.entrySet().stream()
+        return groupedBySpecification.entrySet().stream()
                 .map(entry -> createEquipmentOperationStatusItem(entry.getValue(), currentYm, fuelUsageByEquipment))
                 .toList();
+    }
+
+    /**
+     * 규격 추출
+     */
+    private String extractSpecification(final DailyReportOutsourcingEquipment equipment) {
+        return Optional.ofNullable(equipment.getOutsourcingCompanyContractEquipment())
+                .map(OutsourcingCompanyContractEquipment::getSpecification)
+                .orElse("");
     }
 
     /**
@@ -147,15 +153,24 @@ public class EquipmentOperationStatusService {
             final Map<Long, Map<Integer, Long>> fuelUsageByEquipment) {
 
         final DailyReportOutsourcingEquipment firstEquipment = equipments.get(0);
+        final OutsourcingCompanyContractEquipment contractEquipment = firstEquipment
+                .getOutsourcingCompanyContractEquipment();
+        final OutsourcingCompanyContract outsourcingContract = Optional.ofNullable(contractEquipment)
+                .map(OutsourcingCompanyContractEquipment::getOutsourcingCompanyContract)
+                .orElse(null);
 
         // 외주업체 정보
-        final CompanyResponse.CompanySimpleResponse outsourcingCompany = CompanyResponse.CompanySimpleResponse
-                .from(firstEquipment.getOutsourcingCompany());
+        final CompanyResponse.CompanySimpleResponse outsourcingCompany = Optional.ofNullable(outsourcingContract)
+                .map(OutsourcingCompanyContract::getOutsourcingCompany)
+                .map(CompanyResponse.CompanySimpleResponse::from)
+                .orElseGet(() -> Optional.ofNullable(firstEquipment.getOutsourcingCompany())
+                        .map(CompanyResponse.CompanySimpleResponse::from)
+                        .orElse(null));
 
         // 규격
-        final String specification = firstEquipment.getOutsourcingCompanyContractEquipment() != null
-                ? firstEquipment.getOutsourcingCompanyContractEquipment().getSpecification()
-                : "";
+        final String specification = Optional.ofNullable(contractEquipment)
+                .map(OutsourcingCompanyContractEquipment::getSpecification)
+                .orElse("");
 
         // 기사 정보 (첫 번째 기사 정보 사용, 여러 기사가 있을 수 있음)
         final ContractDriverResponse.ContractDriverSimpleResponse driver = firstEquipment
@@ -166,9 +181,9 @@ public class EquipmentOperationStatusService {
 
         // 장비 정보 (첫 번째 장비의 type 사용, 장비는 하나이므로)
         final OutsourcingCompanyContractCategoryType equipmentType = equipments.stream()
-                .map(equipment -> equipment.getOutsourcingCompanyContractEquipment())
-                .filter(contractEquipment -> contractEquipment != null && contractEquipment.getType() != null)
-                .map(contractEquipment -> contractEquipment.getType())
+                .map(DailyReportOutsourcingEquipment::getOutsourcingCompanyContractEquipment)
+                .filter(contractEq -> contractEq != null && contractEq.getType() != null)
+                .map(OutsourcingCompanyContractEquipment::getType)
                 .findFirst()
                 .orElse(null);
 
