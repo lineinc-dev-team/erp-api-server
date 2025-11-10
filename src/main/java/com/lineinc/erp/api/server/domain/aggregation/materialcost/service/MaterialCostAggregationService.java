@@ -90,7 +90,7 @@ public class MaterialCostAggregationService {
                 .filter(this::hasNonZeroBilling)
                 .toList();
 
-        // 강재수불부 응답 생성 (입고+출고+고철, 업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
+        // 강재수불부 응답 생성 (입고+출고+고철, 업체별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<SteelManagementItemResponse> steelManagementResponses = aggregateSteelManagements(
                 steelManagements, yearMonth).stream()
                 .filter(this::hasNonZeroSteel)
@@ -276,8 +276,8 @@ public class MaterialCostAggregationService {
 
         final OffsetDateTime currentMonthStartDateTime = calculateMonthStartDateTime(yearMonth);
 
-        // 업체+품명별로 그룹핑 (입고 + 출고 + 고철, 자사자재 포함)
-        final Map<String, List<Map.Entry<SteelManagementV2, SteelManagementDetailV2>>> groupedByCompanyAndItem = steelManagements
+        // 업체별로 그룹핑 (입고 + 출고 + 고철, 자사자재 포함)
+        final Map<String, List<Map.Entry<SteelManagementV2, SteelManagementDetailV2>>> groupedByCompany = steelManagements
                 .stream()
                 .flatMap(sm -> sm.getDetails().stream()
                         .filter(detail -> detail.getType() == SteelManagementDetailV2Type.INCOMING ||
@@ -287,20 +287,20 @@ public class MaterialCostAggregationService {
                 .collect(Collectors.groupingBy(this::createSteelGroupingKey));
 
         // 각 그룹별로 전회까지/금회 집계하여 응답 생성
-        return groupedByCompanyAndItem.values().stream()
+        return groupedByCompany.values().stream()
                 .map(group -> createSteelManagementItemResponse(group, currentMonthStartDateTime))
                 .toList();
     }
 
     /**
-     * 강재수불부 그룹핑 키 생성: 업체ID_품명 (외주업체가 없는 경우 "SELF" 사용)
+     * 강재수불부 그룹핑 키 생성: 업체ID만 (외주업체가 없는 경우 "SELF" 사용)
      */
     private String createSteelGroupingKey(final Map.Entry<SteelManagementV2, SteelManagementDetailV2> entry) {
         final SteelManagementDetailV2 detail = entry.getValue();
         final String companyKey = detail.getOutsourcingCompany() != null
                 ? String.valueOf(detail.getOutsourcingCompany().getId())
                 : "SELF";
-        return companyKey + "_" + detail.getName();
+        return companyKey;
     }
 
     /**
@@ -310,7 +310,7 @@ public class MaterialCostAggregationService {
             final List<Map.Entry<SteelManagementV2, SteelManagementDetailV2>> group,
             final OffsetDateTime currentMonthStartDateTime) {
 
-        // 그룹의 첫번째 항목에서 업체와 품명 정보 가져오기
+        // 그룹의 첫번째 항목에서 업체 정보 가져오기
         final SteelManagementDetailV2 firstDetail = group.get(0).getValue();
 
         // 전회까지/금회 청구내역 집계
@@ -325,8 +325,6 @@ public class MaterialCostAggregationService {
         return new SteelManagementItemResponse(
                 companyResponse,
                 firstDetail.getName(),
-                firstDetail.getCategory() != null ? firstDetail.getCategory().getLabel() : "",
-                firstDetail.getCategory() != null ? firstDetail.getCategory().name() : "",
                 previousBilling,
                 currentBilling);
     }

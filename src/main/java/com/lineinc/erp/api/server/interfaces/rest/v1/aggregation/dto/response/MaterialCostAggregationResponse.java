@@ -46,8 +46,6 @@ public record MaterialCostAggregationResponse(
     public record SteelManagementItemResponse(
             @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
             @Schema(description = "품명", example = "H빔") String itemName,
-            @Schema(description = "카테고리", example = "자사자재") String category,
-            @Schema(description = "카테고리 코드", example = "OWN_MATERIAL") String categoryCode,
             @Schema(description = "전회까지 청구내역") MaterialManagementItemResponse.BillingDetail previousBilling,
             @Schema(description = "금회 청구내역") MaterialManagementItemResponse.BillingDetail currentBilling) {
     }
