@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcing;
+import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcingContract;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
@@ -137,10 +139,29 @@ public class LaborPayrollSyncService {
                 }
             }
 
-            // 직영/용역 처리 (삭제되지 않은 데이터만)
+            // 직영 처리 (삭제되지 않은 데이터만)
             for (final DailyReportDirectContract directContract : dailyReport.getDirectContracts()) {
                 if (!directContract.isDeleted()) {
                     processDirectContractData(laborDataMap, directContract, dayOfMonth, yearMonth,
+                            dailyReport.getSite(), dailyReport.getSiteProcess());
+                }
+            }
+
+            // 용역 처리 (삭제되지 않은 데이터만)
+            for (final DailyReportDirectContractOutsourcing directContractOutsourcing : dailyReport
+                    .getDirectContractOutsourcings()) {
+                if (!directContractOutsourcing.isDeleted()) {
+                    processDirectContractOutsourcingData(laborDataMap, directContractOutsourcing, dayOfMonth, yearMonth,
+                            dailyReport.getSite(), dailyReport.getSiteProcess());
+                }
+            }
+
+            // 외주 처리 (삭제되지 않은 데이터만)
+            for (final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract : dailyReport
+                    .getDirectContractOutsourcingContracts()) {
+                if (!directContractOutsourcingContract.isDeleted()) {
+                    processDirectContractOutsourcingContractData(laborDataMap, directContractOutsourcingContract,
+                            dayOfMonth, yearMonth,
                             dailyReport.getSite(), dailyReport.getSiteProcess());
                 }
             }
@@ -165,7 +186,7 @@ public class LaborPayrollSyncService {
     }
 
     /**
-     * 직영/용역 데이터 처리
+     * 직영 데이터 처리
      */
     private void processDirectContractData(final Map<String, LaborPayrollData> laborDataMap,
             final DailyReportDirectContract directContract, final int dayOfMonth, final String yearMonth,
@@ -173,6 +194,44 @@ public class LaborPayrollSyncService {
             final SiteProcess siteProcess) {
         processLaborData(laborDataMap, directContract.getLabor(), directContract.getUnitPrice(),
                 directContract.getWorkQuantity(), dayOfMonth, yearMonth, site, siteProcess);
+    }
+
+    /**
+     * 용역 데이터 처리
+     */
+    private void processDirectContractOutsourcingData(final Map<String, LaborPayrollData> laborDataMap,
+            final DailyReportDirectContractOutsourcing directContractOutsourcing, final int dayOfMonth,
+            final String yearMonth,
+            final Site site,
+            final SiteProcess siteProcess) {
+        processLaborData(laborDataMap, directContractOutsourcing.getLabor(), directContractOutsourcing.getUnitPrice(),
+                directContractOutsourcing.getWorkQuantity(), dayOfMonth, yearMonth, site, siteProcess);
+    }
+
+    /**
+     * 외주 데이터 처리
+     */
+    private void processDirectContractOutsourcingContractData(final Map<String, LaborPayrollData> laborDataMap,
+            final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract, final int dayOfMonth,
+            final String yearMonth,
+            final Site site,
+            final SiteProcess siteProcess) {
+        final Long unitPrice = resolveOutsourcingContractUnitPrice(directContractOutsourcingContract);
+        processLaborData(laborDataMap, directContractOutsourcingContract.getLabor(), unitPrice,
+                directContractOutsourcingContract.getWorkQuantity(), dayOfMonth, yearMonth, site, siteProcess);
+    }
+
+    /**
+     * 외주 단가 보정
+     * 계약 정보에 단가가 직접 없으므로 인력 정보를 통해 추정
+     */
+    private Long resolveOutsourcingContractUnitPrice(
+            final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract) {
+        return Optional.ofNullable(directContractOutsourcingContract.getLabor())
+                .map(labor -> labor.getPreviousDailyWage() != null
+                        ? labor.getPreviousDailyWage()
+                        : labor.getDailyWage())
+                .orElse(null);
     }
 
     /**
