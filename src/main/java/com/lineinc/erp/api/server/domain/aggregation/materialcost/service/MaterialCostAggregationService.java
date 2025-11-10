@@ -16,6 +16,7 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelAggregationRepository;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
+import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -83,7 +84,7 @@ public class MaterialCostAggregationService {
         final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
                 .findBySiteAndSiteProcessAndYearMonthLessThanEqual(site, siteProcess, yearMonth);
 
-        // 자재관리 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
+        // 자재관리 응답 생성 (업체+투입구분별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<MaterialManagementItemResponse> materialManagementResponses = aggregateMaterialManagements(
                 materialManagements, yearMonth).stream()
                 .filter(this::hasNonZeroBilling)
@@ -108,7 +109,7 @@ public class MaterialCostAggregationService {
     }
 
     /**
-     * 자재관리 데이터를 업체+품명별로 그룹핑하여 전회까지/금회 청구내역 집계
+     * 자재관리 데이터를 업체+투입구분별로 그룹핑하여 전회까지/금회 청구내역 집계
      * 
      * @param materialManagements 자재관리 목록
      * @param yearMonth           조회월 (YYYY-MM)
@@ -120,24 +121,43 @@ public class MaterialCostAggregationService {
 
         final OffsetDateTime currentMonthStartDateTime = calculateMonthStartDateTime(yearMonth);
 
-        // 업체+품명별로 그룹핑
-        final Map<String, List<Map.Entry<MaterialManagement, MaterialManagementDetail>>> groupedByCompanyAndItem = materialManagements
+        // 업체+투입구분별로 그룹핑
+        final Map<String, List<Map.Entry<MaterialManagement, MaterialManagementDetail>>> groupedByCompanyAndInputType = materialManagements
                 .stream()
                 .flatMap(mm -> mm.getDetails().stream()
                         .map(detail -> Map.entry(mm, detail)))
                 .collect(Collectors.groupingBy(this::createGroupingKey));
 
         // 각 그룹별로 전회까지/금회 집계하여 응답 생성
-        return groupedByCompanyAndItem.values().stream()
+        return groupedByCompanyAndInputType.values().stream()
                 .map(group -> createMaterialManagementItemResponse(group, currentMonthStartDateTime))
                 .toList();
     }
 
     /**
-     * 그룹핑 키 생성: 업체ID_품명
+     * 그룹핑 키 생성: 업체ID_투입구분 (직접입력은 투입구분 상세 설명 기준)
      */
     private String createGroupingKey(final Map.Entry<MaterialManagement, MaterialManagementDetail> entry) {
-        return entry.getKey().getOutsourcingCompany().getId() + "_" + entry.getValue().getName();
+        final MaterialManagement materialManagement = entry.getKey();
+
+        final String companyKey = materialManagement.getOutsourcingCompany() != null
+                ? String.valueOf(materialManagement.getOutsourcingCompany().getId())
+                : "NO_COMPANY";
+        final MaterialManagementInputType inputType = materialManagement.getInputType();
+
+        if (inputType == null) {
+            return companyKey + "_NO_INPUT_TYPE";
+        }
+
+        if (inputType == MaterialManagementInputType.DIRECT_INPUT) {
+            final String description = materialManagement.getInputTypeDescription();
+            final String normalizedDescription = description != null && !description.isBlank()
+                    ? description.trim()
+                    : MaterialManagementInputType.DIRECT_INPUT.name();
+            return companyKey + "_" + normalizedDescription;
+        }
+
+        return companyKey + "_" + inputType.name();
     }
 
     /**
@@ -147,17 +167,20 @@ public class MaterialCostAggregationService {
             final List<Map.Entry<MaterialManagement, MaterialManagementDetail>> group,
             final OffsetDateTime currentMonthStartDateTime) {
 
-        // 그룹의 첫번째 항목에서 업체와 품명 정보 가져오기
+        // 그룹의 첫번째 항목에서 업체와 투입구분 정보 가져오기
         final MaterialManagement firstMm = group.get(0).getKey();
-        final MaterialManagementDetail firstDetail = group.get(0).getValue();
 
         // 전회까지/금회 청구내역 집계
         final BillingDetail previousBilling = aggregatePreviousBilling(group, currentMonthStartDateTime);
         final BillingDetail currentBilling = aggregateCurrentBilling(group, currentMonthStartDateTime);
 
         return new MaterialManagementItemResponse(
-                CompanyResponse.CompanySimpleResponse.from(firstMm.getOutsourcingCompany()),
-                firstDetail.getName(),
+                firstMm.getOutsourcingCompany() != null
+                        ? CompanyResponse.CompanySimpleResponse.from(firstMm.getOutsourcingCompany())
+                        : null,
+                firstMm.getInputType() != null ? firstMm.getInputType().getLabel() : null,
+                firstMm.getInputType() != null ? firstMm.getInputType().name() : null,
+                firstMm.getInputTypeDescription() != null ? firstMm.getInputTypeDescription() : null,
                 previousBilling,
                 currentBilling);
     }

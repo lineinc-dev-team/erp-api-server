@@ -21,7 +21,9 @@ public record MaterialCostAggregationResponse(
     @Schema(description = "자재관리 항목 응답")
     public record MaterialManagementItemResponse(
             @Schema(description = "외주업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
-            @Schema(description = "품명", example = "시멘트") String itemName,
+            @Schema(description = "투입구분", example = "주요자재(구매)") String inputType,
+            @Schema(description = "투입구분 코드", example = "MAJOR_PURCHASE") String inputTypeCode,
+            @Schema(description = "투입구분 상세 설명", example = "외주사 납품") String inputTypeDescription,
             @Schema(description = "전회까지 청구내역") BillingDetail previousBilling,
             @Schema(description = "금회 청구내역") BillingDetail currentBilling) {
 
