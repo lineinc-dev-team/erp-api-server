@@ -96,7 +96,7 @@ public class MaterialCostAggregationService {
                 .filter(this::hasNonZeroSteel)
                 .toList();
 
-        // 유류집계 응답 생성 (업체+품명별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
+        // 유류집계 응답 생성 (유류업체별로 그룹핑하여 전회까지/금회 집계, 0원 항목 제외)
         final List<FuelAggregationItemResponse> fuelAggregationResponses = aggregateFuelAggregations(
                 fuelAggregations, yearMonth).stream()
                 .filter(this::hasNonZeroFuel)
@@ -407,7 +407,7 @@ public class MaterialCostAggregationService {
     }
 
     /**
-     * 유류집계 데이터를 업체+품명별로 그룹핑하여 전회까지/금회 청구내역 집계
+     * 유류집계 데이터를 유류업체별로 그룹핑하여 전회까지/금회 청구내역 집계
      * 
      * @param fuelAggregations 유류집계 목록
      * @param yearMonth        조회월 (YYYY-MM)
@@ -419,26 +419,27 @@ public class MaterialCostAggregationService {
 
         final OffsetDateTime currentMonthStartDateTime = calculateMonthStartDateTime(yearMonth);
 
-        // 업체+품명별로 그룹핑
-        final Map<String, List<Map.Entry<FuelAggregation, FuelInfo>>> groupedByCompanyAndItem = fuelAggregations
+        // 유류업체별로 그룹핑
+        final Map<String, List<Map.Entry<FuelAggregation, FuelInfo>>> groupedByFuelCompany = fuelAggregations
                 .stream()
                 .flatMap(fa -> fa.getFuelInfos().stream()
-                        .filter(fi -> fi.getOutsourcingCompany() != null) // 업체 정보가 있는 경우만
                         .map(fi -> Map.entry(fa, fi)))
                 .collect(Collectors.groupingBy(this::createFuelGroupingKey));
 
         // 각 그룹별로 전회까지/금회 집계하여 응답 생성
-        return groupedByCompanyAndItem.values().stream()
+        return groupedByFuelCompany.values().stream()
                 .map(group -> createFuelAggregationItemResponse(group, currentMonthStartDateTime))
                 .toList();
     }
 
     /**
-     * 유류집계 그룹핑 키 생성: 업체ID만 (유종 구분 없이 업체별로 통합)
+     * 유류집계 그룹핑 키 생성: 유류업체ID (유류업체가 없으면 기본값)
      */
     private String createFuelGroupingKey(final Map.Entry<FuelAggregation, FuelInfo> entry) {
-        final FuelInfo fuelInfo = entry.getValue();
-        return fuelInfo.getOutsourcingCompany().getId().toString();
+        final FuelAggregation fuelAggregation = entry.getKey();
+        return fuelAggregation.getOutsourcingCompany() != null
+                ? fuelAggregation.getOutsourcingCompany().getId().toString()
+                : "NO_FUEL_COMPANY";
     }
 
     /**
@@ -448,15 +449,17 @@ public class MaterialCostAggregationService {
             final List<Map.Entry<FuelAggregation, FuelInfo>> group,
             final OffsetDateTime currentMonthStartDateTime) {
 
-        // 그룹의 첫번째 항목에서 업체와 유종 정보 가져오기
-        final FuelInfo firstFuelInfo = group.get(0).getValue();
+        // 그룹의 첫번째 항목에서 유류업체 정보 가져오기
+        final FuelAggregation firstFuelAggregation = group.get(0).getKey();
 
         // 전회까지/금회 청구내역 집계
         final BillingDetail previousBilling = aggregateFuelPreviousBilling(group, currentMonthStartDateTime);
         final BillingDetail currentBilling = aggregateFuelCurrentBilling(group, currentMonthStartDateTime);
 
         return new FuelAggregationItemResponse(
-                CompanyResponse.CompanySimpleResponse.from(firstFuelInfo.getOutsourcingCompany()),
+                firstFuelAggregation.getOutsourcingCompany() != null
+                        ? CompanyResponse.CompanySimpleResponse.from(firstFuelAggregation.getOutsourcingCompany())
+                        : null,
                 "유류대",
                 previousBilling,
                 currentBilling);
