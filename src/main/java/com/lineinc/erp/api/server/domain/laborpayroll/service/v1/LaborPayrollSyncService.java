@@ -254,23 +254,39 @@ public class LaborPayrollSyncService {
      * 집계 테이블 재생성 (기존 데이터 삭제 후 새로 생성)
      */
     private void regenerateSummaryTable(final Site site, final SiteProcess siteProcess, final String yearMonth) {
-        // 1. 기존 집계 데이터 삭제
-        removeExistingSummary(site, siteProcess, yearMonth);
-
-        // 2. 해당 월 노무비 명세서 조회
+        // 1. 해당 월 노무비 명세서 조회
         final List<LaborPayroll> payrolls = findPayrollsForSummary(site, siteProcess, yearMonth);
 
-        // 3. 노무비 명세서가 없으면 생성하지 않음
+        // 노무비 명세서가 없으면 기존 집계 데이터를 삭제하고 종료
         if (payrolls.isEmpty()) {
-            log.info("노무비 명세서가 없어 집계 테이블 생성 건너뜀: 현장={}, 공정={}, 년월={}",
+            removeExistingSummary(site, siteProcess, yearMonth);
+            log.info("노무비 명세서가 없어 집계 테이블 생성/업데이트 건너뜀: 현장={}, 공정={}, 년월={}",
                     site.getName(), siteProcess.getName(), yearMonth);
             return;
         }
 
-        // 4. 집계 데이터 계산 및 새로 생성
+        // 2. 집계 데이터 계산
         final var calculatedData = calculateSummaryData(payrolls);
-        final LaborPayrollSummary summary = createNewSummary(site, siteProcess, yearMonth, calculatedData);
-        laborPayrollSummaryRepository.save(summary);
+
+        // 3. 기존 집계 데이터가 있으면 업데이트, 없으면 새로 생성
+        final Optional<LaborPayrollSummary> existingSummary = findExistingSummary(site, siteProcess, yearMonth);
+        if (existingSummary.isPresent()) {
+            final LaborPayrollSummary summary = existingSummary.get();
+            summary.updateSummary(
+                    calculatedData.regularEmployeeCount(),
+                    calculatedData.directContractCount(),
+                    calculatedData.outsourcingCount(),
+                    calculatedData.etcCount(),
+                    calculatedData.totalLaborCost(),
+                    calculatedData.totalDeductions(),
+                    calculatedData.totalNetPayment(),
+                    summary.getMemo());
+            log.info("집계 테이블 업데이트: 현장={}, 공정={}, 년월={}",
+                    site.getName(), siteProcess.getName(), yearMonth);
+        } else {
+            final LaborPayrollSummary summary = createNewSummary(site, siteProcess, yearMonth, calculatedData);
+            laborPayrollSummaryRepository.save(summary);
+        }
     }
 
     /**
@@ -334,6 +350,7 @@ public class LaborPayrollSyncService {
                 .regularEmployeeCount(calculatedData.regularEmployeeCount())
                 .directContractCount(calculatedData.directContractCount())
                 .outsourcingCount(calculatedData.outsourcingCount())
+                .etcCount(calculatedData.etcCount())
                 .totalLaborCost(calculatedData.totalLaborCost())
                 .totalDeductions(calculatedData.totalDeductions())
                 .totalNetPayment(calculatedData.totalNetPayment())
@@ -380,11 +397,19 @@ public class LaborPayrollSyncService {
         final Integer regularEmployeeCount = laborTypeCount.getOrDefault(LaborType.REGULAR_EMPLOYEE, 0L).intValue();
         final Integer directContractCount = laborTypeCount.getOrDefault(LaborType.DIRECT_CONTRACT, 0L).intValue();
         final Integer outsourcingCount = laborTypeCount.getOrDefault(LaborType.OUTSOURCING, 0L).intValue();
+        final long etcCountLong = laborTypeCount.entrySet().stream()
+                .filter(entry -> entry.getKey() != LaborType.REGULAR_EMPLOYEE
+                        && entry.getKey() != LaborType.DIRECT_CONTRACT
+                        && entry.getKey() != LaborType.OUTSOURCING)
+                .mapToLong(Map.Entry::getValue)
+                .sum();
+        final Integer etcCount = Math.toIntExact(etcCountLong);
 
         return new SummaryData(
                 regularEmployeeCount,
                 directContractCount,
                 outsourcingCount,
+                etcCount,
                 totalLaborCost,
                 totalDeductions,
                 totalNetPayment);
@@ -397,6 +422,7 @@ public class LaborPayrollSyncService {
             Integer regularEmployeeCount,
             Integer directContractCount,
             Integer outsourcingCount,
+            Integer etcCount,
             BigDecimal totalLaborCost,
             BigDecimal totalDeductions,
             BigDecimal totalNetPayment) {
