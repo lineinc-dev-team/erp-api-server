@@ -524,19 +524,49 @@ public class MaterialCostAggregationService {
      * 유류비 계산: 주유량 * 유종별 가격
      */
     private long calculateFuelCost(final FuelAggregation fa, final FuelInfo fi) {
-        if (fi.getFuelAmount() == null || fi.getFuelType() == null) {
+        long total = 0L;
+
+        // 기본 유류정보 금액 우선 사용, 없으면 단가 * 수량으로 계산
+        if (fi.getAmount() != null) {
+            total += getValueOrZero(fi.getAmount());
+        } else {
+            total += calculateFuelCostByType(fa, fi.getFuelType(), fi.getFuelAmount());
+        }
+
+        // 서브 장비 유류정보도 동일하게 합산
+        if (fi.getSubEquipments() != null) {
+            for (final var subEquipment : fi.getSubEquipments()) {
+                if (subEquipment.getAmount() != null) {
+                    total += getValueOrZero(subEquipment.getAmount());
+                    continue;
+                }
+
+                total += calculateFuelCostByType(fa, subEquipment.getFuelType(), subEquipment.getFuelAmount());
+            }
+        }
+
+        return total;
+    }
+
+    /**
+     * 유종/수량 기반 유류비 계산 (단가 정보가 없는 경우 0 처리)
+     */
+    private long calculateFuelCostByType(
+            final FuelAggregation fuelAggregation,
+            final FuelInfoFuelType fuelType,
+            final Long fuelAmount) {
+        if (fuelType == null || fuelAmount == null) {
             return 0L;
         }
 
-        final long fuelAmount = fi.getFuelAmount();
-        final FuelInfoFuelType fuelType = fi.getFuelType();
-
-        return switch (fuelType) {
-            case GASOLINE -> getValueOrZero(fa.getGasolinePrice()) * fuelAmount;
-            case DIESEL -> getValueOrZero(fa.getDieselPrice()) * fuelAmount;
-            case UREA -> getValueOrZero(fa.getUreaPrice()) * fuelAmount;
+        final long unitPrice = switch (fuelType) {
+            case GASOLINE -> getValueOrZero(fuelAggregation.getGasolinePrice());
+            case DIESEL -> getValueOrZero(fuelAggregation.getDieselPrice());
+            case UREA -> getValueOrZero(fuelAggregation.getUreaPrice());
             default -> 0L;
         };
+
+        return unitPrice * fuelAmount;
     }
 
     /**
