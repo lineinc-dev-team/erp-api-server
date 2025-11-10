@@ -309,8 +309,8 @@ public class LaborPayroll extends BaseEntity {
      * 공제액 계산 (엑셀 수식 기준)
      */
     private void calculateDeductions() {
-        // 정직원은 모든 공제 항목을 계산하지 않음
-        if (labor.getType() == LaborType.REGULAR_EMPLOYEE || labor.getType() == LaborType.OUTSOURCING) {
+        // 정직원과 외주계약직은 모든 공제 항목을 계산하지 않음
+        if (labor.getType() == LaborType.REGULAR_EMPLOYEE || labor.getType() == LaborType.OUTSOURCING_CONTRACT) {
             this.incomeTax = BigDecimal.ZERO;
             this.employmentInsurance = BigDecimal.ZERO;
             this.healthInsurance = BigDecimal.ZERO;
