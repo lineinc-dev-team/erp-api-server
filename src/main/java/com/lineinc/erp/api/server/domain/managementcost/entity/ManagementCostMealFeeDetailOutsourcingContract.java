@@ -107,7 +107,7 @@ public class ManagementCostMealFeeDetailOutsourcingContract extends BaseEntity {
     private String laborName;
 
     @Transient
-    @DiffInclude
+    @DiffIgnore
     private String outsourcingCompanyName;
 
     // ID만 저장할 필드 추가

@@ -103,7 +103,7 @@ public class ManagementCostMealFeeDetailEquipment extends BaseEntity {
     private String memo;
 
     @Transient
-    @DiffInclude
+    @DiffIgnore
     private String outsourcingCompanyName;
 
     @Transient
