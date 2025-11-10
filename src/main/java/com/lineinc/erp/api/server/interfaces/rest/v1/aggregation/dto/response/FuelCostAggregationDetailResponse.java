@@ -101,8 +101,7 @@ public record FuelCostAggregationDetailResponse(
          */
         @Schema(description = "일별 유류 사용량 및 가격")
         public record DailyFuelUsage(
-                @Schema(description = "사용량 (리터)", example = "100") Long amount,
-                @Schema(description = "단가 (원/리터)", example = "1500") Long price) {
+                @Schema(description = "사용량 (리터)", example = "100") Long amount) {
         }
     }
 }

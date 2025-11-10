@@ -93,17 +93,21 @@ public class FuelAggregationDetailService {
         final YearMonth ym = YearMonth.parse(yearMonth);
         final int daysInMonth = ym.lengthOfMonth();
 
-        // 장비별로 그룹핑 (equipmentId 기준)
-        final Map<Long, List<Map.Entry<FuelAggregation, FuelInfo>>> groupedByEquipment = fuelAggregations
+        // 유류정보의 업체 + 장비별로 그룹핑
+        final Map<CompanyEquipmentKey, List<Map.Entry<FuelAggregation, FuelInfo>>> groupedByCompanyAndEquipment = fuelAggregations
                 .stream()
                 .flatMap(fa -> fa.getFuelInfos().stream()
                         .filter(fi -> fi.getFuelType() == fuelType) // 지정된 유종만
                         .filter(fi -> fi.getEquipment() != null) // 장비 정보가 있는 경우만
                         .map(fi -> Map.entry(fa, fi)))
-                .collect(Collectors.groupingBy(entry -> entry.getValue().getEquipment().getId()));
+                .collect(Collectors.groupingBy(entry -> new CompanyEquipmentKey(
+                        entry.getValue().getOutsourcingCompany() != null
+                                ? entry.getValue().getOutsourcingCompany().getId()
+                                : null,
+                        entry.getValue().getEquipment().getId())));
 
         // 각 장비별로 일별 사용량 집계
-        return groupedByEquipment.values().stream()
+        return groupedByCompanyAndEquipment.values().stream()
                 .map(group -> createFuelAggregationDetailItem(group, ym, daysInMonth))
                 .toList();
     }
@@ -117,7 +121,8 @@ public class FuelAggregationDetailService {
             final int daysInMonth) {
 
         // 그룹의 첫번째 항목에서 기본 정보 가져오기
-        final FuelInfo firstFuelInfo = group.get(0).getValue();
+        final Map.Entry<FuelAggregation, FuelInfo> firstEntry = group.get(0);
+        final FuelInfo firstFuelInfo = firstEntry.getValue();
         final FuelInfoFuelType fuelType = firstFuelInfo.getFuelType();
 
         // 일별 사용량 및 가격 초기화 (1일 ~ 31일까지)
@@ -142,9 +147,8 @@ public class FuelAggregationDetailService {
                     final DailyFuelUsage currentUsage = dailyUsageMap.get(day);
                     final long currentAmount = currentUsage != null ? currentUsage.amount() : 0L;
                     final long newAmount = currentAmount + fi.getFuelAmount();
-                    final long price = getFuelPrice(fa, fuelType);
 
-                    dailyUsageMap.put(day, new DailyFuelUsage(newAmount, price));
+                    dailyUsageMap.put(day, new DailyFuelUsage(newAmount));
                 }
             }
         }
@@ -173,19 +177,6 @@ public class FuelAggregationDetailService {
                 dailyUsageMap.get(29), dailyUsageMap.get(30), dailyUsageMap.get(31));
     }
 
-    /**
-     * 유종별 가격 조회
-     */
-    private long getFuelPrice(final FuelAggregation fa, final FuelInfoFuelType fuelType) {
-        if (fuelType == null) {
-            return 0L;
-        }
-
-        return switch (fuelType) {
-            case GASOLINE -> fa.getGasolinePrice() != null ? fa.getGasolinePrice() : 0L;
-            case DIESEL -> fa.getDieselPrice() != null ? fa.getDieselPrice() : 0L;
-            case UREA -> fa.getUreaPrice() != null ? fa.getUreaPrice() : 0L;
-            default -> 0L;
-        };
+    private record CompanyEquipmentKey(Long companyId, Long equipmentId) {
     }
 }
