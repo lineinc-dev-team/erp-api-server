@@ -1,5 +1,7 @@
 package com.lineinc.erp.api.server.domain.aggregation.materialcost.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
@@ -52,6 +54,8 @@ public class MaterialCostAggregationService {
 
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
+    private static final BigDecimal FUEL_VAT_RATE = BigDecimal.valueOf(0.1);
+    private static final BigDecimal ONE_PLUS_VAT = BigDecimal.ONE.add(FUEL_VAT_RATE);
 
     /**
      * 재료비 집계 조회
@@ -472,22 +476,20 @@ public class MaterialCostAggregationService {
             final List<Map.Entry<FuelAggregation, FuelInfo>> group,
             final OffsetDateTime currentMonthStartDateTime) {
 
-        long supplyPrice = 0;
-
+        long totalGross = 0;
         for (final Map.Entry<FuelAggregation, FuelInfo> entry : group) {
             final FuelAggregation fa = entry.getKey();
             final FuelInfo fi = entry.getValue();
 
             // date 기준으로 전회까지 집계
             if (fa.getDate() != null && fa.getDate().isBefore(currentMonthStartDateTime)) {
-                supplyPrice += calculateFuelCost(fa, fi);
+                totalGross += calculateFuelCost(fa, fi);
             }
         }
 
-        // 부가세 10% 계산
-        final long vat = Math.round(supplyPrice * 0.1);
-        final long total = supplyPrice + vat;
-        return new BillingDetail(supplyPrice, vat, 0L, total);
+        final long supplyPrice = calculateSupplyPriceFromTotal(totalGross);
+        final long vat = totalGross - supplyPrice;
+        return new BillingDetail(supplyPrice, vat, 0L, totalGross);
     }
 
     /**
@@ -497,8 +499,7 @@ public class MaterialCostAggregationService {
             final List<Map.Entry<FuelAggregation, FuelInfo>> group,
             final OffsetDateTime currentMonthStartDateTime) {
 
-        long supplyPrice = 0;
-
+        long totalGross = 0;
         // 조회월의 다음 달 1일 계산 (조회월 범위: currentMonthStart <= date < nextMonthStart)
         final OffsetDateTime nextMonthStartDateTime = currentMonthStartDateTime.plusMonths(1);
 
@@ -510,14 +511,13 @@ public class MaterialCostAggregationService {
             if (fa.getDate() != null
                     && !fa.getDate().isBefore(currentMonthStartDateTime)
                     && fa.getDate().isBefore(nextMonthStartDateTime)) {
-                supplyPrice += calculateFuelCost(fa, fi);
+                totalGross += calculateFuelCost(fa, fi);
             }
         }
 
-        // 부가세 10% 계산
-        final long vat = Math.round(supplyPrice * 0.1);
-        final long total = supplyPrice + vat;
-        return new BillingDetail(supplyPrice, vat, 0L, total);
+        final long supplyPrice = calculateSupplyPriceFromTotal(totalGross);
+        final long vat = totalGross - supplyPrice;
+        return new BillingDetail(supplyPrice, vat, 0L, totalGross);
     }
 
     /**
@@ -567,6 +567,19 @@ public class MaterialCostAggregationService {
         };
 
         return unitPrice * fuelAmount;
+    }
+
+    /**
+     * 총액(부가세 포함)을 기준으로 공급가를 역산
+     */
+    private long calculateSupplyPriceFromTotal(final long totalGross) {
+        if (totalGross <= 0) {
+            return 0L;
+        }
+
+        return BigDecimal.valueOf(totalGross)
+                .divide(ONE_PLUS_VAT, 0, RoundingMode.HALF_UP)
+                .longValueExact();
     }
 
     /**
