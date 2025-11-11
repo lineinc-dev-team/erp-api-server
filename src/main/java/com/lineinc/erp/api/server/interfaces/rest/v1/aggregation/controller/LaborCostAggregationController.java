@@ -15,10 +15,10 @@ import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.LaborCostAggregationRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.LaborPayrollDetailAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.OutsourcingLaborCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.LaborCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.OutsourcingLaborCostAggregationResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollDetailSearchRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollDetailResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -70,9 +70,9 @@ public class LaborCostAggregationController extends BaseController {
     @GetMapping("/labor-payroll")
     @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborPayrollDetailResponse>>> getLaborPayrollDetails(
-            @Parameter(description = "조회 조건") @ModelAttribute final LaborPayrollDetailSearchRequest request) {
+            @Parameter(description = "조회 조건") @ModelAttribute final LaborPayrollDetailAggregationRequest request) {
         final List<LaborPayrollDetailResponse> result = laborPayrollService.getLaborPayrollDetails(
-                request.siteId(), request.processId(), request.yearMonth(), request.type());
+                request.siteId(), request.siteProcessId(), request.yearMonth(), request.type());
         return ResponseEntity.ok(SuccessResponse.of(result));
     }
 
