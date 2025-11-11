@@ -62,7 +62,10 @@ public class ManagementCostAggregationService {
                     ? CompanyResponse.CompanySimpleResponse.from(mc.getOutsourcingCompany())
                     : null;
             final var itemType = mc.getItemType();
-            final GroupKey key = new GroupKey(companySimple, itemType);
+            final String description = ManagementCostItemType.ETC.equals(itemType)
+                    ? mc.getItemTypeDescription()
+                    : null;
+            final GroupKey key = new GroupKey(companySimple, itemType, normalizeDescription(description));
             final GroupBucket bucket = grouped.computeIfAbsent(key, unused -> new GroupBucket());
 
             if (itemType == ManagementCostItemType.MEAL_FEE) {
@@ -91,7 +94,7 @@ public class ManagementCostAggregationService {
             final GroupBucket bucket = entry.getValue();
 
             // 각 그룹별로 itemTypeDescription(최신) 하나 뽑기
-            final String desc = latestDescription(bucket);
+            final String desc = latestDescription(key, bucket);
 
             final var agg = toAggregationItem(key, bucket, startInclusive, endExclusive, desc);
             if (agg != null)
@@ -357,7 +360,13 @@ public class ManagementCostAggregationService {
                 new BillingDetail(currSupply, currVat, currDeduction, currTotal));
     }
 
-    private static String latestDescription(final GroupBucket bucket) {
+    private static String latestDescription(final GroupKey key, final GroupBucket bucket) {
+        if (key.itemType() == ManagementCostItemType.ETC
+                && key.itemTypeDescription() != null
+                && !key.itemTypeDescription().isBlank()) {
+            return key.itemTypeDescription();
+        }
+
         return bucket.allRelatedManagementCosts().stream()
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> {
@@ -383,8 +392,19 @@ public class ManagementCostAggregationService {
         return (total * 9) / 10; // 내림 처리
     }
 
-    // 업체+itemType 기준
-    private record GroupKey(CompanyResponse.CompanySimpleResponse company, ManagementCostItemType itemType) {
+    private static String normalizeDescription(final String description) {
+        if (description == null) {
+            return "";
+        }
+        final String trimmed = description.trim();
+        return trimmed.isEmpty() ? "" : trimmed;
+    }
+
+    // 업체 + itemType + (기타일 때) 항목 설명 기준
+    private record GroupKey(
+            CompanyResponse.CompanySimpleResponse company,
+            ManagementCostItemType itemType,
+            String itemTypeDescription) {
     }
 
     private static final class GroupBucket {
