@@ -2,6 +2,11 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response;
 
 import java.util.List;
 
+import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse.ContractDriverSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -12,12 +17,16 @@ public record MealFeeAggregationDetailResponse(
         @Schema(description = "식대 집계 항목 목록") List<MealFeeAggregationDetailItem> items) {
 
     /**
-     * 식대 집계 상세 항목 (인원별)
+     * 식대 집계 상세 항목 (대상별)
      */
     @Schema(description = "식대 집계 상세 항목")
     public record MealFeeAggregationDetailItem(
             @Schema(description = "직종", example = "기사") String workType,
-            @Schema(description = "이름", example = "홍길동") String name,
+
+            @Schema(description = "외주업체 간단 응답") CompanyResponse.CompanySimpleResponse outsourcingCompany,
+            @Schema(description = "외주업체 계약 간단 응답") ContractSimpleResponse outsourcingCompanyContract,
+            @Schema(description = "인력 간단 응답") LaborSimpleResponse labor,
+            @Schema(description = "기사 간단 응답") ContractDriverSimpleResponse driver,
             @Schema(description = "1일") DailyMealFeeUsage day01,
             @Schema(description = "2일") DailyMealFeeUsage day02,
             @Schema(description = "3일") DailyMealFeeUsage day03,
@@ -58,6 +67,7 @@ public record MealFeeAggregationDetailResponse(
     public record DailyMealFeeUsage(
             @Schema(description = "조식 횟수", example = "1") Integer breakfastCount,
             @Schema(description = "중식 횟수", example = "1") Integer lunchCount,
+            @Schema(description = "석식 횟수", example = "1") Integer dinnerCount,
             @Schema(description = "단가 (원)", example = "5000") Long unitPrice,
             @Schema(description = "금액 (원)", example = "10000") Long amount) {
     }

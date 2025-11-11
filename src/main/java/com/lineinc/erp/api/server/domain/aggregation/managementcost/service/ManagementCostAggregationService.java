@@ -3,17 +3,19 @@ package com.lineinc.erp.api.server.domain.aggregation.managementcost.service;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostKeyMoneyDetail;
@@ -31,9 +33,12 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.Ma
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse.BillingDetail;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse.ManagementCostAggregationItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse.DailyMealFeeUsage;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse.MealFeeAggregationDetailItem;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse.ContractDriverSimpleResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -62,8 +67,8 @@ public class ManagementCostAggregationService {
         // 각 그룹별로 세부 집계 (식대/전도금은 전용 상세 사용, 그 외는 details 사용)
         final Map<GroupKey, GroupBucket> grouped = new HashMap<>();
         for (final ManagementCost mc : costs) {
-            final CompanyResponse.CompanySimpleResponse companySimple = mc.getOutsourcingCompany() != null
-                    ? CompanyResponse.CompanySimpleResponse.from(mc.getOutsourcingCompany())
+            final CompanySimpleResponse companySimple = mc.getOutsourcingCompany() != null
+                    ? CompanySimpleResponse.from(mc.getOutsourcingCompany())
                     : null;
             final var itemType = mc.getItemType();
             final String description = ManagementCostItemType.ETC.equals(itemType)
@@ -135,7 +140,7 @@ public class ManagementCostAggregationService {
         return new ManagementCostAggregationResponse(items);
     }
 
-    public List<CompanyResponse.CompanySimpleResponse> getMealFeeOutsourcingCompanies(
+    public List<CompanySimpleResponse> getMealFeeOutsourcingCompanies(
             final ManagementCostMealFeeOutsourcingCompaniesRequest req) {
         final YearMonth ym = YearMonth.parse(req.yearMonth());
         final LocalDate startMonth = ym.atDay(1);
@@ -152,7 +157,7 @@ public class ManagementCostAggregationService {
                 .stream()
                 .map(ManagementCost::getOutsourcingCompany)
                 .filter(Objects::nonNull)
-                .map(CompanyResponse.CompanySimpleResponse::from)
+                .map(CompanySimpleResponse::from)
                 .distinct()
                 .sorted((a, b) -> a.name().compareToIgnoreCase(b.name()))
                 .toList();
@@ -184,112 +189,365 @@ public class ManagementCostAggregationService {
                         startInclusive,
                         endExclusive);
 
-        // 인원별로 그룹핑 (이름 + 직종 조합으로 그룹핑)
-        final Map<PersonKey, List<ManagementCostMealFeeDetail>> groupedByPerson = mealFeeCosts
-                .stream()
-                .flatMap(mc -> mc.getMealFeeDetails().stream()
-                        .map(meal -> Map.entry(meal, mc)))
-                .filter(entry -> {
-                    // labor가 있으면 labor 이름 확인, 없으면 meal name 확인
-                    final String personName = getPersonName(entry.getKey());
-                    return personName != null && !personName.isBlank();
-                })
-                .collect(Collectors.groupingBy(
-                        entry -> new PersonKey(getPersonName(entry.getKey()), getWorkType(entry.getKey())),
-                        Collectors.mapping(Map.Entry::getKey, Collectors.toList())));
+        // 카테고리(직원/직영/장비기사/외주업체/외주계약)별로 조회월 일자별 식대 사용량을 누적한다.
+        final Map<MealFeeGroupKey, Map<Integer, DailyAccumulator>> groupedByKey = new LinkedHashMap<>();
 
-        // 각 인원별로 일별 집계 생성
-        final List<MealFeeAggregationDetailItem> items = groupedByPerson.entrySet()
-                .stream()
-                .map(entry -> createMealFeeDetailItem(entry.getKey().name(), entry.getKey().workType(),
-                        entry.getValue(), ym))
+        for (final ManagementCost cost : mealFeeCosts) {
+            final OffsetDateTime paymentDate = cost.getPaymentDate();
+
+            // 1) 직원(사내 인력) 식대
+            for (final ManagementCostMealFeeDetail detail : cost.getMealFeeDetails()) {
+                if (detail == null || detail.isDeleted()) {
+                    continue;
+                }
+                final String displayName = detail.getLabor() != null && StringUtils.hasText(detail.getLabor().getName())
+                        ? detail.getLabor().getName()
+                        : detail.getName();
+                if (!StringUtils.hasText(displayName)) {
+                    continue;
+                }
+
+                final LaborSimpleResponse laborSimple = toLaborSimpleResponse(detail.getLabor(),
+                        detail.getLabor() != null ? detail.getLabor().getName() : null);
+                final MealFeeSubjectData subject = new MealFeeSubjectData(
+                        null,
+                        null,
+                        laborSimple,
+                        null,
+                        displayName);
+
+                final MealFeeGroupKey key = new MealFeeGroupKey(
+                        MealFeeCategory.EMPLOYEE,
+                        resolveWorkType(MealFeeCategory.EMPLOYEE, detail.getWorkType()),
+                        subject);
+
+                appendMealFeeUsage(groupedByKey, key, paymentDate,
+                        detail.getBreakfastCount(), detail.getLunchCount(), detail.getDinnerCount(),
+                        detail.getUnitPrice(), detail.getAmount(), ym);
+            }
+
+            // 2) 직영 인력 식대
+            for (final ManagementCostMealFeeDetailDirectContract detail : cost.getMealFeeDetailDirectContracts()) {
+                if (detail == null || detail.isDeleted()) {
+                    continue;
+                }
+                final Labor labor = detail.getLabor();
+                final String displayName = labor != null ? labor.getName() : detail.getLaborName();
+                if (!StringUtils.hasText(displayName)) {
+                    continue;
+                }
+
+                final LaborSimpleResponse laborSimple = toLaborSimpleResponse(labor, displayName);
+                final MealFeeSubjectData subject = new MealFeeSubjectData(
+                        null,
+                        null,
+                        laborSimple,
+                        null,
+                        displayName);
+
+                final MealFeeGroupKey key = new MealFeeGroupKey(
+                        MealFeeCategory.DIRECT,
+                        resolveWorkType(MealFeeCategory.DIRECT, null),
+                        subject);
+
+                appendMealFeeUsage(groupedByKey, key, paymentDate,
+                        detail.getBreakfastCount(), detail.getLunchCount(), detail.getDinnerCount(),
+                        detail.getUnitPrice(), detail.getAmount(), ym);
+            }
+
+            // 3) 장비 기사 식대
+            for (final ManagementCostMealFeeDetailEquipment detail : cost.getMealFeeDetailEquipments()) {
+                if (detail == null || detail.isDeleted()) {
+                    continue;
+                }
+                final var driver = detail.getOutsourcingCompanyContractDriver();
+                final String displayName = driver != null ? driver.getName() : null;
+                if (!StringUtils.hasText(displayName)) {
+                    continue;
+                }
+
+                final CompanySimpleResponse companySimple = detail.getOutsourcingCompany() != null
+                        ? CompanySimpleResponse.from(detail.getOutsourcingCompany())
+                        : null;
+                final ContractDriverSimpleResponse driverSimple = driver != null
+                        ? ContractDriverSimpleResponse.from(driver)
+                        : null;
+                final MealFeeSubjectData subject = new MealFeeSubjectData(
+                        companySimple,
+                        null,
+                        null,
+                        driverSimple,
+                        displayName);
+
+                final MealFeeGroupKey key = new MealFeeGroupKey(
+                        MealFeeCategory.EQUIPMENT,
+                        resolveWorkType(MealFeeCategory.EQUIPMENT, null),
+                        subject);
+
+                appendMealFeeUsage(groupedByKey, key, paymentDate,
+                        detail.getBreakfastCount(), detail.getLunchCount(), detail.getDinnerCount(),
+                        detail.getUnitPrice(), detail.getAmount(), ym);
+            }
+
+            // 4) 용역업체 식대
+            for (final ManagementCostMealFeeDetailOutsourcing detail : cost.getMealFeeDetailOutsourcings()) {
+                if (detail == null || detail.isDeleted()) {
+                    continue;
+                }
+                final var company = detail.getOutsourcingCompany();
+                final String displayName = company != null ? company.getName() : null;
+                if (!StringUtils.hasText(displayName)) {
+                    continue;
+                }
+
+                final CompanySimpleResponse companySimple = company != null
+                        ? CompanySimpleResponse.from(company)
+                        : null;
+                final LaborSimpleResponse laborSimple = toLaborSimpleResponse(detail.getLabor(), displayName);
+                final MealFeeSubjectData subject = new MealFeeSubjectData(
+                        companySimple,
+                        null,
+                        laborSimple,
+                        null,
+                        displayName);
+
+                final MealFeeGroupKey key = new MealFeeGroupKey(
+                        MealFeeCategory.OUTSOURCING_COMPANY,
+                        resolveWorkType(MealFeeCategory.OUTSOURCING_COMPANY, null),
+                        subject);
+
+                appendMealFeeUsage(groupedByKey, key, paymentDate,
+                        detail.getBreakfastCount(), detail.getLunchCount(), detail.getDinnerCount(),
+                        detail.getUnitPrice(), detail.getAmount(), ym);
+            }
+
+            // 5) 외주계약(외주업체와 계약된 인력) 식대
+            for (final ManagementCostMealFeeDetailOutsourcingContract detail : cost
+                    .getMealFeeDetailOutsourcingContracts()) {
+                if (detail == null || detail.isDeleted()) {
+                    continue;
+                }
+
+                final var labor = detail.getLabor();
+                final var outsourcingContract = labor != null ? labor.getOutsourcingCompanyContract() : null;
+
+                // 외주계약 상세는 연결된 외주업체계약이 없으면 집계 기준이 애매하므로 제외한다.
+                if (outsourcingContract == null || !StringUtils.hasText(outsourcingContract.getContractName())) {
+                    continue;
+                }
+
+                final CompanySimpleResponse companySimple = detail.getOutsourcingCompany() != null
+                        ? CompanySimpleResponse.from(detail.getOutsourcingCompany())
+                        : null;
+                final ContractSimpleResponse contractSimple = ContractSimpleResponse.from(outsourcingContract);
+                final LaborSimpleResponse laborSimple = toLaborSimpleResponse(labor, null);
+
+                final MealFeeSubjectData subject = new MealFeeSubjectData(
+                        companySimple,
+                        contractSimple,
+                        laborSimple,
+                        null,
+                        outsourcingContract.getContractName());
+
+                final MealFeeGroupKey key = new MealFeeGroupKey(
+                        MealFeeCategory.OUTSOURCING_CONTRACT,
+                        resolveWorkType(MealFeeCategory.OUTSOURCING_CONTRACT, null),
+                        subject);
+
+                appendMealFeeUsage(groupedByKey, key, paymentDate,
+                        detail.getBreakfastCount(), detail.getLunchCount(), detail.getDinnerCount(),
+                        detail.getUnitPrice(), detail.getAmount(), ym);
+            }
+        }
+
+        final List<MealFeeAggregationDetailItem> items = groupedByKey.entrySet().stream()
+                .sorted(MEAL_FEE_GROUP_COMPARATOR)
+                .map(entry -> toMealFeeAggregationDetailItem(entry.getKey(), entry.getValue()))
                 .toList();
 
         return new MealFeeAggregationDetailResponse(items);
     }
 
-    /**
-     * 인원별 식대 집계 상세 항목 생성
-     */
-    private MealFeeAggregationDetailItem createMealFeeDetailItem(
-            final String name,
-            final String workType,
-            final List<ManagementCostMealFeeDetail> mealFeeDetails,
+    private static LaborSimpleResponse toLaborSimpleResponse(final Labor labor, final String fallbackName) {
+        if (labor != null) {
+            return LaborSimpleResponse.from(labor);
+        }
+        if (StringUtils.hasText(fallbackName)) {
+            return new LaborSimpleResponse(null, fallbackName, null, null, null, null, null, null, null);
+        }
+        return null;
+    }
+
+    private static void appendMealFeeUsage(
+            final Map<MealFeeGroupKey, Map<Integer, DailyAccumulator>> groupedByKey,
+            final MealFeeGroupKey key,
+            final OffsetDateTime paymentDate,
+            final Integer breakfastCount,
+            final Integer lunchCount,
+            final Integer dinnerCount,
+            final Long unitPrice,
+            final Long amount,
             final YearMonth ym) {
 
-        // 일별 사용량 초기화 (1일 ~ 31일까지)
-        final Map<Integer, DailyMealFeeUsage> dailyUsageMap = new HashMap<>();
-        for (int day = 1; day <= 31; day++) {
-            dailyUsageMap.put(day, null); // 데이터가 없는 날은 null
+        if (paymentDate == null || key.subject() == null || !StringUtils.hasText(key.subject().displayName())) {
+            return;
         }
 
-        // 각 식대 상세의 날짜에 해당하는 일자에 집계
-        for (final ManagementCostMealFeeDetail meal : mealFeeDetails) {
-            final ManagementCost mc = meal.getManagementCost();
-            if (mc == null || mc.getPaymentDate() == null)
-                continue;
+        final LocalDate koreaDate = DateTimeFormatUtils.toKoreaLocalDate(paymentDate);
+        if (koreaDate.getYear() != ym.getYear() || koreaDate.getMonthValue() != ym.getMonthValue()) {
+            return;
+        }
 
-            final LocalDate paymentDate = mc.getPaymentDate().atZoneSameInstant(ZoneOffset.of("+09:00"))
-                    .toLocalDate();
+        final int day = koreaDate.getDayOfMonth();
+        final Map<Integer, DailyAccumulator> dailyMap = groupedByKey.computeIfAbsent(key, unused -> new HashMap<>());
+        final DailyAccumulator accumulator = dailyMap.computeIfAbsent(day, unused -> new DailyAccumulator());
 
-            // 조회월에 해당하는 날짜만 집계
-            if (paymentDate.getYear() == ym.getYear() && paymentDate.getMonthValue() == ym.getMonthValue()) {
-                final int day = paymentDate.getDayOfMonth();
+        accumulator.addBreakfast(breakfastCount);
+        accumulator.addLunch(lunchCount);
+        accumulator.addDinner(dinnerCount);
+        accumulator.addAmount(amount);
+        accumulator.updateUnitPrice(unitPrice);
+    }
 
-                // 해당 일자에 이미 데이터가 있으면 합산
-                final DailyMealFeeUsage currentUsage = dailyUsageMap.get(day);
-                final int breakfastCount = safeInteger(meal.getBreakfastCount())
-                        + (currentUsage != null ? safeInteger(currentUsage.breakfastCount()) : 0);
-                final int lunchCount = safeInteger(meal.getLunchCount())
-                        + (currentUsage != null ? safeInteger(currentUsage.lunchCount()) : 0);
-                final long unitPrice = meal.getUnitPrice() != null ? meal.getUnitPrice()
-                        : (currentUsage != null ? currentUsage.unitPrice() : 0L);
-                final long amount = safe(meal.getAmount()) + (currentUsage != null ? currentUsage.amount() : 0L);
+    private MealFeeAggregationDetailItem toMealFeeAggregationDetailItem(
+            final MealFeeGroupKey key,
+            final Map<Integer, DailyAccumulator> dailyMap) {
+        final MealFeeAggregationDetailResponse.DailyMealFeeUsage[] usages = new MealFeeAggregationDetailResponse.DailyMealFeeUsage[31];
+        for (int day = 1; day <= 31; day++) {
+            final DailyAccumulator accumulator = dailyMap.get(day);
+            usages[day - 1] = accumulator != null ? accumulator.toUsage() : null;
+        }
 
-                dailyUsageMap.put(day, new DailyMealFeeUsage(breakfastCount, lunchCount, unitPrice, amount));
+        // DTO는 1~31일까지 고정이므로 배열을 풀어서 생성자에 직접 전달한다.
+        return new MealFeeAggregationDetailItem(
+                key.workType(),
+                key.subject().outsourcingCompany(),
+                key.subject().outsourcingCompanyContract(),
+                key.subject().labor(),
+                key.subject().equipment(),
+                usages[0], usages[1], usages[2], usages[3], usages[4], usages[5], usages[6], usages[7],
+                usages[8], usages[9], usages[10], usages[11], usages[12], usages[13], usages[14], usages[15],
+                usages[16], usages[17], usages[18], usages[19], usages[20], usages[21], usages[22], usages[23],
+                usages[24], usages[25], usages[26], usages[27], usages[28], usages[29], usages[30]);
+    }
+
+    private static String resolveWorkType(final MealFeeCategory category, final String candidate) {
+        if (StringUtils.hasText(candidate)) {
+            return candidate;
+        }
+        return switch (category) {
+            case EMPLOYEE -> "직원";
+            case DIRECT -> "직영";
+            case EQUIPMENT -> "장비";
+            case OUTSOURCING_COMPANY -> "용역";
+            case OUTSOURCING_CONTRACT -> "외주";
+        };
+    }
+
+    private enum MealFeeCategory {
+        EMPLOYEE(1),
+        DIRECT(2),
+        EQUIPMENT(3),
+        OUTSOURCING_COMPANY(4),
+        OUTSOURCING_CONTRACT(5);
+
+        private final int order;
+
+        MealFeeCategory(final int order) {
+            this.order = order;
+        }
+
+        int order() {
+            return order;
+        }
+    }
+
+    private record MealFeeSubjectData(
+            CompanySimpleResponse outsourcingCompany,
+            ContractSimpleResponse outsourcingCompanyContract,
+            LaborSimpleResponse labor,
+            ContractDriverSimpleResponse equipment,
+            String displayName) {
+    }
+
+    private record MealFeeGroupKey(
+            MealFeeCategory category,
+            String workType,
+            MealFeeSubjectData subject) {
+    }
+
+    /**
+     * 일별 누적 값을 계산하기 위한 보조 클래스.
+     * <p>
+     * 하루에 여러 건이 입력될 수 있으므로 조식/중식/금액을 누산하고,
+     * 단가는 최초 입력 값을 유지한다.
+     * </p>
+     */
+    private static final class DailyAccumulator {
+        private int breakfastCount;
+        private int lunchCount;
+        private int dinnerCount;
+        private long amount;
+        private Long unitPrice;
+
+        void addBreakfast(final Integer value) {
+            if (value != null) {
+                breakfastCount += value;
             }
         }
 
-        return new MealFeeAggregationDetailItem(
-                workType,
-                name,
-                dailyUsageMap.get(1), dailyUsageMap.get(2), dailyUsageMap.get(3), dailyUsageMap.get(4),
-                dailyUsageMap.get(5), dailyUsageMap.get(6), dailyUsageMap.get(7), dailyUsageMap.get(8),
-                dailyUsageMap.get(9), dailyUsageMap.get(10), dailyUsageMap.get(11), dailyUsageMap.get(12),
-                dailyUsageMap.get(13), dailyUsageMap.get(14), dailyUsageMap.get(15), dailyUsageMap.get(16),
-                dailyUsageMap.get(17), dailyUsageMap.get(18), dailyUsageMap.get(19), dailyUsageMap.get(20),
-                dailyUsageMap.get(21), dailyUsageMap.get(22), dailyUsageMap.get(23), dailyUsageMap.get(24),
-                dailyUsageMap.get(25), dailyUsageMap.get(26), dailyUsageMap.get(27), dailyUsageMap.get(28),
-                dailyUsageMap.get(29), dailyUsageMap.get(30), dailyUsageMap.get(31));
-    }
-
-    private static int safeInteger(final Integer v) {
-        return v != null ? v : 0;
-    }
-
-    /**
-     * 인원 이름 결정: labor가 있으면 labor 이름, 없으면 meal name
-     */
-    private static String getPersonName(final ManagementCostMealFeeDetail meal) {
-        if (meal.getLabor() != null && meal.getLabor().getName() != null
-                && !meal.getLabor().getName().isBlank()) {
-            return meal.getLabor().getName();
+        void addLunch(final Integer value) {
+            if (value != null) {
+                lunchCount += value;
+            }
         }
-        return meal.getName();
+
+        void addDinner(final Integer value) {
+            if (value != null) {
+                dinnerCount += value;
+            }
+        }
+
+        void addAmount(final Long value) {
+            if (value != null) {
+                amount += value;
+            }
+        }
+
+        void updateUnitPrice(final Long value) {
+            if (value != null && unitPrice == null) {
+                unitPrice = value;
+            }
+        }
+
+        MealFeeAggregationDetailResponse.DailyMealFeeUsage toUsage() {
+            if (breakfastCount == 0 && lunchCount == 0 && dinnerCount == 0 && amount == 0 && unitPrice == null) {
+                return null;
+            }
+
+            final Integer breakfast = breakfastCount > 0 ? breakfastCount : null;
+            final Integer lunch = lunchCount > 0 ? lunchCount : null;
+            final Integer dinner = dinnerCount > 0 ? dinnerCount : null;
+
+            return new MealFeeAggregationDetailResponse.DailyMealFeeUsage(
+                    breakfast,
+                    lunch,
+                    dinner,
+                    unitPrice,
+                    amount);
+        }
     }
 
     /**
-     * 직종 결정: workType 필드에서 가져오기
+     * 집계 결과의 정렬 기준 (카테고리 → 직종 → 이름).
      */
-    private static String getWorkType(final ManagementCostMealFeeDetail meal) {
-        return meal.getWorkType() != null ? meal.getWorkType() : "";
-    }
-
-    /**
-     * 인원 그룹핑 키 (이름 + 직종)
-     */
-    private record PersonKey(String name, String workType) {
-    }
+    private static final Comparator<Map.Entry<MealFeeGroupKey, Map<Integer, DailyAccumulator>>> MEAL_FEE_GROUP_COMPARATOR = Comparator
+            .comparing((final Map.Entry<MealFeeGroupKey, Map<Integer, DailyAccumulator>> entry) -> entry.getKey()
+                    .category()
+                    .order())
+            .thenComparing(entry -> entry.getKey().workType(), Comparator.nullsLast(String::compareToIgnoreCase))
+            .thenComparing(entry -> entry.getKey().subject() != null ? entry.getKey().subject().displayName() : null,
+                    Comparator.nullsLast(String::compareToIgnoreCase));
 
     private ManagementCostAggregationItem toAggregationItem(
             final GroupKey key,
@@ -477,7 +735,7 @@ public class ManagementCostAggregationService {
 
     // 업체 + itemType + (기타일 때) 항목 설명 기준
     private record GroupKey(
-            CompanyResponse.CompanySimpleResponse company,
+            CompanySimpleResponse company,
             ManagementCostItemType itemType,
             String itemTypeDescription) {
     }
