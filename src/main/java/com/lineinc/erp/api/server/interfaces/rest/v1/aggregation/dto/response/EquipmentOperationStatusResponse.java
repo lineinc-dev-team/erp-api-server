@@ -21,6 +21,7 @@ public record EquipmentOperationStatusResponse(
     public record EquipmentOperationStatusItem(
             @Schema(description = "외주업체 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
             @Schema(description = "장비 규격", example = "25톤") String specification,
+            @Schema(description = "차량번호", example = "12가3456") String vehicleNumber,
             @Schema(description = "기사 정보") ContractDriverSimpleResponse driver,
             @Schema(description = "장비 정보") EquipmentDailyUsage equipment,
             @Schema(description = "유류 사용량") FuelUsage fuel,

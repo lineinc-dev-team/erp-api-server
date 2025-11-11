@@ -210,7 +210,11 @@ public class EquipmentOperationStatusService {
                 : null;
         final FuelUsage fuelUsage = createFuelUsage(fuelUsageByEquipment.get(equipmentId));
 
-        return new EquipmentOperationStatusItem(outsourcingCompany, specification, driver, equipmentDailyUsage,
+        // 차량번호
+        final String vehicleNumber = firstEquipment.getOutsourcingCompanyContractEquipment().getVehicleNumber();
+
+        return new EquipmentOperationStatusItem(outsourcingCompany, specification, vehicleNumber, driver,
+                equipmentDailyUsage,
                 fuelUsage, subEquipmentItems);
     }
 
