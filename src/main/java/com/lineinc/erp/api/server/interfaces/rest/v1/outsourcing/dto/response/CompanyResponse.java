@@ -99,6 +99,7 @@ public record CompanyResponse(
             @Schema(description = "계좌번호", example = "123-456-789012") String accountNumber,
             @Schema(description = "예금주", example = "홍길동") String accountHolder,
             @Schema(description = "주소", example = "서울특별시 강남구") String address,
+            @Schema(description = "상세주소", example = "역삼동 123-45") String detailAddress,
             @Schema(description = "전화번호", example = "02-1234-5678") String landlineNumber,
             @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
@@ -114,6 +115,7 @@ public record CompanyResponse(
                     company.getAccountNumber(),
                     company.getAccountHolder(),
                     company.getAddress(),
+                    company.getDetailAddress(),
                     company.getLandlineNumber(),
                     company.getPhoneNumber(),
                     company.isDeleted());
