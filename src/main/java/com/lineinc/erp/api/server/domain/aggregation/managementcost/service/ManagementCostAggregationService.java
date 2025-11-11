@@ -35,7 +35,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.Ma
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MealFeeAggregationDetailResponse.MealFeeAggregationDetailItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborSimpleResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse.ContractDriverSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse.ContractSimpleResponse;
@@ -303,11 +302,10 @@ public class ManagementCostAggregationService {
                 final CompanySimpleResponse companySimple = company != null
                         ? CompanySimpleResponse.from(company)
                         : null;
-                final LaborSimpleResponse laborSimple = toLaborSimpleResponse(detail.getLabor(), displayName);
                 final MealFeeSubjectData subject = new MealFeeSubjectData(
                         companySimple,
                         null,
-                        laborSimple,
+                        null,
                         null,
                         displayName);
 
