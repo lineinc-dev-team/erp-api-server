@@ -312,9 +312,13 @@ public class EquipmentOperationStatusService {
             }
         }
 
+        final String typeDescription = subEquipments.get(0).getOutsourcingCompanyContractSubEquipment()
+                .getDescription();
+
         return createSubEquipmentTypeItemWithDailyUsage(
                 subEquipmentType.getLabel(),
                 subEquipmentType.name(),
+                typeDescription,
                 dailyUsageMap);
     }
 
@@ -405,10 +409,12 @@ public class EquipmentOperationStatusService {
     private SubEquipmentTypeItem createSubEquipmentTypeItemWithDailyUsage(
             final String type,
             final String typeCode,
+            final String typeDescription,
             final Map<Integer, DailyUsage> dailyUsageMap) {
         return new SubEquipmentTypeItem(
                 type,
                 typeCode,
+                typeDescription,
                 dailyUsageMap.get(1), dailyUsageMap.get(2), dailyUsageMap.get(3), dailyUsageMap.get(4),
                 dailyUsageMap.get(5), dailyUsageMap.get(6), dailyUsageMap.get(7), dailyUsageMap.get(8),
                 dailyUsageMap.get(9), dailyUsageMap.get(10), dailyUsageMap.get(11), dailyUsageMap.get(12),

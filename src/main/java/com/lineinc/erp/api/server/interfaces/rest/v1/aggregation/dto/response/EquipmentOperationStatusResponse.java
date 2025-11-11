@@ -75,6 +75,7 @@ public record EquipmentOperationStatusResponse(
     public record SubEquipmentTypeItem(
             @Schema(description = "구분값", example = "죽통임대") String type,
             @Schema(description = "구분값 코드", example = "PIPE_RENTAL") String typeCode,
+            @Schema(description = "구분값 설명", example = "죽통임대") String typeDescription,
             @Schema(description = "1일") DailyUsage day01,
             @Schema(description = "2일") DailyUsage day02,
             @Schema(description = "3일") DailyUsage day03,
