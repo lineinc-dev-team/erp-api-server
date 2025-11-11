@@ -29,7 +29,8 @@ public record LaborSimpleResponse(
         @Schema(description = "공종") String workType,
         @Schema(description = "공종 코드") LaborWorkType workTypeCode,
         @Schema(description = "공종 설명") String workTypeDescription,
-        @Schema(description = "주작업") String mainWork) {
+        @Schema(description = "주작업") String mainWork,
+        @Schema(description = "휴대폰 번호") String phoneNumber) {
 
     /**
      * Labor 엔티티로부터 DTO 생성
@@ -53,6 +54,7 @@ public record LaborSimpleResponse(
                 labor.getWorkType() != null ? labor.getWorkType().getLabel() : null,
                 labor.getWorkType(),
                 labor.getWorkTypeDescription(),
-                labor.getMainWork());
+                labor.getMainWork(),
+                labor.getPhoneNumber());
     }
 }
