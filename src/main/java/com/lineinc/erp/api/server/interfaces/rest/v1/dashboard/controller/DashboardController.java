@@ -1,0 +1,39 @@
+package com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.controller;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lineinc.erp.api.server.domain.dashboard.service.DashboardService;
+import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.DashboardSiteResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * 대시보드 관련 API.
+ */
+@RestController
+@RequestMapping("/api/v1/dashboard")
+@RequiredArgsConstructor
+@Tag(name = "대시보드")
+public class DashboardController extends BaseController {
+
+    private final DashboardService dashboardService;
+
+    @Operation(summary = "대시보드 현장 목록 조회")
+    @GetMapping("/sites")
+    public ResponseEntity<SuccessResponse<List<DashboardSiteResponse>>> getDashboardSites(
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        final List<DashboardSiteResponse> responses = dashboardService.getDashboardSites(user.getUserId());
+        return ResponseEntity.ok(SuccessResponse.of(responses));
+    }
+}

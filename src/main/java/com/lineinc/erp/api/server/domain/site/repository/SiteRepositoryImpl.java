@@ -23,6 +23,7 @@ import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -117,6 +118,44 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
                 .distinct()
                 .where(condition)
                 .orderBy(orders)
+                .fetch();
+    }
+
+    @Override
+    public List<Site> findSitesForDashboard(final OffsetDateTime endedAtThreshold,
+            final OffsetDateTime currentDateTime,
+            final List<Long> accessibleSiteIds) {
+        if (accessibleSiteIds != null && accessibleSiteIds.isEmpty()) {
+            return List.of();
+        }
+
+        final OffsetDateTime threshold = Objects.requireNonNullElse(endedAtThreshold, OffsetDateTime.MIN);
+        final OffsetDateTime now = Objects.requireNonNullElse(currentDateTime, OffsetDateTime.MAX);
+
+        final BooleanBuilder condition = new BooleanBuilder()
+                .and(site.deleted.eq(false))
+                .and(siteProcess.deleted.eq(false));
+
+        final BooleanExpression inProgress = siteProcess.status.eq(SiteProcessStatus.IN_PROGRESS);
+        final BooleanExpression recentlyCompleted = siteProcess.status.eq(SiteProcessStatus.COMPLETED)
+                .and(site.endedAt.isNotNull())
+                .and(site.endedAt.goe(threshold))
+                .and(site.endedAt.loe(now));
+
+        condition.and(inProgress.or(recentlyCompleted));
+
+        if (accessibleSiteIds != null) {
+            condition.and(site.id.in(accessibleSiteIds));
+        }
+
+        return queryFactory
+                .selectDistinct(site)
+                .from(site)
+                .join(site.processes, siteProcess).fetchJoin()
+                .leftJoin(site.clientCompany).fetchJoin()
+                .leftJoin(site.user).fetchJoin()
+                .where(condition)
+                .orderBy(site.createdAt.desc())
                 .fetch();
     }
 
