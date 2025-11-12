@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.aggregation.headquarter.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -7,11 +8,14 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.aggregation.laborcost.service.LaborCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.materialcost.service.MaterialCostAggregationService;
-import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.HeadquarterAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.HeadquarterAggregationResponse.BillingSummary;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.HeadquarterAggregationResponse.CostSummary;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.LaborCostAggregationResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.LaborCostAggregationResponse.LaborCostAggregationItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MaterialCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MaterialCostAggregationResponse.FuelAggregationItemResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MaterialCostAggregationResponse.MaterialManagementItemResponse;
@@ -22,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * 본사 집계 서비스
  * <p>
- * 단기 대응: 기존 재료비 집계 응답을 재활용하여 전회/금회 합계를 구한다.
+ * 단기 대응: 기존 집계 응답을 재활용하여 전회/금회 합계를 구한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class HeadquarterAggregationService {
 
     private final MaterialCostAggregationService materialCostAggregationService;
-    private final SiteProcessService siteProcessService;
+    private final LaborCostAggregationService laborCostAggregationService;
 
     /**
      * 본사 집계 조회
@@ -38,39 +42,57 @@ public class HeadquarterAggregationService {
      * @param siteId        현장 ID
      * @param siteProcessId 공정 ID
      * @param yearMonth     조회월 (YYYY-MM)
-     * @return 재료비 기준 본사 집계 응답
+     * @return 본사 집계 응답
      */
     public HeadquarterAggregationResponse getHeadquarterAggregation(
             final Long siteId,
             final Long siteProcessId,
             final String yearMonth) {
 
-        // 기존 재료비 집계 API 활용
         final MaterialCostAggregationResponse materialResponse = materialCostAggregationService
                 .getMaterialCostAggregation(siteId, siteProcessId, yearMonth);
 
-        // 재료비 전회/금회 합계 계산
-        final BillingSummary previousSummary = sumMaterialBilling(materialResponse, false);
-        final BillingSummary currentSummary = sumMaterialBilling(materialResponse, true);
+        final BillingSummary materialPrevious = sumMaterialBilling(materialResponse, false);
+        final BillingSummary materialCurrent = sumMaterialBilling(materialResponse, true);
 
-        final CostSummary materialSummary = new CostSummary(
-                "재료비",
-                previousSummary,
-                currentSummary);
+        final CostSummary materialSummary = new CostSummary("재료비", materialPrevious, materialCurrent);
 
-        return new HeadquarterAggregationResponse(List.of(materialSummary));
+        final List<LaborCostAggregationResponse> laborResponses = Arrays.stream(LaborType.values())
+                .map(laborType -> laborCostAggregationService.getLaborCostAggregation(
+                        siteId,
+                        siteProcessId,
+                        yearMonth,
+                        laborType))
+                .toList();
+
+        final BillingSummary laborPrevious = sumLaborBilling(laborResponses, false);
+        final BillingSummary laborCurrent = sumLaborBilling(laborResponses, true);
+
+        final CostSummary laborSummary = new CostSummary("노무비", laborPrevious, laborCurrent);
+
+        return new HeadquarterAggregationResponse(List.of(materialSummary, laborSummary));
     }
 
-    /**
-     * 재료비 응답의 전회/금회 청구내역 합계를 계산한다.
-     */
     private BillingSummary sumMaterialBilling(
             final MaterialCostAggregationResponse materialResponse,
             final boolean current) {
 
+        return sumBillingDetails(materialBillingDetails(materialResponse, current));
+    }
+
+    private BillingSummary sumLaborBilling(
+            final List<LaborCostAggregationResponse> laborResponses,
+            final boolean current) {
+
+        return sumBillingDetails(laborBillingDetails(laborResponses, current));
+    }
+
+    private BillingSummary sumBillingDetails(
+            final Stream<MaterialManagementItemResponse.BillingDetail> details) {
+
         final long[] totals = new long[4]; // 0: supply, 1: vat, 2: deduction, 3: total
 
-        billingDetails(materialResponse, current)
+        details
                 .filter(Objects::nonNull)
                 .forEach(detail -> {
                     totals[0] += toLong(detail.supplyPrice());
@@ -82,7 +104,7 @@ public class HeadquarterAggregationService {
         return new BillingSummary(totals[0], totals[1], totals[2], totals[3]);
     }
 
-    private Stream<MaterialManagementItemResponse.BillingDetail> billingDetails(
+    private Stream<MaterialManagementItemResponse.BillingDetail> materialBillingDetails(
             final MaterialCostAggregationResponse response,
             final boolean current) {
         final Stream<MaterialManagementItemResponse.BillingDetail> materialDetails = response.materialManagements()
@@ -100,6 +122,14 @@ public class HeadquarterAggregationService {
         return Stream.concat(Stream.concat(materialDetails, steelDetails), fuelDetails);
     }
 
+    private Stream<MaterialManagementItemResponse.BillingDetail> laborBillingDetails(
+            final List<LaborCostAggregationResponse> responses,
+            final boolean current) {
+        return responses.stream()
+                .flatMap(response -> response.items().stream())
+                .map(item -> selectBilling(item, current));
+    }
+
     private MaterialManagementItemResponse.BillingDetail selectBilling(
             final MaterialManagementItemResponse item,
             final boolean current) {
@@ -114,6 +144,12 @@ public class HeadquarterAggregationService {
 
     private MaterialManagementItemResponse.BillingDetail selectBilling(
             final FuelAggregationItemResponse item,
+            final boolean current) {
+        return current ? item.currentBilling() : item.previousBilling();
+    }
+
+    private MaterialManagementItemResponse.BillingDetail selectBilling(
+            final LaborCostAggregationItem item,
             final boolean current) {
         return current ? item.currentBilling() : item.previousBilling();
     }

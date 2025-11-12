@@ -16,7 +16,7 @@ public record HeadquarterAggregationResponse(
      */
     @Schema(description = "비용 항목 요약 정보")
     public record CostSummary(
-            @Schema(description = "공종명", example = "기초공사") String processName,
+            @Schema(description = "공종명", example = "재료비") String processName,
             @Schema(description = "전회까지 합계") BillingSummary previousSummary,
             @Schema(description = "금회 합계") BillingSummary currentSummary) {
     }
