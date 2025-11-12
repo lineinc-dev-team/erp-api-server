@@ -436,10 +436,13 @@ public class SiteManagementCostService {
         final List<LaborPayroll> payrolls = laborPayrollRepository
                 .findBySiteAndSiteProcessAndYearMonth(site, siteProcess, yearMonth);
 
-        // 2. 정직원 제외한(직영, 용역, 기타) 총 공제액 합계 계산
+        // 2. 직영, 용역 총 공제액 합계 계산
         final BigDecimal totalDeductions = payrolls.stream()
-                .filter(payroll -> payroll.getLabor() != null
-                        && payroll.getLabor().getType() != LaborType.REGULAR_EMPLOYEE)
+                .filter(payroll -> payroll.getLabor() != null)
+                .filter(payroll -> {
+                    final LaborType type = payroll.getLabor().getType();
+                    return type == LaborType.DIRECT_CONTRACT || type == LaborType.OUTSOURCING;
+                })
                 .map(LaborPayroll::getTotalDeductions)
                 .filter(deductions -> deductions != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
