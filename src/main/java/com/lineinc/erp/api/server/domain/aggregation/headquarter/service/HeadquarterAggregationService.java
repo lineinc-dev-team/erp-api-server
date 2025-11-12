@@ -1,6 +1,5 @@
 package com.lineinc.erp.api.server.domain.aggregation.headquarter.service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -57,7 +56,9 @@ public class HeadquarterAggregationService {
 
         final CostSummary materialSummary = new CostSummary("재료비", materialPrevious, materialCurrent);
 
-        final List<LaborCostAggregationResponse> laborResponses = Arrays.stream(LaborType.values())
+        final List<LaborCostAggregationResponse> laborResponses = Stream.of(
+                LaborType.DIRECT_CONTRACT,
+                LaborType.OUTSOURCING)
                 .map(laborType -> laborCostAggregationService.getLaborCostAggregation(
                         siteId,
                         siteProcessId,

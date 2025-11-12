@@ -371,7 +371,20 @@ public class ManagementCostAggregationService {
             return LaborSimpleResponse.from(labor);
         }
         if (StringUtils.hasText(fallbackName)) {
-            return new LaborSimpleResponse(null, fallbackName, null, null, null, null, null, null, null);
+            return new LaborSimpleResponse(
+                    null,
+                    fallbackName,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
         }
         return null;
     }
