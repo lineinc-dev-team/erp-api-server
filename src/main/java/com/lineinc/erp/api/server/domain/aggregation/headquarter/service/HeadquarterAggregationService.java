@@ -9,14 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.aggregation.equipmentcost.service.EquipmentCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.laborcost.service.LaborCostAggregationService;
+import com.lineinc.erp.api.server.domain.aggregation.managementcost.service.ManagementCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.materialcost.service.MaterialCostAggregationService;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse.EquipmentCostAggregationItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.HeadquarterAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.HeadquarterAggregationResponse.CostSummary;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.LaborCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.LaborCostAggregationResponse.LaborCostAggregationItem;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse.ManagementCostAggregationItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MaterialCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MaterialCostAggregationResponse.MaterialManagementItemResponse;
 
@@ -35,6 +39,7 @@ public class HeadquarterAggregationService {
     private final MaterialCostAggregationService materialCostAggregationService;
     private final LaborCostAggregationService laborCostAggregationService;
     private final EquipmentCostAggregationService equipmentCostAggregationService;
+    private final ManagementCostAggregationService managementCostAggregationService;
 
     /**
      * 본사 집계 조회
@@ -77,7 +82,16 @@ public class HeadquarterAggregationService {
         final CostSummary equipmentSummary = buildSummary("장비비",
                 current -> equipmentBillingDetails(equipmentResponse, current));
 
-        return new HeadquarterAggregationResponse(List.of(materialSummary, laborSummary, equipmentSummary));
+        // 4) 관리비 집계 응답 확보
+        final ManagementCostAggregationResponse managementResponse = managementCostAggregationService
+                .getManagementCostAggregation(
+                        new ManagementCostAggregationRequest(siteId, siteProcessId, yearMonth));
+
+        final CostSummary managementSummary = buildSummary("관리비",
+                current -> managementBillingDetails(managementResponse, current));
+
+        return new HeadquarterAggregationResponse(
+                List.of(materialSummary, laborSummary, equipmentSummary, managementSummary));
     }
 
     /**
@@ -169,6 +183,35 @@ public class HeadquarterAggregationService {
             final boolean current) {
         return response.items().stream()
                 .map(item -> pickBilling(item, current));
+    }
+
+    private Stream<MaterialManagementItemResponse.BillingDetail> managementBillingDetails(
+            final ManagementCostAggregationResponse response,
+            final boolean current) {
+        if (response == null || response.items() == null) {
+            return Stream.empty();
+        }
+
+        return response.items().stream()
+                .map(item -> pickBilling(item, current));
+    }
+
+    private MaterialManagementItemResponse.BillingDetail pickBilling(
+            final ManagementCostAggregationItem item,
+            final boolean useCurrent) {
+        if (item == null) {
+            return null;
+        }
+        final var billing = useCurrent ? item.currentBilling() : item.previousBilling();
+        if (billing == null) {
+            return null;
+        }
+
+        return new MaterialManagementItemResponse.BillingDetail(
+                Long.valueOf(billing.supplyPrice()),
+                Long.valueOf(billing.vat()),
+                Long.valueOf(billing.deduction()),
+                Long.valueOf(billing.total()));
     }
 
     @FunctionalInterface
