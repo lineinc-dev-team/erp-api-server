@@ -83,9 +83,26 @@ public record SiteResponse(
     public static record SiteSimpleResponse(
             @Schema(description = "현장 ID", example = "123") Long id,
             @Schema(description = "현장명", example = "서울 APT 신축공사") String name,
+            @Schema(description = "상태", example = "진행중") String status,
+            @Schema(description = "상태 코드", example = "IN_PROGRESS") String statusCode,
+            @Schema(description = "사업 시작일", example = "2024-01-01T00:00:00+09:00") OffsetDateTime startedAt,
+            @Schema(description = "사업 종료일", example = "2025-12-31T00:00:00+09:00") OffsetDateTime endedAt,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static SiteResponse.SiteSimpleResponse from(final Site site) {
-            return new SiteResponse.SiteSimpleResponse(site.getId(), site.getName(), site.isDeleted());
+            return new SiteResponse.SiteSimpleResponse(site.getId(), site.getName(),
+                    site.getProcesses() != null && !site.getProcesses().isEmpty()
+                            ? site.getProcesses().get(0).getStatus() != null
+                                    ? site.getProcesses().get(0).getStatus().getLabel()
+                                    : null
+                            : null,
+                    site.getProcesses() != null && !site.getProcesses().isEmpty()
+                            ? site.getProcesses().get(0).getStatus() != null
+                                    ? site.getProcesses().get(0).getStatus().name()
+                                    : null
+                            : null,
+                    site.getStartedAt(),
+                    site.getEndedAt(),
+                    site.isDeleted());
         }
     }
 }
