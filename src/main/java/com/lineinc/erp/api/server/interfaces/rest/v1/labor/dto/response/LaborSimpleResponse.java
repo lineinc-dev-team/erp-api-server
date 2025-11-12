@@ -16,6 +16,10 @@ public record LaborSimpleResponse(
         @Schema(description = "공종", example = "건축") String workType,
         @Schema(description = "공종 코드", example = "CONSTRUCTION") LaborWorkType workTypeCode,
         @Schema(description = "공종 설명", example = "건축 공종") String workTypeDescription,
+        @Schema(description = "휴대폰 번호", example = "01012345678") String phoneNumber,
+        @Schema(description = "계좌번호", example = "12345678901234567890") String accountNumber,
+        @Schema(description = "예금주", example = "홍길동") String accountHolder,
+        @Schema(description = "은행명", example = "국민은행") String bankName,
         @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
 
     public static LaborSimpleResponse from(final Labor labor) {
@@ -28,6 +32,10 @@ public record LaborSimpleResponse(
                 labor.getWorkType() != null ? labor.getWorkType().getLabel() : null,
                 labor.getWorkType(),
                 labor.getWorkTypeDescription(),
+                labor.getPhoneNumber(),
+                labor.getAccountNumber(),
+                labor.getAccountHolder(),
+                labor.getBankName(),
                 labor.isDeleted());
     }
 }
