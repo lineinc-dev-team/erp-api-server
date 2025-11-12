@@ -12,6 +12,8 @@ import com.lineinc.erp.api.server.domain.aggregation.laborcost.service.LaborCost
 import com.lineinc.erp.api.server.domain.aggregation.managementcost.service.ManagementCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.materialcost.service.MaterialCostAggregationService;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractRepository;
+import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse.EquipmentCostAggregationItem;
@@ -40,6 +42,8 @@ public class HeadquarterAggregationService {
     private final LaborCostAggregationService laborCostAggregationService;
     private final EquipmentCostAggregationService equipmentCostAggregationService;
     private final ManagementCostAggregationService managementCostAggregationService;
+    private final SiteRepository siteRepository;
+    private final OutsourcingCompanyContractRepository outsourcingCompanyContractRepository;
 
     /**
      * 본사 집계 조회
@@ -90,7 +94,11 @@ public class HeadquarterAggregationService {
         final CostSummary managementSummary = buildSummary("관리비",
                 current -> managementBillingDetails(managementResponse, current));
 
+        // 5) 총 공사금액 계산 (현장 계약금액 + 외주 계약금액 합산)
+        final long totalConstructionAmount = calculateTotalConstructionAmount(siteId);
+
         return new HeadquarterAggregationResponse(
+                totalConstructionAmount,
                 List.of(materialSummary, laborSummary, equipmentSummary, managementSummary));
     }
 
@@ -123,6 +131,16 @@ public class HeadquarterAggregationService {
             final EquipmentCostAggregationItem item,
             final boolean useCurrent) {
         return pickBilling(item.previousBilling(), item.currentBilling(), useCurrent);
+    }
+
+    /**
+     * 총 공사금액 = 현장 기본 계약금액 + 외주업체 계약금액 합계
+     */
+    private long calculateTotalConstructionAmount(final Long siteId) {
+        final long siteContractAmount = toLong(siteRepository.findContractAmountBySiteId(siteId));
+        final long outsourcingContractAmount = toLong(
+                outsourcingCompanyContractRepository.sumContractAmountBySiteId(siteId));
+        return siteContractAmount + outsourcingContractAmount;
     }
 
     private long toLong(final Long value) {

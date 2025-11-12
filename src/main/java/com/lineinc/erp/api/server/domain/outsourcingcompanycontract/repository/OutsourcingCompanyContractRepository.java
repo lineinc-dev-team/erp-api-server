@@ -37,6 +37,18 @@ public interface OutsourcingCompanyContractRepository
             @Param("types") List<OutsourcingCompanyContractType> types);
 
     /**
+     * 특정 현장에서 체결한 외주업체 계약 금액의 합계를 조회합니다.
+     *
+     * @param siteId 현장 ID
+     * @return 외주 계약 금액 합계 (없으면 0)
+     */
+    @Query("""
+            SELECT COALESCE(SUM(oc.contractAmount), 0) FROM OutsourcingCompanyContract oc
+            WHERE oc.site.id = :siteId AND oc.deleted = false
+            """)
+    Long sumContractAmountBySiteId(@Param("siteId") Long siteId);
+
+    /**
      * 계약명으로 검색하는 메서드
      * 
      * @param keyword              검색할 계약명 키워드 (null 가능)

@@ -30,4 +30,16 @@ public interface SiteRepository extends JpaRepository<Site, Long>, SiteRepositor
      */
     @Query("SELECT s FROM Site s WHERE s.name = :name AND s.deleted = false")
     java.util.Optional<Site> findByName(@Param("name") String name);
+
+    /**
+     * 현장의 계약금액을 조회합니다.
+     *
+     * @param siteId 현장 ID
+     * @return 계약금액 (없으면 0)
+     */
+    @Query("""
+            SELECT COALESCE(s.contractAmount, 0) FROM Site s
+            WHERE s.id = :siteId AND s.deleted = false
+            """)
+    Long findContractAmountBySiteId(@Param("siteId") Long siteId);
 }

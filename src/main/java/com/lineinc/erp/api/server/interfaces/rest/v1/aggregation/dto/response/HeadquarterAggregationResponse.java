@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "본사 집계 응답")
 public record HeadquarterAggregationResponse(
+        @Schema(description = "총 공사금액", example = "150000000") Long totalConstructionAmount,
         @Schema(description = "비용 항목 요약 목록") List<CostSummary> costSummaries) {
 
     /**
