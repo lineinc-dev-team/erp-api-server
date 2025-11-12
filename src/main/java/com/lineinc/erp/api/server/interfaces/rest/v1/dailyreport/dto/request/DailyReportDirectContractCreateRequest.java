@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Positive;
 
 @Schema(description = "직영/용역 직영 출역일보 등록 요청")
 public record DailyReportDirectContractCreateRequest(
-        @Schema(description = "업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "노무인력 ID", example = "1") Long laborId,
         @Schema(description = "직급", example = "기사") @NotBlank String position,
         @Schema(description = "작업내용", example = "기초공사") @NotBlank String workContent,

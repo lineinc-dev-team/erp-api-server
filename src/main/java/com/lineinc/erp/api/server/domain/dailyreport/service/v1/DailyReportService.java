@@ -211,11 +211,6 @@ public class DailyReportService {
         if (request.directContracts() != null) {
 
             for (final DailyReportDirectContractCreateRequest directContractRequest : request.directContracts()) {
-                final OutsourcingCompany company = directContractRequest.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(directContractRequest.outsourcingCompanyId())
-                        : null;
-
                 Labor labor;
                 // 임시 인력인 경우 새로운 인력을 생성
                 if (Boolean.TRUE.equals(directContractRequest.isTemporary())) {
@@ -229,7 +224,6 @@ public class DailyReportService {
 
                 final DailyReportDirectContract directContract = DailyReportDirectContract.builder()
                         .dailyReport(dailyReport)
-                        .outsourcingCompany(company)
                         .labor(labor)
                         .position(directContractRequest.position())
                         .workContent(directContractRequest.workContent())
