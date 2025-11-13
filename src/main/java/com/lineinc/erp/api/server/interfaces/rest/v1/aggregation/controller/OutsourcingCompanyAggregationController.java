@@ -54,7 +54,7 @@ public class OutsourcingCompanyAggregationController extends BaseController {
     }
 
     @GetMapping("/deduction-amount")
-    @Operation(summary = "공제금액 집계 조회")
+    @Operation(summary = "외주(공사) 공제금액 집계 조회")
     public ResponseEntity<SuccessResponse<DeductionAmountAggregationResponse>> getDeductionAmountAggregation(
             @Valid final DeductionAmountAggregationRequest request) {
         final var response = outsourcingCompanyDeductionAggregationService

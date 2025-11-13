@@ -9,11 +9,19 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
+import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfoSubEquipment;
+import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
+import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoRepository;
+import com.lineinc.erp.api.server.domain.fuelaggregation.repository.FuelInfoWithReportDate;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailOutsourcingContract;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.DeductionAmountAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.DeductionAmountAggregationResponse;
@@ -30,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class OutsourcingCompanyDeductionAggregationService {
 
     private final ManagementCostRepository managementCostRepository;
+    private final FuelInfoRepository fuelInfoRepository;
 
     /**
      * 공제금액 집계 조회
@@ -59,10 +68,13 @@ public class OutsourcingCompanyDeductionAggregationService {
                 startInclusive,
                 endExclusive);
 
-        // 유류대는 추후 구현
-        final DeductionAmountAggregationResponse.DeductionDetail fuelFee = new DeductionAmountAggregationResponse.DeductionDetail(
-                new DeductionAmountAggregationResponse.BillingDetail(null),
-                new DeductionAmountAggregationResponse.BillingDetail(null));
+        // 유류대 공제금액 집계
+        final DeductionAmountAggregationResponse.DeductionDetail fuelFee = calculateFuelDeduction(
+                request.siteId(),
+                request.siteProcessId(),
+                request.outsourcingCompanyContractId(),
+                startInclusive,
+                endExclusive);
 
         return new DeductionAmountAggregationResponse(mealFee, snackFee, fuelFee);
     }
@@ -204,6 +216,125 @@ public class OutsourcingCompanyDeductionAggregationService {
                         previousAmount > 0 ? previousAmount : null),
                 new DeductionAmountAggregationResponse.BillingDetail(
                         currentAmount > 0 ? currentAmount : null));
+    }
+
+    /**
+     * 유류대 공제금액 집계
+     */
+    private DeductionAmountAggregationResponse.DeductionDetail calculateFuelDeduction(
+            final Long siteId,
+            final Long siteProcessId,
+            final Long outsourcingCompanyContractId,
+            final OffsetDateTime startInclusive,
+            final OffsetDateTime endExclusive) {
+        final List<FuelInfoWithReportDate> fuelInfos = fuelInfoRepository
+                .findBySiteIdAndSiteProcessIdAndReportDateLessThan(siteId, siteProcessId, endExclusive);
+
+        long previousAmount = 0L;
+        long currentAmount = 0L;
+
+        for (final FuelInfoWithReportDate fuelInfoWithDate : fuelInfos) {
+            final FuelInfo fuelInfo = fuelInfoWithDate.getFuelInfo();
+            if (fuelInfo == null) {
+                continue;
+            }
+
+            final FuelAggregation fuelAggregation = fuelInfo.getFuelAggregation();
+            if (fuelAggregation == null) {
+                continue;
+            }
+
+            final OutsourcingCompanyContractEquipment equipment = fuelInfo.getEquipment();
+            if (equipment == null) {
+                continue;
+            }
+
+            final OutsourcingCompanyContract contract = equipment.getOutsourcingCompanyContract();
+            if (contract == null || !contract.getId().equals(outsourcingCompanyContractId)) {
+                continue;
+            }
+
+            if (!isDeductionEnabled(contract.getDefaultDeductions(),
+                    OutsourcingCompanyContractDefaultDeductionsType.FUEL_COST)) {
+                continue;
+            }
+
+            final long amount = calculateFuelCost(fuelAggregation, fuelInfo);
+            if (amount <= 0) {
+                continue;
+            }
+
+            OffsetDateTime reportDate = fuelInfoWithDate.getReportDate();
+            if (reportDate == null) {
+                reportDate = fuelAggregation.getDate();
+            }
+
+            if (reportDate == null) {
+                continue;
+            }
+
+            if (reportDate.isBefore(startInclusive)) {
+                previousAmount += amount;
+            } else if (!reportDate.isBefore(startInclusive) && reportDate.isBefore(endExclusive)) {
+                currentAmount += amount;
+            }
+        }
+
+        return new DeductionAmountAggregationResponse.DeductionDetail(
+                new DeductionAmountAggregationResponse.BillingDetail(
+                        previousAmount > 0 ? previousAmount : null),
+                new DeductionAmountAggregationResponse.BillingDetail(
+                        currentAmount > 0 ? currentAmount : null));
+    }
+
+    private long calculateFuelCost(final FuelAggregation fuelAggregation, final FuelInfo fuelInfo) {
+        long total = 0L;
+
+        if (fuelInfo.getAmount() != null) {
+            total += getValueOrZero(fuelInfo.getAmount());
+        } else {
+            total += calculateFuelCostByType(fuelAggregation, fuelInfo.getFuelType(), fuelInfo.getFuelAmount());
+        }
+
+        if (fuelInfo.getSubEquipments() != null) {
+            for (final FuelInfoSubEquipment subEquipment : fuelInfo.getSubEquipments()) {
+                if (subEquipment == null) {
+                    continue;
+                }
+
+                if (subEquipment.getAmount() != null) {
+                    total += getValueOrZero(subEquipment.getAmount());
+                    continue;
+                }
+
+                total += calculateFuelCostByType(fuelAggregation, subEquipment.getFuelType(),
+                        subEquipment.getFuelAmount());
+            }
+        }
+
+        return total;
+    }
+
+    private long calculateFuelCostByType(
+            final FuelAggregation fuelAggregation,
+            final FuelInfoFuelType fuelType,
+            final Long fuelAmount) {
+        if (fuelType == null || fuelAmount == null || fuelAggregation == null) {
+            return 0L;
+        }
+
+        final long unitPrice = switch (fuelType) {
+            case GASOLINE -> getValueOrZero(fuelAggregation.getGasolinePrice());
+            case DIESEL -> getValueOrZero(fuelAggregation.getDieselPrice());
+            case UREA -> getValueOrZero(fuelAggregation.getUreaPrice());
+            default -> 0L;
+        };
+
+        return unitPrice * fuelAmount;
+    }
+
+    private long getValueOrZero(final Long value) {
+        return value != null ? value : 0L;
     }
 
     /**
