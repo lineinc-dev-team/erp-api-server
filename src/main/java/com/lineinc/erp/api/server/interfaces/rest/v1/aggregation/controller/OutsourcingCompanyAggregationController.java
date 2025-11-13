@@ -1,0 +1,40 @@
+package com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.controller;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lineinc.erp.api.server.domain.aggregation.constructionoutsourcing.service.ConstructionOutsourcingCompanyAggregationService;
+import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingCompaniesResponse;
+import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * 외주업체 집계 컨트롤러
+ */
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/aggregation/outsourcing-companies")
+@Tag(name = "집계")
+public class OutsourcingCompanyAggregationController extends BaseController {
+
+    private final ConstructionOutsourcingCompanyAggregationService constructionOutsourcingCompanyAggregationService;
+
+    @GetMapping("/construction")
+    @Operation(summary = "외주(공사) 외주업체 목록 조회")
+    public ResponseEntity<SuccessResponse<List<ConstructionOutsourcingCompaniesResponse>>> getConstructionOutsourcingCompanies(
+            @Valid final ConstructionOutsourcingCompaniesRequest request) {
+        final var responseList = constructionOutsourcingCompanyAggregationService
+                .getConstructionOutsourcingCompanies(request.siteId(), request.siteProcessId());
+        return SuccessResponse.ok(responseList);
+    }
+}
