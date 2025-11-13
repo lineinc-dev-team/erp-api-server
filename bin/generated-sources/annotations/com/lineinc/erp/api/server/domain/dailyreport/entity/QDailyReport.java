@@ -26,6 +26,8 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
 
     public final DateTimePath<java.time.OffsetDateTime> completedAt = createDateTime("completedAt", java.time.OffsetDateTime.class);
 
+    public final ListPath<DailyReportOutsourcingConstructionGroup, QDailyReportOutsourcingConstructionGroup> constructionGroups = this.<DailyReportOutsourcingConstructionGroup, QDailyReportOutsourcingConstructionGroup>createList("constructionGroups", DailyReportOutsourcingConstructionGroup.class, QDailyReportOutsourcingConstructionGroup.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
 
@@ -85,8 +87,6 @@ public class QDailyReport extends EntityPathBase<DailyReport> {
     public final ListPath<DailyReportMaterialStatus, QDailyReportMaterialStatus> materialStatuses = this.<DailyReportMaterialStatus, QDailyReportMaterialStatus>createList("materialStatuses", DailyReportMaterialStatus.class, QDailyReportMaterialStatus.class, PathInits.DIRECT2);
 
     public final StringPath memo = createString("memo");
-
-    public final ListPath<DailyReportOutsourcingCompany, QDailyReportOutsourcingCompany> outsourcingCompanies = this.<DailyReportOutsourcingCompany, QDailyReportOutsourcingCompany>createList("outsourcingCompanies", DailyReportOutsourcingCompany.class, QDailyReportOutsourcingCompany.class, PathInits.DIRECT2);
 
     public final BooleanPath outsourcingConstructionEvidenceSubmitted = createBoolean("outsourcingConstructionEvidenceSubmitted");
 

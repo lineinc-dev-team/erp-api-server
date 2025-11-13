@@ -50,10 +50,6 @@ public class QDailyReportOutsourcingConstruction extends EntityPathBase<DailyRep
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
 
-    public final StringPath specification = createString("specification");
-
-    public final StringPath unit = createString("unit");
-
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> updatedAt = _super.updatedAt;
 

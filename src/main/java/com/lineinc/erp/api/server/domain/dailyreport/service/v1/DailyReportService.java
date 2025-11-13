@@ -28,7 +28,6 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportInputStat
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportMainProcess;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportMaterialStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcing;
-import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingCompany;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstruction;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstructionGroup;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
@@ -112,7 +111,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.Da
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMainProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportMaterialStatusResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingCompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingConstructionGroupResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportOutsourcingResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response.DailyReportWorkResponse;
@@ -401,76 +400,58 @@ public class DailyReportService {
             dailyReport.getFuels().add(fuel);
         }
 
-        // 외주 공사 출역 정보 추가 (3depth 구조: 외주업체 -> 공사 그룹 -> 공사항목)
+        // 외주 공사 출역 정보 추가 (2depth 구조: 외주업체+공사그룹 -> 공사항목)
         if (request.outsourcingConstructions() != null) {
-            for (final DailyReportOutsourcingConstructionCreateRequest outsourcingCompanyRequest : request
+            for (final DailyReportOutsourcingConstructionCreateRequest constructionRequest : request
                     .outsourcingConstructions()) {
 
-                final OutsourcingCompany outsourcingCompany = outsourcingCompanyRequest.outsourcingCompanyId() != null
+                final OutsourcingCompany outsourcingCompany = constructionRequest.outsourcingCompanyId() != null
                         ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(outsourcingCompanyRequest.outsourcingCompanyId())
+                                .getOutsourcingCompanyByIdOrThrow(constructionRequest.outsourcingCompanyId())
                         : null;
 
-                // 외주업체 엔티티 생성
-                final DailyReportOutsourcingCompany dailyReportOutsourcingCompany = DailyReportOutsourcingCompany
+                // 공사 그룹 조회 및 생성
+                final OutsourcingCompanyContractConstructionGroup outsourcingCompanyContractConstructionGroup = constructionRequest
+                        .outsourcingCompanyContractConstructionGroupId() != null
+                                ? outsourcingCompanyContractConstructionService
+                                        .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
+                                                constructionRequest.outsourcingCompanyContractConstructionGroupId())
+                                : null;
+
+                final DailyReportOutsourcingConstructionGroup constructionGroup = DailyReportOutsourcingConstructionGroup
                         .builder()
                         .dailyReport(dailyReport)
                         .outsourcingCompany(outsourcingCompany)
+                        .outsourcingCompanyContractConstructionGroup(outsourcingCompanyContractConstructionGroup)
                         .build();
 
-                // 공사 그룹 목록 추가
-                if (outsourcingCompanyRequest.groups() != null) {
-                    for (final DailyReportOutsourcingConstructionCreateRequest.ConstructionGroupCreateRequest groupRequest : outsourcingCompanyRequest
-                            .groups()) {
+                // 공사항목 목록 추가
+                if (constructionRequest.items() != null) {
+                    for (final DailyReportOutsourcingConstructionCreateRequest.ConstructionItemCreateRequest itemRequest : constructionRequest
+                            .items()) {
 
-                        final OutsourcingCompanyContractConstructionGroup outsourcingCompanyContractConstructionGroup = groupRequest
-                                .outsourcingCompanyContractConstructionGroupId() != null
+                        final OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction = itemRequest
+                                .outsourcingCompanyContractConstructionId() != null
                                         ? outsourcingCompanyContractConstructionService
-                                                .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
-                                                        groupRequest.outsourcingCompanyContractConstructionGroupId())
+                                                .getOutsourcingCompanyContractConstructionByIdOrThrow(
+                                                        itemRequest.outsourcingCompanyContractConstructionId())
                                         : null;
 
-                        // 공사항목 그룹 생성
-                        final DailyReportOutsourcingConstructionGroup constructionGroup = DailyReportOutsourcingConstructionGroup
+                        final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction
                                 .builder()
-                                .dailyReportOutsourcingCompany(dailyReportOutsourcingCompany)
-                                .outsourcingCompanyContractConstructionGroup(
-                                        outsourcingCompanyContractConstructionGroup)
+                                .outsourcingConstructionGroup(constructionGroup)
+                                .outsourcingCompanyContractConstruction(outsourcingCompanyContractConstruction)
+                                .quantity(itemRequest.quantity())
+                                .fileUrl(itemRequest.fileUrl())
+                                .originalFileName(itemRequest.originalFileName())
+                                .memo(itemRequest.memo())
                                 .build();
 
-                        // 공사항목 목록 추가
-                        if (groupRequest.items() != null) {
-                            for (final DailyReportOutsourcingConstructionCreateRequest.ConstructionItemCreateRequest itemRequest : groupRequest
-                                    .items()) {
-
-                                final OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction = itemRequest
-                                        .outsourcingCompanyContractConstructionId() != null
-                                                ? outsourcingCompanyContractConstructionService
-                                                        .getOutsourcingCompanyContractConstructionByIdOrThrow(
-                                                                itemRequest.outsourcingCompanyContractConstructionId())
-                                                : null;
-
-                                final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction
-                                        .builder()
-                                        .outsourcingConstructionGroup(constructionGroup)
-                                        .outsourcingCompanyContractConstruction(outsourcingCompanyContractConstruction)
-                                        .specification(itemRequest.specification())
-                                        .unit(itemRequest.unit())
-                                        .quantity(itemRequest.quantity())
-                                        .fileUrl(itemRequest.fileUrl())
-                                        .originalFileName(itemRequest.originalFileName())
-                                        .memo(itemRequest.memo())
-                                        .build();
-
-                                constructionGroup.getConstructions().add(construction);
-                            }
-                        }
-
-                        dailyReportOutsourcingCompany.getConstructionGroups().add(constructionGroup);
+                        constructionGroup.getConstructions().add(construction);
                     }
                 }
 
-                dailyReport.getOutsourcingCompanies().add(dailyReportOutsourcingCompany);
+                dailyReport.getConstructionGroups().add(constructionGroup);
             }
         }
 
@@ -1521,78 +1502,67 @@ public class DailyReportService {
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
-        // EntitySyncUtils.syncList를 사용하여 외주업체 정보 동기화 (3depth 구조)
+        // EntitySyncUtils.syncList를 사용하여 공사 그룹 정보 동기화 (2depth 구조)
         EntitySyncUtils.syncList(
-                dailyReport.getOutsourcingCompanies(),
-                request.outsourcingCompanies(),
-                (final DailyReportOutsourcingConstructionUpdateRequest.OutsourcingCompanyUpdateInfo dto) -> {
+                dailyReport.getConstructionGroups(),
+                request.constructionGroups(),
+                (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo dto) -> {
                     final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                             .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
 
-                    final DailyReportOutsourcingCompany dailyReportOutsourcingCompany = DailyReportOutsourcingCompany
+                    final OutsourcingCompanyContractConstructionGroup contractConstructionGroup = outsourcingCompanyContractConstructionService
+                            .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
+                                    dto.outsourcingCompanyContractConstructionGroupId());
+
+                    final DailyReportOutsourcingConstructionGroup group = DailyReportOutsourcingConstructionGroup
                             .builder()
                             .dailyReport(dailyReport)
                             .outsourcingCompany(outsourcingCompany)
+                            .outsourcingCompanyContractConstructionGroup(contractConstructionGroup)
                             .build();
 
-                    // 공사 그룹 추가
-                    if (dto.groups() != null) {
-                        for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo groupDto : dto
-                                .groups()) {
-                            final OutsourcingCompanyContractConstructionGroup contractConstructionGroup = outsourcingCompanyContractConstructionService
-                                    .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
-                                            groupDto.outsourcingCompanyContractConstructionGroupId());
+                    // 공사항목 추가
+                    if (dto.items() != null) {
+                        for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionItemUpdateInfo itemDto : dto
+                                .items()) {
+                            final OutsourcingCompanyContractConstruction contractConstruction = outsourcingCompanyContractConstructionService
+                                    .getOutsourcingCompanyContractConstructionByIdOrThrow(
+                                            itemDto.outsourcingCompanyContractConstructionId());
 
-                            final DailyReportOutsourcingConstructionGroup group = DailyReportOutsourcingConstructionGroup
+                            final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction
                                     .builder()
-                                    .dailyReportOutsourcingCompany(dailyReportOutsourcingCompany)
-                                    .outsourcingCompanyContractConstructionGroup(contractConstructionGroup)
+                                    .outsourcingConstructionGroup(group)
+                                    .outsourcingCompanyContractConstruction(contractConstruction)
+                                    .quantity(itemDto.quantity())
+                                    .fileUrl(itemDto.fileUrl())
+                                    .originalFileName(itemDto.originalFileName())
+                                    .memo(itemDto.memo())
                                     .build();
 
-                            // 공사항목 추가
-                            if (groupDto.items() != null) {
-                                for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionItemUpdateInfo itemDto : groupDto
-                                        .items()) {
-                                    final OutsourcingCompanyContractConstruction contractConstruction = outsourcingCompanyContractConstructionService
-                                            .getOutsourcingCompanyContractConstructionByIdOrThrow(
-                                                    itemDto.outsourcingCompanyContractConstructionId());
-
-                                    final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction
-                                            .builder()
-                                            .outsourcingConstructionGroup(group)
-                                            .outsourcingCompanyContractConstruction(contractConstruction)
-                                            .specification(itemDto.specification())
-                                            .unit(itemDto.unit())
-                                            .quantity(itemDto.quantity())
-                                            .fileUrl(itemDto.fileUrl())
-                                            .originalFileName(itemDto.originalFileName())
-                                            .memo(itemDto.memo())
-                                            .build();
-
-                                    group.getConstructions().add(construction);
-                                }
-                            }
-
-                            dailyReportOutsourcingCompany.getConstructionGroups().add(group);
+                            group.getConstructions().add(construction);
                         }
                     }
 
-                    return dailyReportOutsourcingCompany;
+                    return group;
                 });
 
-        // 기존 외주업체 업데이트
-        for (final DailyReportOutsourcingConstructionUpdateRequest.OutsourcingCompanyUpdateInfo companyInfo : request
-                .outsourcingCompanies()) {
-            if (companyInfo.id() != null) { // ID가 있는 것만 처리
+        // 기존 공사 그룹 업데이트
+        for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo groupInfo : request
+                .constructionGroups()) {
+            if (groupInfo.id() != null) { // ID가 있는 것만 처리
                 final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(companyInfo.outsourcingCompanyId());
+                        .getOutsourcingCompanyByIdOrThrow(groupInfo.outsourcingCompanyId());
 
-                // 기존 외주업체 엔티티 찾아서 업데이트
-                dailyReport.getOutsourcingCompanies().stream()
-                        .filter(company -> company.getId() != null && company.getId().equals(companyInfo.id()))
+                final OutsourcingCompanyContractConstructionGroup contractConstructionGroup = outsourcingCompanyContractConstructionService
+                        .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
+                                groupInfo.outsourcingCompanyContractConstructionGroupId());
+
+                // 기존 공사 그룹 엔티티 찾아서 업데이트
+                dailyReport.getConstructionGroups().stream()
+                        .filter(group -> group.getId() != null && group.getId().equals(groupInfo.id()))
                         .findFirst()
-                        .ifPresent(company -> company.updateFrom(companyInfo, outsourcingCompany,
-                                outsourcingCompanyContractConstructionService));
+                        .ifPresent(group -> group.updateFrom(groupInfo, outsourcingCompany,
+                                contractConstructionGroup, outsourcingCompanyContractConstructionService));
             }
         }
 
@@ -1787,7 +1757,7 @@ public class DailyReportService {
      * @param pageable 페이징 정보
      * @return 출역일보 외주(공사) 그룹 정보 슬라이스
      */
-    public Slice<DailyReportOutsourcingCompanyResponse> searchDailyReportOutsourcingConstructions(
+    public Slice<DailyReportOutsourcingConstructionGroupResponse> searchDailyReportOutsourcingConstructions(
             final DailyReportSearchRequest request, final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
@@ -1800,23 +1770,24 @@ public class DailyReportService {
                         DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
                         null, pageable);
 
-        // DailyReport 슬라이스를 DailyReportOutsourcingCompanyResponse 슬라이스로 변환 (3depth 구조)
-        // 각 DailyReport의 외주업체들을 개별 항목으로 변환
-        final List<DailyReportOutsourcingCompanyResponse> allOutsourcingCompanies = new ArrayList<>();
+        // DailyReport 슬라이스를 DailyReportOutsourcingConstructionGroupResponse 슬라이스로 변환
+        // (2depth 구조)
+        // 각 DailyReport의 공사 그룹들을 개별 항목으로 변환
+        final List<DailyReportOutsourcingConstructionGroupResponse> allConstructionGroups = new ArrayList<>();
 
         for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
-            for (final DailyReportOutsourcingCompany company : dailyReport.getOutsourcingCompanies()) {
-                allOutsourcingCompanies.add(DailyReportOutsourcingCompanyResponse.from(company));
+            for (final DailyReportOutsourcingConstructionGroup group : dailyReport.getConstructionGroups()) {
+                allConstructionGroups.add(DailyReportOutsourcingConstructionGroupResponse.from(group));
             }
         }
 
         // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
-        final Slice<DailyReportOutsourcingCompanyResponse> companySlice = new SliceImpl<>(
-                allOutsourcingCompanies,
+        final Slice<DailyReportOutsourcingConstructionGroupResponse> groupSlice = new SliceImpl<>(
+                allConstructionGroups,
                 pageable,
                 dailyReportSlice.hasNext());
 
-        return companySlice;
+        return groupSlice;
     }
 
     /**

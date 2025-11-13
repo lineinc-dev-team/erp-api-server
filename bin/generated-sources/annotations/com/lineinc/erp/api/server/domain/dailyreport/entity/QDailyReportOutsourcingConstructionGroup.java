@@ -32,7 +32,7 @@ public class QDailyReportOutsourcingConstructionGroup extends EntityPathBase<Dai
     //inherited
     public final StringPath createdBy = _super.createdBy;
 
-    public final QDailyReportOutsourcingCompany dailyReportOutsourcingCompany;
+    public final QDailyReport dailyReport;
 
     //inherited
     public final BooleanPath deleted = _super.deleted;
@@ -41,6 +41,8 @@ public class QDailyReportOutsourcingConstructionGroup extends EntityPathBase<Dai
     public final DateTimePath<java.time.OffsetDateTime> deletedAt = _super.deletedAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany outsourcingCompany;
 
     public final com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContractConstructionGroup outsourcingCompanyContractConstructionGroup;
 
@@ -68,7 +70,8 @@ public class QDailyReportOutsourcingConstructionGroup extends EntityPathBase<Dai
 
     public QDailyReportOutsourcingConstructionGroup(Class<? extends DailyReportOutsourcingConstructionGroup> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.dailyReportOutsourcingCompany = inits.isInitialized("dailyReportOutsourcingCompany") ? new QDailyReportOutsourcingCompany(forProperty("dailyReportOutsourcingCompany"), inits.get("dailyReportOutsourcingCompany")) : null;
+        this.dailyReport = inits.isInitialized("dailyReport") ? new QDailyReport(forProperty("dailyReport"), inits.get("dailyReport")) : null;
+        this.outsourcingCompany = inits.isInitialized("outsourcingCompany") ? new com.lineinc.erp.api.server.domain.outsourcingcompany.entity.QOutsourcingCompany(forProperty("outsourcingCompany")) : null;
         this.outsourcingCompanyContractConstructionGroup = inits.isInitialized("outsourcingCompanyContractConstructionGroup") ? new com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.QOutsourcingCompanyContractConstructionGroup(forProperty("outsourcingCompanyContractConstructionGroup"), inits.get("outsourcingCompanyContractConstructionGroup")) : null;
     }
 

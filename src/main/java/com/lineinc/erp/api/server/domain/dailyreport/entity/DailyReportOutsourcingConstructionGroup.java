@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstructionGroup;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractConstructionService;
@@ -51,8 +52,12 @@ public class DailyReportOutsourcingConstructionGroup extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = AppConstants.DAILY_REPORT_OUTSOURCING_COMPANY_ID, nullable = false)
-    private DailyReportOutsourcingCompany dailyReportOutsourcingCompany; // 출역일보 외주업체
+    @JoinColumn(name = AppConstants.DAILY_REPORT_ID, nullable = false)
+    private DailyReport dailyReport; // 출역일보
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
+    private OutsourcingCompany outsourcingCompany; // 외주업체
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_ID)
@@ -66,8 +71,10 @@ public class DailyReportOutsourcingConstructionGroup extends BaseEntity {
      * 요청 객체로부터 엔티티를 업데이트합니다.
      */
     public void updateFrom(final ConstructionGroupUpdateInfo request,
+            final OutsourcingCompany outsourcingCompany,
             final OutsourcingCompanyContractConstructionGroup outsourcingCompanyContractConstructionGroup,
             final OutsourcingCompanyContractConstructionService outsourcingCompanyContractConstructionService) {
+        this.outsourcingCompany = outsourcingCompany;
         this.outsourcingCompanyContractConstructionGroup = outsourcingCompanyContractConstructionGroup;
 
         // 공사항목 업데이트
@@ -96,8 +103,6 @@ public class DailyReportOutsourcingConstructionGroup extends BaseEntity {
                     return DailyReportOutsourcingConstruction.builder()
                             .outsourcingConstructionGroup(this)
                             .outsourcingCompanyContractConstruction(contractConstruction)
-                            .specification(dto.specification())
-                            .unit(dto.unit())
                             .quantity(dto.quantity())
                             .fileUrl(dto.fileUrl())
                             .originalFileName(dto.originalFileName())

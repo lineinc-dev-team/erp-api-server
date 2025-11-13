@@ -49,8 +49,6 @@ public class DailyReportOutsourcingConstruction extends BaseEntity {
     @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_ID)
     private OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction; // 외주업체계약 공사항목
 
-    private String specification; // 규격
-    private String unit; // 단위
     private Integer quantity; // 수량
     private String fileUrl; // 계약서 파일 URL
     private String originalFileName; // 계약서 원본 파일명
@@ -72,8 +70,6 @@ public class DailyReportOutsourcingConstruction extends BaseEntity {
     public void updateFrom(final ConstructionItemUpdateInfo request,
             final OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction) {
         this.outsourcingCompanyContractConstruction = outsourcingCompanyContractConstruction;
-        this.specification = request.specification();
-        this.unit = request.unit();
         this.quantity = request.quantity();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();

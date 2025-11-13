@@ -103,8 +103,8 @@ public class DailyReport extends BaseEntity {
     private List<DailyReportFuel> fuels = new ArrayList<>(); // 유류 출역일보 목록
 
     @Builder.Default
-    @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DailyReportOutsourcingCompany> outsourcingCompanies = new ArrayList<>(); // 외주업체 목록
+    @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DailyReportOutsourcingConstructionGroup> constructionGroups = new ArrayList<>(); // 외주 공사 그룹 목록
 
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.DAILY_REPORT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -301,9 +301,7 @@ public class DailyReport extends BaseEntity {
      * 외주(공사) 항목 개수 계산 및 업데이트
      */
     public void updateOutsourcingConstructionItemCount() {
-        this.outsourcingConstructionItemCount = (int) outsourcingCompanies.stream()
-                .filter(company -> !company.isDeleted())
-                .flatMap(company -> company.getConstructionGroups().stream())
+        this.outsourcingConstructionItemCount = (int) constructionGroups.stream()
                 .filter(group -> !group.isDeleted())
                 .flatMap(group -> group.getConstructions().stream())
                 .filter(construction -> !construction.isDeleted())

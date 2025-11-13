@@ -11,8 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record DailyReportOutsourcingConstructionResponse(
         @Schema(description = "ID", example = "1") Long id,
         @Schema(description = "외주업체계약 공사항목 정보") ContractConstructionResponse.ContractConstructionSimpleResponse outsourcingCompanyContractConstruction,
-        @Schema(description = "규격", example = "C24") String specification,
-        @Schema(description = "단위", example = "m²") String unit,
         @Schema(description = "수량", example = "100") Integer quantity,
         @Schema(description = "파일 URL", example = "https://example.com/contract.pdf") String fileUrl,
         @Schema(description = "원본 파일명", example = "contract.pdf") String originalFileName,
@@ -28,8 +26,6 @@ public record DailyReportOutsourcingConstructionResponse(
                         ? ContractConstructionResponse.ContractConstructionSimpleResponse
                                 .from(construction.getOutsourcingCompanyContractConstruction())
                         : null,
-                construction.getSpecification(),
-                construction.getUnit(),
                 construction.getQuantity(),
                 construction.getFileUrl(),
                 construction.getOriginalFileName(),
