@@ -8,11 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.aggregation.constructionoutsourcing.service.ConstructionOutsourcingCompanyAggregationService;
+import com.lineinc.erp.api.server.domain.aggregation.outsourcingcompany.service.OutsourcingCompanyDeductionAggregationService;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingAggregationDetailRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.DeductionAmountAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingCompaniesResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.DeductionAmountAggregationResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class OutsourcingCompanyAggregationController extends BaseController {
 
     private final ConstructionOutsourcingCompanyAggregationService constructionOutsourcingCompanyAggregationService;
+    private final OutsourcingCompanyDeductionAggregationService outsourcingCompanyDeductionAggregationService;
 
     @GetMapping("/construction")
     @Operation(summary = "외주(공사) 외주업체 목록 조회")
@@ -46,6 +50,15 @@ public class OutsourcingCompanyAggregationController extends BaseController {
             @Valid final ConstructionOutsourcingAggregationDetailRequest request) {
         final var response = constructionOutsourcingCompanyAggregationService
                 .getConstructionOutsourcingAggregationDetail(request);
+        return SuccessResponse.ok(response);
+    }
+
+    @GetMapping("/deduction-amount")
+    @Operation(summary = "공제금액 집계 조회")
+    public ResponseEntity<SuccessResponse<DeductionAmountAggregationResponse>> getDeductionAmountAggregation(
+            @Valid final DeductionAmountAggregationRequest request) {
+        final var response = outsourcingCompanyDeductionAggregationService
+                .getDeductionAmountAggregation(request);
         return SuccessResponse.ok(response);
     }
 }
