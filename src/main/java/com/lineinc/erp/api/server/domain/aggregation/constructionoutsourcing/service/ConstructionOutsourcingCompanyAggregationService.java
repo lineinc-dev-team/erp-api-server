@@ -31,7 +31,6 @@ public class ConstructionOutsourcingCompanyAggregationService {
                 .findBySiteAndSiteProcess(siteId, siteProcessId)
                 .stream()
                 .map(group -> ConstructionOutsourcingCompaniesResponse.from(
-                        group.getOutsourcingCompany(),
                         group.getOutsourcingCompanyContractConstructionGroup().getOutsourcingCompanyContract()))
                 .distinct()
                 .toList();

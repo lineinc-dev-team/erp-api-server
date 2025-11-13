@@ -1,8 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response;
 
-import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -11,13 +10,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "외주(공사) 외주업체 목록 응답")
 public record ConstructionOutsourcingCompaniesResponse(
-        @Schema(description = "외주업체 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
-        @Schema(description = "외주업체 계약명", example = "2025년 공사 계약") String contractName) {
+        @Schema(description = "외주업체 계약 정보") ContractListResponse.ContractSimpleResponse outsourcingCompanyContract) {
 
-    public static ConstructionOutsourcingCompaniesResponse from(final OutsourcingCompany outsourcingCompany,
+    public static ConstructionOutsourcingCompaniesResponse from(
             final OutsourcingCompanyContract outsourcingCompanyContract) {
         return new ConstructionOutsourcingCompaniesResponse(
-                CompanyResponse.CompanySimpleResponse.from(outsourcingCompany),
-                outsourcingCompanyContract != null ? outsourcingCompanyContract.getContractName() : null);
+                ContractListResponse.ContractSimpleResponse.from(outsourcingCompanyContract));
     }
 }
