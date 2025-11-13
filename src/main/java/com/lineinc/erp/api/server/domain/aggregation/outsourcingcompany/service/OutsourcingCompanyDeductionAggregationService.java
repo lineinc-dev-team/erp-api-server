@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
+import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDetail;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailOutsourcingContract;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
@@ -50,10 +51,15 @@ public class OutsourcingCompanyDeductionAggregationService {
                 startInclusive,
                 endExclusive);
 
-        // 간식대, 유류대는 추후 구현
-        final DeductionAmountAggregationResponse.DeductionDetail snackFee = new DeductionAmountAggregationResponse.DeductionDetail(
-                new DeductionAmountAggregationResponse.BillingDetail(null),
-                new DeductionAmountAggregationResponse.BillingDetail(null));
+        // 간식대 공제금액 집계
+        final DeductionAmountAggregationResponse.DeductionDetail snackFee = calculateSnackFeeDeduction(
+                request.siteId(),
+                request.siteProcessId(),
+                request.outsourcingCompanyContractId(),
+                startInclusive,
+                endExclusive);
+
+        // 유류대는 추후 구현
         final DeductionAmountAggregationResponse.DeductionDetail fuelFee = new DeductionAmountAggregationResponse.DeductionDetail(
                 new DeductionAmountAggregationResponse.BillingDetail(null),
                 new DeductionAmountAggregationResponse.BillingDetail(null));
@@ -123,6 +129,71 @@ public class OutsourcingCompanyDeductionAggregationService {
                         previousAmount += amount;
                     } else {
                         currentAmount += amount;
+                    }
+                }
+            }
+        }
+
+        return new DeductionAmountAggregationResponse.DeductionDetail(
+                new DeductionAmountAggregationResponse.BillingDetail(
+                        previousAmount > 0 ? previousAmount : null),
+                new DeductionAmountAggregationResponse.BillingDetail(
+                        currentAmount > 0 ? currentAmount : null));
+    }
+
+    /**
+     * 간식비 공제금액 집계
+     */
+    private DeductionAmountAggregationResponse.DeductionDetail calculateSnackFeeDeduction(
+            final Long siteId,
+            final Long siteProcessId,
+            final Long outsourcingCompanyContractId,
+            final OffsetDateTime startInclusive,
+            final OffsetDateTime endExclusive) {
+        // 조회월 다음달 1일 미만까지의 모든 관리비 데이터 조회
+        // 전회까지의 모든 데이터를 포함하기 위해 paymentDate < endExclusive 조건만 사용
+        final List<ManagementCost> allCosts = managementCostRepository
+                .findBySiteIdAndSiteProcessIdAndPaymentDateLessThanAndDeletedFalse(
+                        siteId,
+                        siteProcessId,
+                        endExclusive);
+
+        // 간식비(SNACK_FEE) 타입만 필터링
+        final List<ManagementCost> snackFeeCosts = allCosts.stream()
+                .filter(cost -> cost.getItemType() == ManagementCostItemType.SNACK_FEE)
+                .toList();
+
+        long previousAmount = 0L;
+        long currentAmount = 0L;
+
+        for (final ManagementCost cost : snackFeeCosts) {
+            final OffsetDateTime paymentDate = cost.getPaymentDate();
+            if (paymentDate == null) {
+                continue;
+            }
+
+            // 공제업체계약 확인
+            if (cost.getDeductionCompanyContract() == null) {
+                continue;
+            }
+
+            // 요청한 계약 ID와 일치하는지 확인
+            if (!cost.getDeductionCompanyContract().getId().equals(outsourcingCompanyContractId)) {
+                continue;
+            }
+
+            // 품목상세의 총합계를 공제금액으로 집계
+            for (final ManagementCostDetail detail : cost.getDetails()) {
+                if (detail == null || detail.isDeleted()) {
+                    continue;
+                }
+
+                final Long total = detail.getTotal();
+                if (total != null && total > 0) {
+                    if (paymentDate.isBefore(startInclusive)) {
+                        previousAmount += total;
+                    } else {
+                        currentAmount += total;
                     }
                 }
             }
