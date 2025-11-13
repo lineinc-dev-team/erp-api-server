@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
@@ -19,6 +21,22 @@ public interface FuelAggregationRepository
      * 현장, 공정, 일자로 유류집계 조회
      */
     Optional<FuelAggregation> findBySiteAndSiteProcessAndDate(Site site, SiteProcess siteProcess, OffsetDateTime date);
+
+    /**
+     * 현장, 공정, 일자로 삭제되지 않은 유류집계 존재 여부 확인
+     */
+    @Query("""
+            SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END
+            FROM FuelAggregation f
+            WHERE f.site = :site
+            AND f.siteProcess = :siteProcess
+            AND f.date = :date
+            AND f.deleted = false
+            """)
+    boolean existsBySiteAndSiteProcessAndDateAndDeletedFalse(
+            @Param("site") Site site,
+            @Param("siteProcess") SiteProcess siteProcess,
+            @Param("date") OffsetDateTime date);
 
     /**
      * 현장, 공정, 날짜(미만) 기준으로 "삭제되지 않은" 유류집계 목록을 조회합니다.

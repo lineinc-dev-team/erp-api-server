@@ -89,10 +89,17 @@ public class FuelAggregationService {
             throw new IllegalArgumentException(ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
+        // 동일한 현장, 공정, 일자의 유류집계 중복 확인
+        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(request.date());
+        if (fuelAggregationRepository.existsBySiteAndSiteProcessAndDateAndDeletedFalse(site, siteProcess, reportDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.FUEL_AGGREGATION_ALREADY_EXISTS);
+        }
+
         final FuelAggregation fuelAggregation = fuelAggregationRepository.save(FuelAggregation.builder()
                 .site(site)
                 .siteProcess(siteProcess)
-                .date(DateTimeFormatUtils.toOffsetDateTime(request.date()))
+                .date(reportDate)
                 .weather(request.weather())
                 .outsourcingCompany(request.outsourcingCompanyId() != null
                         ? outsourcingCompanyService
@@ -155,7 +162,6 @@ public class FuelAggregationService {
         }
 
         // 해당 현장, 공정, 일자에 맞는 출역일보 찾기
-        final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(request.date());
         dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
                 .ifPresent(dailyReport -> {
                     // DailyReportFuel 엔티티 생성 및 연결

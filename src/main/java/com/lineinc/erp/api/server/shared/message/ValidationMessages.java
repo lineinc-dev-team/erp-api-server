@@ -77,6 +77,7 @@ public class ValidationMessages {
     // ===== 관리비/유류 관련 메시지 =====
     public static final String MANAGEMENT_COST_NOT_FOUND = "존재하지 않는 관리비입니다.";
     public static final String FUEL_AGGREGATION_NOT_FOUND = "유류집계를 찾을 수 없습니다.";
+    public static final String FUEL_AGGREGATION_ALREADY_EXISTS = "해당 현장, 공정, 일자에 대한 유류집계가 이미 존재합니다.";
 
     // ===== 출역일보 관련 메시지 =====
     public static final String DAILY_REPORT_NOT_FOUND = "출역일보를 찾을 수 없습니다.";
