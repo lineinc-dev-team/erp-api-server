@@ -163,6 +163,10 @@ public final class AppConstants {
      * 세션 타임아웃 (초 단위, 1800초 = 30분)
      */
     public static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 1800;
+    /**
+     * 개발 서버 세션 타임아웃 (초 단위, 604800초 = 7일)
+     */
+    public static final int DEV_SESSION_TIMEOUT_SECONDS = 604_800;
 
     /**
      * JPA 시퀀스 AllocationSize 기본값

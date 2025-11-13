@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.auth.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,6 +44,9 @@ public class AuthController extends BaseController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
 
+    @Value("${spring.profiles.active:local}")
+    private String activeProfile;
+
     @Operation(summary = "로그인")
     @PostMapping("/login")
     public ResponseEntity<Void> login(
@@ -80,7 +84,9 @@ public class AuthController extends BaseController {
                 context);
 
         // 세션 타임아웃 설정
-        session.setMaxInactiveInterval(AppConstants.DEFAULT_SESSION_TIMEOUT_SECONDS);
+        final int sessionTimeout = "dev".equals(activeProfile) ? AppConstants.DEV_SESSION_TIMEOUT_SECONDS
+                : AppConstants.DEFAULT_SESSION_TIMEOUT_SECONDS;
+        session.setMaxInactiveInterval(sessionTimeout);
         return ResponseEntity.ok().build();
     }
 
