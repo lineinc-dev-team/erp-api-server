@@ -19,7 +19,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.Con
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingCompaniesResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionGroupResponse;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -107,26 +106,58 @@ public class ConstructionOutsourcingCompanyAggregationService {
             }
         }
 
-        // 응답 생성
-        final List<ConstructionOutsourcingAggregationDetailResponse.ConstructionOutsourcingAggregationDetailItem> items = new ArrayList<>();
+        // 그룹별로 공사항목 그룹핑
+        final Map<Long, List<OutsourcingCompanyContractConstruction>> constructionsByGroup = new HashMap<>();
         for (final OutsourcingCompanyContractConstruction construction : allConstructions) {
-            final BillingAccumulator accumulator = billingMap.getOrDefault(construction.getId(),
-                    new BillingAccumulator());
-            items.add(new ConstructionOutsourcingAggregationDetailResponse.ConstructionOutsourcingAggregationDetailItem(
-                    construction.getConstructionGroup() != null
-                            ? ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponseForDailyReport
-                                    .from(construction.getConstructionGroup())
-                            : null,
-                    ContractConstructionResponse.ContractConstructionSimpleResponse.from(construction),
-                    new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
-                            accumulator.previousQuantity > 0 ? accumulator.previousQuantity : null,
-                            accumulator.previousAmount > 0 ? accumulator.previousAmount : null),
-                    new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
-                            accumulator.currentQuantity > 0 ? accumulator.currentQuantity : null,
-                            accumulator.currentAmount > 0 ? accumulator.currentAmount : null)));
+            final Long groupId = construction.getConstructionGroup() != null
+                    ? construction.getConstructionGroup().getId()
+                    : 0L; // 그룹이 없는 경우 0으로 처리
+            constructionsByGroup.computeIfAbsent(groupId, k -> new ArrayList<>()).add(construction);
         }
 
-        return new ConstructionOutsourcingAggregationDetailResponse(items);
+        // 응답 생성 (그룹별로)
+        final List<ConstructionOutsourcingAggregationDetailResponse.ConstructionGroupItem> groupItems = new ArrayList<>();
+        for (final Map.Entry<Long, List<OutsourcingCompanyContractConstruction>> entry : constructionsByGroup
+                .entrySet()) {
+            final List<OutsourcingCompanyContractConstruction> constructions = entry.getValue();
+
+            // 그룹 정보 가져오기 (첫 번째 공사항목의 그룹 사용)
+            final var firstConstruction = constructions.get(0);
+            final var constructionGroup = firstConstruction.getConstructionGroup();
+
+            // 공사항목 목록 생성
+            final List<ConstructionOutsourcingAggregationDetailResponse.ConstructionItem> constructionItems = new ArrayList<>();
+            for (final OutsourcingCompanyContractConstruction construction : constructions) {
+                final BillingAccumulator accumulator = billingMap.getOrDefault(construction.getId(),
+                        new BillingAccumulator());
+                constructionItems.add(new ConstructionOutsourcingAggregationDetailResponse.ConstructionItem(
+                        construction.getId(), // constructionId
+                        construction.getItem(),
+                        construction.getSpecification(),
+                        construction.getUnit(),
+                        construction.getUnitPrice(),
+                        construction.getContractQuantity(),
+                        construction.getContractPrice(),
+                        construction.getOutsourcingContractQuantity(),
+                        construction.getOutsourcingContractUnitPrice(),
+                        construction.getOutsourcingContractPrice(),
+                        new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
+                                accumulator.previousQuantity > 0 ? accumulator.previousQuantity : null,
+                                accumulator.previousAmount > 0 ? accumulator.previousAmount : null),
+                        new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
+                                accumulator.currentQuantity > 0 ? accumulator.currentQuantity : null,
+                                accumulator.currentAmount > 0 ? accumulator.currentAmount : null)));
+            }
+
+            groupItems.add(new ConstructionOutsourcingAggregationDetailResponse.ConstructionGroupItem(
+                    constructionGroup != null
+                            ? ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponseForDailyReport
+                                    .from(constructionGroup)
+                            : null,
+                    constructionItems));
+        }
+
+        return new ConstructionOutsourcingAggregationDetailResponse(groupItems);
     }
 
     /**
