@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.aggregation.constructionoutsourcing.service.ConstructionOutsourcingCompanyAggregationService;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingAggregationDetailRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingCompaniesRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingCompaniesResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
@@ -36,5 +38,14 @@ public class OutsourcingCompanyAggregationController extends BaseController {
         final var responseList = constructionOutsourcingCompanyAggregationService
                 .getConstructionOutsourcingCompanies(request.siteId(), request.siteProcessId());
         return SuccessResponse.ok(responseList);
+    }
+
+    @GetMapping("/construction-detail")
+    @Operation(summary = "외주(공사) 집계 상세 조회")
+    public ResponseEntity<SuccessResponse<ConstructionOutsourcingAggregationDetailResponse>> getConstructionOutsourcingAggregationDetail(
+            @Valid final ConstructionOutsourcingAggregationDetailRequest request) {
+        final var response = constructionOutsourcingCompanyAggregationService
+                .getConstructionOutsourcingAggregationDetail(request);
+        return SuccessResponse.ok(response);
     }
 }

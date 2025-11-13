@@ -53,4 +53,17 @@ public interface OutsourcingCompanyContractConstructionRepository
             @Param("itemName") String itemName,
             @Param("constructionGroupId") Long constructionGroupId,
             @Param("outsourcingCompanyId") Long outsourcingCompanyId);
+
+    /**
+     * 외주업체 계약 ID로 모든 공사항목 정보를 조회합니다.
+     * 공사항목 그룹을 JOIN FETCH하여 N+1 문제 방지
+     */
+    @Query("""
+            SELECT c FROM OutsourcingCompanyContractConstruction c \
+            LEFT JOIN FETCH c.constructionGroup cg \
+            WHERE c.outsourcingCompanyContract.id = :contractId \
+            AND c.deleted = false \
+            ORDER BY c.id""")
+    List<OutsourcingCompanyContractConstruction> findAllByOutsourcingCompanyContractId(
+            @Param("contractId") Long contractId);
 }
