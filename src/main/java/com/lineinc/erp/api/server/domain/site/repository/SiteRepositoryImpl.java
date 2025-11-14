@@ -130,17 +130,20 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         }
 
         final OffsetDateTime threshold = Objects.requireNonNullElse(endedAtThreshold, OffsetDateTime.MIN);
-        final OffsetDateTime now = Objects.requireNonNullElse(currentDateTime, OffsetDateTime.MAX);
 
         final BooleanBuilder condition = new BooleanBuilder()
                 .and(site.deleted.eq(false))
                 .and(siteProcess.deleted.eq(false));
 
+        // 진행 중인 현장
         final BooleanExpression inProgress = siteProcess.status.eq(SiteProcessStatus.IN_PROGRESS);
+
+        // 완료된 현장 중에서 종료일 이후 1개월 이내인 현장
+        // 종료일이 threshold(now - 1개월) 이후인 경우 포함 (종료일 + 1개월 >= now)
+        // 즉: endedAt >= threshold
         final BooleanExpression recentlyCompleted = siteProcess.status.eq(SiteProcessStatus.COMPLETED)
                 .and(site.endedAt.isNotNull())
-                .and(site.endedAt.goe(threshold))
-                .and(site.endedAt.loe(now));
+                .and(site.endedAt.goe(threshold));
 
         condition.and(inProgress.or(recentlyCompleted));
 
