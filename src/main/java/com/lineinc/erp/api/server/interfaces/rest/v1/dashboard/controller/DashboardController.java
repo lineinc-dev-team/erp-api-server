@@ -12,6 +12,7 @@ import com.lineinc.erp.api.server.domain.dashboard.service.DashboardService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.DashboardSiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.SiteMonthlyCostsResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,14 @@ public class DashboardController extends BaseController {
     public ResponseEntity<SuccessResponse<List<DashboardSiteResponse>>> getDashboardSites(
             @AuthenticationPrincipal final CustomUserDetails user) {
         final List<DashboardSiteResponse> responses = dashboardService.getDashboardSites(user.getUserId());
+        return ResponseEntity.ok(SuccessResponse.of(responses));
+    }
+
+    @Operation(summary = "현장별 월별 비용 총합 조회 (본사직원 전용)")
+    @GetMapping("/site-monthly-costs")
+    public ResponseEntity<SuccessResponse<List<SiteMonthlyCostsResponse>>> getSiteMonthlyCosts(
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        final List<SiteMonthlyCostsResponse> responses = dashboardService.getSiteMonthlyCosts(user.getUserId());
         return ResponseEntity.ok(SuccessResponse.of(responses));
     }
 }

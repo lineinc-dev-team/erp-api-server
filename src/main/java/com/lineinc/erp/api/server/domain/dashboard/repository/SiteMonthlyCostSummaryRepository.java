@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.dashboard.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +31,38 @@ public interface SiteMonthlyCostSummaryRepository extends JpaRepository<SiteMont
             @Param("yearMonth") String yearMonth,
             @Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess);
+
+    /**
+     * 현장별 월별 비용 집계 조회 (현장의 모든 공정 합계)
+     */
+    @Query("""
+            SELECT smcs.yearMonth,
+                   SUM(COALESCE(smcs.materialCost, 0)) as materialCost,
+                   SUM(COALESCE(smcs.laborCost, 0)) as laborCost,
+                   SUM(COALESCE(smcs.managementCost, 0)) as managementCost,
+                   SUM(COALESCE(smcs.equipmentCost, 0)) as equipmentCost,
+                   SUM(COALESCE(smcs.outsourcingCost, 0)) as outsourcingCost
+            FROM SiteMonthlyCostSummary smcs
+            WHERE smcs.site.id = :siteId
+            AND smcs.deleted = false
+            GROUP BY smcs.yearMonth
+            ORDER BY smcs.yearMonth""")
+    List<Object[]> findMonthlyCostsBySiteId(@Param("siteId") Long siteId);
+
+    /**
+     * 전체 현장의 월별 비용 총합 조회 (접근 권한이 있는 현장들만)
+     */
+    @Query("""
+            SELECT smcs.yearMonth,
+                   SUM(COALESCE(smcs.materialCost, 0)) as materialCost,
+                   SUM(COALESCE(smcs.laborCost, 0)) as laborCost,
+                   SUM(COALESCE(smcs.managementCost, 0)) as managementCost,
+                   SUM(COALESCE(smcs.equipmentCost, 0)) as equipmentCost,
+                   SUM(COALESCE(smcs.outsourcingCost, 0)) as outsourcingCost
+            FROM SiteMonthlyCostSummary smcs
+            WHERE smcs.site.id IN :siteIds
+            AND smcs.deleted = false
+            GROUP BY smcs.yearMonth
+            ORDER BY smcs.yearMonth""")
+    List<Object[]> findMonthlyCostsTotalBySiteIds(@Param("siteIds") List<Long> siteIds);
 }
