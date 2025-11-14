@@ -271,7 +271,15 @@ public class Labor extends BaseEntity {
             final Grade grade) {
         this.typeDescription = request.typeDescription();
         this.name = request.name();
-        this.residentNumber = request.residentNumber();
+
+        // 주민번호가 마스킹되어 있으면 기존 값 유지
+        final String requestedResidentNumber = request.residentNumber();
+        if (requestedResidentNumber != null && requestedResidentNumber.contains("*")) {
+            // 마스킹된 주민번호는 업데이트하지 않음 (기존 값 유지)
+        } else {
+            this.residentNumber = requestedResidentNumber;
+        }
+
         this.workType = request.workType();
         this.workTypeDescription = request.workTypeDescription();
         this.mainWork = request.mainWork();
