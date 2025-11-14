@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.DashboardSiteMonthlyCostBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureCalculationBatchService;
 
@@ -27,6 +28,7 @@ public class BatchController extends BaseController {
 
     private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
     private final TenureCalculationBatchService tenureCalculationBatchService;
+    private final DashboardSiteMonthlyCostBatchService dashboardSiteMonthlyCostBatchService;
 
     /**
      * 출역일보 자동 마감 배치를 수동으로 실행합니다.
@@ -65,6 +67,29 @@ public class BatchController extends BaseController {
             return ResponseEntity.ok(message);
         } catch (final Exception e) {
             log.error("근속기간 계산 배치 실행 중 오류 발생", e);
+            return ResponseEntity.status(500)
+                    .body("배치 실행 실패: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 대시보드 현장 월별 비용 집계 배치를 수동으로 실행합니다.
+     * 대시보드 현장 목록 조회로 반환되는 현장들에 대해 각 월마다 재료비, 노무비, 관리비, 장비비, 외주비를 저장합니다.
+     * 기준: 착공일(시작일)이 포함된 월부터 배치 실행 시점의 월까지 계산합니다.
+     * 
+     * @return 배치 실행 결과
+     */
+    @PostMapping("/dashboard-site-monthly-cost")
+    @Operation(summary = "대시보드 현장 월별 비용 집계 배치 실행")
+    public ResponseEntity<String> runDashboardSiteMonthlyCostBatch() {
+        try {
+            log.info("대시보드 현장 월별 비용 집계 배치 수동 실행 시작");
+            dashboardSiteMonthlyCostBatchService.execute();
+            final String message = "대시보드 현장 월별 비용 집계 배치 완료";
+            log.info(message);
+            return ResponseEntity.ok(message);
+        } catch (final Exception e) {
+            log.error("대시보드 현장 월별 비용 집계 배치 실행 중 오류 발생", e);
             return ResponseEntity.status(500)
                     .body("배치 실행 실패: " + e.getMessage());
         }
