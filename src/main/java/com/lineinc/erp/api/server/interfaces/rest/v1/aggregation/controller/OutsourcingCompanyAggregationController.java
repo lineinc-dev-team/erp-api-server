@@ -11,9 +11,11 @@ import com.lineinc.erp.api.server.domain.aggregation.constructionoutsourcing.ser
 import com.lineinc.erp.api.server.domain.aggregation.outsourcingcompany.service.OutsourcingCompanyDeductionAggregationService;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingAggregationDetailRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingCompaniesRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.DeductionAmountAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationDetailResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingCompaniesResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.DeductionAmountAggregationResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
@@ -34,6 +36,15 @@ public class OutsourcingCompanyAggregationController extends BaseController {
 
     private final ConstructionOutsourcingCompanyAggregationService constructionOutsourcingCompanyAggregationService;
     private final OutsourcingCompanyDeductionAggregationService outsourcingCompanyDeductionAggregationService;
+
+    @GetMapping("")
+    @Operation(summary = "외주 집계 조회")
+    public ResponseEntity<SuccessResponse<ConstructionOutsourcingAggregationResponse>> getConstructionOutsourcingAggregation(
+            @Valid final ConstructionOutsourcingAggregationRequest request) {
+        final var response = constructionOutsourcingCompanyAggregationService
+                .getConstructionOutsourcingAggregation(request);
+        return SuccessResponse.ok(response);
+    }
 
     @GetMapping("/construction")
     @Operation(summary = "외주(공사) 외주업체 목록 조회")

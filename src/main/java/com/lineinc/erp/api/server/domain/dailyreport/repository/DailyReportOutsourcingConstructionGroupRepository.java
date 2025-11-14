@@ -113,4 +113,30 @@ public interface DailyReportOutsourcingConstructionGroupRepository
             @Param("siteProcessId") Long siteProcessId,
             @Param("outsourcingCompanyContractId") Long outsourcingCompanyContractId,
             @Param("endDate") OffsetDateTime endDate);
+
+    /**
+     * 현장, 공정, 날짜 범위로 외주(공사) 그룹 조회 (집계용)
+     * 외주업체, 공사항목과 외주업체계약 공사항목을 JOIN FETCH하여 N+1 문제 방지
+     * - endDate: 조회월 다음달 1일 00:00 UTC 미만
+     */
+    @Query("""
+            SELECT DISTINCT g FROM DailyReportOutsourcingConstructionGroup g
+            JOIN FETCH g.dailyReport dr
+            LEFT JOIN FETCH g.outsourcingCompany oc
+            LEFT JOIN FETCH g.outsourcingCompanyContractConstructionGroup cg
+            LEFT JOIN FETCH cg.outsourcingCompanyContract contract
+            LEFT JOIN FETCH g.constructions c
+            LEFT JOIN FETCH c.outsourcingCompanyContractConstruction construction
+            WHERE dr.site.id = :siteId
+            AND dr.siteProcess.id = :siteProcessId
+            AND dr.reportDate < :endDate
+            AND g.deleted = false
+            AND dr.deleted = false
+            AND c.deleted = false
+            AND g.outsourcingCompany IS NOT NULL
+            """)
+    List<DailyReportOutsourcingConstructionGroup> findBySiteAndSiteProcessAndReportDateLessThan(
+            @Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId,
+            @Param("endDate") OffsetDateTime endDate);
 }
