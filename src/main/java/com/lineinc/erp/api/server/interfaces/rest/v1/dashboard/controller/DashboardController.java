@@ -38,9 +38,9 @@ public class DashboardController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responses));
     }
 
-    @Operation(summary = "현장별 월별 비용 총합 조회 (본사직원 전용)")
-    @GetMapping("/site-monthly-costs")
-    public ResponseEntity<SuccessResponse<List<SiteMonthlyCostsResponse>>> getSiteMonthlyCosts(
+    @Operation(summary = "현장별 비용 총합 조회 (본사직원 전용)")
+    @GetMapping("/site-costs")
+    public ResponseEntity<SuccessResponse<List<SiteMonthlyCostsResponse>>> getSiteCosts(
             @AuthenticationPrincipal final CustomUserDetails user) {
         final List<SiteMonthlyCostsResponse> responses = dashboardService.getSiteMonthlyCosts(user.getUserId());
         return ResponseEntity.ok(SuccessResponse.of(responses));
