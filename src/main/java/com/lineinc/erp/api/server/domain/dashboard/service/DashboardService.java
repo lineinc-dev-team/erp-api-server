@@ -11,10 +11,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.dashboard.repository.SiteMonthlyCostSummaryRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
+import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.DashboardSiteResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.SiteMonthlyCostResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.SiteMonthlyCostsResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
@@ -33,6 +36,7 @@ public class DashboardService {
 
     private final UserService userService;
     private final SiteRepository siteRepository;
+    private final SiteProcessService siteProcessService;
     private final SiteMonthlyCostSummaryRepository siteMonthlyCostSummaryRepository;
 
     public List<DashboardSiteResponse> getDashboardSites(final Long userId) {
@@ -100,6 +104,60 @@ public class DashboardService {
                             totalEquipmentCost,
                             totalOutsourcingCost,
                             totalCost);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 현장 및 공정별 월별 비용 목록 조회
+     * 해당 현장에 접근 권한이 있는 사용자만 조회 가능합니다.
+     */
+    public List<SiteMonthlyCostResponse> getSiteProcessMonthlyCosts(
+            final Long userId,
+            final Long siteId,
+            final Long siteProcessId) {
+        final User user = userService.getUserByIdOrThrow(userId);
+
+        // 현장 존재 확인
+        siteRepository.findById(siteId)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+
+        // 현장 접근 권한 체크
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
+
+        // 본사직원이거나 접근 가능한 현장 목록에 포함되어 있어야 함
+        if (accessibleSiteIds != null && !accessibleSiteIds.contains(siteId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ValidationMessages.ACCESS_DENIED);
+        }
+
+        // 현장 및 공정 조회
+        final Site site = siteRepository.findById(siteId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(siteProcessId);
+
+        // 월별 비용 조회
+        final List<Object[]> monthlyCostsData = siteMonthlyCostSummaryRepository
+                .findMonthlyCostsBySiteIdAndSiteProcessId(siteId, siteProcessId);
+
+        return monthlyCostsData.stream()
+                .map(data -> {
+                    final String yearMonth = (String) data[0];
+                    final Long materialCost = ((Number) data[1]).longValue();
+                    final Long laborCost = ((Number) data[2]).longValue();
+                    final Long managementCost = ((Number) data[3]).longValue();
+                    final Long equipmentCost = ((Number) data[4]).longValue();
+                    final Long outsourcingCost = ((Number) data[5]).longValue();
+
+                    return SiteMonthlyCostResponse.from(
+                            site,
+                            siteProcess,
+                            yearMonth,
+                            materialCost,
+                            laborCost,
+                            managementCost,
+                            equipmentCost,
+                            outsourcingCost);
                 })
                 .collect(Collectors.toList());
     }

@@ -1,5 +1,10 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response;
 
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -7,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "현장별 월별 비용 응답")
 public record SiteMonthlyCostResponse(
+        @Schema(description = "현장 간단 정보") SiteResponse.SiteSimpleResponse site,
+        @Schema(description = "공정 간단 정보") SiteProcessResponse.SiteProcessSimpleResponse siteProcess,
         @Schema(description = "년월 (YYYY-MM)", example = "2025-01") String yearMonth,
         @Schema(description = "재료비 (원)", example = "1000000") Long materialCost,
         @Schema(description = "노무비 (원)", example = "500000") Long laborCost,
@@ -16,6 +23,8 @@ public record SiteMonthlyCostResponse(
         @Schema(description = "총 비용 (원)", example = "2400000") Long totalCost) {
 
     public static SiteMonthlyCostResponse from(
+            final Site site,
+            final SiteProcess siteProcess,
             final String yearMonth,
             final Long materialCost,
             final Long laborCost,
@@ -29,6 +38,8 @@ public record SiteMonthlyCostResponse(
                 + (outsourcingCost != null ? outsourcingCost : 0L);
 
         return new SiteMonthlyCostResponse(
+                SiteResponse.SiteSimpleResponse.from(site),
+                SiteProcessResponse.SiteProcessSimpleResponse.from(siteProcess),
                 yearMonth,
                 materialCost,
                 laborCost,

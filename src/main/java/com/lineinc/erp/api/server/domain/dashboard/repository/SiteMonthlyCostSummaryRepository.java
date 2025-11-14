@@ -65,4 +65,23 @@ public interface SiteMonthlyCostSummaryRepository extends JpaRepository<SiteMont
             GROUP BY smcs.yearMonth
             ORDER BY smcs.yearMonth""")
     List<Object[]> findMonthlyCostsTotalBySiteIds(@Param("siteIds") List<Long> siteIds);
+
+    /**
+     * 현장 및 공정별 월별 비용 목록 조회
+     */
+    @Query("""
+            SELECT smcs.yearMonth,
+                   COALESCE(smcs.materialCost, 0) as materialCost,
+                   COALESCE(smcs.laborCost, 0) as laborCost,
+                   COALESCE(smcs.managementCost, 0) as managementCost,
+                   COALESCE(smcs.equipmentCost, 0) as equipmentCost,
+                   COALESCE(smcs.outsourcingCost, 0) as outsourcingCost
+            FROM SiteMonthlyCostSummary smcs
+            WHERE smcs.site.id = :siteId
+            AND smcs.siteProcess.id = :siteProcessId
+            AND smcs.deleted = false
+            ORDER BY smcs.yearMonth""")
+    List<Object[]> findMonthlyCostsBySiteIdAndSiteProcessId(
+            @Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId);
 }
