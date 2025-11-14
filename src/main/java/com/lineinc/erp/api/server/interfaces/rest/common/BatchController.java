@@ -1,12 +1,16 @@
 package com.lineinc.erp.api.server.interfaces.rest.common;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lineinc.erp.api.server.infrastructure.config.batch.service.DashboardSiteMonthlyCostBatchService;
+import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
+import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.BatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.DashboardSiteMonthlyCostBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureCalculationBatchService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +33,7 @@ public class BatchController extends BaseController {
     private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
     private final TenureCalculationBatchService tenureCalculationBatchService;
     private final DashboardSiteMonthlyCostBatchService dashboardSiteMonthlyCostBatchService;
+    private final BatchExecutionHistoryRepository batchExecutionHistoryRepository;
 
     /**
      * 출역일보 자동 마감 배치를 수동으로 실행합니다.
@@ -37,18 +42,9 @@ public class BatchController extends BaseController {
      */
     @PostMapping("/daily-report-auto-complete")
     @Operation(summary = "출역일보 자동 마감 배치 실행")
+    @Transactional
     public ResponseEntity<String> runDailyReportAutoCompleteBatch() {
-        try {
-            log.info("출역일보 자동 마감 배치 수동 실행 시작");
-            dailyReportAutoCompleteBatchService.execute();
-            final String message = "출역일보 자동 마감 배치 완료";
-            log.info(message);
-            return ResponseEntity.ok(message);
-        } catch (final Exception e) {
-            log.error("출역일보 자동 마감 배치 실행 중 오류 발생", e);
-            return ResponseEntity.status(500)
-                    .body("배치 실행 실패: " + e.getMessage());
-        }
+        return executeBatchWithHistory(dailyReportAutoCompleteBatchService);
     }
 
     /**
@@ -58,18 +54,9 @@ public class BatchController extends BaseController {
      */
     @PostMapping("/tenure-calculation")
     @Operation(summary = "근속기간 계산 배치 실행")
+    @Transactional
     public ResponseEntity<String> runTenureCalculationBatch() {
-        try {
-            log.info("근속기간 계산 배치 수동 실행 시작");
-            tenureCalculationBatchService.execute();
-            final String message = "근속기간 계산 배치 완료";
-            log.info(message);
-            return ResponseEntity.ok(message);
-        } catch (final Exception e) {
-            log.error("근속기간 계산 배치 실행 중 오류 발생", e);
-            return ResponseEntity.status(500)
-                    .body("배치 실행 실패: " + e.getMessage());
-        }
+        return executeBatchWithHistory(tenureCalculationBatchService);
     }
 
     /**
@@ -81,17 +68,39 @@ public class BatchController extends BaseController {
      */
     @PostMapping("/dashboard-site-monthly-cost")
     @Operation(summary = "대시보드 현장 월별 비용 집계 배치 실행")
+    @Transactional
     public ResponseEntity<String> runDashboardSiteMonthlyCostBatch() {
+        return executeBatchWithHistory(dashboardSiteMonthlyCostBatchService);
+    }
+
+    /**
+     * 배치 작업을 실행하고 이력을 기록합니다.
+     * 
+     * @param batchService 실행할 배치 서비스
+     * @return 배치 실행 결과
+     */
+    private ResponseEntity<String> executeBatchWithHistory(final BatchService batchService) {
+        final BatchExecutionHistory history = batchService.createExecutionHistory();
+        batchExecutionHistoryRepository.save(history);
+
         try {
-            log.info("대시보드 현장 월별 비용 집계 배치 수동 실행 시작");
-            dashboardSiteMonthlyCostBatchService.execute();
-            final String message = "대시보드 현장 월별 비용 집계 배치 완료";
+            log.info("{} 수동 실행 시작", batchService.getBatchName());
+            batchService.execute();
+            history.markAsCompleted();
+            batchExecutionHistoryRepository.save(history);
+
+            final String message = String.format("%s 완료 - 실행 시간: %.2f초",
+                    batchService.getBatchName(), history.getExecutionTimeSeconds());
             log.info(message);
             return ResponseEntity.ok(message);
         } catch (final Exception e) {
-            log.error("대시보드 현장 월별 비용 집계 배치 실행 중 오류 발생", e);
-            return ResponseEntity.status(500)
-                    .body("배치 실행 실패: " + e.getMessage());
+            history.markAsFailed(e.getMessage());
+            batchExecutionHistoryRepository.save(history);
+
+            final String errorMessage = String.format("%s 실행 중 오류 발생 - 실행 시간: %.2f초, 오류: %s",
+                    batchService.getBatchName(), history.getExecutionTimeSeconds(), e.getMessage());
+            log.error(errorMessage, e);
+            return ResponseEntity.status(500).body("배치 실행 실패: " + e.getMessage());
         }
     }
 }

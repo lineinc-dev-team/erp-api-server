@@ -9,24 +9,25 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.aggregation.constructionoutsourcing.service.ConstructionOutsourcingCompanyAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.equipmentcost.service.EquipmentCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.laborcost.service.LaborCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.managementcost.service.ManagementCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.materialcost.service.MaterialCostAggregationService;
-import com.lineinc.erp.api.server.domain.aggregation.outsourcinglaborcost.service.OutsourcingLaborCostAggregationService;
 import com.lineinc.erp.api.server.domain.dashboard.entity.SiteMonthlyCostSummary;
 import com.lineinc.erp.api.server.domain.dashboard.repository.SiteMonthlyCostSummaryRepository;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.LaborCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ManagementCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MaterialCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.MaterialCostAggregationResponse.MaterialManagementItemResponse.BillingDetail;
-import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.OutsourcingLaborCostAggregationResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
     private final LaborCostAggregationService laborCostAggregationService;
     private final ManagementCostAggregationService managementCostAggregationService;
     private final EquipmentCostAggregationService equipmentCostAggregationService;
-    private final OutsourcingLaborCostAggregationService outsourcingLaborCostAggregationService;
+    private final ConstructionOutsourcingCompanyAggregationService constructionOutsourcingCompanyAggregationService;
     private final SiteMonthlyCostSummaryRepository siteMonthlyCostSummaryRepository;
 
     @Override
@@ -200,7 +201,8 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
                 }
             }
 
-            return total > 0 ? total : null;
+            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
+            return total;
         } catch (final Exception e) {
             log.warn("재료비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
                     siteId, siteProcessId, yearMonth, e.getMessage());
@@ -233,7 +235,8 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
                 }
             }
 
-            return total > 0 ? total : null;
+            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
+            return total;
         } catch (final Exception e) {
             log.warn("노무비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
                     siteId, siteProcessId, yearMonth, e.getMessage());
@@ -259,7 +262,8 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
                 }
             }
 
-            return total > 0 ? total : null;
+            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
+            return total;
         } catch (final Exception e) {
             log.warn("관리비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
                     siteId, siteProcessId, yearMonth, e.getMessage());
@@ -284,7 +288,8 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
                 }
             }
 
-            return total > 0 ? total : null;
+            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
+            return total;
         } catch (final Exception e) {
             log.warn("장비비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
                     siteId, siteProcessId, yearMonth, e.getMessage());
@@ -293,23 +298,27 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
     }
 
     /**
-     * 외주비 총액 계산
+     * 외주비 총액 계산 (외주 공사 비용)
      */
     private Long calculateOutsourcingCost(final Long siteId, final Long siteProcessId, final String yearMonth) {
         try {
-            final OutsourcingLaborCostAggregationResponse response = outsourcingLaborCostAggregationService
-                    .getOutsourcingLaborCostAggregation(siteId, siteProcessId, yearMonth);
+            final ConstructionOutsourcingAggregationResponse response = constructionOutsourcingCompanyAggregationService
+                    .getConstructionOutsourcingAggregation(
+                            new ConstructionOutsourcingAggregationRequest(siteId, siteProcessId, yearMonth));
 
             long total = 0L;
 
             if (response.items() != null) {
                 for (final var item : response.items()) {
-                    // 해당 월만 집계
-                    total += getTotal(item.currentBilling());
+                    // 해당 월만 집계 (음수 값도 포함)
+                    if (item.currentBilling() != null) {
+                        total += item.currentBilling().total();
+                    }
                 }
             }
 
-            return total > 0 ? total : null;
+            // 0원인 경우도 0으로 저장, 음수인 경우도 그대로 저장
+            return total;
         } catch (final Exception e) {
             log.warn("외주비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
                     siteId, siteProcessId, yearMonth, e.getMessage());

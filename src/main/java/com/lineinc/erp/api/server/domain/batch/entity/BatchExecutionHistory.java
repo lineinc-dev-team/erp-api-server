@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionHistoryStatus;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
 import jakarta.persistence.Column;
@@ -29,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-public class BatchExecutionHistory {
+public class BatchExecutionHistory extends BaseEntity {
     private static final String SEQUENCE_NAME = "batch_execution_history_seq";
 
     @Id
