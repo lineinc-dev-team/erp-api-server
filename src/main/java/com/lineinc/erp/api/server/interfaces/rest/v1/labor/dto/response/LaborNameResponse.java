@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response;
 
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
 
@@ -21,7 +22,9 @@ public record LaborNameResponse(
         @Schema(description = "주민등록번호") String residentNumber,
         @Schema(description = "휴대폰 번호") String phoneNumber,
         @Schema(description = "본사 여부", example = "false") Boolean isHeadOffice,
-        @Schema(description = "직급") String grade) {
+        @Schema(description = "직급") String grade,
+        @Schema(description = "공종") String workType,
+        @Schema(description = "공종 코드") LaborWorkType workTypeCode) {
 
     public static LaborNameResponse from(final Labor labor) {
         return new LaborNameResponse(
@@ -38,6 +41,8 @@ public record LaborNameResponse(
                 PrivacyMaskingUtils.maskResidentNumber(labor.getResidentNumber()),
                 labor.getPhoneNumber(),
                 labor.getIsHeadOffice(),
-                labor.getGrade() != null ? labor.getGrade().getName() : null);
+                labor.getGrade() != null ? labor.getGrade().getName() : null,
+                labor.getWorkType() != null ? labor.getWorkType().getLabel() : null,
+                labor.getWorkType());
     }
 }
