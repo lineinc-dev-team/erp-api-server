@@ -5,9 +5,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType;
 import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.BatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.DashboardSiteMonthlyCostBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureCalculationBatchService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class BatchScheduler {
 
     private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
     private final TenureCalculationBatchService tenureCalculationBatchService;
+    private final DashboardSiteMonthlyCostBatchService dashboardSiteMonthlyCostBatchService;
     private final BatchExecutionHistoryRepository batchExecutionHistoryRepository;
 
     /**
@@ -45,13 +48,22 @@ public class BatchScheduler {
     }
 
     /**
+     * 매일 새벽 2시에 대시보드 현장 월별 비용 집계 배치 실행
+     * Cron 표현식: "0 0 2 * * ?" (한국시간 매일 새벽 2시 0분)
+     */
+    @Scheduled(cron = "0 0 2 * * ?", zone = "Asia/Seoul")
+    public void aggregateDashboardSiteMonthlyCost() {
+        executeBatchWithHistory(dashboardSiteMonthlyCostBatchService);
+    }
+
+    /**
      * 배치 작업을 실행하고 이력을 기록합니다.
      * 
      * @param batchService 실행할 배치 서비스
      */
     @Transactional
-    public void executeBatchWithHistory(BatchService batchService) {
-        BatchExecutionHistory history = batchService.createExecutionHistory();
+    public void executeBatchWithHistory(final BatchService batchService) {
+        final BatchExecutionHistory history = batchService.createExecutionHistory(BatchExecutionType.SCHEDULED);
         batchExecutionHistoryRepository.save(history);
 
         try {
@@ -62,7 +74,7 @@ public class BatchScheduler {
 
             log.info("{} 완료 - 실행 시간: {}초",
                     batchService.getBatchName(), history.getExecutionTimeSeconds());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             history.markAsFailed(e.getMessage());
             batchExecutionHistoryRepository.save(history);
 

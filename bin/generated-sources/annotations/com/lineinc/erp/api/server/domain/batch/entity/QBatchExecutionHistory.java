@@ -41,6 +41,8 @@ public class QBatchExecutionHistory extends EntityPathBase<BatchExecutionHistory
 
     public final NumberPath<Double> executionTimeSeconds = createNumber("executionTimeSeconds", Double.class);
 
+    public final EnumPath<com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType> executionType = createEnum("executionType", com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final DateTimePath<java.time.OffsetDateTime> startTime = createDateTime("startTime", java.time.OffsetDateTime.class);

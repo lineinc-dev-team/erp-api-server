@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.infrastructure.config.batch.service;
 
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionHistoryStatus;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType;
 
 /**
  * 배치 작업 서비스 인터페이스
@@ -26,13 +27,15 @@ public interface BatchService {
     /**
      * 배치 실행 이력을 생성합니다.
      * 
+     * @param executionType 실행 타입 (자동/수동)
      * @return 배치 실행 이력
      */
-    default BatchExecutionHistory createExecutionHistory() {
+    default BatchExecutionHistory createExecutionHistory(final BatchExecutionType executionType) {
         return BatchExecutionHistory.builder()
                 .batchName(getBatchName())
                 .startTime(java.time.OffsetDateTime.now())
                 .status(BatchExecutionHistoryStatus.RUNNING)
+                .executionType(executionType)
                 .build();
     }
 }

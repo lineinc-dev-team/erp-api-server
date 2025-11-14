@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType;
 import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.BatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
@@ -80,7 +81,7 @@ public class BatchController extends BaseController {
      * @return 배치 실행 결과
      */
     private ResponseEntity<String> executeBatchWithHistory(final BatchService batchService) {
-        final BatchExecutionHistory history = batchService.createExecutionHistory();
+        final BatchExecutionHistory history = batchService.createExecutionHistory(BatchExecutionType.MANUAL);
         batchExecutionHistoryRepository.save(history);
 
         try {
