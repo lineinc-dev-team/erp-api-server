@@ -30,7 +30,7 @@ public class DashboardController extends BaseController {
 
     private final DashboardService dashboardService;
 
-    @Operation(summary = "대시보드 현장 목록 조회")
+    @Operation(summary = "현장 목록 조회")
     @GetMapping("/sites")
     public ResponseEntity<SuccessResponse<List<DashboardSiteResponse>>> getDashboardSites(
             @AuthenticationPrincipal final CustomUserDetails user) {
