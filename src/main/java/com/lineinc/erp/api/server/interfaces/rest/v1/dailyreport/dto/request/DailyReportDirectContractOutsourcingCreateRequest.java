@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Positive;
 public record DailyReportDirectContractOutsourcingCreateRequest(
         @Schema(description = "업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "노무인력 ID", example = "1") Long laborId,
-        @Schema(description = "직급", example = "기사") @NotBlank String position,
+        @Schema(description = "직급", example = "기사") String position,
         @Schema(description = "작업내용", example = "기초공사") @NotBlank String workContent,
         @Schema(description = "단가", example = "50000") @NotNull @Positive Long unitPrice,
         @Schema(description = "공수", example = "1.0") @NotNull @Positive Double workQuantity,
