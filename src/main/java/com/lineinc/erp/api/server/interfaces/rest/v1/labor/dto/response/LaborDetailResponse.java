@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.organization.dto.response.GradeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDetailResponse;
 import com.lineinc.erp.api.server.shared.util.PrivacyMaskingUtils;
@@ -43,7 +44,7 @@ public record LaborDetailResponse(
         @Schema(description = "근속개월") Integer tenureMonths,
         @Schema(description = "퇴직금 발생 요건 여부", example = "true") Boolean isSeverancePayEligible,
         @Schema(description = "임시 인력 여부", example = "true") Boolean isTemporary,
-        @Schema(description = "직급") String grade,
+        @Schema(description = "직급") GradeResponse grade,
         @Schema(description = "첨부파일 목록") List<LaborFileResponse> files) {
 
     public static LaborDetailResponse from(final Labor labor) {
@@ -83,7 +84,7 @@ public record LaborDetailResponse(
                 labor.getTenureMonths(),
                 labor.getIsSeverancePayEligible(),
                 labor.getIsTemporary(),
-                labor.getGrade() != null ? labor.getGrade().getName() : null,
+                labor.getGrade() != null ? GradeResponse.from(labor.getGrade()) : null,
                 fileResponses
 
         );
