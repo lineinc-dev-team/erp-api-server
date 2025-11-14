@@ -43,7 +43,8 @@ public class DashboardService {
         final OffsetDateTime now = OffsetDateTime.now(AppConstants.KOREA_ZONE);
         final OffsetDateTime threshold = now.minusMonths(1);
         final User user = userService.getUserByIdOrThrow(userId);
-        final List<Long> accessibleSiteIds = resolveAccessibleSiteIds(user);
+        // 접근 권한이 있는 현장만 조회 (본사직원이어도 각 사용자가 접근 권한을 가진 현장들만 반환)
+        final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
         final List<Site> sites = siteRepository.findSitesForDashboard(threshold, now, accessibleSiteIds);
 
         return sites.stream()
@@ -160,12 +161,5 @@ public class DashboardService {
                             outsourcingCost);
                 })
                 .collect(Collectors.toList());
-    }
-
-    private List<Long> resolveAccessibleSiteIds(final User user) {
-        if (user.isHeadOffice()) {
-            return null;
-        }
-        return userService.getAccessibleSiteIds(user);
     }
 }
