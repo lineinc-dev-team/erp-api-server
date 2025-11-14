@@ -15,7 +15,11 @@ import com.lineinc.erp.api.server.domain.aggregation.managementcost.service.Mana
 import com.lineinc.erp.api.server.domain.aggregation.materialcost.service.MaterialCostAggregationService;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractRepository;
+import com.lineinc.erp.api.server.domain.site.entity.Site;
+import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
+import com.lineinc.erp.api.server.domain.site.repository.SiteProcessRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
+import com.lineinc.erp.api.server.domain.sitemanagementcost.repository.SiteManagementCostRepository;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationResponse;
@@ -49,7 +53,9 @@ public class HeadquarterAggregationService {
     private final ManagementCostAggregationService managementCostAggregationService;
     private final ConstructionOutsourcingCompanyAggregationService constructionOutsourcingCompanyAggregationService;
     private final SiteRepository siteRepository;
+    private final SiteProcessRepository siteProcessRepository;
     private final OutsourcingCompanyContractRepository outsourcingCompanyContractRepository;
+    private final SiteManagementCostRepository siteManagementCostRepository;
 
     /**
      * 본사 집계 조회
@@ -101,6 +107,10 @@ public class HeadquarterAggregationService {
         final CompletableFuture<Long> totalConstructionAmountFuture = CompletableFuture
                 .supplyAsync(() -> calculateTotalConstructionAmount(siteId));
 
+        // 현장/본사 관리비 조회 (병렬 처리)
+        final CompletableFuture<SiteManagementCostInfo> siteManagementCostFuture = CompletableFuture
+                .supplyAsync(() -> getSiteManagementCostInfo(siteId, siteProcessId, yearMonth));
+
         // 모든 결과를 기다림
         final MaterialCostAggregationResponse materialResponse = materialFuture.join();
         final List<LaborCostAggregationResponse> laborResponses = laborFuture.join();
@@ -109,6 +119,7 @@ public class HeadquarterAggregationService {
                 .join();
         final ManagementCostAggregationResponse managementResponse = managementFuture.join();
         final long totalConstructionAmount = totalConstructionAmountFuture.join();
+        final SiteManagementCostInfo siteManagementCostInfo = siteManagementCostFuture.join();
 
         // 요약 생성
         final CostSummary materialSummary = buildSummary("재료비",
@@ -122,10 +133,20 @@ public class HeadquarterAggregationService {
         final CostSummary managementSummary = buildSummary("관리비",
                 current -> managementBillingDetails(managementResponse, current));
 
+        // 현장관리비와 본사관리비는 공급가와 계만 있음 (부가세, 공제금액은 0)
+        final CostSummary siteManagementCostSummary = buildSiteManagementCostSummary(
+                "현장관리비",
+                siteManagementCostInfo.previousSiteManagementCost(),
+                siteManagementCostInfo.currentSiteManagementCost());
+        final CostSummary headquartersManagementCostSummary = buildSiteManagementCostSummary(
+                "본사관리비",
+                siteManagementCostInfo.previousHeadquartersManagementCost(),
+                siteManagementCostInfo.currentHeadquartersManagementCost());
+
         return new HeadquarterAggregationResponse(
                 totalConstructionAmount,
                 List.of(materialSummary, laborSummary, equipmentSummary, constructionOutsourcingSummary,
-                        managementSummary));
+                        managementSummary, siteManagementCostSummary, headquartersManagementCostSummary));
     }
 
     /**
@@ -138,6 +159,35 @@ public class HeadquarterAggregationService {
                 costName,
                 sumBillingDetails(detailSupplier.get(false)),
                 sumBillingDetails(detailSupplier.get(true)));
+    }
+
+    /**
+     * 현장/본사 관리비 요약 생성
+     * 공급가와 계만 있고, 부가세와 공제금액은 0
+     */
+    private CostSummary buildSiteManagementCostSummary(
+            final String costName,
+            final Long previousManagementCost,
+            final Long currentManagementCost) {
+        final Long previousSupplyPrice = previousManagementCost != null ? previousManagementCost : 0L;
+        final Long previousVat = 0L;
+        final Long previousDeductionAmount = 0L;
+        final Long previousTotal = previousSupplyPrice; // 공급가 = 계 (부가세, 공제금액이 0이므로)
+
+        final Long currentSupplyPrice = currentManagementCost != null ? currentManagementCost : 0L;
+        final Long currentVat = 0L;
+        final Long currentDeductionAmount = 0L;
+        final Long currentTotal = currentSupplyPrice; // 공급가 = 계 (부가세, 공제금액이 0이므로)
+
+        final HeadquarterAggregationResponse.BillingSummary previousSummary = new HeadquarterAggregationResponse.BillingSummary(
+                previousSupplyPrice, previousVat, previousDeductionAmount, previousTotal);
+        final HeadquarterAggregationResponse.BillingSummary currentSummary = new HeadquarterAggregationResponse.BillingSummary(
+                currentSupplyPrice, currentVat, currentDeductionAmount, currentTotal);
+
+        return new CostSummary(
+                costName,
+                previousSummary,
+                currentSummary);
     }
 
     private MaterialManagementItemResponse.BillingDetail pickBilling(
@@ -285,6 +335,67 @@ public class HeadquarterAggregationService {
                 Long.valueOf(billing.vat()),
                 Long.valueOf(billing.deduction()),
                 Long.valueOf(billing.total()));
+    }
+
+    /**
+     * 현장/본사 관리비 정보 조회
+     * 전회: 조회월 이전까지의 합계, 금회: 조회월의 값
+     */
+    private SiteManagementCostInfo getSiteManagementCostInfo(
+            final Long siteId,
+            final Long siteProcessId,
+            final String yearMonth) {
+        final Site site = siteRepository.findById(siteId).orElse(null);
+        final SiteProcess siteProcess = siteProcessRepository.findById(siteProcessId).orElse(null);
+
+        if (site == null || siteProcess == null) {
+            return new SiteManagementCostInfo(0L, 0L, 0L, 0L);
+        }
+
+        // 전회: 조회월 이전까지의 모든 현장관리비 합계
+        final List<com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagementCost> previousCosts = siteManagementCostRepository
+                .findByYearMonthLessThanAndSiteAndSiteProcess(yearMonth, site, siteProcess);
+
+        long previousSiteManagementTotal = 0L;
+        long previousHeadquartersManagementCost = 0L;
+        for (final var cost : previousCosts) {
+            final Long siteTotal = cost.calculateSiteManagementTotal();
+            if (siteTotal != null) {
+                previousSiteManagementTotal += siteTotal;
+            }
+            final Long headquartersCost = cost.getHeadquartersManagementCost();
+            if (headquartersCost != null) {
+                previousHeadquartersManagementCost += headquartersCost;
+            }
+        }
+
+        // 금회: 조회월의 현장관리비
+        final var currentSiteManagementCost = siteManagementCostRepository
+                .findByYearMonthAndSiteAndSiteProcess(yearMonth, site, siteProcess)
+                .orElse(null);
+
+        final Long currentSiteManagementTotal = currentSiteManagementCost != null
+                ? currentSiteManagementCost.calculateSiteManagementTotal()
+                : 0L;
+        final Long currentHeadquartersManagementCost = currentSiteManagementCost != null
+                ? currentSiteManagementCost.getHeadquartersManagementCost()
+                : 0L;
+
+        return new SiteManagementCostInfo(
+                previousSiteManagementTotal,
+                currentSiteManagementTotal != null ? currentSiteManagementTotal : 0L,
+                previousHeadquartersManagementCost,
+                currentHeadquartersManagementCost != null ? currentHeadquartersManagementCost : 0L);
+    }
+
+    /**
+     * 현장/본사 관리비 정보를 담는 내부 클래스
+     */
+    private record SiteManagementCostInfo(
+            Long previousSiteManagementCost,
+            Long currentSiteManagementCost,
+            Long previousHeadquartersManagementCost,
+            Long currentHeadquartersManagementCost) {
     }
 
     @FunctionalInterface

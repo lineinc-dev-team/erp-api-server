@@ -1,5 +1,6 @@
 package com.lineinc.erp.api.server.domain.sitemanagementcost.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,6 +29,21 @@ public interface SiteManagementCostRepository
             AND smc.siteProcess = :siteProcess \
             AND smc.deleted = false""")
     Optional<SiteManagementCost> findByYearMonthAndSiteAndSiteProcess(
+            @Param("yearMonth") String yearMonth,
+            @Param("site") Site site,
+            @Param("siteProcess") SiteProcess siteProcess);
+
+    /**
+     * 조회월 이전의 모든 현장관리비 조회 (전회 집계용)
+     */
+    @Query("""
+            SELECT smc FROM SiteManagementCost smc \
+            WHERE smc.yearMonth < :yearMonth \
+            AND smc.site = :site \
+            AND smc.siteProcess = :siteProcess \
+            AND smc.deleted = false \
+            ORDER BY smc.yearMonth""")
+    List<SiteManagementCost> findByYearMonthLessThanAndSiteAndSiteProcess(
             @Param("yearMonth") String yearMonth,
             @Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess);
