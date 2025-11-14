@@ -21,7 +21,18 @@ public enum ExcelDownloadHistoryType {
     OUTSOURCING_COMPANY_CONTRACT("외주업체 계약 목록"),
     MANAGEMENT_COST("관리비 목록"),
     SITE_MANAGEMENT_COST("현장관리비 목록"),
-    ACCOUNT("유저 목록");
+    ACCOUNT("유저 목록"),
+
+    // 집계 관련
+    AGGREGATION_TABLE("집계표(본사)"),
+    AGGREGATION_MATERIAL_COST("집계표 재료비"),
+    AGGREGATION_FUEL("집계표 유류집계"),
+    AGGREGATION_LABOR_COST("집계표 노무비"),
+    AGGREGATION_LABOR_PAYROLL("집계표 노무비명세서"),
+    AGGREGATION_EQUIPMENT_COST("집계표 장비비"),
+    AGGREGATION_EQUIPMENT_OPERATION("집계표 장비가동현황"),
+    AGGREGATION_MANAGEMENT_COST("집계표 관리비"),
+    AGGREGATION_OUTSOURCING_CONSTRUCTION("집계표 외주");
 
     private final String label;
 }
