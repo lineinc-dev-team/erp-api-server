@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "외주(공사) 집계 상세 응답")
 public record ConstructionOutsourcingAggregationDetailResponse(
-        @Schema(description = "외주(공사) 집계 그룹 목록") List<ConstructionGroupItem> groups) {
+        @Schema(description = "외주(공사) 집계 그룹 목록") List<ConstructionGroupItem> constructionGroups) {
 
     /**
      * 외주(공사) 집계 그룹 항목
