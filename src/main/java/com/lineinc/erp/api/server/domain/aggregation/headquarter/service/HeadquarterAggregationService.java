@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.domain.aggregation.headquarter.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
@@ -63,52 +64,63 @@ public class HeadquarterAggregationService {
             final Long siteProcessId,
             final String yearMonth) {
 
-        // 1) 재료비 집계 응답 확보
-        final MaterialCostAggregationResponse materialResponse = materialCostAggregationService
-                .getMaterialCostAggregation(siteId, siteProcessId, yearMonth);
+        // 모든 집계 서비스를 병렬로 실행
+        final CompletableFuture<MaterialCostAggregationResponse> materialFuture = CompletableFuture
+                .supplyAsync(() -> materialCostAggregationService.getMaterialCostAggregation(siteId, siteProcessId,
+                        yearMonth));
 
-        final CostSummary materialSummary = buildSummary("재료비",
-                current -> materialBillingDetails(materialResponse, current));
-
-        // 2) 노무비 집계 응답 확보 (직영 + 용역만 포함)
-        final List<LaborCostAggregationResponse> laborResponses = Stream.of(
-                LaborType.DIRECT_CONTRACT,
-                LaborType.OUTSOURCING)
-                .map(laborType -> laborCostAggregationService.getLaborCostAggregation(
+        // 노무비 집계 (직영 + 용역) 병렬 처리
+        final CompletableFuture<LaborCostAggregationResponse> directContractFuture = CompletableFuture
+                .supplyAsync(() -> laborCostAggregationService.getLaborCostAggregation(
                         siteId,
                         siteProcessId,
                         yearMonth,
-                        laborType))
-                .toList();
+                        LaborType.DIRECT_CONTRACT));
+        final CompletableFuture<LaborCostAggregationResponse> outsourcingFuture = CompletableFuture
+                .supplyAsync(() -> laborCostAggregationService.getLaborCostAggregation(
+                        siteId,
+                        siteProcessId,
+                        yearMonth,
+                        LaborType.OUTSOURCING));
+        final CompletableFuture<List<LaborCostAggregationResponse>> laborFuture = directContractFuture
+                .thenCombine(outsourcingFuture, (direct, outsourcing) -> List.of(direct, outsourcing));
 
+        final CompletableFuture<EquipmentCostAggregationResponse> equipmentFuture = CompletableFuture
+                .supplyAsync(() -> equipmentCostAggregationService.getEquipmentCostAggregation(siteId, siteProcessId,
+                        yearMonth));
+
+        final CompletableFuture<ConstructionOutsourcingAggregationResponse> constructionOutsourcingFuture = CompletableFuture
+                .supplyAsync(() -> constructionOutsourcingCompanyAggregationService
+                        .getConstructionOutsourcingAggregation(
+                                new ConstructionOutsourcingAggregationRequest(siteId, siteProcessId, yearMonth)));
+
+        final CompletableFuture<ManagementCostAggregationResponse> managementFuture = CompletableFuture
+                .supplyAsync(() -> managementCostAggregationService.getManagementCostAggregation(
+                        new ManagementCostAggregationRequest(siteId, siteProcessId, yearMonth)));
+
+        final CompletableFuture<Long> totalConstructionAmountFuture = CompletableFuture
+                .supplyAsync(() -> calculateTotalConstructionAmount(siteId));
+
+        // 모든 결과를 기다림
+        final MaterialCostAggregationResponse materialResponse = materialFuture.join();
+        final List<LaborCostAggregationResponse> laborResponses = laborFuture.join();
+        final EquipmentCostAggregationResponse equipmentResponse = equipmentFuture.join();
+        final ConstructionOutsourcingAggregationResponse constructionOutsourcingResponse = constructionOutsourcingFuture
+                .join();
+        final ManagementCostAggregationResponse managementResponse = managementFuture.join();
+        final long totalConstructionAmount = totalConstructionAmountFuture.join();
+
+        // 요약 생성
+        final CostSummary materialSummary = buildSummary("재료비",
+                current -> materialBillingDetails(materialResponse, current));
         final CostSummary laborSummary = buildSummary("노무비",
                 current -> laborBillingDetails(laborResponses, current));
-
-        // 3) 장비비 집계 응답 확보
-        final EquipmentCostAggregationResponse equipmentResponse = equipmentCostAggregationService
-                .getEquipmentCostAggregation(siteId, siteProcessId, yearMonth);
-
         final CostSummary equipmentSummary = buildSummary("장비비",
                 current -> equipmentBillingDetails(equipmentResponse, current));
-
-        // 4) 외주비 집계 응답 확보
-        final ConstructionOutsourcingAggregationResponse constructionOutsourcingResponse = constructionOutsourcingCompanyAggregationService
-                .getConstructionOutsourcingAggregation(
-                        new ConstructionOutsourcingAggregationRequest(siteId, siteProcessId, yearMonth));
-
         final CostSummary constructionOutsourcingSummary = buildSummary("외주비",
                 current -> constructionOutsourcingBillingDetails(constructionOutsourcingResponse, current));
-
-        // 5) 관리비 집계 응답 확보
-        final ManagementCostAggregationResponse managementResponse = managementCostAggregationService
-                .getManagementCostAggregation(
-                        new ManagementCostAggregationRequest(siteId, siteProcessId, yearMonth));
-
         final CostSummary managementSummary = buildSummary("관리비",
                 current -> managementBillingDetails(managementResponse, current));
-
-        // 6) 총 공사금액 계산 (현장 계약금액 + 외주 계약금액 합산)
-        final long totalConstructionAmount = calculateTotalConstructionAmount(siteId);
 
         return new HeadquarterAggregationResponse(
                 totalConstructionAmount,
