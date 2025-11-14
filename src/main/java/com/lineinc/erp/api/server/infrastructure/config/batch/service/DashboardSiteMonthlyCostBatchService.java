@@ -5,6 +5,9 @@ import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,16 +81,16 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
 
             log.info("대시보드 현장 {}건 발견", sites.size());
 
-            int processedCount = 0;
-            int errorCount = 0;
+            final AtomicInteger processedCount = new AtomicInteger(0);
+            final AtomicInteger errorCount = new AtomicInteger(0);
 
-            // 각 현장별로 처리
-            for (final Site site : sites) {
+            // 현장별 병렬 처리
+            sites.parallelStream().forEach(site -> {
                 try {
                     // 현장의 착공일(시작일) 확인
                     if (site.getStartedAt() == null) {
                         log.warn("현장 ID {}의 착공일이 없어 건너뜁니다.", site.getId());
-                        continue;
+                        return;
                     }
 
                     final LocalDate startedDate = site.getStartedAt().toLocalDate();
@@ -98,32 +101,31 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
                     while (!targetMonth.isAfter(currentYearMonth)) {
                         final String yearMonth = targetMonth.format(DateTimeFormatter.ofPattern("yyyy-MM"));
 
-                        // 현장의 각 공정별로 처리
-                        for (final SiteProcess siteProcess : site.getProcesses()) {
-                            if (siteProcess.isDeleted()) {
-                                continue;
-                            }
-
-                            try {
-                                processSiteProcessCost(site, siteProcess, yearMonth);
-                                processedCount++;
-                            } catch (final Exception e) {
-                                log.error("현장 ID {}, 공정 ID {}, 년월 {} 처리 중 오류 발생: {}",
-                                        site.getId(), siteProcess.getId(), yearMonth, e.getMessage(), e);
-                                errorCount++;
-                            }
-                        }
+                        // 현장의 각 공정별로 병렬 처리
+                        site.getProcesses().parallelStream()
+                                .filter(process -> !process.isDeleted())
+                                .forEach(siteProcess -> {
+                                    try {
+                                        processSiteProcessCost(site, siteProcess, yearMonth);
+                                        processedCount.incrementAndGet();
+                                    } catch (final Exception e) {
+                                        log.error("현장 ID {}, 공정 ID {}, 년월 {} 처리 중 오류 발생: {}",
+                                                site.getId(), siteProcess.getId(), yearMonth, e.getMessage(), e);
+                                        errorCount.incrementAndGet();
+                                    }
+                                });
 
                         targetMonth = targetMonth.plusMonths(1);
                     }
 
                 } catch (final Exception e) {
                     log.error("현장 ID {} 처리 중 오류 발생: {}", site.getId(), e.getMessage(), e);
-                    errorCount++;
+                    errorCount.incrementAndGet();
                 }
-            }
+            });
 
-            log.info("대시보드 현장 월별 비용 집계 배치 완료 - 처리된 건수: {}, 오류 건수: {}", processedCount, errorCount);
+            log.info("대시보드 현장 월별 비용 집계 배치 완료 - 처리된 건수: {}, 오류 건수: {}",
+                    processedCount.get(), errorCount.get());
 
         } catch (final Exception e) {
             log.error("대시보드 현장 월별 비용 집계 배치 실행 중 오류 발생", e);
@@ -133,18 +135,43 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
 
     /**
      * 현장 공정별 월별 비용 집계 처리
+     * 각 비용 계산을 병렬로 수행하여 성능을 향상시킵니다.
      */
     private void processSiteProcessCost(
             final Site site,
             final SiteProcess siteProcess,
             final String yearMonth) {
 
-        // 각 비용별 집계 조회 및 총액 계산
-        final Long materialCost = calculateMaterialCost(site.getId(), siteProcess.getId(), yearMonth);
-        final Long laborCost = calculateLaborCost(site.getId(), siteProcess.getId(), yearMonth);
-        final Long managementCost = calculateManagementCost(site.getId(), siteProcess.getId(), yearMonth);
-        final Long equipmentCost = calculateEquipmentCost(site.getId(), siteProcess.getId(), yearMonth);
-        final Long outsourcingCost = calculateOutsourcingCost(site.getId(), siteProcess.getId(), yearMonth);
+        final Long siteId = site.getId();
+        final Long siteProcessId = siteProcess.getId();
+
+        // 각 비용별 집계를 병렬로 계산
+        final CompletableFuture<Long> materialCostFuture = CompletableFuture
+                .supplyAsync(() -> calculateCost("재료비", siteId, siteProcessId, yearMonth,
+                        () -> calculateMaterialCost(siteId, siteProcessId, yearMonth)));
+
+        final CompletableFuture<Long> laborCostFuture = CompletableFuture
+                .supplyAsync(() -> calculateCost("노무비", siteId, siteProcessId, yearMonth,
+                        () -> calculateLaborCost(siteId, siteProcessId, yearMonth)));
+
+        final CompletableFuture<Long> managementCostFuture = CompletableFuture
+                .supplyAsync(() -> calculateCost("관리비", siteId, siteProcessId, yearMonth,
+                        () -> calculateManagementCost(siteId, siteProcessId, yearMonth)));
+
+        final CompletableFuture<Long> equipmentCostFuture = CompletableFuture
+                .supplyAsync(() -> calculateCost("장비비", siteId, siteProcessId, yearMonth,
+                        () -> calculateEquipmentCost(siteId, siteProcessId, yearMonth)));
+
+        final CompletableFuture<Long> outsourcingCostFuture = CompletableFuture
+                .supplyAsync(() -> calculateCost("외주비", siteId, siteProcessId, yearMonth,
+                        () -> calculateOutsourcingCost(siteId, siteProcessId, yearMonth)));
+
+        // 모든 비용 계산 완료 대기
+        final Long materialCost = materialCostFuture.join();
+        final Long laborCost = laborCostFuture.join();
+        final Long managementCost = managementCostFuture.join();
+        final Long equipmentCost = equipmentCostFuture.join();
+        final Long outsourcingCost = outsourcingCostFuture.join();
 
         // 기존 데이터 조회 또는 생성
         SiteMonthlyCostSummary summary = siteMonthlyCostSummaryRepository
@@ -152,7 +179,6 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
                 .orElse(null);
 
         if (summary == null) {
-            // 새로 생성
             summary = SiteMonthlyCostSummary.builder()
                     .yearMonth(yearMonth)
                     .site(site)
@@ -166,184 +192,151 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
         siteMonthlyCostSummaryRepository.save(summary);
 
         log.debug("현장 ID {}, 공정 ID {}, 년월 {} 비용 집계 완료 - 재료비: {}, 노무비: {}, 관리비: {}, 장비비: {}, 외주비: {}",
-                site.getId(), siteProcess.getId(), yearMonth,
+                siteId, siteProcessId, yearMonth,
                 materialCost, laborCost, managementCost, equipmentCost, outsourcingCost);
+    }
+
+    /**
+     * 비용 계산을 수행하고 예외를 처리합니다.
+     */
+    private Long calculateCost(
+            final String costType,
+            final Long siteId,
+            final Long siteProcessId,
+            final String yearMonth,
+            final Supplier<Long> calculator) {
+        try {
+            return calculator.get();
+        } catch (final Exception e) {
+            log.warn("{} 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
+                    costType, siteId, siteProcessId, yearMonth, e.getMessage());
+            return null;
+        }
     }
 
     /**
      * 재료비 총액 계산
      */
     private Long calculateMaterialCost(final Long siteId, final Long siteProcessId, final String yearMonth) {
-        try {
-            final MaterialCostAggregationResponse response = materialCostAggregationService
-                    .getMaterialCostAggregation(siteId, siteProcessId, yearMonth);
+        final MaterialCostAggregationResponse response = materialCostAggregationService
+                .getMaterialCostAggregation(siteId, siteProcessId, yearMonth);
 
-            long total = 0L;
+        long total = 0L;
 
-            // 자재관리 총액 (해당 월만)
-            if (response.materialManagements() != null) {
-                for (final var item : response.materialManagements()) {
-                    total += getTotal(item.currentBilling());
-                }
-            }
+        // 자재관리 총액 (해당 월만)
+        total += sumBillingTotal(response.materialManagements(), item -> item.currentBilling());
 
-            // 강재수불부 총액 (해당 월만)
-            if (response.steelManagements() != null) {
-                for (final var item : response.steelManagements()) {
-                    total += getTotal(item.currentBilling());
-                }
-            }
+        // 강재수불부 총액 (해당 월만)
+        total += sumBillingTotal(response.steelManagements(), item -> item.currentBilling());
 
-            // 유류집계 총액 (해당 월만)
-            if (response.fuelAggregations() != null) {
-                for (final var item : response.fuelAggregations()) {
-                    total += getTotal(item.currentBilling());
-                }
-            }
+        // 유류집계 총액 (해당 월만)
+        total += sumBillingTotal(response.fuelAggregations(), item -> item.currentBilling());
 
-            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
-            return total;
-        } catch (final Exception e) {
-            log.warn("재료비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
-                    siteId, siteProcessId, yearMonth, e.getMessage());
-            return null;
-        }
+        return total;
     }
 
     /**
      * 노무비 총액 계산
      */
     private Long calculateLaborCost(final Long siteId, final Long siteProcessId, final String yearMonth) {
-        try {
-            long total = 0L;
+        long total = 0L;
 
-            // 정직원 노무비 (해당 월만)
-            final LaborCostAggregationResponse regularResponse = laborCostAggregationService
-                    .getLaborCostAggregation(siteId, siteProcessId, yearMonth, LaborType.REGULAR_EMPLOYEE);
-            if (regularResponse.items() != null) {
-                for (final var item : regularResponse.items()) {
-                    total += getTotal(item.currentBilling());
-                }
-            }
+        // 정직원 노무비 (해당 월만)
+        final LaborCostAggregationResponse regularResponse = laborCostAggregationService
+                .getLaborCostAggregation(siteId, siteProcessId, yearMonth, LaborType.REGULAR_EMPLOYEE);
+        total += sumBillingTotal(regularResponse.items(), item -> item.currentBilling());
 
-            // 직영 노무비 (해당 월만)
-            final LaborCostAggregationResponse directResponse = laborCostAggregationService
-                    .getLaborCostAggregation(siteId, siteProcessId, yearMonth, LaborType.DIRECT_CONTRACT);
-            if (directResponse.items() != null) {
-                for (final var item : directResponse.items()) {
-                    total += getTotal(item.currentBilling());
-                }
-            }
+        // 직영 노무비 (해당 월만)
+        final LaborCostAggregationResponse directResponse = laborCostAggregationService
+                .getLaborCostAggregation(siteId, siteProcessId, yearMonth, LaborType.DIRECT_CONTRACT);
+        total += sumBillingTotal(directResponse.items(), item -> item.currentBilling());
 
-            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
-            return total;
-        } catch (final Exception e) {
-            log.warn("노무비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
-                    siteId, siteProcessId, yearMonth, e.getMessage());
-            return null;
-        }
+        return total;
     }
 
     /**
      * 관리비 총액 계산
      */
     private Long calculateManagementCost(final Long siteId, final Long siteProcessId, final String yearMonth) {
-        try {
-            final ManagementCostAggregationResponse response = managementCostAggregationService
-                    .getManagementCostAggregation(
-                            new ManagementCostAggregationRequest(siteId, siteProcessId, yearMonth));
+        final ManagementCostAggregationResponse response = managementCostAggregationService
+                .getManagementCostAggregation(
+                        new ManagementCostAggregationRequest(siteId, siteProcessId, yearMonth));
 
-            long total = 0L;
-
-            if (response.items() != null) {
-                for (final var item : response.items()) {
-                    // 해당 월만 집계
-                    total += getTotalFromManagementBilling(item.currentBilling());
-                }
-            }
-
-            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
-            return total;
-        } catch (final Exception e) {
-            log.warn("관리비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
-                    siteId, siteProcessId, yearMonth, e.getMessage());
-            return null;
-        }
+        return sumLongTotal(response.items(), item -> {
+            final var billing = item.currentBilling();
+            return billing != null ? billing.total() : 0L;
+        });
     }
 
     /**
      * 장비비 총액 계산
      */
     private Long calculateEquipmentCost(final Long siteId, final Long siteProcessId, final String yearMonth) {
-        try {
-            final EquipmentCostAggregationResponse response = equipmentCostAggregationService
-                    .getEquipmentCostAggregation(siteId, siteProcessId, yearMonth);
+        final EquipmentCostAggregationResponse response = equipmentCostAggregationService
+                .getEquipmentCostAggregation(siteId, siteProcessId, yearMonth);
 
-            long total = 0L;
-
-            if (response.items() != null) {
-                for (final var item : response.items()) {
-                    // 해당 월만 집계
-                    total += getTotal(item.currentBilling());
-                }
-            }
-
-            // 0원인 경우도 0으로 저장 (null이 아닌 0으로 표기)
-            return total;
-        } catch (final Exception e) {
-            log.warn("장비비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
-                    siteId, siteProcessId, yearMonth, e.getMessage());
-            return null;
-        }
+        return sumBillingTotal(response.items(), item -> item.currentBilling());
     }
 
     /**
      * 외주비 총액 계산 (외주 공사 비용)
      */
     private Long calculateOutsourcingCost(final Long siteId, final Long siteProcessId, final String yearMonth) {
-        try {
-            final ConstructionOutsourcingAggregationResponse response = constructionOutsourcingCompanyAggregationService
-                    .getConstructionOutsourcingAggregation(
-                            new ConstructionOutsourcingAggregationRequest(siteId, siteProcessId, yearMonth));
+        final ConstructionOutsourcingAggregationResponse response = constructionOutsourcingCompanyAggregationService
+                .getConstructionOutsourcingAggregation(
+                        new ConstructionOutsourcingAggregationRequest(siteId, siteProcessId, yearMonth));
 
-            long total = 0L;
-
-            if (response.items() != null) {
-                for (final var item : response.items()) {
-                    // 해당 월만 집계 (음수 값도 포함)
-                    if (item.currentBilling() != null) {
-                        total += item.currentBilling().total();
-                    }
-                }
-            }
-
-            // 0원인 경우도 0으로 저장, 음수인 경우도 그대로 저장
-            return total;
-        } catch (final Exception e) {
-            log.warn("외주비 계산 중 오류 발생 - 현장 ID: {}, 공정 ID: {}, 년월: {}, 오류: {}",
-                    siteId, siteProcessId, yearMonth, e.getMessage());
-            return null;
-        }
+        return sumLongTotal(response.items(), item -> {
+            final var billing = item.currentBilling();
+            return billing != null ? billing.total() : 0L;
+        });
     }
 
     /**
-     * MaterialCostAggregationResponse의 BillingDetail 총액 반환 (null 처리)
+     * 리스트의 각 항목에서 BillingDetail을 추출하여 총액을 합산합니다.
+     * 
+     * @param items            리스트 (null 가능)
+     * @param billingExtractor BillingDetail을 추출하는 함수
+     * @return 총액
      */
-    private long getTotal(final BillingDetail billingDetail) {
+    private <T> long sumBillingTotal(
+            final List<T> items,
+            final java.util.function.Function<T, BillingDetail> billingExtractor) {
+        if (items == null) {
+            return 0L;
+        }
+        return items.stream()
+                .map(billingExtractor)
+                .mapToLong(this::getBillingTotal)
+                .sum();
+    }
+
+    /**
+     * 리스트의 각 항목에서 Long 값을 추출하여 합산합니다.
+     * 
+     * @param items          리스트 (null 가능)
+     * @param valueExtractor Long 값을 추출하는 함수
+     * @return 총액
+     */
+    private <T> long sumLongTotal(
+            final List<T> items,
+            final java.util.function.Function<T, Long> valueExtractor) {
+        if (items == null) {
+            return 0L;
+        }
+        return items.stream()
+                .map(valueExtractor)
+                .mapToLong(value -> value != null ? value : 0L)
+                .sum();
+    }
+
+    /**
+     * BillingDetail의 총액을 반환합니다 (null 처리)
+     */
+    private long getBillingTotal(final BillingDetail billingDetail) {
         if (billingDetail == null) {
             return 0L;
         }
         return billingDetail.total() != null ? billingDetail.total() : 0L;
-    }
-
-    /**
-     * ManagementCostAggregationResponse의 BillingDetail 총액 반환
-     */
-    private long getTotalFromManagementBilling(
-            final ManagementCostAggregationResponse.BillingDetail billingDetail) {
-        if (billingDetail == null) {
-            return 0L;
-        }
-        return billingDetail.total();
     }
 }
