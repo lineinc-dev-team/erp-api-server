@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.aggregation.constructionoutsourcing.service.ConstructionOutsourcingCompanyAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.equipmentcost.service.EquipmentCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.laborcost.service.LaborCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.managementcost.service.ManagementCostAggregationService;
@@ -14,7 +15,10 @@ import com.lineinc.erp.api.server.domain.aggregation.materialcost.service.Materi
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.repository.OutsourcingCompanyContractRepository;
 import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ConstructionOutsourcingAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.ManagementCostAggregationRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingAggregationResponse.ConstructionOutsourcingAggregationItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.EquipmentCostAggregationResponse.EquipmentCostAggregationItem;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.HeadquarterAggregationResponse;
@@ -42,6 +46,7 @@ public class HeadquarterAggregationService {
     private final LaborCostAggregationService laborCostAggregationService;
     private final EquipmentCostAggregationService equipmentCostAggregationService;
     private final ManagementCostAggregationService managementCostAggregationService;
+    private final ConstructionOutsourcingCompanyAggregationService constructionOutsourcingCompanyAggregationService;
     private final SiteRepository siteRepository;
     private final OutsourcingCompanyContractRepository outsourcingCompanyContractRepository;
 
@@ -86,7 +91,15 @@ public class HeadquarterAggregationService {
         final CostSummary equipmentSummary = buildSummary("장비비",
                 current -> equipmentBillingDetails(equipmentResponse, current));
 
-        // 4) 관리비 집계 응답 확보
+        // 4) 외주비 집계 응답 확보
+        final ConstructionOutsourcingAggregationResponse constructionOutsourcingResponse = constructionOutsourcingCompanyAggregationService
+                .getConstructionOutsourcingAggregation(
+                        new ConstructionOutsourcingAggregationRequest(siteId, siteProcessId, yearMonth));
+
+        final CostSummary constructionOutsourcingSummary = buildSummary("외주비",
+                current -> constructionOutsourcingBillingDetails(constructionOutsourcingResponse, current));
+
+        // 5) 관리비 집계 응답 확보
         final ManagementCostAggregationResponse managementResponse = managementCostAggregationService
                 .getManagementCostAggregation(
                         new ManagementCostAggregationRequest(siteId, siteProcessId, yearMonth));
@@ -94,12 +107,13 @@ public class HeadquarterAggregationService {
         final CostSummary managementSummary = buildSummary("관리비",
                 current -> managementBillingDetails(managementResponse, current));
 
-        // 5) 총 공사금액 계산 (현장 계약금액 + 외주 계약금액 합산)
+        // 6) 총 공사금액 계산 (현장 계약금액 + 외주 계약금액 합산)
         final long totalConstructionAmount = calculateTotalConstructionAmount(siteId);
 
         return new HeadquarterAggregationResponse(
                 totalConstructionAmount,
-                List.of(materialSummary, laborSummary, equipmentSummary, managementSummary));
+                List.of(materialSummary, laborSummary, equipmentSummary, constructionOutsourcingSummary,
+                        managementSummary));
     }
 
     /**
@@ -203,6 +217,17 @@ public class HeadquarterAggregationService {
                 .map(item -> pickBilling(item, current));
     }
 
+    private Stream<MaterialManagementItemResponse.BillingDetail> constructionOutsourcingBillingDetails(
+            final ConstructionOutsourcingAggregationResponse response,
+            final boolean current) {
+        if (response == null || response.items() == null) {
+            return Stream.empty();
+        }
+
+        return response.items().stream()
+                .map(item -> pickBilling(item, current));
+    }
+
     private Stream<MaterialManagementItemResponse.BillingDetail> managementBillingDetails(
             final ManagementCostAggregationResponse response,
             final boolean current) {
@@ -212,6 +237,24 @@ public class HeadquarterAggregationService {
 
         return response.items().stream()
                 .map(item -> pickBilling(item, current));
+    }
+
+    private MaterialManagementItemResponse.BillingDetail pickBilling(
+            final ConstructionOutsourcingAggregationItem item,
+            final boolean useCurrent) {
+        if (item == null) {
+            return null;
+        }
+        final var billing = useCurrent ? item.currentBilling() : item.previousBilling();
+        if (billing == null) {
+            return null;
+        }
+
+        return new MaterialManagementItemResponse.BillingDetail(
+                Long.valueOf(billing.supplyPrice()),
+                Long.valueOf(billing.vat()),
+                Long.valueOf(billing.deduction()),
+                Long.valueOf(billing.total()));
     }
 
     private MaterialManagementItemResponse.BillingDetail pickBilling(
