@@ -23,7 +23,7 @@ public class ErpApiServerApplication {
      * 
      * @param args 명령행 인수
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(ErpApiServerApplication.class, args);
     }
 
