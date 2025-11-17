@@ -15,6 +15,8 @@ public record MaterialManagementCreateRequest(
         @Schema(description = "현장 ID", example = "1") @NotNull Long siteId,
         @Schema(description = "공정 ID", example = "1") @NotNull Long siteProcessId,
         @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
+        @Schema(description = "공제업체 ID", example = "1") Long deductionCompanyId,
+        @Schema(description = "공제업체 계약 ID", example = "1") Long deductionCompanyContractId,
         @Schema(description = "투입 구분", example = "MAJOR_PURCHASE") @NotNull MaterialManagementInputType inputType,
         @Schema(description = "투입 구분 상세", example = "외주사 납품") String inputTypeDescription,
         @Schema(description = "납품일자", example = "2024-07-28") @NotNull LocalDate deliveryDate,

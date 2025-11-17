@@ -27,7 +27,9 @@ import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialM
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementDetailRepository;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
@@ -61,7 +63,8 @@ public class MaterialManagementService {
     private final MaterialManagementDetailRepository materialManagementDetailRepository;
     private final SiteService siteService;
     private final SiteProcessService siteProcessService;
-    private final OutsourcingCompanyRepository outsourcingCompanyRepository;
+    private final OutsourcingCompanyService outsourcingCompanyService;
+    private final OutsourcingCompanyContractService outsourcingCompanyContractService;
     private final Javers javers;
     private final MaterialManagementChangeHistoryRepository materialManagementChangeHistoryRepository;
     private final UserService userService;
@@ -76,22 +79,31 @@ public class MaterialManagementService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
+        // 외주업체 조회
+        final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+
+        // 공제업체 조회
+        final OutsourcingCompany deductionCompany = request.deductionCompanyId() != null
+                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
+                : null;
+
+        // 공제업체계약 조회
+        final OutsourcingCompanyContract deductionCompanyContract = request.deductionCompanyContractId() != null
+                ? outsourcingCompanyContractService.getContractByIdOrThrow(request.deductionCompanyContractId())
+                : null;
+
         final MaterialManagement materialManagement = MaterialManagement.builder()
                 .site(site)
                 .siteProcess(siteProcess)
+                .outsourcingCompany(outsourcingCompany)
+                .deductionCompany(deductionCompany)
+                .deductionCompanyContract(deductionCompanyContract)
                 .inputType(request.inputType())
                 .inputTypeDescription(request.inputTypeDescription())
                 .deliveryDate(DateTimeFormatUtils.toOffsetDateTime(request.deliveryDate()))
                 .memo(request.memo())
                 .build();
-
-        // 외주업체 설정
-        if (request.outsourcingCompanyId() != null) {
-            final var outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
-            materialManagement.changeOutsourcingCompany(outsourcingCompany);
-        }
 
         materialManagementDetailService.createMaterialDetailManagement(materialManagement, request.details());
         materialManagementFileService.createMaterialFileManagement(materialManagement, request.files());
@@ -260,12 +272,18 @@ public class MaterialManagementService {
         }
 
         // 외주업체 조회
-        OutsourcingCompany outsourcingCompany = null;
-        if (request.outsourcingCompanyId() != null) {
-            outsourcingCompany = outsourcingCompanyRepository.findById(request.outsourcingCompanyId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
-        }
+        final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
+                .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
+
+        // 공제업체 조회
+        final OutsourcingCompany deductionCompany = request.deductionCompanyId() != null
+                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
+                : null;
+
+        // 공제업체계약 조회
+        final OutsourcingCompanyContract deductionCompanyContract = request.deductionCompanyContractId() != null
+                ? outsourcingCompanyContractService.getContractByIdOrThrow(request.deductionCompanyContractId())
+                : null;
 
         materialManagement.syncTransientFields();
         // 변경 전 상태 저장 (Javers 스냅샷)
@@ -273,7 +291,8 @@ public class MaterialManagementService {
                 MaterialManagement.class);
 
         // updateFrom 메서드에서 모든 필드 업데이트
-        materialManagement.updateFrom(request, site, siteProcess, outsourcingCompany);
+        materialManagement.updateFrom(request, site, siteProcess, outsourcingCompany, deductionCompany,
+                deductionCompanyContract);
 
         final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         // 자재 상세 정보가 있는 경우에만 업데이트

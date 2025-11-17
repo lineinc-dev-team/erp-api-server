@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 
@@ -24,6 +25,8 @@ public record MaterialManagementResponse(
         @Schema(description = "현장 요약 정보") SiteResponse.SiteSimpleResponse site,
         @Schema(description = "공정 요약 정보") SiteProcessResponse.SiteProcessSimpleResponse process,
         @Schema(description = "자재업체 요약 정보") CompanyResponse.CompanySimpleResponse outsourcingCompany,
+        @Schema(description = "공제업체 요약 정보") CompanyResponse.CompanySimpleResponse deductionCompany,
+        @Schema(description = "공제업체계약 요약 정보") ContractListResponse.ContractSimpleResponse deductionCompanyContract,
         @Schema(description = "상세 품목 정보") MaterialManagementDetailResponse detail) {
     public static MaterialManagementResponse from(final MaterialManagement entity,
             final MaterialManagementDetail detail) {
@@ -42,6 +45,12 @@ public record MaterialManagementResponse(
                 SiteProcessResponse.SiteProcessSimpleResponse.from(entity.getSiteProcess()),
                 entity.getOutsourcingCompany() != null
                         ? CompanyResponse.CompanySimpleResponse.from(entity.getOutsourcingCompany())
+                        : null,
+                entity.getDeductionCompany() != null
+                        ? CompanyResponse.CompanySimpleResponse.from(entity.getDeductionCompany())
+                        : null,
+                entity.getDeductionCompanyContract() != null
+                        ? ContractListResponse.ContractSimpleResponse.from(entity.getDeductionCompanyContract())
                         : null,
                 MaterialManagementDetailResponse.from(detail));
     }

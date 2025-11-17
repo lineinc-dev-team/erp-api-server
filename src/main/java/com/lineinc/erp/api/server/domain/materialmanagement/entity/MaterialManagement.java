@@ -10,6 +10,7 @@ import org.javers.core.metamodel.annotation.DiffInclude;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request.MaterialManagementUpdateRequest;
@@ -70,6 +71,22 @@ public class MaterialManagement extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = AppConstants.OUTSOURCING_COMPANY_ID)
     private OutsourcingCompany outsourcingCompany;
+
+    /**
+     * 공제업체
+     */
+    @DiffIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.DEDUCTION_COMPANY_ID)
+    private OutsourcingCompany deductionCompany;
+
+    /**
+     * 공제업체계약
+     */
+    @DiffIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = AppConstants.DEDUCTION_COMPANY_CONTRACT_ID)
+    private OutsourcingCompanyContract deductionCompanyContract;
 
     @DiffIgnore
     @Column
@@ -132,6 +149,14 @@ public class MaterialManagement extends BaseEntity {
     @DiffInclude
     private String deliveryDateFormat;
 
+    @Transient
+    @DiffInclude
+    private String deductionCompanyName;
+
+    @Transient
+    @DiffInclude
+    private String deductionCompanyContractName;
+
     /**
      * 연관 엔티티에서 이름 값을 복사해 transient 필드에 세팅
      */
@@ -143,14 +168,21 @@ public class MaterialManagement extends BaseEntity {
         this.deliveryDateFormat = this.deliveryDate != null
                 ? DateTimeFormatUtils.formatKoreaLocalDate(this.deliveryDate)
                 : null;
+        this.deductionCompanyName = this.deductionCompany != null ? this.deductionCompany.getName() : null;
+        this.deductionCompanyContractName = this.deductionCompanyContract != null
+                ? this.deductionCompanyContract.getContractName()
+                : null;
     }
 
     public void updateFrom(final MaterialManagementUpdateRequest request, final Site site,
             final SiteProcess siteProcess,
-            final OutsourcingCompany outsourcingCompany) {
+            final OutsourcingCompany outsourcingCompany, final OutsourcingCompany deductionCompany,
+            final OutsourcingCompanyContract deductionCompanyContract) {
         this.site = site;
         this.siteProcess = siteProcess;
         this.outsourcingCompany = outsourcingCompany;
+        this.deductionCompany = deductionCompany;
+        this.deductionCompanyContract = deductionCompanyContract;
         this.inputTypeDescription = request.inputTypeDescription();
         this.deliveryDate = DateTimeFormatUtils.toOffsetDateTime(request.deliveryDate());
         this.memo = request.memo();
