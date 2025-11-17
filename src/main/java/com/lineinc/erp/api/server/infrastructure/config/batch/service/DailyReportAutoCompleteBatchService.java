@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
@@ -29,7 +30,7 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
 
     @Override
     public String getBatchName() {
-        return "출역일보 자동 마감 배치";
+        return BatchName.DAILY_REPORT_AUTO_COMPLETE.getLabel();
     }
 
     /**

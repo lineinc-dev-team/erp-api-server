@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
@@ -33,7 +34,7 @@ public class TenureCalculationBatchService implements BatchService {
 
     @Override
     public String getBatchName() {
-        return "근속기간 계산 배치";
+        return BatchName.TENURE_CALCULATION.getLabel();
     }
 
     @Override

@@ -7,12 +7,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.dashboard.service.DashboardService;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.request.SiteProcessMonthlyCostsRequest;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.BatchNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.DashboardBatchExecutionTimeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.DashboardSiteResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.SiteMonthlyCostResponse;
@@ -60,10 +63,20 @@ public class DashboardController extends BaseController {
         return ResponseEntity.ok(SuccessResponse.of(responses));
     }
 
-    @Operation(summary = "대시보드 현장 비용 집계 배치 실행 시간 조회")
-    @GetMapping("/batch-execution-time")
-    public ResponseEntity<SuccessResponse<DashboardBatchExecutionTimeResponse>> getDashboardBatchExecutionTime() {
-        final DashboardBatchExecutionTimeResponse response = dashboardService.getDashboardBatchExecutionTime();
+    @Operation(summary = "배치 이름 목록 조회")
+    @GetMapping("/batch-names")
+    public ResponseEntity<SuccessResponse<List<BatchNameResponse>>> getBatchNames() {
+        final List<BatchNameResponse> responses = java.util.Arrays.stream(BatchName.values())
+                .map(BatchNameResponse::new)
+                .toList();
+        return ResponseEntity.ok(SuccessResponse.of(responses));
+    }
+
+    @Operation(summary = "배치 최근 실행시간 조회")
+    @GetMapping("/batch-latest-execution-time")
+    public ResponseEntity<SuccessResponse<DashboardBatchExecutionTimeResponse>> getBatchExecutionTime(
+            @RequestParam(required = false) final BatchName batchName) {
+        final DashboardBatchExecutionTimeResponse response = dashboardService.getBatchExecutionTime(batchName);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
 }

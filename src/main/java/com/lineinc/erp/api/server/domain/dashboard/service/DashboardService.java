@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
 import com.lineinc.erp.api.server.domain.dashboard.repository.SiteMonthlyCostSummaryRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -168,14 +169,15 @@ public class DashboardService {
     }
 
     /**
-     * 대시보드 현장 비용 집계 배치의 가장 최근 실행 시간 조회
+     * 배치의 가장 최근 실행 시간 조회
      * 
+     * @param batchName 배치 이름 Enum
      * @return 배치 실행 종료 시간 (없으면 null)
      */
-    public DashboardBatchExecutionTimeResponse getDashboardBatchExecutionTime() {
-        final String batchName = "대시보드 현장 월별 비용 집계 배치";
+    public DashboardBatchExecutionTimeResponse getBatchExecutionTime(final BatchName batchName) {
+        final String batchNameLabel = batchName.getLabel();
         final OffsetDateTime latestEndTime = batchExecutionHistoryRepository
-                .findTop1ByBatchNameAndEndTimeIsNotNullOrderByEndTimeDesc(batchName)
+                .findTop1ByBatchNameAndEndTimeIsNotNullOrderByEndTimeDesc(batchNameLabel)
                 .map(BatchExecutionHistory::getEndTime)
                 .orElse(null);
         return new DashboardBatchExecutionTimeResponse(latestEndTime);

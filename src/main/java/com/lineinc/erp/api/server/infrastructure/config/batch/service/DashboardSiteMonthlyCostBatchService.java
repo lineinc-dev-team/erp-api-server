@@ -17,6 +17,7 @@ import com.lineinc.erp.api.server.domain.aggregation.equipmentcost.service.Equip
 import com.lineinc.erp.api.server.domain.aggregation.laborcost.service.LaborCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.managementcost.service.ManagementCostAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.materialcost.service.MaterialCostAggregationService;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.dashboard.entity.SiteMonthlyCostSummary;
 import com.lineinc.erp.api.server.domain.dashboard.repository.SiteMonthlyCostSummaryRepository;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
@@ -56,7 +57,7 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
 
     @Override
     public String getBatchName() {
-        return "대시보드 현장 월별 비용 집계 배치";
+        return BatchName.DASHBOARD_SITE_MONTHLY_COST.getLabel();
     }
 
     @Override
