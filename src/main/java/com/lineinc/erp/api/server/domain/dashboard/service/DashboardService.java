@@ -175,9 +175,8 @@ public class DashboardService {
      * @return 배치 실행 종료 시간 (없으면 null)
      */
     public DashboardBatchExecutionTimeResponse getBatchExecutionTime(final BatchName batchName) {
-        final String batchNameLabel = batchName.getLabel();
         final OffsetDateTime latestEndTime = batchExecutionHistoryRepository
-                .findTop1ByBatchNameAndEndTimeIsNotNullOrderByEndTimeDesc(batchNameLabel)
+                .findTop1ByBatchNameAndEndTimeIsNotNullOrderByEndTimeDesc(batchName)
                 .map(BatchExecutionHistory::getEndTime)
                 .orElse(null);
         return new DashboardBatchExecutionTimeResponse(latestEndTime);

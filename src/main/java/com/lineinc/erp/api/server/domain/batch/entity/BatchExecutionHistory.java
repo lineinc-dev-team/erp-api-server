@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionHistoryStatus;
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 
@@ -40,7 +41,8 @@ public class BatchExecutionHistory extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String batchName;
+    @Enumerated(EnumType.STRING)
+    private BatchName batchName;
 
     @Column(nullable = false)
     private OffsetDateTime startTime;

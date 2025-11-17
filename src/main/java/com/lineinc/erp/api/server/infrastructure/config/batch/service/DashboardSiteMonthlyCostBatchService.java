@@ -56,8 +56,8 @@ public class DashboardSiteMonthlyCostBatchService implements BatchService {
     private final SiteMonthlyCostSummaryRepository siteMonthlyCostSummaryRepository;
 
     @Override
-    public String getBatchName() {
-        return BatchName.DASHBOARD_SITE_MONTHLY_COST.getLabel();
+    public BatchName getBatchName() {
+        return BatchName.DASHBOARD_SITE_MONTHLY_COST;
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -127,6 +128,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, message, List.of());
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
+            final MissingServletRequestParameterException ex) {
+        log.warn("MissingServletRequestParameterException: {} - {}", ex.getParameterName(), ex.getParameterType(), ex);
+        final String message = String.format("필수 파라미터 '%s'가 제공되지 않았습니다.", ex.getParameterName());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, message, List.of());
+    }
+
     // 3. 미디어 타입 관련
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleUnsupportedMediaType(final HttpMediaTypeNotSupportedException ex) {
@@ -212,14 +221,45 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorResponse> handleNullPointerException(final NullPointerException ex) {
-        log.warn("NullPointerException: {}", ex.getMessage(), ex);
+        log.error("NullPointerException: {}", ex.getMessage(), ex);
 
-        // 요청 데이터가 null인 경우
-        if (ex.getMessage() != null && ex.getMessage().contains("because the return value of")) {
-            return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.DEFAULT_INVALID_INPUT, List.of());
+        // 에러 메시지에서 원인 파악
+        String message = ValidationMessages.DEFAULT_INVALID_INPUT;
+        if (ex.getMessage() != null) {
+            // 파라미터가 null인 경우 구체적인 메시지 생성
+            if (ex.getMessage().contains("because \"") && ex.getMessage().contains("\" is null")) {
+                final String nullField = extractNullFieldName(ex.getMessage());
+                if (nullField != null) {
+                    message = String.format("필수 파라미터 '%s'가 제공되지 않았습니다.", nullField);
+                }
+            } else if (ex.getMessage().contains("because the return value of")) {
+                message = ValidationMessages.DEFAULT_INVALID_INPUT;
+            }
         }
 
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ValidationMessages.DEFAULT_INVALID_INPUT, List.of());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, message, List.of());
+    }
+
+    /**
+     * NullPointerException 메시지에서 null인 필드명 추출
+     * 예: "Cannot invoke \"com.example.BatchName.getLabel()\" because \"batchName\"
+     * is null"
+     * -> "batchName" 반환
+     */
+    private String extractNullFieldName(final String message) {
+        if (message == null) {
+            return null;
+        }
+        final int becauseIndex = message.indexOf("because \"");
+        if (becauseIndex == -1) {
+            return null;
+        }
+        final int startIndex = becauseIndex + 9; // "because \"" 길이
+        final int endIndex = message.indexOf("\" is null", startIndex);
+        if (endIndex == -1) {
+            return null;
+        }
+        return message.substring(startIndex, endIndex);
     }
 
     @ExceptionHandler(RuntimeException.class)

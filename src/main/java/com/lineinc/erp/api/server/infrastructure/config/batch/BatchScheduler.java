@@ -67,19 +67,19 @@ public class BatchScheduler {
         batchExecutionHistoryRepository.save(history);
 
         try {
-            log.info("{} 시작", batchService.getBatchName());
+            log.info("{} 시작", batchService.getBatchName().getLabel());
             batchService.execute();
             history.markAsCompleted();
             batchExecutionHistoryRepository.save(history);
 
             log.info("{} 완료 - 실행 시간: {}초",
-                    batchService.getBatchName(), history.getExecutionTimeSeconds());
+                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds());
         } catch (final Exception e) {
             history.markAsFailed(e.getMessage());
             batchExecutionHistoryRepository.save(history);
 
             log.error("{} 실행 중 오류 발생 - 실행 시간: {}초",
-                    batchService.getBatchName(), history.getExecutionTimeSeconds(), e);
+                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds(), e);
         }
     }
 }

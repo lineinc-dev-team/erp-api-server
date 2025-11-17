@@ -33,8 +33,8 @@ public class TenureCalculationBatchService implements BatchService {
     private final LaborPayrollRepository laborPayrollRepository;
 
     @Override
-    public String getBatchName() {
-        return BatchName.TENURE_CALCULATION.getLabel();
+    public BatchName getBatchName() {
+        return BatchName.TENURE_CALCULATION;
     }
 
     @Override

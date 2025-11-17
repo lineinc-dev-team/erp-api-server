@@ -85,13 +85,13 @@ public class BatchController extends BaseController {
         batchExecutionHistoryRepository.save(history);
 
         try {
-            log.info("{} 수동 실행 시작", batchService.getBatchName());
+            log.info("{} 수동 실행 시작", batchService.getBatchName().getLabel());
             batchService.execute();
             history.markAsCompleted();
             batchExecutionHistoryRepository.save(history);
 
             final String message = String.format("%s 완료 - 실행 시간: %.2f초",
-                    batchService.getBatchName(), history.getExecutionTimeSeconds());
+                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds());
             log.info(message);
             return ResponseEntity.ok(message);
         } catch (final Exception e) {
@@ -99,7 +99,7 @@ public class BatchController extends BaseController {
             batchExecutionHistoryRepository.save(history);
 
             final String errorMessage = String.format("%s 실행 중 오류 발생 - 실행 시간: %.2f초, 오류: %s",
-                    batchService.getBatchName(), history.getExecutionTimeSeconds(), e.getMessage());
+                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds(), e.getMessage());
             log.error(errorMessage, e);
             return ResponseEntity.status(500).body("배치 실행 실패: " + e.getMessage());
         }

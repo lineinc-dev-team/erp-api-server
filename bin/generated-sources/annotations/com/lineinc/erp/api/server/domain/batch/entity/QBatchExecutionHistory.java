@@ -21,7 +21,7 @@ public class QBatchExecutionHistory extends EntityPathBase<BatchExecutionHistory
 
     public final com.lineinc.erp.api.server.domain.common.entity.QBaseEntity _super = new com.lineinc.erp.api.server.domain.common.entity.QBaseEntity(this);
 
-    public final StringPath batchName = createString("batchName");
+    public final EnumPath<com.lineinc.erp.api.server.domain.batch.enums.BatchName> batchName = createEnum("batchName", com.lineinc.erp.api.server.domain.batch.enums.BatchName.class);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;

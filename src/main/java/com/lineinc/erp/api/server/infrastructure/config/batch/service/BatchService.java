@@ -3,6 +3,7 @@ package com.lineinc.erp.api.server.infrastructure.config.batch.service;
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionHistoryStatus;
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType;
+import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 
 /**
  * 배치 작업 서비스 인터페이스
@@ -20,9 +21,9 @@ public interface BatchService {
     /**
      * 배치 작업의 이름을 반환합니다.
      * 
-     * @return 배치 작업 이름
+     * @return 배치 이름 Enum
      */
-    String getBatchName();
+    BatchName getBatchName();
 
     /**
      * 배치 실행 이력을 생성합니다.

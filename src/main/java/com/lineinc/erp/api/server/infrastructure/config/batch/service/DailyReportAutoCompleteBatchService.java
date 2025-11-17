@@ -29,8 +29,8 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
     private final DailyReportRepository dailyReportRepository;
 
     @Override
-    public String getBatchName() {
-        return BatchName.DAILY_REPORT_AUTO_COMPLETE.getLabel();
+    public BatchName getBatchName() {
+        return BatchName.DAILY_REPORT_AUTO_COMPLETE;
     }
 
     /**

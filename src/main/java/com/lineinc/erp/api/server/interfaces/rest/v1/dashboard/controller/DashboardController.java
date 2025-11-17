@@ -75,7 +75,7 @@ public class DashboardController extends BaseController {
     @Operation(summary = "배치 최근 실행시간 조회")
     @GetMapping("/batch-latest-execution-time")
     public ResponseEntity<SuccessResponse<DashboardBatchExecutionTimeResponse>> getBatchExecutionTime(
-            @RequestParam(required = false) final BatchName batchName) {
+            @RequestParam(required = true) final BatchName batchName) {
         final DashboardBatchExecutionTimeResponse response = dashboardService.getBatchExecutionTime(batchName);
         return ResponseEntity.ok(SuccessResponse.of(response));
     }
