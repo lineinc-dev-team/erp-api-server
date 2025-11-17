@@ -209,14 +209,23 @@ public class SiteManagementCostService {
 
             // 현장관리비 관련 필드
             final List<String> siteManagementFields = List.of(
-                    "employeeSalary", "employeeSalaryMemo",
-                    "regularRetirementPension", "regularRetirementPensionMemo",
-                    "retirementDeduction", "retirementDeductionMemo",
-                    "majorInsuranceRegular", "majorInsuranceRegularMemo",
-                    "majorInsuranceDaily", "majorInsuranceDailyMemo",
-                    "contractGuaranteeFee", "contractGuaranteeFeeMemo",
-                    "equipmentGuaranteeFee", "equipmentGuaranteeFeeMemo",
-                    "nationalTaxPayment", "nationalTaxPaymentMemo");
+                    "employeeSalary", "employeeSalarySupplyPrice", "employeeSalaryVat", "employeeSalaryDeduction",
+                    "employeeSalaryMemo",
+                    "regularRetirementPension", "regularRetirementPensionSupplyPrice",
+                    "regularRetirementPensionVat", "regularRetirementPensionDeduction",
+                    "regularRetirementPensionMemo",
+                    "retirementDeduction", "retirementDeductionSupplyPrice", "retirementDeductionVat",
+                    "retirementDeductionDeduction", "retirementDeductionMemo",
+                    "majorInsuranceRegular", "majorInsuranceRegularSupplyPrice", "majorInsuranceRegularVat",
+                    "majorInsuranceRegularDeduction", "majorInsuranceRegularMemo",
+                    "majorInsuranceDaily", "majorInsuranceDailySupplyPrice", "majorInsuranceDailyVat",
+                    "majorInsuranceDailyDeduction", "majorInsuranceDailyMemo",
+                    "contractGuaranteeFee", "contractGuaranteeFeeSupplyPrice", "contractGuaranteeFeeVat",
+                    "contractGuaranteeFeeDeduction", "contractGuaranteeFeeMemo",
+                    "equipmentGuaranteeFee", "equipmentGuaranteeFeeSupplyPrice", "equipmentGuaranteeFeeVat",
+                    "equipmentGuaranteeFeeDeduction", "equipmentGuaranteeFeeMemo",
+                    "nationalTaxPayment", "nationalTaxPaymentSupplyPrice", "nationalTaxPaymentVat",
+                    "nationalTaxPaymentDeduction", "nationalTaxPaymentMemo");
 
             // 본사관리비 관련 필드
             final List<String> headquartersManagementFields = List.of(
