@@ -133,12 +133,19 @@ public class HeadquarterAggregationService {
         final CostSummary managementSummary = buildSummary("관리비",
                 current -> managementBillingDetails(managementResponse, current));
 
-        // 현장관리비와 본사관리비는 공급가와 계만 있음 (부가세, 공제금액은 0)
+        // 현장관리비: 공급가, 부가세, 공제금액을 각각 합산
         final CostSummary siteManagementCostSummary = buildSiteManagementCostSummary(
                 "현장관리비",
-                siteManagementCostInfo.previousSiteManagementCost(),
-                siteManagementCostInfo.currentSiteManagementCost());
-        final CostSummary headquartersManagementCostSummary = buildSiteManagementCostSummary(
+                siteManagementCostInfo.previousSiteManagementSupplyPrice(),
+                siteManagementCostInfo.previousSiteManagementVat(),
+                siteManagementCostInfo.previousSiteManagementDeduction(),
+                siteManagementCostInfo.previousSiteManagementTotal(),
+                siteManagementCostInfo.currentSiteManagementSupplyPrice(),
+                siteManagementCostInfo.currentSiteManagementVat(),
+                siteManagementCostInfo.currentSiteManagementDeduction(),
+                siteManagementCostInfo.currentSiteManagementTotal());
+        // 본사관리비: 공급가와 계만 있음 (부가세, 공제금액은 0)
+        final CostSummary headquartersManagementCostSummary = buildHeadquartersManagementCostSummary(
                 "본사관리비",
                 siteManagementCostInfo.previousHeadquartersManagementCost(),
                 siteManagementCostInfo.currentHeadquartersManagementCost());
@@ -162,10 +169,41 @@ public class HeadquarterAggregationService {
     }
 
     /**
-     * 현장/본사 관리비 요약 생성
-     * 공급가와 계만 있고, 부가세와 공제금액은 0
+     * 현장관리비 요약 생성
+     * 공급가, 부가세, 공제금액을 각각 합산
      */
     private CostSummary buildSiteManagementCostSummary(
+            final String costName,
+            final Long previousSupplyPrice,
+            final Long previousVat,
+            final Long previousDeduction,
+            final Long previousTotal,
+            final Long currentSupplyPrice,
+            final Long currentVat,
+            final Long currentDeduction,
+            final Long currentTotal) {
+        final HeadquarterAggregationResponse.BillingSummary previousSummary = new HeadquarterAggregationResponse.BillingSummary(
+                previousSupplyPrice != null ? previousSupplyPrice : 0L,
+                previousVat != null ? previousVat : 0L,
+                previousDeduction != null ? previousDeduction : 0L,
+                previousTotal != null ? previousTotal : 0L);
+        final HeadquarterAggregationResponse.BillingSummary currentSummary = new HeadquarterAggregationResponse.BillingSummary(
+                currentSupplyPrice != null ? currentSupplyPrice : 0L,
+                currentVat != null ? currentVat : 0L,
+                currentDeduction != null ? currentDeduction : 0L,
+                currentTotal != null ? currentTotal : 0L);
+
+        return new CostSummary(
+                costName,
+                previousSummary,
+                currentSummary);
+    }
+
+    /**
+     * 본사관리비 요약 생성
+     * 공급가와 계만 있고, 부가세와 공제금액은 0
+     */
+    private CostSummary buildHeadquartersManagementCostSummary(
             final String costName,
             final Long previousManagementCost,
             final Long currentManagementCost) {
@@ -349,16 +387,31 @@ public class HeadquarterAggregationService {
         final SiteProcess siteProcess = siteProcessRepository.findById(siteProcessId).orElse(null);
 
         if (site == null || siteProcess == null) {
-            return new SiteManagementCostInfo(0L, 0L, 0L, 0L);
+            return new SiteManagementCostInfo(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
         }
 
         // 전회: 조회월 이전까지의 모든 현장관리비 합계
         final List<com.lineinc.erp.api.server.domain.sitemanagementcost.entity.SiteManagementCost> previousCosts = siteManagementCostRepository
                 .findByYearMonthLessThanAndSiteAndSiteProcess(yearMonth, site, siteProcess);
 
+        long previousSiteManagementSupplyPrice = 0L;
+        long previousSiteManagementVat = 0L;
+        long previousSiteManagementDeduction = 0L;
         long previousSiteManagementTotal = 0L;
         long previousHeadquartersManagementCost = 0L;
         for (final var cost : previousCosts) {
+            final Long supplyPrice = cost.calculateSiteManagementSupplyPrice();
+            if (supplyPrice != null) {
+                previousSiteManagementSupplyPrice += supplyPrice;
+            }
+            final Long vat = cost.calculateSiteManagementVat();
+            if (vat != null) {
+                previousSiteManagementVat += vat;
+            }
+            final Long deduction = cost.calculateSiteManagementDeduction();
+            if (deduction != null) {
+                previousSiteManagementDeduction += deduction;
+            }
             final Long siteTotal = cost.calculateSiteManagementTotal();
             if (siteTotal != null) {
                 previousSiteManagementTotal += siteTotal;
@@ -374,6 +427,15 @@ public class HeadquarterAggregationService {
                 .findByYearMonthAndSiteAndSiteProcess(yearMonth, site, siteProcess)
                 .orElse(null);
 
+        final Long currentSiteManagementSupplyPrice = currentSiteManagementCost != null
+                ? currentSiteManagementCost.calculateSiteManagementSupplyPrice()
+                : 0L;
+        final Long currentSiteManagementVat = currentSiteManagementCost != null
+                ? currentSiteManagementCost.calculateSiteManagementVat()
+                : 0L;
+        final Long currentSiteManagementDeduction = currentSiteManagementCost != null
+                ? currentSiteManagementCost.calculateSiteManagementDeduction()
+                : 0L;
         final Long currentSiteManagementTotal = currentSiteManagementCost != null
                 ? currentSiteManagementCost.calculateSiteManagementTotal()
                 : 0L;
@@ -382,7 +444,13 @@ public class HeadquarterAggregationService {
                 : 0L;
 
         return new SiteManagementCostInfo(
+                previousSiteManagementSupplyPrice,
+                previousSiteManagementVat,
+                previousSiteManagementDeduction,
                 previousSiteManagementTotal,
+                currentSiteManagementSupplyPrice != null ? currentSiteManagementSupplyPrice : 0L,
+                currentSiteManagementVat != null ? currentSiteManagementVat : 0L,
+                currentSiteManagementDeduction != null ? currentSiteManagementDeduction : 0L,
                 currentSiteManagementTotal != null ? currentSiteManagementTotal : 0L,
                 previousHeadquartersManagementCost,
                 currentHeadquartersManagementCost != null ? currentHeadquartersManagementCost : 0L);
@@ -392,8 +460,14 @@ public class HeadquarterAggregationService {
      * 현장/본사 관리비 정보를 담는 내부 클래스
      */
     private record SiteManagementCostInfo(
-            Long previousSiteManagementCost,
-            Long currentSiteManagementCost,
+            Long previousSiteManagementSupplyPrice,
+            Long previousSiteManagementVat,
+            Long previousSiteManagementDeduction,
+            Long previousSiteManagementTotal,
+            Long currentSiteManagementSupplyPrice,
+            Long currentSiteManagementVat,
+            Long currentSiteManagementDeduction,
+            Long currentSiteManagementTotal,
             Long previousHeadquartersManagementCost,
             Long currentHeadquartersManagementCost) {
     }

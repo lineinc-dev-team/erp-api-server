@@ -370,7 +370,7 @@ public class SiteManagementCost extends BaseEntity {
     private String headquartersManagementCostMemo;
 
     /**
-     * 현장관리비 합계 계산
+     * 현장관리비 합계 계산 (금액 합계)
      */
     public Long calculateSiteManagementTotal() {
         long total = 0L;
@@ -390,6 +390,78 @@ public class SiteManagementCost extends BaseEntity {
             total += equipmentGuaranteeFee;
         if (nationalTaxPayment != null)
             total += nationalTaxPayment;
+        return total;
+    }
+
+    /**
+     * 현장관리비 공급가 합계 계산
+     */
+    public Long calculateSiteManagementSupplyPrice() {
+        long total = 0L;
+        if (employeeSalarySupplyPrice != null)
+            total += employeeSalarySupplyPrice;
+        if (regularRetirementPensionSupplyPrice != null)
+            total += regularRetirementPensionSupplyPrice;
+        if (retirementDeductionSupplyPrice != null)
+            total += retirementDeductionSupplyPrice;
+        if (majorInsuranceRegularSupplyPrice != null)
+            total += majorInsuranceRegularSupplyPrice;
+        if (majorInsuranceDailySupplyPrice != null)
+            total += majorInsuranceDailySupplyPrice;
+        if (contractGuaranteeFeeSupplyPrice != null)
+            total += contractGuaranteeFeeSupplyPrice;
+        if (equipmentGuaranteeFeeSupplyPrice != null)
+            total += equipmentGuaranteeFeeSupplyPrice;
+        if (nationalTaxPaymentSupplyPrice != null)
+            total += nationalTaxPaymentSupplyPrice;
+        return total;
+    }
+
+    /**
+     * 현장관리비 부가세 합계 계산
+     */
+    public Long calculateSiteManagementVat() {
+        long total = 0L;
+        if (employeeSalaryVat != null)
+            total += employeeSalaryVat;
+        if (regularRetirementPensionVat != null)
+            total += regularRetirementPensionVat;
+        if (retirementDeductionVat != null)
+            total += retirementDeductionVat;
+        if (majorInsuranceRegularVat != null)
+            total += majorInsuranceRegularVat;
+        if (majorInsuranceDailyVat != null)
+            total += majorInsuranceDailyVat;
+        if (contractGuaranteeFeeVat != null)
+            total += contractGuaranteeFeeVat;
+        if (equipmentGuaranteeFeeVat != null)
+            total += equipmentGuaranteeFeeVat;
+        if (nationalTaxPaymentVat != null)
+            total += nationalTaxPaymentVat;
+        return total;
+    }
+
+    /**
+     * 현장관리비 공제금액 합계 계산
+     */
+    public Long calculateSiteManagementDeduction() {
+        long total = 0L;
+        if (employeeSalaryDeduction != null)
+            total += employeeSalaryDeduction;
+        if (regularRetirementPensionDeduction != null)
+            total += regularRetirementPensionDeduction;
+        if (retirementDeductionDeduction != null)
+            total += retirementDeductionDeduction;
+        if (majorInsuranceRegularDeduction != null)
+            total += majorInsuranceRegularDeduction;
+        if (majorInsuranceDailyDeduction != null)
+            total += majorInsuranceDailyDeduction;
+        if (contractGuaranteeFeeDeduction != null)
+            total += contractGuaranteeFeeDeduction;
+        if (equipmentGuaranteeFeeDeduction != null)
+            total += equipmentGuaranteeFeeDeduction;
+        if (nationalTaxPaymentDeduction != null)
+            total += nationalTaxPaymentDeduction;
         return total;
     }
 

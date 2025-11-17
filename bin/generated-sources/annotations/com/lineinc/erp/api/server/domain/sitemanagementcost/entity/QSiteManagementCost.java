@@ -26,7 +26,13 @@ public class QSiteManagementCost extends EntityPathBase<SiteManagementCost> {
 
     public final NumberPath<Long> contractGuaranteeFee = createNumber("contractGuaranteeFee", Long.class);
 
+    public final NumberPath<Long> contractGuaranteeFeeDeduction = createNumber("contractGuaranteeFeeDeduction", Long.class);
+
     public final StringPath contractGuaranteeFeeMemo = createString("contractGuaranteeFeeMemo");
+
+    public final NumberPath<Long> contractGuaranteeFeeSupplyPrice = createNumber("contractGuaranteeFeeSupplyPrice", Long.class);
+
+    public final NumberPath<Long> contractGuaranteeFeeVat = createNumber("contractGuaranteeFeeVat", Long.class);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
@@ -42,11 +48,23 @@ public class QSiteManagementCost extends EntityPathBase<SiteManagementCost> {
 
     public final NumberPath<Long> employeeSalary = createNumber("employeeSalary", Long.class);
 
+    public final NumberPath<Long> employeeSalaryDeduction = createNumber("employeeSalaryDeduction", Long.class);
+
     public final StringPath employeeSalaryMemo = createString("employeeSalaryMemo");
+
+    public final NumberPath<Long> employeeSalarySupplyPrice = createNumber("employeeSalarySupplyPrice", Long.class);
+
+    public final NumberPath<Long> employeeSalaryVat = createNumber("employeeSalaryVat", Long.class);
 
     public final NumberPath<Long> equipmentGuaranteeFee = createNumber("equipmentGuaranteeFee", Long.class);
 
+    public final NumberPath<Long> equipmentGuaranteeFeeDeduction = createNumber("equipmentGuaranteeFeeDeduction", Long.class);
+
     public final StringPath equipmentGuaranteeFeeMemo = createString("equipmentGuaranteeFeeMemo");
+
+    public final NumberPath<Long> equipmentGuaranteeFeeSupplyPrice = createNumber("equipmentGuaranteeFeeSupplyPrice", Long.class);
+
+    public final NumberPath<Long> equipmentGuaranteeFeeVat = createNumber("equipmentGuaranteeFeeVat", Long.class);
 
     public final NumberPath<Long> headquartersManagementCost = createNumber("headquartersManagementCost", Long.class);
 
@@ -56,23 +74,53 @@ public class QSiteManagementCost extends EntityPathBase<SiteManagementCost> {
 
     public final NumberPath<Long> majorInsuranceDaily = createNumber("majorInsuranceDaily", Long.class);
 
+    public final NumberPath<Long> majorInsuranceDailyDeduction = createNumber("majorInsuranceDailyDeduction", Long.class);
+
     public final StringPath majorInsuranceDailyMemo = createString("majorInsuranceDailyMemo");
+
+    public final NumberPath<Long> majorInsuranceDailySupplyPrice = createNumber("majorInsuranceDailySupplyPrice", Long.class);
+
+    public final NumberPath<Long> majorInsuranceDailyVat = createNumber("majorInsuranceDailyVat", Long.class);
 
     public final NumberPath<Long> majorInsuranceRegular = createNumber("majorInsuranceRegular", Long.class);
 
+    public final NumberPath<Long> majorInsuranceRegularDeduction = createNumber("majorInsuranceRegularDeduction", Long.class);
+
     public final StringPath majorInsuranceRegularMemo = createString("majorInsuranceRegularMemo");
+
+    public final NumberPath<Long> majorInsuranceRegularSupplyPrice = createNumber("majorInsuranceRegularSupplyPrice", Long.class);
+
+    public final NumberPath<Long> majorInsuranceRegularVat = createNumber("majorInsuranceRegularVat", Long.class);
 
     public final NumberPath<Long> nationalTaxPayment = createNumber("nationalTaxPayment", Long.class);
 
+    public final NumberPath<Long> nationalTaxPaymentDeduction = createNumber("nationalTaxPaymentDeduction", Long.class);
+
     public final StringPath nationalTaxPaymentMemo = createString("nationalTaxPaymentMemo");
+
+    public final NumberPath<Long> nationalTaxPaymentSupplyPrice = createNumber("nationalTaxPaymentSupplyPrice", Long.class);
+
+    public final NumberPath<Long> nationalTaxPaymentVat = createNumber("nationalTaxPaymentVat", Long.class);
 
     public final NumberPath<Long> regularRetirementPension = createNumber("regularRetirementPension", Long.class);
 
+    public final NumberPath<Long> regularRetirementPensionDeduction = createNumber("regularRetirementPensionDeduction", Long.class);
+
     public final StringPath regularRetirementPensionMemo = createString("regularRetirementPensionMemo");
+
+    public final NumberPath<Long> regularRetirementPensionSupplyPrice = createNumber("regularRetirementPensionSupplyPrice", Long.class);
+
+    public final NumberPath<Long> regularRetirementPensionVat = createNumber("regularRetirementPensionVat", Long.class);
 
     public final NumberPath<Long> retirementDeduction = createNumber("retirementDeduction", Long.class);
 
+    public final NumberPath<Long> retirementDeductionDeduction = createNumber("retirementDeductionDeduction", Long.class);
+
     public final StringPath retirementDeductionMemo = createString("retirementDeductionMemo");
+
+    public final NumberPath<Long> retirementDeductionSupplyPrice = createNumber("retirementDeductionSupplyPrice", Long.class);
+
+    public final NumberPath<Long> retirementDeductionVat = createNumber("retirementDeductionVat", Long.class);
 
     public final com.lineinc.erp.api.server.domain.site.entity.QSite site;
 
