@@ -6,10 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OutsourcingCompanyContractDefaultDeductionsType {
-    FOUR_INSURANCES("4대보험"),
     FUEL_COST("유류비"),
-    MEAL_COST("식대"),
-    ETC("기타");
+    MEAL_COST("식대");
 
     private final String label;
 
