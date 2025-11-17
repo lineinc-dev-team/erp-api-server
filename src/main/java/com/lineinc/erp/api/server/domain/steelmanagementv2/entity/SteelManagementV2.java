@@ -279,8 +279,18 @@ public class SteelManagementV2 extends BaseEntity {
         final double remaining = incomingWeightSubtotal - outgoingWeightSubtotal
                 - (this.scrapTotalWeight != null ? this.scrapTotalWeight : 0.0);
 
-        // 소수점 4자리에서 반올림
-        this.onSiteRemainingWeight = Math.round(remaining * 10000.0) / 10000.0;
+        // 소수점 이하 3자리로 반올림
+        this.onSiteRemainingWeight = roundToThreeDecimals(remaining);
+    }
+
+    /**
+     * Double 값을 소수점 이하 3자리로 반올림
+     */
+    private static Double roundToThreeDecimals(final Double value) {
+        if (value == null) {
+            return null;
+        }
+        return Math.round(value * 1000.0) / 1000.0;
     }
 
     /**
@@ -288,15 +298,16 @@ public class SteelManagementV2 extends BaseEntity {
      *
      * @param type     상세 타입 (입고/출고/사장/고철)
      * @param category 상세 카테고리 (자사자재/구매/임대)
-     * @return 총 무게(톤)
+     * @return 총 무게(톤) - 소수점 이하 3자리로 반올림
      */
     private Double calculateTotalWeight(
             final SteelManagementDetailV2Type type,
             final SteelManagementDetailV2Category category) {
-        return details.stream()
+        final double sum = details.stream()
                 .filter(detail -> !detail.isDeleted() && detail.getType() == type && detail.getCategory() == category)
                 .mapToDouble(detail -> detail.getTotalWeight() != null ? detail.getTotalWeight() : 0.0)
                 .sum();
+        return roundToThreeDecimals(sum);
     }
 
     /**
@@ -319,14 +330,15 @@ public class SteelManagementV2 extends BaseEntity {
      * 특정 타입의 총 무게를 계산 (카테고리 무관)
      *
      * @param type 상세 타입 (입고/출고/사장/고철)
-     * @return 총 무게(톤)
+     * @return 총 무게(톤) - 소수점 이하 3자리로 반올림
      */
     private Double calculateTotalWeightByType(
             final SteelManagementDetailV2Type type) {
-        return details.stream()
+        final double sum = details.stream()
                 .filter(detail -> !detail.isDeleted() && detail.getType() == type)
                 .mapToDouble(detail -> detail.getTotalWeight() != null ? detail.getTotalWeight() : 0.0)
                 .sum();
+        return roundToThreeDecimals(sum);
     }
 
     /**
