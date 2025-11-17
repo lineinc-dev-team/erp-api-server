@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
+import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
 import com.lineinc.erp.api.server.domain.dashboard.repository.SiteMonthlyCostSummaryRepository;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -16,6 +18,7 @@ import com.lineinc.erp.api.server.domain.site.repository.SiteRepository;
 import com.lineinc.erp.api.server.domain.site.service.v1.SiteProcessService;
 import com.lineinc.erp.api.server.domain.user.entity.User;
 import com.lineinc.erp.api.server.domain.user.service.v1.UserService;
+import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.DashboardBatchExecutionTimeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.DashboardSiteResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.SiteMonthlyCostResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.dashboard.dto.response.SiteMonthlyCostsResponse;
@@ -38,6 +41,7 @@ public class DashboardService {
     private final SiteRepository siteRepository;
     private final SiteProcessService siteProcessService;
     private final SiteMonthlyCostSummaryRepository siteMonthlyCostSummaryRepository;
+    private final BatchExecutionHistoryRepository batchExecutionHistoryRepository;
 
     public List<DashboardSiteResponse> getDashboardSites(final Long userId) {
         final OffsetDateTime now = OffsetDateTime.now(AppConstants.KOREA_ZONE);
@@ -161,5 +165,19 @@ public class DashboardService {
                             outsourcingCost);
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 대시보드 현장 비용 집계 배치의 가장 최근 실행 시간 조회
+     * 
+     * @return 배치 실행 종료 시간 (없으면 null)
+     */
+    public DashboardBatchExecutionTimeResponse getDashboardBatchExecutionTime() {
+        final String batchName = "대시보드 현장 월별 비용 집계 배치";
+        final OffsetDateTime latestEndTime = batchExecutionHistoryRepository
+                .findTop1ByBatchNameAndEndTimeIsNotNullOrderByEndTimeDesc(batchName)
+                .map(BatchExecutionHistory::getEndTime)
+                .orElse(null);
+        return new DashboardBatchExecutionTimeResponse(latestEndTime);
     }
 }
