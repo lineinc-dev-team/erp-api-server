@@ -214,7 +214,7 @@ public class DailyReportService {
                 // 임시 인력인 경우 새로운 인력을 생성
                 if (Boolean.TRUE.equals(directContractRequest.isTemporary())) {
                     labor = createTemporaryLabor(directContractRequest.temporaryLaborName(),
-                            directContractRequest.unitPrice(), userId, LaborType.DIRECT_CONTRACT);
+                            directContractRequest.unitPrice(), userId, LaborType.DIRECT_CONTRACT, null);
                 } else {
                     // 기존 인력 검색
                     labor = laborService.getLaborByIdOrThrow(directContractRequest.laborId());
@@ -282,7 +282,8 @@ public class DailyReportService {
                 // 임시 인력인 경우 새로운 인력을 생성
                 if (Boolean.TRUE.equals(directContractOutsourcingRequest.isTemporary())) {
                     labor = createTemporaryLabor(directContractOutsourcingRequest.temporaryLaborName(),
-                            directContractOutsourcingRequest.unitPrice(), userId, LaborType.OUTSOURCING);
+                            directContractOutsourcingRequest.unitPrice(), userId, LaborType.OUTSOURCING,
+                            directContractOutsourcingRequest.outsourcingCompanyId());
                 } else {
                     // 기존 인력 검색
                     labor = laborService
@@ -1095,7 +1096,7 @@ public class DailyReportService {
                     // 임시 인력인 경우 새로운 인력을 생성
                     if (Boolean.TRUE.equals(dto.isTemporary())) {
                         labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId,
-                                LaborType.DIRECT_CONTRACT);
+                                LaborType.DIRECT_CONTRACT, dto.outsourcingCompanyId());
                     } else {
                         // 기존 인력 검색
                         labor = laborService.getLaborByIdOrThrow(dto.laborId());
@@ -1256,7 +1257,7 @@ public class DailyReportService {
                     // 임시 인력인 경우 새로운 인력을 생성
                     if (Boolean.TRUE.equals(dto.isTemporary())) {
                         labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId,
-                                LaborType.OUTSOURCING);
+                                LaborType.OUTSOURCING, dto.outsourcingCompanyId());
                     } else {
                         // 기존 인력 검색
                         labor = laborService.getLaborByIdOrThrow(dto.laborId());
@@ -1724,11 +1725,16 @@ public class DailyReportService {
      * 임시 인력 생성 메서드
      */
     private Labor createTemporaryLabor(final String temporaryLaborName, final Long unitPrice, final Long userId,
-            final LaborType laborType) {
+            final LaborType laborType, final Long outsourcingCompanyId) {
         // 임시 인력 이름이 필수
         if (temporaryLaborName == null || temporaryLaborName.trim().isEmpty()) {
             throw new IllegalArgumentException(ValidationMessages.TEMPORARY_LABOR_NAME_REQUIRED);
         }
+
+        // 외주업체 조회
+        final OutsourcingCompany outsourcingCompany = outsourcingCompanyId != null
+                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(outsourcingCompanyId)
+                : null;
 
         // 임시 인력 생성
         final Labor temporaryLabor = Labor.builder()
@@ -1736,6 +1742,7 @@ public class DailyReportService {
                 .type(laborType)
                 .isTemporary(true)
                 .dailyWage(unitPrice)
+                .outsourcingCompany(outsourcingCompany)
                 .build();
 
         final Labor labor = laborRepository.save(temporaryLabor);
