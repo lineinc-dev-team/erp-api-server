@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -15,11 +16,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(responseCode = "200", description = "성공", content = @Content()),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/BadRequest"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/Unauthorized"),
         @ApiResponse(responseCode = "403", ref = "#/components/responses/Forbidden"),
         @ApiResponse(responseCode = "404", ref = "#/components/responses/NotFound"),
+        @ApiResponse(responseCode = "409", ref = "#/components/responses/Conflict"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/InternalServerError")
 })
 public @interface CommonApiResponses {
