@@ -20,6 +20,9 @@ import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostDet
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostMealFeeDetailOutsourcingContract;
 import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostItemType;
 import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCostRepository;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
+import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
+import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
@@ -39,10 +42,11 @@ public class OutsourcingCompanyDeductionAggregationService {
 
     private final ManagementCostRepository managementCostRepository;
     private final FuelInfoRepository fuelInfoRepository;
+    private final MaterialManagementRepository materialManagementRepository;
 
     /**
      * 공제금액 집계 조회
-     * 식대, 간식대, 유류대의 전회/금회 공제금액을 반환
+     * 식대, 간식대, 유류대, 자재비의 전회/금회 공제금액을 반환
      */
     public DeductionAmountAggregationResponse getDeductionAmountAggregation(
             final DeductionAmountAggregationRequest request) {
@@ -76,7 +80,15 @@ public class OutsourcingCompanyDeductionAggregationService {
                 startInclusive,
                 endExclusive);
 
-        return new DeductionAmountAggregationResponse(mealFee, snackFee, fuelFee);
+        // 자재비 공제금액 집계
+        final DeductionAmountAggregationResponse.DeductionDetail materialCost = calculateMaterialCostDeduction(
+                request.siteId(),
+                request.siteProcessId(),
+                request.outsourcingCompanyContractId(),
+                startInclusive,
+                endExclusive);
+
+        return new DeductionAmountAggregationResponse(mealFee, snackFee, fuelFee, materialCost);
     }
 
     /**
@@ -331,6 +343,66 @@ public class OutsourcingCompanyDeductionAggregationService {
         };
 
         return unitPrice * fuelAmount;
+    }
+
+    /**
+     * 자재비 공제금액 집계
+     */
+    private DeductionAmountAggregationResponse.DeductionDetail calculateMaterialCostDeduction(
+            final Long siteId,
+            final Long siteProcessId,
+            final Long outsourcingCompanyContractId,
+            final OffsetDateTime startInclusive,
+            final OffsetDateTime endExclusive) {
+        // 조회월 다음달 1일 미만까지의 모든 자재관리 데이터 조회
+        // 전회까지의 모든 데이터를 포함하기 위해 deliveryDate < endExclusive 조건만 사용
+        final List<MaterialManagement> allMaterialManagements = materialManagementRepository
+                .findBySiteIdAndSiteProcessIdAndDeliveryDateLessThanAndDeletedFalse(
+                        siteId,
+                        siteProcessId,
+                        endExclusive);
+
+        long previousAmount = 0L;
+        long currentAmount = 0L;
+
+        for (final MaterialManagement materialManagement : allMaterialManagements) {
+            final OffsetDateTime deliveryDate = materialManagement.getDeliveryDate();
+            if (deliveryDate == null) {
+                continue;
+            }
+
+            // 공제업체계약 확인
+            if (materialManagement.getDeductionCompanyContract() == null) {
+                continue;
+            }
+
+            // 요청한 계약 ID와 일치하는지 확인
+            if (!materialManagement.getDeductionCompanyContract().getId().equals(outsourcingCompanyContractId)) {
+                continue;
+            }
+
+            // 상세 품목의 총합계를 공제금액으로 집계
+            for (final MaterialManagementDetail detail : materialManagement.getDetails()) {
+                if (detail == null || detail.isDeleted()) {
+                    continue;
+                }
+
+                final Integer total = detail.getTotal();
+                if (total != null && total > 0) {
+                    if (deliveryDate.isBefore(startInclusive)) {
+                        previousAmount += total;
+                    } else {
+                        currentAmount += total;
+                    }
+                }
+            }
+        }
+
+        return new DeductionAmountAggregationResponse.DeductionDetail(
+                new DeductionAmountAggregationResponse.BillingDetail(
+                        previousAmount > 0 ? previousAmount : null),
+                new DeductionAmountAggregationResponse.BillingDetail(
+                        currentAmount > 0 ? currentAmount : null));
     }
 
     private long getValueOrZero(final Long value) {

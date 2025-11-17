@@ -248,7 +248,7 @@ public class ConstructionOutsourcingCompanyAggregationService {
                                     request.yearMonth(),
                                     contractId));
 
-            // 식대, 간식대, 유류대 공제금액 합산
+            // 식대, 간식대, 유류대, 자재비 공제금액 합산
             long previousDeduction = 0L;
             long currentDeduction = 0L;
 
@@ -280,6 +280,16 @@ public class ConstructionOutsourcingCompanyAggregationService {
                 if (deductionResponse.fuelFee().currentBilling() != null
                         && deductionResponse.fuelFee().currentBilling().totalAmount() != null) {
                     currentDeduction += deductionResponse.fuelFee().currentBilling().totalAmount();
+                }
+            }
+            if (deductionResponse.materialCost() != null) {
+                if (deductionResponse.materialCost().previousBilling() != null
+                        && deductionResponse.materialCost().previousBilling().totalAmount() != null) {
+                    previousDeduction += deductionResponse.materialCost().previousBilling().totalAmount();
+                }
+                if (deductionResponse.materialCost().currentBilling() != null
+                        && deductionResponse.materialCost().currentBilling().totalAmount() != null) {
+                    currentDeduction += deductionResponse.materialCost().currentBilling().totalAmount();
                 }
             }
 

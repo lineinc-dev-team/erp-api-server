@@ -9,7 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record DeductionAmountAggregationResponse(
         @Schema(description = "식대 공제금액") DeductionDetail mealFee,
         @Schema(description = "간식대 공제금액") DeductionDetail snackFee,
-        @Schema(description = "유류대 공제금액") DeductionDetail fuelFee) {
+        @Schema(description = "유류대 공제금액") DeductionDetail fuelFee,
+        @Schema(description = "자재비 공제금액") DeductionDetail materialCost) {
 
     /**
      * 공제금액 상세
