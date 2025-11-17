@@ -31,6 +31,10 @@ public class OpenAPIConfig {
                         // 공통 응답 컴포넌트 정의 - 모든 API에서 재사용 가능
                         .addResponses("BadRequest", new ApiResponse()
                                 .description("입력값 오류 또는 비즈니스 로직 위반"))
+                        .addResponses("Unauthorized", new ApiResponse()
+                                .description("인증이 필요함"))
+                        .addResponses("Forbidden", new ApiResponse()
+                                .description("권한이 없음"))
                         .addResponses("NotFound", new ApiResponse()
                                 .description("요청한 리소스를 찾을 수 없음"))
                         .addResponses("InternalServerError", new ApiResponse()
