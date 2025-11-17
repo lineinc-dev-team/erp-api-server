@@ -14,7 +14,7 @@ public record SteelManagementDetailV2CreateRequest(
         @Schema(description = "품명", example = "H Beam") String name,
         @Schema(description = "규격", example = "D10") String specification,
         @Schema(description = "무게 (톤)", example = "5.6") Double weight,
-        @Schema(description = "본", example = "10") Integer count,
+        @Schema(description = "본", example = "10.5") Double count,
         @Schema(description = "총무게 (톤)", example = "56.0") Double totalWeight,
         @Schema(description = "단가 (원)", example = "12000") Long unitPrice,
         @Schema(description = "공급가 (원)", example = "672000") Long amount,

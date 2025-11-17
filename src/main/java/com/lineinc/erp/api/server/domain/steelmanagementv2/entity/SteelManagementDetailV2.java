@@ -105,7 +105,7 @@ public class SteelManagementDetailV2 extends BaseEntity {
      */
     @DiffInclude
     @Column
-    private Integer count;
+    private Double count;
 
     /**
      * 총무게

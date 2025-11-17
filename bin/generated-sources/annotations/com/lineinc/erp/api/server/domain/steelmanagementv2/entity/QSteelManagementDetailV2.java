@@ -28,7 +28,7 @@ public class QSteelManagementDetailV2 extends EntityPathBase<SteelManagementDeta
 
     public final EnumPath<com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category> category = createEnum("category", com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category.class);
 
-    public final NumberPath<Integer> count = createNumber("count", Integer.class);
+    public final NumberPath<Double> count = createNumber("count", Double.class);
 
     //inherited
     public final DateTimePath<java.time.OffsetDateTime> createdAt = _super.createdAt;
