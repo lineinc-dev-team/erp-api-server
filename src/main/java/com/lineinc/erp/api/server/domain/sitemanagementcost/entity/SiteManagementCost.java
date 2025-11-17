@@ -80,6 +80,27 @@ public class SiteManagementCost extends BaseEntity {
     private Long employeeSalary;
 
     /**
+     * 직원급여 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long employeeSalarySupplyPrice;
+
+    /**
+     * 직원급여 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long employeeSalaryVat;
+
+    /**
+     * 직원급여 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long employeeSalaryDeduction;
+
+    /**
      * 직원급여 메모
      */
     @Column(columnDefinition = "TEXT")
@@ -92,6 +113,27 @@ public class SiteManagementCost extends BaseEntity {
     @Column
     @DiffInclude
     private Long regularRetirementPension;
+
+    /**
+     * 퇴직연금(정규직) 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long regularRetirementPensionSupplyPrice;
+
+    /**
+     * 퇴직연금(정규직) 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long regularRetirementPensionVat;
+
+    /**
+     * 퇴직연금(정규직) 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long regularRetirementPensionDeduction;
 
     /**
      * 퇴직연금(정규직) 메모
@@ -108,6 +150,27 @@ public class SiteManagementCost extends BaseEntity {
     private Long retirementDeduction;
 
     /**
+     * 퇴직공제부금 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long retirementDeductionSupplyPrice;
+
+    /**
+     * 퇴직공제부금 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long retirementDeductionVat;
+
+    /**
+     * 퇴직공제부금 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long retirementDeductionDeduction;
+
+    /**
      * 퇴직공제부금 메모
      */
     @Column(columnDefinition = "TEXT")
@@ -120,6 +183,27 @@ public class SiteManagementCost extends BaseEntity {
     @Column
     @DiffInclude
     private Long majorInsuranceRegular;
+
+    /**
+     * 4대보험(상용) 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long majorInsuranceRegularSupplyPrice;
+
+    /**
+     * 4대보험(상용) 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long majorInsuranceRegularVat;
+
+    /**
+     * 4대보험(상용) 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long majorInsuranceRegularDeduction;
 
     /**
      * 4대보험(상용) 메모
@@ -137,6 +221,27 @@ public class SiteManagementCost extends BaseEntity {
     private Long majorInsuranceDaily;
 
     /**
+     * 4대보험(일용) 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long majorInsuranceDailySupplyPrice;
+
+    /**
+     * 4대보험(일용) 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long majorInsuranceDailyVat;
+
+    /**
+     * 4대보험(일용) 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long majorInsuranceDailyDeduction;
+
+    /**
      * 4대보험(일용) 메모
      */
     @Column(columnDefinition = "TEXT")
@@ -149,6 +254,27 @@ public class SiteManagementCost extends BaseEntity {
     @Column
     @DiffInclude
     private Long contractGuaranteeFee;
+
+    /**
+     * 보증수수료(계약보증) 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long contractGuaranteeFeeSupplyPrice;
+
+    /**
+     * 보증수수료(계약보증) 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long contractGuaranteeFeeVat;
+
+    /**
+     * 보증수수료(계약보증) 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long contractGuaranteeFeeDeduction;
 
     /**
      * 보증수수료(계약보증) 메모
@@ -165,6 +291,27 @@ public class SiteManagementCost extends BaseEntity {
     private Long equipmentGuaranteeFee;
 
     /**
+     * 보증수수료(현장별건설기계) 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long equipmentGuaranteeFeeSupplyPrice;
+
+    /**
+     * 보증수수료(현장별건설기계) 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long equipmentGuaranteeFeeVat;
+
+    /**
+     * 보증수수료(현장별건설기계) 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long equipmentGuaranteeFeeDeduction;
+
+    /**
      * 보증수수료(현장별건설기계) 메모
      */
     @Column(columnDefinition = "TEXT")
@@ -177,6 +324,27 @@ public class SiteManagementCost extends BaseEntity {
     @Column
     @DiffInclude
     private Long nationalTaxPayment;
+
+    /**
+     * 국세납부 공급가
+     */
+    @Column
+    @DiffInclude
+    private Long nationalTaxPaymentSupplyPrice;
+
+    /**
+     * 국세납부 부가세
+     */
+    @Column
+    @DiffInclude
+    private Long nationalTaxPaymentVat;
+
+    /**
+     * 국세납부 공제금액
+     */
+    @Column
+    @DiffInclude
+    private Long nationalTaxPaymentDeduction;
 
     /**
      * 국세납부 메모
@@ -228,20 +396,44 @@ public class SiteManagementCost extends BaseEntity {
     public void updateFrom(
             final SiteManagementCostUpdateRequest request) {
         this.employeeSalary = request.employeeSalary();
+        this.employeeSalarySupplyPrice = request.employeeSalarySupplyPrice();
+        this.employeeSalaryVat = request.employeeSalaryVat();
+        this.employeeSalaryDeduction = request.employeeSalaryDeduction();
         this.employeeSalaryMemo = request.employeeSalaryMemo();
         this.regularRetirementPension = request.regularRetirementPension();
+        this.regularRetirementPensionSupplyPrice = request.regularRetirementPensionSupplyPrice();
+        this.regularRetirementPensionVat = request.regularRetirementPensionVat();
+        this.regularRetirementPensionDeduction = request.regularRetirementPensionDeduction();
         this.regularRetirementPensionMemo = request.regularRetirementPensionMemo();
         this.retirementDeduction = request.retirementDeduction();
+        this.retirementDeductionSupplyPrice = request.retirementDeductionSupplyPrice();
+        this.retirementDeductionVat = request.retirementDeductionVat();
+        this.retirementDeductionDeduction = request.retirementDeductionDeduction();
         this.retirementDeductionMemo = request.retirementDeductionMemo();
         this.majorInsuranceRegular = request.majorInsuranceRegular();
+        this.majorInsuranceRegularSupplyPrice = request.majorInsuranceRegularSupplyPrice();
+        this.majorInsuranceRegularVat = request.majorInsuranceRegularVat();
+        this.majorInsuranceRegularDeduction = request.majorInsuranceRegularDeduction();
         this.majorInsuranceRegularMemo = request.majorInsuranceRegularMemo();
         this.majorInsuranceDaily = request.majorInsuranceDaily();
+        this.majorInsuranceDailySupplyPrice = request.majorInsuranceDailySupplyPrice();
+        this.majorInsuranceDailyVat = request.majorInsuranceDailyVat();
+        this.majorInsuranceDailyDeduction = request.majorInsuranceDailyDeduction();
         this.majorInsuranceDailyMemo = request.majorInsuranceDailyMemo();
         this.contractGuaranteeFee = request.contractGuaranteeFee();
+        this.contractGuaranteeFeeSupplyPrice = request.contractGuaranteeFeeSupplyPrice();
+        this.contractGuaranteeFeeVat = request.contractGuaranteeFeeVat();
+        this.contractGuaranteeFeeDeduction = request.contractGuaranteeFeeDeduction();
         this.contractGuaranteeFeeMemo = request.contractGuaranteeFeeMemo();
         this.equipmentGuaranteeFee = request.equipmentGuaranteeFee();
+        this.equipmentGuaranteeFeeSupplyPrice = request.equipmentGuaranteeFeeSupplyPrice();
+        this.equipmentGuaranteeFeeVat = request.equipmentGuaranteeFeeVat();
+        this.equipmentGuaranteeFeeDeduction = request.equipmentGuaranteeFeeDeduction();
         this.equipmentGuaranteeFeeMemo = request.equipmentGuaranteeFeeMemo();
         this.nationalTaxPayment = request.nationalTaxPayment();
+        this.nationalTaxPaymentSupplyPrice = request.nationalTaxPaymentSupplyPrice();
+        this.nationalTaxPaymentVat = request.nationalTaxPaymentVat();
+        this.nationalTaxPaymentDeduction = request.nationalTaxPaymentDeduction();
         this.nationalTaxPaymentMemo = request.nationalTaxPaymentMemo();
         this.headquartersManagementCost = request.headquartersManagementCost();
         this.headquartersManagementCostMemo = request.headquartersManagementCostMemo();
