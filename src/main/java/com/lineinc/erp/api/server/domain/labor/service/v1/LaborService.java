@@ -421,4 +421,16 @@ public class LaborService {
         // 엔티티를 DTO로 변환하여 페이지 반환
         return historyPage.map(history -> LaborChangeHistoryResponse.from(history, userId));
     }
+
+    /**
+     * 주민등록번호 중복 검사
+     */
+    @Transactional(readOnly = true)
+    public boolean checkResidentNumberDuplicate(final String residentNumber) {
+        // 마스킹된 주민번호는 중복 검사 제외
+        if (residentNumber == null || residentNumber.contains("*")) {
+            return false;
+        }
+        return laborRepository.existsByResidentNumber(residentNumber);
+    }
 }

@@ -40,6 +40,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborDet
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborListResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborNameResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.LaborTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.ResidentNumberDuplicateResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.TypeDescriptionResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.response.WorkTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.response.LaborPayrollHistoryResponse;
@@ -221,5 +222,14 @@ public class LaborController extends BaseController {
 
         return ResponseEntity.ok(SuccessResponse.of(
                 new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+    }
+
+    @Operation(summary = "주민등록번호 중복 검사")
+    @GetMapping("/check-resident-number-duplicate")
+    @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<ResidentNumberDuplicateResponse>> checkResidentNumberDuplicate(
+            @RequestParam final String residentNumber) {
+        final boolean isDuplicate = laborService.checkResidentNumberDuplicate(residentNumber);
+        return ResponseEntity.ok(SuccessResponse.of(new ResidentNumberDuplicateResponse(isDuplicate)));
     }
 }
