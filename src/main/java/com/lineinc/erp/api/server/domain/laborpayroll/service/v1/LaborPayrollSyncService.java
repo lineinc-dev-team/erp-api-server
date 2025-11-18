@@ -18,6 +18,7 @@ import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectCon
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcing;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcingContract;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportEmployee;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
@@ -111,12 +112,13 @@ public class LaborPayrollSyncService {
         final OffsetDateTime startDateTime = DateTimeFormatUtils.toUtcStartOfDay(startDate);
         final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcEndOfDay(endDate);
 
-        // 같은 현장, 공정의 해당 월 출역일보 모두 조회
+        // 같은 현장, 공정의 해당 월 출역일보 모두 조회 (마감 상태만)
         return dailyReportRepository.findBySiteAndSiteProcessAndReportDateBetween(
                 triggerReport.getSite(),
                 triggerReport.getSiteProcess(),
                 startDateTime,
-                endDateTime);
+                endDateTime,
+                List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
     }
 
     /**

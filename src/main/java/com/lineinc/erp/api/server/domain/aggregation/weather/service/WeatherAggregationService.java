@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.DailyWeatherAggregationRequest;
@@ -37,11 +38,12 @@ public class WeatherAggregationService {
         final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startOfMonth);
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
 
-        // 월 구간 내 출역일보 조회
+        // 월 구간 내 출역일보 조회 (마감 상태만)
         final List<DailyReport> reports = dailyReportRepository
                 .findBySiteIdAndSiteProcessIdAndReportDateBetweenMonth(request.siteId(), request.siteProcessId(),
                         startInclusive,
-                        endExclusive);
+                        endExclusive,
+                        List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
 
         // 일자별 날씨 매핑 (동일 일자의 마지막 값을 사용) - KST 기준 일자 계산
         final Map<Integer, FuelAggregationWeatherType> byDay = new HashMap<>();

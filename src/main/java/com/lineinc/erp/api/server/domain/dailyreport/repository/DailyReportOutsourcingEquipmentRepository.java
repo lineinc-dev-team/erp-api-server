@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 
 /**
  * 출역일보 외주업체 장비 Repository
@@ -20,6 +21,7 @@ public interface DailyReportOutsourcingEquipmentRepository
     /**
      * 현장, 공정, 날짜 범위로 외주업체 장비 조회 (집계용)
      * 외주업체, 서브장비를 JOIN FETCH하여 N+1 문제 방지
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT DISTINCT droe FROM DailyReportOutsourcingEquipment droe
@@ -30,17 +32,20 @@ public interface DailyReportOutsourcingEquipmentRepository
             WHERE dr.site.id = :siteId
             AND dr.siteProcess.id = :siteProcessId
             AND dr.reportDate <= :endDate
+            AND dr.status IN :statuses
             AND droe.outsourcingCompany IS NOT NULL
             """)
     List<DailyReportOutsourcingEquipment> findBySiteAndSiteProcessAndReportDateLessThanEqual(
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 
     /**
      * 현장, 공정, 월 구간(포함/미만)으로 외주업체 장비 조회 (집계용)
      * - startDate: 조회월 1일 00:00 UTC 이상
      * - endDate : 다음달 1일 00:00 UTC 미만
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT DISTINCT droe FROM DailyReportOutsourcingEquipment droe
@@ -52,11 +57,13 @@ public interface DailyReportOutsourcingEquipmentRepository
             AND dr.siteProcess.id = :siteProcessId
             AND dr.reportDate >= :startDate
             AND dr.reportDate < :endDate
+            AND dr.status IN :statuses
             AND droe.outsourcingCompany IS NOT NULL
             """)
     List<DailyReportOutsourcingEquipment> findBySiteAndSiteProcessAndReportDateBetweenMonth(
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
             @Param("startDate") OffsetDateTime startDate,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 }

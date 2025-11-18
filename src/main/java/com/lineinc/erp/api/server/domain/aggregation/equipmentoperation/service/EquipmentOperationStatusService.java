@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipmentSubEquipment;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportOutsourcingEquipmentRepository;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
@@ -112,7 +113,8 @@ public class EquipmentOperationStatusService {
                 site.getId(),
                 siteProcess.getId(),
                 startInclusive,
-                endExclusive);
+                endExclusive,
+                List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
     }
 
     /**

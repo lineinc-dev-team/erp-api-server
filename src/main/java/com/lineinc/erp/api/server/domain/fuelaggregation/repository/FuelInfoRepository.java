@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
@@ -41,6 +42,7 @@ public interface FuelInfoRepository extends JpaRepository<FuelInfo, Long> {
 
     /**
      * 특정 현장, 공정의 출역일보 유류 정보를 조회 종료일 이전까지 조회합니다.
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT DISTINCT fi AS fuelInfo, dr.reportDate AS reportDate
@@ -51,11 +53,13 @@ public interface FuelInfoRepository extends JpaRepository<FuelInfo, Long> {
             WHERE dr.site.id = :siteId
             AND dr.siteProcess.id = :siteProcessId
             AND dr.reportDate < :endDate
+            AND dr.status IN :statuses
             AND fa.deleted = false
             AND fi.deleted = false
             """)
     List<FuelInfoWithReportDate> findBySiteIdAndSiteProcessIdAndReportDateLessThan(
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 }

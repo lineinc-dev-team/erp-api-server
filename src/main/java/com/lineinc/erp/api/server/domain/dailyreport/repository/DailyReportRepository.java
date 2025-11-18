@@ -84,6 +84,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
     /**
      * 특정 현장, 공정, 날짜 범위로 출역일보를 조회합니다.
      * 노무비 명세서 동기화에서 사용됩니다.
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT dr FROM DailyReport dr \
@@ -91,15 +92,18 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
             AND dr.siteProcess = :siteProcess \
             AND dr.reportDate >= :startDate \
             AND dr.reportDate <= :endDate \
+            AND dr.status IN :statuses \
             AND dr.deleted = false \
             ORDER BY dr.reportDate ASC""")
     List<DailyReport> findBySiteAndSiteProcessAndReportDateBetween(@Param("site") Site site,
             @Param("siteProcess") SiteProcess siteProcess,
             @Param("startDate") OffsetDateTime startDate,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 
     /**
      * 특정 현장, 공정, 월 구간(포함/미만)으로 출역일보 조회 (날씨 수집용)
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT dr FROM DailyReport dr \
@@ -107,12 +111,14 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
             AND dr.siteProcess.id = :siteProcessId \
             AND dr.reportDate >= :startDate \
             AND dr.reportDate < :endDate \
+            AND dr.status IN :statuses \
             AND dr.deleted = false \
             ORDER BY dr.reportDate ASC""")
     List<DailyReport> findBySiteIdAndSiteProcessIdAndReportDateBetweenMonth(
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
             @Param("startDate") OffsetDateTime startDate,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 
 }

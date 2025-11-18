@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfoSubEquipment;
@@ -240,7 +241,8 @@ public class OutsourcingCompanyDeductionAggregationService {
             final OffsetDateTime startInclusive,
             final OffsetDateTime endExclusive) {
         final List<FuelInfoWithReportDate> fuelInfos = fuelInfoRepository
-                .findBySiteIdAndSiteProcessIdAndReportDateLessThan(siteId, siteProcessId, endExclusive);
+                .findBySiteIdAndSiteProcessIdAndReportDateLessThan(siteId, siteProcessId, endExclusive,
+                        List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
 
         long previousAmount = 0L;
         long currentAmount = 0L;

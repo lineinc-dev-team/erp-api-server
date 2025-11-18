@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstructionGroup;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 
@@ -48,6 +49,7 @@ public interface DailyReportOutsourcingConstructionGroupRepository
      * 외주업체를 JOIN FETCH하여 N+1 문제 방지
      * - startDate: 조회월 1일 00:00 UTC 이상
      * - endDate : 다음달 1일 00:00 UTC 미만
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT DISTINCT g FROM DailyReportOutsourcingConstructionGroup g
@@ -57,6 +59,7 @@ public interface DailyReportOutsourcingConstructionGroupRepository
             AND dr.siteProcess.id = :siteProcessId
             AND dr.reportDate >= :startDate
             AND dr.reportDate < :endDate
+            AND dr.status IN :statuses
             AND g.deleted = false
             AND dr.deleted = false
             AND g.outsourcingCompany IS NOT NULL
@@ -65,7 +68,8 @@ public interface DailyReportOutsourcingConstructionGroupRepository
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
             @Param("startDate") OffsetDateTime startDate,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 
     /**
      * 현장, 공정으로 외주(공사) 그룹 조회 (집계용)
@@ -92,6 +96,7 @@ public interface DailyReportOutsourcingConstructionGroupRepository
      * 현장, 공정, 외주업체계약 ID, 날짜 범위로 외주(공사) 그룹 조회 (집계 상세용)
      * 공사항목과 외주업체계약 공사항목을 JOIN FETCH하여 N+1 문제 방지
      * - endDate: 조회월 다음달 1일 00:00 UTC 미만
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT DISTINCT g FROM DailyReportOutsourcingConstructionGroup g
@@ -104,6 +109,7 @@ public interface DailyReportOutsourcingConstructionGroupRepository
             AND dr.siteProcess.id = :siteProcessId
             AND cg.outsourcingCompanyContract.id = :outsourcingCompanyContractId
             AND dr.reportDate < :endDate
+            AND dr.status IN :statuses
             AND g.deleted = false
             AND dr.deleted = false
             AND c.deleted = false
@@ -112,12 +118,14 @@ public interface DailyReportOutsourcingConstructionGroupRepository
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
             @Param("outsourcingCompanyContractId") Long outsourcingCompanyContractId,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 
     /**
      * 현장, 공정, 날짜 범위로 외주(공사) 그룹 조회 (집계용)
      * 외주업체, 공사항목과 외주업체계약 공사항목을 JOIN FETCH하여 N+1 문제 방지
      * - endDate: 조회월 다음달 1일 00:00 UTC 미만
+     * 마감 상태(COMPLETED, AUTO_COMPLETED)인 출역일보만 조회합니다.
      */
     @Query("""
             SELECT DISTINCT g FROM DailyReportOutsourcingConstructionGroup g
@@ -130,6 +138,7 @@ public interface DailyReportOutsourcingConstructionGroupRepository
             WHERE dr.site.id = :siteId
             AND dr.siteProcess.id = :siteProcessId
             AND dr.reportDate < :endDate
+            AND dr.status IN :statuses
             AND g.deleted = false
             AND dr.deleted = false
             AND c.deleted = false
@@ -138,5 +147,6 @@ public interface DailyReportOutsourcingConstructionGroupRepository
     List<DailyReportOutsourcingConstructionGroup> findBySiteAndSiteProcessAndReportDateLessThan(
             @Param("siteId") Long siteId,
             @Param("siteProcessId") Long siteProcessId,
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("statuses") List<DailyReportStatus> statuses);
 }

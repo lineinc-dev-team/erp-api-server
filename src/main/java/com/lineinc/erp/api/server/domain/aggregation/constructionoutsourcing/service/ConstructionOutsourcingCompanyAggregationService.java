@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lineinc.erp.api.server.domain.aggregation.outsourcingcompany.service.OutsourcingCompanyDeductionAggregationService;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstruction;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstructionGroup;
+import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportOutsourcingConstructionGroupRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractConstruction;
@@ -75,13 +76,14 @@ public class ConstructionOutsourcingCompanyAggregationService {
         final List<OutsourcingCompanyContractConstruction> allConstructions = outsourcingCompanyContractConstructionRepository
                 .findAllByOutsourcingCompanyContractId(request.outsourcingCompanyContractId());
 
-        // 조회월 다음달 1일 미만까지의 모든 출역일보 데이터 조회
+        // 조회월 다음달 1일 미만까지의 모든 출역일보 데이터 조회 (마감 상태만)
         final var groups = dailyReportOutsourcingConstructionGroupRepository
                 .findBySiteAndSiteProcessAndContractIdAndReportDateLessThan(
                         request.siteId(),
                         request.siteProcessId(),
                         request.outsourcingCompanyContractId(),
-                        endExclusive);
+                        endExclusive,
+                        List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
 
         // 공사항목 ID별로 수량 및 금액 집계
         final Map<Long, BillingAccumulator> billingMap = new HashMap<>();
@@ -181,12 +183,13 @@ public class ConstructionOutsourcingCompanyAggregationService {
         final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startMonth);
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthStart);
 
-        // 조회월 다음달 1일 미만까지의 모든 출역일보 데이터 조회
+        // 조회월 다음달 1일 미만까지의 모든 출역일보 데이터 조회 (마감 상태만)
         final List<DailyReportOutsourcingConstructionGroup> groups = dailyReportOutsourcingConstructionGroupRepository
                 .findBySiteAndSiteProcessAndReportDateLessThan(
                         request.siteId(),
                         request.siteProcessId(),
-                        endExclusive);
+                        endExclusive,
+                        List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
 
         // 외주업체 계약별로 청구내역 집계
         final Map<Long, ContractBillingAccumulator> contractBillingMap = new HashMap<>();
