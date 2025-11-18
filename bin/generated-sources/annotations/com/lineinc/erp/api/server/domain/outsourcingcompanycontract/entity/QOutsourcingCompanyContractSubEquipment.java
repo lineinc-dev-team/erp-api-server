@@ -44,6 +44,8 @@ public class QOutsourcingCompanyContractSubEquipment extends EntityPathBase<Outs
 
     public final StringPath memo = createString("memo");
 
+    public final NumberPath<Long> previousUnitPrice = createNumber("previousUnitPrice", Long.class);
+
     public final StringPath taskDescription = createString("taskDescription");
 
     public final EnumPath<com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContactSubEquipmentType> type = createEnum("type", com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContactSubEquipmentType.class);

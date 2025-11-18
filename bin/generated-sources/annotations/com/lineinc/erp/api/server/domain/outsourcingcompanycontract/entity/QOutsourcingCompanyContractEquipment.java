@@ -44,6 +44,8 @@ public class QOutsourcingCompanyContractEquipment extends EntityPathBase<Outsour
 
     public final QOutsourcingCompanyContract outsourcingCompanyContract;
 
+    public final NumberPath<Long> previousUnitPrice = createNumber("previousUnitPrice", Long.class);
+
     public final StringPath specification = createString("specification");
 
     public final ListPath<OutsourcingCompanyContractSubEquipment, QOutsourcingCompanyContractSubEquipment> subEquipments = this.<OutsourcingCompanyContractSubEquipment, QOutsourcingCompanyContractSubEquipment>createList("subEquipments", OutsourcingCompanyContractSubEquipment.class, QOutsourcingCompanyContractSubEquipment.class, PathInits.DIRECT2);

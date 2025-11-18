@@ -327,6 +327,10 @@ public class DailyReportService {
                 if (equipmentRequest.outsourcingCompanyContractEquipmentId() != null) {
                     equipment = getOutsourcingCompanyContractEquipmentByIdOrThrow(
                             equipmentRequest.outsourcingCompanyContractEquipmentId());
+                    // 장비의 이전단가 업데이트
+                    if (equipment != null && equipmentRequest.unitPrice() != null) {
+                        equipment.updatePreviousUnitPrice(equipmentRequest.unitPrice());
+                    }
                 }
 
                 final DailyReportOutsourcingEquipment outsourcingEquipment = DailyReportOutsourcingEquipment.builder()
@@ -345,6 +349,17 @@ public class DailyReportService {
                 if (equipmentRequest.subEquipments() != null) {
                     for (final DailyReportOutsourcingEquipmentSubEquipmentCreateRequest subEquipmentRequest : equipmentRequest
                             .subEquipments()) {
+                        // 서브장비 조회 및 이전단가 업데이트
+                        OutsourcingCompanyContractSubEquipment subEquipmentEntity = null;
+                        if (subEquipmentRequest.outsourcingCompanyContractSubEquipmentId() != null) {
+                            subEquipmentEntity = outsourcingCompanyContractService
+                                    .getSubEquipmentByIdOrThrow(
+                                            subEquipmentRequest.outsourcingCompanyContractSubEquipmentId());
+                            if (subEquipmentEntity != null && subEquipmentRequest.unitPrice() != null) {
+                                subEquipmentEntity.updatePreviousUnitPrice(subEquipmentRequest.unitPrice());
+                            }
+                        }
+
                         final DailyReportOutsourcingEquipmentSubEquipment subEquipment = DailyReportOutsourcingEquipmentSubEquipment
                                 .builder()
                                 .dailyReportOutsourcingEquipment(outsourcingEquipment)
@@ -352,9 +367,10 @@ public class DailyReportService {
                                 .unitPrice(subEquipmentRequest.unitPrice())
                                 .workHours(subEquipmentRequest.workHours())
                                 .memo(subEquipmentRequest.memo())
-                                .outsourcingCompanyContractSubEquipment(OutsourcingCompanyContractSubEquipment.builder()
-                                        .id(subEquipmentRequest.outsourcingCompanyContractSubEquipmentId())
-                                        .build())
+                                .outsourcingCompanyContractSubEquipment(subEquipmentEntity != null ? subEquipmentEntity
+                                        : OutsourcingCompanyContractSubEquipment.builder()
+                                                .id(subEquipmentRequest.outsourcingCompanyContractSubEquipmentId())
+                                                .build())
                                 .build();
                         outsourcingEquipment.getSubEquipments().add(subEquipment);
                     }
@@ -1405,6 +1421,16 @@ public class DailyReportService {
                 dailyReport.getOutsourcingEquipments(),
                 request.outsourcingEquipments(),
                 (final DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo dto) -> {
+                    OutsourcingCompanyContractEquipment equipmentEntity = null;
+                    if (dto.outsourcingCompanyContractEquipmentId() != null) {
+                        equipmentEntity = getOutsourcingCompanyContractEquipmentByIdOrThrow(
+                                dto.outsourcingCompanyContractEquipmentId());
+                        // 장비의 이전단가 업데이트
+                        if (equipmentEntity != null && dto.unitPrice() != null) {
+                            equipmentEntity.updatePreviousUnitPrice(dto.unitPrice());
+                        }
+                    }
+
                     final DailyReportOutsourcingEquipment equipment = DailyReportOutsourcingEquipment.builder()
                             .dailyReport(dailyReport)
                             .outsourcingCompany(outsourcingCompanyService
@@ -1413,10 +1439,7 @@ public class DailyReportService {
                                     ? getOutsourcingCompanyContractDriverByIdOrThrow(
                                             dto.outsourcingCompanyContractDriverId())
                                     : null)
-                            .outsourcingCompanyContractEquipment(dto.outsourcingCompanyContractEquipmentId() != null
-                                    ? getOutsourcingCompanyContractEquipmentByIdOrThrow(
-                                            dto.outsourcingCompanyContractEquipmentId())
-                                    : null)
+                            .outsourcingCompanyContractEquipment(equipmentEntity)
                             .workContent(dto.workContent())
                             .unitPrice(dto.unitPrice())
                             .workHours(dto.workHours())
@@ -1429,11 +1452,23 @@ public class DailyReportService {
                     if (dto.subEquipments() != null) {
                         for (final DailyReportEquipmentUpdateRequest.OutsourcingCompanyContractSubEquipmentUpdateInfo subEquipmentDto : dto
                                 .subEquipments()) {
+                            // 서브장비 조회 및 이전단가 업데이트
+                            OutsourcingCompanyContractSubEquipment subEquipmentEntity = null;
+                            if (subEquipmentDto.outsourcingCompanyContractSubEquipmentId() != null) {
+                                subEquipmentEntity = outsourcingCompanyContractService
+                                        .getSubEquipmentByIdOrThrow(
+                                                subEquipmentDto.outsourcingCompanyContractSubEquipmentId());
+                                if (subEquipmentEntity != null && subEquipmentDto.unitPrice() != null) {
+                                    subEquipmentEntity.updatePreviousUnitPrice(subEquipmentDto.unitPrice());
+                                }
+                            }
+
                             final DailyReportOutsourcingEquipmentSubEquipment subEquipment = DailyReportOutsourcingEquipmentSubEquipment
                                     .builder()
                                     .dailyReportOutsourcingEquipment(equipment)
-                                    .outsourcingCompanyContractSubEquipment(
-                                            OutsourcingCompanyContractSubEquipment.builder()
+                                    .outsourcingCompanyContractSubEquipment(subEquipmentEntity != null
+                                            ? subEquipmentEntity
+                                            : OutsourcingCompanyContractSubEquipment.builder()
                                                     .id(subEquipmentDto.outsourcingCompanyContractSubEquipmentId())
                                                     .build())
                                     .workContent(subEquipmentDto.workContent())
@@ -1468,6 +1503,11 @@ public class DailyReportService {
                                         equipmentInfo.outsourcingCompanyContractEquipmentId())
                                 : null;
 
+                // 장비의 이전단가 업데이트
+                if (outsourcingCompanyContractEquipment != null && equipmentInfo.unitPrice() != null) {
+                    outsourcingCompanyContractEquipment.updatePreviousUnitPrice(equipmentInfo.unitPrice());
+                }
+
                 // 기존 엔티티만 찾아서 outsourcingCompany, outsourcingCompanyContractDriver,
                 // outsourcingCompanyContractEquipment 설정 (ID가 null이 아닌 것만)
                 dailyReport.getOutsourcingEquipments().stream()
@@ -1476,6 +1516,22 @@ public class DailyReportService {
                         .ifPresent(eq -> {
                             eq.updateFrom(equipmentInfo, outsourcingCompany, outsourcingCompanyContractDriver,
                                     outsourcingCompanyContractEquipment);
+
+                            // 서브장비의 이전단가 업데이트
+                            if (equipmentInfo.subEquipments() != null) {
+                                for (final DailyReportEquipmentUpdateRequest.OutsourcingCompanyContractSubEquipmentUpdateInfo subEquipmentInfo : equipmentInfo
+                                        .subEquipments()) {
+                                    if (subEquipmentInfo.outsourcingCompanyContractSubEquipmentId() != null
+                                            && subEquipmentInfo.unitPrice() != null) {
+                                        final OutsourcingCompanyContractSubEquipment subEquipmentEntity = outsourcingCompanyContractService
+                                                .getSubEquipmentByIdOrThrow(
+                                                        subEquipmentInfo.outsourcingCompanyContractSubEquipmentId());
+                                        if (subEquipmentEntity != null) {
+                                            subEquipmentEntity.updatePreviousUnitPrice(subEquipmentInfo.unitPrice());
+                                        }
+                                    }
+                                }
+                            }
                         });
             }
         }

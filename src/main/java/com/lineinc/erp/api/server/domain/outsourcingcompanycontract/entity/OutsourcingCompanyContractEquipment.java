@@ -73,6 +73,13 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
     @Column
     private Long unitPrice;
 
+    /**
+     * 이전단가
+     */
+    @DiffIgnore
+    @Column
+    private Long previousUnitPrice;
+
     @DiffInclude
     @Column
     private Long subtotal;
@@ -127,5 +134,12 @@ public class OutsourcingCompanyContractEquipment extends BaseEntity {
         }
 
         syncTransientFields();
+    }
+
+    /**
+     * 이전단가를 업데이트합니다.
+     */
+    public void updatePreviousUnitPrice(final Long previousUnitPrice) {
+        this.previousUnitPrice = previousUnitPrice;
     }
 }
