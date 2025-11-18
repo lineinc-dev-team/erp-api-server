@@ -56,7 +56,8 @@ public record DailyReportListResponse(
                 dailyReport.getCompletedAt(),
                 dailyReport.getEmployeeWorkQuantitySum(),
                 dailyReport.getEmployeeEvidenceSubmitted(),
-                dailyReport.getDirectContractWorkQuantitySum(),
+                dailyReport.getDirectContractWorkQuantitySum()
+                        + dailyReport.getDirectContractOutsourcingWorkQuantitySum(),
                 dailyReport.getDirectContractEvidenceSubmitted(),
                 dailyReport.getOutsourcingWorkQuantitySum(),
                 dailyReport.getOutsourcingEvidenceSubmitted(),
