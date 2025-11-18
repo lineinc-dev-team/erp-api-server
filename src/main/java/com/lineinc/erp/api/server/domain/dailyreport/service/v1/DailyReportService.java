@@ -571,8 +571,7 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        // 노무비 명세서 동기화는 마감 시에만 실행됨
     }
 
     public DailyReport getDailyReportById(final Long id) {
@@ -1067,8 +1066,7 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        // 노무비 명세서 동기화는 마감 시에만 실행됨
     }
 
     @Transactional
@@ -1165,8 +1163,7 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        // 노무비 명세서 동기화는 마감 시에만 실행됨
     }
 
     @Transactional
@@ -1328,8 +1325,7 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화
-        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        // 노무비 명세서 동기화는 마감 시에만 실행됨
     }
 
     @Transactional
@@ -1690,7 +1686,7 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void completeDailyReport(final DailyReportSearchRequest searchRequest) {
+    public void completeDailyReport(final DailyReportSearchRequest searchRequest, final Long userId) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
@@ -1707,7 +1703,10 @@ public class DailyReportService {
 
         // 수동 마감 처리
         dailyReport.complete();
-        dailyReportRepository.save(dailyReport);
+        final DailyReport savedDailyReport = dailyReportRepository.save(dailyReport);
+
+        // 노무비 명세서 동기화 (마감 시에만 실행)
+        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
     }
 
     private OutsourcingCompanyContractWorker getOutsourcingCompanyContractWorkerByIdOrThrow(final Long workerId) {

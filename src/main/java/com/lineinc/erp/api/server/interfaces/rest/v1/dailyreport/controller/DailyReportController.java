@@ -341,8 +341,10 @@ public class DailyReportController extends BaseController {
     @Operation(summary = "출역일보 마감")
     @PatchMapping("/complete")
     @RequireMenuPermission(menu = AppConstants.MENU_WORK_DAILY_REPORT, action = PermissionAction.APPROVE)
-    public ResponseEntity<Void> completeDailyReport(@Valid final DailyReportSearchRequest searchRequest) {
-        dailyReportService.completeDailyReport(searchRequest);
+    public ResponseEntity<Void> completeDailyReport(
+            @Valid final DailyReportSearchRequest searchRequest,
+            @AuthenticationPrincipal final CustomUserDetails user) {
+        dailyReportService.completeDailyReport(searchRequest, user.getUserId());
         return ResponseEntity.ok().build();
     }
 

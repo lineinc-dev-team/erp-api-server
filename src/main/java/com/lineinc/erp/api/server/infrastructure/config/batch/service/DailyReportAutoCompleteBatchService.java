@@ -11,6 +11,7 @@ import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.dailyreport.repository.DailyReportRepository;
+import com.lineinc.erp.api.server.domain.laborpayroll.service.v1.LaborPayrollSyncService;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DailyReportAutoCompleteBatchService implements BatchService {
 
     private final DailyReportRepository dailyReportRepository;
+    private final LaborPayrollSyncService laborPayrollSyncService;
 
     @Override
     public BatchName getBatchName() {
@@ -65,8 +67,18 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
             for (final DailyReport report : pendingReports) {
                 try {
                     report.autoComplete();
-                    dailyReportRepository.save(report);
+                    final DailyReport savedReport = dailyReportRepository.save(report);
                     completedCount++;
+
+                    // 노무비 명세서 동기화 (자동 마감 시에만 실행)
+                    // 배치에서는 userId를 null로 전달 (시스템 자동 처리)
+                    try {
+                        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedReport, null);
+                    } catch (final Exception syncException) {
+                        log.warn("노무비 명세서 동기화 실패 - 출역일보 ID: {}, 오류: {}",
+                                savedReport.getId(), syncException.getMessage());
+                        // 동기화 실패해도 마감 처리는 완료된 것으로 간주
+                    }
 
                     log.debug("출역일보 자동 마감 완료 - ID: {}, 현장: {}, 공정: {}, 날짜: {}",
                             report.getId(),
