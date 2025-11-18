@@ -56,8 +56,8 @@ public record DailyReportListResponse(
                 dailyReport.getCompletedAt(),
                 dailyReport.getEmployeeWorkQuantitySum(),
                 dailyReport.getEmployeeEvidenceSubmitted(),
-                dailyReport.getDirectContractWorkQuantitySum()
-                        + dailyReport.getDirectContractOutsourcingWorkQuantitySum(),
+                getDoubleValueOrZero(dailyReport.getDirectContractWorkQuantitySum())
+                        + getDoubleValueOrZero(dailyReport.getDirectContractOutsourcingWorkQuantitySum()),
                 dailyReport.getDirectContractEvidenceSubmitted(),
                 dailyReport.getOutsourcingWorkQuantitySum(),
                 dailyReport.getOutsourcingEvidenceSubmitted(),
@@ -74,5 +74,12 @@ public record DailyReportListResponse(
                 dailyReport.getOutsourcingConstructionEvidenceSubmitted(),
                 dailyReport.getCreatedAt(),
                 dailyReport.getUpdatedAt());
+    }
+
+    /**
+     * Double 값이 null인 경우 0.0을 반환합니다.
+     */
+    private static Double getDoubleValueOrZero(final Double value) {
+        return value != null ? value : 0.0;
     }
 }
