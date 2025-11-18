@@ -571,7 +571,11 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화는 마감 시에만 실행됨
+        // 노무비 명세서 동기화 (마감 상태인 경우에만 실행)
+        if (savedDailyReport.getStatus() == DailyReportStatus.COMPLETED
+                || savedDailyReport.getStatus() == DailyReportStatus.AUTO_COMPLETED) {
+            laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        }
     }
 
     public DailyReport getDailyReportById(final Long id) {
@@ -1066,7 +1070,11 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화는 마감 시에만 실행됨
+        // 노무비 명세서 동기화 (마감 상태인 경우에만 실행)
+        if (savedDailyReport.getStatus() == DailyReportStatus.COMPLETED
+                || savedDailyReport.getStatus() == DailyReportStatus.AUTO_COMPLETED) {
+            laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        }
     }
 
     @Transactional
@@ -1163,7 +1171,11 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화는 마감 시에만 실행됨
+        // 노무비 명세서 동기화 (마감 상태인 경우에만 실행)
+        if (savedDailyReport.getStatus() == DailyReportStatus.COMPLETED
+                || savedDailyReport.getStatus() == DailyReportStatus.AUTO_COMPLETED) {
+            laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        }
     }
 
     @Transactional
@@ -1325,7 +1337,11 @@ public class DailyReportService {
         savedDailyReport.updateAllAggregatedData();
         dailyReportRepository.save(savedDailyReport);
 
-        // 노무비 명세서 동기화는 마감 시에만 실행됨
+        // 노무비 명세서 동기화 (마감 상태인 경우에만 실행)
+        if (savedDailyReport.getStatus() == DailyReportStatus.COMPLETED
+                || savedDailyReport.getStatus() == DailyReportStatus.AUTO_COMPLETED) {
+            laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
+        }
     }
 
     @Transactional
