@@ -31,8 +31,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private final RateLimitService rateLimitService;
 
     // Rate Limiting 설정
-    private static final int AUTHENTICATED_REQUESTS_PER_MINUTE = 400; // 로그인 사용자: 1분당 최대 요청 수
-    private static final int ANONYMOUS_REQUESTS_PER_MINUTE = 50; // 비로그인 사용자: 1분당 최대 요청 수
+    private static final int AUTHENTICATED_REQUESTS_PER_MINUTE = 500; // 로그인 사용자: 1분당 최대 요청 수
+    private static final int ANONYMOUS_REQUESTS_PER_MINUTE = 100; // 비로그인 사용자: 1분당 최대 요청 수
     private static final int TIME_WINDOW_SECONDS = 60; // 시간 윈도우 (초)
 
     @Override
