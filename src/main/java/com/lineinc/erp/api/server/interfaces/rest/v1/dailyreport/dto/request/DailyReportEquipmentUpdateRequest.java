@@ -4,7 +4,6 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "출역일보 장비 수정 요청")
@@ -17,7 +16,7 @@ public record DailyReportEquipmentUpdateRequest(
             @Schema(description = "외주업체 ID", example = "1") @NotNull Long outsourcingCompanyId,
             @Schema(description = "외주업체계약 기사 ID", example = "1") @NotNull Long outsourcingCompanyContractDriverId,
             @Schema(description = "외주업체계약 장비 ID", example = "1") @NotNull Long outsourcingCompanyContractEquipmentId,
-            @Schema(description = "작업내용", example = "기초 굴착 작업") @NotBlank String workContent,
+            @Schema(description = "작업내용", example = "기초 굴착 작업") String workContent,
             @Schema(description = "단가", example = "50000") @NotNull Long unitPrice,
             @Schema(description = "작업시간", example = "1.0") @NotNull Double workHours,
             @Schema(description = "사진 URL", example = "https://example.com/photo.jpg") String fileUrl,
