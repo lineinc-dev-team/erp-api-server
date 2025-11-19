@@ -30,8 +30,8 @@
     // Google Java Style Guide 적용
     "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
     "java.format.settings.profile": "GoogleStyle",
-    // 주석 포맷팅 활성화
-    "java.format.comments.enabled": true,
+    // 주석 포맷팅 비활성화 (Javadoc 줄바꿈 유지)
+    "java.format.comments.enabled": false,
     // 입력 시 자동 포맷팅 (선택 사항, 취향에 따라 false로 변경 가능)
     "java.format.onType.enabled": true,
     // -------------------------------------------------------------------------
