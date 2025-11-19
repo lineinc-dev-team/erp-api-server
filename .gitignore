@@ -202,7 +202,6 @@ tmp/
 *.old
 
 # IDE 설정 파일들 (IntelliJ 외)
-.vscode/
 *.swp
 *.swo
 *~
