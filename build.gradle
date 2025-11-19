@@ -76,6 +76,9 @@ dependencies {
     // ----- 유틸리티 라이브러리 -----
     implementation "com.github.vladimir-bukhtoyarov:bucket4j-core:${bucket4jVersion}"     // Rate Limiting 구현
     implementation "org.javers:javers-spring-boot-starter-sql:${javersVersion}"           // 데이터 변경 이력 추적
+
+    // ----- 개발 편의성 -----
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'             // 서버 자동 재시작 등 개발 편의 도구
 }
 
 // ===== 소스셋 설정 =====
@@ -102,4 +105,12 @@ tasks.withType(JavaCompile).configureEach {
 // Spring Boot의 fat JAR가 생성되어 모든 의존성을 포함한 실행 가능한 JAR 생성
 tasks.named('jar') {
     enabled = false
+}
+
+
+
+// ===== Clean 설정 =====
+// clean 태스크 실행 시 QueryDSL 생성 파일도 삭제
+clean {
+    delete file('build/generated/querydsl')
 }
