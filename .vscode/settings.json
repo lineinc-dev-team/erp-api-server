@@ -1,30 +1,45 @@
 {
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // Java 핵심 설정 (Java Core Settings)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 컴파일 시 null 분석 모드를 자동으로 설정합니다.
     "java.compile.nullAnalysis.mode": "automatic",
     // 빌드 구성을 자동으로 업데이트합니다.
     "java.configuration.updateBuildConfiguration": "automatic",
-    // 동시 빌드 작업 수를 제한합니다 (시스템 부하 감소).
-    "java.maxConcurrentBuilds": 1,
-    // Gradle 빌드 파일을 사용할지 여부 (Gradle 프로젝트에 권장)
+    // 동시 빌드 작업 수 (성능 향상을 위해 증가, CPU 코어 수에 따라 조정 가능)
+    "java.maxConcurrentBuilds": 3,
+    // Gradle 빌드 파일 사용 (Gradle 프로젝트에 권장)
     "java.import.gradle.enabled": true,
     "java.import.gradle.wrapper.enabled": true,
-    // -------------------------------------------------------------------------
+    // Gradle 홈 자동 감지 (비어있으면 자동 감지)
+    "java.import.gradle.home": "",
+    // 프로젝트 메타데이터 파일을 프로젝트 루트에 생성 (권장)
+    "java.import.generatesMetadataFilesAtProjectRoot": false,
+    // =========================================================================
+    // Lombok 설정 (Lombok Support)
+    // =========================================================================
+    // Lombok 어노테이션 처리 활성화 (자동 생성 코드 인식)
+    "java.jdt.ls.lombokSupport.enabled": true,
+    // =========================================================================
     // 코드 생성 설정 (Code Generation)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // hashCode() 및 equals() 생성 시 Java 7+ Objects.hash 사용
     "java.codeGeneration.hashCodeEquals.useJava7Objects": true,
+    // instanceof 사용 (타입 안정성 향상)
+    "java.codeGeneration.hashCodeEquals.useInstanceof": true,
     // 코드 블록({ ... }) 사용 강제
     "java.codeGeneration.useBlocks": true,
     // toString() 생성 스타일: StringBuilder 체이닝 방식
     "java.codeGeneration.toString.codeStyle": "STRING_BUILDER_CHAINED",
+    // toString()에 슈퍼클래스 필드 포함
+    "java.codeGeneration.toString.skipNullValues": false,
     // 생성된 코드의 삽입 위치: 커서 다음
     "java.codeGeneration.insertionLocation": "afterCursor",
-    // -------------------------------------------------------------------------
+    // 생성자 생성 시 필드 초기화 포함
+    "java.codeGeneration.generateComments": false,
+    // =========================================================================
     // 포맷팅 및 스타일 (Formatting & Style - Google Style Guide)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // Java 포맷터 활성화
     "java.format.enabled": true,
     // Google Java Style Guide 적용
@@ -34,11 +49,13 @@
     "java.format.comments.enabled": false,
     // 입력 시 자동 포맷팅 (선택 사항, 취향에 따라 false로 변경 가능)
     "java.format.onType.enabled": true,
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 에디터 동작 (Editor Actions - Save & Cleanup)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 저장 시 자동 포맷팅
     "editor.formatOnSave": true,
+    // 붙여넣기 시 자동 포맷팅
+    "editor.formatOnPaste": false,
     // 저장 시 수행할 추가 작업
     "editor.codeActionsOnSave": {
         // 임포트 정리 (사용하지 않는 임포트 제거 및 정렬)
@@ -46,9 +63,12 @@
         // 기타 문제 자동 수정
         "source.fixAll": "explicit"
     },
-    // -------------------------------------------------------------------------
+    // 자동 저장 (1초 지연 후 자동 저장, 선택 사항)
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    // =========================================================================
     // 에디터 UI 및 동작 (Editor UI & Behavior)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 탭 크기: 4칸
     "editor.tabSize": 4,
     // 탭 대신 스페이스 사용
@@ -64,21 +84,40 @@
     "editor.guides.bracketPairs": true,
     // 인레이 힌트 (파라미터 이름 등 표시) 활성화 - 코드 읽기에 매우 도움됨
     "editor.inlayHints.enabled": "on",
+    // 미니맵 표시 (파일 전체 구조 한눈에 보기)
+    "editor.minimap.enabled": true,
+    // 현재 라인 하이라이트
+    "editor.renderLineHighlight": "all",
+    // 공백 문자 표시 (선택 사항)
+    "editor.renderWhitespace": "selection",
     // Java 전용 에디터 설정
     "[java]": {
         "editor.defaultFormatter": "redhat.java",
         "editor.tabSize": 4,
         "editor.insertSpaces": true,
         "editor.foldingImportsByDefault": true,
-        "editor.suggestSelection": "first"
+        "editor.suggestSelection": "first",
+        // 자동완성 제안 우선순위
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        // 자동완성 시 괄호 자동 삽입
+        "editor.suggest.insertMode": "insert"
     },
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 임포트 및 자동완성 (Imports & Completion)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 자동완성 활성화
     "java.completion.enabled": true,
     // 메서드 인자 추측 활성화
     "java.completion.guessMethodArguments": "insertBestGuessedArguments",
+    // 임포트 자동 추가
+    "java.completion.importOrder": [
+        "java",
+        "javax",
+        "org",
+        "com"
+    ],
+    // 체인 자동완성 활성화 (stream 등에서 유용)
+    "java.completion.chain.enabled": true,
     // 자주 사용하는 정적 멤버 즐겨찾기 (테스트 코드 작성 시 유용)
     "java.completion.favoriteStaticMembers": [
         "org.junit.Assert.*",
@@ -86,34 +125,60 @@
         "org.junit.jupiter.api.Assertions.*",
         "org.junit.jupiter.api.Assumptions.*",
         "org.mockito.Mockito.*",
-        "org.mockito.ArgumentMatchers.*"
+        "org.mockito.ArgumentMatchers.*",
+        "org.mockito.BDDMockito.*",
+        "org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*",
+        "org.springframework.test.web.servlet.result.MockMvcResultMatchers.*",
+        "org.springframework.test.web.servlet.result.MockMvcResultHandlers.*"
     ],
     // 와일드카드(*) 임포트로 변환되는 기준 (99개 이상일 때만 * 사용 -> 사실상 항상 풀네임 사용)
     "java.sources.organizeImports.starThreshold": 99,
-    "java.sources.organizeImports.staticStarThreshold": 5,
+    "java.sources.organizeImports.staticStarThreshold": 99,
     // 퀵픽(전구 아이콘) 표시 시점
     "java.quickfix.showAt": "problem",
     // 메서드 시그니처 도움말 활성화
     "java.signatureHelp.enabled": true,
-    // 인레이 힌트 세부 설정 (Java)
+    // 자동완성 필터링 (매칭 방식)
+    "java.completion.matchCase": "firstLetter",
+    // =========================================================================
+    // 인레이 힌트 상세 설정 (Inlay Hints - Enhanced)
+    // =========================================================================
+    // 파라미터 이름 힌트 (모든 파라미터에 표시)
     "java.inlayHints.parameterNames.enabled": "all",
-    // -------------------------------------------------------------------------
+    // 변수 타입 힌트 표시 (var 사용 시 유용)
+    "editor.inlayHints.padding": true,
+    // =========================================================================
     // 탐색 및 참조 (Navigation & References)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 참조 수 표시 (Code Lens)
     "java.referencesCodeLens.enabled": true,
-    // 구현체 수 표시 (Code Lens)
-    "java.implementationsCodeLens.enabled": true,
     // 라이브러리 소스 코드 다운로드 (디버깅 시 유용)
     "java.eclipse.downloadSources": true,
-    // -------------------------------------------------------------------------
+    // Maven 의존성 소스 다운로드
+    "java.maven.downloadSources": true,
+    // =========================================================================
     // 디버깅 (Debugging)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 핫 코드 교체(Hot Code Replace) 자동 적용
     "java.debug.settings.hotCodeReplace": "auto",
-    // -------------------------------------------------------------------------
+    // 디버그 시 toString() 자동 호출
+    "java.debug.settings.showToString": true,
+    // 디버그 콘솔에 예외 스택 트레이스 표시
+    "java.debug.settings.showQualifiedNames": false,
+    // 디버그 시 스텝 필터 (JDK 내부 코드 건너뛰기)
+    "java.debug.settings.stepping.skipClasses": [
+        "java.lang.ClassLoader"
+    ],
+    // 디버그 시 변수 값 인라인 표시
+    "java.debug.settings.showHex": false,
+    // =========================================================================
+    // 에러 및 경고 설정 (Errors & Warnings)
+    // =========================================================================
+    // 문제 표시 최대 개수
+    "java.errors.incompleteClasspath.severity": "warning",
+    // =========================================================================
     // 시각적 사용자 정의 (Visual Customizations)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 텍스트 블록 내 SQL 하이라이팅 색상 지정
     "editor.tokenColorCustomizations": {
         "textMateRules": [
@@ -125,13 +190,38 @@
             }
         ]
     },
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 파일 인코딩 (File Encoding)
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 기본 인코딩 UTF-8
     "files.encoding": "utf8",
     // 파일 열 때 인코딩 자동 감지
     "files.autoGuessEncoding": true,
     // 줄바꿈 문자 LF로 통일 (Git 협업 시 권장)
-    "files.eol": "\n"
+    "files.eol": "\n",
+    // 파일 끝에 빈 줄 자동 삽입
+    "files.insertFinalNewline": true,
+    // 파일 끝 공백 제거
+    "files.trimFinalNewlines": true,
+    // 저장 시 후행 공백 제거
+    "files.trimTrailingWhitespace": true,
+    // =========================================================================
+    // 성능 최적화 (Performance Optimization)
+    // =========================================================================
+    // 파일 감시 제외 (성능 향상)
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true,
+        "**/.hg/store/**": true,
+        "**/build/**": true,
+        "**/bin/**": true,
+        "**/.gradle/**": true
+    },
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    }
 }
