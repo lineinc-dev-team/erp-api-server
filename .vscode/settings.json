@@ -90,6 +90,10 @@
     "editor.renderLineHighlight": "all",
     // 공백 문자 표시 (선택 사항)
     "editor.renderWhitespace": "selection",
+    // 줄 길이 가이드 표시 (120자 - 현대적인 기준)
+    "editor.rulers": [
+        120
+    ],
     // Java 전용 에디터 설정
     "[java]": {
         "editor.defaultFormatter": "redhat.java",
