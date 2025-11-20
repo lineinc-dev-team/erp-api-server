@@ -3,15 +3,14 @@ package com.lineinc.erp.api.server.domain.aggregation.equipmentoperation.service
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingEquipmentSubEquipment;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
@@ -38,7 +37,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.Eq
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,17 +62,15 @@ public class EquipmentOperationStatusService {
      * @param yearMonth     조회월 (YYYY-MM)
      * @return 장비가동현황 응답
      */
-    public EquipmentOperationStatusResponse getEquipmentOperationStatus(
-            final Long siteId,
-            final Long siteProcessId,
-            final String yearMonth) {
+    public EquipmentOperationStatusResponse getEquipmentOperationStatus(final Long siteId,
+            final Long siteProcessId, final String yearMonth) {
 
         final Site site = siteService.getSiteByIdOrThrow(siteId);
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(siteProcessId);
 
         // 해당 월까지의 외주업체 장비 데이터 조회
-        final List<DailyReportOutsourcingEquipment> allEquipments = findEquipmentsUpToMonth(site, siteProcess,
-                yearMonth);
+        final List<DailyReportOutsourcingEquipment> allEquipments =
+                findEquipmentsUpToMonth(site, siteProcess, yearMonth);
 
         // 해당 월의 유류집계 데이터 조회 후 장비별 일자 사용량 Map 구성 (해당 월만)
         final YearMonth ym = YearMonth.parse(yearMonth);
@@ -83,14 +79,14 @@ public class EquipmentOperationStatusService {
         final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startOfMonth);
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
         final List<FuelAggregation> fuelAggregations = fuelAggregationRepository
-                .findBySiteAndSiteProcessAndDateGreaterThanEqualAndDateLessThanAndDeletedFalse(
-                        site, siteProcess, startInclusive, endExclusive);
-        final Map<Long, Map<Integer, Long>> fuelUsageByEquipment = buildFuelUsageByEquipmentForMonth(
-                fuelAggregations, YearMonth.parse(yearMonth));
+                .findBySiteAndSiteProcessAndDateGreaterThanEqualAndDateLessThanAndDeletedFalse(site,
+                        siteProcess, startInclusive, endExclusive);
+        final Map<Long, Map<Integer, Long>> fuelUsageByEquipment =
+                buildFuelUsageByEquipmentForMonth(fuelAggregations, YearMonth.parse(yearMonth));
 
         // 장비(규격)별로 그룹핑
-        final List<EquipmentOperationStatusItem> items = aggregateByEquipment(allEquipments, yearMonth,
-                fuelUsageByEquipment);
+        final List<EquipmentOperationStatusItem> items =
+                aggregateByEquipment(allEquipments, yearMonth, fuelUsageByEquipment);
 
         return new EquipmentOperationStatusResponse(items);
     }
@@ -98,10 +94,8 @@ public class EquipmentOperationStatusService {
     /**
      * 해당 월까지의 외주업체 장비 데이터 조회
      */
-    private List<DailyReportOutsourcingEquipment> findEquipmentsUpToMonth(
-            final Site site,
-            final SiteProcess siteProcess,
-            final String yearMonth) {
+    private List<DailyReportOutsourcingEquipment> findEquipmentsUpToMonth(final Site site,
+            final SiteProcess siteProcess, final String yearMonth) {
 
         final YearMonth ym = YearMonth.parse(yearMonth);
         final LocalDate startOfMonth = ym.atDay(1);
@@ -109,11 +103,8 @@ public class EquipmentOperationStatusService {
         final OffsetDateTime startInclusive = DateTimeFormatUtils.toUtcStartOfDay(startOfMonth);
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDay);
 
-        return equipmentRepository.findBySiteAndSiteProcessAndReportDateBetweenMonth(
-                site.getId(),
-                siteProcess.getId(),
-                startInclusive,
-                endExclusive,
+        return equipmentRepository.findBySiteAndSiteProcessAndReportDateBetweenMonth(site.getId(),
+                siteProcess.getId(), startInclusive, endExclusive,
                 List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
     }
 
@@ -134,7 +125,8 @@ public class EquipmentOperationStatusService {
                 .collect(Collectors.groupingBy(equipment -> extractEquipmentId(equipment)));
 
         return groupedByEquipment.entrySet().stream()
-                .map(entry -> createEquipmentOperationStatusItem(entry.getValue(), currentYm, fuelUsageByEquipment))
+                .map(entry -> createEquipmentOperationStatusItem(entry.getValue(), currentYm,
+                        fuelUsageByEquipment))
                 .toList();
     }
 
@@ -149,33 +141,32 @@ public class EquipmentOperationStatusService {
      * 외주업체 + 규격별 장비가동현황 항목 생성
      */
     private EquipmentOperationStatusItem createEquipmentOperationStatusItem(
-            final List<DailyReportOutsourcingEquipment> equipments,
-            final YearMonth currentYm,
+            final List<DailyReportOutsourcingEquipment> equipments, final YearMonth currentYm,
             final Map<Long, Map<Integer, Long>> fuelUsageByEquipment) {
 
         final DailyReportOutsourcingEquipment firstEquipment = equipments.get(0);
-        final OutsourcingCompanyContractEquipment contractEquipment = firstEquipment
-                .getOutsourcingCompanyContractEquipment();
-        final OutsourcingCompanyContract outsourcingContract = Optional.ofNullable(contractEquipment)
-                .map(OutsourcingCompanyContractEquipment::getOutsourcingCompanyContract)
-                .orElse(null);
+        final OutsourcingCompanyContractEquipment contractEquipment =
+                firstEquipment.getOutsourcingCompanyContractEquipment();
+        final OutsourcingCompanyContract outsourcingContract =
+                Optional.ofNullable(contractEquipment)
+                        .map(OutsourcingCompanyContractEquipment::getOutsourcingCompanyContract)
+                        .orElse(null);
 
         // 외주업체 정보
-        final CompanyResponse.CompanySimpleResponse outsourcingCompany = Optional.ofNullable(outsourcingContract)
-                .map(OutsourcingCompanyContract::getOutsourcingCompany)
-                .map(CompanyResponse.CompanySimpleResponse::from)
-                .orElseGet(() -> Optional.ofNullable(firstEquipment.getOutsourcingCompany())
+        final CompanyResponse.CompanySimpleResponse outsourcingCompany =
+                Optional.ofNullable(outsourcingContract)
+                        .map(OutsourcingCompanyContract::getOutsourcingCompany)
                         .map(CompanyResponse.CompanySimpleResponse::from)
-                        .orElse(null));
+                        .orElseGet(() -> Optional.ofNullable(firstEquipment.getOutsourcingCompany())
+                                .map(CompanyResponse.CompanySimpleResponse::from).orElse(null));
 
         // 규격
         final String specification = Optional.ofNullable(contractEquipment)
-                .map(OutsourcingCompanyContractEquipment::getSpecification)
-                .orElse("");
+                .map(OutsourcingCompanyContractEquipment::getSpecification).orElse("");
 
         // 기사 정보 (첫 번째 기사 정보 사용, 여러 기사가 있을 수 있음)
-        final ContractDriverResponse.ContractDriverSimpleResponse driver = firstEquipment
-                .getOutsourcingCompanyContractDriver() != null
+        final ContractDriverResponse.ContractDriverSimpleResponse driver =
+                firstEquipment.getOutsourcingCompanyContractDriver() != null
                         ? ContractDriverResponse.ContractDriverSimpleResponse
                                 .from(firstEquipment.getOutsourcingCompanyContractDriver())
                         : null;
@@ -184,27 +175,51 @@ public class EquipmentOperationStatusService {
         final OutsourcingCompanyContractCategoryType equipmentType = equipments.stream()
                 .map(DailyReportOutsourcingEquipment::getOutsourcingCompanyContractEquipment)
                 .filter(contractEq -> contractEq != null && contractEq.getType() != null)
-                .map(OutsourcingCompanyContractEquipment::getType)
-                .findFirst()
-                .orElse(null);
+                .map(OutsourcingCompanyContractEquipment::getType).findFirst().orElse(null);
 
-        final EquipmentDailyUsage equipmentDailyUsage = createEquipmentDailyUsage(equipmentType, equipments, currentYm);
+        final EquipmentDailyUsage equipmentDailyUsage =
+                createEquipmentDailyUsage(equipmentType, equipments, currentYm);
+
+        // 서브장비 필터링 (contractSubEquipment가 있고 type이 있는 것만)
+        final List<DailyReportOutsourcingEquipmentSubEquipment> validSubEquipments = equipments
+                .stream().flatMap(eq -> eq.getSubEquipments().stream()).filter(subEquipment -> {
+                    final OutsourcingCompanyContractSubEquipment contractSubEquipment =
+                            subEquipment.getOutsourcingCompanyContractSubEquipment();
+                    return contractSubEquipment != null && contractSubEquipment.getType() != null;
+                }).toList();
 
         // 서브장비 구분값별로 그룹핑
-        final Map<OutsourcingCompanyContactSubEquipmentType, List<DailyReportOutsourcingEquipmentSubEquipment>> groupedBySubEquipmentType = equipments
-                .stream()
-                .flatMap(eq -> eq.getSubEquipments().stream())
-                .filter(subEquipment -> {
-                    final OutsourcingCompanyContractSubEquipment contractSubEquipment = subEquipment
-                            .getOutsourcingCompanyContractSubEquipment();
-                    return contractSubEquipment != null && contractSubEquipment.getType() != null;
-                })
-                .collect(Collectors.groupingBy(subEquipment -> subEquipment.getOutsourcingCompanyContractSubEquipment()
-                        .getType()));
+        // - ETC(기타)가 아닌 경우: type으로 그룹핑 (하나의 항목으로 합산)
+        // - ETC(기타)인 경우: contractSubEquipment ID별로 그룹핑 (각각 별도 항목으로 반환)
+        final Map<OutsourcingCompanyContactSubEquipmentType, List<DailyReportOutsourcingEquipmentSubEquipment>> nonEtcGrouped =
+                validSubEquipments.stream()
+                        .filter(subEquipment -> subEquipment
+                                .getOutsourcingCompanyContractSubEquipment()
+                                .getType() != OutsourcingCompanyContactSubEquipmentType.ETC)
+                        .collect(Collectors.groupingBy(subEquipment -> subEquipment
+                                .getOutsourcingCompanyContractSubEquipment().getType()));
 
-        final List<SubEquipmentTypeItem> subEquipmentItems = groupedBySubEquipmentType.entrySet().stream()
-                .map(entry -> createSubEquipmentTypeItem(entry.getKey(), entry.getValue(), currentYm))
-                .toList();
+        final Map<Long, List<DailyReportOutsourcingEquipmentSubEquipment>> etcGroupedById =
+                validSubEquipments.stream()
+                        .filter(subEquipment -> subEquipment
+                                .getOutsourcingCompanyContractSubEquipment()
+                                .getType() == OutsourcingCompanyContactSubEquipmentType.ETC)
+                        .collect(Collectors.groupingBy(subEquipment -> subEquipment
+                                .getOutsourcingCompanyContractSubEquipment().getId()));
+
+        // 서브장비 항목 생성
+        final List<SubEquipmentTypeItem> subEquipmentItems = new ArrayList<>();
+
+        // ETC가 아닌 서브장비 항목 추가
+        nonEtcGrouped.forEach((type, subEquipments) -> {
+            subEquipmentItems.add(createSubEquipmentTypeItem(type, subEquipments, currentYm));
+        });
+
+        // ETC 서브장비 항목 추가 (각각 별도 항목)
+        etcGroupedById.forEach((contractSubEquipmentId, subEquipments) -> {
+            subEquipmentItems.add(createSubEquipmentTypeItem(
+                    OutsourcingCompanyContactSubEquipmentType.ETC, subEquipments, currentYm));
+        });
 
         // 유류 사용량 (해당 장비의 ContractEquipment ID 기준)
         final Long equipmentId = firstEquipment.getOutsourcingCompanyContractEquipment() != null
@@ -213,11 +228,11 @@ public class EquipmentOperationStatusService {
         final FuelUsage fuelUsage = createFuelUsage(fuelUsageByEquipment.get(equipmentId));
 
         // 차량번호
-        final String vehicleNumber = firstEquipment.getOutsourcingCompanyContractEquipment().getVehicleNumber();
+        final String vehicleNumber =
+                firstEquipment.getOutsourcingCompanyContractEquipment().getVehicleNumber();
 
-        return new EquipmentOperationStatusItem(outsourcingCompany, specification, vehicleNumber, driver,
-                equipmentDailyUsage,
-                fuelUsage, subEquipmentItems);
+        return new EquipmentOperationStatusItem(outsourcingCompany, specification, vehicleNumber,
+                driver, equipmentDailyUsage, fuelUsage, subEquipmentItems);
     }
 
     /**
@@ -225,8 +240,7 @@ public class EquipmentOperationStatusService {
      */
     private EquipmentDailyUsage createEquipmentDailyUsage(
             final OutsourcingCompanyContractCategoryType equipmentType,
-            final List<DailyReportOutsourcingEquipment> equipments,
-            final YearMonth currentYm) {
+            final List<DailyReportOutsourcingEquipment> equipments, final YearMonth currentYm) {
 
         // 1~31일별 데이터 초기화
         final Map<Integer, DailyUsage> dailyUsageMap = new HashMap<>();
@@ -236,7 +250,8 @@ public class EquipmentOperationStatusService {
 
         // 해당 월의 장비 데이터만 처리
         for (final DailyReportOutsourcingEquipment equipment : equipments) {
-            if (equipment.getDailyReport() == null || equipment.getDailyReport().getReportDate() == null) {
+            if (equipment.getDailyReport() == null
+                    || equipment.getDailyReport().getReportDate() == null) {
                 continue;
             }
 
@@ -250,7 +265,8 @@ public class EquipmentOperationStatusService {
             }
 
             final int day = reportDate.getDayOfMonth();
-            final Double workHours = equipment.getWorkHours() != null ? equipment.getWorkHours() : 0.0;
+            final Double workHours =
+                    equipment.getWorkHours() != null ? equipment.getWorkHours() : 0.0;
             final Long unitPrice = equipment.getUnitPrice() != null ? equipment.getUnitPrice() : 0L;
 
             // 같은 날에 데이터가 있으면 시간 합산, 단가는 첫 번째 것으로 사용
@@ -285,7 +301,8 @@ public class EquipmentOperationStatusService {
 
         // 해당 월의 서브장비 데이터만 처리
         for (final DailyReportOutsourcingEquipmentSubEquipment subEquipment : subEquipments) {
-            final DailyReportOutsourcingEquipment equipment = subEquipment.getDailyReportOutsourcingEquipment();
+            final DailyReportOutsourcingEquipment equipment =
+                    subEquipment.getDailyReportOutsourcingEquipment();
             if (equipment == null || equipment.getDailyReport() == null
                     || equipment.getDailyReport().getReportDate() == null) {
                 continue;
@@ -301,8 +318,10 @@ public class EquipmentOperationStatusService {
             }
 
             final int day = reportDate.getDayOfMonth();
-            final Double workHours = subEquipment.getWorkHours() != null ? subEquipment.getWorkHours() : 0.0;
-            final Long unitPrice = subEquipment.getUnitPrice() != null ? subEquipment.getUnitPrice() : 0L;
+            final Double workHours =
+                    subEquipment.getWorkHours() != null ? subEquipment.getWorkHours() : 0.0;
+            final Long unitPrice =
+                    subEquipment.getUnitPrice() != null ? subEquipment.getUnitPrice() : 0L;
 
             // 같은 날에 데이터가 있으면 시간 합산, 단가는 첫 번째 것으로 사용
             final DailyUsage existing = dailyUsageMap.get(day);
@@ -314,22 +333,18 @@ public class EquipmentOperationStatusService {
             }
         }
 
-        final String typeDescription = subEquipments.get(0).getOutsourcingCompanyContractSubEquipment()
-                .getDescription();
+        final String typeDescription =
+                subEquipments.get(0).getOutsourcingCompanyContractSubEquipment().getDescription();
 
-        return createSubEquipmentTypeItemWithDailyUsage(
-                subEquipmentType.getLabel(),
-                subEquipmentType.name(),
-                typeDescription,
-                dailyUsageMap);
+        return createSubEquipmentTypeItemWithDailyUsage(subEquipmentType.getLabel(),
+                subEquipmentType.name(), typeDescription, dailyUsageMap);
     }
 
     /**
      * 유류 사용량 Map 구성 (장비별, 일자별 합계) - 해당 월만 포함
      */
     private Map<Long, Map<Integer, Long>> buildFuelUsageByEquipmentForMonth(
-            final List<FuelAggregation> fuelAggregations,
-            final YearMonth ym) {
+            final List<FuelAggregation> fuelAggregations, final YearMonth ym) {
         final Map<Long, Map<Integer, Long>> result = new HashMap<>();
 
         for (final FuelAggregation fa : fuelAggregations) {
@@ -357,13 +372,12 @@ public class EquipmentOperationStatusService {
 
     private FuelUsage createFuelUsage(final Map<Integer, Long> dailyAmountMap) {
         if (dailyAmountMap == null) {
-            return new FuelUsage(null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null, null);
+            return new FuelUsage(null, null, null, null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null);
         }
 
-        return new FuelUsage(
-                toFuelDaily(dailyAmountMap.get(1)), toFuelDaily(dailyAmountMap.get(2)),
+        return new FuelUsage(toFuelDaily(dailyAmountMap.get(1)), toFuelDaily(dailyAmountMap.get(2)),
                 toFuelDaily(dailyAmountMap.get(3)), toFuelDaily(dailyAmountMap.get(4)),
                 toFuelDaily(dailyAmountMap.get(5)), toFuelDaily(dailyAmountMap.get(6)),
                 toFuelDaily(dailyAmountMap.get(7)), toFuelDaily(dailyAmountMap.get(8)),
@@ -388,42 +402,37 @@ public class EquipmentOperationStatusService {
     /**
      * EquipmentDailyUsage 생성 (일별 데이터 포함)
      */
-    private EquipmentDailyUsage createEquipmentDailyUsageWithDailyUsage(
-            final String type,
-            final String typeCode,
-            final Map<Integer, DailyUsage> dailyUsageMap) {
-        return new EquipmentDailyUsage(
-                type,
-                typeCode,
-                dailyUsageMap.get(1), dailyUsageMap.get(2), dailyUsageMap.get(3), dailyUsageMap.get(4),
-                dailyUsageMap.get(5), dailyUsageMap.get(6), dailyUsageMap.get(7), dailyUsageMap.get(8),
-                dailyUsageMap.get(9), dailyUsageMap.get(10), dailyUsageMap.get(11), dailyUsageMap.get(12),
-                dailyUsageMap.get(13), dailyUsageMap.get(14), dailyUsageMap.get(15), dailyUsageMap.get(16),
-                dailyUsageMap.get(17), dailyUsageMap.get(18), dailyUsageMap.get(19), dailyUsageMap.get(20),
-                dailyUsageMap.get(21), dailyUsageMap.get(22), dailyUsageMap.get(23), dailyUsageMap.get(24),
-                dailyUsageMap.get(25), dailyUsageMap.get(26), dailyUsageMap.get(27), dailyUsageMap.get(28),
-                dailyUsageMap.get(29), dailyUsageMap.get(30), dailyUsageMap.get(31));
+    private EquipmentDailyUsage createEquipmentDailyUsageWithDailyUsage(final String type,
+            final String typeCode, final Map<Integer, DailyUsage> dailyUsageMap) {
+        return new EquipmentDailyUsage(type, typeCode, dailyUsageMap.get(1), dailyUsageMap.get(2),
+                dailyUsageMap.get(3), dailyUsageMap.get(4), dailyUsageMap.get(5),
+                dailyUsageMap.get(6), dailyUsageMap.get(7), dailyUsageMap.get(8),
+                dailyUsageMap.get(9), dailyUsageMap.get(10), dailyUsageMap.get(11),
+                dailyUsageMap.get(12), dailyUsageMap.get(13), dailyUsageMap.get(14),
+                dailyUsageMap.get(15), dailyUsageMap.get(16), dailyUsageMap.get(17),
+                dailyUsageMap.get(18), dailyUsageMap.get(19), dailyUsageMap.get(20),
+                dailyUsageMap.get(21), dailyUsageMap.get(22), dailyUsageMap.get(23),
+                dailyUsageMap.get(24), dailyUsageMap.get(25), dailyUsageMap.get(26),
+                dailyUsageMap.get(27), dailyUsageMap.get(28), dailyUsageMap.get(29),
+                dailyUsageMap.get(30), dailyUsageMap.get(31));
     }
 
     /**
      * SubEquipmentTypeItem 생성 (일별 데이터 포함)
      */
-    private SubEquipmentTypeItem createSubEquipmentTypeItemWithDailyUsage(
-            final String type,
-            final String typeCode,
-            final String typeDescription,
+    private SubEquipmentTypeItem createSubEquipmentTypeItemWithDailyUsage(final String type,
+            final String typeCode, final String typeDescription,
             final Map<Integer, DailyUsage> dailyUsageMap) {
-        return new SubEquipmentTypeItem(
-                type,
-                typeCode,
-                typeDescription,
-                dailyUsageMap.get(1), dailyUsageMap.get(2), dailyUsageMap.get(3), dailyUsageMap.get(4),
-                dailyUsageMap.get(5), dailyUsageMap.get(6), dailyUsageMap.get(7), dailyUsageMap.get(8),
-                dailyUsageMap.get(9), dailyUsageMap.get(10), dailyUsageMap.get(11), dailyUsageMap.get(12),
-                dailyUsageMap.get(13), dailyUsageMap.get(14), dailyUsageMap.get(15), dailyUsageMap.get(16),
-                dailyUsageMap.get(17), dailyUsageMap.get(18), dailyUsageMap.get(19), dailyUsageMap.get(20),
-                dailyUsageMap.get(21), dailyUsageMap.get(22), dailyUsageMap.get(23), dailyUsageMap.get(24),
-                dailyUsageMap.get(25), dailyUsageMap.get(26), dailyUsageMap.get(27), dailyUsageMap.get(28),
+        return new SubEquipmentTypeItem(type, typeCode, typeDescription, dailyUsageMap.get(1),
+                dailyUsageMap.get(2), dailyUsageMap.get(3), dailyUsageMap.get(4),
+                dailyUsageMap.get(5), dailyUsageMap.get(6), dailyUsageMap.get(7),
+                dailyUsageMap.get(8), dailyUsageMap.get(9), dailyUsageMap.get(10),
+                dailyUsageMap.get(11), dailyUsageMap.get(12), dailyUsageMap.get(13),
+                dailyUsageMap.get(14), dailyUsageMap.get(15), dailyUsageMap.get(16),
+                dailyUsageMap.get(17), dailyUsageMap.get(18), dailyUsageMap.get(19),
+                dailyUsageMap.get(20), dailyUsageMap.get(21), dailyUsageMap.get(22),
+                dailyUsageMap.get(23), dailyUsageMap.get(24), dailyUsageMap.get(25),
+                dailyUsageMap.get(26), dailyUsageMap.get(27), dailyUsageMap.get(28),
                 dailyUsageMap.get(29), dailyUsageMap.get(30), dailyUsageMap.get(31));
     }
 }
