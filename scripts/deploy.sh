@@ -95,6 +95,11 @@ show_logs_and_exit() {
 # 기존 앱 정리
 cleanup_old_app() {
     echo "🧹 [5/5] 기존 앱($OLD_APP) 정리..."
+
+    # Nginx가 새 포트로 트래픽을 전환할 시간 확보
+    echo "   ⏳ 트래픽 전환 대기 중... (3초)"
+    sleep 3
+
     pm2 delete "$OLD_APP" 2>/dev/null || true
     pm2 save --force
     echo "🎉 배포 완료!"
