@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.lineinc.erp.api.server.domain.aggregation.outsourcingcompany.service.OutsourcingCompanyDeductionAggregationService;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstruction;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportOutsourcingConstructionGroup;
@@ -29,7 +27,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.De
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionGroupResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractListResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -49,15 +46,13 @@ public class ConstructionOutsourcingCompanyAggregationService {
      * 현장, 공정으로 필터링하여 외주업체와 외주업체계약을 중복 제거 후 반환
      */
     public List<ConstructionOutsourcingCompaniesResponse> getConstructionOutsourcingCompanies(
-            final Long siteId,
-            final Long siteProcessId) {
+            final Long siteId, final Long siteProcessId) {
         return dailyReportOutsourcingConstructionGroupRepository
-                .findBySiteAndSiteProcess(siteId, siteProcessId)
-                .stream()
-                .map(group -> ConstructionOutsourcingCompaniesResponse.from(
-                        group.getOutsourcingCompanyContractConstructionGroup().getOutsourcingCompanyContract()))
-                .distinct()
-                .toList();
+                .findBySiteAndSiteProcess(siteId, siteProcessId).stream()
+                .map(group -> ConstructionOutsourcingCompaniesResponse
+                        .from(group.getOutsourcingCompanyContractConstructionGroup()
+                                .getOutsourcingCompanyContract()))
+                .distinct().toList();
     }
 
     /**
@@ -73,15 +68,15 @@ public class ConstructionOutsourcingCompanyAggregationService {
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthStart);
 
         // 해당 계약의 모든 공사항목 조회
-        final List<OutsourcingCompanyContractConstruction> allConstructions = outsourcingCompanyContractConstructionRepository
-                .findAllByOutsourcingCompanyContractId(request.outsourcingCompanyContractId());
+        final List<OutsourcingCompanyContractConstruction> allConstructions =
+                outsourcingCompanyContractConstructionRepository
+                        .findAllByOutsourcingCompanyContractId(
+                                request.outsourcingCompanyContractId());
 
         // 조회월 다음달 1일 미만까지의 모든 출역일보 데이터 조회 (마감 상태만)
         final var groups = dailyReportOutsourcingConstructionGroupRepository
-                .findBySiteAndSiteProcessAndContractIdAndReportDateLessThan(
-                        request.siteId(),
-                        request.siteProcessId(),
-                        request.outsourcingCompanyContractId(),
+                .findBySiteAndSiteProcessAndContractIdAndReportDateLessThan(request.siteId(),
+                        request.siteProcessId(), request.outsourcingCompanyContractId(),
                         endExclusive,
                         List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
 
@@ -92,8 +87,8 @@ public class ConstructionOutsourcingCompanyAggregationService {
                 if (construction.getOutsourcingCompanyContractConstruction() == null) {
                     continue;
                 }
-                final OutsourcingCompanyContractConstruction contractConstruction = construction
-                        .getOutsourcingCompanyContractConstruction();
+                final OutsourcingCompanyContractConstruction contractConstruction =
+                        construction.getOutsourcingCompanyContractConstruction();
                 final Long constructionId = contractConstruction.getId();
                 final OffsetDateTime reportDate = group.getDailyReport().getReportDate();
                 final Integer quantity = construction.getQuantity();
@@ -103,9 +98,9 @@ public class ConstructionOutsourcingCompanyAggregationService {
                     continue;
                 }
 
-                final BillingAccumulator accumulator = billingMap.computeIfAbsent(constructionId,
-                        k -> new BillingAccumulator());
-                final long amount = (unitPrice != null ? unitPrice : 0L) * quantity;
+                final BillingAccumulator accumulator =
+                        billingMap.computeIfAbsent(constructionId, k -> new BillingAccumulator());
+                final long amount = (unitPrice != null ? unitPrice : 0L) * quantity.longValue();
 
                 if (reportDate.isBefore(startInclusive)) {
                     accumulator.previousQuantity += quantity;
@@ -118,7 +113,8 @@ public class ConstructionOutsourcingCompanyAggregationService {
         }
 
         // 그룹별로 공사항목 그룹핑
-        final Map<Long, List<OutsourcingCompanyContractConstruction>> constructionsByGroup = new HashMap<>();
+        final Map<Long, List<OutsourcingCompanyContractConstruction>> constructionsByGroup =
+                new HashMap<>();
         for (final OutsourcingCompanyContractConstruction construction : allConstructions) {
             final Long groupId = construction.getConstructionGroup() != null
                     ? construction.getConstructionGroup().getId()
@@ -127,7 +123,8 @@ public class ConstructionOutsourcingCompanyAggregationService {
         }
 
         // 응답 생성 (그룹별로)
-        final List<ConstructionOutsourcingAggregationDetailResponse.ConstructionGroupItem> groupItems = new ArrayList<>();
+        final List<ConstructionOutsourcingAggregationDetailResponse.ConstructionGroupItem> groupItems =
+                new ArrayList<>();
         for (final Map.Entry<Long, List<OutsourcingCompanyContractConstruction>> entry : constructionsByGroup
                 .entrySet()) {
             final List<OutsourcingCompanyContractConstruction> constructions = entry.getValue();
@@ -137,35 +134,41 @@ public class ConstructionOutsourcingCompanyAggregationService {
             final var constructionGroup = firstConstruction.getConstructionGroup();
 
             // 공사항목 목록 생성
-            final List<ConstructionOutsourcingAggregationDetailResponse.ConstructionItem> constructionItems = new ArrayList<>();
+            final List<ConstructionOutsourcingAggregationDetailResponse.ConstructionItem> constructionItems =
+                    new ArrayList<>();
             for (final OutsourcingCompanyContractConstruction construction : constructions) {
-                final BillingAccumulator accumulator = billingMap.getOrDefault(construction.getId(),
-                        new BillingAccumulator());
-                constructionItems.add(new ConstructionOutsourcingAggregationDetailResponse.ConstructionItem(
-                        construction.getId(), // constructionId
-                        construction.getItem(),
-                        construction.getSpecification(),
-                        construction.getUnit(),
-                        construction.getUnitPrice(),
-                        construction.getContractQuantity(),
-                        construction.getContractPrice(),
-                        construction.getOutsourcingContractQuantity(),
-                        construction.getOutsourcingContractUnitPrice(),
-                        construction.getOutsourcingContractPrice(),
-                        new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
-                                accumulator.previousQuantity > 0 ? accumulator.previousQuantity : null,
-                                accumulator.previousAmount > 0 ? accumulator.previousAmount : null),
-                        new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
-                                accumulator.currentQuantity > 0 ? accumulator.currentQuantity : null,
-                                accumulator.currentAmount > 0 ? accumulator.currentAmount : null)));
+                final BillingAccumulator accumulator =
+                        billingMap.getOrDefault(construction.getId(), new BillingAccumulator());
+                constructionItems
+                        .add(new ConstructionOutsourcingAggregationDetailResponse.ConstructionItem(
+                                construction.getId(), // constructionId
+                                construction.getItem(), construction.getSpecification(),
+                                construction.getUnit(), construction.getUnitPrice(),
+                                construction.getContractQuantity(), construction.getContractPrice(),
+                                construction.getOutsourcingContractQuantity(),
+                                construction.getOutsourcingContractUnitPrice(),
+                                construction.getOutsourcingContractPrice(),
+                                new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
+                                        accumulator.previousQuantity > 0
+                                                ? accumulator.previousQuantity
+                                                : null,
+                                        accumulator.previousAmount > 0 ? accumulator.previousAmount
+                                                : null),
+                                new ConstructionOutsourcingAggregationDetailResponse.BillingDetail(
+                                        accumulator.currentQuantity > 0
+                                                ? accumulator.currentQuantity
+                                                : null,
+                                        accumulator.currentAmount > 0 ? accumulator.currentAmount
+                                                : null)));
             }
 
-            groupItems.add(new ConstructionOutsourcingAggregationDetailResponse.ConstructionGroupItem(
-                    constructionGroup != null
-                            ? ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponseForDailyReport
-                                    .from(constructionGroup)
-                            : null,
-                    constructionItems));
+            groupItems
+                    .add(new ConstructionOutsourcingAggregationDetailResponse.ConstructionGroupItem(
+                            constructionGroup != null
+                                    ? ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponseForDailyReport
+                                            .from(constructionGroup)
+                                    : null,
+                            constructionItems));
         }
 
         return new ConstructionOutsourcingAggregationDetailResponse(groupItems);
@@ -184,27 +187,29 @@ public class ConstructionOutsourcingCompanyAggregationService {
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthStart);
 
         // 조회월 다음달 1일 미만까지의 모든 출역일보 데이터 조회 (마감 상태만)
-        final List<DailyReportOutsourcingConstructionGroup> groups = dailyReportOutsourcingConstructionGroupRepository
-                .findBySiteAndSiteProcessAndReportDateLessThan(
-                        request.siteId(),
-                        request.siteProcessId(),
-                        endExclusive,
-                        List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
+        final List<DailyReportOutsourcingConstructionGroup> groups =
+                dailyReportOutsourcingConstructionGroupRepository
+                        .findBySiteAndSiteProcessAndReportDateLessThan(request.siteId(),
+                                request.siteProcessId(), endExclusive,
+                                List.of(DailyReportStatus.COMPLETED,
+                                        DailyReportStatus.AUTO_COMPLETED));
 
         // 외주업체 계약별로 청구내역 집계
         final Map<Long, ContractBillingAccumulator> contractBillingMap = new HashMap<>();
         for (final DailyReportOutsourcingConstructionGroup group : groups) {
             // 계약 정보 가져오기
             if (group.getOutsourcingCompanyContractConstructionGroup() == null
-                    || group.getOutsourcingCompanyContractConstructionGroup().getOutsourcingCompanyContract() == null) {
+                    || group.getOutsourcingCompanyContractConstructionGroup()
+                            .getOutsourcingCompanyContract() == null) {
                 continue;
             }
 
-            final OutsourcingCompanyContract contract = group.getOutsourcingCompanyContractConstructionGroup()
-                    .getOutsourcingCompanyContract();
+            final OutsourcingCompanyContract contract =
+                    group.getOutsourcingCompanyContractConstructionGroup()
+                            .getOutsourcingCompanyContract();
             final Long contractId = contract.getId();
-            final ContractBillingAccumulator accumulator = contractBillingMap.computeIfAbsent(contractId,
-                    k -> new ContractBillingAccumulator(contract));
+            final ContractBillingAccumulator accumulator = contractBillingMap
+                    .computeIfAbsent(contractId, k -> new ContractBillingAccumulator(contract));
 
             final OffsetDateTime reportDate = group.getDailyReport().getReportDate();
             if (reportDate == null) {
@@ -217,8 +222,8 @@ public class ConstructionOutsourcingCompanyAggregationService {
                     continue;
                 }
 
-                final OutsourcingCompanyContractConstruction contractConstruction = construction
-                        .getOutsourcingCompanyContractConstruction();
+                final OutsourcingCompanyContractConstruction contractConstruction =
+                        construction.getOutsourcingCompanyContractConstruction();
                 final Integer quantity = construction.getQuantity();
                 final Long unitPrice = contractConstruction.getOutsourcingContractUnitPrice();
 
@@ -227,7 +232,7 @@ public class ConstructionOutsourcingCompanyAggregationService {
                 }
 
                 // 금액 = 단가 × 수량
-                final long amount = (unitPrice != null ? unitPrice : 0L) * quantity;
+                final long amount = (unitPrice != null ? unitPrice : 0L) * quantity.longValue();
 
                 if (reportDate.isBefore(startInclusive)) {
                     accumulator.previousAmount += amount;
@@ -238,18 +243,16 @@ public class ConstructionOutsourcingCompanyAggregationService {
         }
 
         // 외주업체 계약별로 공제금액 집계
-        for (final Map.Entry<Long, ContractBillingAccumulator> entry : contractBillingMap.entrySet()) {
+        for (final Map.Entry<Long, ContractBillingAccumulator> entry : contractBillingMap
+                .entrySet()) {
             final Long contractId = entry.getKey();
             final ContractBillingAccumulator accumulator = entry.getValue();
 
             // 해당 계약의 공제금액 계산
-            final DeductionAmountAggregationResponse deductionResponse = outsourcingCompanyDeductionAggregationService
-                    .getDeductionAmountAggregation(
-                            new DeductionAmountAggregationRequest(
-                                    request.siteId(),
-                                    request.siteProcessId(),
-                                    request.yearMonth(),
-                                    contractId));
+            final DeductionAmountAggregationResponse deductionResponse =
+                    outsourcingCompanyDeductionAggregationService.getDeductionAmountAggregation(
+                            new DeductionAmountAggregationRequest(request.siteId(),
+                                    request.siteProcessId(), request.yearMonth(), contractId));
 
             // 식대, 간식대, 유류대, 자재비 공제금액 합산
             long previousDeduction = 0L;
@@ -258,7 +261,8 @@ public class ConstructionOutsourcingCompanyAggregationService {
             if (deductionResponse.mealFee() != null) {
                 if (deductionResponse.mealFee().previousBilling() != null
                         && deductionResponse.mealFee().previousBilling().totalAmount() != null) {
-                    previousDeduction += deductionResponse.mealFee().previousBilling().totalAmount();
+                    previousDeduction +=
+                            deductionResponse.mealFee().previousBilling().totalAmount();
                 }
                 if (deductionResponse.mealFee().currentBilling() != null
                         && deductionResponse.mealFee().currentBilling().totalAmount() != null) {
@@ -268,7 +272,8 @@ public class ConstructionOutsourcingCompanyAggregationService {
             if (deductionResponse.snackFee() != null) {
                 if (deductionResponse.snackFee().previousBilling() != null
                         && deductionResponse.snackFee().previousBilling().totalAmount() != null) {
-                    previousDeduction += deductionResponse.snackFee().previousBilling().totalAmount();
+                    previousDeduction +=
+                            deductionResponse.snackFee().previousBilling().totalAmount();
                 }
                 if (deductionResponse.snackFee().currentBilling() != null
                         && deductionResponse.snackFee().currentBilling().totalAmount() != null) {
@@ -278,7 +283,8 @@ public class ConstructionOutsourcingCompanyAggregationService {
             if (deductionResponse.fuelFee() != null) {
                 if (deductionResponse.fuelFee().previousBilling() != null
                         && deductionResponse.fuelFee().previousBilling().totalAmount() != null) {
-                    previousDeduction += deductionResponse.fuelFee().previousBilling().totalAmount();
+                    previousDeduction +=
+                            deductionResponse.fuelFee().previousBilling().totalAmount();
                 }
                 if (deductionResponse.fuelFee().currentBilling() != null
                         && deductionResponse.fuelFee().currentBilling().totalAmount() != null) {
@@ -286,13 +292,15 @@ public class ConstructionOutsourcingCompanyAggregationService {
                 }
             }
             if (deductionResponse.materialCost() != null) {
-                if (deductionResponse.materialCost().previousBilling() != null
-                        && deductionResponse.materialCost().previousBilling().totalAmount() != null) {
-                    previousDeduction += deductionResponse.materialCost().previousBilling().totalAmount();
+                if (deductionResponse.materialCost().previousBilling() != null && deductionResponse
+                        .materialCost().previousBilling().totalAmount() != null) {
+                    previousDeduction +=
+                            deductionResponse.materialCost().previousBilling().totalAmount();
                 }
-                if (deductionResponse.materialCost().currentBilling() != null
-                        && deductionResponse.materialCost().currentBilling().totalAmount() != null) {
-                    currentDeduction += deductionResponse.materialCost().currentBilling().totalAmount();
+                if (deductionResponse.materialCost().currentBilling() != null && deductionResponse
+                        .materialCost().currentBilling().totalAmount() != null) {
+                    currentDeduction +=
+                            deductionResponse.materialCost().currentBilling().totalAmount();
                 }
             }
 
@@ -313,30 +321,23 @@ public class ConstructionOutsourcingCompanyAggregationService {
         }
 
         // 응답 생성
-        final List<ConstructionOutsourcingAggregationResponse.ConstructionOutsourcingAggregationItem> items = contractBillingMap
-                .values()
-                .stream()
-                .filter(acc -> acc.previousAmount > 0 || acc.currentAmount > 0)
-                .map(acc -> {
-                    final ContractListResponse.ContractSimpleResponse contractSimple = ContractListResponse.ContractSimpleResponse
-                            .from(acc.contract);
+        final List<ConstructionOutsourcingAggregationResponse.ConstructionOutsourcingAggregationItem> items =
+                contractBillingMap.values().stream()
+                        .filter(acc -> acc.previousAmount > 0 || acc.currentAmount > 0).map(acc -> {
+                            final ContractListResponse.ContractSimpleResponse contractSimple =
+                                    ContractListResponse.ContractSimpleResponse.from(acc.contract);
 
-                    return new ConstructionOutsourcingAggregationResponse.ConstructionOutsourcingAggregationItem(
-                            contractSimple,
-                            // 전회 청구내역: 값이 없어도 0으로 표시
-                            new ConstructionOutsourcingAggregationResponse.BillingDetail(
-                                    acc.previousSupplyPrice,
-                                    acc.previousVat,
-                                    acc.previousDeduction,
-                                    acc.previousTotal),
-                            // 금회 청구내역: 값이 없어도 0으로 표시
-                            new ConstructionOutsourcingAggregationResponse.BillingDetail(
-                                    acc.currentSupplyPrice,
-                                    acc.currentVat,
-                                    acc.currentDeduction,
-                                    acc.currentTotal));
-                })
-                .toList();
+                            return new ConstructionOutsourcingAggregationResponse.ConstructionOutsourcingAggregationItem(
+                                    contractSimple,
+                                    // 전회 청구내역: 값이 없어도 0으로 표시
+                                    new ConstructionOutsourcingAggregationResponse.BillingDetail(
+                                            acc.previousSupplyPrice, acc.previousVat,
+                                            acc.previousDeduction, acc.previousTotal),
+                                    // 금회 청구내역: 값이 없어도 0으로 표시
+                                    new ConstructionOutsourcingAggregationResponse.BillingDetail(
+                                            acc.currentSupplyPrice, acc.currentVat,
+                                            acc.currentDeduction, acc.currentTotal));
+                        }).toList();
 
         return new ConstructionOutsourcingAggregationResponse(items);
     }
@@ -345,9 +346,9 @@ public class ConstructionOutsourcingCompanyAggregationService {
      * 청구내역 누적을 위한 보조 클래스
      */
     private static final class BillingAccumulator {
-        int previousQuantity = 0;
+        double previousQuantity = 0;
         long previousAmount = 0;
-        int currentQuantity = 0;
+        double currentQuantity = 0;
         long currentAmount = 0;
     }
 

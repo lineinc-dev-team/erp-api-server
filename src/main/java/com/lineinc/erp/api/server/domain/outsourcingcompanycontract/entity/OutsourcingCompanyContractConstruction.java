@@ -2,11 +2,9 @@ package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractConstructionUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,7 +30,8 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
     @Id
     @DiffInclude
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME,
+            allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -53,7 +52,7 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
 
     @DiffInclude
     @Column
-    private Integer contractQuantity; // 도급금액 수량
+    private Double contractQuantity; // 도급금액 수량
 
     @DiffInclude
     @Column
@@ -61,7 +60,7 @@ public class OutsourcingCompanyContractConstruction extends BaseEntity {
 
     @DiffInclude
     @Column
-    private Integer outsourcingContractQuantity; // 외주계약금액 수량
+    private Double outsourcingContractQuantity; // 외주계약금액 수량
 
     @DiffInclude
     @Column

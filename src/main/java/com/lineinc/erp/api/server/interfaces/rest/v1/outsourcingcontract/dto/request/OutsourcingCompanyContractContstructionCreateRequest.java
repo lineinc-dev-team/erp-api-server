@@ -10,11 +10,14 @@ public record OutsourcingCompanyContractContstructionCreateRequest(
         @Schema(description = "규격", example = "C30") @NotBlank String specification,
         @Schema(description = "단위", example = "m³") @NotBlank String unit,
         @Schema(description = "도급단가", example = "50000") @NotNull Long unitPrice,
-        @Schema(description = "도급금액 수량", example = "100") @NotNull Integer contractQuantity,
+        @Schema(description = "도급금액 수량", example = "100.5") @NotNull Double contractQuantity,
         @Schema(description = "도급금액 금액", example = "5000000") @NotNull Long contractPrice,
-        @Schema(description = "외주계약금액 수량", example = "100") @NotNull Integer outsourcingContractQuantity,
-        @Schema(description = "외주계약금액 단가", example = "50000") @NotNull Long outsourcingContractUnitPrice,
-        @Schema(description = "외주계약금액 금액", example = "5000000") @NotNull Long outsourcingContractPrice,
+        @Schema(description = "외주계약금액 수량",
+                example = "100.5") @NotNull Double outsourcingContractQuantity,
+        @Schema(description = "외주계약금액 단가",
+                example = "50000") @NotNull Long outsourcingContractUnitPrice,
+        @Schema(description = "외주계약금액 금액",
+                example = "5000000") @NotNull Long outsourcingContractPrice,
         @Schema(description = "메모", example = "품질관리 특별요구사항") String memo) {
 
 }
