@@ -7,9 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      EC2_USER: ${{ secrets.DEV_EC2_USER }}
-      EC2_HOST: ${{ secrets.DEV_EC2_HOST }}
 
     steps:
       - name: ✅ 체크아웃
@@ -36,6 +33,8 @@ jobs:
       - name: 🚀 배포
         env:
           SSH_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          EC2_USER: ${{ secrets.DEV_EC2_USER }}
+          EC2_HOST: ${{ secrets.DEV_EC2_HOST }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/id_rsa
