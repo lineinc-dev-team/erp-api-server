@@ -39,61 +39,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 📦 JAR 파일 EC2로 전송
+      - name: 📦 배포 파일 전송 (JAR & 스크립트)
         run: |
-          rsync -az build/libs/*.jar ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/app-new.jar
+          chmod +x scripts/deploy.sh
+          rsync -az build/libs/*.jar scripts/deploy.sh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }}:/home/ubuntu/
 
-      - name: 🚀 EC2 무중단 배포
+      - name: 🚀 EC2 무중단 배포 실행
         run: |
-          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} bash -s << 'EOF'
-            set -euo pipefail
-
-            echo "🚀 무중단 배포 시작"
-
-            # JAR 교체
-            mv /home/ubuntu/app-new.jar /home/ubuntu/app-latest.jar
-            [ -f "/home/ubuntu/app-latest.jar" ] || { echo "❌ JAR 없음"; exit 1; }
-
-            # 새/이전 포트 결정
-            if ss -tlnp | grep -q ":8080[[:space:]]"; then
-              NEW_PORT=8081; OLD_PORT=8080
-            else
-              NEW_PORT=8080; OLD_PORT=8081
-            fi
-
-            NEW_APP="app-${NEW_PORT}"
-            OLD_APP="app-${OLD_PORT}"
-            echo "▶ 새 포트: $NEW_PORT, 이전 포트: $OLD_PORT"
-
-            # 새 앱 시작
-            if pm2 list | grep -q "$NEW_APP"; then
-              pm2 restart "$NEW_APP"
-            else
-              pm2 start ecosystem.config.js --only "$NEW_APP"
-            fi
-
-            # 포트 오픈 대기 (최대 60초)
-            for i in {1..20}; do
-              if ss -tlnp | grep -q ":$NEW_PORT[[:space:]]"; then
-                echo "✅ 포트 $NEW_PORT 열림"; break
-              fi
-              sleep 3
-              [ $i -eq 20 ] && { echo "❌ 포트 열림 실패"; pm2 logs "$NEW_APP" --lines 20; exit 1; }
-            done
-
-            # 헬스체크 대기 (최대 60초)
-            for i in {1..20}; do
-              if curl -s --max-time 5 "http://localhost:${NEW_PORT}/actuator/health" | grep -q '"status":"UP"'; then
-                echo "✅ 새 앱 준비 완료"; break
-              fi
-              sleep 3
-              [ $i -eq 20 ] && { echo "❌ 헬스체크 실패"; pm2 logs "$NEW_APP" --lines 20; exit 1; }
-            done
-
-            # 이전 앱 종료
-            pm2 delete "$OLD_APP" 2>/dev/null || true
-
-            # 상태 저장
-            pm2 save --force
-            echo "✅ 무중단 배포 완료"
-          EOF
+          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} "bash /home/ubuntu/deploy.sh"
