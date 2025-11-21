@@ -5,7 +5,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
@@ -50,7 +48,6 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -73,29 +70,25 @@ public class LaborPayrollService {
      * 노무명세서 월별 집계 목록 조회 (페이징)
      * 사전에 계산된 집계 테이블에서 현장, 공정별 통계 정보 조회
      */
-    public PagingResponse<LaborPayrollSummaryResponse> getLaborPayrollMonthlyList(
-            final Long userId,
-            final LaborPayrollSearchRequest request, final PageRequest pageRequest, final SortRequest sortRequest) {
+    public PagingResponse<LaborPayrollSummaryResponse> getLaborPayrollMonthlyList(final Long userId,
+            final LaborPayrollSearchRequest request, final PageRequest pageRequest,
+            final SortRequest sortRequest) {
 
         final User user = userService.getUserByIdOrThrow(userId);
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
 
         // 페이징 및 정렬 처리
-        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                sortRequest.sort());
+        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
+                pageRequest.size(), sortRequest.sort());
 
         // 집계 테이블에서 조건에 맞는 데이터 조회
-        final Page<LaborPayrollSummary> summaryPage = laborPayrollSummaryRepository.findBySearchCondition(
-                request.siteName(),
-                request.processName(),
-                request.yearMonth(),
-                pageable,
-                accessibleSiteIds);
+        final Page<LaborPayrollSummary> summaryPage =
+                laborPayrollSummaryRepository.findBySearchCondition(request.siteName(),
+                        request.processName(), request.yearMonth(), pageable, accessibleSiteIds);
 
         // 엔티티를 DTO로 변환
         final List<LaborPayrollSummaryResponse> responseList = summaryPage.getContent().stream()
-                .map(LaborPayrollSummaryResponse::from)
-                .collect(Collectors.toList());
+                .map(LaborPayrollSummaryResponse::from).collect(Collectors.toList());
 
         return new PagingResponse<>(PagingInfo.from(summaryPage), responseList);
     }
@@ -105,30 +98,23 @@ public class LaborPayrollService {
      * 검색 조건에 맞는 노무명세서 목록을 엑셀로 내보내기
      */
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final CustomUserDetails user, final LaborPayrollSearchRequest request,
-            final Sort sort, final List<String> fields) {
+    public Workbook downloadExcel(final CustomUserDetails user,
+            final LaborPayrollSearchRequest request, final Sort sort, final List<String> fields) {
         final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
 
-        final List<LaborPayrollSummaryResponse> responses = laborPayrollSummaryRepository
-                .findAllWithoutPaging(request, sort, accessibleSiteIds)
-                .stream()
-                .map(LaborPayrollSummaryResponse::from)
-                .toList();
+        final List<LaborPayrollSummaryResponse> responses =
+                laborPayrollSummaryRepository.findAllWithoutPaging(request, sort, accessibleSiteIds)
+                        .stream().map(LaborPayrollSummaryResponse::from).toList();
 
-        final Workbook workbook = ExcelExportUtils.generateWorkbook(
-                responses,
-                fields,
-                this::getExcelHeaderName,
-                this::getExcelCellValue);
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(responses, fields,
+                this::getExcelHeaderName, this::getExcelCellValue);
 
         final String fileUrl = s3FileService.uploadExcelToS3(workbook,
                 ExcelDownloadHistoryType.LABOR_PAYROLL.name());
 
-        excelDownloadHistoryService.recordDownload(
-                ExcelDownloadHistoryType.LABOR_PAYROLL,
-                userService.getUserByIdOrThrow(user.getUserId()),
-                fileUrl);
+        excelDownloadHistoryService.recordDownload(ExcelDownloadHistoryType.LABOR_PAYROLL,
+                userService.getUserByIdOrThrow(user.getUserId()), fileUrl);
 
         return workbook;
     }
@@ -157,11 +143,13 @@ public class LaborPayrollService {
     /**
      * 엑셀 셀 값 추출
      */
-    private String getExcelCellValue(final LaborPayrollSummaryResponse response, final String field) {
+    private String getExcelCellValue(final LaborPayrollSummaryResponse response,
+            final String field) {
         return switch (field) {
             case "id" -> response.id() != null ? response.id().toString() : "";
             case "siteName" -> response.site() != null ? response.site().name() : "";
-            case "processName" -> response.siteProcess() != null ? response.siteProcess().name() : "";
+            case "processName" -> response.siteProcess() != null ? response.siteProcess().name()
+                    : "";
             case "regularEmployeeCount" -> {
                 if (response.regularEmployeeCount() != null) {
                     yield NumberFormat.getNumberInstance().format(response.regularEmployeeCount());
@@ -213,26 +201,43 @@ public class LaborPayrollService {
     /**
      * 노무명세서 상세 조회
      * 현장 ID, 공정 ID, 년월, 노무인력 타입으로 필터링하여 노무명세서 상세 정보를 조회
+     * 주민번호순으로 정렬 (나이 많은 사람이 위로)
      */
     @Transactional(readOnly = true)
-    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(final Long siteId, final Long siteProcessId,
-            final String yearMonth,
-            final LaborType type) {
+    public List<LaborPayrollDetailResponse> getLaborPayrollDetails(final Long siteId,
+            final Long siteProcessId, final String yearMonth, final LaborType type) {
         List<LaborPayroll> laborPayrolls;
 
         if (type == null) {
             // type이 null이면 전체 조회
-            laborPayrolls = laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonth(siteId, siteProcessId,
-                    yearMonth);
+            laborPayrolls = laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonth(siteId,
+                    siteProcessId, yearMonth);
         } else {
             // type이 지정되면 해당 타입만 조회
-            laborPayrolls = laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonthAndLaborType(siteId,
-                    siteProcessId, yearMonth, type);
+            laborPayrolls =
+                    laborPayrollRepository.findBySiteIdAndSiteProcessIdAndYearMonthAndLaborType(
+                            siteId, siteProcessId, yearMonth, type);
         }
 
-        return laborPayrolls.stream()
-                .map(LaborPayrollDetailResponse::from)
-                .toList();
+        return laborPayrolls.stream().sorted((lp1, lp2) -> {
+            // 주민번호 기준으로 정렬 (나이 많은 사람이 위로)
+            final String rn1 = lp1.getLabor() != null ? lp1.getLabor().getResidentNumber() : null;
+            final String rn2 = lp2.getLabor() != null ? lp2.getLabor().getResidentNumber() : null;
+
+            // 주민번호가 없는 경우 맨 뒤로
+            if (rn1 == null && rn2 == null) {
+                return 0;
+            }
+            if (rn1 == null) {
+                return 1;
+            }
+            if (rn2 == null) {
+                return -1;
+            }
+
+            // 주민번호 앞 6자리(생년월일) 비교
+            return rn1.compareTo(rn2);
+        }).map(LaborPayrollDetailResponse::from).toList();
     }
 
     /**
@@ -253,14 +258,15 @@ public class LaborPayrollService {
      * 집계 테이블의 비고 필드만 수정 가능
      */
     @Transactional
-    public void updateLaborPayrollSummary(final Long id, final LaborPayrollSummaryUpdateRequest request,
-            final Long userId) {
+    public void updateLaborPayrollSummary(final Long id,
+            final LaborPayrollSummaryUpdateRequest request, final Long userId) {
         final LaborPayrollSummary summary = laborPayrollSummaryRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.LABOR_PAYROLL_SUMMARY_NOT_FOUND));
 
         // 변경 전 스냅샷 생성
-        final LaborPayrollSummary oldSnapshot = JaversUtils.createSnapshot(javers, summary, LaborPayrollSummary.class);
+        final LaborPayrollSummary oldSnapshot =
+                JaversUtils.createSnapshot(javers, summary, LaborPayrollSummary.class);
 
         // memo 필드 수정
         summary.setMemo(request.memo());
@@ -268,16 +274,15 @@ public class LaborPayrollService {
 
         // 변경 이력 저장
         final Diff diff = javers.compare(oldSnapshot, summary);
-        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final List<Map<String, String>> simpleChanges =
+                JaversUtils.extractModifiedChanges(javers, diff);
         final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            final LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
-                    .type(LaborPayrollChangeType.BASIC)
-                    .changes(changesJson)
-                    .laborPayrollSummary(summary)
-                    .user(userService.getUserByIdOrThrow(userId))
-                    .build();
+            final LaborPayrollChangeHistory changeHistory =
+                    LaborPayrollChangeHistory.builder().type(LaborPayrollChangeType.BASIC)
+                            .changes(changesJson).laborPayrollSummary(summary)
+                            .user(userService.getUserByIdOrThrow(userId)).build();
             laborPayrollChangeHistoryRepository.save(changeHistory);
         }
     }
@@ -293,7 +298,8 @@ public class LaborPayrollService {
                         ValidationMessages.LABOR_PAYROLL_NOT_FOUND));
 
         // 변경 전 스냅샷 생성
-        final LaborPayroll oldSnapshot = JaversUtils.createSnapshot(javers, laborPayroll, LaborPayroll.class);
+        final LaborPayroll oldSnapshot =
+                JaversUtils.createSnapshot(javers, laborPayroll, LaborPayroll.class);
 
         // 엔티티의 updateFrom 메서드로 필드 업데이트
         laborPayroll.updateFrom(info);
@@ -302,23 +308,20 @@ public class LaborPayrollService {
 
         // 변경 이력 저장
         final Diff diff = javers.compare(oldSnapshot, laborPayroll);
-        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final List<Map<String, String>> simpleChanges =
+                JaversUtils.extractModifiedChanges(javers, diff);
         final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
             // 해당하는 LaborPayrollSummary 찾기
             final LaborPayrollSummary summary = laborPayrollSummaryRepository
-                    .findBySiteAndSiteProcessAndYearMonth(
-                            laborPayroll.getSite(),
-                            laborPayroll.getSiteProcess(),
-                            laborPayroll.getYearMonth())
+                    .findBySiteAndSiteProcessAndYearMonth(laborPayroll.getSite(),
+                            laborPayroll.getSiteProcess(), laborPayroll.getYearMonth())
                     .orElse(null);
 
-            final LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
-                    .type(LaborPayrollChangeType.LABOR_PAYROLL)
-                    .changes(changesJson)
-                    .laborPayrollSummary(summary)
-                    .build();
+            final LaborPayrollChangeHistory changeHistory =
+                    LaborPayrollChangeHistory.builder().type(LaborPayrollChangeType.LABOR_PAYROLL)
+                            .changes(changesJson).laborPayrollSummary(summary).build();
             laborPayrollChangeHistoryRepository.save(changeHistory);
         }
     }
@@ -339,7 +342,8 @@ public class LaborPayrollService {
                             ValidationMessages.LABOR_PAYROLL_NOT_FOUND));
 
             // 변경 전 스냅샷 생성
-            final LaborPayroll oldSnapshot = JaversUtils.createSnapshot(javers, laborPayroll, LaborPayroll.class);
+            final LaborPayroll oldSnapshot =
+                    JaversUtils.createSnapshot(javers, laborPayroll, LaborPayroll.class);
 
             // 엔티티의 updateFrom 메서드로 필드 업데이트
             laborPayroll.updateFrom(laborPayrollInfo);
@@ -348,25 +352,22 @@ public class LaborPayrollService {
 
             // 변경 이력 저장
             final Diff diff = javers.compare(oldSnapshot, laborPayroll);
-            final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+            final List<Map<String, String>> simpleChanges =
+                    JaversUtils.extractModifiedChanges(javers, diff);
             final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
             if (!simpleChanges.isEmpty()) {
                 // 해당하는 LaborPayrollSummary 찾기
                 final LaborPayrollSummary summary = laborPayrollSummaryRepository
-                        .findBySiteAndSiteProcessAndYearMonth(
-                                laborPayroll.getSite(),
-                                laborPayroll.getSiteProcess(),
-                                laborPayroll.getYearMonth())
+                        .findBySiteAndSiteProcessAndYearMonth(laborPayroll.getSite(),
+                                laborPayroll.getSiteProcess(), laborPayroll.getYearMonth())
                         .orElse(null);
 
                 final LaborPayrollChangeHistory changeHistory = LaborPayrollChangeHistory.builder()
-                        .type(LaborPayrollChangeType.LABOR_PAYROLL)
-                        .changes(changesJson)
+                        .type(LaborPayrollChangeType.LABOR_PAYROLL).changes(changesJson)
                         .laborPayrollSummary(summary)
                         .description(generateLaborDescription(laborPayroll))
-                        .user(userService.getUserByIdOrThrow(userId))
-                        .build();
+                        .user(userService.getUserByIdOrThrow(userId)).build();
                 laborPayrollChangeHistoryRepository.save(changeHistory);
             }
         }
@@ -390,44 +391,33 @@ public class LaborPayrollService {
                         ValidationMessages.LABOR_PAYROLL_NOT_FOUND));
 
         // 해당 현장/공정/년월의 모든 노무명세서 조회
-        final List<LaborPayroll> allPayrolls = laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(
-                firstPayroll.getSite(),
-                firstPayroll.getSiteProcess(),
-                firstPayroll.getYearMonth());
+        final List<LaborPayroll> allPayrolls =
+                laborPayrollRepository.findBySiteAndSiteProcessAndYearMonth(firstPayroll.getSite(),
+                        firstPayroll.getSiteProcess(), firstPayroll.getYearMonth());
 
         // 집계 계산
-        final BigDecimal totalLaborCost = allPayrolls.stream()
-                .map(LaborPayroll::getTotalLaborCost)
-                .filter(cost -> cost != null)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        final BigDecimal totalLaborCost = allPayrolls.stream().map(LaborPayroll::getTotalLaborCost)
+                .filter(cost -> cost != null).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         final BigDecimal totalDeductions = allPayrolls.stream()
-                .map(LaborPayroll::getTotalDeductions)
-                .filter(deductions -> deductions != null)
+                .map(LaborPayroll::getTotalDeductions).filter(deductions -> deductions != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        final BigDecimal totalNetPayment = allPayrolls.stream()
-                .map(LaborPayroll::getNetPayment)
-                .filter(payment -> payment != null)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        final BigDecimal totalNetPayment = allPayrolls.stream().map(LaborPayroll::getNetPayment)
+                .filter(payment -> payment != null).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // 집계 테이블 업데이트
-        final var existingSummary = laborPayrollSummaryRepository.findBySiteAndSiteProcessAndYearMonth(
-                firstPayroll.getSite(),
-                firstPayroll.getSiteProcess(),
-                firstPayroll.getYearMonth());
+        final var existingSummary = laborPayrollSummaryRepository
+                .findBySiteAndSiteProcessAndYearMonth(firstPayroll.getSite(),
+                        firstPayroll.getSiteProcess(), firstPayroll.getYearMonth());
 
         if (existingSummary.isPresent()) {
             final LaborPayrollSummary summary = existingSummary.get();
-            summary.updateSummary(
-                    summary.getRegularEmployeeCount(), // 기존 값 유지
+            summary.updateSummary(summary.getRegularEmployeeCount(), // 기존 값 유지
                     summary.getDirectContractCount(), // 기존 값 유지
                     summary.getOutsourcingCount(), // 기존 값 유지
                     summary.getEtcCount(), // 기존 값 유지
-                    totalLaborCost,
-                    totalDeductions,
-                    totalNetPayment,
-                    summary.getMemo()); // 기존 비고 유지
+                    totalLaborCost, totalDeductions, totalNetPayment, summary.getMemo()); // 기존 비고 유지
             laborPayrollSummaryRepository.save(summary);
         }
     }
@@ -441,7 +431,8 @@ public class LaborPayrollService {
             final Long laborPayrollSummaryId, final Pageable pageable, final Long userId) {
         final Slice<LaborPayrollChangeHistory> changeHistories = laborPayrollChangeHistoryRepository
                 .findBySummaryId(laborPayrollSummaryId, pageable);
-        return changeHistories.map(history -> LaborPayrollChangeHistoryResponse.from(history, userId));
+        return changeHistories
+                .map(history -> LaborPayrollChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -451,10 +442,13 @@ public class LaborPayrollService {
     @Transactional(readOnly = true)
     public Page<LaborPayrollChangeHistoryResponse> getLaborPayrollChangeHistoriesWithPaging(
             final Long laborPayrollSummaryId, final Pageable pageable, final Long userId) {
-        final LaborPayrollSummary laborPayrollSummary = getLaborPayrollSummaryByIdOrThrow(laborPayrollSummaryId);
-        final Page<LaborPayrollChangeHistory> changeHistoryPage = laborPayrollChangeHistoryRepository
-                .findBySummaryIdWithPaging(laborPayrollSummary, pageable);
-        return changeHistoryPage.map(history -> LaborPayrollChangeHistoryResponse.from(history, userId));
+        final LaborPayrollSummary laborPayrollSummary =
+                getLaborPayrollSummaryByIdOrThrow(laborPayrollSummaryId);
+        final Page<LaborPayrollChangeHistory> changeHistoryPage =
+                laborPayrollChangeHistoryRepository.findBySummaryIdWithPaging(laborPayrollSummary,
+                        pageable);
+        return changeHistoryPage
+                .map(history -> LaborPayrollChangeHistoryResponse.from(history, userId));
     }
 
     /**
@@ -463,9 +457,10 @@ public class LaborPayrollService {
     @Transactional
     public void updateLaborPayrollChangeHistory(final Long changeHistoryId,
             final LaborPayrollChangeHistoryUpdateRequest request) {
-        final LaborPayrollChangeHistory changeHistory = laborPayrollChangeHistoryRepository.findById(changeHistoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.CHANGE_HISTORY_NOT_FOUND));
+        final LaborPayrollChangeHistory changeHistory =
+                laborPayrollChangeHistoryRepository.findById(changeHistoryId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                ValidationMessages.CHANGE_HISTORY_NOT_FOUND));
 
         // memo 필드 수정
         changeHistory.setMemo(request.memo());
@@ -478,11 +473,10 @@ public class LaborPayrollService {
      */
     @Transactional(readOnly = true)
     public List<LaborPayrollHistoryResponse> getLaborPayrollsByLaborId(final Long laborId) {
-        final List<LaborPayroll> laborPayrolls = laborPayrollRepository.findByLaborIdOrderByYearMonthDesc(laborId);
+        final List<LaborPayroll> laborPayrolls =
+                laborPayrollRepository.findByLaborIdOrderByYearMonthDesc(laborId);
 
-        return laborPayrolls.stream()
-                .map(LaborPayrollHistoryResponse::from)
-                .toList();
+        return laborPayrolls.stream().map(LaborPayrollHistoryResponse::from).toList();
     }
 
     /**
@@ -490,20 +484,20 @@ public class LaborPayrollService {
      * 특정 노무인력의 명세서를 페이징하여 조회 (연월, 현장, 공정 정보 포함)
      */
     @Transactional(readOnly = true)
-    public Page<LaborPayrollHistoryResponse> getLaborPayrollsByLaborId(final Long laborId, final Pageable pageable) {
-        final Page<LaborPayroll> laborPayrollsPage = laborPayrollRepository.findByLaborIdOrderByYearMonthDesc(laborId,
-                pageable);
+    public Page<LaborPayrollHistoryResponse> getLaborPayrollsByLaborId(final Long laborId,
+            final Pageable pageable) {
+        final Page<LaborPayroll> laborPayrollsPage =
+                laborPayrollRepository.findByLaborIdOrderByYearMonthDesc(laborId, pageable);
 
         final List<LaborPayrollHistoryResponse> responses = laborPayrollsPage.getContent().stream()
-                .map(LaborPayrollHistoryResponse::from)
-                .toList();
+                .map(LaborPayrollHistoryResponse::from).toList();
 
         return new PageImpl<>(responses, pageable, laborPayrollsPage.getTotalElements());
     }
 
     /**
      * 노무명세서의 인력 이름과 단가 정보를 생성합니다.
-     * 
+     *
      * @param laborPayroll 노무명세서
      * @return 인력 이름과 단가 정보 문자열
      */
