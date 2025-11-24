@@ -3,13 +3,11 @@ package com.lineinc.erp.api.server.domain.dailyreport.repository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
-
 import com.lineinc.erp.api.server.domain.dailyreport.entity.QDailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
@@ -22,7 +20,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -35,17 +32,14 @@ public class DailyReportRepositoryImpl implements DailyReportRepositoryCustom {
     private final QSiteProcess siteProcess = QSiteProcess.siteProcess;
 
     // 정렬 가능한 필드 매핑
-    private final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
-            "id", dailyReport.id,
-            "reportDate", dailyReport.reportDate,
-            "createdAt", dailyReport.createdAt,
-            "updatedAt", dailyReport.updatedAt,
-            "completedAt", dailyReport.completedAt);
+    private final Map<String, ComparableExpressionBase<?>> SORT_FIELDS =
+            Map.of("id", dailyReport.id, "reportDate", dailyReport.reportDate, "createdAt",
+                    dailyReport.createdAt, "updatedAt", dailyReport.updatedAt, "completedAt",
+                    dailyReport.completedAt);
 
     @Override
     public Page<DailyReportListResponse> findAllBySearchConditions(
-            final DailyReportListSearchRequest request,
-            final Pageable pageable,
+            final DailyReportListSearchRequest request, final Pageable pageable,
             final List<Long> accessibleSiteIds) {
 
         // 동적 검색 조건 생성
@@ -62,28 +56,16 @@ public class DailyReportRepositoryImpl implements DailyReportRepositoryCustom {
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         // 데이터 조회
-        final List<DailyReportListResponse> content = queryFactory
-                .select(dailyReport)
-                .from(dailyReport)
-                .leftJoin(dailyReport.site, site).fetchJoin()
-                .leftJoin(dailyReport.siteProcess, siteProcess).fetchJoin()
-                .where(condition)
-                .orderBy(orders)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch()
-                .stream()
-                .map(DailyReportListResponse::from)
-                .toList();
+        final List<DailyReportListResponse> content = queryFactory.select(dailyReport)
+                .from(dailyReport).leftJoin(dailyReport.site, site).fetchJoin()
+                .leftJoin(dailyReport.siteProcess, siteProcess).fetchJoin().where(condition)
+                .orderBy(orders).offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch()
+                .stream().map(DailyReportListResponse::from).toList();
 
         // 전체 개수 조회
-        final Long total = queryFactory
-                .select(dailyReport.count())
-                .from(dailyReport)
-                .leftJoin(dailyReport.site, site)
-                .leftJoin(dailyReport.siteProcess, siteProcess)
-                .where(condition)
-                .fetchOne();
+        final Long total = queryFactory.select(dailyReport.count()).from(dailyReport)
+                .leftJoin(dailyReport.site, site).leftJoin(dailyReport.siteProcess, siteProcess)
+                .where(condition).fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
@@ -101,27 +83,31 @@ public class DailyReportRepositoryImpl implements DailyReportRepositoryCustom {
 
         // 공정명 검색
         if (StringUtils.hasText(request.processName())) {
-            condition = condition.and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
+            condition = condition
+                    .and(siteProcess.name.containsIgnoreCase(request.processName().trim()));
         }
 
         // 시작일 필터
         if (request.startDate() != null) {
-            final OffsetDateTime startDateTime = DateTimeFormatUtils.toUtcStartOfDay(request.startDate());
+            final OffsetDateTime startDateTime =
+                    DateTimeFormatUtils.toUtcStartOfDay(request.startDate());
             condition = condition.and(dailyReport.reportDate.goe(startDateTime));
         }
 
         // 종료일 필터
         if (request.endDate() != null) {
-            final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcEndOfDay(request.endDate());
-            condition = condition.and(dailyReport.reportDate.loe(endDateTime));
+            // endDate의 다음날 00:00:00 UTC를 기준으로 lt(less than) 비교
+            // 예: endDate가 2025-08-01이면 2025-08-02 00:00:00 KST (2025-08-01 15:00:00 UTC) 미만까지만 조회
+            final OffsetDateTime endDateTime =
+                    DateTimeFormatUtils.toUtcStartOfDay(request.endDate().plusDays(1));
+            condition = condition.and(dailyReport.reportDate.lt(endDateTime));
         }
 
         // 마감 여부 필터
         if (request.isCompleted() != null) {
             if (request.isCompleted()) {
-                condition = condition.and(
-                        dailyReport.status.eq(DailyReportStatus.COMPLETED)
-                                .or(dailyReport.status.eq(DailyReportStatus.AUTO_COMPLETED)));
+                condition = condition.and(dailyReport.status.eq(DailyReportStatus.COMPLETED)
+                        .or(dailyReport.status.eq(DailyReportStatus.AUTO_COMPLETED)));
             } else {
                 condition = condition.and(dailyReport.status.eq(DailyReportStatus.PENDING));
             }
@@ -133,22 +119,20 @@ public class DailyReportRepositoryImpl implements DailyReportRepositoryCustom {
         if (request.isEvidenceSubmitted() != null) {
             if (request.isEvidenceSubmitted()) {
                 // 하나라도 false면 조회됨
-                condition = condition.and(
-                        dailyReport.employeeEvidenceSubmitted.eq(false)
-                                .or(dailyReport.directContractEvidenceSubmitted.eq(false))
-                                .or(dailyReport.outsourcingEvidenceSubmitted.eq(false))
-                                .or(dailyReport.equipmentEvidenceSubmitted.eq(false))
-                                .or(dailyReport.fuelEvidenceSubmitted.eq(false))
-                                .or(dailyReport.sitePhotoSubmitted.eq(false)));
+                condition = condition.and(dailyReport.employeeEvidenceSubmitted.eq(false)
+                        .or(dailyReport.directContractEvidenceSubmitted.eq(false))
+                        .or(dailyReport.outsourcingEvidenceSubmitted.eq(false))
+                        .or(dailyReport.equipmentEvidenceSubmitted.eq(false))
+                        .or(dailyReport.fuelEvidenceSubmitted.eq(false))
+                        .or(dailyReport.sitePhotoSubmitted.eq(false)));
             } else {
                 // 모두 true여야 조회됨
-                condition = condition.and(
-                        dailyReport.employeeEvidenceSubmitted.eq(true)
-                                .and(dailyReport.directContractEvidenceSubmitted.eq(true))
-                                .and(dailyReport.outsourcingEvidenceSubmitted.eq(true))
-                                .and(dailyReport.equipmentEvidenceSubmitted.eq(true))
-                                .and(dailyReport.fuelEvidenceSubmitted.eq(true))
-                                .and(dailyReport.sitePhotoSubmitted.eq(true)));
+                condition = condition.and(dailyReport.employeeEvidenceSubmitted.eq(true)
+                        .and(dailyReport.directContractEvidenceSubmitted.eq(true))
+                        .and(dailyReport.outsourcingEvidenceSubmitted.eq(true))
+                        .and(dailyReport.equipmentEvidenceSubmitted.eq(true))
+                        .and(dailyReport.fuelEvidenceSubmitted.eq(true))
+                        .and(dailyReport.sitePhotoSubmitted.eq(true)));
             }
         }
 
