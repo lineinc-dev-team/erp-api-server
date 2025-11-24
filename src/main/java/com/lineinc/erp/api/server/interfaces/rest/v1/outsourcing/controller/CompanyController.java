@@ -263,11 +263,12 @@ public class CompanyController extends BaseController {
     @GetMapping("/{id}/contract-construction-groups")
     public ResponseEntity<SuccessResponse<SliceResponse<ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse>>> getContractConstructionGroupsByCompany(
             @PathVariable final Long id, @RequestParam(required = false) final Long siteId,
+            @RequestParam(required = false) final String keyword,
             @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest) {
         final Slice<ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse> slice =
                 outsourcingCompanyContractService.getContractConstructionGroupsByCompany(id, siteId,
-                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                                sortRequest.sort()));
+                        keyword, PageableUtils.createPageable(pageRequest.page(),
+                                pageRequest.size(), sortRequest.sort()));
         return ResponseEntity.ok(
                 SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }

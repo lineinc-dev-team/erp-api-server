@@ -676,12 +676,17 @@ public class OutsourcingCompanyContractService {
      */
     @Transactional(readOnly = true)
     public Slice<ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse> getContractConstructionGroupsByCompany(
-            final Long companyId, final Long siteId, final Pageable pageable) {
+            final Long companyId, final Long siteId, final String keyword,
+            final Pageable pageable) {
         final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId, null);
 
-        // 계약 ID들로 공사항목 그룹 조회
+        // 키워드 정리 (null 또는 빈 문자열이면 null로 변환)
+        final String searchKeyword =
+                (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+
+        // 계약 ID들로 공사항목 그룹 조회 (키워드 포함)
         final Page<OutsourcingCompanyContractConstructionGroup> page = constructionGroupRepository
-                .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
+                .findByContractIdsAndKeyword(contractIds, searchKeyword, pageable);
         return page.map(
                 group -> ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse
                         .from(group));
