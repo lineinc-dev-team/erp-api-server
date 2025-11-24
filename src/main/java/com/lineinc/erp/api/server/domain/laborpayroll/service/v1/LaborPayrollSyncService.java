@@ -421,39 +421,48 @@ public class LaborPayrollSyncService {
 
     /**
      * 노무비 명세서 목록으로부터 집계 데이터 계산
+     * - 정직원: 집계 제외 (0으로 설정)
+     * - 직영: DIRECT_CONTRACT만 집계
+     * - 용역: OUTSOURCING만 집계
+     * - 기타: 집계 제외 (0으로 설정)
+     * - 금액: 직영과 용역만 집계
      */
     private SummaryData calculateSummaryData(final List<LaborPayroll> payrolls) {
-        // 인력 타입별 고유 인력 수 집계
-        final Map<LaborType, Long> laborTypeCount = payrolls.stream()
+        // 직영과 용역만 필터링
+        final List<LaborPayroll> filteredPayrolls = payrolls.stream()
+                .filter(payroll -> payroll.getLabor().getType() == LaborType.DIRECT_CONTRACT
+                        || payroll.getLabor().getType() == LaborType.OUTSOURCING)
+                .toList();
+
+        // 인력 타입별 고유 인력 수 집계 (직영, 용역만)
+        final Map<LaborType, Long> laborTypeCount = filteredPayrolls.stream()
                 .collect(Collectors.groupingBy(payroll -> payroll.getLabor().getType(),
                         Collectors.mapping(payroll -> payroll.getLabor().getId(),
                                 Collectors.toSet())))
                 .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
                         entry -> (long) entry.getValue().size()));
 
-        // 금액 집계
-        final BigDecimal totalLaborCost = payrolls.stream().map(LaborPayroll::getTotalLaborCost)
-                .filter(cost -> cost != null).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 금액 집계 (직영, 용역만)
+        final BigDecimal totalLaborCost =
+                filteredPayrolls.stream().map(LaborPayroll::getTotalLaborCost)
+                        .filter(cost -> cost != null).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        final BigDecimal totalDeductions = payrolls.stream().map(LaborPayroll::getTotalDeductions)
-                .filter(deductions -> deductions != null).reduce(BigDecimal.ZERO, BigDecimal::add);
+        final BigDecimal totalDeductions = filteredPayrolls.stream()
+                .map(LaborPayroll::getTotalDeductions).filter(deductions -> deductions != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        final BigDecimal totalNetPayment = payrolls.stream().map(LaborPayroll::getNetPayment)
-                .filter(payment -> payment != null).reduce(BigDecimal.ZERO, BigDecimal::add);
+        final BigDecimal totalNetPayment = filteredPayrolls.stream()
+                .map(LaborPayroll::getNetPayment).filter(payment -> payment != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // 집계 데이터 반환
-        final Integer regularEmployeeCount =
-                laborTypeCount.getOrDefault(LaborType.REGULAR_EMPLOYEE, 0L).intValue();
+        // 정직원과 기타는 0으로 설정 (집계 제외)
+        final Integer regularEmployeeCount = 0;
         final Integer directContractCount =
                 laborTypeCount.getOrDefault(LaborType.DIRECT_CONTRACT, 0L).intValue();
         final Integer outsourcingCount =
                 laborTypeCount.getOrDefault(LaborType.OUTSOURCING, 0L).intValue();
-        final long etcCountLong = laborTypeCount.entrySet().stream()
-                .filter(entry -> entry.getKey() != LaborType.REGULAR_EMPLOYEE
-                        && entry.getKey() != LaborType.DIRECT_CONTRACT
-                        && entry.getKey() != LaborType.OUTSOURCING)
-                .mapToLong(Map.Entry::getValue).sum();
-        final Integer etcCount = Math.toIntExact(etcCountLong);
+        final Integer etcCount = 0;
 
         return new SummaryData(regularEmployeeCount, directContractCount, outsourcingCount,
                 etcCount, totalLaborCost, totalDeductions, totalNetPayment);
