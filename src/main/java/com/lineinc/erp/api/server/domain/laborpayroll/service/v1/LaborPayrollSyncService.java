@@ -105,12 +105,15 @@ public class LaborPayrollSyncService {
         final int year = Integer.parseInt(parts[0]);
         final int month = Integer.parseInt(parts[1]);
         final LocalDate startDate = LocalDate.of(year, month, 1);
-        final LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        // 다음 달 1일로 설정 (< 조건 사용)
+        final LocalDate nextMonthFirstDate = startDate.plusMonths(1);
 
         final OffsetDateTime startDateTime = DateTimeFormatUtils.toUtcStartOfDay(startDate);
-        final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcEndOfDay(endDate);
+        // 다음 달 1일 00:00:00 (미포함)
+        final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcStartOfDay(nextMonthFirstDate);
 
         // 같은 현장, 공정의 해당 월 출역일보 모두 조회 (마감 상태만)
+        // startDate <= reportDate < endDateTime (다음 달 1일 00:00:00 미포함)
         return dailyReportRepository.findBySiteAndSiteProcessAndReportDateBetween(
                 triggerReport.getSite(), triggerReport.getSiteProcess(), startDateTime, endDateTime,
                 List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
