@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
@@ -81,7 +79,6 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -120,7 +117,8 @@ public class OutsourcingCompanyContractService {
     /**
      * 외주업체 계약을 생성합니다.
      */
-    public void createContract(final OutsourcingCompanyContractCreateRequest request, final Long userId) {
+    public void createContract(final OutsourcingCompanyContractCreateRequest request,
+            final Long userId) {
         log.info("외주업체 계약 생성 시작: {}", request);
 
         // 1. 기본 계약 정보 생성
@@ -161,45 +159,43 @@ public class OutsourcingCompanyContractService {
         // 8. 계약 이력 생성
         createContractHistory(contract);
 
-        final OutsourcingCompanyContractChangeHistory changeHistory = OutsourcingCompanyContractChangeHistory.builder()
-                .outsourcingCompanyContract(contract)
-                .description(ValidationMessages.INITIAL_CREATION)
-                .user(userService.getUserByIdOrThrow(userId))
-                .build();
+        final OutsourcingCompanyContractChangeHistory changeHistory =
+                OutsourcingCompanyContractChangeHistory.builder()
+                        .outsourcingCompanyContract(contract)
+                        .description(ValidationMessages.INITIAL_CREATION)
+                        .user(userService.getUserByIdOrThrow(userId)).build();
         contractChangeHistoryRepository.save(changeHistory);
     }
 
     /**
      * 기본 계약 정보를 생성합니다.
      */
-    private OutsourcingCompanyContract createMainContract(final OutsourcingCompanyContractCreateRequest request) {
+    private OutsourcingCompanyContract createMainContract(
+            final OutsourcingCompanyContractCreateRequest request) {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        final SiteProcess siteProcess =
+                siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                 .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
 
-        final OffsetDateTime contractStartDate = DateTimeFormatUtils.toOffsetDateTime(request.contractStartDate());
-        final OffsetDateTime contractEndDate = DateTimeFormatUtils.toOffsetDateTime(request.contractEndDate());
+        final OffsetDateTime contractStartDate =
+                DateTimeFormatUtils.toOffsetDateTime(request.contractStartDate());
+        final OffsetDateTime contractEndDate =
+                DateTimeFormatUtils.toOffsetDateTime(request.contractEndDate());
 
         final OutsourcingCompanyContract contract = OutsourcingCompanyContract.builder()
-                .contractName(request.contractName())
-                .site(site)
-                .siteProcess(siteProcess)
-                .outsourcingCompany(outsourcingCompany)
-                .type(request.type())
-                .typeDescription(request.typeDescription())
-                .contractStartDate(contractStartDate)
-                .contractEndDate(contractEndDate)
-                .contractAmount(request.contractAmount())
+                .contractName(request.contractName()).site(site).siteProcess(siteProcess)
+                .outsourcingCompany(outsourcingCompany).type(request.type())
+                .typeDescription(request.typeDescription()).contractStartDate(contractStartDate)
+                .contractEndDate(contractEndDate).contractAmount(request.contractAmount())
                 .defaultDeductions(request.defaultDeductionsType())
                 .defaultDeductionsDescription(request.defaultDeductionsDescription())
                 .taxInvoiceCondition(request.taxInvoiceCondition())
                 .taxInvoiceIssueDayOfMonth(request.taxInvoiceIssueDayOfMonth())
-                .category(request.category())
-                .workTypeName(request.workTypeName())
-                .status(request.status() != null ? request.status() : OutsourcingCompanyContractStatus.IN_PROGRESS)
-                .memo(request.memo())
-                .build();
+                .category(request.category()).workTypeName(request.workTypeName())
+                .status(request.status() != null ? request.status()
+                        : OutsourcingCompanyContractStatus.IN_PROGRESS)
+                .memo(request.memo()).build();
 
         return contractRepository.save(contract);
     }
@@ -213,23 +209,19 @@ public class OutsourcingCompanyContractService {
         if (contacts == null || contacts.isEmpty())
             return;
 
-        final long mainCount = contacts.stream().filter(OutsourcingCompanyContractContactCreateRequest::isMain).count();
+        final long mainCount = contacts.stream()
+                .filter(OutsourcingCompanyContractContactCreateRequest::isMain).count();
         if (mainCount != 1) {
             throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
         }
 
         for (final OutsourcingCompanyContractContactCreateRequest contactRequest : contacts) {
-            final OutsourcingCompanyContractContact contact = OutsourcingCompanyContractContact.builder()
-                    .outsourcingCompanyContract(contract)
-                    .name(contactRequest.name())
-                    .department(contactRequest.department())
-                    .position(contactRequest.position())
+            final OutsourcingCompanyContractContact contact = OutsourcingCompanyContractContact
+                    .builder().outsourcingCompanyContract(contract).name(contactRequest.name())
+                    .department(contactRequest.department()).position(contactRequest.position())
                     .landlineNumber(contactRequest.landlineNumber())
-                    .phoneNumber(contactRequest.phoneNumber())
-                    .email(contactRequest.email())
-                    .memo(contactRequest.memo())
-                    .isMain(contactRequest.isMain())
-                    .build();
+                    .phoneNumber(contactRequest.phoneNumber()).email(contactRequest.email())
+                    .memo(contactRequest.memo()).isMain(contactRequest.isMain()).build();
 
             contactRepository.save(contact);
         }
@@ -242,13 +234,9 @@ public class OutsourcingCompanyContractService {
             final List<OutsourcingCompanyContractFileCreateRequest> files) {
         for (final OutsourcingCompanyContractFileCreateRequest fileRequest : files) {
             final OutsourcingCompanyContractFile file = OutsourcingCompanyContractFile.builder()
-                    .outsourcingCompanyContract(contract)
-                    .name(fileRequest.name())
-                    .fileUrl(fileRequest.fileUrl())
-                    .originalFileName(fileRequest.originalFileName())
-                    .type(fileRequest.type())
-                    .memo(fileRequest.memo())
-                    .build();
+                    .outsourcingCompanyContract(contract).name(fileRequest.name())
+                    .fileUrl(fileRequest.fileUrl()).originalFileName(fileRequest.originalFileName())
+                    .type(fileRequest.type()).memo(fileRequest.memo()).build();
 
             fileRepository.save(file);
         }
@@ -260,13 +248,11 @@ public class OutsourcingCompanyContractService {
     private void createContractWorkers(final OutsourcingCompanyContract contract,
             final List<OutsourcingCompanyContractWorkerCreateRequest> workers) {
         for (final OutsourcingCompanyContractWorkerCreateRequest workerRequest : workers) {
-            final OutsourcingCompanyContractWorker worker = OutsourcingCompanyContractWorker.builder()
-                    .outsourcingCompanyContract(contract)
-                    .name(workerRequest.name())
-                    .category(workerRequest.category())
-                    .taskDescription(workerRequest.taskDescription())
-                    .memo(workerRequest.memo())
-                    .build();
+            final OutsourcingCompanyContractWorker worker =
+                    OutsourcingCompanyContractWorker.builder().outsourcingCompanyContract(contract)
+                            .name(workerRequest.name()).category(workerRequest.category())
+                            .taskDescription(workerRequest.taskDescription())
+                            .memo(workerRequest.memo()).build();
 
             workerRepository.save(worker);
 
@@ -283,22 +269,22 @@ public class OutsourcingCompanyContractService {
     private void createContractEquipments(final OutsourcingCompanyContract contract,
             final List<OutsourcingCompanyContractEquipmentCreateRequest> equipments) {
         for (final OutsourcingCompanyContractEquipmentCreateRequest equipmentRequest : equipments) {
-            final OutsourcingCompanyContractEquipment equipment = OutsourcingCompanyContractEquipment.builder()
-                    .outsourcingCompanyContract(contract)
-                    .specification(equipmentRequest.specification())
-                    .vehicleNumber(equipmentRequest.vehicleNumber())
-                    .category(equipmentRequest.category())
-                    .unitPrice(equipmentRequest.unitPrice())
-                    .subtotal(equipmentRequest.subtotal())
-                    .taskDescription(equipmentRequest.taskDescription())
-                    .type(equipmentRequest.type())
-                    .memo(equipmentRequest.memo())
-                    .build();
+            final OutsourcingCompanyContractEquipment equipment =
+                    OutsourcingCompanyContractEquipment.builder()
+                            .outsourcingCompanyContract(contract)
+                            .specification(equipmentRequest.specification())
+                            .vehicleNumber(equipmentRequest.vehicleNumber())
+                            .category(equipmentRequest.category())
+                            .unitPrice(equipmentRequest.unitPrice())
+                            .subtotal(equipmentRequest.subtotal())
+                            .taskDescription(equipmentRequest.taskDescription())
+                            .type(equipmentRequest.type()).memo(equipmentRequest.memo()).build();
 
             equipmentRepository.save(equipment);
 
             // 보조장비가 있으면 생성
-            if (equipmentRequest.subEquipments() != null && !equipmentRequest.subEquipments().isEmpty()) {
+            if (equipmentRequest.subEquipments() != null
+                    && !equipmentRequest.subEquipments().isEmpty()) {
                 createContractSubEquipments(equipment, equipmentRequest.subEquipments());
             }
         }
@@ -310,11 +296,9 @@ public class OutsourcingCompanyContractService {
     private void createContractDrivers(final OutsourcingCompanyContract contract,
             final List<OutsourcingCompanyContractDriverCreateRequest> drivers) {
         for (final OutsourcingCompanyContractDriverCreateRequest driverRequest : drivers) {
-            final OutsourcingCompanyContractDriver driver = OutsourcingCompanyContractDriver.builder()
-                    .outsourcingCompanyContract(contract)
-                    .name(driverRequest.name())
-                    .memo(driverRequest.memo())
-                    .build();
+            final OutsourcingCompanyContractDriver driver =
+                    OutsourcingCompanyContractDriver.builder().outsourcingCompanyContract(contract)
+                            .name(driverRequest.name()).memo(driverRequest.memo()).build();
 
             driverRepository.save(driver);
 
@@ -331,11 +315,9 @@ public class OutsourcingCompanyContractService {
     private void createContractWorkerFiles(final OutsourcingCompanyContractWorker worker,
             final List<OutsourcingCompanyContractWorkerFileCreateRequest> files) {
         for (final OutsourcingCompanyContractWorkerFileCreateRequest fileRequest : files) {
-            final OutsourcingCompanyContractWorkerFile file = OutsourcingCompanyContractWorkerFile.builder()
-                    .worker(worker)
-                    .fileUrl(fileRequest.fileUrl())
-                    .originalFileName(fileRequest.originalFileName())
-                    .build();
+            final OutsourcingCompanyContractWorkerFile file = OutsourcingCompanyContractWorkerFile
+                    .builder().worker(worker).fileUrl(fileRequest.fileUrl())
+                    .originalFileName(fileRequest.originalFileName()).build();
 
             workerFileRepository.save(file);
         }
@@ -347,12 +329,10 @@ public class OutsourcingCompanyContractService {
     private void createContractDriverFiles(final OutsourcingCompanyContractDriver driver,
             final List<OutsourcingCompanyContractDriverFileCreateRequest> files) {
         for (final OutsourcingCompanyContractDriverFileCreateRequest fileRequest : files) {
-            final OutsourcingCompanyContractDriverFile file = OutsourcingCompanyContractDriverFile.builder()
-                    .driver(driver)
-                    .documentType(fileRequest.documentType())
-                    .fileUrl(fileRequest.fileUrl())
-                    .originalFileName(fileRequest.originalFileName())
-                    .build();
+            final OutsourcingCompanyContractDriverFile file =
+                    OutsourcingCompanyContractDriverFile.builder().driver(driver)
+                            .documentType(fileRequest.documentType()).fileUrl(fileRequest.fileUrl())
+                            .originalFileName(fileRequest.originalFileName()).build();
 
             // 파일을 드라이버의 files 리스트에 추가
             driver.getFiles().add(file);
@@ -365,19 +345,21 @@ public class OutsourcingCompanyContractService {
     private void createContractConstructions(final OutsourcingCompanyContract contract,
             final List<OutsourcingCompanyContractContstructionCreateRequest> constructions) {
         for (final OutsourcingCompanyContractContstructionCreateRequest constructionRequest : constructions) {
-            final OutsourcingCompanyContractConstruction construction = OutsourcingCompanyContractConstruction.builder()
-                    .outsourcingCompanyContract(contract)
-                    .item(constructionRequest.item())
-                    .specification(constructionRequest.specification())
-                    .unit(constructionRequest.unit())
-                    .unitPrice(constructionRequest.unitPrice())
-                    .contractQuantity(constructionRequest.contractQuantity())
-                    .contractPrice(constructionRequest.contractPrice())
-                    .outsourcingContractQuantity(constructionRequest.outsourcingContractQuantity())
-                    .outsourcingContractUnitPrice(constructionRequest.outsourcingContractUnitPrice())
-                    .outsourcingContractPrice(constructionRequest.outsourcingContractPrice())
-                    .memo(constructionRequest.memo())
-                    .build();
+            final OutsourcingCompanyContractConstruction construction =
+                    OutsourcingCompanyContractConstruction.builder()
+                            .outsourcingCompanyContract(contract).item(constructionRequest.item())
+                            .specification(constructionRequest.specification())
+                            .unit(constructionRequest.unit())
+                            .unitPrice(constructionRequest.unitPrice())
+                            .contractQuantity(constructionRequest.contractQuantity())
+                            .contractPrice(constructionRequest.contractPrice())
+                            .outsourcingContractQuantity(
+                                    constructionRequest.outsourcingContractQuantity())
+                            .outsourcingContractUnitPrice(
+                                    constructionRequest.outsourcingContractUnitPrice())
+                            .outsourcingContractPrice(
+                                    constructionRequest.outsourcingContractPrice())
+                            .memo(constructionRequest.memo()).build();
 
             constructionRepository.save(construction);
         }
@@ -390,33 +372,34 @@ public class OutsourcingCompanyContractService {
             final List<OutsourcingCompanyContractConstructionCreateRequestV2> constructionsV2) {
         for (final OutsourcingCompanyContractConstructionCreateRequestV2 workTypeRequest : constructionsV2) {
             // WorkType 생성
-            final OutsourcingCompanyContractConstructionGroup constructionGroup = OutsourcingCompanyContractConstructionGroup
-                    .builder()
-                    .outsourcingCompanyContract(contract)
-                    .itemName(workTypeRequest.itemName())
-                    .build();
+            final OutsourcingCompanyContractConstructionGroup constructionGroup =
+                    OutsourcingCompanyContractConstructionGroup.builder()
+                            .outsourcingCompanyContract(contract)
+                            .itemName(workTypeRequest.itemName()).build();
 
-            final OutsourcingCompanyContractConstructionGroup savedConstructionGroup = constructionGroupRepository
-                    .save(constructionGroup);
+            final OutsourcingCompanyContractConstructionGroup savedConstructionGroup =
+                    constructionGroupRepository.save(constructionGroup);
 
             // 해당 WorkType에 속하는 공사항목들 생성
             if (workTypeRequest.items() != null) {
-                for (final OutsourcingCompanyContractContstructionCreateRequest itemRequest : workTypeRequest.items()) {
-                    final OutsourcingCompanyContractConstruction construction = OutsourcingCompanyContractConstruction
-                            .builder()
-                            .outsourcingCompanyContract(contract)
-                            .constructionGroup(savedConstructionGroup)
-                            .item(itemRequest.item())
-                            .specification(itemRequest.specification())
-                            .unit(itemRequest.unit())
-                            .unitPrice(itemRequest.unitPrice())
-                            .contractQuantity(itemRequest.contractQuantity())
-                            .contractPrice(itemRequest.contractPrice())
-                            .outsourcingContractQuantity(itemRequest.outsourcingContractQuantity())
-                            .outsourcingContractUnitPrice(itemRequest.outsourcingContractUnitPrice())
-                            .outsourcingContractPrice(itemRequest.outsourcingContractPrice())
-                            .memo(itemRequest.memo())
-                            .build();
+                for (final OutsourcingCompanyContractContstructionCreateRequest itemRequest : workTypeRequest
+                        .items()) {
+                    final OutsourcingCompanyContractConstruction construction =
+                            OutsourcingCompanyContractConstruction.builder()
+                                    .outsourcingCompanyContract(contract)
+                                    .constructionGroup(savedConstructionGroup)
+                                    .item(itemRequest.item())
+                                    .specification(itemRequest.specification())
+                                    .unit(itemRequest.unit()).unitPrice(itemRequest.unitPrice())
+                                    .contractQuantity(itemRequest.contractQuantity())
+                                    .contractPrice(itemRequest.contractPrice())
+                                    .outsourcingContractQuantity(
+                                            itemRequest.outsourcingContractQuantity())
+                                    .outsourcingContractUnitPrice(
+                                            itemRequest.outsourcingContractUnitPrice())
+                                    .outsourcingContractPrice(
+                                            itemRequest.outsourcingContractPrice())
+                                    .memo(itemRequest.memo()).build();
 
                     constructionRepository.save(construction);
                 }
@@ -430,14 +413,13 @@ public class OutsourcingCompanyContractService {
     private void createContractSubEquipments(final OutsourcingCompanyContractEquipment equipment,
             final List<OutsourcingCompanyContractSubEquipmentCreateRequest> subEquipments) {
         for (final OutsourcingCompanyContractSubEquipmentCreateRequest subEquipmentRequest : subEquipments) {
-            final OutsourcingCompanyContractSubEquipment subEquipment = OutsourcingCompanyContractSubEquipment.builder()
-                    .equipment(equipment)
-                    .type(subEquipmentRequest.type())
-                    .description(subEquipmentRequest.description())
-                    .unitPrice(subEquipmentRequest.unitPrice())
-                    .taskDescription(subEquipmentRequest.taskDescription())
-                    .memo(subEquipmentRequest.memo())
-                    .build();
+            final OutsourcingCompanyContractSubEquipment subEquipment =
+                    OutsourcingCompanyContractSubEquipment.builder().equipment(equipment)
+                            .type(subEquipmentRequest.type())
+                            .description(subEquipmentRequest.description())
+                            .unitPrice(subEquipmentRequest.unitPrice())
+                            .taskDescription(subEquipmentRequest.taskDescription())
+                            .memo(subEquipmentRequest.memo()).build();
 
             subEquipmentRepository.save(subEquipment);
         }
@@ -447,9 +429,8 @@ public class OutsourcingCompanyContractService {
      * 계약 이력을 생성합니다.
      */
     private void createContractHistory(final OutsourcingCompanyContract contract) {
-        final OutsourcingCompanyContractHistory history = OutsourcingCompanyContractHistory.builder()
-                .outsourcingCompany(contract.getOutsourcingCompany())
-                .contract(contract)
+        final OutsourcingCompanyContractHistory history = OutsourcingCompanyContractHistory
+                .builder().outsourcingCompany(contract.getOutsourcingCompany()).contract(contract)
                 .build();
 
         contractHistoryRepository.save(history);
@@ -459,12 +440,11 @@ public class OutsourcingCompanyContractService {
      * 외주업체별 계약 이력을 페이징하여 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Page<ContractHistoryResponse> getContractHistoryByCompany(
-            final Long companyId,
+    public Page<ContractHistoryResponse> getContractHistoryByCompany(final Long companyId,
             final Pageable pageable) {
 
-        final Page<OutsourcingCompanyContractHistory> historyPage = contractHistoryRepository
-                .findByOutsourcingCompanyIdWithPaging(companyId, pageable);
+        final Page<OutsourcingCompanyContractHistory> historyPage =
+                contractHistoryRepository.findByOutsourcingCompanyIdWithPaging(companyId, pageable);
 
         // ContractHistoryResponse로 변환
         return historyPage.map(ContractHistoryResponse::from);
@@ -474,15 +454,15 @@ public class OutsourcingCompanyContractService {
      * 검색 조건에 따라 외주계약 리스트를 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Page<ContractListResponse> getContractList(final Long userId, final ContractListSearchRequest searchRequest,
-            final Pageable pageable) {
+    public Page<ContractListResponse> getContractList(final Long userId,
+            final ContractListSearchRequest searchRequest, final Pageable pageable) {
         log.info("외주계약 리스트 조회 시작: searchRequest={}, pageable={}", searchRequest, pageable);
 
         final User user = userService.getUserByIdOrThrow(userId);
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
 
-        final Page<OutsourcingCompanyContract> contractPage = contractRepository.findBySearchConditions(searchRequest,
-                pageable, accessibleSiteIds);
+        final Page<OutsourcingCompanyContract> contractPage = contractRepository
+                .findBySearchConditions(searchRequest, pageable, accessibleSiteIds);
 
         return contractPage.map(ContractListResponse::from);
     }
@@ -491,21 +471,16 @@ public class OutsourcingCompanyContractService {
      * 외주업체 계약 목록을 엑셀로 다운로드합니다.
      */
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final CustomUserDetails user, final ContractListSearchRequest request,
-            final Sort sort, final List<String> fields) {
+    public Workbook downloadExcel(final CustomUserDetails user,
+            final ContractListSearchRequest request, final Sort sort, final List<String> fields) {
         final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
-        final List<ContractListResponse> contractResponses = contractRepository.findAllWithoutPaging(request, sort,
-                accessibleSiteIds)
-                .stream()
-                .map(ContractListResponse::from)
-                .toList();
+        final List<ContractListResponse> contractResponses =
+                contractRepository.findAllWithoutPaging(request, sort, accessibleSiteIds).stream()
+                        .map(ContractListResponse::from).toList();
 
-        final Workbook workbook = ExcelExportUtils.generateWorkbook(
-                contractResponses,
-                fields,
-                this::getExcelHeaderName,
-                this::getExcelCellValue);
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(contractResponses, fields,
+                this::getExcelHeaderName, this::getExcelCellValue);
 
         final String fileUrl = s3FileService.uploadExcelToS3(workbook,
                 ExcelDownloadHistoryType.OUTSOURCING_COMPANY_CONTRACT.name());
@@ -554,18 +529,20 @@ public class OutsourcingCompanyContractService {
             case "businessNumber" -> contract.businessNumber();
             case "contractType" -> contract.contractType();
             case "contractPeriod" -> {
-                final String startDate = DateTimeFormatUtils.formatKoreaLocalDate(contract.contractStartDate());
-                final String endDate = DateTimeFormatUtils.formatKoreaLocalDate(contract.contractEndDate());
+                final String startDate =
+                        DateTimeFormatUtils.formatKoreaLocalDate(contract.contractStartDate());
+                final String endDate =
+                        DateTimeFormatUtils.formatKoreaLocalDate(contract.contractEndDate());
                 yield startDate + " ~ " + endDate;
             }
-            case "contractAmount" ->
-                contract.contractAmount() != null ? String.format("%,d", contract.contractAmount()) : "";
+            case "contractAmount" -> contract.contractAmount() != null
+                    ? String.format("%,d", contract.contractAmount())
+                    : "";
             case "defaultDeductions" -> contract.defaultDeductions();
             case "taxInvoiceCondition" -> contract.taxInvoiceCondition();
             case "contactName" -> {
                 if (contract.contacts() != null && !contract.contacts().isEmpty()) {
-                    yield contract.contacts().stream()
-                            .map(contact -> contact.name())
+                    yield contract.contacts().stream().map(contact -> contact.name())
                             .collect(java.util.stream.Collectors.joining(", "));
                 }
                 yield "";
@@ -585,8 +562,8 @@ public class OutsourcingCompanyContractService {
     @Transactional(readOnly = true)
     public ContractDetailResponse getContractDetail(final Long contractId) {
         final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
         return ContractDetailResponse.from(contract);
     }
 
@@ -594,15 +571,16 @@ public class OutsourcingCompanyContractService {
      * 외주업체 계약 인력 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Slice<ContractWorkerResponse> getContractWorkers(final Long contractId, final Pageable pageable) {
+    public Slice<ContractWorkerResponse> getContractWorkers(final Long contractId,
+            final Pageable pageable) {
         // 계약이 존재하는지 확인
         if (!contractRepository.existsById(contractId)) {
-            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+            throw new IllegalArgumentException(
+                    ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
         }
 
-        final Page<OutsourcingCompanyContractWorker> page = workerRepository.findByOutsourcingCompanyContractId(
-                contractId,
-                pageable);
+        final Page<OutsourcingCompanyContractWorker> page =
+                workerRepository.findByOutsourcingCompanyContractId(contractId, pageable);
         return page.map(ContractWorkerResponse::from);
     }
 
@@ -610,15 +588,16 @@ public class OutsourcingCompanyContractService {
      * 외주업체 계약 장비 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Slice<ContractEquipmentResponse> getContractEquipments(final Long contractId, final Pageable pageable) {
+    public Slice<ContractEquipmentResponse> getContractEquipments(final Long contractId,
+            final Pageable pageable) {
         // 계약이 존재하는지 확인
         if (!contractRepository.existsById(contractId)) {
-            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+            throw new IllegalArgumentException(
+                    ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
         }
 
-        final Page<OutsourcingCompanyContractEquipment> page = equipmentRepository.findByOutsourcingCompanyContractId(
-                contractId,
-                pageable);
+        final Page<OutsourcingCompanyContractEquipment> page =
+                equipmentRepository.findByOutsourcingCompanyContractId(contractId, pageable);
         return page.map(ContractEquipmentResponse::from);
     }
 
@@ -626,15 +605,16 @@ public class OutsourcingCompanyContractService {
      * 외주업체 계약 기사(운전자) 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Slice<ContractDriverResponse> getContractDrivers(final Long contractId, final Pageable pageable) {
+    public Slice<ContractDriverResponse> getContractDrivers(final Long contractId,
+            final Pageable pageable) {
         // 계약이 존재하는지 확인
         if (!contractRepository.existsById(contractId)) {
-            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+            throw new IllegalArgumentException(
+                    ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
         }
 
-        final Page<OutsourcingCompanyContractDriver> page = driverRepository.findByOutsourcingCompanyContractId(
-                contractId,
-                pageable);
+        final Page<OutsourcingCompanyContractDriver> page =
+                driverRepository.findByOutsourcingCompanyContractId(contractId, pageable);
         return page.map(ContractDriverResponse::from);
     }
 
@@ -643,13 +623,18 @@ public class OutsourcingCompanyContractService {
      */
     @Transactional(readOnly = true)
     public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> getContractEquipmentsByCompany(
-            final Long companyId, final Long siteId, final List<OutsourcingCompanyContractType> types,
+            final Long companyId, final Long siteId,
+            final List<OutsourcingCompanyContractType> types, final String keyword,
             final Pageable pageable) {
         final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId, types);
 
-        // 계약 ID들로 장비 조회
+        // 키워드 정리 (null 또는 빈 문자열이면 null로 변환)
+        final String searchKeyword =
+                (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+
+        // 계약 ID들로 장비 조회 (키워드 포함)
         final Page<OutsourcingCompanyContractEquipment> page = equipmentRepository
-                .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
+                .findByContractIdsAndKeyword(contractIds, searchKeyword, pageable);
         return page.map(ContractEquipmentResponse.ContractEquipmentSimpleResponse::from);
     }
 
@@ -657,13 +642,18 @@ public class OutsourcingCompanyContractService {
      * 외주업체별 계약 기사(운전자) 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Slice<ContractDriverResponse.ContractDriverSimpleResponse> getContractDriversByCompany(final Long companyId,
-            final Long siteId, final Pageable pageable) {
+    public Slice<ContractDriverResponse.ContractDriverSimpleResponse> getContractDriversByCompany(
+            final Long companyId, final Long siteId, final String keyword,
+            final Pageable pageable) {
         final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId, null);
 
-        // 계약 ID들로 기사 조회
-        final Page<OutsourcingCompanyContractDriver> page = driverRepository
-                .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
+        // 키워드 정리 (null 또는 빈 문자열이면 null로 변환)
+        final String searchKeyword =
+                (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+
+        // 계약 ID들로 기사 조회 (키워드 포함)
+        final Page<OutsourcingCompanyContractDriver> page =
+                driverRepository.findByContractIdsAndKeyword(contractIds, searchKeyword, pageable);
         return page.map(ContractDriverResponse.ContractDriverSimpleResponse::from);
     }
 
@@ -671,13 +661,13 @@ public class OutsourcingCompanyContractService {
      * 외주업체별 계약 인력 정보를 Slice로 조회합니다.
      */
     @Transactional(readOnly = true)
-    public Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> getContractWorkersByCompany(final Long companyId,
-            final Long siteId, final Pageable pageable) {
+    public Slice<ContractWorkerResponse.ContractWorkerSimpleResponse> getContractWorkersByCompany(
+            final Long companyId, final Long siteId, final Pageable pageable) {
         final List<Long> contractIds = getContractIdsByCompanyAndSite(companyId, siteId, null);
 
         // 계약 ID들로 인력 조회
-        final Page<OutsourcingCompanyContractWorker> page = workerRepository
-                .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
+        final Page<OutsourcingCompanyContractWorker> page =
+                workerRepository.findByOutsourcingCompanyContractIdIn(contractIds, pageable);
         return page.map(ContractWorkerResponse.ContractWorkerSimpleResponse::from);
     }
 
@@ -692,28 +682,31 @@ public class OutsourcingCompanyContractService {
         // 계약 ID들로 공사항목 그룹 조회
         final Page<OutsourcingCompanyContractConstructionGroup> page = constructionGroupRepository
                 .findByOutsourcingCompanyContractIdIn(contractIds, pageable);
-        return page.map(group -> ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse.from(group));
+        return page.map(
+                group -> ContractConstructionGroupResponse.ContractConstructionGroupSimpleResponse
+                        .from(group));
     }
 
     /**
      * 외주업체 ID, 항목 그룹 ID, 공사항목 이름으로 규격 목록을 조회합니다.
      */
     @Transactional(readOnly = true)
-    public List<String> getSpecificationsByConditions(final String itemName, final Long constructionGroupId,
-            final Long outsourcingCompanyId) {
-        return constructionRepository.findDistinctSpecificationsByConditions(itemName, constructionGroupId,
-                outsourcingCompanyId);
+    public List<String> getSpecificationsByConditions(final String itemName,
+            final Long constructionGroupId, final Long outsourcingCompanyId) {
+        return constructionRepository.findDistinctSpecificationsByConditions(itemName,
+                constructionGroupId, outsourcingCompanyId);
     }
 
     /**
      * 외주업체 계약 공사항목 그룹 정보를 Slice로 조회합니다. (V2)
      */
     @Transactional(readOnly = true)
-    public Slice<ContractConstructionGroupResponse> getContractConstructionGroups(final Long contractId,
-            final Pageable pageable) {
+    public Slice<ContractConstructionGroupResponse> getContractConstructionGroups(
+            final Long contractId, final Pageable pageable) {
         // 계약이 존재하는지 확인
         if (!contractRepository.existsById(contractId)) {
-            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+            throw new IllegalArgumentException(
+                    ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
         }
 
         final Page<OutsourcingCompanyContractConstructionGroup> page = constructionGroupRepository
@@ -729,34 +722,34 @@ public class OutsourcingCompanyContractService {
             final Pageable pageable) {
         // 계약이 존재하는지 확인
         if (!contractRepository.existsById(contractId)) {
-            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+            throw new IllegalArgumentException(
+                    ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
         }
 
-        final Page<OutsourcingCompanyContractConstruction> page = constructionRepository
-                .findByOutsourcingCompanyContractId(
-                        contractId,
-                        pageable);
+        final Page<OutsourcingCompanyContractConstruction> page =
+                constructionRepository.findByOutsourcingCompanyContractId(contractId, pageable);
         return page.map(ContractConstructionResponse::from);
     }
 
     /**
      * 외주업체 계약을 수정합니다.
      */
-    public void updateContract(final Long contractId, final OutsourcingCompanyContractUpdateRequest request,
-            final Long userId) {
+    public void updateContract(final Long contractId,
+            final OutsourcingCompanyContractUpdateRequest request, final Long userId) {
 
         // 1. 계약이 존재하는지 확인
         final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
         contract.syncTransientFields();
         // 2. 변경 전 스냅샷 생성
-        final OutsourcingCompanyContract oldSnapshot = JaversUtils.createSnapshot(javers, contract,
-                OutsourcingCompanyContract.class);
+        final OutsourcingCompanyContract oldSnapshot =
+                JaversUtils.createSnapshot(javers, contract, OutsourcingCompanyContract.class);
 
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        final SiteProcess siteProcess =
+                siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
                 .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
 
@@ -765,23 +758,23 @@ public class OutsourcingCompanyContractService {
 
         // 4. 변경사항 추출 및 변경 히스토리 저장
         final Diff diff = javers.compare(oldSnapshot, contract);
-        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final List<Map<String, String>> simpleChanges =
+                JaversUtils.extractModifiedChanges(javers, diff);
         final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         if (!simpleChanges.isEmpty()) {
-            final OutsourcingCompanyContractChangeHistory changeHistory = OutsourcingCompanyContractChangeHistory
-                    .builder()
-                    .outsourcingCompanyContract(contract)
-                    .type(OutsourcingCompanyContractChangeType.BASIC)
-                    .changes(changesJson)
-                    .user(userService.getUserByIdOrThrow(userId))
-                    .build();
+            final OutsourcingCompanyContractChangeHistory changeHistory =
+                    OutsourcingCompanyContractChangeHistory.builder()
+                            .outsourcingCompanyContract(contract)
+                            .type(OutsourcingCompanyContractChangeType.BASIC).changes(changesJson)
+                            .user(userService.getUserByIdOrThrow(userId)).build();
             contractChangeHistoryRepository.save(changeHistory);
         }
 
         // 5. 담당자 정보 수정
         if (request.contacts() != null) {
-            contractContactService.updateContractContacts(contract.getId(), request.contacts(), userId);
+            contractContactService.updateContractContacts(contract.getId(), request.contacts(),
+                    userId);
         }
 
         // 6. 첨부파일 정보 수정
@@ -791,36 +784,41 @@ public class OutsourcingCompanyContractService {
 
         // 7. 인력 정보 수정
         if (request.workers() != null) {
-            contractWorkerService.updateContractWorkers(contract.getId(), request.workers(), userId);
+            contractWorkerService.updateContractWorkers(contract.getId(), request.workers(),
+                    userId);
         }
 
         // 8. 장비 정보 수정
         if (request.equipments() != null) {
-            contractEquipmentService.updateContractEquipments(contract.getId(), request.equipments(), userId);
+            contractEquipmentService.updateContractEquipments(contract.getId(),
+                    request.equipments(), userId);
         }
 
         // 9. 운전자 정보 수정
         if (request.drivers() != null) {
-            contractDriverService.updateContractDrivers(contract.getId(), request.drivers(), userId);
+            contractDriverService.updateContractDrivers(contract.getId(), request.drivers(),
+                    userId);
         }
 
         // 10. 공사항목 정보 수정
         if (request.constructions() != null) {
-            contractConstructionService.updateContractConstructions(contract.getId(), request.constructions(), userId);
+            contractConstructionService.updateContractConstructions(contract.getId(),
+                    request.constructions(), userId);
         }
 
         // 10. 공사항목 정보 수정 V2
         if (request.constructions() == null && request.constructionsV2() != null) {
-            contractConstructionService.updateContractConstructionsV2(contract.getId(), request.constructionsV2(),
-                    userId);
+            contractConstructionService.updateContractConstructionsV2(contract.getId(),
+                    request.constructionsV2(), userId);
         }
 
         // 11. 사용자 정의 변경 이력 저장
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (final OutsourcingCompanyContractUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {
-                contractChangeHistoryRepository.findById(historyRequest.id())
-                        .filter(history -> history.getOutsourcingCompanyContract().getId().equals(contract.getId()))
+                contractChangeHistoryRepository
+                        .findById(historyRequest.id()).filter(history -> history
+                                .getOutsourcingCompanyContract().getId().equals(contract.getId()))
                         .ifPresent(history -> {
                             history.setMemo(historyRequest.memo());
                         });
@@ -836,10 +834,12 @@ public class OutsourcingCompanyContractService {
         final List<Long> contractIds = request.contractIds();
 
         // 계약들이 존재하는지 확인
-        final List<OutsourcingCompanyContract> contracts = contractRepository.findAllById(contractIds);
+        final List<OutsourcingCompanyContract> contracts =
+                contractRepository.findAllById(contractIds);
 
         if (contracts.size() != contractIds.size()) {
-            throw new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
+            throw new IllegalArgumentException(
+                    ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND);
         }
 
         // 각 계약에 대해 소프트 삭제 처리
@@ -851,8 +851,8 @@ public class OutsourcingCompanyContractService {
     /**
      * 계약 변경 이력을 조회합니다.
      */
-    public Slice<OutsourcingCompanyContractChangeHistory> getContractChangeHistories(final Long contractId,
-            final Pageable pageable) {
+    public Slice<OutsourcingCompanyContractChangeHistory> getContractChangeHistories(
+            final Long contractId, final Pageable pageable) {
         return contractChangeHistoryRepository.findByOutsourcingCompanyContractId(contractId,
                 pageable);
     }
@@ -862,27 +862,29 @@ public class OutsourcingCompanyContractService {
      * 페이지 네비게이션이 필요한 경우 사용
      */
     @Transactional(readOnly = true)
-    public Page<ContractChangeHistoryResponse> getContractChangeHistoriesWithPaging(final Long contractId,
-            final Pageable pageable, final Long userId) {
+    public Page<ContractChangeHistoryResponse> getContractChangeHistoriesWithPaging(
+            final Long contractId, final Pageable pageable, final Long userId) {
         final OutsourcingCompanyContract contract = getContractByIdOrThrow(contractId);
 
-        final Page<OutsourcingCompanyContractChangeHistory> historyPage = contractChangeHistoryRepository
-                .findByOutsourcingCompanyContractWithPaging(contract, pageable);
+        final Page<OutsourcingCompanyContractChangeHistory> historyPage =
+                contractChangeHistoryRepository.findByOutsourcingCompanyContractWithPaging(contract,
+                        pageable);
         return historyPage.map(history -> ContractChangeHistoryResponse.from(history, userId));
     }
 
     private List<Long> getContractIdsByCompanyAndSite(final Long companyId, final Long siteId,
             final List<OutsourcingCompanyContractType> types) {
         // 해당 외주업체와 현장의 계약 ID들을 조회
-        final List<OutsourcingCompanyContractType> searchTypes = (types == null || types.isEmpty()) ? null : types;
-        return contractRepository.findContractIdsByCompanyAndSiteAndTypes(companyId, siteId, searchTypes);
+        final List<OutsourcingCompanyContractType> searchTypes =
+                (types == null || types.isEmpty()) ? null : types;
+        return contractRepository.findContractIdsByCompanyAndSiteAndTypes(companyId, siteId,
+                searchTypes);
     }
 
     @Transactional(readOnly = true)
     public OutsourcingCompanyContractDriver getDriverByIdOrThrow(final Long driverId) {
-        return driverRepository.findById(driverId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_DRIVER_NOT_FOUND));
+        return driverRepository.findById(driverId).orElseThrow(() -> new IllegalArgumentException(
+                ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_DRIVER_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
@@ -892,18 +894,20 @@ public class OutsourcingCompanyContractService {
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND));
     }
 
-    public OutsourcingCompanyContractSubEquipment getSubEquipmentByIdOrThrow(final Long subEquipmentId) {
+    public OutsourcingCompanyContractSubEquipment getSubEquipmentByIdOrThrow(
+            final Long subEquipmentId) {
         return subEquipmentRepository.findById(subEquipmentId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_SUB_EQUIPMENT_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> searchVehicleNumber(final String keyword,
-            final Pageable pageable) {
-        final String searchKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
-        final Slice<OutsourcingCompanyContractEquipment> equipmentSlice = equipmentRepository
-                .findAllByVehicleNumber(searchKeyword, pageable);
+    public Slice<ContractEquipmentResponse.ContractEquipmentSimpleResponse> searchVehicleNumber(
+            final String keyword, final Pageable pageable) {
+        final String searchKeyword =
+                (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        final Slice<OutsourcingCompanyContractEquipment> equipmentSlice =
+                equipmentRepository.findAllByVehicleNumber(searchKeyword, pageable);
 
         return equipmentSlice.map(ContractEquipmentResponse.ContractEquipmentSimpleResponse::from);
     }
@@ -915,11 +919,14 @@ public class OutsourcingCompanyContractService {
     public Slice<ContractListResponse.ContractSimpleResponse> searchByName(final String keyword,
             final List<OutsourcingCompanyContractType> types, final Long outsourcingCompanyId,
             final Pageable pageable) {
-        final String searchKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        final String searchKeyword =
+                (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
         // 빈 리스트인 경우 null로 변환 (쿼리에서 모든 타입 검색하도록)
-        final List<OutsourcingCompanyContractType> searchTypes = (types == null || types.isEmpty()) ? null : types;
-        final Slice<OutsourcingCompanyContract> contracts = contractRepository
-                .findByTypeDescriptionAndKeyword(searchKeyword, searchTypes, outsourcingCompanyId, pageable);
+        final List<OutsourcingCompanyContractType> searchTypes =
+                (types == null || types.isEmpty()) ? null : types;
+        final Slice<OutsourcingCompanyContract> contracts =
+                contractRepository.findByTypeDescriptionAndKeyword(searchKeyword, searchTypes,
+                        outsourcingCompanyId, pageable);
 
         return contracts.map(ContractListResponse.ContractSimpleResponse::from);
     }
