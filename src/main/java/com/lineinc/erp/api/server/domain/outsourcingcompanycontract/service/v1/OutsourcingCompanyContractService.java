@@ -513,6 +513,7 @@ public class OutsourcingCompanyContractService {
             case "memo" -> "비고";
             case "hasGuaranteeCertificate" -> "보증서";
             case "hasContractCertificate" -> "계약서";
+            case "ceoName" -> "대표자명";
             default -> null;
         };
     }
@@ -552,6 +553,7 @@ public class OutsourcingCompanyContractService {
             case "memo" -> contract.memo();
             case "hasGuaranteeCertificate" -> contract.hasGuaranteeCertificate() ? "Y" : "N";
             case "hasContractCertificate" -> contract.hasContractCertificate() ? "Y" : "N";
+            case "ceoName" -> contract.ceoName();
             default -> null;
         };
     }
