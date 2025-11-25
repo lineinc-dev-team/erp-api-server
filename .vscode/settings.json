@@ -53,7 +53,7 @@
     // Java 포맷터 활성화
     "java.format.enabled": true,
     // Google Java Style Guide 적용
-    "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+    "java.format.settings.url": ".vscode/java-google-style.xml",
     "java.format.settings.profile": "GoogleStyle",
     // 주석 포맷팅 비활성화 (Javadoc 줄바꿈 유지)
     "java.format.comments.enabled": false,
