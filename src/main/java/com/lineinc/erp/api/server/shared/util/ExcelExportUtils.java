@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -54,6 +55,7 @@ public class ExcelExportUtils {
     private static CellStyle createNumberStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setDataFormat(workbook.createDataFormat().getFormat("#,##0"));
         setBorders(style);
         return style;
@@ -65,6 +67,7 @@ public class ExcelExportUtils {
     private static CellStyle createDecimalStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setDataFormat(workbook.createDataFormat().getFormat("#,##0.0#"));
         setBorders(style);
         return style;
@@ -76,6 +79,7 @@ public class ExcelExportUtils {
     private static CellStyle createTextStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.LEFT);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         setBorders(style);
         return style;
     }
@@ -86,6 +90,7 @@ public class ExcelExportUtils {
     private static CellStyle createHeaderStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         setBorders(style);
         return style;
     }
