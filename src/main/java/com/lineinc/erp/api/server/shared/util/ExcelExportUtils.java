@@ -2,6 +2,7 @@ package com.lineinc.erp.api.server.shared.util;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
@@ -38,22 +39,54 @@ public class ExcelExportUtils {
     }
 
     /**
-     * 숫자 셀 스타일 생성 (오른쪽 정렬 + 천단위 구분 기호)
+     * 셀 스타일 테두리 설정
+     */
+    private static void setBorders(final CellStyle style) {
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+    }
+
+    /**
+     * 숫자 셀 스타일 생성 (오른쪽 정렬 + 천단위 구분 기호 + 테두리)
      */
     private static CellStyle createNumberStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
         style.setDataFormat(workbook.createDataFormat().getFormat("#,##0"));
+        setBorders(style);
         return style;
     }
 
     /**
-     * 소수점 숫자 셀 스타일 생성 (오른쪽 정렬 + 천단위 구분 기호 + 소수점)
+     * 소수점 숫자 셀 스타일 생성 (오른쪽 정렬 + 천단위 구분 기호 + 소수점 + 테두리)
      */
     private static CellStyle createDecimalStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
         style.setDataFormat(workbook.createDataFormat().getFormat("#,##0.0#"));
+        setBorders(style);
+        return style;
+    }
+
+    /**
+     * 일반 텍스트 셀 스타일 생성 (왼쪽 정렬 + 테두리)
+     */
+    private static CellStyle createTextStyle(final Workbook workbook) {
+        final CellStyle style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.LEFT);
+        setBorders(style);
+        return style;
+    }
+
+    /**
+     * 헤더 셀 스타일 생성 (가운데 정렬 + 테두리)
+     */
+    private static CellStyle createHeaderStyle(final Workbook workbook) {
+        final CellStyle style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.CENTER);
+        setBorders(style);
         return style;
     }
 
@@ -210,17 +243,21 @@ public class ExcelExportUtils {
             final ExcelHeaderResolverSimple headerResolver, final boolean hasIdField) {
         final Row headerRow = sheet.createRow(0);
         int col = 0;
+        final CellStyle headerStyle = createHeaderStyle(sheet.getWorkbook());
 
         if (hasIdField) {
-            headerRow.createCell(col++).setCellValue("No.");
+            final var cell = headerRow.createCell(col++);
+            cell.setCellValue("No.");
+            cell.setCellStyle(headerStyle);
         }
 
         for (final String field : fields) {
             if ("id".equals(field))
                 continue;
             final String resolvedHeader = headerResolver.resolve(field);
-            headerRow.createCell(col++)
-                    .setCellValue(resolvedHeader != null ? resolvedHeader : field);
+            final var cell = headerRow.createCell(col++);
+            cell.setCellValue(resolvedHeader != null ? resolvedHeader : field);
+            cell.setCellStyle(headerStyle);
         }
     }
 
@@ -232,9 +269,12 @@ public class ExcelExportUtils {
             final K context) {
         final Row headerRow = sheet.createRow(0);
         int col = 0;
+        final CellStyle headerStyle = createHeaderStyle(sheet.getWorkbook());
 
         if (hasIdField) {
-            headerRow.createCell(col++).setCellValue("No.");
+            final var cell = headerRow.createCell(col++);
+            cell.setCellValue("No.");
+            cell.setCellStyle(headerStyle);
         }
 
         for (final String field : fields) {
@@ -243,7 +283,9 @@ public class ExcelExportUtils {
             final String resolvedHeader = headerResolver.resolve(field, context);
             // null인 헤더는 해당 컬럼을 제외
             if (resolvedHeader != null) {
-                headerRow.createCell(col++).setCellValue(resolvedHeader);
+                final var cell = headerRow.createCell(col++);
+                cell.setCellValue(resolvedHeader);
+                cell.setCellStyle(headerStyle);
             }
         }
     }
@@ -260,13 +302,16 @@ public class ExcelExportUtils {
         // 스타일 생성
         final CellStyle numberStyle = createNumberStyle(sheet.getWorkbook());
         final CellStyle decimalStyle = createDecimalStyle(sheet.getWorkbook());
+        final CellStyle textStyle = createTextStyle(sheet.getWorkbook());
 
         for (final T item : data) {
             final Row row = sheet.createRow(rowIdx);
             int col = 0;
 
             if (hasIdField) {
-                row.createCell(col++).setCellValue(String.valueOf(totalCount - rowIdx + 1));
+                final var cell = row.createCell(col++);
+                cell.setCellValue(String.valueOf(totalCount - rowIdx + 1));
+                cell.setCellStyle(textStyle);
             }
 
             for (final String field : fields) {
@@ -276,7 +321,8 @@ public class ExcelExportUtils {
                 final String cellValue = cellValueExtractor.extract(item, field);
                 final var cell = row.createCell(col++);
 
-                setCellValueWithFormat(cell, cellValue, field, numberStyle, decimalStyle);
+                setCellValueWithFormat(cell, cellValue, field, numberStyle, decimalStyle,
+                        textStyle);
             }
             rowIdx++;
         }
@@ -289,9 +335,10 @@ public class ExcelExportUtils {
      */
     private static void setCellValueWithFormat(final org.apache.poi.ss.usermodel.Cell cell,
             final String cellValue, final String field, final CellStyle numberStyle,
-            final CellStyle decimalStyle) {
+            final CellStyle decimalStyle, final CellStyle textStyle) {
         if (cellValue == null || cellValue.isEmpty()) {
             cell.setCellValue("");
+            cell.setCellStyle(textStyle);
             return;
         }
 
@@ -310,10 +357,12 @@ public class ExcelExportUtils {
             } catch (final NumberFormatException e) {
                 // 숫자로 파싱 실패하면 문자열로 저장
                 cell.setCellValue(cellValue);
+                cell.setCellStyle(textStyle);
             }
         } else {
             // 숫자 필드가 아니면 문자열로 저장
             cell.setCellValue(cellValue);
+            cell.setCellStyle(textStyle);
         }
     }
 
@@ -330,13 +379,16 @@ public class ExcelExportUtils {
         // 스타일 생성
         final CellStyle numberStyle = createNumberStyle(sheet.getWorkbook());
         final CellStyle decimalStyle = createDecimalStyle(sheet.getWorkbook());
+        final CellStyle textStyle = createTextStyle(sheet.getWorkbook());
 
         for (final T item : data) {
             final Row row = sheet.createRow(rowIdx);
             int col = 0;
 
             if (hasIdField) {
-                row.createCell(col++).setCellValue(String.valueOf(totalCount - rowIdx + 1));
+                final var cell = row.createCell(col++);
+                cell.setCellValue(String.valueOf(totalCount - rowIdx + 1));
+                cell.setCellStyle(textStyle);
             }
 
             for (final String field : fields) {
@@ -349,7 +401,8 @@ public class ExcelExportUtils {
                     final String cellValue = cellValueExtractor.extract(item, field);
                     final var cell = row.createCell(col++);
 
-                    setCellValueWithFormat(cell, cellValue, field, numberStyle, decimalStyle);
+                    setCellValueWithFormat(cell, cellValue, field, numberStyle, decimalStyle,
+                            textStyle);
                 }
             }
             rowIdx++;
@@ -374,17 +427,28 @@ public class ExcelExportUtils {
         // 가운데 정렬 스타일 적용
         final CellStyle centerAlignStyle = sheet.getWorkbook().createCellStyle();
         centerAlignStyle.setAlignment(HorizontalAlignment.CENTER);
+        setBorders(centerAlignStyle);
         subtotalCell.setCellStyle(centerAlignStyle);
 
         // 숫자 스타일 생성
         final CellStyle numberStyle = createNumberStyle(sheet.getWorkbook());
+        final CellStyle textStyle = createTextStyle(sheet.getWorkbook());
 
         // 병합할 컬럼 수만큼 건너뛰기
-        int col = subtotalMergeColumns;
+        // int col = subtotalMergeColumns; (기존 로직 대체)
+        int currentFieldCol = hasIdField ? 1 : 0;
 
         for (final String field : fields) {
             if ("id".equals(field))
                 continue;
+
+            // 현재 필드가 병합된 영역 내에 있다면 건너뜀
+            if (currentFieldCol < subtotalMergeColumns) {
+                currentFieldCol++;
+                continue;
+            }
+
+            final var cell = subtotalRow.createCell(currentFieldCol++);
 
             // 지정된 필드만 소계에 표시
             if (subtotalFields.contains(field)) {
@@ -399,9 +463,10 @@ public class ExcelExportUtils {
                     }
                 }).sum();
 
-                final var cell = subtotalRow.createCell(col++);
                 cell.setCellValue(sum);
                 cell.setCellStyle(numberStyle);
+            } else {
+                cell.setCellStyle(textStyle);
             }
         }
 
@@ -430,13 +495,16 @@ public class ExcelExportUtils {
         // 가운데 정렬 스타일 적용
         final CellStyle centerAlignStyle = sheet.getWorkbook().createCellStyle();
         centerAlignStyle.setAlignment(HorizontalAlignment.CENTER);
+        setBorders(centerAlignStyle);
         subtotalCell.setCellStyle(centerAlignStyle);
 
         // 숫자 스타일 생성
         final CellStyle numberStyle = createNumberStyle(sheet.getWorkbook());
+        final CellStyle textStyle = createTextStyle(sheet.getWorkbook());
 
         // 병합할 컬럼 수만큼 건너뛰기
-        int col = subtotalMergeColumns;
+        // int col = subtotalMergeColumns; (기존 로직 대체)
+        int currentFieldCol = hasIdField ? 1 : 0;
 
         for (final String field : fields) {
             if ("id".equals(field))
@@ -447,6 +515,14 @@ public class ExcelExportUtils {
             if (resolvedHeader == null) {
                 continue;
             }
+
+            // 현재 필드가 병합된 영역 내에 있다면 건너뜀
+            if (currentFieldCol < subtotalMergeColumns) {
+                currentFieldCol++;
+                continue;
+            }
+
+            final var cell = subtotalRow.createCell(currentFieldCol++);
 
             // 지정된 필드만 소계에 표시
             if (subtotalFields.contains(field)) {
@@ -461,9 +537,10 @@ public class ExcelExportUtils {
                     }
                 }).sum();
 
-                final var cell = subtotalRow.createCell(col++);
                 cell.setCellValue(sum);
                 cell.setCellStyle(numberStyle);
+            } else {
+                cell.setCellStyle(textStyle);
             }
         }
 
