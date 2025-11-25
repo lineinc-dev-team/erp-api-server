@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.laborpayroll.entity.LaborPayroll;
 
@@ -45,7 +44,8 @@ public class LaborPayrollCalculator {
     /**
      * 총 노무비 계산 (공수 × 일당 기준)
      */
-    public static BigDecimal calculateTotalLaborCost(final Integer dailyWage, final BigDecimal totalWorkHours) {
+    public static BigDecimal calculateTotalLaborCost(final Integer dailyWage,
+            final BigDecimal totalWorkHours) {
         if (dailyWage != null && totalWorkHours != null) {
             return BigDecimal.valueOf(dailyWage).multiply(totalWorkHours);
         }
@@ -56,7 +56,8 @@ public class LaborPayrollCalculator {
      * 생년월일 계산 (주민번호 기준)
      */
     public static LocalDate calculateBirthDate(final Labor labor) {
-        if (labor == null || labor.getResidentNumber() == null || labor.getResidentNumber().length() < 13) {
+        if (labor == null || labor.getResidentNumber() == null
+                || labor.getResidentNumber().length() < 13) {
             return LocalDate.of(1989, 1, 1); // 기본값
         }
 
@@ -82,8 +83,8 @@ public class LaborPayrollCalculator {
 
             // 엑셀 수식과 동일한 로직: 1,2,5,6이면 1900년대, 아니면 2000년대
             int fullYear;
-            if ("1".equals(genderCode) || "2".equals(genderCode) ||
-                    "5".equals(genderCode) || "6".equals(genderCode)) {
+            if ("1".equals(genderCode) || "2".equals(genderCode) || "5".equals(genderCode)
+                    || "6".equals(genderCode)) {
                 fullYear = 1900 + yy;
             } else {
                 fullYear = 2000 + yy;
@@ -136,8 +137,8 @@ public class LaborPayrollCalculator {
 
         // 1일부터 시작해서 첫 번째 평일(월~금) 찾기
         LocalDate currentDay = firstDay;
-        while (currentDay.getDayOfWeek() == DayOfWeek.SATURDAY ||
-                currentDay.getDayOfWeek() == DayOfWeek.SUNDAY) {
+        while (currentDay.getDayOfWeek() == DayOfWeek.SATURDAY
+                || currentDay.getDayOfWeek() == DayOfWeek.SUNDAY) {
             currentDay = currentDay.plusDays(1);
         }
 
@@ -150,7 +151,7 @@ public class LaborPayrollCalculator {
      */
     public static BigDecimal calculateIncomeTax(final Integer dailyWage, final LaborPayroll payroll,
             final String yearMonth) {
-        if (dailyWage == null || !workedOnFirstWeekday(payroll, yearMonth)) {
+        if (dailyWage == null) {
             return BigDecimal.ZERO;
         }
 
@@ -162,13 +163,13 @@ public class LaborPayrollCalculator {
             final Double dayHours = payroll.getDayHours(day);
             if (dayHours != null && dayHours > 0.0) {
                 // 일당 × 해당일 공수
-                final BigDecimal dailyAmount = BigDecimal.valueOf(dailyWage).multiply(BigDecimal.valueOf(dayHours));
+                final BigDecimal dailyAmount =
+                        BigDecimal.valueOf(dailyWage).multiply(BigDecimal.valueOf(dayHours));
 
                 if (dailyAmount.compareTo(threshold) > 0) {
                     // (일당×공수 - 150000) * 6% * 45%
                     final BigDecimal exceededAmount = dailyAmount.subtract(threshold);
-                    final BigDecimal dailyTax = exceededAmount
-                            .multiply(new BigDecimal("0.06"))
+                    final BigDecimal dailyTax = exceededAmount.multiply(new BigDecimal("0.06"))
                             .multiply(new BigDecimal("0.45"));
                     totalTax = totalTax.add(roundDown(dailyTax, 0));
                 }

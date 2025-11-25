@@ -1,10 +1,8 @@
 package com.lineinc.erp.api.server.domain.laborpayroll.entity;
 
 import java.math.BigDecimal;
-
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.labor.entity.Labor;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
@@ -13,7 +11,6 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.laborpayroll.dto.request.LaborPayrollInfo;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -37,11 +34,8 @@ import lombok.experimental.SuperBuilder;
  * 월별 인력별 근무 내역 및 급여 정보를 저장
  */
 @Entity
-@Table(indexes = {
-        @Index(columnList = "year_month"),
-        @Index(columnList = "created_at"),
-        @Index(columnList = "updated_at")
-})
+@Table(indexes = {@Index(columnList = "year_month"), @Index(columnList = "created_at"),
+        @Index(columnList = "updated_at")})
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -53,7 +47,8 @@ public class LaborPayroll extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME,
+            allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     // 인력 정보
@@ -286,19 +281,16 @@ public class LaborPayroll extends BaseEntity {
         calculateTotalWorkDays();
 
         // 총 노무비 계산
-        this.totalLaborCost = LaborPayrollCalculator.calculateTotalLaborCost(dailyWage, totalWorkHours);
+        this.totalLaborCost =
+                LaborPayrollCalculator.calculateTotalLaborCost(dailyWage, totalWorkHours);
 
         // 공제액 계산
         if (totalLaborCost != null) {
             calculateDeductions();
 
             // 총 공제액 계산 및 저장
-            this.totalDeductions = incomeTax
-                    .add(employmentInsurance)
-                    .add(healthInsurance)
-                    .add(localTax)
-                    .add(nationalPension)
-                    .add(longTermCareInsurance);
+            this.totalDeductions = incomeTax.add(employmentInsurance).add(healthInsurance)
+                    .add(localTax).add(nationalPension).add(longTermCareInsurance);
 
             // 차감지급액 계산 (총 노무비 - 총 공제액)
             this.netPayment = totalLaborCost.subtract(this.totalDeductions);
@@ -310,7 +302,8 @@ public class LaborPayroll extends BaseEntity {
      */
     private void calculateDeductions() {
         // 정직원과 외주계약직은 모든 공제 항목을 계산하지 않음
-        if (labor.getType() == LaborType.REGULAR_EMPLOYEE || labor.getType() == LaborType.OUTSOURCING_CONTRACT) {
+        if (labor.getType() == LaborType.REGULAR_EMPLOYEE
+                || labor.getType() == LaborType.OUTSOURCING_CONTRACT) {
             this.incomeTax = BigDecimal.ZERO;
             this.employmentInsurance = BigDecimal.ZERO;
             this.healthInsurance = BigDecimal.ZERO;
@@ -328,7 +321,8 @@ public class LaborPayroll extends BaseEntity {
         final BigDecimal pensionMaxAmount = new BigDecimal("286650");
 
         // 소득세 계산: 첫 번째 평일 근무 여부를 기준으로 계산
-        final BigDecimal calculatedIncomeTax = LaborPayrollCalculator.calculateIncomeTax(dailyWage, this, yearMonth);
+        final BigDecimal calculatedIncomeTax =
+                LaborPayrollCalculator.calculateIncomeTax(dailyWage, this, yearMonth);
 
         // 소득세 1000원 미만은 0으로 처리 (엑셀 수식: =IF(AN6<1000, 0, AN6))
         if (calculatedIncomeTax.compareTo(new BigDecimal("1000")) < 0) {
@@ -337,9 +331,8 @@ public class LaborPayroll extends BaseEntity {
             this.incomeTax = calculatedIncomeTax;
         }
 
-        // 주민세: ROUNDDOWN(소득세 × 10%, -1) && 첫 번째 평일 근무해야 함
-        final boolean workedOnFirstWeekday = LaborPayrollCalculator.workedOnFirstWeekday(this, yearMonth);
-        if (!workedOnFirstWeekday || incomeTax.compareTo(BigDecimal.ZERO) == 0) {
+        // 주민세: ROUNDDOWN(소득세 × 10%, -1)
+        if (incomeTax.compareTo(BigDecimal.ZERO) == 0) {
             this.localTax = BigDecimal.ZERO;
         } else {
             final BigDecimal tax = incomeTax.multiply(new BigDecimal("0.1"));
