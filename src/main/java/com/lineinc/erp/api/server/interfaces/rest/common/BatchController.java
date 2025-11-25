@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
 import com.lineinc.erp.api.server.domain.batch.enums.BatchExecutionType;
 import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
@@ -13,7 +12,6 @@ import com.lineinc.erp.api.server.infrastructure.config.batch.service.BatchServi
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DashboardSiteMonthlyCostBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureCalculationBatchService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,19 +36,18 @@ public class BatchController extends BaseController {
 
     /**
      * 출역일보 자동 마감 배치를 수동으로 실행합니다.
-     * 
+     *
      * @return 배치 실행 결과
      */
     @PostMapping("/daily-report-auto-complete")
     @Operation(summary = "출역일보 자동 마감 배치 실행")
-    @Transactional
     public ResponseEntity<String> runDailyReportAutoCompleteBatch() {
         return executeBatchWithHistory(dailyReportAutoCompleteBatchService);
     }
 
     /**
      * 근속기간 계산 배치를 수동으로 실행합니다.
-     * 
+     *
      * @return 배치 실행 결과
      */
     @PostMapping("/tenure-calculation")
@@ -64,7 +61,7 @@ public class BatchController extends BaseController {
      * 대시보드 현장 월별 비용 집계 배치를 수동으로 실행합니다.
      * 대시보드 현장 목록 조회로 반환되는 현장들에 대해 각 월마다 재료비, 노무비, 관리비, 장비비, 외주비를 저장합니다.
      * 기준: 착공일(시작일)이 포함된 월부터 배치 실행 시점의 월까지 계산합니다.
-     * 
+     *
      * @return 배치 실행 결과
      */
     @PostMapping("/dashboard-site-monthly-cost")
@@ -76,12 +73,13 @@ public class BatchController extends BaseController {
 
     /**
      * 배치 작업을 실행하고 이력을 기록합니다.
-     * 
+     *
      * @param batchService 실행할 배치 서비스
      * @return 배치 실행 결과
      */
     private ResponseEntity<String> executeBatchWithHistory(final BatchService batchService) {
-        final BatchExecutionHistory history = batchService.createExecutionHistory(BatchExecutionType.MANUAL);
+        final BatchExecutionHistory history =
+                batchService.createExecutionHistory(BatchExecutionType.MANUAL);
         batchExecutionHistoryRepository.save(history);
 
         try {
@@ -99,7 +97,8 @@ public class BatchController extends BaseController {
             batchExecutionHistoryRepository.save(history);
 
             final String errorMessage = String.format("%s 실행 중 오류 발생 - 실행 시간: %.2f초, 오류: %s",
-                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds(), e.getMessage());
+                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds(),
+                    e.getMessage());
             log.error(errorMessage, e);
             return ResponseEntity.status(500).body("배치 실행 실패: " + e.getMessage());
         }
