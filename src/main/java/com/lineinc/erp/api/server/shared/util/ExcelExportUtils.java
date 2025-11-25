@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -85,12 +87,17 @@ public class ExcelExportUtils {
     }
 
     /**
-     * 헤더 셀 스타일 생성 (가운데 정렬 + 테두리)
+     * 헤더 셀 스타일 생성 (가운데 정렬 + 연한 회색 배경 + 테두리)
      */
     private static CellStyle createHeaderStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        // 연한 회색 배경색 설정
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
         setBorders(style);
         return style;
     }
