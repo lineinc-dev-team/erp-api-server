@@ -147,8 +147,8 @@ public class LaborPayrollCalculator {
 
     /**
      * 소득세 계산
-     * 일당 150,000 초과 시: (일당 - 150,000) × 0.027
-     * 1000원 미만은 0으로 처리
+     * 각 일별로 (일당 × 공수 - 150,000) × 0.027 계산 후 합산
+     * 총 소득세가 1000원 미만은 0으로 처리
      */
     public static BigDecimal calculateIncomeTax(final Integer dailyWage, final LaborPayroll payroll,
             final String yearMonth) {
@@ -160,22 +160,32 @@ public class LaborPayrollCalculator {
         final BigDecimal taxRate = new BigDecimal("0.027");
         final BigDecimal minTaxThreshold = new BigDecimal("1000");
 
-        // 일당이 150,000 이하면 소득세 없음
-        if (BigDecimal.valueOf(dailyWage).compareTo(threshold) <= 0) {
+        BigDecimal totalTax = BigDecimal.ZERO;
+
+        // 각 일별로 소득세 계산
+        for (int day = 1; day <= 31; day++) {
+            final Double dayHours = payroll.getDayHours(day);
+            if (dayHours != null && dayHours > 0.0) {
+                // 일당 × 해당일 공수
+                final BigDecimal dailyAmount =
+                        BigDecimal.valueOf(dailyWage).multiply(BigDecimal.valueOf(dayHours));
+
+                // 150,000원 초과 시 소득세 계산
+                if (dailyAmount.compareTo(threshold) > 0) {
+                    // (일당×공수 - 150,000) × 0.027
+                    final BigDecimal exceededAmount = dailyAmount.subtract(threshold);
+                    final BigDecimal dailyTax = exceededAmount.multiply(taxRate);
+                    totalTax = totalTax.add(roundDown(dailyTax, 0));
+                }
+            }
+        }
+
+        // 총 소득세가 1000원 미만은 0으로 처리
+        if (totalTax.compareTo(minTaxThreshold) < 0) {
             return BigDecimal.ZERO;
         }
 
-        // (일당 - 150,000) × 0.027
-        final BigDecimal exceededAmount = BigDecimal.valueOf(dailyWage).subtract(threshold);
-        final BigDecimal calculatedTax = exceededAmount.multiply(taxRate);
-
-        // 1000원 미만은 0으로 처리
-        if (calculatedTax.compareTo(minTaxThreshold) < 0) {
-            return BigDecimal.ZERO;
-        }
-
-        // 소수점 이하 절사
-        return roundDown(calculatedTax, 0);
+        return totalTax;
     }
 
     /**
