@@ -1,9 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 
 import java.util.List;
-
 import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -22,11 +20,13 @@ public record OutsourcingCompanyUpdateRequest(
         @Schema(description = "휴대폰번호", example = "010-1234-5678") String phoneNumber,
         @Schema(description = "이메일", example = "ceo@outsourcing.com") @Email String email,
         @Schema(description = "활성 여부", example = "true") @NotNull Boolean isActive,
-        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)", example = "FUEL_COST,MEAL_COST") String defaultDeductions,
-        @Schema(description = "기본 공제 항목 설명", example = "3.3% 원천징수") String defaultDeductionsDescription,
-        @Schema(description = "은행명", example = "국민은행") @NotBlank String bankName,
-        @Schema(description = "계좌번호", example = "123456-78-901234") @NotBlank String accountNumber,
-        @Schema(description = "예금주", example = "홍길순") @NotBlank String accountHolder,
+        @Schema(description = "기본 공제 항목 (콤마로 구분된 문자열)",
+                example = "FUEL_COST,MEAL_COST") String defaultDeductions,
+        @Schema(description = "기본 공제 항목 설명",
+                example = "3.3% 원천징수") String defaultDeductionsDescription,
+        @Schema(description = "은행명", example = "국민은행") String bankName,
+        @Schema(description = "계좌번호", example = "123456-78-901234") String accountNumber,
+        @Schema(description = "예금주", example = "홍길순") String accountHolder,
         @Schema(description = "비고") String memo,
         @Schema(description = "담당자 목록") @Valid List<OutsourcingCompanyContactUpdateRequest> contacts,
         @Schema(description = "첨부파일 목록") @Valid List<OutsourcingCompanyFileUpdateRequest> files,
