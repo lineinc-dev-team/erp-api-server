@@ -4,14 +4,12 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
-
 import com.lineinc.erp.api.server.domain.site.entity.QSite;
 import com.lineinc.erp.api.server.domain.site.entity.QSiteProcess;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
@@ -26,7 +24,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -42,12 +39,9 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
     private final QSiteProcess siteProcess = QSiteProcess.siteProcess;
 
     // 정렬 필드를 미리 정의하여 정적 매핑.
-    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
-            "id", QSite.site.id,
-            "name", QSite.site.name,
-            "startedAt", QSite.site.startedAt,
-            "createdAt", QSite.site.createdAt,
-            "updatedAt", QSite.site.updatedAt);
+    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS =
+            Map.of("id", QSite.site.id, "name", QSite.site.name, "startedAt", QSite.site.startedAt,
+                    "createdAt", QSite.site.createdAt, "updatedAt", QSite.site.updatedAt);
 
     /**
      * Site 목록을 요청 조건(request)과 Pageable 정보에 따라 조회.
@@ -67,33 +61,19 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             }
             condition.and(site.id.in(accessibleSiteIds));
         }
-        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(
-                pageable,
-                SORT_FIELDS);
+        final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
-        final List<Site> content = queryFactory
-                .selectFrom(site)
-                .leftJoin(site.clientCompany).fetchJoin()
-                .leftJoin(site.user).fetchJoin()
-                .leftJoin(site.processes, siteProcess).fetchJoin()
-                .distinct()
-                .where(condition)
-                .orderBy(orders)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        final List<Site> content = queryFactory.selectFrom(site).leftJoin(site.clientCompany)
+                .fetchJoin().leftJoin(site.user).fetchJoin().leftJoin(site.processes, siteProcess)
+                .fetchJoin().distinct().where(condition).orderBy(orders)
+                .offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
 
         // count 쿼리를 별도로 수행 (성능 최적화를 위해 fetchResults 대신 직접 분리)
-        final Long totalCount = queryFactory
-                .select(site.count())
-                .from(site)
-                .where(condition)
-                .fetchOne();
+        final Long totalCount =
+                queryFactory.select(site.count()).from(site).where(condition).fetchOne();
         final long total = Objects.requireNonNullElse(totalCount, 0L);
 
-        final List<SiteResponse> responses = content.stream()
-                .map(SiteResponse::from)
-                .toList();
+        final List<SiteResponse> responses = content.stream().map(SiteResponse::from).toList();
 
         return new PageImpl<>(responses, pageable, total);
     }
@@ -110,30 +90,23 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         }
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(sort, SORT_FIELDS);
 
-        return queryFactory
-                .selectFrom(site)
-                .leftJoin(site.clientCompany).fetchJoin()
-                .leftJoin(site.user).fetchJoin()
-                .leftJoin(site.processes, siteProcess).fetchJoin()
-                .distinct()
-                .where(condition)
-                .orderBy(orders)
-                .fetch();
+        return queryFactory.selectFrom(site).leftJoin(site.clientCompany).fetchJoin()
+                .leftJoin(site.user).fetchJoin().leftJoin(site.processes, siteProcess).fetchJoin()
+                .distinct().where(condition).orderBy(orders).fetch();
     }
 
     @Override
     public List<Site> findSitesForDashboard(final OffsetDateTime endedAtThreshold,
-            final OffsetDateTime currentDateTime,
-            final List<Long> accessibleSiteIds) {
+            final OffsetDateTime currentDateTime, final List<Long> accessibleSiteIds) {
         if (accessibleSiteIds != null && accessibleSiteIds.isEmpty()) {
             return List.of();
         }
 
-        final OffsetDateTime threshold = Objects.requireNonNullElse(endedAtThreshold, OffsetDateTime.MIN);
+        final OffsetDateTime threshold =
+                Objects.requireNonNullElse(endedAtThreshold, OffsetDateTime.MIN);
 
-        final BooleanBuilder condition = new BooleanBuilder()
-                .and(site.deleted.eq(false))
-                .and(siteProcess.deleted.eq(false));
+        final BooleanBuilder condition =
+                new BooleanBuilder().and(site.deleted.eq(false)).and(siteProcess.deleted.eq(false));
 
         // 진행 중인 현장
         final BooleanExpression inProgress = siteProcess.status.eq(SiteProcessStatus.IN_PROGRESS);
@@ -141,9 +114,9 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         // 완료된 현장 중에서 종료일 이후 1개월 이내인 현장
         // 종료일이 threshold(now - 1개월) 이후인 경우 포함 (종료일 + 1개월 >= now)
         // 즉: endedAt >= threshold
-        final BooleanExpression recentlyCompleted = siteProcess.status.eq(SiteProcessStatus.COMPLETED)
-                .and(site.endedAt.isNotNull())
-                .and(site.endedAt.goe(threshold));
+        final BooleanExpression recentlyCompleted =
+                siteProcess.status.eq(SiteProcessStatus.COMPLETED).and(site.endedAt.isNotNull())
+                        .and(site.endedAt.goe(threshold));
 
         condition.and(inProgress.or(recentlyCompleted));
 
@@ -151,15 +124,9 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             condition.and(site.id.in(accessibleSiteIds));
         }
 
-        return queryFactory
-                .selectDistinct(site)
-                .from(site)
-                .join(site.processes, siteProcess).fetchJoin()
-                .leftJoin(site.clientCompany).fetchJoin()
-                .leftJoin(site.user).fetchJoin()
-                .where(condition)
-                .orderBy(site.createdAt.desc())
-                .fetch();
+        return queryFactory.selectDistinct(site).from(site).join(site.processes, siteProcess)
+                .fetchJoin().leftJoin(site.clientCompany).fetchJoin().leftJoin(site.user)
+                .fetchJoin().where(condition).orderBy(site.createdAt.desc()).fetch();
     }
 
     /**
@@ -187,7 +154,8 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
         }
         if (StringUtils.hasText(request.managerName())) {
             builder.and(site.processes.any().manager.isNotNull()
-                    .and(site.processes.any().manager.username.containsIgnoreCase(request.managerName().trim())));
+                    .and(site.processes.any().manager.username
+                            .containsIgnoreCase(request.managerName().trim())));
         }
         if (StringUtils.hasText(request.city())) {
             builder.and(site.city.eq(request.city().trim()));
@@ -201,29 +169,34 @@ public class SiteRepositoryImpl implements SiteRepositoryCustom {
             builder.and(site.processes.any().status.in(siteProcessStatuses));
         }
         if (StringUtils.hasText(request.clientCompanyName())) {
-            builder.and(site.clientCompany.name.containsIgnoreCase(request.clientCompanyName().trim()));
+            builder.and(
+                    site.clientCompany.name.containsIgnoreCase(request.clientCompanyName().trim()));
         }
         if (StringUtils.hasText(request.createdBy())) {
             builder.and(site.createdBy.containsIgnoreCase(request.createdBy().trim()));
         }
 
         if (request.startDate() != null) {
-            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.startDate());
+            final OffsetDateTime[] dateRange =
+                    DateTimeFormatUtils.getUtcDateRange(request.startDate());
             builder.and(site.startedAt.goe(dateRange[0]));
         }
 
         if (request.endDate() != null) {
-            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.endDate());
+            final OffsetDateTime[] dateRange =
+                    DateTimeFormatUtils.getUtcDateRange(request.endDate());
             builder.and(site.endedAt.lt(dateRange[1]));
         }
 
         if (request.createdStartDate() != null) {
-            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
+            final OffsetDateTime[] dateRange =
+                    DateTimeFormatUtils.getUtcDateRange(request.createdStartDate());
             builder.and(site.createdAt.goe(dateRange[0]));
         }
 
         if (request.createdEndDate() != null) {
-            final OffsetDateTime[] dateRange = DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
+            final OffsetDateTime[] dateRange =
+                    DateTimeFormatUtils.getUtcDateRange(request.createdEndDate());
             builder.and(site.createdAt.lt(dateRange[1]));
         }
 

@@ -3,12 +3,10 @@ package com.lineinc.erp.api.server.domain.dashboard.service;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.lineinc.erp.api.server.domain.batch.entity.BatchExecutionHistory;
 import com.lineinc.erp.api.server.domain.batch.enums.BatchName;
 import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryRepository;
@@ -27,7 +25,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProce
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -44,17 +41,25 @@ public class DashboardService {
     private final SiteMonthlyCostSummaryRepository siteMonthlyCostSummaryRepository;
     private final BatchExecutionHistoryRepository batchExecutionHistoryRepository;
 
-    public List<DashboardSiteResponse> getDashboardSites(final Long userId) {
+    /**
+     * 대시보드 현장 목록 조회
+     * keyword가 제공되면 현장명에 keyword가 포함된 경우만 반환합니다 (부분 검색).
+     */
+    public List<DashboardSiteResponse> getDashboardSites(final Long userId, final String keyword) {
         final OffsetDateTime now = OffsetDateTime.now(AppConstants.KOREA_ZONE);
         final OffsetDateTime threshold = now.minusMonths(1);
         final User user = userService.getUserByIdOrThrow(userId);
         // 접근 권한이 있는 현장만 조회 (본사직원이어도 각 사용자가 접근 권한을 가진 현장들만 반환)
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
-        final List<Site> sites = siteRepository.findSitesForDashboard(threshold, now, accessibleSiteIds);
+        final List<Site> sites =
+                siteRepository.findSitesForDashboard(threshold, now, accessibleSiteIds);
 
-        return sites.stream()
-                .map(DashboardSiteResponse::from)
-                .toList();
+        // keyword 필터링 (응용 계층에서 처리)
+        final List<Site> filteredSites = (keyword != null && !keyword.trim().isEmpty())
+                ? sites.stream().filter(site -> site.getName().contains(keyword.trim())).toList()
+                : sites;
+
+        return filteredSites.stream().map(DashboardSiteResponse::from).toList();
     }
 
     /**
@@ -67,7 +72,8 @@ public class DashboardService {
 
         // 본사직원 체크
         if (!user.isHeadOffice()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ValidationMessages.ACCESS_DENIED);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    ValidationMessages.ACCESS_DENIED);
         }
 
         // 대시보드 현장 목록 조회 (접근 권한이 있는 현장만)
@@ -75,110 +81,94 @@ public class DashboardService {
         final OffsetDateTime now = OffsetDateTime.now(AppConstants.KOREA_ZONE);
         final OffsetDateTime threshold = now.minusMonths(1);
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
-        final List<Site> sites = siteRepository.findSitesForDashboard(threshold, now, accessibleSiteIds);
+        final List<Site> sites =
+                siteRepository.findSitesForDashboard(threshold, now, accessibleSiteIds);
 
-        return sites.stream()
-                .map(site -> {
-                    // 해당 현장의 모든 공정을 합산한 월별 비용 조회
-                    final List<Object[]> monthlyCostsData = siteMonthlyCostSummaryRepository
-                            .findMonthlyCostsBySiteId(site.getId());
+        return sites.stream().map(site -> {
+            // 해당 현장의 모든 공정을 합산한 월별 비용 조회
+            final List<Object[]> monthlyCostsData =
+                    siteMonthlyCostSummaryRepository.findMonthlyCostsBySiteId(site.getId());
 
-                    // 모든 월의 비용을 합산하여 총합 계산
-                    long totalMaterialCost = 0L;
-                    long totalLaborCost = 0L;
-                    long totalManagementCost = 0L;
-                    long totalEquipmentCost = 0L;
-                    long totalOutsourcingCost = 0L;
+            // 모든 월의 비용을 합산하여 총합 계산
+            long totalMaterialCost = 0L;
+            long totalLaborCost = 0L;
+            long totalManagementCost = 0L;
+            long totalEquipmentCost = 0L;
+            long totalOutsourcingCost = 0L;
 
-                    for (final Object[] data : monthlyCostsData) {
-                        totalMaterialCost += ((Number) data[1]).longValue();
-                        totalLaborCost += ((Number) data[2]).longValue();
-                        totalManagementCost += ((Number) data[3]).longValue();
-                        totalEquipmentCost += ((Number) data[4]).longValue();
-                        totalOutsourcingCost += ((Number) data[5]).longValue();
-                    }
+            for (final Object[] data : monthlyCostsData) {
+                totalMaterialCost += ((Number) data[1]).longValue();
+                totalLaborCost += ((Number) data[2]).longValue();
+                totalManagementCost += ((Number) data[3]).longValue();
+                totalEquipmentCost += ((Number) data[4]).longValue();
+                totalOutsourcingCost += ((Number) data[5]).longValue();
+            }
 
-                    final long totalCost = totalMaterialCost + totalLaborCost + totalManagementCost
-                            + totalEquipmentCost + totalOutsourcingCost;
+            final long totalCost = totalMaterialCost + totalLaborCost + totalManagementCost
+                    + totalEquipmentCost + totalOutsourcingCost;
 
-                    return new SiteMonthlyCostsResponse(
-                            SiteResponse.SiteSimpleResponse.from(site),
-                            SiteProcessResponse.SiteProcessSimpleResponse.from(site.getProcesses().get(0)),
-                            totalMaterialCost,
-                            totalLaborCost,
-                            totalManagementCost,
-                            totalEquipmentCost,
-                            totalOutsourcingCost,
-                            totalCost);
-                })
-                .collect(Collectors.toList());
+            return new SiteMonthlyCostsResponse(SiteResponse.SiteSimpleResponse.from(site),
+                    SiteProcessResponse.SiteProcessSimpleResponse.from(site.getProcesses().get(0)),
+                    totalMaterialCost, totalLaborCost, totalManagementCost, totalEquipmentCost,
+                    totalOutsourcingCost, totalCost);
+        }).collect(Collectors.toList());
     }
 
     /**
      * 현장 및 공정별 월별 비용 목록 조회
      * 해당 현장에 접근 권한이 있는 사용자만 조회 가능합니다.
      */
-    public List<SiteMonthlyCostResponse> getSiteProcessMonthlyCosts(
-            final Long userId,
-            final Long siteId,
-            final Long siteProcessId) {
+    public List<SiteMonthlyCostResponse> getSiteProcessMonthlyCosts(final Long userId,
+            final Long siteId, final Long siteProcessId) {
         final User user = userService.getUserByIdOrThrow(userId);
 
         // 현장 존재 확인
         siteRepository.findById(siteId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.SITE_NOT_FOUND));
 
         // 현장 접근 권한 체크
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
 
         // 본사직원이거나 접근 가능한 현장 목록에 포함되어 있어야 함
         if (accessibleSiteIds != null && !accessibleSiteIds.contains(siteId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ValidationMessages.ACCESS_DENIED);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    ValidationMessages.ACCESS_DENIED);
         }
 
         // 현장 및 공정 조회
-        final Site site = siteRepository.findById(siteId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.SITE_NOT_FOUND));
+        final Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.SITE_NOT_FOUND));
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(siteProcessId);
 
         // 월별 비용 조회
         final List<Object[]> monthlyCostsData = siteMonthlyCostSummaryRepository
                 .findMonthlyCostsBySiteIdAndSiteProcessId(siteId, siteProcessId);
 
-        return monthlyCostsData.stream()
-                .map(data -> {
-                    final String yearMonth = (String) data[0];
-                    final Long materialCost = ((Number) data[1]).longValue();
-                    final Long laborCost = ((Number) data[2]).longValue();
-                    final Long managementCost = ((Number) data[3]).longValue();
-                    final Long equipmentCost = ((Number) data[4]).longValue();
-                    final Long outsourcingCost = ((Number) data[5]).longValue();
+        return monthlyCostsData.stream().map(data -> {
+            final String yearMonth = (String) data[0];
+            final Long materialCost = ((Number) data[1]).longValue();
+            final Long laborCost = ((Number) data[2]).longValue();
+            final Long managementCost = ((Number) data[3]).longValue();
+            final Long equipmentCost = ((Number) data[4]).longValue();
+            final Long outsourcingCost = ((Number) data[5]).longValue();
 
-                    return SiteMonthlyCostResponse.from(
-                            site,
-                            siteProcess,
-                            yearMonth,
-                            materialCost,
-                            laborCost,
-                            managementCost,
-                            equipmentCost,
-                            outsourcingCost);
-                })
-                .collect(Collectors.toList());
+            return SiteMonthlyCostResponse.from(site, siteProcess, yearMonth, materialCost,
+                    laborCost, managementCost, equipmentCost, outsourcingCost);
+        }).collect(Collectors.toList());
     }
 
     /**
      * 배치의 가장 최근 실행 시간 조회
-     * 
+     *
      * @param batchName 배치 이름 Enum
      * @return 배치 실행 종료 시간 (없으면 null)
      */
     public DashboardBatchExecutionTimeResponse getBatchExecutionTime(final BatchName batchName) {
         final OffsetDateTime latestEndTime = batchExecutionHistoryRepository
                 .findTop1ByBatchNameAndEndTimeIsNotNullOrderByEndTimeDesc(batchName)
-                .map(BatchExecutionHistory::getEndTime)
-                .orElse(null);
+                .map(BatchExecutionHistory::getEndTime).orElse(null);
         return new DashboardBatchExecutionTimeResponse(latestEndTime);
     }
 }
