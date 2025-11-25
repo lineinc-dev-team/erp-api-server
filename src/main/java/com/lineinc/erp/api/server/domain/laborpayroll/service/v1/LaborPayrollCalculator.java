@@ -146,8 +146,9 @@ public class LaborPayrollCalculator {
     }
 
     /**
-     * 소득세 계산 (엑셀 수식과 동일)
-     * 첫 번째 평일 근무 여부를 기준으로 계산
+     * 소득세 계산
+     * 일당 150,000 초과 시: (일당 - 150,000) × 0.027
+     * 1000원 미만은 0으로 처리
      */
     public static BigDecimal calculateIncomeTax(final Integer dailyWage, final LaborPayroll payroll,
             final String yearMonth) {
@@ -155,29 +156,26 @@ public class LaborPayrollCalculator {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal totalTax = BigDecimal.ZERO;
         final BigDecimal threshold = new BigDecimal("150000");
+        final BigDecimal taxRate = new BigDecimal("0.027");
+        final BigDecimal minTaxThreshold = new BigDecimal("1000");
 
-        // 각 일별로 소득세 계산
-        for (int day = 1; day <= 31; day++) {
-            final Double dayHours = payroll.getDayHours(day);
-            if (dayHours != null && dayHours > 0.0) {
-                // 일당 × 해당일 공수
-                final BigDecimal dailyAmount =
-                        BigDecimal.valueOf(dailyWage).multiply(BigDecimal.valueOf(dayHours));
-
-                if (dailyAmount.compareTo(threshold) > 0) {
-                    // (일당×공수 - 150000) * 6% * 45%
-                    final BigDecimal exceededAmount = dailyAmount.subtract(threshold);
-                    final BigDecimal dailyTax = exceededAmount.multiply(new BigDecimal("0.06"))
-                            .multiply(new BigDecimal("0.45"));
-                    totalTax = totalTax.add(roundDown(dailyTax, 0));
-                }
-            }
+        // 일당이 150,000 이하면 소득세 없음
+        if (BigDecimal.valueOf(dailyWage).compareTo(threshold) <= 0) {
+            return BigDecimal.ZERO;
         }
 
-        // ROUNDDOWN(SUM, -1) 적용
-        return roundDown(totalTax, -1);
+        // (일당 - 150,000) × 0.027
+        final BigDecimal exceededAmount = BigDecimal.valueOf(dailyWage).subtract(threshold);
+        final BigDecimal calculatedTax = exceededAmount.multiply(taxRate);
+
+        // 1000원 미만은 0으로 처리
+        if (calculatedTax.compareTo(minTaxThreshold) < 0) {
+            return BigDecimal.ZERO;
+        }
+
+        // 소수점 이하 절사
+        return roundDown(calculatedTax, 0);
     }
 
     /**
