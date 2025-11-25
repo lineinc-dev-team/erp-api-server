@@ -1,10 +1,8 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request;
 
 import java.util.List;
-
 import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
 import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -20,7 +18,7 @@ public record ClientCompanyUpdateRequest(
         @Schema(description = "전화번호", example = "02-123-5678") @NotBlank String landlineNumber,
         @Schema(description = "팩스번호", example = "02-123-5679") String faxNumber,
         @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
-        @Schema(description = "이메일", example = "example@samsung.com") @NotBlank @Email String email,
+        @Schema(description = "이메일", example = "example@samsung.com") @Email String email,
         @Schema(description = "결제 방식", example = "CASH") ClientCompanyPaymentMethod paymentMethod,
         @Schema(description = "결제 유예 기간", example = "2") String paymentPeriod,
         @Schema(description = "비고 / 메모") String memo,
