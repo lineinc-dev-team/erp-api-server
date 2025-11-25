@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.re
 
 import java.time.OffsetDateTime;
 import java.util.List;
-
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractFileType;
@@ -10,15 +9,14 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 계약 목록 응답")
-public record ContractListResponse(
-        @Schema(description = "계약 ID") Long id,
+public record ContractListResponse(@Schema(description = "계약 ID") Long id,
         @Schema(description = "현장명") String siteName,
         @Schema(description = "공정명") String processName,
         @Schema(description = "외주업체명") String companyName,
+        @Schema(description = "대표자명") String ceoName,
         @Schema(description = "사업자등록번호") String businessNumber,
         @Schema(description = "계약 구분") String contractType,
         @Schema(description = "계약 구분 코드") String contractTypeCode,
@@ -44,30 +42,34 @@ public record ContractListResponse(
 
     public static ContractListResponse from(final OutsourcingCompanyContract contract) {
         // 담당자 목록 생성 (대표담당자만)
-        final List<CompanyContactResponse> contacts = contract.getContacts() != null
-                && !contract.getContacts().isEmpty()
-                        ? contract.getContacts().stream()
-                                .filter(contact -> contact.getIsMain())
-                                .map(CompanyContactResponse::from)
-                                .toList()
+        final List<CompanyContactResponse> contacts =
+                contract.getContacts() != null && !contract.getContacts().isEmpty()
+                        ? contract.getContacts().stream().filter(contact -> contact.getIsMain())
+                                .map(CompanyContactResponse::from).toList()
                         : List.of();
 
         // 공제항목을 콤마로 구분하여 각각의 label로 변환
         String defaultDeductionsLabel = null;
-        if (contract.getDefaultDeductions() != null && !contract.getDefaultDeductions().trim().isEmpty()) {
-            defaultDeductionsLabel = java.util.Arrays.stream(contract.getDefaultDeductions().split(","))
-                    .map(String::trim)
+        if (contract.getDefaultDeductions() != null
+                && !contract.getDefaultDeductions().trim().isEmpty()) {
+            defaultDeductionsLabel = java.util.Arrays
+                    .stream(contract.getDefaultDeductions().split(",")).map(String::trim)
                     .map(OutsourcingCompanyContractDefaultDeductionsType::safeLabelOf)
                     .collect(java.util.stream.Collectors.joining(","));
         }
 
-        return new ContractListResponse(
-                contract.getId(),
+        return new ContractListResponse(contract.getId(),
                 contract.getSite() != null ? contract.getSite().getName() : null,
                 contract.getSiteProcess() != null ? contract.getSiteProcess().getName() : null,
-                contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getName()
+                contract.getOutsourcingCompany() != null
+                        ? contract.getOutsourcingCompany().getName()
                         : null,
-                contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getBusinessNumber() : null,
+                contract.getOutsourcingCompany() != null
+                        ? contract.getOutsourcingCompany().getCeoName()
+                        : null,
+                contract.getOutsourcingCompany() != null
+                        ? contract.getOutsourcingCompany().getBusinessNumber()
+                        : null,
                 contract.getType() != null ? contract.getType().getLabel() : null,
                 contract.getType() != null ? contract.getType().name() : null,
                 contract.getTypeDescription(),
@@ -75,19 +77,16 @@ public record ContractListResponse(
                 contract.getStatus() != null ? contract.getStatus().name() : null,
                 contract.getCategory() != null ? contract.getCategory().getLabel() : null,
                 contract.getCategory() != null ? contract.getCategory().name() : null,
-                contract.getContractAmount(),
-                contacts,
-                defaultDeductionsLabel,
+                contract.getContractAmount(), contacts, defaultDeductionsLabel,
                 contract.getDefaultDeductions() != null ? contract.getDefaultDeductions() : null,
-                contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().getLabel()
+                contract.getTaxInvoiceCondition() != null
+                        ? contract.getTaxInvoiceCondition().getLabel()
                         : null,
-                contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().name() : null,
-                contract.getTaxInvoiceIssueDayOfMonth(),
-                contract.getMemo(),
-                contract.getContractStartDate(),
-                contract.getContractEndDate(),
-                contract.getCreatedAt(),
-                contract.getUpdatedAt(),
+                contract.getTaxInvoiceCondition() != null ? contract.getTaxInvoiceCondition().name()
+                        : null,
+                contract.getTaxInvoiceIssueDayOfMonth(), contract.getMemo(),
+                contract.getContractStartDate(), contract.getContractEndDate(),
+                contract.getCreatedAt(), contract.getUpdatedAt(),
                 contract.getFiles().stream()
                         .anyMatch(file -> file.getFileUrl() != null && !file.getFileUrl().isBlank()
                                 && file.getType() == OutsourcingCompanyContractFileType.GUARANTEE),
@@ -111,24 +110,26 @@ public record ContractListResponse(
             @Schema(description = "외주금액", example = "50000000") Long contractAmount,
             @Schema(description = "삭제 여부", example = "false") Boolean deleted) {
         public static ContractSimpleResponse from(final OutsourcingCompanyContract contract) {
-            return new ContractSimpleResponse(
-                    contract.getId(),
-                    contract.getContractName(),
+            return new ContractSimpleResponse(contract.getId(), contract.getContractName(),
                     contract.getOutsourcingCompany() != null
-                            ? CompanyResponse.CompanySimpleResponse.from(contract.getOutsourcingCompany())
+                            ? CompanyResponse.CompanySimpleResponse
+                                    .from(contract.getOutsourcingCompany())
                             : null,
-                    contract.getOutsourcingCompany() != null ? contract.getOutsourcingCompany().getBusinessNumber()
+                    contract.getOutsourcingCompany() != null
+                            ? contract.getOutsourcingCompany().getBusinessNumber()
                             : null,
-                    contract.getSite() != null ? SiteResponse.SiteSimpleResponse.from(contract.getSite()) : null,
+                    contract.getSite() != null
+                            ? SiteResponse.SiteSimpleResponse.from(contract.getSite())
+                            : null,
                     contract.getSiteProcess() != null
-                            ? SiteProcessResponse.SiteProcessSimpleResponse.from(contract.getSiteProcess())
+                            ? SiteProcessResponse.SiteProcessSimpleResponse
+                                    .from(contract.getSiteProcess())
                             : null,
                     contract.getType() != null ? contract.getType().getLabel() : null,
                     contract.getType() != null ? contract.getType().name() : null,
                     contract.getStatus() != null ? contract.getStatus().getLabel() : null,
                     contract.getStatus() != null ? contract.getStatus().name() : null,
-                    contract.getContractAmount(),
-                    contract.isDeleted());
+                    contract.getContractAmount(), contract.isDeleted());
         }
     }
 }
