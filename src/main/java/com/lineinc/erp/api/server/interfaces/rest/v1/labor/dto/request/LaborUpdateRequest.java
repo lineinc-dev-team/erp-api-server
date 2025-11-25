@@ -1,9 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request;
 
 import java.util.List;
-
 import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "인력정보 수정 요청")
@@ -28,8 +26,7 @@ public record LaborUpdateRequest(
         @Schema(description = "첨부파일 목록") List<LaborFileUpdateRequest> files,
         @Schema(description = "변경이력 목록") List<ChangeHistoryRequest> changeHistories) {
     @Schema(description = "변경이력 수정 요청")
-    public record ChangeHistoryRequest(
-            @Schema(description = "변경이력 ID", example = "1") Long id,
+    public record ChangeHistoryRequest(@Schema(description = "변경이력 ID", example = "1") Long id,
             @Schema(description = "메모", example = "수정 사유") String memo) {
     }
 }

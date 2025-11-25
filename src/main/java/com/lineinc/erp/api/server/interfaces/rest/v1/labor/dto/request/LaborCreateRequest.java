@@ -1,10 +1,8 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request;
 
 import java.util.List;
-
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -25,10 +23,10 @@ public record LaborCreateRequest(
         @Schema(description = "공종", example = "WELDER") LaborWorkType workType,
         @Schema(description = "공종 설명", example = "용접 작업") String workTypeDescription,
         @NotBlank @Schema(description = "주작업", example = "강재 용접") String mainWork,
-        @NotNull @Schema(description = "기준일당", example = "150000") Long dailyWage,
-        @NotBlank @Schema(description = "은행명", example = "신한은행") String bankName,
-        @NotBlank @Schema(description = "계좌번호", example = "110-123456789") String accountNumber,
-        @NotBlank @Schema(description = "예금주", example = "홍길동") String accountHolder,
+        @Schema(description = "기준일당", example = "150000") Long dailyWage,
+        @Schema(description = "은행명", example = "신한은행") String bankName,
+        @Schema(description = "계좌번호", example = "110-123456789") String accountNumber,
+        @Schema(description = "예금주", example = "홍길동") String accountHolder,
         @Schema(description = "직급 ID", example = "1") Long gradeId,
         @Schema(description = "첨부파일 목록") @Valid List<LaborFileCreateRequest> files) {
 }
