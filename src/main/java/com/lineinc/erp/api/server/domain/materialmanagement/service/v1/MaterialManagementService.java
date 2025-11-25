@@ -4,7 +4,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
@@ -48,7 +46,6 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -72,11 +69,14 @@ public class MaterialManagementService {
     private final ExcelDownloadHistoryService excelDownloadHistoryService;
 
     @Transactional
-    public void createMaterialManagement(final MaterialManagementCreateRequest request, final CustomUserDetails user) {
+    public void createMaterialManagement(final MaterialManagementCreateRequest request,
+            final CustomUserDetails user) {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
-        final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
+        final SiteProcess siteProcess =
+                siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
         // 외주업체 조회
@@ -84,43 +84,43 @@ public class MaterialManagementService {
                 .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
 
         // 공제업체 조회
-        final OutsourcingCompany deductionCompany = request.deductionCompanyId() != null
-                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
-                : null;
+        final OutsourcingCompany deductionCompany =
+                request.deductionCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
+                        : null;
 
         // 공제업체계약 조회
-        final OutsourcingCompanyContract deductionCompanyContract = request.deductionCompanyContractId() != null
-                ? outsourcingCompanyContractService.getContractByIdOrThrow(request.deductionCompanyContractId())
-                : null;
+        final OutsourcingCompanyContract deductionCompanyContract =
+                request.deductionCompanyContractId() != null
+                        ? outsourcingCompanyContractService
+                                .getContractByIdOrThrow(request.deductionCompanyContractId())
+                        : null;
 
-        final MaterialManagement materialManagement = MaterialManagement.builder()
-                .site(site)
-                .siteProcess(siteProcess)
-                .outsourcingCompany(outsourcingCompany)
+        final MaterialManagement materialManagement = MaterialManagement.builder().site(site)
+                .siteProcess(siteProcess).outsourcingCompany(outsourcingCompany)
                 .deductionCompany(deductionCompany)
-                .deductionCompanyContract(deductionCompanyContract)
-                .inputType(request.inputType())
+                .deductionCompanyContract(deductionCompanyContract).inputType(request.inputType())
                 .inputTypeDescription(request.inputTypeDescription())
                 .deliveryDate(DateTimeFormatUtils.toOffsetDateTime(request.deliveryDate()))
-                .memo(request.memo())
-                .build();
+                .memo(request.memo()).build();
 
-        materialManagementDetailService.createMaterialDetailManagement(materialManagement, request.details());
-        materialManagementFileService.createMaterialFileManagement(materialManagement, request.files());
+        materialManagementDetailService.createMaterialDetailManagement(materialManagement,
+                request.details());
+        materialManagementFileService.createMaterialFileManagement(materialManagement,
+                request.files());
         materialManagementRepository.save(materialManagement);
 
-        final MaterialManagementChangeHistory changeHistory = MaterialManagementChangeHistory.builder()
-                .materialManagement(materialManagement)
-                .description(ValidationMessages.INITIAL_CREATION)
-                .user(userService.getUserByIdOrThrow(user.getUserId()))
-                .build();
+        final MaterialManagementChangeHistory changeHistory =
+                MaterialManagementChangeHistory.builder().materialManagement(materialManagement)
+                        .description(ValidationMessages.INITIAL_CREATION)
+                        .user(userService.getUserByIdOrThrow(user.getUserId())).build();
         materialManagementChangeHistoryRepository.save(changeHistory);
     }
 
     @Transactional(readOnly = true)
     public Page<MaterialManagementResponse> getAllMaterialManagements(final Long userId,
-            final MaterialManagementListRequest request,
-            final Pageable pageable) {
+            final MaterialManagementListRequest request, final Pageable pageable) {
         final User user = userService.getUserByIdOrThrow(userId);
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(user);
         return materialManagementRepository.findAll(request, pageable, accessibleSiteIds);
@@ -128,10 +128,11 @@ public class MaterialManagementService {
 
     @Transactional
     public void deleteMaterialManagements(final DeleteMaterialManagementsRequest request) {
-        final List<MaterialManagement> materialManagements = materialManagementRepository
-                .findAllById(request.materialManagementIds());
+        final List<MaterialManagement> materialManagements =
+                materialManagementRepository.findAllById(request.materialManagementIds());
         if (materialManagements.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND);
         }
 
         for (final MaterialManagement materialManagement : materialManagements) {
@@ -142,28 +143,23 @@ public class MaterialManagementService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(final CustomUserDetails user, final MaterialManagementListRequest request,
-            final Sort sort,
+    public Workbook downloadExcel(final CustomUserDetails user,
+            final MaterialManagementListRequest request, final Sort sort,
             final List<String> fields) {
 
         final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
-        final List<MaterialManagementResponse> responses = materialManagementRepository.findAllWithoutPaging(request,
-                sort, accessibleSiteIds);
+        final List<MaterialManagementResponse> responses =
+                materialManagementRepository.findAllWithoutPaging(request, sort, accessibleSiteIds);
 
-        final Workbook workbook = ExcelExportUtils.generateWorkbook(
-                responses,
-                fields,
-                this::getExcelHeaderName,
-                this::getExcelCellValue);
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(responses, fields,
+                this::getExcelHeaderName, this::getExcelCellValue);
 
         final String fileUrl = s3FileService.uploadExcelToS3(workbook,
                 ExcelDownloadHistoryType.MATERIAL_MANAGEMENT.name());
 
-        excelDownloadHistoryService.recordDownload(
-                ExcelDownloadHistoryType.MATERIAL_MANAGEMENT,
-                userService.getUserByIdOrThrow(user.getUserId()),
-                fileUrl);
+        excelDownloadHistoryService.recordDownload(ExcelDownloadHistoryType.MATERIAL_MANAGEMENT,
+                userService.getUserByIdOrThrow(user.getUserId()), fileUrl);
 
         return workbook;
     }
@@ -175,7 +171,7 @@ public class MaterialManagementService {
             case "outsourcingCompanyName" -> "자재업체명";
             case "inputType" -> "투입구분";
             case "inputTypeDescription" -> "투입구분 상세";
-            case "deliveryDate" -> "납품일자";
+            case "deliveryDate" -> "요청일자";
             case "name" -> "품명";
             case "standard" -> "규격";
             case "usage" -> "사용용도";
@@ -190,38 +186,59 @@ public class MaterialManagementService {
         };
     }
 
-    private String getExcelCellValue(final MaterialManagementResponse materialManagement, final String field) {
+    private String getExcelCellValue(final MaterialManagementResponse materialManagement,
+            final String field) {
         return switch (field) {
-            case "siteName" -> materialManagement.site() != null ? materialManagement.site().name() : "";
-            case "processName" -> materialManagement.process() != null ? materialManagement.process().name() : "";
-            case "outsourcingCompanyName" ->
-                materialManagement.outsourcingCompany() != null ? materialManagement.outsourcingCompany().name() : "";
-            case "inputType" -> materialManagement.inputType() != null ? materialManagement.inputType() : "";
-            case "inputTypeDescription" ->
-                materialManagement.inputTypeDescription() != null ? materialManagement.inputTypeDescription() : "";
-            case "deliveryDate" ->
-                materialManagement.deliveryDate() != null
-                        ? DateTimeFormatUtils.formatKoreaLocalDate(materialManagement.deliveryDate())
-                        : "";
-            case "name" -> materialManagement.detail() != null ? materialManagement.detail().name() : "";
-            case "standard" -> materialManagement.detail() != null ? materialManagement.detail().standard() : "";
-            case "usage" -> materialManagement.detail() != null ? materialManagement.detail().usage() : "";
-            case "quantity" -> materialManagement.detail() != null && materialManagement.detail().quantity() != null
-                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().quantity())
+            case "siteName" -> materialManagement.site() != null ? materialManagement.site().name()
                     : "";
-            case "unitPrice" -> materialManagement.detail() != null && materialManagement.detail().unitPrice() != null
-                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().unitPrice())
+            case "processName" -> materialManagement.process() != null
+                    ? materialManagement.process().name()
                     : "";
-            case "supplyPrice" ->
-                materialManagement.detail() != null && materialManagement.detail().supplyPrice() != null
-                        ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().supplyPrice())
-                        : "";
-            case "vat" -> materialManagement.detail() != null && materialManagement.detail().vat() != null
-                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().vat())
+            case "outsourcingCompanyName" -> materialManagement.outsourcingCompany() != null
+                    ? materialManagement.outsourcingCompany().name()
                     : "";
-            case "total" -> materialManagement.detail() != null && materialManagement.detail().total() != null
-                    ? NumberFormat.getNumberInstance(Locale.KOREA).format(materialManagement.detail().total())
+            case "inputType" -> materialManagement.inputType() != null
+                    ? materialManagement.inputType()
                     : "";
+            case "inputTypeDescription" -> materialManagement.inputTypeDescription() != null
+                    ? materialManagement.inputTypeDescription()
+                    : "";
+            case "deliveryDate" -> materialManagement.deliveryDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(materialManagement.deliveryDate())
+                    : "";
+            case "name" -> materialManagement.detail() != null ? materialManagement.detail().name()
+                    : "";
+            case "standard" -> materialManagement.detail() != null
+                    ? materialManagement.detail().standard()
+                    : "";
+            case "usage" -> materialManagement.detail() != null
+                    ? materialManagement.detail().usage()
+                    : "";
+            case "quantity" -> materialManagement.detail() != null
+                    && materialManagement.detail().quantity() != null
+                            ? NumberFormat.getNumberInstance(Locale.KOREA).format(
+                                    materialManagement.detail().quantity())
+                            : "";
+            case "unitPrice" -> materialManagement.detail() != null
+                    && materialManagement.detail().unitPrice() != null
+                            ? NumberFormat.getNumberInstance(Locale.KOREA).format(
+                                    materialManagement.detail().unitPrice())
+                            : "";
+            case "supplyPrice" -> materialManagement.detail() != null
+                    && materialManagement.detail().supplyPrice() != null
+                            ? NumberFormat.getNumberInstance(Locale.KOREA).format(
+                                    materialManagement.detail().supplyPrice())
+                            : "";
+            case "vat" -> materialManagement.detail() != null
+                    && materialManagement.detail().vat() != null
+                            ? NumberFormat.getNumberInstance(Locale.KOREA).format(
+                                    materialManagement.detail().vat())
+                            : "";
+            case "total" -> materialManagement.detail() != null
+                    && materialManagement.detail().total() != null
+                            ? NumberFormat.getNumberInstance(Locale.KOREA).format(
+                                    materialManagement.detail().total())
+                            : "";
             case "hasFile" -> materialManagement.hasFile() ? "Y" : "N";
             case "memo" -> materialManagement.memo() != null ? materialManagement.memo() : "";
             default -> "";
@@ -243,22 +260,25 @@ public class MaterialManagementService {
         if (keyword == null || keyword.isBlank()) {
             resultSlice = materialManagementDetailRepository.findAllDistinctNames(pageable);
         } else {
-            resultSlice = materialManagementDetailRepository.findDistinctNamesByKeyword(keyword, pageable);
+            resultSlice = materialManagementDetailRepository.findDistinctNamesByKeyword(keyword,
+                    pageable);
         }
 
-        return resultSlice.map(result -> new MaterialManagementNameResponse((Long) result[1], (String) result[0]));
+        return resultSlice.map(
+                result -> new MaterialManagementNameResponse((Long) result[1], (String) result[0]));
     }
 
     @Transactional
-    public void updateMaterialManagement(final Long id, final MaterialManagementUpdateRequest request,
-            final CustomUserDetails user) {
+    public void updateMaterialManagement(final Long id,
+            final MaterialManagementUpdateRequest request, final CustomUserDetails user) {
         final MaterialManagement materialManagement = materialManagementRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.MATERIAL_MANAGEMENT_NOT_FOUND));
 
         // siteId가 null이면 기존 site 유지, 아니면 새로운 site 검증
-        final Site site = request.siteId() != null ? siteService.getSiteByIdOrThrow(request.siteId())
-                : materialManagement.getSite();
+        final Site site =
+                request.siteId() != null ? siteService.getSiteByIdOrThrow(request.siteId())
+                        : materialManagement.getSite();
 
         // siteProcessId가 null이면 기존 siteProcess 유지, 아니면 새로운 siteProcess 검증
         final SiteProcess siteProcess = request.siteProcessId() != null
@@ -266,9 +286,10 @@ public class MaterialManagementService {
                 : materialManagement.getSiteProcess();
 
         // 새로운 site와 siteProcess가 모두 제공된 경우에만 검증
-        if (request.siteId() != null && request.siteProcessId() != null &&
-                !siteProcess.getSite().getId().equals(site.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+        if (request.siteId() != null && request.siteProcessId() != null
+                && !siteProcess.getSite().getId().equals(site.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
         // 외주업체 조회
@@ -276,58 +297,62 @@ public class MaterialManagementService {
                 .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId());
 
         // 공제업체 조회
-        final OutsourcingCompany deductionCompany = request.deductionCompanyId() != null
-                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
-                : null;
+        final OutsourcingCompany deductionCompany =
+                request.deductionCompanyId() != null
+                        ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
+                        : null;
 
         // 공제업체계약 조회
-        final OutsourcingCompanyContract deductionCompanyContract = request.deductionCompanyContractId() != null
-                ? outsourcingCompanyContractService.getContractByIdOrThrow(request.deductionCompanyContractId())
-                : null;
+        final OutsourcingCompanyContract deductionCompanyContract =
+                request.deductionCompanyContractId() != null
+                        ? outsourcingCompanyContractService
+                                .getContractByIdOrThrow(request.deductionCompanyContractId())
+                        : null;
 
         materialManagement.syncTransientFields();
         // 변경 전 상태 저장 (Javers 스냅샷)
-        final MaterialManagement oldSnapshot = JaversUtils.createSnapshot(javers, materialManagement,
-                MaterialManagement.class);
+        final MaterialManagement oldSnapshot =
+                JaversUtils.createSnapshot(javers, materialManagement, MaterialManagement.class);
 
         // updateFrom 메서드에서 모든 필드 업데이트
-        materialManagement.updateFrom(request, site, siteProcess, outsourcingCompany, deductionCompany,
-                deductionCompanyContract);
+        materialManagement.updateFrom(request, site, siteProcess, outsourcingCompany,
+                deductionCompany, deductionCompanyContract);
 
         final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         // 자재 상세 정보가 있는 경우에만 업데이트
         if (request.details() != null) {
-            materialManagementDetailService.updateMaterialManagementDetails(materialManagement, request.details(),
-                    userEntity);
+            materialManagementDetailService.updateMaterialManagementDetails(materialManagement,
+                    request.details(), userEntity);
         }
 
         // 파일 정보가 있는 경우에만 업데이트
         if (request.files() != null) {
-            materialManagementFileService.updateMaterialManagementFiles(materialManagement, request.files(),
-                    userEntity);
+            materialManagementFileService.updateMaterialManagementFiles(materialManagement,
+                    request.files(), userEntity);
         }
 
         // Javers를 사용하여 변경사항 추적
         final Diff diff = javers.compare(oldSnapshot, materialManagement);
-        final List<Map<String, String>> simpleChanges = JaversUtils.extractModifiedChanges(javers, diff);
+        final List<Map<String, String>> simpleChanges =
+                JaversUtils.extractModifiedChanges(javers, diff);
         final String changesJson = javers.getJsonConverter().toJson(simpleChanges);
 
         // 변경사항이 있을 때만 수정이력 생성
         if (!simpleChanges.isEmpty()) {
-            final MaterialManagementChangeHistory changeHistory = MaterialManagementChangeHistory.builder()
-                    .materialManagement(materialManagement)
-                    .type(MaterialManagementChangeHistoryType.BASIC)
-                    .changes(changesJson)
-                    .user(userEntity)
-                    .build();
+            final MaterialManagementChangeHistory changeHistory =
+                    MaterialManagementChangeHistory.builder().materialManagement(materialManagement)
+                            .type(MaterialManagementChangeHistoryType.BASIC).changes(changesJson)
+                            .user(userEntity).build();
             changeHistoryRepository.save(changeHistory);
         }
 
         if (request.changeHistories() != null && !request.changeHistories().isEmpty()) {
             for (final MaterialManagementUpdateRequest.ChangeHistoryRequest historyRequest : request
                     .changeHistories()) {
-                materialManagementChangeHistoryRepository.findById(historyRequest.id())
-                        .filter(history -> history.getMaterialManagement().getId().equals(materialManagement.getId()))
+                materialManagementChangeHistoryRepository
+                        .findById(historyRequest.id()).filter(history -> history
+                                .getMaterialManagement().getId().equals(materialManagement.getId()))
                         .ifPresent(history -> {
                             history.setMemo(historyRequest.memo());
                         });

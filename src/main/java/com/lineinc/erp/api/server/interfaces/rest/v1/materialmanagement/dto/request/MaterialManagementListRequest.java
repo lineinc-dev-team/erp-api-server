@@ -1,10 +1,8 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.materialmanagement.dto.request;
 
 import java.time.LocalDate;
-
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @ParameterObject
@@ -18,7 +16,9 @@ public record MaterialManagementListRequest(
 
         @Schema(description = "품명", example = "철근 D10") String materialName,
 
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "납품 시작일", example = "2025-07-01") LocalDate deliveryStartDate,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "요청 시작일",
+                example = "2025-07-01") LocalDate deliveryStartDate,
 
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "납품 종료일", example = "2025-07-31") LocalDate deliveryEndDate) {
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Schema(description = "요청 종료일",
+                example = "2025-07-31") LocalDate deliveryEndDate) {
 }
