@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
@@ -20,7 +18,6 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.request.OutsourcingCompanyContractUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,20 +45,16 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@Table(indexes = {
-        @Index(columnList = "status"),
-        @Index(columnList = "type"),
-        @Index(columnList = "category"),
-        @Index(columnList = "contract_start_date"),
-        @Index(columnList = "contract_end_date"),
-        @Index(columnList = "created_at")
-})
+@Table(indexes = {@Index(columnList = "status"), @Index(columnList = "type"), @Index(columnList = "category"),
+        @Index(columnList = "contract_start_date"), @Index(columnList = "contract_end_date"),
+        @Index(columnList = "created_at")})
 public class OutsourcingCompanyContract extends BaseEntity {
 
     private static final String SEQUENCE_NAME = "outsourcing_company_contract_seq";
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME,
+            allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -140,49 +133,57 @@ public class OutsourcingCompanyContract extends BaseEntity {
 
     // 계약 담당자 목록
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractContact> contacts = new ArrayList<>();
 
     // 계약 첨부파일 목록
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractFile> files = new ArrayList<>();
 
     // 계약 인력 목록
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractWorker> workers = new ArrayList<>();
 
     // 계약 장비 목록
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractEquipment> equipments = new ArrayList<>();
 
     // 계약 운전자 목록
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractDriver> drivers = new ArrayList<>();
 
     // 계약 공사항목 목록
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractConstruction> constructions = new ArrayList<>();
 
     // 계약 공사항목 그룹 목록 (V2)
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractConstructionGroup> constructionGroups = new ArrayList<>();
 
     // 계약 변경 히스토리 목록
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Builder.Default
     private List<OutsourcingCompanyContractChangeHistory> changeHistories = new ArrayList<>();
 
@@ -230,8 +231,7 @@ public class OutsourcingCompanyContract extends BaseEntity {
      * 외주업체 계약 정보를 수정합니다.
      */
     public void updateFrom(final OutsourcingCompanyContractUpdateRequest request, final Site site,
-            final SiteProcess siteProcess,
-            final OutsourcingCompany outsourcingCompany) {
+            final SiteProcess siteProcess, final OutsourcingCompany outsourcingCompany) {
 
         // 현장, 공정, 외주업체 수정
         this.contractName = request.contractName();
@@ -264,10 +264,8 @@ public class OutsourcingCompanyContract extends BaseEntity {
         this.statusName = this.status != null ? this.status.getLabel() : null;
         this.taxInvoiceConditionName = this.taxInvoiceCondition != null ? this.taxInvoiceCondition.getLabel() : null;
         this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null
-                : Arrays.stream(this.defaultDeductions.split(","))
-                        .map(String::trim)
-                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(","));
+                : Arrays.stream(this.defaultDeductions.split(",")).map(String::trim)
+                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf).collect(Collectors.joining(","));
 
         // 관련 엔티티 이름들 동기화
         this.siteName = this.site != null ? this.site.getName() : null;
@@ -275,10 +273,11 @@ public class OutsourcingCompanyContract extends BaseEntity {
         this.outsourcingCompanyName = this.outsourcingCompany != null ? this.outsourcingCompany.getName() : null;
 
         // 날짜 포맷 동기화
-        this.contractStartDateFormat = this.contractStartDate != null
-                ? com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils
-                        .formatKoreaLocalDate(this.contractStartDate)
-                : null;
+        this.contractStartDateFormat =
+                this.contractStartDate != null
+                        ? com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils
+                                .formatKoreaLocalDate(this.contractStartDate)
+                        : null;
         this.contractEndDateFormat = this.contractEndDate != null
                 ? com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils.formatKoreaLocalDate(this.contractEndDate)
                 : null;
