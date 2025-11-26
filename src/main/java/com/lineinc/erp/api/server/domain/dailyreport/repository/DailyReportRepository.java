@@ -16,8 +16,7 @@ import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 
 @Repository
-public interface DailyReportRepository
-        extends JpaRepository<DailyReport, Long>, DailyReportRepositoryCustom {
+public interface DailyReportRepository extends JpaRepository<DailyReport, Long>, DailyReportRepositoryCustom {
 
     /**
      * 현장, 공정, 일자, 날씨(선택사항)로 출역일보를 슬라이스로 조회합니다.
@@ -35,9 +34,8 @@ public interface DailyReportRepository
             AND dr.reportDate = :reportDate \
             AND (:weather IS NULL OR dr.weather = :weather) \
             AND dr.deleted = false""")
-    Slice<DailyReport> findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-            @Param("site") Site site, @Param("siteProcess") SiteProcess siteProcess,
-            @Param("reportDate") OffsetDateTime reportDate,
+    Slice<DailyReport> findBySiteAndSiteProcessAndReportDateAndWeatherOptional(@Param("site") Site site,
+            @Param("siteProcess") SiteProcess siteProcess, @Param("reportDate") OffsetDateTime reportDate,
             @Param("weather") FuelAggregationWeatherType weather, Pageable pageable);
 
     /**
@@ -50,8 +48,7 @@ public interface DailyReportRepository
             AND dr.reportDate = :reportDate \
             AND dr.deleted = false""")
     boolean existsBySiteAndSiteProcessAndReportDate(@Param("siteId") Long siteId,
-            @Param("siteProcessId") Long siteProcessId,
-            @Param("reportDate") OffsetDateTime reportDate);
+            @Param("siteProcessId") Long siteProcessId, @Param("reportDate") OffsetDateTime reportDate);
 
     /**
      * 같은 날짜, 현장, 공정에 대한 출역일보를 조회합니다.
@@ -63,20 +60,21 @@ public interface DailyReportRepository
             AND dr.reportDate = :reportDate \
             AND dr.deleted = false""")
     Optional<DailyReport> findBySiteAndSiteProcessAndReportDate(@Param("site") Site site,
-            @Param("siteProcess") SiteProcess siteProcess,
-            @Param("reportDate") OffsetDateTime reportDate);
+            @Param("siteProcess") SiteProcess siteProcess, @Param("reportDate") OffsetDateTime reportDate);
 
     /**
      * 특정 날짜 이전의 특정 상태 출역일보를 조회합니다.
      * 자동 마감 배치에서 사용됩니다.
+     * Site와 SiteProcess를 Fetch Join으로 함께 조회하여 LazyInitializationException 방지
      */
     @Query("""
             SELECT dr FROM DailyReport dr \
+            LEFT JOIN FETCH dr.site \
+            LEFT JOIN FETCH dr.siteProcess \
             WHERE dr.reportDate < :beforeDate \
             AND dr.status = :status \
             AND dr.deleted = false""")
-    List<DailyReport> findByReportDateBeforeAndStatus(
-            @Param("beforeDate") OffsetDateTime beforeDate,
+    List<DailyReport> findByReportDateBeforeAndStatus(@Param("beforeDate") OffsetDateTime beforeDate,
             @Param("status") DailyReportStatus status);
 
     /**
@@ -96,9 +94,8 @@ public interface DailyReportRepository
             AND dr.deleted = false \
             ORDER BY dr.reportDate ASC""")
     List<DailyReport> findBySiteAndSiteProcessAndReportDateBetween(@Param("site") Site site,
-            @Param("siteProcess") SiteProcess siteProcess,
-            @Param("startDate") OffsetDateTime startDate, @Param("endDate") OffsetDateTime endDate,
-            @Param("statuses") List<DailyReportStatus> statuses);
+            @Param("siteProcess") SiteProcess siteProcess, @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate, @Param("statuses") List<DailyReportStatus> statuses);
 
     /**
      * 특정 현장, 공정, 월 구간(포함/미만)으로 출역일보 조회 (날씨 수집용)
@@ -113,9 +110,8 @@ public interface DailyReportRepository
             AND dr.status IN :statuses \
             AND dr.deleted = false \
             ORDER BY dr.reportDate ASC""")
-    List<DailyReport> findBySiteIdAndSiteProcessIdAndReportDateBetweenMonth(
-            @Param("siteId") Long siteId, @Param("siteProcessId") Long siteProcessId,
-            @Param("startDate") OffsetDateTime startDate, @Param("endDate") OffsetDateTime endDate,
-            @Param("statuses") List<DailyReportStatus> statuses);
+    List<DailyReport> findBySiteIdAndSiteProcessIdAndReportDateBetweenMonth(@Param("siteId") Long siteId,
+            @Param("siteProcessId") Long siteProcessId, @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate, @Param("statuses") List<DailyReportStatus> statuses);
 
 }
