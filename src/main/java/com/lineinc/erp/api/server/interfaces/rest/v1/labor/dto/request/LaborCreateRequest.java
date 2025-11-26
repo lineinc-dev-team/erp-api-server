@@ -9,8 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "노무 생성 요청")
-public record LaborCreateRequest(
-        @NotNull @Schema(description = "노무 구분", example = "DIRECT_CONTRACT") LaborType type,
+public record LaborCreateRequest(@NotNull @Schema(description = "노무 구분", example = "DIRECT_CONTRACT") LaborType type,
         @Schema(description = "구분 설명", example = "현장 작업용역") String typeDescription,
         @Schema(description = "소속업체 ID", example = "1") Long outsourcingCompanyId,
         @Schema(description = "외주업체 계약 ID", example = "1") Long outsourcingCompanyContractId,
@@ -22,7 +21,7 @@ public record LaborCreateRequest(
         @Schema(description = "비고", example = "추가 메모") String memo,
         @Schema(description = "공종", example = "WELDER") LaborWorkType workType,
         @Schema(description = "공종 설명", example = "용접 작업") String workTypeDescription,
-        @NotBlank @Schema(description = "주작업", example = "강재 용접") String mainWork,
+        @Schema(description = "주작업", example = "강재 용접") String mainWork,
         @Schema(description = "기준일당", example = "150000") Long dailyWage,
         @Schema(description = "은행명", example = "신한은행") String bankName,
         @Schema(description = "계좌번호", example = "110-123456789") String accountNumber,
