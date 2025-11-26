@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
 import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
 import com.lineinc.erp.api.server.domain.labor.service.v1.LaborService;
@@ -55,7 +53,6 @@ import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -84,20 +81,19 @@ public class LaborController extends BaseController {
     @GetMapping("/labor-types")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<List<LaborTypeResponse>>> getLaborTypes() {
-        final List<LaborTypeResponse> laborTypes = Arrays.stream(LaborType.values())
-                .map(LaborTypeResponse::from)
-                .toList();
+        final List<LaborTypeResponse> laborTypes =
+                Arrays.stream(LaborType.values()).map(LaborTypeResponse::from).toList();
         return ResponseEntity.ok(SuccessResponse.of(laborTypes));
     }
 
     @Operation(summary = "공종 구분 조회")
     @GetMapping("/work-types")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
-    public ResponseEntity<SuccessResponse<List<WorkTypeResponse>>> getWorkTypes() {
+    public ResponseEntity<SuccessResponse<List<WorkTypeResponse>>> getWorkTypes(
+            @RequestParam(required = false) final String keyword) {
         final List<WorkTypeResponse> workTypes = Arrays.stream(LaborWorkType.values())
-                .sorted(Comparator.comparingInt(LaborWorkType::getOrder))
-                .map(WorkTypeResponse::from)
-                .toList();
+                .filter(workType -> keyword == null || keyword.isBlank() || workType.getLabel().contains(keyword))
+                .sorted(Comparator.comparingInt(LaborWorkType::getOrder)).map(WorkTypeResponse::from).toList();
         return ResponseEntity.ok(SuccessResponse.of(workTypes));
     }
 
@@ -105,26 +101,22 @@ public class LaborController extends BaseController {
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborListResponse>>> getLaborList(
-            @ModelAttribute final LaborListRequest request,
-            @ModelAttribute final PageRequest pageRequest,
+            @ModelAttribute final LaborListRequest request, @ModelAttribute final PageRequest pageRequest,
             @ModelAttribute final SortRequest sortRequest) {
         final Page<LaborListResponse> page = laborService.getLaborList(request,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
-        return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+        return ResponseEntity.ok(SuccessResponse.of(new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
     @Operation(summary = "ETC 노무 구분 설명 키워드 검색")
     @GetMapping("/etc-type-descriptions/search")
     public ResponseEntity<SuccessResponse<SliceResponse<TypeDescriptionResponse>>> searchEtcTypeDescriptions(
-            @RequestParam(required = false) final String keyword,
-            @ModelAttribute final PageRequest pageRequest) {
-        final Slice<TypeDescriptionResponse> slice = laborService.getEtcTypeDescriptions(
-                keyword, PageableUtils.createPageable(pageRequest.page(), pageRequest.size()));
+            @RequestParam(required = false) final String keyword, @ModelAttribute final PageRequest pageRequest) {
+        final Slice<TypeDescriptionResponse> slice = laborService.getEtcTypeDescriptions(keyword,
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size()));
 
-        return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "인력정보 삭제")
@@ -138,21 +130,16 @@ public class LaborController extends BaseController {
     @Operation(summary = "인력정보 목록 엑셀 다운로드")
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
-    public void downloadLaborsExcel(
-            @AuthenticationPrincipal final CustomUserDetails user,
-            @Valid final SortRequest sortRequest,
-            @Valid final LaborListRequest request,
-            @Valid final LaborDownloadRequest laborDownloadRequest,
-            final HttpServletResponse response) throws IOException {
+    public void downloadLaborsExcel(@AuthenticationPrincipal final CustomUserDetails user,
+            @Valid final SortRequest sortRequest, @Valid final LaborListRequest request,
+            @Valid final LaborDownloadRequest laborDownloadRequest, final HttpServletResponse response)
+            throws IOException {
         final List<String> parsed = DownloadFieldUtils.parseFields(laborDownloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed, LaborDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "인력정보 목록.xlsx");
 
-        try (Workbook workbook = laborService.downloadExcel(
-                user,
-                request,
-                PageableUtils.parseSort(sortRequest.sort()),
-                parsed)) {
+        try (Workbook workbook =
+                laborService.downloadExcel(user, request, PageableUtils.parseSort(sortRequest.sort()), parsed)) {
             workbook.write(response.getOutputStream());
         }
     }
@@ -168,8 +155,7 @@ public class LaborController extends BaseController {
     @Operation(summary = "인력정보 수정")
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateLabor(
-            @PathVariable final Long id,
+    public ResponseEntity<Void> updateLabor(@PathVariable final Long id,
             @Valid @RequestBody final LaborUpdateRequest request,
             @AuthenticationPrincipal final CustomUserDetails user) {
         laborService.updateLabor(id, request, user.getUserId());
@@ -180,9 +166,7 @@ public class LaborController extends BaseController {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<LaborChangeHistoryResponse>>> getLaborChangeHistories(
-            @PathVariable final Long id,
-            @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
+            @PathVariable final Long id, @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
             @AuthenticationPrincipal final CustomUserDetails user) {
         final Slice<LaborChangeHistoryResponse> slice = laborService.getLaborChangeHistories(id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()),
@@ -193,35 +177,30 @@ public class LaborController extends BaseController {
     @Operation(summary = "인력명 키워드 검색")
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<SliceResponse<LaborNameResponse>>> getLaborNames(
-            @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
             @RequestParam(required = false) final String keyword,
             @RequestParam(required = false) final List<LaborType> types,
             @RequestParam(required = false) final Long outsourcingCompanyId,
             @RequestParam(required = false) final Long outsourcingCompanyContractId,
             @RequestParam(required = false) final Boolean isHeadOffice) {
-        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                sortRequest.sort());
+        final Pageable pageable =
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
         final Slice<LaborNameResponse> slice = laborService.getLaborNames(keyword, types, outsourcingCompanyId,
-                outsourcingCompanyContractId, isHeadOffice,
-                pageable);
+                outsourcingCompanyContractId, isHeadOffice, pageable);
 
-        return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "노무인력 명세서 이력 조회")
     @GetMapping("/{id}/payrolls")
     @RequireMenuPermission(menu = AppConstants.MENU_LABOR_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<LaborPayrollHistoryResponse>>> getLaborPayrolls(
-            @PathVariable final Long id,
-            @ModelAttribute final PageRequest pageRequest) {
+            @PathVariable final Long id, @ModelAttribute final PageRequest pageRequest) {
 
         final Page<LaborPayrollHistoryResponse> page = laborPayrollService.getLaborPayrollsByLaborId(id,
                 PageableUtils.createPageable(pageRequest.page(), pageRequest.size()));
 
-        return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+        return ResponseEntity.ok(SuccessResponse.of(new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
     @Operation(summary = "주민등록번호 중복 검사")
