@@ -147,6 +147,9 @@ public class DailyReport extends BaseEntity {
     // 직영/용역 용역 관련
     private Double directContractOutsourcingWorkQuantitySum; // 직영/용역 용역 공수합
 
+    // 직영/용역 외주 관련
+    private Double directContractOutsourcingContractWorkQuantitySum; // 직영/용역 외주 공수합
+
     @Builder.Default
     private Boolean directContractEvidenceSubmitted = false; // 직영/용역 증빙 여부
 
@@ -227,6 +230,15 @@ public class DailyReport extends BaseEntity {
                 .filter(outsourcing -> !outsourcing.isDeleted())
                 .mapToDouble(outsourcing -> outsourcing.getWorkQuantity() != null ? outsourcing.getWorkQuantity() : 0.0)
                 .sum();
+    }
+
+    /**
+     * 직영/용역 외주 공수합 계산 및 업데이트
+     */
+    public void updateDirectContractOutsourcingContractWorkQuantitySum() {
+        this.directContractOutsourcingContractWorkQuantitySum = directContractOutsourcingContracts.stream()
+                .filter(contract -> !contract.isDeleted())
+                .mapToDouble(contract -> contract.getWorkQuantity() != null ? contract.getWorkQuantity() : 0.0).sum();
     }
 
     /**
@@ -394,6 +406,7 @@ public class DailyReport extends BaseEntity {
         updateEmployeeWorkQuantitySum();
         updateDirectContractWorkQuantitySum();
         updateDirectContractOutsourcingWorkQuantitySum();
+        updateDirectContractOutsourcingContractWorkQuantitySum();
         updateOutsourcingWorkQuantitySum();
         updateEquipmentTotalHours();
         updateOutsourcingConstructionItemCount();

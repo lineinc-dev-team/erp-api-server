@@ -1,18 +1,15 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.dailyreport.dto.response;
 
 import java.time.OffsetDateTime;
-
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelAggregationWeatherType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteProcessResponse.SiteProcessSimpleResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.site.dto.response.SiteResponse.SiteSimpleResponse;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "출역일보 목록 응답")
-public record DailyReportListResponse(
-        @Schema(description = "ID", example = "1") Long id,
+public record DailyReportListResponse(@Schema(description = "ID", example = "1") Long id,
         @Schema(description = "현장 정보") SiteSimpleResponse site,
         @Schema(description = "공정 정보") SiteProcessSimpleResponse siteProcess,
         @Schema(description = "출역일보 일자", example = "2024-01-15T00:00:00+09:00") OffsetDateTime reportDate,
@@ -44,35 +41,25 @@ public record DailyReportListResponse(
         @Schema(description = "수정일", example = "2024-01-15T14:30:00+09:00") OffsetDateTime updatedAt) {
 
     public static DailyReportListResponse from(final DailyReport dailyReport) {
-        return new DailyReportListResponse(
-                dailyReport.getId(),
+        return new DailyReportListResponse(dailyReport.getId(),
                 dailyReport.getSite() != null ? SiteSimpleResponse.from(dailyReport.getSite()) : null,
                 dailyReport.getSiteProcess() != null ? SiteProcessSimpleResponse.from(dailyReport.getSiteProcess())
                         : null,
                 dailyReport.getReportDate(),
-                dailyReport.getWeather() != null ? dailyReport.getWeather().getLabel() : null,
-                dailyReport.getWeather(),
-                dailyReport.getStatus(),
-                dailyReport.getCompletedAt(),
-                dailyReport.getEmployeeWorkQuantitySum(),
+                dailyReport.getWeather() != null ? dailyReport.getWeather().getLabel() : null, dailyReport.getWeather(),
+                dailyReport.getStatus(), dailyReport.getCompletedAt(), dailyReport.getEmployeeWorkQuantitySum(),
                 dailyReport.getEmployeeEvidenceSubmitted(),
                 getDoubleValueOrZero(dailyReport.getDirectContractWorkQuantitySum())
-                        + getDoubleValueOrZero(dailyReport.getDirectContractOutsourcingWorkQuantitySum()),
-                dailyReport.getDirectContractEvidenceSubmitted(),
-                dailyReport.getOutsourcingWorkQuantitySum(),
-                dailyReport.getOutsourcingEvidenceSubmitted(),
-                dailyReport.getEquipmentTotalHours(),
-                dailyReport.getEquipmentEvidenceSubmitted(),
-                dailyReport.getSitePhotoSubmitted(),
-                dailyReport.getGasolineTotalAmount(),
-                dailyReport.getDieselTotalAmount(),
-                dailyReport.getUreaTotalAmount(),
-                dailyReport.getEtcTotalAmount(),
-                dailyReport.getFuelEvidenceSubmitted(),
-                dailyReport.getIsConstructionReport(),
+                        + getDoubleValueOrZero(dailyReport.getDirectContractOutsourcingWorkQuantitySum())
+                        + getDoubleValueOrZero(dailyReport.getDirectContractOutsourcingContractWorkQuantitySum()),
+                dailyReport.getDirectContractEvidenceSubmitted(), dailyReport.getOutsourcingWorkQuantitySum(),
+                dailyReport.getOutsourcingEvidenceSubmitted(), dailyReport.getEquipmentTotalHours(),
+                dailyReport.getEquipmentEvidenceSubmitted(), dailyReport.getSitePhotoSubmitted(),
+                dailyReport.getGasolineTotalAmount(), dailyReport.getDieselTotalAmount(),
+                dailyReport.getUreaTotalAmount(), dailyReport.getEtcTotalAmount(),
+                dailyReport.getFuelEvidenceSubmitted(), dailyReport.getIsConstructionReport(),
                 dailyReport.getOutsourcingConstructionItemCount(),
-                dailyReport.getOutsourcingConstructionEvidenceSubmitted(),
-                dailyReport.getCreatedAt(),
+                dailyReport.getOutsourcingConstructionEvidenceSubmitted(), dailyReport.getCreatedAt(),
                 dailyReport.getUpdatedAt());
     }
 
