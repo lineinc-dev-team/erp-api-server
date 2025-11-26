@@ -6,49 +6,10 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    environment: prod
-
-    steps:
-      - name: ✅ 체크아웃
-        uses: actions/checkout@v4
-
-      - name: ☕ Java 24 설정
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 24
-
-      - name: 🔁 Gradle 캐시
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
-
-      - name: 🧱 빌드
-        run: ./gradlew bootJar --no-daemon --parallel -x test
-
-      - name: 🚀 배포
-        env:
-          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          EC2_USER: ${{ secrets.PROD_EC2_USER }}
-          EC2_HOST: ${{ secrets.PROD_EC2_HOST }}
-        run: |
-          # SSH 키 설정 (보안 강화)
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-
-          # JAR 파일 및 배포 스크립트 전송
-          scp build/libs/*.jar $EC2_USER@$EC2_HOST:/home/ubuntu/app-new.jar
-          scp scripts/deploy.sh $EC2_USER@$EC2_HOST:/home/ubuntu/deploy.sh
-
-          # 배포 실행
-          ssh $EC2_USER@$EC2_HOST "bash /home/ubuntu/deploy.sh"
-
-          # SSH 키 정리 (보안)
-          rm -f ~/.ssh/id_rsa
+    uses: ./.github/workflows/deploy-common.yml
+    with:
+      environment: prod
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+      EC2_USER: ${{ secrets.PROD_EC2_USER }}
+      EC2_HOST: ${{ secrets.PROD_EC2_HOST }}
