@@ -48,8 +48,8 @@ public class EquipmentCostAggregationService {
      * @param yearMonth     조회월 (YYYY-MM)
      * @return 장비비 집계 응답
      */
-    public EquipmentCostAggregationResponse getEquipmentCostAggregation(final Long siteId,
-            final Long siteProcessId, final String yearMonth) {
+    public EquipmentCostAggregationResponse getEquipmentCostAggregation(final Long siteId, final Long siteProcessId,
+            final String yearMonth) {
 
         final Site site = siteService.getSiteByIdOrThrow(siteId);
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(siteProcessId);
@@ -59,8 +59,7 @@ public class EquipmentCostAggregationService {
                 findEquipmentsUpToMonth(site, siteProcess, yearMonth);
 
         // 장비(규격)별로 그룹핑하여 집계
-        final List<EquipmentCostAggregationItem> items =
-                aggregateByEquipment(allEquipments, yearMonth);
+        final List<EquipmentCostAggregationItem> items = aggregateByEquipment(allEquipments, yearMonth);
 
         return new EquipmentCostAggregationResponse(items);
     }
@@ -76,27 +75,24 @@ public class EquipmentCostAggregationService {
         final LocalDate lastDay = ym.atEndOfMonth();
         final OffsetDateTime endDateTime = DateTimeFormatUtils.toUtcEndOfDay(lastDay);
 
-        return equipmentRepository.findBySiteAndSiteProcessAndReportDateLessThanEqual(site.getId(),
-                siteProcess.getId(), endDateTime,
-                List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
+        return equipmentRepository.findBySiteAndSiteProcessAndReportDateLessThanEqual(site.getId(), siteProcess.getId(),
+                endDateTime, List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
     }
 
     /**
      * 장비(규격)별로 장비비 집계
      */
     private List<EquipmentCostAggregationItem> aggregateByEquipment(
-            final List<DailyReportOutsourcingEquipment> allEquipments,
-            final String currentYearMonth) {
+            final List<DailyReportOutsourcingEquipment> allEquipments, final String currentYearMonth) {
 
         // 장비 ID로 그룹핑 (장비, 규격별)
-        final Map<Long, List<DailyReportOutsourcingEquipment>> groupedByEquipment = allEquipments
-                .stream().filter(equipment -> equipment.getOutsourcingCompany() != null)
-                .filter(equipment -> equipment.getOutsourcingCompanyContractEquipment() != null)
-                .collect(Collectors.groupingBy(
-                        equipment -> equipment.getOutsourcingCompanyContractEquipment().getId()));
+        final Map<Long, List<DailyReportOutsourcingEquipment>> groupedByEquipment = allEquipments.stream()
+                .filter(equipment -> equipment.getOutsourcingCompany() != null)
+                .filter(equipment -> equipment.getOutsourcingCompanyContractEquipment() != null).collect(
+                        Collectors.groupingBy(equipment -> equipment.getOutsourcingCompanyContractEquipment().getId()));
 
-        return groupedByEquipment.entrySet().stream().map(
-                entry -> createEquipmentCostAggregationItem(entry.getValue(), currentYearMonth))
+        return groupedByEquipment.entrySet().stream()
+                .map(entry -> createEquipmentCostAggregationItem(entry.getValue(), currentYearMonth))
                 .filter(this::hasNonZeroBilling).toList();
     }
 
@@ -113,34 +109,30 @@ public class EquipmentCostAggregationService {
                 CompanyResponse.CompanySimpleResponse.from(firstEquipment.getOutsourcingCompany());
 
         // 장비 정보
-        final String specification =
-                firstEquipment.getOutsourcingCompanyContractEquipment().getSpecification();
+        final String specification = firstEquipment.getOutsourcingCompanyContractEquipment().getSpecification();
 
         // 전회까지 청구내역 (현재 월 이전)
-        final BillingDetail previousBilling =
-                aggregatePreviousBilling(equipments, currentYearMonth);
+        final BillingDetail previousBilling = aggregatePreviousBilling(equipments, currentYearMonth);
 
         // 금회 청구내역 (현재 월)
         final BillingDetail currentBilling = aggregateCurrentBilling(equipments, currentYearMonth);
 
-        return new EquipmentCostAggregationItem(outsourcingCompany, specification, previousBilling,
-                currentBilling);
+        return new EquipmentCostAggregationItem(outsourcingCompany, specification, previousBilling, currentBilling);
     }
 
     /**
      * 전회까지 청구내역 집계
      */
-    private BillingDetail aggregatePreviousBilling(
-            final List<DailyReportOutsourcingEquipment> equipments, final String currentYearMonth) {
+    private BillingDetail aggregatePreviousBilling(final List<DailyReportOutsourcingEquipment> equipments,
+            final String currentYearMonth) {
 
         final YearMonth currentYm = YearMonth.parse(currentYearMonth);
 
         final List<DailyReportOutsourcingEquipment> previousEquipments =
                 equipments.stream().filter(equipment -> equipment.getDailyReport() != null)
-                        .filter(equipment -> equipment.getDailyReport().getReportDate() != null)
-                        .filter(equipment -> {
-                            final LocalDate reportDate = DateTimeFormatUtils
-                                    .toKoreaLocalDate(equipment.getDailyReport().getReportDate());
+                        .filter(equipment -> equipment.getDailyReport().getReportDate() != null).filter(equipment -> {
+                            final LocalDate reportDate =
+                                    DateTimeFormatUtils.toKoreaLocalDate(equipment.getDailyReport().getReportDate());
                             final YearMonth reportYm = YearMonth.from(reportDate);
                             return reportYm.isBefore(currentYm);
                         }).toList();
@@ -151,17 +143,16 @@ public class EquipmentCostAggregationService {
     /**
      * 금회 청구내역 집계
      */
-    private BillingDetail aggregateCurrentBilling(
-            final List<DailyReportOutsourcingEquipment> equipments, final String currentYearMonth) {
+    private BillingDetail aggregateCurrentBilling(final List<DailyReportOutsourcingEquipment> equipments,
+            final String currentYearMonth) {
 
         final YearMonth currentYm = YearMonth.parse(currentYearMonth);
 
         final List<DailyReportOutsourcingEquipment> currentEquipments =
                 equipments.stream().filter(equipment -> equipment.getDailyReport() != null)
-                        .filter(equipment -> equipment.getDailyReport().getReportDate() != null)
-                        .filter(equipment -> {
-                            final LocalDate reportDate = DateTimeFormatUtils
-                                    .toKoreaLocalDate(equipment.getDailyReport().getReportDate());
+                        .filter(equipment -> equipment.getDailyReport().getReportDate() != null).filter(equipment -> {
+                            final LocalDate reportDate =
+                                    DateTimeFormatUtils.toKoreaLocalDate(equipment.getDailyReport().getReportDate());
                             final YearMonth reportYm = YearMonth.from(reportDate);
                             return reportYm.equals(currentYm);
                         }).toList();
@@ -176,8 +167,7 @@ public class EquipmentCostAggregationService {
      * 공제금액 = 0
      * 계 = 공급가 + 부가세
      */
-    private BillingDetail calculateBillingDetail(
-            final List<DailyReportOutsourcingEquipment> equipments) {
+    private BillingDetail calculateBillingDetail(final List<DailyReportOutsourcingEquipment> equipments) {
         long supplyPrice = 0L;
 
         for (final DailyReportOutsourcingEquipment equipment : equipments) {
@@ -186,16 +176,15 @@ public class EquipmentCostAggregationService {
             supplyPrice += equipmentSupplyPrice;
 
             // 서브장비 공급가 합산
-            for (final DailyReportOutsourcingEquipmentSubEquipment subEquipment : equipment
-                    .getSubEquipments()) {
+            for (final DailyReportOutsourcingEquipmentSubEquipment subEquipment : equipment.getSubEquipments()) {
                 final long subEquipmentSupplyPrice = calculateSubEquipmentCost(subEquipment);
                 supplyPrice += subEquipmentSupplyPrice;
             }
         }
 
         // 부가세 = 공급가 × 10%
-        final long vat = BigDecimal.valueOf(supplyPrice).multiply(VAT_RATE)
-                .setScale(0, RoundingMode.HALF_UP).longValue();
+        final long vat =
+                BigDecimal.valueOf(supplyPrice).multiply(VAT_RATE).setScale(0, RoundingMode.HALF_UP).longValue();
 
         // 공제금액 = 0 (장비비는 공제 없음)
         final long deductionAmount = 0L;
@@ -218,12 +207,9 @@ public class EquipmentCostAggregationService {
     /**
      * 서브장비 공급가 계산 (단가 × 시간)
      */
-    private long calculateSubEquipmentCost(
-            final DailyReportOutsourcingEquipmentSubEquipment subEquipment) {
-        final long unitPrice =
-                subEquipment.getUnitPrice() != null ? subEquipment.getUnitPrice() : 0L;
-        final double workHours =
-                subEquipment.getWorkHours() != null ? subEquipment.getWorkHours() : 0.0;
+    private long calculateSubEquipmentCost(final DailyReportOutsourcingEquipmentSubEquipment subEquipment) {
+        final long unitPrice = subEquipment.getUnitPrice() != null ? subEquipment.getUnitPrice() : 0L;
+        final double workHours = subEquipment.getWorkHours() != null ? subEquipment.getWorkHours() : 0.0;
         return Math.round(unitPrice * workHours);
     }
 

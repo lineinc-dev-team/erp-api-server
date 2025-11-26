@@ -235,7 +235,6 @@ htmlcov/
 *.swp
 *.swo
 *~
-.vscode/
 .project
 .classpath
 .settings/
