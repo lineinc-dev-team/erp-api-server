@@ -3,7 +3,6 @@ package com.lineinc.erp.api.server.domain.dailyreport.entity;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportEvidenceFileType;
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
@@ -12,7 +11,6 @@ import com.lineinc.erp.api.server.domain.fuelaggregation.enums.FuelInfoFuelType;
 import com.lineinc.erp.api.server.domain.site.entity.Site;
 import com.lineinc.erp.api.server.domain.site.entity.SiteProcess;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,6 +26,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,9 +36,9 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(indexes = {
-        @Index(columnList = "reportDate"),
-})
+@Table(indexes = {@Index(columnList = "reportDate")},
+        uniqueConstraints = {@UniqueConstraint(name = "uk_daily_report_site_process_date",
+                columnNames = {"site_id", "site_process_id", "reportDate"})})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -49,7 +48,8 @@ public class DailyReport extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME,
+            allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -207,20 +207,16 @@ public class DailyReport extends BaseEntity {
      * 직원 공수합 계산 및 업데이트
      */
     public void updateEmployeeWorkQuantitySum() {
-        this.employeeWorkQuantitySum = employees.stream()
-                .filter(employee -> !employee.isDeleted())
-                .mapToDouble(employee -> employee.getWorkQuantity() != null ? employee.getWorkQuantity() : 0.0)
-                .sum();
+        this.employeeWorkQuantitySum = employees.stream().filter(employee -> !employee.isDeleted())
+                .mapToDouble(employee -> employee.getWorkQuantity() != null ? employee.getWorkQuantity() : 0.0).sum();
     }
 
     /**
      * 직영/용역 직영 공수합 계산 및 업데이트
      */
     public void updateDirectContractWorkQuantitySum() {
-        this.directContractWorkQuantitySum = directContracts.stream()
-                .filter(contract -> !contract.isDeleted())
-                .mapToDouble(contract -> contract.getWorkQuantity() != null ? contract.getWorkQuantity() : 0.0)
-                .sum();
+        this.directContractWorkQuantitySum = directContracts.stream().filter(contract -> !contract.isDeleted())
+                .mapToDouble(contract -> contract.getWorkQuantity() != null ? contract.getWorkQuantity() : 0.0).sum();
     }
 
     /**
@@ -237,8 +233,7 @@ public class DailyReport extends BaseEntity {
      * 외주 공수합 계산 및 업데이트
      */
     public void updateOutsourcingWorkQuantitySum() {
-        this.outsourcingWorkQuantitySum = outsourcings.stream()
-                .filter(outsourcing -> !outsourcing.isDeleted())
+        this.outsourcingWorkQuantitySum = outsourcings.stream().filter(outsourcing -> !outsourcing.isDeleted())
                 .mapToDouble(outsourcing -> outsourcing.getWorkQuantity() != null ? outsourcing.getWorkQuantity() : 0.0)
                 .sum();
     }
@@ -247,26 +242,22 @@ public class DailyReport extends BaseEntity {
      * 장비 총시간 계산 및 업데이트
      */
     public void updateEquipmentTotalHours() {
-        this.equipmentTotalHours = outsourcingEquipments.stream()
-                .filter(equipment -> !equipment.isDeleted())
-                .mapToDouble(equipment -> equipment.getWorkHours() != null ? equipment.getWorkHours() : 0.0)
-                .sum();
+        this.equipmentTotalHours = outsourcingEquipments.stream().filter(equipment -> !equipment.isDeleted())
+                .mapToDouble(equipment -> equipment.getWorkHours() != null ? equipment.getWorkHours() : 0.0).sum();
     }
 
     /**
      * 현장 사진 여부 업데이트
      */
     public void updateSitePhotoSubmitted() {
-        this.sitePhotoSubmitted = files.stream()
-                .anyMatch(file -> !file.isDeleted());
+        this.sitePhotoSubmitted = files.stream().anyMatch(file -> !file.isDeleted());
     }
 
     /**
      * 직원 증빙 여부 업데이트
      */
     public void updateEmployeeEvidenceSubmitted() {
-        this.employeeEvidenceSubmitted = evidenceFiles.stream()
-                .filter(file -> !file.isDeleted())
+        this.employeeEvidenceSubmitted = evidenceFiles.stream().filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.EMPLOYEE);
     }
 
@@ -274,8 +265,7 @@ public class DailyReport extends BaseEntity {
      * 직영/용역 증빙 여부 업데이트
      */
     public void updateDirectContractEvidenceSubmitted() {
-        this.directContractEvidenceSubmitted = evidenceFiles.stream()
-                .filter(file -> !file.isDeleted())
+        this.directContractEvidenceSubmitted = evidenceFiles.stream().filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.DIRECT_CONTRACT);
     }
 
@@ -283,8 +273,7 @@ public class DailyReport extends BaseEntity {
      * 외주 증빙 여부 업데이트
      */
     public void updateOutsourcingEvidenceSubmitted() {
-        this.outsourcingEvidenceSubmitted = evidenceFiles.stream()
-                .filter(file -> !file.isDeleted())
+        this.outsourcingEvidenceSubmitted = evidenceFiles.stream().filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.OUTSOURCING);
     }
 
@@ -292,8 +281,7 @@ public class DailyReport extends BaseEntity {
      * 장비 증빙 여부 업데이트
      */
     public void updateEquipmentEvidenceSubmitted() {
-        this.equipmentEvidenceSubmitted = evidenceFiles.stream()
-                .filter(file -> !file.isDeleted())
+        this.equipmentEvidenceSubmitted = evidenceFiles.stream().filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.EQUIPMENT);
     }
 
@@ -301,10 +289,8 @@ public class DailyReport extends BaseEntity {
      * 외주(공사) 항목 개수 계산 및 업데이트
      */
     public void updateOutsourcingConstructionItemCount() {
-        this.outsourcingConstructionItemCount = (int) constructionGroups.stream()
-                .filter(group -> !group.isDeleted())
-                .flatMap(group -> group.getConstructions().stream())
-                .filter(construction -> !construction.isDeleted())
+        this.outsourcingConstructionItemCount = (int) constructionGroups.stream().filter(group -> !group.isDeleted())
+                .flatMap(group -> group.getConstructions().stream()).filter(construction -> !construction.isDeleted())
                 .count();
     }
 
@@ -312,8 +298,7 @@ public class DailyReport extends BaseEntity {
      * 외주(공사) 증빙 여부 업데이트
      */
     public void updateOutsourcingConstructionEvidenceSubmitted() {
-        this.outsourcingConstructionEvidenceSubmitted = evidenceFiles.stream()
-                .filter(file -> !file.isDeleted())
+        this.outsourcingConstructionEvidenceSubmitted = evidenceFiles.stream().filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.OUTSOURCING_CONSTRUCTION);
     }
 
@@ -321,76 +306,71 @@ public class DailyReport extends BaseEntity {
      * 휘발유 총 주유량 계산 및 업데이트
      */
     public void updateGasolineTotalAmount() {
-        this.gasolineTotalAmount = fuels.stream()
-                .filter(fuel -> !fuel.isDeleted())
-                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
-                        ? fuel.getFuelAggregation().getFuelInfos().stream()
-                                .filter(info -> !info.isDeleted())
-                                .filter(info -> info.getFuelType() != null
-                                        && info.getFuelType() == FuelInfoFuelType.GASOLINE)
-                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
-                                .sum()
-                        : 0.0)
-                .sum();
+        this.gasolineTotalAmount =
+                fuels.stream().filter(fuel -> !fuel.isDeleted())
+                        .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                                ? fuel.getFuelAggregation().getFuelInfos().stream().filter(info -> !info.isDeleted())
+                                        .filter(info -> info.getFuelType() != null
+                                                && info.getFuelType() == FuelInfoFuelType.GASOLINE)
+                                        .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                        .sum()
+                                : 0.0)
+                        .sum();
     }
 
     /**
      * 경유 총 주유량 계산 및 업데이트
      */
     public void updateDieselTotalAmount() {
-        this.dieselTotalAmount = fuels.stream()
-                .filter(fuel -> !fuel.isDeleted())
-                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
-                        ? fuel.getFuelAggregation().getFuelInfos().stream()
-                                .filter(info -> !info.isDeleted())
-                                .filter(info -> info.getFuelType() != null
-                                        && info.getFuelType() == FuelInfoFuelType.DIESEL)
-                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
-                                .sum()
-                        : 0.0)
-                .sum();
+        this.dieselTotalAmount =
+                fuels.stream().filter(fuel -> !fuel.isDeleted())
+                        .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                                ? fuel.getFuelAggregation().getFuelInfos().stream().filter(info -> !info.isDeleted())
+                                        .filter(info -> info.getFuelType() != null
+                                                && info.getFuelType() == FuelInfoFuelType.DIESEL)
+                                        .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                        .sum()
+                                : 0.0)
+                        .sum();
     }
 
     /**
      * 요소수 총 주유량 계산 및 업데이트
      */
     public void updateUreaTotalAmount() {
-        this.ureaTotalAmount = fuels.stream()
-                .filter(fuel -> !fuel.isDeleted())
-                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
-                        ? fuel.getFuelAggregation().getFuelInfos().stream()
-                                .filter(info -> !info.isDeleted())
-                                .filter(info -> info.getFuelType() != null
-                                        && info.getFuelType() == FuelInfoFuelType.UREA)
-                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
-                                .sum()
-                        : 0.0)
-                .sum();
+        this.ureaTotalAmount =
+                fuels.stream().filter(fuel -> !fuel.isDeleted())
+                        .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                                ? fuel.getFuelAggregation().getFuelInfos().stream().filter(info -> !info.isDeleted())
+                                        .filter(info -> info.getFuelType() != null
+                                                && info.getFuelType() == FuelInfoFuelType.UREA)
+                                        .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                        .sum()
+                                : 0.0)
+                        .sum();
     }
 
     /**
      * 기타 총 주유량 계산 및 업데이트
      */
     public void updateEtcTotalAmount() {
-        this.etcTotalAmount = fuels.stream()
-                .filter(fuel -> !fuel.isDeleted())
-                .mapToDouble(fuel -> fuel.getFuelAggregation() != null
-                        ? fuel.getFuelAggregation().getFuelInfos().stream()
-                                .filter(info -> !info.isDeleted())
-                                .filter(info -> info.getFuelType() != null
-                                        && info.getFuelType() == FuelInfoFuelType.ETC)
-                                .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
-                                .sum()
-                        : 0.0)
-                .sum();
+        this.etcTotalAmount =
+                fuels.stream().filter(fuel -> !fuel.isDeleted())
+                        .mapToDouble(fuel -> fuel.getFuelAggregation() != null
+                                ? fuel.getFuelAggregation().getFuelInfos().stream().filter(info -> !info.isDeleted())
+                                        .filter(info -> info.getFuelType() != null
+                                                && info.getFuelType() == FuelInfoFuelType.ETC)
+                                        .mapToDouble(info -> info.getFuelAmount() != null ? info.getFuelAmount() : 0.0)
+                                        .sum()
+                                : 0.0)
+                        .sum();
     }
 
     /**
      * 유류 증빙 여부 업데이트
      */
     public void updateFuelEvidenceSubmitted() {
-        this.fuelEvidenceSubmitted = evidenceFiles.stream()
-                .filter(file -> !file.isDeleted())
+        this.fuelEvidenceSubmitted = evidenceFiles.stream().filter(file -> !file.isDeleted())
                 .anyMatch(file -> file.getFileType() == DailyReportEvidenceFileType.FUEL);
     }
 
