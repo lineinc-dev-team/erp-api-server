@@ -13,3 +13,4 @@ jobs:
       SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
       EC2_USER: ${{ secrets.DEV_EC2_USER }}
       EC2_HOST: ${{ secrets.DEV_EC2_HOST }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
