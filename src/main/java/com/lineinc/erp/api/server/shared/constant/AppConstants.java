@@ -49,7 +49,7 @@ public final class AppConstants {
     public static final String MENU_STEEL_MANAGEMENT = "강재수불부 관리";
     public static final String MENU_MATERIAL_MANAGEMENT = "자재 관리";
     public static final String MENU_FUEL_AGGREGATION = "유류집계 관리";
-    public static final String MENU_LABOR_MANAGEMENT = "노무 관리";
+    public static final String MENU_LABOR_MANAGEMENT = "근로자 관리";
     public static final String MENU_LABOR_PAYROLL = "노무명세서 관리";
     public static final String MENU_OUTSOURCING_COMPANY = "외주업체 관리";
     public static final String MENU_OUTSOURCING_COMPANY_CONTRACT = "외주업체 계약 관리";
@@ -64,7 +64,7 @@ public final class AppConstants {
             MENU_MATERIAL_MANAGEMENT, // 4. 자재 관리
             MENU_STEEL_MANAGEMENT, // 5. 강재수불부 관리
             MENU_FUEL_AGGREGATION, // 6. 유류집계 관리
-            MENU_LABOR_MANAGEMENT, // 7. 노무 관리
+            MENU_LABOR_MANAGEMENT, // 7. 근로자 관리
             MENU_LABOR_PAYROLL, // 8. 노무명세서 관리
             MENU_OUTSOURCING_COMPANY, // 9. 외주업체 관리
             MENU_OUTSOURCING_COMPANY_CONTRACT, // 10. 외주업체 계약 관리
@@ -115,10 +115,9 @@ public final class AppConstants {
      * 직급 목록 (계급 순서)
      */
     public static final List<String> GRADE_NAMES =
-            List.of(GRADE_CEO, GRADE_VICE_CHAIRMAN, GRADE_EXECUTIVE_VICE_PRESIDENT,
-                    GRADE_MANAGING_DIRECTOR, GRADE_EXECUTIVE_DIRECTOR, GRADE_GENERAL_MANAGER,
-                    GRADE_DEPUTY_GENERAL_MANAGER, GRADE_MANAGER, GRADE_ASSISTANT_MANAGER,
-                    GRADE_SUPERVISOR, GRADE_EMPLOYEE, GRADE_FOREMAN, GRADE_TECHNICIAN);
+            List.of(GRADE_CEO, GRADE_VICE_CHAIRMAN, GRADE_EXECUTIVE_VICE_PRESIDENT, GRADE_MANAGING_DIRECTOR,
+                    GRADE_EXECUTIVE_DIRECTOR, GRADE_GENERAL_MANAGER, GRADE_DEPUTY_GENERAL_MANAGER, GRADE_MANAGER,
+                    GRADE_ASSISTANT_MANAGER, GRADE_SUPERVISOR, GRADE_EMPLOYEE, GRADE_FOREMAN, GRADE_TECHNICIAN);
 
     /**
      * 직책 목록
@@ -129,9 +128,8 @@ public final class AppConstants {
     /**
      * 부서 목록
      */
-    public static final List<String> DEPARTMENT_NAMES =
-            List.of(DEPT_CEO, DEPT_LEGAL_AUDIT, DEPT_MANAGEMENT, DEPT_MATERIAL_PURCHASING,
-                    DEPT_ENGINEERING, DEPT_CIVIL_ENGINEERING, DEPT_DUSON_INTERNATIONAL);
+    public static final List<String> DEPARTMENT_NAMES = List.of(DEPT_CEO, DEPT_LEGAL_AUDIT, DEPT_MANAGEMENT,
+            DEPT_MATERIAL_PURCHASING, DEPT_ENGINEERING, DEPT_CIVIL_ENGINEERING, DEPT_DUSON_INTERNATIONAL);
 
     // ==================== 시간 및 지역 설정 ====================
     /**
@@ -170,18 +168,14 @@ public final class AppConstants {
     public static final String DEDUCTION_COMPANY_CONTRACT_ID = "deduction_company_contract_id";
     public static final String LABOR_ID = "labor_id";
     public static final String FUEL_AGGREGATION_ID = "fuel_aggregation_id";
-    public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_ID =
-            "outsourcing_company_contract_worker_id";
-    public static final String OUTSOURCING_COMPANY_CONTRACT_DRIVER_ID =
-            "outsourcing_company_contract_driver_id";
-    public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_ID =
-            "outsourcing_company_contract_equipment_id";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_ID = "outsourcing_company_contract_worker_id";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_DRIVER_ID = "outsourcing_company_contract_driver_id";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_ID = "outsourcing_company_contract_equipment_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_ID =
             "outsourcing_company_contract_construction_id";
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_ID =
             "daily_report_outsourcing_construction_group_id";
-    public static final String DAILY_REPORT_OUTSOURCING_COMPANY_ID =
-            "daily_report_outsourcing_company_id";
+    public static final String DAILY_REPORT_OUTSOURCING_COMPANY_ID = "daily_report_outsourcing_company_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_ID =
             "outsourcing_company_contract_construction_group_id";
     public static final String OUTSOURCING_COMPANY_CONTRACT_ID = "outsourcing_company_contract_id";
@@ -209,8 +203,7 @@ public final class AppConstants {
     public static final String DAILY_REPORT_MAPPED_BY = "dailyReport";
     public static final String FUEL_AGGREGATION_MAPPED_BY = "fuelAggregation";
     public static final String LABOR_MAPPED_BY = "labor";
-    public static final String DAILY_REPORT_OUTSOURCING_COMPANY_MAPPED_BY =
-            "dailyReportOutsourcingCompany";
+    public static final String DAILY_REPORT_OUTSOURCING_COMPANY_MAPPED_BY = "dailyReportOutsourcingCompany";
     public static final String DAILY_REPORT_OUTSOURCING_CONSTRUCTION_GROUP_MAPPED_BY =
             "dailyReportOutsourcingConstructionGroup";
     public static final String USER_MAPPED_BY = "user";
@@ -218,10 +211,8 @@ public final class AppConstants {
     public static final String SITE_MAPPED_BY = "site";
     public static final String SITE_CONTRACT_MAPPED_BY = "siteContract";
     public static final String ROLE_MAPPED_BY = "role";
-    public static final String OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY =
-            "outsourcingCompanyContract";
-    public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_MAPPED_BY =
-            "constructionGroup";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_MAPPED_BY = "outsourcingCompanyContract";
+    public static final String OUTSOURCING_COMPANY_CONTRACT_CONSTRUCTION_GROUP_MAPPED_BY = "constructionGroup";
     public static final String OUTSOURCING_COMPANY_CONTRACT_DRIVER_MAPPED_BY = "driver";
     public static final String OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_MAPPED_BY = "equipment";
     public static final String OUTSOURCING_COMPANY_CONTRACT_WORKER_MAPPED_BY = "worker";
