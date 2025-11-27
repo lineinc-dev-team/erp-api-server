@@ -63,7 +63,7 @@ public record CompanyDetailResponse(
                 company.getAccountNumber(),
                 company.getAccountHolder(),
                 company.getMemo(),
-                company.getVatType() != null ? company.getVatType().name() : null,
+                company.getVatType() != null ? company.getVatType().getLabel() : null,
                 company.getVatType(),
                 company.getContacts()
                         .stream()
