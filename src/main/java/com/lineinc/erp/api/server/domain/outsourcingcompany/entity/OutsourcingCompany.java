@@ -172,8 +172,10 @@ public class OutsourcingCompany extends BaseEntity {
     public void syncTransientFields() {
         this.typeName = this.type != null ? this.type.getLabel() : null;
         this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null
-                : Arrays.stream(this.defaultDeductions.split(",")).map(String::trim)
-                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf).collect(Collectors.joining(","));
+                : Arrays.stream(this.defaultDeductions.split(","))
+                        .map(String::trim)
+                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
+                        .collect(Collectors.joining(","));
         this.vatTypeName = this.vatType != null ? this.vatType.getLabel() : null;
     }
 
