@@ -38,8 +38,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@Table(indexes = {@Index(columnList = "name"), @Index(columnList = "ceo_name"), @Index(columnList = "email"),
-        @Index(columnList = "business_number"), @Index(columnList = "type"), @Index(columnList = "landline_number"),
+@Table(indexes = {
+        @Index(columnList = "name"),
+        @Index(columnList = "ceo_name"),
+        @Index(columnList = "email"),
+        @Index(columnList = "business_number"),
+        @Index(columnList = "type"),
+        @Index(columnList = "landline_number"),
         @Index(columnList = "created_at"),})
 public class OutsourcingCompany extends BaseEntity {
     private static final String SEQUENCE_NAME = "outsourcing_company_seq";
