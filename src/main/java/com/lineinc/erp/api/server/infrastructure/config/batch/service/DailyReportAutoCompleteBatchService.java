@@ -50,8 +50,8 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
             log.info("자동 마감 대상: {} 이전 날짜의 모든 출역일보 (오늘: {})", twoDaysAgo, today);
 
             // 오늘로부터 2일 전보다 이전의 모든 PENDING 상태 출역일보 조회
-            final List<DailyReport> pendingReports = dailyReportRepository
-                    .findByReportDateBeforeAndStatus(cutoffDate, DailyReportStatus.PENDING);
+            final List<DailyReport> pendingReports =
+                    dailyReportRepository.findByReportDateBeforeAndStatus(cutoffDate, DailyReportStatus.PENDING);
 
             if (pendingReports.isEmpty()) {
                 log.info("자동 마감할 출역일보가 없습니다. (기준일: {})", today);
@@ -71,7 +71,7 @@ public class DailyReportAutoCompleteBatchService implements BatchService {
                     // 노무비 명세서 동기화 (자동 마감 시에만 실행)
                     // 배치에서는 userId를 null로 전달 (시스템 자동 처리)
                     try {
-                        laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedReport, null);
+                        laborPayrollSyncService.syncLaborPayrollFromDailyReport(report, null);
                     } catch (final Exception syncException) {
                         log.warn("노무비 명세서 동기화 실패 - 출역일보 ID: {}, 오류: {}", savedReport.getId(),
                                 syncException.getMessage());
