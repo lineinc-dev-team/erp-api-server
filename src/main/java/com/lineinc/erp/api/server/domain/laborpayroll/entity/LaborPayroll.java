@@ -281,16 +281,15 @@ public class LaborPayroll extends BaseEntity {
         calculateTotalWorkDays();
 
         // 총 노무비 계산
-        this.totalLaborCost =
-                LaborPayrollCalculator.calculateTotalLaborCost(dailyWage, totalWorkHours);
+        this.totalLaborCost = LaborPayrollCalculator.calculateTotalLaborCost(dailyWage, totalWorkHours);
 
         // 공제액 계산
         if (totalLaborCost != null) {
             calculateDeductions();
 
             // 총 공제액 계산 및 저장
-            this.totalDeductions = incomeTax.add(employmentInsurance).add(healthInsurance)
-                    .add(localTax).add(nationalPension).add(longTermCareInsurance);
+            this.totalDeductions = incomeTax.add(employmentInsurance).add(healthInsurance).add(localTax)
+                    .add(nationalPension).add(longTermCareInsurance);
 
             // 차감지급액 계산 (총 노무비 - 총 공제액)
             this.netPayment = totalLaborCost.subtract(this.totalDeductions);
@@ -302,8 +301,7 @@ public class LaborPayroll extends BaseEntity {
      */
     private void calculateDeductions() {
         // 정직원과 외주계약직은 모든 공제 항목을 계산하지 않음
-        if (labor.getType() == LaborType.REGULAR_EMPLOYEE
-                || labor.getType() == LaborType.OUTSOURCING_CONTRACT) {
+        if (labor.getType() == LaborType.REGULAR_EMPLOYEE || labor.getType() == LaborType.OUTSOURCING_CONTRACT) {
             this.incomeTax = BigDecimal.ZERO;
             this.employmentInsurance = BigDecimal.ZERO;
             this.healthInsurance = BigDecimal.ZERO;
@@ -321,8 +319,7 @@ public class LaborPayroll extends BaseEntity {
         final BigDecimal pensionMaxAmount = new BigDecimal("286650");
 
         // 소득세 계산: 첫 번째 평일 근무 여부를 기준으로 계산
-        final BigDecimal calculatedIncomeTax =
-                LaborPayrollCalculator.calculateIncomeTax(dailyWage, this, yearMonth);
+        final BigDecimal calculatedIncomeTax = LaborPayrollCalculator.calculateIncomeTax(dailyWage, this, yearMonth);
 
         // 소득세 1000원 미만은 0으로 처리 (엑셀 수식: =IF(AN6<1000, 0, AN6))
         if (calculatedIncomeTax.compareTo(new BigDecimal("1000")) < 0) {
@@ -377,8 +374,8 @@ public class LaborPayroll extends BaseEntity {
         // Z6: 총 일수, AD6: 건강보험료
         if (totalWorkDays.compareTo(new BigDecimal("8")) >= 0) {
             // 건강보험료 * (0.9182% / 7.09%) 계산
-            final BigDecimal rate = new BigDecimal("0.009182").divide(new BigDecimal("0.0709"), 10,
-                    java.math.RoundingMode.HALF_UP);
+            final BigDecimal rate =
+                    new BigDecimal("0.009182").divide(new BigDecimal("0.0709"), 10, java.math.RoundingMode.HALF_UP);
             final BigDecimal insurance = healthInsurance.multiply(rate);
             this.longTermCareInsurance = LaborPayrollCalculator.roundDown(insurance, -1);
         } else {

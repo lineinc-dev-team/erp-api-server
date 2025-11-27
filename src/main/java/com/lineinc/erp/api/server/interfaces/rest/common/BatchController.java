@@ -11,7 +11,7 @@ import com.lineinc.erp.api.server.domain.batch.repository.BatchExecutionHistoryR
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.BatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DailyReportAutoCompleteBatchService;
 import com.lineinc.erp.api.server.infrastructure.config.batch.service.DashboardSiteMonthlyCostBatchService;
-import com.lineinc.erp.api.server.infrastructure.config.batch.service.TenureCalculationBatchService;
+import com.lineinc.erp.api.server.infrastructure.config.batch.service.SeverancePayEligibilityBatchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchController extends BaseController {
 
     private final DailyReportAutoCompleteBatchService dailyReportAutoCompleteBatchService;
-    private final TenureCalculationBatchService tenureCalculationBatchService;
+    private final SeverancePayEligibilityBatchService severancePayEligibilityBatchService;
     private final DashboardSiteMonthlyCostBatchService dashboardSiteMonthlyCostBatchService;
     private final BatchExecutionHistoryRepository batchExecutionHistoryRepository;
 
@@ -46,15 +46,15 @@ public class BatchController extends BaseController {
     }
 
     /**
-     * 근속기간 계산 배치를 수동으로 실행합니다.
+     * 퇴직금 발생 여부 계산 배치를 수동으로 실행합니다.
      *
      * @return 배치 실행 결과
      */
-    @PostMapping("/tenure-calculation")
-    @Operation(summary = "근속기간 계산 배치 실행")
+    @PostMapping("/severance-pay-eligibility-calculation")
+    @Operation(summary = "퇴직금 발생 여부 계산 배치 실행")
     @Transactional
-    public ResponseEntity<String> runTenureCalculationBatch() {
-        return executeBatchWithHistory(tenureCalculationBatchService);
+    public ResponseEntity<String> runSeverancePayEligibilityCalculationBatch() {
+        return executeBatchWithHistory(severancePayEligibilityBatchService);
     }
 
     /**
@@ -78,8 +78,7 @@ public class BatchController extends BaseController {
      * @return 배치 실행 결과
      */
     private ResponseEntity<String> executeBatchWithHistory(final BatchService batchService) {
-        final BatchExecutionHistory history =
-                batchService.createExecutionHistory(BatchExecutionType.MANUAL);
+        final BatchExecutionHistory history = batchService.createExecutionHistory(BatchExecutionType.MANUAL);
         batchExecutionHistoryRepository.save(history);
 
         try {
@@ -88,8 +87,8 @@ public class BatchController extends BaseController {
             history.markAsCompleted();
             batchExecutionHistoryRepository.save(history);
 
-            final String message = String.format("%s 완료 - 실행 시간: %.2f초",
-                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds());
+            final String message = String.format("%s 완료 - 실행 시간: %.2f초", batchService.getBatchName().getLabel(),
+                    history.getExecutionTimeSeconds());
             log.info(message);
             return ResponseEntity.ok(message);
         } catch (final Exception e) {
@@ -97,8 +96,7 @@ public class BatchController extends BaseController {
             batchExecutionHistoryRepository.save(history);
 
             final String errorMessage = String.format("%s 실행 중 오류 발생 - 실행 시간: %.2f초, 오류: %s",
-                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds(),
-                    e.getMessage());
+                    batchService.getBatchName().getLabel(), history.getExecutionTimeSeconds(), e.getMessage());
             log.error(errorMessage, e);
             return ResponseEntity.status(500).body("배치 실행 실패: " + e.getMessage());
         }
