@@ -12,7 +12,8 @@ public enum OutsourcingCompanyType {
     CONSTRUCTION("외주", 3),
     MATERIAL("재료", 4),
     FUEL("유류", 5),
-    MANAGEMENT("관리", 6);
+    MANAGEMENT("관리", 6),
+    RESTAURANT("식당", 7);
 
     private final String label;
     private final int order;
