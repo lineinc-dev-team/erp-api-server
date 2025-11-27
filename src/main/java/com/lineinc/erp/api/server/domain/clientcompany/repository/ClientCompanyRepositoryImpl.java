@@ -3,12 +3,10 @@ package com.lineinc.erp.api.server.domain.clientcompany.repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
-
 import com.lineinc.erp.api.server.domain.clientcompany.entity.ClientCompany;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.QClientCompany;
 import com.lineinc.erp.api.server.domain.clientcompany.entity.QClientCompanyContact;
@@ -21,7 +19,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -37,26 +34,18 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
     private final QClientCompanyContact clientCompanyContact = QClientCompanyContact.clientCompanyContact;
     private final QUser user = QUser.user;
 
-    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS = Map.of(
-            "id", QClientCompany.clientCompany.id,
-            "name", QClientCompany.clientCompany.name,
-            "createdAt", QClientCompany.clientCompany.createdAt,
-            "updatedAt", QClientCompany.clientCompany.updatedAt);
+    private static final Map<String, ComparableExpressionBase<?>> SORT_FIELDS =
+            Map.of("id", QClientCompany.clientCompany.id, "name", QClientCompany.clientCompany.name, "createdAt",
+                    QClientCompany.clientCompany.createdAt, "updatedAt", QClientCompany.clientCompany.updatedAt);
 
     @Override
-    public Page<ClientCompanyResponse> findAll(
-            final ClientCompanyListRequest request,
-            final Pageable pageable) {
+    public Page<ClientCompanyResponse> findAll(final ClientCompanyListRequest request, final Pageable pageable) {
 
         final BooleanBuilder condition = buildCondition(request);
         final OrderSpecifier<?>[] orders = PageableUtils.toOrderSpecifiers(pageable, SORT_FIELDS);
 
         // 1단계: ID만 페이징으로 조회
-        var idQuery = queryFactory
-                .select(clientCompany.id)
-                .from(clientCompany)
-                .where(condition)
-                .orderBy(orders);
+        var idQuery = queryFactory.select(clientCompany.id).from(clientCompany).where(condition).orderBy(orders);
 
         // 페이징이 있는 경우에만 offset, limit 적용 (unpaged 제외)
         if (pageable.isPaged()) {
@@ -70,32 +59,23 @@ public class ClientCompanyRepositoryImpl implements ClientCompanyRepositoryCusto
         if (ids.isEmpty()) {
             content = List.of();
         } else {
-            content = queryFactory
-                    .selectFrom(clientCompany)
-                    .distinct()
+            content = queryFactory.selectFrom(clientCompany).distinct()
                     .leftJoin(clientCompany.contacts, clientCompanyContact).fetchJoin()
-                    .leftJoin(clientCompany.user, user).fetchJoin()
-                    .where(clientCompany.id.in(ids))
-                    .orderBy(orders)
+                    .leftJoin(clientCompany.user, user).fetchJoin().where(clientCompany.id.in(ids)).orderBy(orders)
                     .fetch();
         }
 
         // count 쿼리는 페이징이 있을 때만 수행 (성능 최적화)
         long total;
         if (pageable.isPaged()) {
-            final Long totalCount = queryFactory
-                    .select(clientCompany.count())
-                    .from(clientCompany)
-                    .where(condition)
-                    .fetchOne();
+            final Long totalCount =
+                    queryFactory.select(clientCompany.count()).from(clientCompany).where(condition).fetchOne();
             total = Objects.requireNonNullElse(totalCount, 0L);
         } else {
             total = content.size();
         }
 
-        final List<ClientCompanyResponse> responses = content.stream()
-                .map(ClientCompanyResponse::from)
-                .toList();
+        final List<ClientCompanyResponse> responses = content.stream().map(ClientCompanyResponse::from).toList();
 
         return PageableUtils.createPage(responses, pageable, total);
     }
