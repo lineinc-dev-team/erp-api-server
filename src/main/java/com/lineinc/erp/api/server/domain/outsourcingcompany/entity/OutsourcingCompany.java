@@ -4,14 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
-import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +17,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -172,7 +172,8 @@ public class OutsourcingCompany extends BaseEntity {
         this.vatTypeName = this.vatType != null ? this.vatType.getLabel() : null;
     }
 
-    public void updateFrom(final OutsourcingCompanyUpdateRequest request) {
+    public void updateFrom(
+            final OutsourcingCompanyUpdateRequest request) {
         this.name = request.name();
         this.businessNumber = request.businessNumber();
         this.typeDescription = request.typeDescription();
@@ -196,8 +197,14 @@ public class OutsourcingCompany extends BaseEntity {
     /**
      * 외주업체 기본 정보를 업데이트합니다.
      */
-    public void updateOutsourcingCompanyInfo(final String name, final String businessNumber, final String ceoName,
-            final String bankName, final String accountNumber, final String accountHolder, final String memo) {
+    public void updateOutsourcingCompanyInfo(
+            final String name,
+            final String businessNumber,
+            final String ceoName,
+            final String bankName,
+            final String accountNumber,
+            final String accountHolder,
+            final String memo) {
         this.name = name;
         this.businessNumber = businessNumber;
         this.ceoName = ceoName;

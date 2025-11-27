@@ -1,16 +1,17 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request;
 
 import java.util.List;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
-import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
+import com.lineinc.erp.api.server.shared.dto.request.ChangeHistoryRequest;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "외주업체 수정 요청")
-public record OutsourcingCompanyUpdateRequest(@Schema(description = "외주업체명", example = "삼성ENG") @NotBlank String name,
+public record OutsourcingCompanyUpdateRequest(
+        @Schema(description = "외주업체명", example = "삼성ENG") @NotBlank String name,
         @Schema(description = "사업자등록번호", example = "123-45-67890") @NotBlank String businessNumber,
         @Schema(description = "구분 설명", example = "직접 시공 업체") String typeDescription,
         @Schema(description = "대표자명", example = "김대표") @NotBlank String ceoName,
