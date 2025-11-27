@@ -36,7 +36,6 @@ jobs:
           fi
 
           COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1)
-          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
           COMMIT_HASH=$(git log -1 --pretty=%h)
 
           curl -X POST $SLACK_WEBHOOK \
@@ -44,12 +43,11 @@ jobs:
             -d "{
               \"attachments\": [{
                 \"color\": \"#2196F3\",
-                \"title\": \"🚀 배포 시작\",
+                \"title\": \"🚀 배포 시작: ${{ inputs.environment }}\",
                 \"fields\": [
                   {\"title\": \"환경\", \"value\": \"\`${{ inputs.environment }}\`\", \"short\": true},
                   {\"title\": \"브랜치\", \"value\": \"\`${{ github.ref_name }}\`\", \"short\": true},
                   {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true},
-                  {\"title\": \"배포자\", \"value\": \"${COMMIT_AUTHOR}\", \"short\": true},
                   {\"title\": \"메시지\", \"value\": \"${COMMIT_MSG}\", \"short\": false}
                 ],
                 \"footer\": \"ERP API Server\",
@@ -107,8 +105,6 @@ jobs:
             exit 0
           fi
 
-          COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1)
-          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
           COMMIT_HASH=$(git log -1 --pretty=%h)
 
           curl -X POST $SLACK_WEBHOOK \
@@ -116,18 +112,16 @@ jobs:
             -d "{
               \"attachments\": [{
                 \"color\": \"#4CAF50\",
-                \"title\": \"✅ 배포 성공\",
-                \"text\": \"*${{ inputs.environment }}* 서버에 성공적으로 배포되었습니다!\",
+                \"title\": \"✅ 배포 성공!\",
+                \"text\": \"\`${{ inputs.environment }}\` 환경에 성공적으로 배포되었습니다.\",
                 \"fields\": [
                   {\"title\": \"환경\", \"value\": \"\`${{ inputs.environment }}\`\", \"short\": true},
                   {\"title\": \"브랜치\", \"value\": \"\`${{ github.ref_name }}\`\", \"short\": true},
-                  {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true},
-                  {\"title\": \"배포자\", \"value\": \"${COMMIT_AUTHOR}\", \"short\": true},
-                  {\"title\": \"메시지\", \"value\": \"${COMMIT_MSG}\", \"short\": false}
+                  {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true}
                 ],
                 \"actions\": [{
                   \"type\": \"button\",
-                  \"text\": \"배포 로그 보기\",
+                  \"text\": \"로그 보기\",
                   \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
                 }],
                 \"footer\": \"ERP API Server\",
@@ -145,8 +139,6 @@ jobs:
             exit 0
           fi
 
-          COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1)
-          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
           COMMIT_HASH=$(git log -1 --pretty=%h)
 
           curl -X POST $SLACK_WEBHOOK \
@@ -154,18 +146,16 @@ jobs:
             -d "{
               \"attachments\": [{
                 \"color\": \"#F44336\",
-                \"title\": \"❌ 배포 실패\",
-                \"text\": \"*${{ inputs.environment }}* 서버 배포에 실패했습니다. 로그를 확인해주세요.\",
+                \"title\": \"❌ 배포 실패!\",
+                \"text\": \"\`${{ inputs.environment }}\` 환경 배포를 확인해주세요.\",
                 \"fields\": [
                   {\"title\": \"환경\", \"value\": \"\`${{ inputs.environment }}\`\", \"short\": true},
                   {\"title\": \"브랜치\", \"value\": \"\`${{ github.ref_name }}\`\", \"short\": true},
-                  {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true},
-                  {\"title\": \"배포자\", \"value\": \"${COMMIT_AUTHOR}\", \"short\": true},
-                  {\"title\": \"메시지\", \"value\": \"${COMMIT_MSG}\", \"short\": false}
+                  {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true}
                 ],
                 \"actions\": [{
                   \"type\": \"button\",
-                  \"text\": \"배포 로그 보기\",
+                  \"text\": \"실패 로그 보기\",
                   \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
                 }],
                 \"footer\": \"ERP API Server\",
