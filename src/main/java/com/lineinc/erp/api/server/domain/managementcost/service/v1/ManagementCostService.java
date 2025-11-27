@@ -39,6 +39,7 @@ import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCo
 import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompanyChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyChangeHistoryType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyChangeRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.repository.OutsourcingCompanyRepository;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
@@ -111,7 +112,9 @@ public class ManagementCostService {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
         // 2. 외주업체 처리
@@ -232,6 +235,8 @@ public class ManagementCostService {
                     .businessNumber(outsourcingCompanyInfo.businessNumber())
                     .type(ManagementCostItemType.MEAL_FEE.equals(itemType) ? OutsourcingCompanyType.MEAL_FEE
                             : OutsourcingCompanyType.ETC)
+                    .vatType(ManagementCostItemType.MEAL_FEE.equals(itemType) ? OutsourcingCompanyVatType.VAT_SEPARATE
+                            : null)
                     .ceoName(outsourcingCompanyInfo.ceoName())
                     .bankName(outsourcingCompanyInfo.bankName())
                     .accountNumber(outsourcingCompanyInfo.accountNumber())
@@ -444,7 +449,9 @@ public class ManagementCostService {
             final DeleteManagementCostsRequest request) {
         final List<ManagementCost> managementCosts = managementCostRepository.findAllById(request.managementCostIds());
         if (managementCosts.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    ValidationMessages.MANAGEMENT_COST_NOT_FOUND);
         }
 
         for (final ManagementCost managementCost : managementCosts) {
@@ -586,7 +593,8 @@ public class ManagementCostService {
     public ManagementCostDetailViewResponse getManagementCostById(
             final Long siteId) {
         final ManagementCost managementCost = managementCostRepository.findById(siteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
         return ManagementCostDetailViewResponse.from(managementCost);
     }
@@ -595,7 +603,8 @@ public class ManagementCostService {
     public ManagementCost getManagementCostByIdOrThrow(
             final Long id) {
         return managementCostRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
     }
 
@@ -608,7 +617,9 @@ public class ManagementCostService {
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
         if (!siteProcess.getSite().getId().equals(site.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
 
         // 2. 외주업체 처리
@@ -716,7 +727,9 @@ public class ManagementCostService {
                     keyword, pageable);
         }
 
-        return resultSlice.map(result -> new ItemDescriptionResponse((Long) result[1], (String) result[0]));
+        return resultSlice.map(result -> new ItemDescriptionResponse(
+                (Long) result[1],
+                (String) result[0]));
     }
 
     /**
@@ -799,8 +812,8 @@ public class ManagementCostService {
         }
 
         // 변경 이력 추적 및 저장
-        final List<ManagementCostMealFeeDetailDirectContract> afterDetails =
-                new ArrayList<>(managementCost.getMealFeeDetailDirectContracts());
+        final List<ManagementCostMealFeeDetailDirectContract> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailDirectContracts());
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
@@ -896,8 +909,8 @@ public class ManagementCostService {
         }
 
         // 변경 이력 추적 및 저장
-        final List<ManagementCostMealFeeDetailOutsourcing> afterDetails =
-                new ArrayList<>(managementCost.getMealFeeDetailOutsourcings());
+        final List<ManagementCostMealFeeDetailOutsourcing> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailOutsourcings());
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
@@ -998,8 +1011,8 @@ public class ManagementCostService {
         }
 
         // 변경 이력 추적 및 저장
-        final List<ManagementCostMealFeeDetailEquipment> afterDetails =
-                new ArrayList<>(managementCost.getMealFeeDetailEquipments());
+        final List<ManagementCostMealFeeDetailEquipment> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailEquipments());
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
@@ -1099,8 +1112,8 @@ public class ManagementCostService {
         }
 
         // 변경 이력 추적 및 저장
-        final List<ManagementCostMealFeeDetailOutsourcingContract> afterDetails =
-                new ArrayList<>(managementCost.getMealFeeDetailOutsourcingContracts());
+        final List<ManagementCostMealFeeDetailOutsourcingContract> afterDetails = new ArrayList<>(
+                managementCost.getMealFeeDetailOutsourcingContracts());
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
