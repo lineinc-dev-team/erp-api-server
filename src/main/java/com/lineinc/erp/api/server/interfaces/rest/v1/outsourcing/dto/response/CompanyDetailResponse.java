@@ -32,7 +32,8 @@ public record CompanyDetailResponse(
         @Schema(description = "계좌번호", example = "123-456-7890") String accountNumber,
         @Schema(description = "예금주", example = "홍길동") String accountHolder,
         @Schema(description = "비고", example = "주요 거래처") String memo,
-        @Schema(description = "부가세 타입", example = "NO_VAT") OutsourcingCompanyVatType vatType,
+        @Schema(description = "부가세", example = "부가세 없음") String vatType,
+        @Schema(description = "부가세 코드", example = "NO_VAT") OutsourcingCompanyVatType vatTypeCode,
         @Schema(description = "담당자 목록") List<CompanyContactResponse> contacts,
         @Schema(description = "파일 목록") List<CompanyFileResponse> files) {
     public static CompanyDetailResponse from(
@@ -62,6 +63,7 @@ public record CompanyDetailResponse(
                 company.getAccountNumber(),
                 company.getAccountHolder(),
                 company.getMemo(),
+                company.getVatType() != null ? company.getVatType().name() : null,
                 company.getVatType(),
                 company.getContacts()
                         .stream()
