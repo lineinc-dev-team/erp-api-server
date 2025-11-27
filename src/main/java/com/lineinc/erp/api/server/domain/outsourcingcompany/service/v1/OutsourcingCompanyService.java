@@ -2,7 +2,6 @@ package com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1;
 
 import java.util.List;
 import java.util.Map;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
@@ -41,7 +39,6 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -67,24 +64,14 @@ public class OutsourcingCompanyService {
         }
 
         // 1. OutsourcingCompany 객체 빌드
-        final OutsourcingCompany outsourcingCompany = OutsourcingCompany.builder()
-                .name(request.name())
-                .businessNumber(request.businessNumber())
-                .type(request.type())
-                .typeDescription(request.typeDescription())
-                .ceoName(request.ceoName())
-                .address(request.address())
-                .detailAddress(request.detailAddress())
-                .landlineNumber(request.landlineNumber())
-                .email(request.email())
+        final OutsourcingCompany outsourcingCompany = OutsourcingCompany.builder().name(request.name())
+                .businessNumber(request.businessNumber()).type(request.type())
+                .typeDescription(request.typeDescription()).ceoName(request.ceoName()).address(request.address())
+                .detailAddress(request.detailAddress()).landlineNumber(request.landlineNumber()).email(request.email())
                 .defaultDeductions(request.defaultDeductions())
-                .defaultDeductionsDescription(request.defaultDeductionsDescription())
-                .bankName(request.bankName())
-                .accountNumber(request.accountNumber())
-                .accountHolder(request.accountHolder())
-                .isActive(request.isActive())
-                .memo(request.memo())
-                .build();
+                .defaultDeductionsDescription(request.defaultDeductionsDescription()).bankName(request.bankName())
+                .accountNumber(request.accountNumber()).accountHolder(request.accountHolder())
+                .isActive(request.isActive()).memo(request.memo()).vatType(request.vatType()).build();
 
         // 2. 외주업체 먼저 저장
         outsourcingCompanyRepository.save(outsourcingCompany);
@@ -95,10 +82,8 @@ public class OutsourcingCompanyService {
 
         // 4. 변경 이력 생성
         final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
-                .outsourcingCompany(outsourcingCompany)
-                .description(ValidationMessages.INITIAL_CREATION)
-                .user(userService.getUserByIdOrThrow(userId))
-                .build();
+                .outsourcingCompany(outsourcingCompany).description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId)).build();
         outsourcingCompanyChangeRepository.save(changeHistory);
 
         return outsourcingCompany;
@@ -126,9 +111,8 @@ public class OutsourcingCompanyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        if (request.businessNumber() != null &&
-                !request.businessNumber().equals(company.getBusinessNumber()) &&
-                outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
+        if (request.businessNumber() != null && !request.businessNumber().equals(company.getBusinessNumber())
+                && outsourcingCompanyRepository.existsByBusinessNumber(request.businessNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     ValidationMessages.BUSINESS_NUMBER_ALREADY_EXISTS);
         }
@@ -145,11 +129,8 @@ public class OutsourcingCompanyService {
 
         if (!simpleChanges.isEmpty()) {
             final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
-                    .outsourcingCompany(company)
-                    .type(OutsourcingCompanyChangeHistoryType.BASIC)
-                    .changes(changesJson)
-                    .user(userService.getUserByIdOrThrow(userId))
-                    .build();
+                    .outsourcingCompany(company).type(OutsourcingCompanyChangeHistoryType.BASIC).changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId)).build();
             outsourcingCompanyChangeRepository.save(changeHistory);
         }
 
@@ -175,8 +156,8 @@ public class OutsourcingCompanyService {
 
     @Transactional
     public void deleteOutsourcingCompanies(final DeleteOutsourcingCompaniesRequest request) {
-        final List<OutsourcingCompany> outsourcingCompanies = outsourcingCompanyRepository
-                .findAllById(request.outsourcingCompanyIds());
+        final List<OutsourcingCompany> outsourcingCompanies =
+                outsourcingCompanyRepository.findAllById(request.outsourcingCompanyIds());
         if (outsourcingCompanies.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND);
         }
@@ -189,29 +170,19 @@ public class OutsourcingCompanyService {
     }
 
     @Transactional(readOnly = true)
-    public Workbook downloadExcel(
-            final CustomUserDetails user,
-            final OutsourcingCompanyListRequest request,
-            final Sort sort,
-            final List<String> fields) {
+    public Workbook downloadExcel(final CustomUserDetails user, final OutsourcingCompanyListRequest request,
+            final Sort sort, final List<String> fields) {
         final List<CompanyResponse> companyRespons = outsourcingCompanyRepository.findAllWithoutPaging(request, sort)
-                .stream()
-                .map(CompanyResponse::from)
-                .toList();
+                .stream().map(CompanyResponse::from).toList();
 
-        final Workbook workbook = ExcelExportUtils.generateWorkbook(
-                companyRespons,
-                fields,
-                this::getExcelHeaderName,
+        final Workbook workbook = ExcelExportUtils.generateWorkbook(companyRespons, fields, this::getExcelHeaderName,
                 this::getExcelCellValue);
 
-        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
-                ExcelDownloadHistoryType.OUTSOURCING_COMPANY.name());
+        final String fileUrl =
+                s3FileService.uploadExcelToS3(workbook, ExcelDownloadHistoryType.OUTSOURCING_COMPANY.name());
 
-        excelDownloadHistoryService.recordDownload(
-                ExcelDownloadHistoryType.OUTSOURCING_COMPANY,
-                userService.getUserByIdOrThrow(user.getUserId()),
-                fileUrl);
+        excelDownloadHistoryService.recordDownload(ExcelDownloadHistoryType.OUTSOURCING_COMPANY,
+                userService.getUserByIdOrThrow(user.getUserId()), fileUrl);
 
         return workbook;
     }
@@ -239,10 +210,8 @@ public class OutsourcingCompanyService {
     }
 
     private String getExcelCellValue(final CompanyResponse company, final String field) {
-        final var mainContact = company.contacts().stream()
-                .filter(CompanyContactResponse::isMain)
-                .findFirst()
-                .orElse(null);
+        final var mainContact =
+                company.contacts().stream().filter(CompanyContactResponse::isMain).findFirst().orElse(null);
 
         return switch (field) {
             case "id" -> String.valueOf(company.id());
@@ -259,13 +228,13 @@ public class OutsourcingCompanyService {
             case "phoneNumber" -> company.phoneNumber();
             case "landlineNumber" -> company.landlineNumber();
             case "contactName" -> mainContact != null ? mainContact.name() : "";
-            case "contactPositionAndDepartment" ->
-                mainContact != null ? mainContact.position() + "/" + mainContact.department() : "";
+            case "contactPositionAndDepartment" -> mainContact != null
+                    ? mainContact.position() + "/" + mainContact.department()
+                    : "";
             case "defaultDeductions" -> company.defaultDeductions();
             case "isActive" -> company.isActive() ? "Y" : "N";
-            case "createdAtAndUpdatedAt" ->
-                DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/"
-                        + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
+            case "createdAtAndUpdatedAt" -> DateTimeFormatUtils.formatKoreaLocalDate(company.createdAt()) + "/"
+                    + DateTimeFormatUtils.formatKoreaLocalDate(company.updatedAt());
             case "hasFile" -> company.hasFile() ? "Y" : "N";
             case "memo" -> company.memo();
             case "email" -> company.email();
@@ -280,10 +249,8 @@ public class OutsourcingCompanyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        final Slice<OutsourcingCompanyChangeHistory> histories = outsourcingCompanyChangeRepository
-                .findAllByOutsourcingCompany(
-                        company,
-                        pageable);
+        final Slice<OutsourcingCompanyChangeHistory> histories =
+                outsourcingCompanyChangeRepository.findAllByOutsourcingCompany(company, pageable);
         return histories.map(history -> CompanyChangeHistoryResponse.from(history, userId));
     }
 
@@ -298,10 +265,8 @@ public class OutsourcingCompanyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_NOT_FOUND));
 
-        final Page<OutsourcingCompanyChangeHistory> historyPage = outsourcingCompanyChangeRepository
-                .findAllByOutsourcingCompanyWithPaging(
-                        company,
-                        pageable);
+        final Page<OutsourcingCompanyChangeHistory> historyPage =
+                outsourcingCompanyChangeRepository.findAllByOutsourcingCompanyWithPaging(company, pageable);
         return historyPage.map(history -> CompanyChangeHistoryResponse.from(history, userId));
     }
 

@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
-
 import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.request.OutsourcingCompanyUpdateRequest;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,21 +38,16 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder
-@Table(indexes = {
-        @Index(columnList = "name"),
-        @Index(columnList = "ceo_name"),
-        @Index(columnList = "email"),
-        @Index(columnList = "business_number"),
-        @Index(columnList = "type"),
-        @Index(columnList = "landline_number"),
-        @Index(columnList = "created_at"),
-})
+@Table(indexes = {@Index(columnList = "name"), @Index(columnList = "ceo_name"), @Index(columnList = "email"),
+        @Index(columnList = "business_number"), @Index(columnList = "type"), @Index(columnList = "landline_number"),
+        @Index(columnList = "created_at"),})
 public class OutsourcingCompany extends BaseEntity {
     private static final String SEQUENCE_NAME = "outsourcing_company_seq";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME,
+            allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     @DiffInclude
@@ -139,6 +132,16 @@ public class OutsourcingCompany extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    /**
+     * 부가세 타입 (식당 구분인 경우 필수)
+     * - NO_VAT: 부가세 없음
+     * - VAT_INCLUDED: 부가세 포함
+     * - VAT_SEPARATE: 부가세 별도
+     */
+    @Enumerated(EnumType.STRING)
+    @DiffInclude
+    private OutsourcingCompanyVatType vatType;
+
     @DiffIgnore
     @Builder.Default
     @OneToMany(mappedBy = AppConstants.OUTSOURCING_COMPANY_MAPPED_BY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -157,13 +160,16 @@ public class OutsourcingCompany extends BaseEntity {
     @DiffInclude
     private String defaultDeductionsName;
 
+    @Transient
+    @DiffInclude
+    private String vatTypeName;
+
     public void syncTransientFields() {
         this.typeName = this.type != null ? this.type.getLabel() : null;
         this.defaultDeductionsName = (this.defaultDeductions == null || this.defaultDeductions.isBlank()) ? null
-                : Arrays.stream(this.defaultDeductions.split(","))
-                        .map(String::trim)
-                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
-                        .collect(Collectors.joining(","));
+                : Arrays.stream(this.defaultDeductions.split(",")).map(String::trim)
+                        .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf).collect(Collectors.joining(","));
+        this.vatTypeName = this.vatType != null ? this.vatType.getLabel() : null;
     }
 
     public void updateFrom(final OutsourcingCompanyUpdateRequest request) {
@@ -183,6 +189,7 @@ public class OutsourcingCompany extends BaseEntity {
         this.accountNumber = request.accountNumber();
         this.accountHolder = request.accountHolder();
         this.memo = request.memo();
+        this.vatType = request.vatType();
         syncTransientFields();
     }
 
