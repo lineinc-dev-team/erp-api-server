@@ -9,13 +9,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "발주처 등록 요청")
-public record ClientCompanyCreateRequest(
-        @Schema(description = "발주처명", example = "삼성건설") @NotBlank String name,
+public record ClientCompanyCreateRequest(@Schema(description = "발주처명", example = "삼성건설") @NotBlank String name,
         @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
         @Schema(description = "대표자명", example = "홍길동") @NotBlank String ceoName,
         @Schema(description = "본사 주소", example = "서울시 강남구") @NotBlank String address,
         @Schema(description = "상세 주소", example = "강남구 테헤란로 123") String detailAddress,
-        @Schema(description = "전화번호", example = "02-123-5678") @NotBlank String landlineNumber,
+        @Schema(description = "전화번호", example = "02-123-5678") String landlineNumber,
         @Schema(description = "팩스번호", example = "02-123-5679") String faxNumber,
         @Schema(description = "개인 휴대폰", example = "010-1234-5678") String phoneNumber,
         @Schema(description = "이메일", example = "example@samsung.com") @Email String email,
