@@ -37,17 +37,32 @@ public record CompanyDetailResponse(
         @Schema(description = "파일 목록") List<CompanyFileResponse> files) {
     public static CompanyDetailResponse from(
             final OutsourcingCompany company) {
-        return new CompanyDetailResponse(company.getId(), company.getName(), company.getBusinessNumber(),
-                company.getType() != null ? company.getType().getLabel() : null, company.getType(),
-                company.getTypeDescription(), company.getCeoName(), company.getAddress(), company.getDetailAddress(),
-                company.getLandlineNumber(), company.getPhoneNumber(), company.getEmail(), company.isActive(),
+        return new CompanyDetailResponse(
+                company.getId(),
+                company.getName(),
+                company.getBusinessNumber(),
+                company.getType() != null ? company.getType().getLabel() : null,
+                company.getType(),
+                company.getTypeDescription(),
+                company.getCeoName(),
+                company.getAddress(),
+                company.getDetailAddress(),
+                company.getLandlineNumber(),
+                company.getPhoneNumber(),
+                company.getEmail(),
+                company.isActive(),
                 company.getDefaultDeductions() != null && !company.getDefaultDeductions().isEmpty()
                         ? Arrays.stream(company.getDefaultDeductions().split(","))
                                 .map(OutsourcingCompanyDefaultDeductionsType::safeLabelOf)
                                 .collect(Collectors.joining(","))
                         : null,
-                company.getDefaultDeductions(), company.getDefaultDeductionsDescription(), company.getBankName(),
-                company.getAccountNumber(), company.getAccountHolder(), company.getMemo(), company.getVatType(),
+                company.getDefaultDeductions(),
+                company.getDefaultDeductionsDescription(),
+                company.getBankName(),
+                company.getAccountNumber(),
+                company.getAccountHolder(),
+                company.getMemo(),
+                company.getVatType(),
                 company.getContacts()
                         .stream()
                         .map(CompanyContactResponse::from)
