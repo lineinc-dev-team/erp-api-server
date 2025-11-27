@@ -43,12 +43,10 @@ jobs:
             -d "{
               \"attachments\": [{
                 \"color\": \"#2196F3\",
-                \"title\": \"🚀 배포 시작: ${{ inputs.environment }}\",
+                \"title\": \"🚀 ${{ inputs.environment }} 배포 시작\",
                 \"fields\": [
-                  {\"title\": \"환경\", \"value\": \"\`${{ inputs.environment }}\`\", \"short\": true},
-                  {\"title\": \"브랜치\", \"value\": \"\`${{ github.ref_name }}\`\", \"short\": true},
                   {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true},
-                  {\"title\": \"메시지\", \"value\": \"${COMMIT_MSG}\", \"short\": false}
+                  {\"title\": \"메시지\", \"value\": \"${COMMIT_MSG}\", \"short\": true}
                 ],
                 \"footer\": \"ERP API Server\",
                 \"ts\": $(date +%s)
@@ -112,11 +110,8 @@ jobs:
             -d "{
               \"attachments\": [{
                 \"color\": \"#4CAF50\",
-                \"title\": \"✅ 배포 성공!\",
-                \"text\": \"\`${{ inputs.environment }}\` 환경에 성공적으로 배포되었습니다.\",
+                \"title\": \"✅ ${{ inputs.environment }} 배포 성공\",
                 \"fields\": [
-                  {\"title\": \"환경\", \"value\": \"\`${{ inputs.environment }}\`\", \"short\": true},
-                  {\"title\": \"브랜치\", \"value\": \"\`${{ github.ref_name }}\`\", \"short\": true},
                   {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true}
                 ],
                 \"actions\": [{
@@ -146,11 +141,8 @@ jobs:
             -d "{
               \"attachments\": [{
                 \"color\": \"#F44336\",
-                \"title\": \"❌ 배포 실패!\",
-                \"text\": \"\`${{ inputs.environment }}\` 환경 배포를 확인해주세요.\",
+                \"title\": \"❌ ${{ inputs.environment }} 배포 실패\",
                 \"fields\": [
-                  {\"title\": \"환경\", \"value\": \"\`${{ inputs.environment }}\`\", \"short\": true},
-                  {\"title\": \"브랜치\", \"value\": \"\`${{ github.ref_name }}\`\", \"short\": true},
                   {\"title\": \"커밋\", \"value\": \"\`${COMMIT_HASH}\`\", \"short\": true}
                 ],
                 \"actions\": [{
