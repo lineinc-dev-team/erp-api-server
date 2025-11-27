@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lineinc.erp.api.server.domain.materialmanagement.enums.MaterialManagementInputType;
 import com.lineinc.erp.api.server.domain.materialmanagement.service.v1.MaterialManagementChangeHistoryService;
 import com.lineinc.erp.api.server.domain.materialmanagement.service.v1.MaterialManagementService;
@@ -49,7 +47,6 @@ import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -79,47 +76,38 @@ public class MaterialManagementController extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     @GetMapping("/input-types")
     public ResponseEntity<SuccessResponse<List<MaterialManagementInputTypeResponse>>> getMaterialManagementInputTypes() {
-        final List<MaterialManagementInputTypeResponse> responseList = Arrays
-                .stream(MaterialManagementInputType.values())
-                .sorted(Comparator.comparingInt(MaterialManagementInputType::getOrder))
-                .map(type -> new MaterialManagementInputTypeResponse(type.name(), type.getLabel()))
-                .toList();
+        final List<MaterialManagementInputTypeResponse> responseList =
+                Arrays.stream(MaterialManagementInputType.values())
+                        .sorted(Comparator.comparingInt(MaterialManagementInputType::getOrder))
+                        .map(type -> new MaterialManagementInputTypeResponse(type.name(), type.getLabel())).toList();
         return ResponseEntity.ok(SuccessResponse.of(responseList));
     }
 
     @Operation(summary = "자재관리 상세 품명 키워드 검색")
     @GetMapping("/detail-names/search")
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementNameResponse>>> getMaterialManagementDetailNames(
-            @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
+            @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
             @RequestParam(required = false) final String keyword) {
-        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                sortRequest.sort());
-        final Slice<MaterialManagementNameResponse> slice = materialManagementService.getMaterialManagementNames(
-                keyword,
-                pageable);
+        final Pageable pageable =
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
+        final Slice<MaterialManagementNameResponse> slice =
+                materialManagementService.getMaterialManagementNames(keyword, pageable);
 
-        return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent())));
     }
 
     @Operation(summary = "자재관리 목록 조회")
     @GetMapping
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<PagingResponse<MaterialManagementResponse>>> getMaterialManagements(
-            @AuthenticationPrincipal final CustomUserDetails user,
-            @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
-            @Valid final MaterialManagementListRequest request) {
+            @AuthenticationPrincipal final CustomUserDetails user, @Valid final PageRequest pageRequest,
+            @Valid final SortRequest sortRequest, @Valid final MaterialManagementListRequest request) {
 
-        final Page<MaterialManagementResponse> page = materialManagementService.getAllMaterialManagements(
-                user.getUserId(),
-                request,
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(),
-                        sortRequest.sort()));
+        final Page<MaterialManagementResponse> page =
+                materialManagementService.getAllMaterialManagements(user.getUserId(), request,
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
 
-        return ResponseEntity.ok(SuccessResponse.of(
-                new PagingResponse<>(PagingInfo.from(page), page.getContent())));
+        return ResponseEntity.ok(SuccessResponse.of(new PagingResponse<>(PagingInfo.from(page), page.getContent())));
     }
 
     @Operation(summary = "자재관리 삭제")
@@ -134,22 +122,16 @@ public class MaterialManagementController extends BaseController {
     @Operation(summary = "자재관리 목록 엑셀 다운로드")
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
-    public void downloadSitesExcel(
-            @AuthenticationPrincipal final CustomUserDetails user,
-            @Valid final SortRequest sortRequest,
-            @Valid final MaterialManagementListRequest request,
+    public void downloadSitesExcel(@AuthenticationPrincipal final CustomUserDetails user,
+            @Valid final SortRequest sortRequest, @Valid final MaterialManagementListRequest request,
             @Valid final MaterialManagementDownloadRequest materialManagementDownloadRequest,
             final HttpServletResponse response) throws IOException {
         final List<String> parsed = DownloadFieldUtils.parseFields(materialManagementDownloadRequest.fields());
-        DownloadFieldUtils.validateFields(parsed,
-                MaterialManagementDownloadRequest.ALLOWED_FIELDS);
+        DownloadFieldUtils.validateFields(parsed, MaterialManagementDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "자재관리 목록.xlsx");
 
-        try (Workbook workbook = materialManagementService.downloadExcel(
-                user,
-                request,
-                PageableUtils.parseSort(sortRequest.sort()),
-                parsed)) {
+        try (Workbook workbook = materialManagementService.downloadExcel(user, request,
+                PageableUtils.parseSort(sortRequest.sort()), parsed)) {
             workbook.write(response.getOutputStream());
         }
     }
@@ -160,15 +142,13 @@ public class MaterialManagementController extends BaseController {
     public ResponseEntity<SuccessResponse<MaterialManagementDetailViewResponse>> getMaterialManagementDetail(
             @PathVariable final Long id) {
         final MaterialManagementDetailViewResponse response = materialManagementService.getMaterialManagementById(id);
-        return ResponseEntity.ok(
-                SuccessResponse.of(response));
+        return ResponseEntity.ok(SuccessResponse.of(response));
     }
 
     @Operation(summary = "자재관리 정보 수정")
     @PatchMapping("/{id}")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.UPDATE)
-    public ResponseEntity<Void> updateMaterialManagement(
-            @PathVariable final Long id,
+    public ResponseEntity<Void> updateMaterialManagement(@PathVariable final Long id,
             @Valid @RequestBody final MaterialManagementUpdateRequest request,
             @AuthenticationPrincipal final CustomUserDetails user) {
         materialManagementService.updateMaterialManagement(id, request, user);
@@ -179,19 +159,15 @@ public class MaterialManagementController extends BaseController {
     @GetMapping("/{id}/change-histories")
     @RequireMenuPermission(menu = AppConstants.MENU_MATERIAL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SliceResponse<MaterialManagementChangeHistoryResponse>>> getMaterialManagementChangeHistories(
-            @PathVariable final Long id,
-            @Valid final PageRequest pageRequest,
-            @Valid final SortRequest sortRequest,
+            @PathVariable final Long id, @Valid final PageRequest pageRequest, @Valid final SortRequest sortRequest,
             @AuthenticationPrincipal final CustomUserDetails user) {
 
-        final Pageable pageable = PageableUtils.createPageable(pageRequest.page(),
-                pageRequest.size(), sortRequest.sort());
+        final Pageable pageable =
+                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort());
         final Long userId = user.getUserId();
         final var slice = changeHistoryService.getChangeHistories(id, pageable);
 
-        return ResponseEntity.ok(SuccessResponse.of(
-                new SliceResponse<>(SliceInfo.from(slice), slice.getContent().stream()
-                        .map(history -> MaterialManagementChangeHistoryResponse.from(history, userId))
-                        .toList())));
+        return ResponseEntity.ok(SuccessResponse.of(new SliceResponse<>(SliceInfo.from(slice), slice.getContent()
+                .stream().map(history -> MaterialManagementChangeHistoryResponse.from(history, userId)).toList())));
     }
 }
