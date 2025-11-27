@@ -27,10 +27,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 📢 Slack 배포 시작 알림
-        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          if [ -z "$SLACK_WEBHOOK" ]; then
+            echo "Slack webhook not set, skipping."
+            exit 0
+          fi
+
           COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1)
           COMMIT_AUTHOR=$(git log -1 --pretty=%an)
           COMMIT_HASH=$(git log -1 --pretty=%h)
@@ -94,10 +98,15 @@ jobs:
           rm -f ~/.ssh/id_rsa
 
       - name: ✅ Slack 배포 성공 알림
-        if: ${{ success() && secrets.SLACK_WEBHOOK_URL != '' }}
+        if: success()
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          if [ -z "$SLACK_WEBHOOK" ]; then
+            echo "Slack webhook not set, skipping."
+            exit 0
+          fi
+
           COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1)
           COMMIT_AUTHOR=$(git log -1 --pretty=%an)
           COMMIT_HASH=$(git log -1 --pretty=%h)
@@ -127,10 +136,15 @@ jobs:
             }"
 
       - name: ❌ Slack 배포 실패 알림
-        if: ${{ failure() && secrets.SLACK_WEBHOOK_URL != '' }}
+        if: failure()
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          if [ -z "$SLACK_WEBHOOK" ]; then
+            echo "Slack webhook not set, skipping."
+            exit 0
+          fi
+
           COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1)
           COMMIT_AUTHOR=$(git log -1 --pretty=%an)
           COMMIT_HASH=$(git log -1 --pretty=%h)
