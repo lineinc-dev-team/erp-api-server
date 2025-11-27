@@ -119,7 +119,9 @@ public class ManagementCostService {
                 request.outsourcingCompanyInfo(), request.itemType(), userId);
 
         // 3. 관리비 엔티티 생성 및 저장
-        ManagementCost managementCost = ManagementCost.builder().site(site).siteProcess(siteProcess)
+        ManagementCost managementCost = ManagementCost.builder()
+                .site(site)
+                .siteProcess(siteProcess)
                 .outsourcingCompany(outsourcingCompany)
                 .deductionCompany(request.deductionCompanyId() != null
                         ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(request.deductionCompanyId())
@@ -127,8 +129,11 @@ public class ManagementCostService {
                 .deductionCompanyContract(request.deductionCompanyContractId() != null
                         ? outsourcingCompanyContractService.getContractByIdOrThrow(request.deductionCompanyContractId())
                         : null)
-                .itemType(request.itemType()).itemTypeDescription(request.itemTypeDescription())
-                .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate())).memo(request.memo()).build();
+                .itemType(request.itemType())
+                .itemTypeDescription(request.itemTypeDescription())
+                .paymentDate(DateTimeFormatUtils.toOffsetDateTime(request.paymentDate()))
+                .memo(request.memo())
+                .build();
 
         managementCost = managementCostRepository.save(managementCost);
 
@@ -174,8 +179,10 @@ public class ManagementCostService {
         }
 
         final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
-                .managementCost(managementCost).description(ValidationMessages.INITIAL_CREATION)
-                .user(userService.getUserByIdOrThrow(userId)).build();
+                .managementCost(managementCost)
+                .description(ValidationMessages.INITIAL_CREATION)
+                .user(userService.getUserByIdOrThrow(userId))
+                .build();
         managementCostChangeHistoryRepository.save(changeHistory);
     }
 
@@ -210,26 +217,35 @@ public class ManagementCostService {
 
                 if (!simpleChanges.isEmpty()) {
                     final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
-                            .outsourcingCompany(outsourcingCompany).type(OutsourcingCompanyChangeHistoryType.BASIC)
-                            .user(userService.getUserByIdOrThrow(userId)).changes(changesJson).build();
+                            .outsourcingCompany(outsourcingCompany)
+                            .type(OutsourcingCompanyChangeHistoryType.BASIC)
+                            .user(userService.getUserByIdOrThrow(userId))
+                            .changes(changesJson)
+                            .build();
                     outsourcingCompanyChangeRepository.save(changeHistory);
                 }
             }
         } else if (outsourcingCompanyInfo != null) {
             // 신규 외주업체 생성
-            outsourcingCompany = OutsourcingCompany.builder().name(outsourcingCompanyInfo.name())
+            outsourcingCompany = OutsourcingCompany.builder()
+                    .name(outsourcingCompanyInfo.name())
                     .businessNumber(outsourcingCompanyInfo.businessNumber())
                     .type(ManagementCostItemType.MEAL_FEE.equals(itemType) ? OutsourcingCompanyType.MEAL_FEE
                             : OutsourcingCompanyType.ETC)
-                    .ceoName(outsourcingCompanyInfo.ceoName()).bankName(outsourcingCompanyInfo.bankName())
+                    .ceoName(outsourcingCompanyInfo.ceoName())
+                    .bankName(outsourcingCompanyInfo.bankName())
                     .accountNumber(outsourcingCompanyInfo.accountNumber())
-                    .accountHolder(outsourcingCompanyInfo.accountHolder()).memo(outsourcingCompanyInfo.memo()).build();
+                    .accountHolder(outsourcingCompanyInfo.accountHolder())
+                    .memo(outsourcingCompanyInfo.memo())
+                    .build();
             outsourcingCompany = outsourcingCompanyRepository.save(outsourcingCompany);
 
             // 변경 이력 생성
             final OutsourcingCompanyChangeHistory changeHistory = OutsourcingCompanyChangeHistory.builder()
-                    .outsourcingCompany(outsourcingCompany).user(userService.getUserByIdOrThrow(userId))
-                    .description(ValidationMessages.INITIAL_CREATION).build();
+                    .outsourcingCompany(outsourcingCompany)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .description(ValidationMessages.INITIAL_CREATION)
+                    .build();
             outsourcingCompanyChangeRepository.save(changeHistory);
         }
 
@@ -247,9 +263,15 @@ public class ManagementCostService {
         }
 
         final List<ManagementCostKeyMoneyDetail> details = requests.stream()
-                .map(request -> ManagementCostKeyMoneyDetail.builder().managementCost(managementCost)
-                        .account(request.account()).purpose(request.purpose()).personnelCount(request.personnelCount())
-                        .amount(request.amount()).isDeductible(request.isDeductible()).memo(request.memo()).build())
+                .map(request -> ManagementCostKeyMoneyDetail.builder()
+                        .managementCost(managementCost)
+                        .account(request.account())
+                        .purpose(request.purpose())
+                        .personnelCount(request.personnelCount())
+                        .amount(request.amount())
+                        .isDeductible(request.isDeductible())
+                        .memo(request.memo())
+                        .build())
                 .collect(Collectors.toList());
 
         managementCost.getKeyMoneyDetails().addAll(details);
@@ -267,11 +289,17 @@ public class ManagementCostService {
 
         final List<ManagementCostMealFeeDetail> details = requests.stream()
                 .<ManagementCostMealFeeDetail>map(request -> ManagementCostMealFeeDetail.builder()
-                        .managementCost(managementCost).workType(request.workType())
+                        .managementCost(managementCost)
+                        .workType(request.workType())
                         .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId()) : null)
-                        .name(request.name()).breakfastCount(request.breakfastCount()).lunchCount(request.lunchCount())
-                        .dinnerCount(request.dinnerCount()).unitPrice(request.unitPrice()).amount(request.amount())
-                        .memo(request.memo()).build())
+                        .name(request.name())
+                        .breakfastCount(request.breakfastCount())
+                        .lunchCount(request.lunchCount())
+                        .dinnerCount(request.dinnerCount())
+                        .unitPrice(request.unitPrice())
+                        .amount(request.amount())
+                        .memo(request.memo())
+                        .build())
                 .collect(Collectors.toList());
 
         managementCost.getMealFeeDetails().addAll(details);
@@ -289,11 +317,16 @@ public class ManagementCostService {
 
         final List<ManagementCostMealFeeDetailDirectContract> details = requests.stream()
                 .<ManagementCostMealFeeDetailDirectContract>map(request -> ManagementCostMealFeeDetailDirectContract
-                        .builder().managementCost(managementCost)
+                        .builder()
+                        .managementCost(managementCost)
                         .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId()) : null)
-                        .breakfastCount(request.breakfastCount()).lunchCount(request.lunchCount())
-                        .dinnerCount(request.dinnerCount()).unitPrice(request.unitPrice()).amount(request.amount())
-                        .memo(request.memo()).build())
+                        .breakfastCount(request.breakfastCount())
+                        .lunchCount(request.lunchCount())
+                        .dinnerCount(request.dinnerCount())
+                        .unitPrice(request.unitPrice())
+                        .amount(request.amount())
+                        .memo(request.memo())
+                        .build())
                 .collect(Collectors.toList());
 
         managementCost.getMealFeeDetailDirectContracts().addAll(details);
@@ -311,14 +344,19 @@ public class ManagementCostService {
 
         final List<ManagementCostMealFeeDetailOutsourcing> details = requests.stream()
                 .<ManagementCostMealFeeDetailOutsourcing>map(request -> ManagementCostMealFeeDetailOutsourcing.builder()
-                        .managementCost(managementCost).outsourcingCompany(request.outsourcingCompanyId() != null
+                        .managementCost(managementCost)
+                        .outsourcingCompany(request.outsourcingCompanyId() != null
                                 ? outsourcingCompanyService
                                         .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
                                 : null)
                         .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId()) : null)
-                        .breakfastCount(request.breakfastCount()).lunchCount(request.lunchCount())
-                        .dinnerCount(request.dinnerCount()).unitPrice(request.unitPrice()).amount(request.amount())
-                        .memo(request.memo()).build())
+                        .breakfastCount(request.breakfastCount())
+                        .lunchCount(request.lunchCount())
+                        .dinnerCount(request.dinnerCount())
+                        .unitPrice(request.unitPrice())
+                        .amount(request.amount())
+                        .memo(request.memo())
+                        .build())
                 .collect(Collectors.toList());
 
         managementCost.getMealFeeDetailOutsourcings().addAll(details);
@@ -337,7 +375,8 @@ public class ManagementCostService {
         final List<ManagementCostMealFeeDetailEquipment> details =
                 requests.stream()
                         .<ManagementCostMealFeeDetailEquipment>map(request -> ManagementCostMealFeeDetailEquipment
-                                .builder().managementCost(managementCost)
+                                .builder()
+                                .managementCost(managementCost)
                                 .outsourcingCompany(request.outsourcingCompanyId() != null
                                         ? outsourcingCompanyService
                                                 .getOutsourcingCompanyByIdOrThrow(request.outsourcingCompanyId())
@@ -346,9 +385,13 @@ public class ManagementCostService {
                                         ? outsourcingCompanyContractService
                                                 .getDriverByIdOrThrow(request.outsourcingCompanyContractDriverId())
                                         : null)
-                                .breakfastCount(request.breakfastCount()).lunchCount(request.lunchCount())
-                                .dinnerCount(request.dinnerCount()).unitPrice(request.unitPrice())
-                                .amount(request.amount()).memo(request.memo()).build())
+                                .breakfastCount(request.breakfastCount())
+                                .lunchCount(request.lunchCount())
+                                .dinnerCount(request.dinnerCount())
+                                .unitPrice(request.unitPrice())
+                                .amount(request.amount())
+                                .memo(request.memo())
+                                .build())
                         .collect(Collectors.toList());
 
         managementCost.getMealFeeDetailEquipments().addAll(details);
@@ -374,9 +417,13 @@ public class ManagementCostService {
                                         : null)
                                 .labor(request.laborId() != null ? laborService.getLaborByIdOrThrow(request.laborId())
                                         : null)
-                                .breakfastCount(request.breakfastCount()).lunchCount(request.lunchCount())
-                                .dinnerCount(request.dinnerCount()).unitPrice(request.unitPrice())
-                                .amount(request.amount()).memo(request.memo()).build())
+                                .breakfastCount(request.breakfastCount())
+                                .lunchCount(request.lunchCount())
+                                .dinnerCount(request.dinnerCount())
+                                .unitPrice(request.unitPrice())
+                                .amount(request.amount())
+                                .memo(request.memo())
+                                .build())
                 .collect(Collectors.toList());
 
         managementCost.getMealFeeDetailOutsourcingContracts().addAll(details);
@@ -416,8 +463,10 @@ public class ManagementCostService {
         final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
         final List<ManagementCostResponse> managementCostResponses =
-                managementCostRepository.findAllWithoutPaging(request, sort, accessibleSiteIds).stream()
-                        .map(ManagementCostResponse::from).toList();
+                managementCostRepository.findAllWithoutPaging(request, sort, accessibleSiteIds)
+                        .stream()
+                        .map(ManagementCostResponse::from)
+                        .toList();
 
         final Workbook workbook = ExcelExportUtils.generateWorkbook(managementCostResponses, fields,
                 this::getExcelHeaderName, this::getExcelCellValue);
@@ -536,16 +585,18 @@ public class ManagementCostService {
     @Transactional(readOnly = true)
     public ManagementCostDetailViewResponse getManagementCostById(
             final Long siteId) {
-        final ManagementCost managementCost = managementCostRepository.findById(siteId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
+        final ManagementCost managementCost = managementCostRepository.findById(siteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
         return ManagementCostDetailViewResponse.from(managementCost);
     }
 
     @Transactional(readOnly = true)
     public ManagementCost getManagementCostByIdOrThrow(
             final Long id) {
-        return managementCostRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
+        return managementCostRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ValidationMessages.MANAGEMENT_COST_NOT_FOUND));
     }
 
     @Transactional
@@ -586,8 +637,11 @@ public class ManagementCostService {
 
         if (!simpleChanges.isEmpty()) {
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
-                    .managementCost(managementCost).type(ManagementCostChangeHistoryType.BASIC)
-                    .user(userService.getUserByIdOrThrow(userId)).changes(changesJson).build();
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.BASIC)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .changes(changesJson)
+                    .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }
 
@@ -708,17 +762,26 @@ public class ManagementCostService {
 
         // 수정 전 스냅샷 생성
         final List<ManagementCostMealFeeDetailDirectContract> beforeDetails =
-                managementCost.getMealFeeDetailDirectContracts().stream().map(detail -> JaversUtils
-                        .createSnapshot(javers, detail, ManagementCostMealFeeDetailDirectContract.class)).toList();
+                managementCost.getMealFeeDetailDirectContracts()
+                        .stream()
+                        .map(detail -> JaversUtils.createSnapshot(javers, detail,
+                                ManagementCostMealFeeDetailDirectContract.class))
+                        .toList();
 
         // 식대 상세 정보 업데이트
         EntitySyncUtils.syncList(managementCost.getMealFeeDetailDirectContracts(), requests, (
                 final ManagementCostMealFeeDetailDirectContractUpdateRequest dto) -> {
             final Labor labor = (dto.laborId() != null) ? laborService.getLaborByIdOrThrow(dto.laborId()) : null;
             final ManagementCostMealFeeDetailDirectContract detail = ManagementCostMealFeeDetailDirectContract.builder()
-                    .managementCost(managementCost).labor(labor).breakfastCount(dto.breakfastCount())
-                    .lunchCount(dto.lunchCount()).dinnerCount(dto.dinnerCount()).unitPrice(dto.unitPrice())
-                    .amount(dto.amount()).memo(dto.memo()).build();
+                    .managementCost(managementCost)
+                    .labor(labor)
+                    .breakfastCount(dto.breakfastCount())
+                    .lunchCount(dto.lunchCount())
+                    .dinnerCount(dto.dinnerCount())
+                    .unitPrice(dto.unitPrice())
+                    .amount(dto.amount())
+                    .memo(dto.memo())
+                    .build();
             detail.updateFrom(dto);
             detail.syncTransientFields();
             return detail;
@@ -741,8 +804,10 @@ public class ManagementCostService {
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
-        final Set<Long> beforeIds = beforeDetails.stream().map(ManagementCostMealFeeDetailDirectContract::getId)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailDirectContract::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         for (final ManagementCostMealFeeDetailDirectContract after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
@@ -754,9 +819,9 @@ public class ManagementCostService {
         }
 
         // 수정된 식대 상세 항목
-        final Map<Long, ManagementCostMealFeeDetailDirectContract> afterMap =
-                afterDetails.stream().filter(d -> d.getId() != null)
-                        .collect(Collectors.toMap(ManagementCostMealFeeDetailDirectContract::getId, d -> d));
+        final Map<Long, ManagementCostMealFeeDetailDirectContract> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailDirectContract::getId, d -> d));
 
         for (final ManagementCostMealFeeDetailDirectContract before : beforeDetails) {
             if (before.getId() != null && afterMap.containsKey(before.getId())) {
@@ -771,8 +836,11 @@ public class ManagementCostService {
         if (!allChanges.isEmpty()) {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
-                    .managementCost(managementCost).type(ManagementCostChangeHistoryType.MEAL_FEE_DIRECT_CONTRACT)
-                    .changes(changesJson).user(userService.getUserByIdOrThrow(userId)).build();
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_DIRECT_CONTRACT)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }
     }
@@ -802,9 +870,16 @@ public class ManagementCostService {
                     : null;
             final Labor labor = (dto.laborId() != null) ? laborService.getLaborByIdOrThrow(dto.laborId()) : null;
             final ManagementCostMealFeeDetailOutsourcing detail = ManagementCostMealFeeDetailOutsourcing.builder()
-                    .managementCost(managementCost).outsourcingCompany(outsourcingCompany).labor(labor)
-                    .breakfastCount(dto.breakfastCount()).lunchCount(dto.lunchCount()).dinnerCount(dto.dinnerCount())
-                    .unitPrice(dto.unitPrice()).amount(dto.amount()).memo(dto.memo()).build();
+                    .managementCost(managementCost)
+                    .outsourcingCompany(outsourcingCompany)
+                    .labor(labor)
+                    .breakfastCount(dto.breakfastCount())
+                    .lunchCount(dto.lunchCount())
+                    .dinnerCount(dto.dinnerCount())
+                    .unitPrice(dto.unitPrice())
+                    .amount(dto.amount())
+                    .memo(dto.memo())
+                    .build();
             detail.updateFrom(dto);
             detail.syncTransientFields();
             return detail;
@@ -826,8 +901,10 @@ public class ManagementCostService {
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
-        final Set<Long> beforeIds = beforeDetails.stream().map(ManagementCostMealFeeDetailOutsourcing::getId)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailOutsourcing::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         for (final ManagementCostMealFeeDetailOutsourcing after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
@@ -839,9 +916,9 @@ public class ManagementCostService {
         }
 
         // 수정된 식대 상세 항목
-        final Map<Long, ManagementCostMealFeeDetailOutsourcing> afterMap =
-                afterDetails.stream().filter(d -> d.getId() != null)
-                        .collect(Collectors.toMap(ManagementCostMealFeeDetailOutsourcing::getId, d -> d));
+        final Map<Long, ManagementCostMealFeeDetailOutsourcing> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailOutsourcing::getId, d -> d));
 
         for (final ManagementCostMealFeeDetailOutsourcing before : beforeDetails) {
             if (before.getId() != null && afterMap.containsKey(before.getId())) {
@@ -856,8 +933,11 @@ public class ManagementCostService {
         if (!allChanges.isEmpty()) {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
-                    .managementCost(managementCost).type(ManagementCostChangeHistoryType.MEAL_FEE_OUTSOURCING)
-                    .changes(changesJson).user(userService.getUserByIdOrThrow(userId)).build();
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_OUTSOURCING)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }
     }
@@ -889,10 +969,16 @@ public class ManagementCostService {
                     ? outsourcingCompanyContractService.getDriverByIdOrThrow(dto.outsourcingCompanyContractDriverId())
                     : null;
             final ManagementCostMealFeeDetailEquipment detail = ManagementCostMealFeeDetailEquipment.builder()
-                    .managementCost(managementCost).outsourcingCompany(outsourcingCompany)
-                    .outsourcingCompanyContractDriver(driver).breakfastCount(dto.breakfastCount())
-                    .lunchCount(dto.lunchCount()).dinnerCount(dto.dinnerCount()).unitPrice(dto.unitPrice())
-                    .amount(dto.amount()).memo(dto.memo()).build();
+                    .managementCost(managementCost)
+                    .outsourcingCompany(outsourcingCompany)
+                    .outsourcingCompanyContractDriver(driver)
+                    .breakfastCount(dto.breakfastCount())
+                    .lunchCount(dto.lunchCount())
+                    .dinnerCount(dto.dinnerCount())
+                    .unitPrice(dto.unitPrice())
+                    .amount(dto.amount())
+                    .memo(dto.memo())
+                    .build();
             detail.updateFrom(dto);
             detail.syncTransientFields();
             return detail;
@@ -917,8 +1003,10 @@ public class ManagementCostService {
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
-        final Set<Long> beforeIds = beforeDetails.stream().map(ManagementCostMealFeeDetailEquipment::getId)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailEquipment::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         for (final ManagementCostMealFeeDetailEquipment after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
@@ -930,9 +1018,9 @@ public class ManagementCostService {
         }
 
         // 수정된 식대 상세 항목
-        final Map<Long, ManagementCostMealFeeDetailEquipment> afterMap =
-                afterDetails.stream().filter(d -> d.getId() != null)
-                        .collect(Collectors.toMap(ManagementCostMealFeeDetailEquipment::getId, d -> d));
+        final Map<Long, ManagementCostMealFeeDetailEquipment> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailEquipment::getId, d -> d));
 
         for (final ManagementCostMealFeeDetailEquipment before : beforeDetails) {
             if (before.getId() != null && afterMap.containsKey(before.getId())) {
@@ -947,8 +1035,11 @@ public class ManagementCostService {
         if (!allChanges.isEmpty()) {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
-                    .managementCost(managementCost).type(ManagementCostChangeHistoryType.MEAL_FEE_EQUIPMENT)
-                    .changes(changesJson).user(userService.getUserByIdOrThrow(userId)).build();
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_EQUIPMENT)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }
     }
@@ -966,9 +1057,10 @@ public class ManagementCostService {
 
         // 수정 전 스냅샷 생성
         final List<ManagementCostMealFeeDetailOutsourcingContract> beforeDetails =
-                managementCost
-                        .getMealFeeDetailOutsourcingContracts().stream().map(detail -> JaversUtils
-                                .createSnapshot(javers, detail, ManagementCostMealFeeDetailOutsourcingContract.class))
+                managementCost.getMealFeeDetailOutsourcingContracts()
+                        .stream()
+                        .map(detail -> JaversUtils.createSnapshot(javers, detail,
+                                ManagementCostMealFeeDetailOutsourcingContract.class))
                         .toList();
 
         // 식대 상세 정보 업데이트
@@ -978,10 +1070,18 @@ public class ManagementCostService {
                     ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
                     : null;
             final Labor labor = (dto.laborId() != null) ? laborService.getLaborByIdOrThrow(dto.laborId()) : null;
-            final ManagementCostMealFeeDetailOutsourcingContract detail = ManagementCostMealFeeDetailOutsourcingContract
-                    .builder().managementCost(managementCost).outsourcingCompany(outsourcingCompany).labor(labor)
-                    .breakfastCount(dto.breakfastCount()).lunchCount(dto.lunchCount()).dinnerCount(dto.dinnerCount())
-                    .unitPrice(dto.unitPrice()).amount(dto.amount()).memo(dto.memo()).build();
+            final ManagementCostMealFeeDetailOutsourcingContract detail =
+                    ManagementCostMealFeeDetailOutsourcingContract.builder()
+                            .managementCost(managementCost)
+                            .outsourcingCompany(outsourcingCompany)
+                            .labor(labor)
+                            .breakfastCount(dto.breakfastCount())
+                            .lunchCount(dto.lunchCount())
+                            .dinnerCount(dto.dinnerCount())
+                            .unitPrice(dto.unitPrice())
+                            .amount(dto.amount())
+                            .memo(dto.memo())
+                            .build();
             detail.updateFrom(dto);
             detail.syncTransientFields();
             return detail;
@@ -1004,8 +1104,10 @@ public class ManagementCostService {
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 식대 상세 항목
-        final Set<Long> beforeIds = beforeDetails.stream().map(ManagementCostMealFeeDetailOutsourcingContract::getId)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
+        final Set<Long> beforeIds = beforeDetails.stream()
+                .map(ManagementCostMealFeeDetailOutsourcingContract::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         for (final ManagementCostMealFeeDetailOutsourcingContract after : afterDetails) {
             if (after.getId() == null || !beforeIds.contains(after.getId())) {
@@ -1017,9 +1119,9 @@ public class ManagementCostService {
         }
 
         // 수정된 식대 상세 항목
-        final Map<Long, ManagementCostMealFeeDetailOutsourcingContract> afterMap =
-                afterDetails.stream().filter(d -> d.getId() != null)
-                        .collect(Collectors.toMap(ManagementCostMealFeeDetailOutsourcingContract::getId, d -> d));
+        final Map<Long, ManagementCostMealFeeDetailOutsourcingContract> afterMap = afterDetails.stream()
+                .filter(d -> d.getId() != null)
+                .collect(Collectors.toMap(ManagementCostMealFeeDetailOutsourcingContract::getId, d -> d));
 
         for (final ManagementCostMealFeeDetailOutsourcingContract before : beforeDetails) {
             if (before.getId() != null && afterMap.containsKey(before.getId())) {
@@ -1034,8 +1136,11 @@ public class ManagementCostService {
         if (!allChanges.isEmpty()) {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
             final ManagementCostChangeHistory changeHistory = ManagementCostChangeHistory.builder()
-                    .managementCost(managementCost).type(ManagementCostChangeHistoryType.MEAL_FEE_OUTSOURCING_CONTRACT)
-                    .changes(changesJson).user(userService.getUserByIdOrThrow(userId)).build();
+                    .managementCost(managementCost)
+                    .type(ManagementCostChangeHistoryType.MEAL_FEE_OUTSOURCING_CONTRACT)
+                    .changes(changesJson)
+                    .user(userService.getUserByIdOrThrow(userId))
+                    .build();
             managementCostChangeHistoryRepository.save(changeHistory);
         }
     }
