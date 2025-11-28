@@ -5,10 +5,8 @@ import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.lineinc.erp.api.server.domain.dailyreport.enums.DailyReportStatus;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelAggregation;
 import com.lineinc.erp.api.server.domain.fuelaggregation.entity.FuelInfo;
@@ -24,13 +22,14 @@ import com.lineinc.erp.api.server.domain.managementcost.repository.ManagementCos
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagement;
 import com.lineinc.erp.api.server.domain.materialmanagement.entity.MaterialManagementDetail;
 import com.lineinc.erp.api.server.domain.materialmanagement.repository.MaterialManagementRepository;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractEquipment;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractDefaultDeductionsType;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.request.DeductionAmountAggregationRequest;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.DeductionAmountAggregationResponse;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -58,38 +57,27 @@ public class OutsourcingCompanyDeductionAggregationService {
         final OffsetDateTime endExclusive = DateTimeFormatUtils.toUtcStartOfDay(nextMonthStart);
 
         // 식대 공제금액 집계
-        final DeductionAmountAggregationResponse.DeductionDetail mealFee = calculateMealFeeDeduction(
-                request.siteId(),
-                request.siteProcessId(),
-                request.outsourcingCompanyContractId(),
-                startInclusive,
-                endExclusive);
+        final DeductionAmountAggregationResponse.DeductionDetail mealFee = calculateMealFeeDeduction(request.siteId(),
+                request.siteProcessId(), request.outsourcingCompanyContractId(), startInclusive, endExclusive);
 
         // 간식대 공제금액 집계
-        final DeductionAmountAggregationResponse.DeductionDetail snackFee = calculateSnackFeeDeduction(
-                request.siteId(),
-                request.siteProcessId(),
-                request.outsourcingCompanyContractId(),
-                startInclusive,
-                endExclusive);
+        final DeductionAmountAggregationResponse.DeductionDetail snackFee = calculateSnackFeeDeduction(request.siteId(),
+                request.siteProcessId(), request.outsourcingCompanyContractId(), startInclusive, endExclusive);
 
         // 유류대 공제금액 집계
-        final DeductionAmountAggregationResponse.DeductionDetail fuelFee = calculateFuelDeduction(
-                request.siteId(),
-                request.siteProcessId(),
-                request.outsourcingCompanyContractId(),
-                startInclusive,
-                endExclusive);
+        final DeductionAmountAggregationResponse.DeductionDetail fuelFee = calculateFuelDeduction(request.siteId(),
+                request.siteProcessId(), request.outsourcingCompanyContractId(), startInclusive, endExclusive);
 
         // 자재비 공제금액 집계
-        final DeductionAmountAggregationResponse.DeductionDetail materialCost = calculateMaterialCostDeduction(
-                request.siteId(),
-                request.siteProcessId(),
-                request.outsourcingCompanyContractId(),
-                startInclusive,
-                endExclusive);
+        final DeductionAmountAggregationResponse.DeductionDetail materialCost =
+                calculateMaterialCostDeduction(request.siteId(), request.siteProcessId(),
+                        request.outsourcingCompanyContractId(), startInclusive, endExclusive);
 
-        return new DeductionAmountAggregationResponse(mealFee, snackFee, fuelFee, materialCost);
+        return new DeductionAmountAggregationResponse(
+                mealFee,
+                snackFee,
+                fuelFee,
+                materialCost);
     }
 
     /**
@@ -104,15 +92,11 @@ public class OutsourcingCompanyDeductionAggregationService {
         // 조회월 다음달 1일 미만까지의 모든 식대 관리비 데이터 조회
         // 전회까지의 모든 데이터를 포함하기 위해 paymentDate < endExclusive 조건만 사용
         final List<ManagementCost> allMealFeeCosts = managementCostRepository
-                .findBySiteIdAndSiteProcessIdAndPaymentDateLessThanAndDeletedFalse(
-                        siteId,
-                        siteProcessId,
-                        endExclusive);
+                .findBySiteIdAndSiteProcessIdAndPaymentDateLessThanAndDeletedFalse(siteId, siteProcessId, endExclusive);
 
         // 식대(MEAL_FEE) 타입만 필터링
-        final List<ManagementCost> mealFeeCosts = allMealFeeCosts.stream()
-                .filter(cost -> cost.getItemType() == ManagementCostItemType.MEAL_FEE)
-                .toList();
+        final List<ManagementCost> mealFeeCosts =
+                allMealFeeCosts.stream().filter(cost -> cost.getItemType() == ManagementCostItemType.MEAL_FEE).toList();
 
         long previousAmount = 0L;
         long currentAmount = 0L;
@@ -147,13 +131,21 @@ public class OutsourcingCompanyDeductionAggregationService {
                     continue;
                 }
 
-                // 금액 집계
+                // 금액 집계 (vatType에 따라 공제금액 계산)
                 final Long amount = detail.getAmount();
                 if (amount != null && amount > 0) {
+                    // 외주업체의 vatType 확인 (null이면 부가세 없음으로 처리)
+                    final OutsourcingCompany outsourcingCompany = cost.getOutsourcingCompany();
+                    final OutsourcingCompanyVatType vatType =
+                            outsourcingCompany != null ? outsourcingCompany.getVatType() : null;
+
+                    // vatType에 따라 공제금액(계) 계산
+                    final long deductionAmount = calculateMealFeeDeductionAmount(amount, vatType);
+
                     if (paymentDate.isBefore(startInclusive)) {
-                        previousAmount += amount;
+                        previousAmount += deductionAmount;
                     } else {
-                        currentAmount += amount;
+                        currentAmount += deductionAmount;
                     }
                 }
             }
@@ -178,15 +170,11 @@ public class OutsourcingCompanyDeductionAggregationService {
         // 조회월 다음달 1일 미만까지의 모든 관리비 데이터 조회
         // 전회까지의 모든 데이터를 포함하기 위해 paymentDate < endExclusive 조건만 사용
         final List<ManagementCost> allCosts = managementCostRepository
-                .findBySiteIdAndSiteProcessIdAndPaymentDateLessThanAndDeletedFalse(
-                        siteId,
-                        siteProcessId,
-                        endExclusive);
+                .findBySiteIdAndSiteProcessIdAndPaymentDateLessThanAndDeletedFalse(siteId, siteProcessId, endExclusive);
 
         // 간식비(SNACK_FEE) 타입만 필터링
-        final List<ManagementCost> snackFeeCosts = allCosts.stream()
-                .filter(cost -> cost.getItemType() == ManagementCostItemType.SNACK_FEE)
-                .toList();
+        final List<ManagementCost> snackFeeCosts =
+                allCosts.stream().filter(cost -> cost.getItemType() == ManagementCostItemType.SNACK_FEE).toList();
 
         long previousAmount = 0L;
         long currentAmount = 0L;
@@ -240,9 +228,9 @@ public class OutsourcingCompanyDeductionAggregationService {
             final Long outsourcingCompanyContractId,
             final OffsetDateTime startInclusive,
             final OffsetDateTime endExclusive) {
-        final List<FuelInfoWithReportDate> fuelInfos = fuelInfoRepository
-                .findBySiteIdAndSiteProcessIdAndReportDateLessThan(siteId, siteProcessId, endExclusive,
-                        List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
+        final List<FuelInfoWithReportDate> fuelInfos =
+                fuelInfoRepository.findBySiteIdAndSiteProcessIdAndReportDateLessThan(siteId, siteProcessId,
+                        endExclusive, List.of(DailyReportStatus.COMPLETED, DailyReportStatus.AUTO_COMPLETED));
 
         long previousAmount = 0L;
         long currentAmount = 0L;
@@ -301,7 +289,9 @@ public class OutsourcingCompanyDeductionAggregationService {
                         currentAmount > 0 ? currentAmount : null));
     }
 
-    private long calculateFuelCost(final FuelAggregation fuelAggregation, final FuelInfo fuelInfo) {
+    private long calculateFuelCost(
+            final FuelAggregation fuelAggregation,
+            final FuelInfo fuelInfo) {
         long total = 0L;
 
         if (fuelInfo.getAmount() != null) {
@@ -358,11 +348,9 @@ public class OutsourcingCompanyDeductionAggregationService {
             final OffsetDateTime endExclusive) {
         // 조회월 다음달 1일 미만까지의 모든 자재관리 데이터 조회
         // 전회까지의 모든 데이터를 포함하기 위해 deliveryDate < endExclusive 조건만 사용
-        final List<MaterialManagement> allMaterialManagements = materialManagementRepository
-                .findBySiteIdAndSiteProcessIdAndDeliveryDateLessThanAndDeletedFalse(
-                        siteId,
-                        siteProcessId,
-                        endExclusive);
+        final List<MaterialManagement> allMaterialManagements =
+                materialManagementRepository.findBySiteIdAndSiteProcessIdAndDeliveryDateLessThanAndDeletedFalse(siteId,
+                        siteProcessId, endExclusive);
 
         long previousAmount = 0L;
         long currentAmount = 0L;
@@ -407,14 +395,46 @@ public class OutsourcingCompanyDeductionAggregationService {
                         currentAmount > 0 ? currentAmount : null));
     }
 
-    private long getValueOrZero(final Long value) {
+    /**
+     * vatType에 따라 식대 공제금액(계)을 계산
+     *
+     * @param amount 입력 금액 (공급가 또는 총합계)
+     * @param vatType 부가세 타입 (null이면 부가세 없음으로 처리)
+     * @return 공제금액(계)
+     */
+    private long calculateMealFeeDeductionAmount(
+            final long amount,
+            final OutsourcingCompanyVatType vatType) {
+        if (amount <= 0) {
+            return 0L;
+        }
+
+        // null이면 부가세 없음으로 처리
+        if (vatType == null || vatType == OutsourcingCompanyVatType.NO_VAT) {
+            // 부가세 없음: 총합계 = 공급가 = 계
+            return amount;
+        }
+
+        if (vatType == OutsourcingCompanyVatType.VAT_INCLUDED) {
+            // 부가세 포함: 총합계 = 계
+            return amount;
+        }
+
+        // VAT_SEPARATE: 총합계 = 공급가, 부가세 = 공급가*0.1, 계 = 공급가*1.1
+        // amount가 공급가이므로, 계 = 공급가 + 부가세 = 공급가 + (공급가 / 10)
+        return amount + (amount / 10);
+    }
+
+    private long getValueOrZero(
+            final Long value) {
         return value != null ? value : 0L;
     }
 
     /**
      * 공제 여부 확인
      */
-    private boolean isDeductionEnabled(final String defaultDeductions,
+    private boolean isDeductionEnabled(
+            final String defaultDeductions,
             final OutsourcingCompanyContractDefaultDeductionsType deductionType) {
         if (defaultDeductions == null || defaultDeductions.trim().isEmpty()) {
             return false;
