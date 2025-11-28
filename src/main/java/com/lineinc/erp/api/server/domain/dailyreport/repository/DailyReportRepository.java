@@ -63,6 +63,18 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long>,
             @Param("siteProcess") SiteProcess siteProcess, @Param("reportDate") OffsetDateTime reportDate);
 
     /**
+     * 같은 날짜, 현장, 공정에 대한 출역일보를 조회합니다 (소프트 삭제 포함).
+     * 삭제 여부와 관계없이 조회합니다.
+     */
+    @Query("""
+            SELECT dr FROM DailyReport dr \
+            WHERE dr.site = :site \
+            AND dr.siteProcess = :siteProcess \
+            AND dr.reportDate = :reportDate""")
+    Optional<DailyReport> findBySiteAndSiteProcessAndReportDateIncludingDeleted(@Param("site") Site site,
+            @Param("siteProcess") SiteProcess siteProcess, @Param("reportDate") OffsetDateTime reportDate);
+
+    /**
      * 특정 날짜 이전의 특정 상태 출역일보를 조회합니다.
      * 자동 마감 배치에서 사용됩니다.
      * Site와 SiteProcess를 Fetch Join으로 함께 조회하여 LazyInitializationException 방지

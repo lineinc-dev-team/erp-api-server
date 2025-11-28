@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReport;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContract;
 import com.lineinc.erp.api.server.domain.dailyreport.entity.DailyReportDirectContractOutsourcing;
@@ -120,7 +119,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.fuelaggregation.dto.request
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -146,27 +144,48 @@ public class DailyReportService {
     private final OutsourcingCompanyContractService outsourcingCompanyContractService;
 
     @Transactional
-    public void createDailyReport(final DailyReportCreateRequest request, final Long userId) {
+    public void createDailyReport(
+            final DailyReportCreateRequest request,
+            final Long userId) {
         // 현장 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
-        // 같은 날짜, 현장, 공정에 대한 출역일보 중복 체크
+        // 같은 날짜, 현장, 공정에 대한 출역일보 조회 (소프트 삭제 포함)
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(request.reportDate());
-        if (dailyReportRepository.existsBySiteAndSiteProcessAndReportDate(
-                site.getId(), siteProcess.getId(), reportDate)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    ValidationMessages.DAILY_REPORT_ALREADY_EXISTS);
-        }
+        final Optional<DailyReport> existingDailyReportOpt = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDateIncludingDeleted(site, siteProcess, reportDate);
 
-        // 출역일보 생성
-        final DailyReport dailyReport = DailyReport.builder()
-                .site(site)
-                .siteProcess(siteProcess)
-                .reportDate(reportDate)
-                .weather(request.weather())
-                .memo(request.memo())
-                .build();
+        DailyReport dailyReport;
+        if (existingDailyReportOpt.isPresent()) {
+            final DailyReport existingDailyReport = existingDailyReportOpt.get();
+
+            // 삭제되지 않은 출역일보가 이미 존재하면 에러 반환
+            if (!existingDailyReport.isDeleted()) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        ValidationMessages.DAILY_REPORT_ALREADY_EXISTS);
+            }
+
+            // 소프트 삭제된 출역일보는 복구하고 기본 정보만 업데이트
+            existingDailyReport.restore();
+            if (request.weather() != null) {
+                existingDailyReport.setWeather(request.weather());
+            }
+            if (request.memo() != null) {
+                existingDailyReport.setMemo(request.memo());
+            }
+            dailyReport = existingDailyReport;
+        } else {
+            // 출역일보 생성
+            dailyReport = DailyReport.builder()
+                    .site(site)
+                    .siteProcess(siteProcess)
+                    .reportDate(reportDate)
+                    .weather(request.weather())
+                    .memo(request.memo())
+                    .build();
+        }
 
         // 증빙 파일 추가
         if (request.evidenceFiles() != null) {
@@ -243,26 +262,24 @@ public class DailyReportService {
         if (request.directContractOutsourcingContracts() != null) {
             for (final DailyReportDirectContractOutsourcingContractCreateRequest directContractOutsourcingContractRequest : request
                     .directContractOutsourcingContracts()) {
-                final OutsourcingCompany company = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(
-                                directContractOutsourcingContractRequest.outsourcingCompanyId());
-                final OutsourcingCompanyContract contract = outsourcingCompanyContractService
-                        .getContractByIdOrThrow(
-                                directContractOutsourcingContractRequest.outsourcingCompanyContractId());
-                final Labor labor = laborService
-                        .getLaborByIdOrThrow(directContractOutsourcingContractRequest.laborId());
+                final OutsourcingCompany company = outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(
+                        directContractOutsourcingContractRequest.outsourcingCompanyId());
+                final OutsourcingCompanyContract contract = outsourcingCompanyContractService.getContractByIdOrThrow(
+                        directContractOutsourcingContractRequest.outsourcingCompanyContractId());
+                final Labor labor =
+                        laborService.getLaborByIdOrThrow(directContractOutsourcingContractRequest.laborId());
 
-                final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract = DailyReportDirectContractOutsourcingContract
-                        .builder()
-                        .dailyReport(dailyReport)
-                        .outsourcingCompany(company)
-                        .outsourcingCompanyContract(contract)
-                        .labor(labor)
-                        .workQuantity(directContractOutsourcingContractRequest.workQuantity())
-                        .fileUrl(directContractOutsourcingContractRequest.fileUrl())
-                        .originalFileName(directContractOutsourcingContractRequest.originalFileName())
-                        .memo(directContractOutsourcingContractRequest.memo())
-                        .build();
+                final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract =
+                        DailyReportDirectContractOutsourcingContract.builder()
+                                .dailyReport(dailyReport)
+                                .outsourcingCompany(company)
+                                .outsourcingCompanyContract(contract)
+                                .labor(labor)
+                                .workQuantity(directContractOutsourcingContractRequest.workQuantity())
+                                .fileUrl(directContractOutsourcingContractRequest.fileUrl())
+                                .originalFileName(directContractOutsourcingContractRequest.originalFileName())
+                                .memo(directContractOutsourcingContractRequest.memo())
+                                .build();
 
                 dailyReport.getDirectContractOutsourcingContracts().add(directContractOutsourcingContract);
             }
@@ -272,11 +289,11 @@ public class DailyReportService {
         if (request.directContractOutsourcings() != null) {
             for (final DailyReportDirectContractOutsourcingCreateRequest directContractOutsourcingRequest : request
                     .directContractOutsourcings()) {
-                final OutsourcingCompany company = directContractOutsourcingRequest.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(
+                final OutsourcingCompany company =
+                        directContractOutsourcingRequest.outsourcingCompanyId() != null
+                                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(
                                         directContractOutsourcingRequest.outsourcingCompanyId())
-                        : null;
+                                : null;
 
                 Labor labor;
                 // 임시 인력인 경우 새로운 인력을 생성
@@ -286,23 +303,22 @@ public class DailyReportService {
                             directContractOutsourcingRequest.outsourcingCompanyId());
                 } else {
                     // 기존 인력 검색
-                    labor = laborService
-                            .getLaborByIdOrThrow(directContractOutsourcingRequest.laborId());
+                    labor = laborService.getLaborByIdOrThrow(directContractOutsourcingRequest.laborId());
                 }
 
-                final DailyReportDirectContractOutsourcing directContractOutsourcing = DailyReportDirectContractOutsourcing
-                        .builder()
-                        .dailyReport(dailyReport)
-                        .outsourcingCompany(company)
-                        .labor(labor)
-                        .position(directContractOutsourcingRequest.position())
-                        .workContent(directContractOutsourcingRequest.workContent())
-                        .unitPrice(directContractOutsourcingRequest.unitPrice())
-                        .workQuantity(directContractOutsourcingRequest.workQuantity())
-                        .memo(directContractOutsourcingRequest.memo())
-                        .fileUrl(directContractOutsourcingRequest.fileUrl())
-                        .originalFileName(directContractOutsourcingRequest.originalFileName())
-                        .build();
+                final DailyReportDirectContractOutsourcing directContractOutsourcing =
+                        DailyReportDirectContractOutsourcing.builder()
+                                .dailyReport(dailyReport)
+                                .outsourcingCompany(company)
+                                .labor(labor)
+                                .position(directContractOutsourcingRequest.position())
+                                .workContent(directContractOutsourcingRequest.workContent())
+                                .unitPrice(directContractOutsourcingRequest.unitPrice())
+                                .workQuantity(directContractOutsourcingRequest.workQuantity())
+                                .memo(directContractOutsourcingRequest.memo())
+                                .fileUrl(directContractOutsourcingRequest.fileUrl())
+                                .originalFileName(directContractOutsourcingRequest.originalFileName())
+                                .build();
 
                 labor.updatePreviousDailyWage(directContractOutsourcingRequest.unitPrice());
 
@@ -352,26 +368,27 @@ public class DailyReportService {
                         // 서브장비 조회 및 이전단가 업데이트
                         OutsourcingCompanyContractSubEquipment subEquipmentEntity = null;
                         if (subEquipmentRequest.outsourcingCompanyContractSubEquipmentId() != null) {
-                            subEquipmentEntity = outsourcingCompanyContractService
-                                    .getSubEquipmentByIdOrThrow(
-                                            subEquipmentRequest.outsourcingCompanyContractSubEquipmentId());
+                            subEquipmentEntity = outsourcingCompanyContractService.getSubEquipmentByIdOrThrow(
+                                    subEquipmentRequest.outsourcingCompanyContractSubEquipmentId());
                             if (subEquipmentEntity != null && subEquipmentRequest.unitPrice() != null) {
                                 subEquipmentEntity.updatePreviousUnitPrice(subEquipmentRequest.unitPrice());
                             }
                         }
 
-                        final DailyReportOutsourcingEquipmentSubEquipment subEquipment = DailyReportOutsourcingEquipmentSubEquipment
-                                .builder()
-                                .dailyReportOutsourcingEquipment(outsourcingEquipment)
-                                .workContent(subEquipmentRequest.workContent())
-                                .unitPrice(subEquipmentRequest.unitPrice())
-                                .workHours(subEquipmentRequest.workHours())
-                                .memo(subEquipmentRequest.memo())
-                                .outsourcingCompanyContractSubEquipment(subEquipmentEntity != null ? subEquipmentEntity
-                                        : OutsourcingCompanyContractSubEquipment.builder()
-                                                .id(subEquipmentRequest.outsourcingCompanyContractSubEquipmentId())
-                                                .build())
-                                .build();
+                        final DailyReportOutsourcingEquipmentSubEquipment subEquipment =
+                                DailyReportOutsourcingEquipmentSubEquipment.builder()
+                                        .dailyReportOutsourcingEquipment(outsourcingEquipment)
+                                        .workContent(subEquipmentRequest.workContent())
+                                        .unitPrice(subEquipmentRequest.unitPrice())
+                                        .workHours(subEquipmentRequest.workHours())
+                                        .memo(subEquipmentRequest.memo())
+                                        .outsourcingCompanyContractSubEquipment(
+                                                subEquipmentEntity != null ? subEquipmentEntity
+                                                        : OutsourcingCompanyContractSubEquipment.builder()
+                                                                .id(subEquipmentRequest
+                                                                        .outsourcingCompanyContractSubEquipmentId())
+                                                                .build())
+                                        .build();
                         outsourcingEquipment.getSubEquipments().add(subEquipment);
                     }
                 }
@@ -392,7 +409,8 @@ public class DailyReportService {
                     request.gasolinePrice(),
                     request.dieselPrice(),
                     request.ureaPrice(),
-                    request.fuelInfos().stream()
+                    request.fuelInfos()
+                            .stream()
                             .map(fuelInfoRequest -> new FuelInfoCreateRequest(
                                     fuelInfoRequest.outsourcingCompanyId(),
                                     fuelInfoRequest.categoryType(),
@@ -403,16 +421,15 @@ public class DailyReportService {
                                     fuelInfoRequest.amount(),
                                     fuelInfoRequest.fileUrl(),
                                     fuelInfoRequest.originalFileName(),
-                                    fuelInfoRequest.memo(), fuelInfoRequest.subEquipments()))
+                                    fuelInfoRequest.memo(),
+                                    fuelInfoRequest.subEquipments()))
                             .toList());
-            final FuelAggregation fuelAggregation = fuelAggregationService
-                    .createFuelAggregation(fuelAggregationRequest, userId);
+            final FuelAggregation fuelAggregation =
+                    fuelAggregationService.createFuelAggregation(fuelAggregationRequest, userId);
 
             // FuelAggregation만 연결하는 DailyReportFuel 생성
-            final DailyReportFuel fuel = DailyReportFuel.builder()
-                    .dailyReport(dailyReport)
-                    .fuelAggregation(fuelAggregation)
-                    .build();
+            final DailyReportFuel fuel =
+                    DailyReportFuel.builder().dailyReport(dailyReport).fuelAggregation(fuelAggregation).build();
 
             dailyReport.getFuels().add(fuel);
         }
@@ -422,47 +439,49 @@ public class DailyReportService {
             for (final DailyReportOutsourcingConstructionCreateRequest constructionRequest : request
                     .outsourcingConstructions()) {
 
-                final OutsourcingCompany outsourcingCompany = constructionRequest.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(constructionRequest.outsourcingCompanyId())
-                        : null;
+                final OutsourcingCompany outsourcingCompany =
+                        constructionRequest.outsourcingCompanyId() != null
+                                ? outsourcingCompanyService
+                                        .getOutsourcingCompanyByIdOrThrow(constructionRequest.outsourcingCompanyId())
+                                : null;
 
                 // 공사 그룹 조회 및 생성
-                final OutsourcingCompanyContractConstructionGroup outsourcingCompanyContractConstructionGroup = constructionRequest
-                        .outsourcingCompanyContractConstructionGroupId() != null
+                final OutsourcingCompanyContractConstructionGroup outsourcingCompanyContractConstructionGroup =
+                        constructionRequest.outsourcingCompanyContractConstructionGroupId() != null
                                 ? outsourcingCompanyContractConstructionService
                                         .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
                                                 constructionRequest.outsourcingCompanyContractConstructionGroupId())
                                 : null;
 
-                final DailyReportOutsourcingConstructionGroup constructionGroup = DailyReportOutsourcingConstructionGroup
-                        .builder()
-                        .dailyReport(dailyReport)
-                        .outsourcingCompany(outsourcingCompany)
-                        .outsourcingCompanyContractConstructionGroup(outsourcingCompanyContractConstructionGroup)
-                        .build();
+                final DailyReportOutsourcingConstructionGroup constructionGroup =
+                        DailyReportOutsourcingConstructionGroup.builder()
+                                .dailyReport(dailyReport)
+                                .outsourcingCompany(outsourcingCompany)
+                                .outsourcingCompanyContractConstructionGroup(
+                                        outsourcingCompanyContractConstructionGroup)
+                                .build();
 
                 // 공사항목 목록 추가
                 if (constructionRequest.items() != null) {
                     for (final DailyReportOutsourcingConstructionCreateRequest.ConstructionItemCreateRequest itemRequest : constructionRequest
                             .items()) {
 
-                        final OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction = itemRequest
-                                .outsourcingCompanyContractConstructionId() != null
+                        final OutsourcingCompanyContractConstruction outsourcingCompanyContractConstruction =
+                                itemRequest.outsourcingCompanyContractConstructionId() != null
                                         ? outsourcingCompanyContractConstructionService
                                                 .getOutsourcingCompanyContractConstructionByIdOrThrow(
                                                         itemRequest.outsourcingCompanyContractConstructionId())
                                         : null;
 
-                        final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction
-                                .builder()
-                                .outsourcingConstructionGroup(constructionGroup)
-                                .outsourcingCompanyContractConstruction(outsourcingCompanyContractConstruction)
-                                .quantity(itemRequest.quantity())
-                                .fileUrl(itemRequest.fileUrl())
-                                .originalFileName(itemRequest.originalFileName())
-                                .memo(itemRequest.memo())
-                                .build();
+                        final DailyReportOutsourcingConstruction construction =
+                                DailyReportOutsourcingConstruction.builder()
+                                        .outsourcingConstructionGroup(constructionGroup)
+                                        .outsourcingCompanyContractConstruction(outsourcingCompanyContractConstruction)
+                                        .quantity(itemRequest.quantity())
+                                        .fileUrl(itemRequest.fileUrl())
+                                        .originalFileName(itemRequest.originalFileName())
+                                        .memo(itemRequest.memo())
+                                        .build();
 
                         constructionGroup.getConstructions().add(construction);
                     }
@@ -578,7 +597,8 @@ public class DailyReportService {
         }
     }
 
-    public DailyReport getDailyReportById(final Long id) {
+    public DailyReport getDailyReportById(
+            final Long id) {
         return getDailyReportByIdOrThrow(id);
     }
 
@@ -589,15 +609,18 @@ public class DailyReportService {
      * @return 출역일보 상세 정보
      */
     @Transactional(readOnly = true)
-    public DailyReportDetailResponse getDailyReportDetail(final DailyReportSearchRequest request) {
+    public DailyReportDetailResponse getDailyReportDetail(
+            final DailyReportSearchRequest request) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 출역일보 조회
-        final DailyReport dailyReport = dailyReportRepository.findBySiteAndSiteProcessAndReportDate(
-                site, siteProcess, DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        final DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()))
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         return DailyReportDetailResponse.from(dailyReport);
@@ -610,16 +633,19 @@ public class DailyReportService {
      * @param request       수정 요청 정보
      */
     @Transactional
-    public void updateDailyReport(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReport(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportUpdateRequest request) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
 
         // 출역일보 조회
-        final DailyReport dailyReport = dailyReportRepository.findBySiteAndSiteProcessAndReportDate(
-                site, siteProcess, DateTimeFormatUtils.toUtcStartOfDay(searchRequest.reportDate()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        final DailyReport dailyReport = dailyReportRepository
+                .findBySiteAndSiteProcessAndReportDate(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(searchRequest.reportDate()))
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 현재는 날씨 데이터만 수정
@@ -635,23 +661,22 @@ public class DailyReportService {
             for (final DailyReportEvidenceFileUpdateRequest evidenceFileRequest : request.evidenceFiles()) {
                 // 해당 fileType의 파일들만 추출하여 별도 리스트로 동기화 (다른 fileType 보호)
                 final List<DailyReportEvidenceFile> typeSpecificFiles = new ArrayList<>(
-                        dailyReport.getEvidenceFiles().stream()
+                        dailyReport.getEvidenceFiles()
+                                .stream()
                                 .filter(file -> file.getFileType() == evidenceFileRequest.fileType())
                                 .toList());
 
-                EntitySyncUtils.syncList(
-                        typeSpecificFiles,
-                        evidenceFileRequest.files(),
-                        (final DailyReportEvidenceFileUpdateRequest.EvidenceFileUpdateInfo dto) -> {
-                            return DailyReportEvidenceFile.builder()
-                                    .dailyReport(dailyReport)
-                                    .fileType(evidenceFileRequest.fileType())
-                                    .name(dto.name())
-                                    .fileUrl(dto.fileUrl())
-                                    .originalFileName(dto.originalFileName())
-                                    .memo(dto.memo())
-                                    .build();
-                        });
+                EntitySyncUtils.syncList(typeSpecificFiles, evidenceFileRequest.files(), (
+                        final DailyReportEvidenceFileUpdateRequest.EvidenceFileUpdateInfo dto) -> {
+                    return DailyReportEvidenceFile.builder()
+                            .dailyReport(dailyReport)
+                            .fileType(evidenceFileRequest.fileType())
+                            .name(dto.name())
+                            .fileUrl(dto.fileUrl())
+                            .originalFileName(dto.originalFileName())
+                            .memo(dto.memo())
+                            .build();
+                });
 
                 // 원본 리스트에서 해당 fileType 제거 후 동기화된 결과 추가
                 dailyReport.getEvidenceFiles().removeIf(file -> file.getFileType() == evidenceFileRequest.fileType());
@@ -672,18 +697,17 @@ public class DailyReportService {
      * @param pageable 페이징 정보
      * @return 출역일보 직원정보 슬라이스
      */
-    public Slice<DailyReportEmployeeResponse> searchDailyReportEmployees(final DailyReportSearchRequest request,
+    public Slice<DailyReportEmployeeResponse> searchDailyReportEmployees(
+            final DailyReportSearchRequest request,
             final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportEmployeeResponse 슬라이스로 변환
         // 각 DailyReport의 직원들을 개별 항목으로 변환
@@ -719,11 +743,9 @@ public class DailyReportService {
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportDirectContractResponse 슬라이스로 변환
         // 각 DailyReport의 직영/용역들을 개별 항목으로 변환
@@ -759,11 +781,9 @@ public class DailyReportService {
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportDirectContractOutsourcingResponse 슬라이스로 변환
         // 각 DailyReport의 직영/용역 용역들을 개별 항목으로 변환
@@ -801,30 +821,29 @@ public class DailyReportService {
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportDirectContractOutsourcingResponse 슬라이스로 변환
         // 각 DailyReport의 직영/용역 외주들을 개별 항목으로 변환
-        final List<DailyReportDirectContractOutsourcingContractResponse> allDirectContractOutsourcings = new ArrayList<>();
+        final List<DailyReportDirectContractOutsourcingContractResponse> allDirectContractOutsourcings =
+                new ArrayList<>();
 
         for (final DailyReport dailyReport : dailyReportSlice.getContent()) {
             for (final DailyReportDirectContractOutsourcingContract directContractOutsourcingContract : dailyReport
                     .getDirectContractOutsourcingContracts()) {
-                allDirectContractOutsourcings
-                        .add(DailyReportDirectContractOutsourcingContractResponse
-                                .from(directContractOutsourcingContract));
+                allDirectContractOutsourcings.add(
+                        DailyReportDirectContractOutsourcingContractResponse.from(directContractOutsourcingContract));
             }
         }
 
         // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
-        final Slice<DailyReportDirectContractOutsourcingContractResponse> directContractOutsourcingSlice = new SliceImpl<>(
-                allDirectContractOutsourcings,
-                pageable,
-                dailyReportSlice.hasNext());
+        final Slice<DailyReportDirectContractOutsourcingContractResponse> directContractOutsourcingSlice =
+                new SliceImpl<>(
+                        allDirectContractOutsourcings,
+                        pageable,
+                        dailyReportSlice.hasNext());
 
         return directContractOutsourcingSlice;
     }
@@ -836,18 +855,17 @@ public class DailyReportService {
      * @param pageable 페이징 정보
      * @return 출역일보 외주 정보 슬라이스
      */
-    public Slice<DailyReportOutsourcingResponse> searchDailyReportOutsourcings(final DailyReportSearchRequest request,
+    public Slice<DailyReportOutsourcingResponse> searchDailyReportOutsourcings(
+            final DailyReportSearchRequest request,
             final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportOutsourcingResponse 슬라이스로 변환
         // 각 DailyReport의 외주들을 개별 항목으로 변환
@@ -875,20 +893,20 @@ public class DailyReportService {
      * @param pageable 페이징 정보
      * @return 출역일보 유류 정보 슬라이스
      */
-    public Slice<DailyReportFuelResponse> searchDailyReportFuels(final DailyReportSearchRequest request,
+    public Slice<DailyReportFuelResponse> searchDailyReportFuels(
+            final DailyReportSearchRequest request,
             final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // FuelInfo를 직접 페이징으로 조회
-        final Slice<FuelInfo> fuelInfoSlice = fuelInfoRepository.findByDailyReportSiteAndProcessAndDate(
-                site, siteProcess, DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), pageable);
+        final Slice<FuelInfo> fuelInfoSlice = fuelInfoRepository.findByDailyReportSiteAndProcessAndDate(site,
+                siteProcess, DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), pageable);
 
         // FuelInfo를 DailyReportFuelResponse로 변환
-        final List<DailyReportFuelResponse> fuelResponses = fuelInfoSlice.getContent().stream()
-                .map(fuelInfo -> DailyReportFuelResponse.from(fuelInfo))
-                .toList();
+        final List<DailyReportFuelResponse> fuelResponses =
+                fuelInfoSlice.getContent().stream().map(fuelInfo -> DailyReportFuelResponse.from(fuelInfo)).toList();
 
         // 슬라이스 정보를 유지하면서 새로운 슬라이스 생성
         final Slice<DailyReportFuelResponse> fuelSlice = new SliceImpl<>(
@@ -906,18 +924,17 @@ public class DailyReportService {
      * @param pageable 페이징 정보
      * @return 출역일보 장비 정보 슬라이스
      */
-    public Slice<DailyReportEquipmentResponse> searchDailyReportEquipments(final DailyReportSearchRequest request,
+    public Slice<DailyReportEquipmentResponse> searchDailyReportEquipments(
+            final DailyReportSearchRequest request,
             final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportEquipmentResponse 슬라이스로 변환
         // 각 DailyReport의 장비들을 개별 항목으로 변환
@@ -945,18 +962,17 @@ public class DailyReportService {
      * @param pageable 페이징 정보
      * @return 출역일보 파일 정보 슬라이스
      */
-    public Slice<DailyReportFileResponse> searchDailyReportFiles(final DailyReportSearchRequest request,
+    public Slice<DailyReportFileResponse> searchDailyReportFiles(
+            final DailyReportSearchRequest request,
             final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportFileResponse 슬라이스로 변환
         // 각 DailyReport의 파일들을 개별 항목으로 변환
@@ -985,24 +1001,32 @@ public class DailyReportService {
      * @param pageable 페이징 정보
      * @return 출역일보 증빙 파일 정보 슬라이스
      */
-    public Slice<DailyReportEvidenceFileResponse> searchDailyReportEvidenceFiles(final Long id,
+    public Slice<DailyReportEvidenceFileResponse> searchDailyReportEvidenceFiles(
+            final Long id,
             final DailyReportEvidenceFileType fileType,
             final Pageable pageable) {
         final DailyReport dailyReport = dailyReportRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
-        final List<DailyReportEvidenceFileResponse> evidenceFiles = dailyReport.getEvidenceFiles().stream()
+        final List<DailyReportEvidenceFileResponse> evidenceFiles = dailyReport.getEvidenceFiles()
+                .stream()
                 .filter(file -> fileType == null || file.getFileType() == fileType)
                 .map(DailyReportEvidenceFileResponse::from)
                 .toList();
 
-        return new SliceImpl<>(evidenceFiles, pageable, false);
+        return new SliceImpl<>(
+                evidenceFiles,
+                pageable,
+                false);
     }
 
     @Transactional
-    public void updateDailyReportEmployees(final DailyReportSearchRequest searchRequest,
-            final DailyReportEmployeeUpdateRequest request, final Long userId) {
+    public void updateDailyReportEmployees(
+            final DailyReportSearchRequest searchRequest,
+            final DailyReportEmployeeUpdateRequest request,
+            final Long userId) {
 
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
@@ -1011,10 +1035,11 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
@@ -1023,34 +1048,34 @@ public class DailyReportService {
         final Set<Long> laborIds = new HashSet<>();
         for (final DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo employee : request.employees()) {
             if (employee.laborId() != null && !laborIds.add(employee.laborId())) {
-                throw new IllegalArgumentException(ValidationMessages.DAILY_REPORT_EMPLOYEE_DUPLICATE_LABOR_ID);
+                throw new IllegalArgumentException(
+                        ValidationMessages.DAILY_REPORT_EMPLOYEE_DUPLICATE_LABOR_ID);
             }
         }
 
         // 정규직원만 직원 출역 정보에 추가 가능
-        if (request.employees().stream().anyMatch(employee -> employee.laborId() != null
-                && laborService.getLaborByIdOrThrow(employee.laborId()).getType() != LaborType.REGULAR_EMPLOYEE)) {
+        if (request.employees()
+                .stream()
+                .anyMatch(employee -> employee.laborId() != null && laborService.getLaborByIdOrThrow(employee.laborId())
+                        .getType() != LaborType.REGULAR_EMPLOYEE)) {
             throw new IllegalArgumentException(
                     ValidationMessages.DAILY_REPORT_EMPLOYEE_MUST_BE_REGULAR);
         }
 
         // EntitySyncUtils.syncList를 사용하여 직원정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getEmployees(),
-                request.employees(),
-                (final DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo dto) -> {
-                    return DailyReportEmployee.builder()
-                            .dailyReport(dailyReport)
-                            .labor(laborService.getLaborByIdOrThrow(dto.laborId()))
-                            .workContent(dto.workContent())
-                            .workQuantity(dto.workQuantity())
-                            .unitPrice(laborService.getLaborByIdOrThrow(dto.laborId())
-                                    .getDailyWage())
-                            .fileUrl(dto.fileUrl())
-                            .originalFileName(dto.originalFileName())
-                            .memo(dto.memo())
-                            .build();
-                });
+        EntitySyncUtils.syncList(dailyReport.getEmployees(), request.employees(), (
+                final DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo dto) -> {
+            return DailyReportEmployee.builder()
+                    .dailyReport(dailyReport)
+                    .labor(laborService.getLaborByIdOrThrow(dto.laborId()))
+                    .workContent(dto.workContent())
+                    .workQuantity(dto.workQuantity())
+                    .unitPrice(laborService.getLaborByIdOrThrow(dto.laborId()).getDailyWage())
+                    .fileUrl(dto.fileUrl())
+                    .originalFileName(dto.originalFileName())
+                    .memo(dto.memo())
+                    .build();
+        });
 
         // labor 업데이트를 위해 추가 처리 (한 번만 반복)
         for (final DailyReportEmployeeUpdateRequest.EmployeeUpdateInfo employeeInfo : request.employees()) {
@@ -1058,7 +1083,8 @@ public class DailyReportService {
                 final Labor labor = laborService.getLaborByIdOrThrow(employeeInfo.laborId());
 
                 // 기존 엔티티만 찾아서 labor 설정 (ID가 null이 아닌 것만)
-                dailyReport.getEmployees().stream()
+                dailyReport.getEmployees()
+                        .stream()
                         .filter(emp -> emp.getId() != null && emp.getId().equals(employeeInfo.id()))
                         .findFirst()
                         .ifPresent(emp -> emp.updateFrom(employeeInfo, labor));
@@ -1078,8 +1104,10 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void updateDailyReportDirectContracts(final DailyReportSearchRequest searchRequest,
-            final DailyReportDirectContractUpdateRequest request, final Long userId) {
+    public void updateDailyReportDirectContracts(
+            final DailyReportSearchRequest searchRequest,
+            final DailyReportDirectContractUpdateRequest request,
+            final Long userId) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
@@ -1087,10 +1115,11 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
@@ -1099,8 +1128,7 @@ public class DailyReportService {
         final Set<String> directContractKeys = new HashSet<>();
         for (final DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo directContract : request
                 .directContracts()) {
-            if (!Boolean.TRUE.equals(directContract.isTemporary()) &&
-                    directContract.laborId() != null) {
+            if (!Boolean.TRUE.equals(directContract.isTemporary()) && directContract.laborId() != null) {
                 final String key = directContract.laborId() + "_" + directContract.unitPrice();
                 if (!directContractKeys.add(key)) {
                     throw new IllegalArgumentException(
@@ -1110,54 +1138,54 @@ public class DailyReportService {
         }
 
         // EntitySyncUtils.syncList를 사용하여 직영/용역 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getDirectContracts(),
-                request.directContracts(),
-                (final DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo dto) -> {
-                    Labor labor;
-                    // 임시 인력인 경우 새로운 인력을 생성
-                    if (Boolean.TRUE.equals(dto.isTemporary())) {
-                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId,
-                                LaborType.DIRECT_CONTRACT, dto.outsourcingCompanyId());
-                    } else {
-                        // 기존 인력 검색
-                        labor = laborService.getLaborByIdOrThrow(dto.laborId());
+        EntitySyncUtils.syncList(dailyReport.getDirectContracts(), request.directContracts(), (
+                final DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo dto) -> {
+            Labor labor;
+            // 임시 인력인 경우 새로운 인력을 생성
+            if (Boolean.TRUE.equals(dto.isTemporary())) {
+                labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId,
+                        LaborType.DIRECT_CONTRACT, dto.outsourcingCompanyId());
+            } else {
+                // 기존 인력 검색
+                labor = laborService.getLaborByIdOrThrow(dto.laborId());
 
-                        labor.updatePreviousDailyWage(dto.unitPrice());
-                    }
+                labor.updatePreviousDailyWage(dto.unitPrice());
+            }
 
-                    final OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
-                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
-                            : null;
+            final OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
+                    ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                    : null;
 
-                    return DailyReportDirectContract.builder()
-                            .dailyReport(dailyReport)
-                            .outsourcingCompany(outsourcingCompany)
-                            .labor(labor)
-                            .position(dto.position())
-                            .workContent(dto.workContent())
-                            .unitPrice(dto.unitPrice())
-                            .workQuantity(dto.workQuantity())
-                            .memo(dto.memo())
-                            .fileUrl(dto.fileUrl())
-                            .originalFileName(dto.originalFileName())
-                            .build();
-                });
+            return DailyReportDirectContract.builder()
+                    .dailyReport(dailyReport)
+                    .outsourcingCompany(outsourcingCompany)
+                    .labor(labor)
+                    .position(dto.position())
+                    .workContent(dto.workContent())
+                    .unitPrice(dto.unitPrice())
+                    .workQuantity(dto.workQuantity())
+                    .memo(dto.memo())
+                    .fileUrl(dto.fileUrl())
+                    .originalFileName(dto.originalFileName())
+                    .build();
+        });
 
         // company와 labor 업데이트를 위해 추가 처리 (한 번만 반복)
         for (final DailyReportDirectContractUpdateRequest.DirectContractUpdateInfo directContractInfo : request
                 .directContracts()) {
             if (directContractInfo.id() != null) { // ID가 있는 것만 처리
-                final OutsourcingCompany company = directContractInfo.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(directContractInfo.outsourcingCompanyId())
-                        : null;
+                final OutsourcingCompany company =
+                        directContractInfo.outsourcingCompanyId() != null
+                                ? outsourcingCompanyService
+                                        .getOutsourcingCompanyByIdOrThrow(directContractInfo.outsourcingCompanyId())
+                                : null;
                 final Labor labor = directContractInfo.laborId() != null
                         ? laborService.getLaborByIdOrThrow(directContractInfo.laborId())
                         : null;
 
                 // 기존 엔티티만 찾아서 company와 labor 설정 (ID가 null이 아닌 것만)
-                dailyReport.getDirectContracts().stream()
+                dailyReport.getDirectContracts()
+                        .stream()
                         .filter(dc -> dc.getId() != null && dc.getId().equals(directContractInfo.id()))
                         .findFirst()
                         .ifPresent(dc -> {
@@ -1179,7 +1207,8 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void updateDailyReportDirectContractOutsourcingContracts(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportDirectContractOutsourcingContracts(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportDirectContractOutsourcingContractUpdateRequest request) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
@@ -1188,21 +1217,21 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 직영/용역 외주 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getDirectContractOutsourcingContracts(),
-                request.directContractOutsourcingContracts(),
-                (final DailyReportDirectContractOutsourcingContractUpdateRequest.DirectContractOutsourcingContractUpdateInfo dto) -> {
-                    final OutsourcingCompany company = outsourcingCompanyService
-                            .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
+        EntitySyncUtils.syncList(dailyReport.getDirectContractOutsourcingContracts(),
+                request.directContractOutsourcingContracts(), (
+                        final DailyReportDirectContractOutsourcingContractUpdateRequest.DirectContractOutsourcingContractUpdateInfo dto) -> {
+                    final OutsourcingCompany company =
+                            outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
                     final OutsourcingCompanyContract contract = outsourcingCompanyContractService
                             .getContractByIdOrThrow(dto.outsourcingCompanyContractId());
                     final Labor labor = laborService.getLaborByIdOrThrow(dto.laborId());
@@ -1230,7 +1259,8 @@ public class DailyReportService {
                 final Labor labor = laborService.getLaborByIdOrThrow(directContractOutsourcingContractInfo.laborId());
 
                 // 기존 엔티티만 찾아서 업데이트
-                dailyReport.getDirectContractOutsourcingContracts().stream()
+                dailyReport.getDirectContractOutsourcingContracts()
+                        .stream()
                         .filter(dco -> dco.getId() != null
                                 && dco.getId().equals(directContractOutsourcingContractInfo.id()))
                         .findFirst()
@@ -1242,8 +1272,10 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void updateDailyReportDirectContractOutsourcings(final DailyReportSearchRequest searchRequest,
-            final DailyReportDirectContractOutsourcingUpdateRequest request, final Long userId) {
+    public void updateDailyReportDirectContractOutsourcings(
+            final DailyReportSearchRequest searchRequest,
+            final DailyReportDirectContractOutsourcingUpdateRequest request,
+            final Long userId) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
@@ -1251,10 +1283,11 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
@@ -1263,8 +1296,8 @@ public class DailyReportService {
         final Set<String> directContractOutsourcingKeys = new HashSet<>();
         for (final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo directContractOutsourcing : request
                 .directContractOutsourcings()) {
-            if (!Boolean.TRUE.equals(directContractOutsourcing.isTemporary()) &&
-                    directContractOutsourcing.laborId() != null) {
+            if (!Boolean.TRUE.equals(directContractOutsourcing.isTemporary())
+                    && directContractOutsourcing.laborId() != null) {
                 final String key = directContractOutsourcing.laborId() + "_" + directContractOutsourcing.unitPrice();
                 if (!directContractOutsourcingKeys.add(key)) {
                     throw new IllegalArgumentException(
@@ -1274,57 +1307,56 @@ public class DailyReportService {
         }
 
         // EntitySyncUtils.syncList를 사용하여 직영/용역 용역 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getDirectContractOutsourcings(),
-                request.directContractOutsourcings(),
-                (final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo dto) -> {
-                    Labor labor;
-                    // 임시 인력인 경우 새로운 인력을 생성
-                    if (Boolean.TRUE.equals(dto.isTemporary())) {
-                        labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId,
-                                LaborType.OUTSOURCING, dto.outsourcingCompanyId());
-                    } else {
-                        // 기존 인력 검색
-                        labor = laborService.getLaborByIdOrThrow(dto.laborId());
+        EntitySyncUtils.syncList(dailyReport.getDirectContractOutsourcings(), request.directContractOutsourcings(), (
+                final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo dto) -> {
+            Labor labor;
+            // 임시 인력인 경우 새로운 인력을 생성
+            if (Boolean.TRUE.equals(dto.isTemporary())) {
+                labor = createTemporaryLabor(dto.temporaryLaborName(), dto.unitPrice(), userId, LaborType.OUTSOURCING,
+                        dto.outsourcingCompanyId());
+            } else {
+                // 기존 인력 검색
+                labor = laborService.getLaborByIdOrThrow(dto.laborId());
 
-                        labor.updatePreviousDailyWage(dto.unitPrice());
-                    }
+                labor.updatePreviousDailyWage(dto.unitPrice());
+            }
 
-                    final OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
-                            ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
-                            : null;
+            final OutsourcingCompany outsourcingCompany = dto.outsourcingCompanyId() != null
+                    ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId())
+                    : null;
 
-                    return DailyReportDirectContractOutsourcing.builder()
-                            .dailyReport(dailyReport)
-                            .outsourcingCompany(outsourcingCompany)
-                            .labor(labor)
-                            .position(dto.position())
-                            .workContent(dto.workContent())
-                            .unitPrice(dto.unitPrice())
-                            .workQuantity(dto.workQuantity())
-                            .memo(dto.memo())
-                            .fileUrl(dto.fileUrl())
-                            .originalFileName(dto.originalFileName())
-                            .build();
-                });
+            return DailyReportDirectContractOutsourcing.builder()
+                    .dailyReport(dailyReport)
+                    .outsourcingCompany(outsourcingCompany)
+                    .labor(labor)
+                    .position(dto.position())
+                    .workContent(dto.workContent())
+                    .unitPrice(dto.unitPrice())
+                    .workQuantity(dto.workQuantity())
+                    .memo(dto.memo())
+                    .fileUrl(dto.fileUrl())
+                    .originalFileName(dto.originalFileName())
+                    .build();
+        });
 
         // company와 labor 업데이트를 위해 추가 처리 (한 번만 반복)
         for (final DailyReportDirectContractOutsourcingUpdateRequest.DirectContractOutsourcingUpdateInfo directContractOutsourcingInfo : request
                 .directContractOutsourcings()) {
             if (directContractOutsourcingInfo.id() != null) { // ID가 있는 것만 처리
-                final OutsourcingCompany company = directContractOutsourcingInfo.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(directContractOutsourcingInfo.outsourcingCompanyId())
-                        : null;
-                final Labor labor = (!Boolean.TRUE.equals(directContractOutsourcingInfo.isTemporary()) &&
-                        directContractOutsourcingInfo.laborId() != null)
+                final OutsourcingCompany company =
+                        directContractOutsourcingInfo.outsourcingCompanyId() != null
+                                ? outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(
+                                        directContractOutsourcingInfo.outsourcingCompanyId())
+                                : null;
+                final Labor labor = (!Boolean.TRUE.equals(directContractOutsourcingInfo.isTemporary())
+                        && directContractOutsourcingInfo.laborId() != null)
                                 ? laborService.getLaborByIdOrThrow(directContractOutsourcingInfo.laborId())
                                 : null;
 
                 // 기존 엔티티만 찾아서 company와 labor 설정 (ID가 null이 아닌 것만)
-                dailyReport.getDirectContractOutsourcings().stream()
-                        .filter(dco -> dco.getId() != null
-                                && dco.getId().equals(directContractOutsourcingInfo.id()))
+                dailyReport.getDirectContractOutsourcings()
+                        .stream()
+                        .filter(dco -> dco.getId() != null && dco.getId().equals(directContractOutsourcingInfo.id()))
                         .findFirst()
                         .ifPresent(dco -> {
                             dco.updateFrom(directContractOutsourcingInfo, labor, company);
@@ -1345,7 +1377,8 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void updateDailyReportOutsourcings(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportOutsourcings(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportOutsourcingUpdateRequest request) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
@@ -1354,49 +1387,50 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 외주 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getOutsourcings(),
-                request.outsourcings(),
-                (final DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo dto) -> {
-                    return DailyReportOutsourcing.builder()
-                            .dailyReport(dailyReport)
-                            .outsourcingCompany(outsourcingCompanyService
-                                    .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
-                            .outsourcingCompanyContractWorker(getOutsourcingCompanyContractWorkerByIdOrThrow(
-                                    dto.outsourcingCompanyContractWorkerId()))
-                            .category(dto.category())
-                            .workContent(dto.workContent())
-                            .workQuantity(dto.workQuantity())
-                            .memo(dto.memo())
-                            .fileUrl(dto.fileUrl())
-                            .originalFileName(dto.originalFileName())
-                            .build();
-                });
+        EntitySyncUtils.syncList(dailyReport.getOutsourcings(), request.outsourcings(), (
+                final DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo dto) -> {
+            return DailyReportOutsourcing.builder()
+                    .dailyReport(dailyReport)
+                    .outsourcingCompany(
+                            outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
+                    .outsourcingCompanyContractWorker(
+                            getOutsourcingCompanyContractWorkerByIdOrThrow(dto.outsourcingCompanyContractWorkerId()))
+                    .category(dto.category())
+                    .workContent(dto.workContent())
+                    .workQuantity(dto.workQuantity())
+                    .memo(dto.memo())
+                    .fileUrl(dto.fileUrl())
+                    .originalFileName(dto.originalFileName())
+                    .build();
+        });
 
         // company와 outsourcingCompanyContractWorker 업데이트를 위해 추가 처리 (한 번만 반복)
         for (final DailyReportOutsourcingUpdateRequest.OutsourcingUpdateInfo outsourcingInfo : request.outsourcings()) {
             if (outsourcingInfo.id() != null) { // ID가 있는 것만 처리
-                final OutsourcingCompany company = outsourcingInfo.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(outsourcingInfo.outsourcingCompanyId())
-                        : null;
-                final OutsourcingCompanyContractWorker outsourcingCompanyContractWorker = outsourcingInfo
-                        .outsourcingCompanyContractWorkerId() != null
+                final OutsourcingCompany company =
+                        outsourcingInfo.outsourcingCompanyId() != null
+                                ? outsourcingCompanyService
+                                        .getOutsourcingCompanyByIdOrThrow(outsourcingInfo.outsourcingCompanyId())
+                                : null;
+                final OutsourcingCompanyContractWorker outsourcingCompanyContractWorker =
+                        outsourcingInfo.outsourcingCompanyContractWorkerId() != null
                                 ? getOutsourcingCompanyContractWorkerByIdOrThrow(
                                         outsourcingInfo.outsourcingCompanyContractWorkerId())
                                 : null;
 
                 // 기존 엔티티만 찾아서 company와 outsourcingCompanyContractWorker 설정 (ID가 null이 아닌 것만)
-                dailyReport.getOutsourcings().stream()
+                dailyReport.getOutsourcings()
+                        .stream()
                         .filter(os -> os.getId() != null && os.getId().equals(outsourcingInfo.id()))
                         .findFirst()
                         .ifPresent(os -> {
@@ -1411,7 +1445,8 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void updateDailyReportEquipments(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportEquipments(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportEquipmentUpdateRequest request) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
@@ -1420,63 +1455,60 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 장비 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getOutsourcingEquipments(),
-                request.outsourcingEquipments(),
-                (final DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo dto) -> {
-                    OutsourcingCompanyContractEquipment equipmentEntity = null;
-                    if (dto.outsourcingCompanyContractEquipmentId() != null) {
-                        equipmentEntity = getOutsourcingCompanyContractEquipmentByIdOrThrow(
-                                dto.outsourcingCompanyContractEquipmentId());
-                        // 장비의 이전단가 업데이트
-                        if (equipmentEntity != null && dto.unitPrice() != null) {
-                            equipmentEntity.updatePreviousUnitPrice(dto.unitPrice());
+        EntitySyncUtils.syncList(dailyReport.getOutsourcingEquipments(), request.outsourcingEquipments(), (
+                final DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo dto) -> {
+            OutsourcingCompanyContractEquipment equipmentEntity = null;
+            if (dto.outsourcingCompanyContractEquipmentId() != null) {
+                equipmentEntity =
+                        getOutsourcingCompanyContractEquipmentByIdOrThrow(dto.outsourcingCompanyContractEquipmentId());
+                // 장비의 이전단가 업데이트
+                if (equipmentEntity != null && dto.unitPrice() != null) {
+                    equipmentEntity.updatePreviousUnitPrice(dto.unitPrice());
+                }
+            }
+
+            final DailyReportOutsourcingEquipment equipment = DailyReportOutsourcingEquipment.builder()
+                    .dailyReport(dailyReport)
+                    .outsourcingCompany(
+                            outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
+                    .outsourcingCompanyContractDriver(dto.outsourcingCompanyContractDriverId() != null
+                            ? getOutsourcingCompanyContractDriverByIdOrThrow(dto.outsourcingCompanyContractDriverId())
+                            : null)
+                    .outsourcingCompanyContractEquipment(equipmentEntity)
+                    .workContent(dto.workContent())
+                    .unitPrice(dto.unitPrice())
+                    .workHours(dto.workHours())
+                    .memo(dto.memo())
+                    .fileUrl(dto.fileUrl())
+                    .originalFileName(dto.originalFileName())
+                    .build();
+
+            // 서브 장비 추가
+            if (dto.subEquipments() != null) {
+                for (final DailyReportEquipmentUpdateRequest.OutsourcingCompanyContractSubEquipmentUpdateInfo subEquipmentDto : dto
+                        .subEquipments()) {
+                    // 서브장비 조회 및 이전단가 업데이트
+                    OutsourcingCompanyContractSubEquipment subEquipmentEntity = null;
+                    if (subEquipmentDto.outsourcingCompanyContractSubEquipmentId() != null) {
+                        subEquipmentEntity = outsourcingCompanyContractService
+                                .getSubEquipmentByIdOrThrow(subEquipmentDto.outsourcingCompanyContractSubEquipmentId());
+                        if (subEquipmentEntity != null && subEquipmentDto.unitPrice() != null) {
+                            subEquipmentEntity.updatePreviousUnitPrice(subEquipmentDto.unitPrice());
                         }
                     }
 
-                    final DailyReportOutsourcingEquipment equipment = DailyReportOutsourcingEquipment.builder()
-                            .dailyReport(dailyReport)
-                            .outsourcingCompany(outsourcingCompanyService
-                                    .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId()))
-                            .outsourcingCompanyContractDriver(dto.outsourcingCompanyContractDriverId() != null
-                                    ? getOutsourcingCompanyContractDriverByIdOrThrow(
-                                            dto.outsourcingCompanyContractDriverId())
-                                    : null)
-                            .outsourcingCompanyContractEquipment(equipmentEntity)
-                            .workContent(dto.workContent())
-                            .unitPrice(dto.unitPrice())
-                            .workHours(dto.workHours())
-                            .memo(dto.memo())
-                            .fileUrl(dto.fileUrl())
-                            .originalFileName(dto.originalFileName())
-                            .build();
-
-                    // 서브 장비 추가
-                    if (dto.subEquipments() != null) {
-                        for (final DailyReportEquipmentUpdateRequest.OutsourcingCompanyContractSubEquipmentUpdateInfo subEquipmentDto : dto
-                                .subEquipments()) {
-                            // 서브장비 조회 및 이전단가 업데이트
-                            OutsourcingCompanyContractSubEquipment subEquipmentEntity = null;
-                            if (subEquipmentDto.outsourcingCompanyContractSubEquipmentId() != null) {
-                                subEquipmentEntity = outsourcingCompanyContractService
-                                        .getSubEquipmentByIdOrThrow(
-                                                subEquipmentDto.outsourcingCompanyContractSubEquipmentId());
-                                if (subEquipmentEntity != null && subEquipmentDto.unitPrice() != null) {
-                                    subEquipmentEntity.updatePreviousUnitPrice(subEquipmentDto.unitPrice());
-                                }
-                            }
-
-                            final DailyReportOutsourcingEquipmentSubEquipment subEquipment = DailyReportOutsourcingEquipmentSubEquipment
-                                    .builder()
+                    final DailyReportOutsourcingEquipmentSubEquipment subEquipment =
+                            DailyReportOutsourcingEquipmentSubEquipment.builder()
                                     .dailyReportOutsourcingEquipment(equipment)
                                     .outsourcingCompanyContractSubEquipment(subEquipmentEntity != null
                                             ? subEquipmentEntity
@@ -1488,29 +1520,28 @@ public class DailyReportService {
                                     .workHours(subEquipmentDto.workHours())
                                     .memo(subEquipmentDto.memo())
                                     .build();
-                            equipment.getSubEquipments().add(subEquipment);
-                        }
-                    }
+                    equipment.getSubEquipments().add(subEquipment);
+                }
+            }
 
-                    return equipment;
-                });
+            return equipment;
+        });
 
         // outsourcingCompany, outsourcingCompanyContractDriver,
         // outsourcingCompanyContractEquipment 업데이트를 위해 추가 처리 (한 번만 반복)
         for (final DailyReportEquipmentUpdateRequest.EquipmentUpdateInfo equipmentInfo : request
                 .outsourcingEquipments()) {
             if (equipmentInfo.id() != null) { // ID가 있는 것만 처리
-                final OutsourcingCompany outsourcingCompany = equipmentInfo.outsourcingCompanyId() != null
-                        ? outsourcingCompanyService
-                                .getOutsourcingCompanyByIdOrThrow(equipmentInfo.outsourcingCompanyId())
-                        : null;
-                final OutsourcingCompanyContractDriver outsourcingCompanyContractDriver = equipmentInfo
-                        .outsourcingCompanyContractDriverId() != null
+                final OutsourcingCompany outsourcingCompany =
+                        equipmentInfo.outsourcingCompanyId() != null ? outsourcingCompanyService
+                                .getOutsourcingCompanyByIdOrThrow(equipmentInfo.outsourcingCompanyId()) : null;
+                final OutsourcingCompanyContractDriver outsourcingCompanyContractDriver =
+                        equipmentInfo.outsourcingCompanyContractDriverId() != null
                                 ? getOutsourcingCompanyContractDriverByIdOrThrow(
                                         equipmentInfo.outsourcingCompanyContractDriverId())
                                 : null;
-                final OutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment = equipmentInfo
-                        .outsourcingCompanyContractEquipmentId() != null
+                final OutsourcingCompanyContractEquipment outsourcingCompanyContractEquipment =
+                        equipmentInfo.outsourcingCompanyContractEquipmentId() != null
                                 ? getOutsourcingCompanyContractEquipmentByIdOrThrow(
                                         equipmentInfo.outsourcingCompanyContractEquipmentId())
                                 : null;
@@ -1522,7 +1553,8 @@ public class DailyReportService {
 
                 // 기존 엔티티만 찾아서 outsourcingCompany, outsourcingCompanyContractDriver,
                 // outsourcingCompanyContractEquipment 설정 (ID가 null이 아닌 것만)
-                dailyReport.getOutsourcingEquipments().stream()
+                dailyReport.getOutsourcingEquipments()
+                        .stream()
                         .filter(eq -> eq.getId() != null && eq.getId().equals(equipmentInfo.id()))
                         .findFirst()
                         .ifPresent(eq -> {
@@ -1535,8 +1567,8 @@ public class DailyReportService {
                                         .subEquipments()) {
                                     if (subEquipmentInfo.outsourcingCompanyContractSubEquipmentId() != null
                                             && subEquipmentInfo.unitPrice() != null) {
-                                        final OutsourcingCompanyContractSubEquipment subEquipmentEntity = outsourcingCompanyContractService
-                                                .getSubEquipmentByIdOrThrow(
+                                        final OutsourcingCompanyContractSubEquipment subEquipmentEntity =
+                                                outsourcingCompanyContractService.getSubEquipmentByIdOrThrow(
                                                         subEquipmentInfo.outsourcingCompanyContractSubEquipmentId());
                                         if (subEquipmentEntity != null) {
                                             subEquipmentEntity.updatePreviousUnitPrice(subEquipmentInfo.unitPrice());
@@ -1554,7 +1586,8 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void updateDailyReportOutsourcingConstructions(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportOutsourcingConstructions(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportOutsourcingConstructionUpdateRequest request) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
@@ -1563,75 +1596,76 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 공사 그룹 정보 동기화 (2depth 구조)
-        EntitySyncUtils.syncList(
-                dailyReport.getConstructionGroups(),
-                request.constructionGroups(),
-                (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo dto) -> {
-                    final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
-                            .getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
+        EntitySyncUtils.syncList(dailyReport.getConstructionGroups(), request.constructionGroups(), (
+                final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo dto) -> {
+            final OutsourcingCompany outsourcingCompany =
+                    outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(dto.outsourcingCompanyId());
 
-                    final OutsourcingCompanyContractConstructionGroup contractConstructionGroup = outsourcingCompanyContractConstructionService
+            final OutsourcingCompanyContractConstructionGroup contractConstructionGroup =
+                    outsourcingCompanyContractConstructionService
                             .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
                                     dto.outsourcingCompanyContractConstructionGroupId());
 
-                    final DailyReportOutsourcingConstructionGroup group = DailyReportOutsourcingConstructionGroup
-                            .builder()
-                            .dailyReport(dailyReport)
-                            .outsourcingCompany(outsourcingCompany)
-                            .outsourcingCompanyContractConstructionGroup(contractConstructionGroup)
-                            .build();
+            final DailyReportOutsourcingConstructionGroup group = DailyReportOutsourcingConstructionGroup.builder()
+                    .dailyReport(dailyReport)
+                    .outsourcingCompany(outsourcingCompany)
+                    .outsourcingCompanyContractConstructionGroup(contractConstructionGroup)
+                    .build();
 
-                    // 공사항목 추가
-                    if (dto.items() != null) {
-                        for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionItemUpdateInfo itemDto : dto
-                                .items()) {
-                            final OutsourcingCompanyContractConstruction contractConstruction = outsourcingCompanyContractConstructionService
+            // 공사항목 추가
+            if (dto.items() != null) {
+                for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionItemUpdateInfo itemDto : dto
+                        .items()) {
+                    final OutsourcingCompanyContractConstruction contractConstruction =
+                            outsourcingCompanyContractConstructionService
                                     .getOutsourcingCompanyContractConstructionByIdOrThrow(
                                             itemDto.outsourcingCompanyContractConstructionId());
 
-                            final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction
-                                    .builder()
-                                    .outsourcingConstructionGroup(group)
-                                    .outsourcingCompanyContractConstruction(contractConstruction)
-                                    .quantity(itemDto.quantity())
-                                    .fileUrl(itemDto.fileUrl())
-                                    .originalFileName(itemDto.originalFileName())
-                                    .memo(itemDto.memo())
-                                    .build();
+                    final DailyReportOutsourcingConstruction construction = DailyReportOutsourcingConstruction.builder()
+                            .outsourcingConstructionGroup(group)
+                            .outsourcingCompanyContractConstruction(contractConstruction)
+                            .quantity(itemDto.quantity())
+                            .fileUrl(itemDto.fileUrl())
+                            .originalFileName(itemDto.originalFileName())
+                            .memo(itemDto.memo())
+                            .build();
 
-                            group.getConstructions().add(construction);
-                        }
-                    }
+                    group.getConstructions().add(construction);
+                }
+            }
 
-                    return group;
-                });
+            return group;
+        });
 
         // 기존 공사 그룹 업데이트
         for (final DailyReportOutsourcingConstructionUpdateRequest.ConstructionGroupUpdateInfo groupInfo : request
                 .constructionGroups()) {
             if (groupInfo.id() != null) { // ID가 있는 것만 처리
-                final OutsourcingCompany outsourcingCompany = outsourcingCompanyService
-                        .getOutsourcingCompanyByIdOrThrow(groupInfo.outsourcingCompanyId());
+                final OutsourcingCompany outsourcingCompany =
+                        outsourcingCompanyService.getOutsourcingCompanyByIdOrThrow(groupInfo.outsourcingCompanyId());
 
-                final OutsourcingCompanyContractConstructionGroup contractConstructionGroup = outsourcingCompanyContractConstructionService
-                        .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
-                                groupInfo.outsourcingCompanyContractConstructionGroupId());
+                final OutsourcingCompanyContractConstructionGroup contractConstructionGroup =
+                        outsourcingCompanyContractConstructionService
+                                .getOutsourcingCompanyContractConstructionGroupByIdOrThrow(
+                                        groupInfo.outsourcingCompanyContractConstructionGroupId());
 
                 // 기존 공사 그룹 엔티티 찾아서 업데이트
-                dailyReport.getConstructionGroups().stream()
+                dailyReport.getConstructionGroups()
+                        .stream()
                         .filter(group -> group.getId() != null && group.getId().equals(groupInfo.id()))
                         .findFirst()
-                        .ifPresent(group -> group.updateFrom(groupInfo, outsourcingCompany,
-                                contractConstructionGroup, outsourcingCompanyContractConstructionService));
+                        .ifPresent(group -> group.updateFrom(groupInfo, outsourcingCompany, contractConstructionGroup,
+                                outsourcingCompanyContractConstructionService));
             }
         }
 
@@ -1641,7 +1675,8 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void updateDailyReportFiles(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportFiles(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportFileUpdateRequest request) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
@@ -1650,33 +1685,33 @@ public class DailyReportService {
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 파일 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getFiles(),
-                request.files(),
-                (final DailyReportFileUpdateRequest.FileUpdateInfo dto) -> {
-                    return DailyReportFile.builder()
-                            .dailyReport(dailyReport)
-                            .fileUrl(dto.fileUrl())
-                            .originalFileName(dto.originalFileName())
-                            .description(dto.description())
-                            .memo(dto.memo())
-                            .build();
-                });
+        EntitySyncUtils.syncList(dailyReport.getFiles(), request.files(), (
+                final DailyReportFileUpdateRequest.FileUpdateInfo dto) -> {
+            return DailyReportFile.builder()
+                    .dailyReport(dailyReport)
+                    .fileUrl(dto.fileUrl())
+                    .originalFileName(dto.originalFileName())
+                    .description(dto.description())
+                    .memo(dto.memo())
+                    .build();
+        });
 
         // 기존 엔티티 업데이트를 위해 추가 처리 (한 번만 반복)
         for (final DailyReportFileUpdateRequest.FileUpdateInfo fileInfo : request.files()) {
             if (fileInfo.id() != null) { // ID가 있는 것만 처리
                 // 기존 엔티티만 찾아서 업데이트 (ID가 null이 아닌 것만)
-                dailyReport.getFiles().stream()
+                dailyReport.getFiles()
+                        .stream()
                         .filter(file -> file.getId() != null && file.getId().equals(fileInfo.id()))
                         .findFirst()
                         .ifPresent(file -> file.updateFrom(fileInfo));
@@ -1702,17 +1737,20 @@ public class DailyReportService {
     }
 
     @Transactional
-    public void completeDailyReport(final DailyReportSearchRequest searchRequest, final Long userId) {
+    public void completeDailyReport(
+            final DailyReportSearchRequest searchRequest,
+            final Long userId) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
 
         // 해당 날짜의 출역일보 조회
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
-        final DailyReport dailyReport = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ValidationMessages.DAILY_REPORT_NOT_FOUND));
+        final DailyReport dailyReport =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                ValidationMessages.DAILY_REPORT_NOT_FOUND));
 
         // 출역일보 수정 권한 검증
         validateDailyReportEditPermission(dailyReport);
@@ -1725,35 +1763,43 @@ public class DailyReportService {
         laborPayrollSyncService.syncLaborPayrollFromDailyReport(savedDailyReport, userId);
     }
 
-    private OutsourcingCompanyContractWorker getOutsourcingCompanyContractWorkerByIdOrThrow(final Long workerId) {
+    private OutsourcingCompanyContractWorker getOutsourcingCompanyContractWorkerByIdOrThrow(
+            final Long workerId) {
         return outsourcingCompanyContractWorkerRepository.findById(workerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_WORKER_NOT_FOUND));
     }
 
-    private OutsourcingCompanyContractDriver getOutsourcingCompanyContractDriverByIdOrThrow(final Long driverId) {
+    private OutsourcingCompanyContractDriver getOutsourcingCompanyContractDriverByIdOrThrow(
+            final Long driverId) {
         return outsourcingCompanyContractDriverRepository.findById(driverId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_DRIVER_NOT_FOUND));
     }
 
     private OutsourcingCompanyContractEquipment getOutsourcingCompanyContractEquipmentByIdOrThrow(
             final Long equipmentId) {
         return outsourcingCompanyContractEquipmentRepository.findById(equipmentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_EQUIPMENT_NOT_FOUND));
     }
 
-    private DailyReport getDailyReportByIdOrThrow(final Long id) {
+    private DailyReport getDailyReportByIdOrThrow(
+            final Long id) {
         return dailyReportRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
     }
 
     /**
      * 출역일보 검색 요청으로 출역일보를 조회합니다.
      */
-    private DailyReport getDailyReportBySearchRequest(final DailyReportSearchRequest searchRequest) {
+    private DailyReport getDailyReportBySearchRequest(
+            final DailyReportSearchRequest searchRequest) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(searchRequest.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(searchRequest.siteProcessId());
@@ -1762,7 +1808,8 @@ public class DailyReportService {
         final OffsetDateTime reportDate = DateTimeFormatUtils.toOffsetDateTime(searchRequest.reportDate());
 
         return dailyReportRepository.findBySiteAndSiteProcessAndReportDate(site, siteProcess, reportDate)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.DAILY_REPORT_NOT_FOUND));
     }
 
@@ -1774,10 +1821,11 @@ public class DailyReportService {
      * @param dailyReport 출역일보
      * @throws ResponseStatusException 수정 권한이 없을 때
      */
-    private void validateDailyReportEditPermission(final DailyReport dailyReport) {
+    private void validateDailyReportEditPermission(
+            final DailyReport dailyReport) {
         // 현재 사용자 정보 조회
-        final CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        final CustomUserDetails userDetails =
+                (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         final User currentUser = userService.getUserEntity(userDetails.getUserId());
 
         // 본사 직원인 경우 언제든 수정 가능
@@ -1787,7 +1835,8 @@ public class DailyReportService {
 
         // 현장 직원인 경우 PENDING 상태가 아니면 수정 불가
         if (dailyReport.getStatus() != DailyReportStatus.PENDING) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     ValidationMessages.DAILY_REPORT_EDIT_NOT_ALLOWED);
         }
     }
@@ -1797,7 +1846,8 @@ public class DailyReportService {
      * 마감된 출역일보는 삭제할 수 없습니다.
      */
     @Transactional
-    public void deleteDailyReports(final List<Long> dailyReportIds) {
+    public void deleteDailyReports(
+            final List<Long> dailyReportIds) {
         final List<DailyReport> dailyReports = new ArrayList<>();
 
         for (final Long id : dailyReportIds) {
@@ -1806,7 +1856,8 @@ public class DailyReportService {
             // 마감된 출역일보는 삭제 불가
             if (dailyReport.getStatus() == DailyReportStatus.COMPLETED
                     || dailyReport.getStatus() == DailyReportStatus.AUTO_COMPLETED) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
                         ValidationMessages.DAILY_REPORT_DELETE_NOT_ALLOWED);
             }
 
@@ -1821,11 +1872,16 @@ public class DailyReportService {
     /**
      * 임시 인력 생성 메서드
      */
-    private Labor createTemporaryLabor(final String temporaryLaborName, final Long unitPrice, final Long userId,
-            final LaborType laborType, final Long outsourcingCompanyId) {
+    private Labor createTemporaryLabor(
+            final String temporaryLaborName,
+            final Long unitPrice,
+            final Long userId,
+            final LaborType laborType,
+            final Long outsourcingCompanyId) {
         // 임시 인력 이름이 필수
         if (temporaryLaborName == null || temporaryLaborName.trim().isEmpty()) {
-            throw new IllegalArgumentException(ValidationMessages.TEMPORARY_LABOR_NAME_REQUIRED);
+            throw new IllegalArgumentException(
+                    ValidationMessages.TEMPORARY_LABOR_NAME_REQUIRED);
         }
 
         // 외주업체 조회
@@ -1862,17 +1918,16 @@ public class DailyReportService {
      * @return 출역일보 외주(공사) 그룹 정보 슬라이스
      */
     public Slice<DailyReportOutsourcingConstructionGroupResponse> searchDailyReportOutsourcingConstructions(
-            final DailyReportSearchRequest request, final Pageable pageable) {
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportOutsourcingConstructionGroupResponse 슬라이스로 변환
         // (2depth 구조)
@@ -1902,17 +1957,16 @@ public class DailyReportService {
      * @return 출역일보 작업 정보 슬라이스
      */
     public Slice<DailyReportWorkResponse> searchDailyReportWorks(
-            final DailyReportSearchRequest request, final Pageable pageable) {
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportWorkResponse 슬라이스로 변환
         // 각 DailyReport의 작업들을 개별 항목으로 변환
@@ -1941,17 +1995,16 @@ public class DailyReportService {
      * @return 출역일보 작업 디테일 정보 슬라이스
      */
     public Slice<DailyReportWorkDetailResponse> searchDailyReportWorkDetails(
-            final DailyReportSearchRequest request, final Pageable pageable) {
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportWorkDetailResponse 슬라이스로 변환
         // 각 DailyReport의 작업 디테일들을 개별 항목으로 변환
@@ -1982,17 +2035,16 @@ public class DailyReportService {
      * @return 출역일보 주요공정 정보 슬라이스
      */
     public Slice<DailyReportMainProcessResponse> searchDailyReportMainProcesses(
-            final DailyReportSearchRequest request, final Pageable pageable) {
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportMainProcessResponse 슬라이스로 변환
         // 각 DailyReport의 주요공정들을 개별 항목으로 변환
@@ -2021,17 +2073,16 @@ public class DailyReportService {
      * @return 출역일보 투입현황 정보 슬라이스
      */
     public Slice<DailyReportInputStatusResponse> searchDailyReportInputStatuses(
-            final DailyReportSearchRequest request, final Pageable pageable) {
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportInputStatusResponse 슬라이스로 변환
         // 각 DailyReport의 투입현황들을 개별 항목으로 변환
@@ -2060,17 +2111,16 @@ public class DailyReportService {
      * @return 출역일보 자재현황 정보 슬라이스
      */
     public Slice<DailyReportMaterialStatusResponse> searchDailyReportMaterialStatuses(
-            final DailyReportSearchRequest request, final Pageable pageable) {
+            final DailyReportSearchRequest request,
+            final Pageable pageable) {
         // 현장과 공정 조회
         final Site site = siteService.getSiteByIdOrThrow(request.siteId());
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         // 해당 일자와 날씨(선택사항)의 출역일보를 슬라이스로 조회
-        final Slice<DailyReport> dailyReportSlice = dailyReportRepository
-                .findBySiteAndSiteProcessAndReportDateAndWeatherOptional(
-                        site, siteProcess,
-                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()),
-                        null, pageable);
+        final Slice<DailyReport> dailyReportSlice =
+                dailyReportRepository.findBySiteAndSiteProcessAndReportDateAndWeatherOptional(site, siteProcess,
+                        DateTimeFormatUtils.toUtcStartOfDay(request.reportDate()), null, pageable);
 
         // DailyReport 슬라이스를 DailyReportMaterialStatusResponse 슬라이스로 변환
         // 각 DailyReport의 자재현황들을 개별 항목으로 변환
@@ -2098,7 +2148,8 @@ public class DailyReportService {
      * @param request       작업 수정 요청
      */
     @Transactional
-    public void updateDailyReportWork(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportWork(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportWorkUpdateRequest request) {
         // 출역일보 조회
         final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
@@ -2107,29 +2158,26 @@ public class DailyReportService {
         validateDailyReportEditPermission(dailyReport);
 
         // 작업 정보 동기화 (디테일 포함)
-        EntitySyncUtils.syncList(
-                dailyReport.getWorks(),
-                request.works(),
-                (final DailyReportWorkUpdateRequest.WorkUpdateInfo dto) -> {
-                    final DailyReportWork work = DailyReportWork.builder()
-                            .dailyReport(dailyReport)
-                            .workName(dto.workName())
-                            .isToday(dto.isToday())
-                            .build();
+        EntitySyncUtils.syncList(dailyReport.getWorks(), request.works(), (
+                final DailyReportWorkUpdateRequest.WorkUpdateInfo dto) -> {
+            final DailyReportWork work = DailyReportWork.builder()
+                    .dailyReport(dailyReport)
+                    .workName(dto.workName())
+                    .isToday(dto.isToday())
+                    .build();
 
-                    // 디테일도 함께 생성
-                    for (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto : dto
-                            .workDetails()) {
-                        final DailyReportWorkDetail workDetail = DailyReportWorkDetail.builder()
-                                .work(work)
-                                .content(detailDto.content())
-                                .personnelAndEquipment(detailDto.personnelAndEquipment())
-                                .build();
-                        work.getWorkDetails().add(workDetail);
-                    }
+            // 디테일도 함께 생성
+            for (final DailyReportWorkUpdateRequest.WorkUpdateInfo.WorkDetailUpdateInfo detailDto : dto.workDetails()) {
+                final DailyReportWorkDetail workDetail = DailyReportWorkDetail.builder()
+                        .work(work)
+                        .content(detailDto.content())
+                        .personnelAndEquipment(detailDto.personnelAndEquipment())
+                        .build();
+                work.getWorkDetails().add(workDetail);
+            }
 
-                    return work;
-                });
+            return work;
+        });
 
         dailyReportRepository.save(dailyReport);
     }
@@ -2141,7 +2189,8 @@ public class DailyReportService {
      * @param request       주요공정 수정 요청
      */
     @Transactional
-    public void updateDailyReportMainProcess(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportMainProcess(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportMainProcessUpdateRequest request) {
         // 출역일보 조회
         final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
@@ -2150,21 +2199,19 @@ public class DailyReportService {
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 주요공정 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getMainProcesses(),
-                request.mainProcesses(),
-                (final DailyReportMainProcessUpdateRequest.MainProcessUpdateInfo dto) -> {
-                    return DailyReportMainProcess.builder()
-                            .dailyReport(dailyReport)
-                            .process(dto.process())
-                            .unit(dto.unit())
-                            .contractAmount(dto.contractAmount())
-                            .previousDayAmount(dto.previousDayAmount())
-                            .todayAmount(dto.todayAmount())
-                            .cumulativeAmount(dto.cumulativeAmount())
-                            .processRate(dto.processRate())
-                            .build();
-                });
+        EntitySyncUtils.syncList(dailyReport.getMainProcesses(), request.mainProcesses(), (
+                final DailyReportMainProcessUpdateRequest.MainProcessUpdateInfo dto) -> {
+            return DailyReportMainProcess.builder()
+                    .dailyReport(dailyReport)
+                    .process(dto.process())
+                    .unit(dto.unit())
+                    .contractAmount(dto.contractAmount())
+                    .previousDayAmount(dto.previousDayAmount())
+                    .todayAmount(dto.todayAmount())
+                    .cumulativeAmount(dto.cumulativeAmount())
+                    .processRate(dto.processRate())
+                    .build();
+        });
 
         dailyReportRepository.save(dailyReport);
     }
@@ -2176,7 +2223,8 @@ public class DailyReportService {
      * @param request       투입현황 수정 요청
      */
     @Transactional
-    public void updateDailyReportInputStatus(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportInputStatus(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportInputStatusUpdateRequest request) {
         // 출역일보 조회
         final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
@@ -2185,19 +2233,17 @@ public class DailyReportService {
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 투입현황 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getInputStatuses(),
-                request.inputStatuses(),
-                (final DailyReportInputStatusUpdateRequest.InputStatusUpdateInfo dto) -> {
-                    return DailyReportInputStatus.builder()
-                            .dailyReport(dailyReport)
-                            .category(dto.category())
-                            .previousDayCount(dto.previousDayCount())
-                            .todayCount(dto.todayCount())
-                            .cumulativeCount(dto.cumulativeCount())
-                            .type(dto.type())
-                            .build();
-                });
+        EntitySyncUtils.syncList(dailyReport.getInputStatuses(), request.inputStatuses(), (
+                final DailyReportInputStatusUpdateRequest.InputStatusUpdateInfo dto) -> {
+            return DailyReportInputStatus.builder()
+                    .dailyReport(dailyReport)
+                    .category(dto.category())
+                    .previousDayCount(dto.previousDayCount())
+                    .todayCount(dto.todayCount())
+                    .cumulativeCount(dto.cumulativeCount())
+                    .type(dto.type())
+                    .build();
+        });
 
         dailyReportRepository.save(dailyReport);
     }
@@ -2209,7 +2255,8 @@ public class DailyReportService {
      * @param request       자재현황 수정 요청
      */
     @Transactional
-    public void updateDailyReportMaterialStatus(final DailyReportSearchRequest searchRequest,
+    public void updateDailyReportMaterialStatus(
+            final DailyReportSearchRequest searchRequest,
             final DailyReportMaterialStatusUpdateRequest request) {
         // 출역일보 조회
         final DailyReport dailyReport = getDailyReportBySearchRequest(searchRequest);
@@ -2218,22 +2265,20 @@ public class DailyReportService {
         validateDailyReportEditPermission(dailyReport);
 
         // EntitySyncUtils.syncList를 사용하여 자재현황 정보 동기화
-        EntitySyncUtils.syncList(
-                dailyReport.getMaterialStatuses(),
-                request.materialStatuses(),
-                (final DailyReportMaterialStatusUpdateRequest.MaterialStatusUpdateInfo dto) -> {
-                    return DailyReportMaterialStatus.builder()
-                            .dailyReport(dailyReport)
-                            .materialName(dto.materialName())
-                            .unit(dto.unit())
-                            .plannedAmount(dto.plannedAmount())
-                            .previousDayAmount(dto.previousDayAmount())
-                            .todayAmount(dto.todayAmount())
-                            .cumulativeAmount(dto.cumulativeAmount())
-                            .remainingAmount(dto.remainingAmount())
-                            .type(dto.type())
-                            .build();
-                });
+        EntitySyncUtils.syncList(dailyReport.getMaterialStatuses(), request.materialStatuses(), (
+                final DailyReportMaterialStatusUpdateRequest.MaterialStatusUpdateInfo dto) -> {
+            return DailyReportMaterialStatus.builder()
+                    .dailyReport(dailyReport)
+                    .materialName(dto.materialName())
+                    .unit(dto.unit())
+                    .plannedAmount(dto.plannedAmount())
+                    .previousDayAmount(dto.previousDayAmount())
+                    .todayAmount(dto.todayAmount())
+                    .cumulativeAmount(dto.cumulativeAmount())
+                    .remainingAmount(dto.remainingAmount())
+                    .type(dto.type())
+                    .build();
+        });
 
         dailyReportRepository.save(dailyReport);
     }

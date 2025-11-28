@@ -79,4 +79,12 @@ public abstract class BaseEntity {
         this.deleted = true;
         this.deletedAt = OffsetDateTime.now();
     }
+
+    /**
+     * 소프트 삭제 복구 메서드
+     */
+    public void restore() {
+        this.deleted = false;
+        this.deletedAt = null;
+    }
 }
