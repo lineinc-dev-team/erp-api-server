@@ -6,12 +6,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractChangeHistory;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContractContact;
@@ -23,7 +21,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.req
 import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,33 +42,34 @@ public class OutsourcingCompanyContractContactService {
      * 계약 담당자 정보를 수정합니다.
      */
     @Transactional
-    public void updateContractContacts(final Long contractId,
-            final List<OutsourcingCompanyContractContactUpdateRequest> contacts, final Long userId) {
+    public void updateContractContacts(
+            final Long contractId,
+            final List<OutsourcingCompanyContractContactUpdateRequest> contacts,
+            final Long userId) {
 
         // 1. 계약이 존재하는지 확인
         final OutsourcingCompanyContract contract = contractRepository.findById(contractId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException(ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ValidationMessages.OUTSOURCING_COMPANY_CONTRACT_NOT_FOUND));
 
         if (contacts == null || contacts.isEmpty())
             return;
 
         final long mainCount = contacts.stream().filter(OutsourcingCompanyContractContactUpdateRequest::isMain).count();
         if (mainCount != 1) {
-            throw new IllegalArgumentException(ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
+            throw new IllegalArgumentException(
+                    ValidationMessages.MUST_HAVE_ONE_MAIN_CONTACT);
         }
 
         // 2. 변경 전 스냅샷 생성
-        final List<OutsourcingCompanyContractContact> beforeContacts = contract.getContacts().stream()
+        final List<OutsourcingCompanyContractContact> beforeContacts = contract.getContacts()
+                .stream()
                 .map(contact -> JaversUtils.createSnapshot(javers, contact, OutsourcingCompanyContractContact.class))
                 .toList();
 
         // 3. 담당자 정보 동기화 (EntitySyncUtils 사용)
-        EntitySyncUtils.syncList(
-                contract.getContacts(),
-                contacts,
-                (final OutsourcingCompanyContractContactUpdateRequest dto) -> OutsourcingCompanyContractContact
-                        .builder()
+        EntitySyncUtils.syncList(contract.getContacts(), contacts, (
+                final OutsourcingCompanyContractContactUpdateRequest dto) -> OutsourcingCompanyContractContact.builder()
                         .name(dto.name())
                         .department(dto.department())
                         .position(dto.position())
@@ -84,7 +82,8 @@ public class OutsourcingCompanyContractContactService {
                         .build());
 
         // 4. 변경사항 추출 및 변경 히스토리 저장
-        final List<OutsourcingCompanyContractContact> afterContacts = new ArrayList<>(contract.getContacts());
+        final List<OutsourcingCompanyContractContact> afterContacts = new ArrayList<>(
+                contract.getContacts());
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         final Set<Long> beforeIds = beforeContacts.stream()
