@@ -1,12 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.controller;
 
 import java.util.List;
-
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lineinc.erp.api.server.domain.aggregation.constructionoutsourcing.service.ConstructionOutsourcingCompanyAggregationService;
 import com.lineinc.erp.api.server.domain.aggregation.outsourcingcompany.service.OutsourcingCompanyDeductionAggregationService;
 import com.lineinc.erp.api.server.interfaces.rest.common.BaseController;
@@ -19,10 +18,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.ConstructionOutsourcingCompaniesResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.DeductionAmountAggregationResponse;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -41,8 +38,8 @@ public class OutsourcingCompanyAggregationController extends BaseController {
     @Operation(summary = "외주 집계 조회")
     public ResponseEntity<SuccessResponse<ConstructionOutsourcingAggregationResponse>> getConstructionOutsourcingAggregation(
             @Valid final ConstructionOutsourcingAggregationRequest request) {
-        final var response = constructionOutsourcingCompanyAggregationService
-                .getConstructionOutsourcingAggregation(request);
+        final var response =
+                constructionOutsourcingCompanyAggregationService.getConstructionOutsourcingAggregation(request);
         return SuccessResponse.ok(response);
     }
 
@@ -59,8 +56,8 @@ public class OutsourcingCompanyAggregationController extends BaseController {
     @Operation(summary = "외주(공사) 집계 상세 조회")
     public ResponseEntity<SuccessResponse<ConstructionOutsourcingAggregationDetailResponse>> getConstructionOutsourcingAggregationDetail(
             @Valid final ConstructionOutsourcingAggregationDetailRequest request) {
-        final var response = constructionOutsourcingCompanyAggregationService
-                .getConstructionOutsourcingAggregationDetail(request);
+        final var response =
+                constructionOutsourcingCompanyAggregationService.getConstructionOutsourcingAggregationDetail(request);
         return SuccessResponse.ok(response);
     }
 
@@ -68,8 +65,7 @@ public class OutsourcingCompanyAggregationController extends BaseController {
     @Operation(summary = "외주(공사) 공제금액 집계 조회")
     public ResponseEntity<SuccessResponse<DeductionAmountAggregationResponse>> getDeductionAmountAggregation(
             @Valid final DeductionAmountAggregationRequest request) {
-        final var response = outsourcingCompanyDeductionAggregationService
-                .getDeductionAmountAggregation(request);
+        final var response = outsourcingCompanyDeductionAggregationService.getDeductionAmountAggregation(request);
         return SuccessResponse.ok(response);
     }
 }

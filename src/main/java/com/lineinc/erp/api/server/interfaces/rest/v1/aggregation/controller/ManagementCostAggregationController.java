@@ -1,12 +1,11 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.controller;
 
 import java.util.List;
-
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lineinc.erp.api.server.domain.aggregation.managementcost.service.ManagementCostAggregationService;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
@@ -19,10 +18,8 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.aggregation.dto.response.Me
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -38,8 +35,8 @@ public class ManagementCostAggregationController extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<ManagementCostAggregationResponse>> getManagementCostAggregation(
             @Valid final ManagementCostAggregationRequest request) {
-        final ManagementCostAggregationResponse response = managementCostAggregationService
-                .getManagementCostAggregation(request);
+        final ManagementCostAggregationResponse response =
+                managementCostAggregationService.getManagementCostAggregation(request);
         return SuccessResponse.ok(response);
     }
 
@@ -56,8 +53,8 @@ public class ManagementCostAggregationController extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_AGGREGATION_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<MealFeeAggregationDetailResponse>> getMealFeeAggregationDetail(
             @Valid final MealFeeAggregationDetailRequest request) {
-        final MealFeeAggregationDetailResponse response = managementCostAggregationService
-                .getMealFeeAggregationDetail(request);
+        final MealFeeAggregationDetailResponse response =
+                managementCostAggregationService.getMealFeeAggregationDetail(request);
         return SuccessResponse.ok(response);
     }
 }

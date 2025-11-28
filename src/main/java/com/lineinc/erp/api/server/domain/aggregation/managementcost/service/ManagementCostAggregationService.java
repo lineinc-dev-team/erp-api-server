@@ -797,7 +797,7 @@ public class ManagementCostAggregationService {
 
         final OffsetDateTime paymentDate = managementCost.getPaymentDate();
 
-        // 외주업체의 vatType 확인 (null이면 부가세 별도로 처리)
+        // 외주업체의 vatType 확인 (null이면 부가세 없음으로 처리)
         final OutsourcingCompany outsourcingCompany = managementCost.getOutsourcingCompany();
         final OutsourcingCompanyVatType vatType = outsourcingCompany != null ? outsourcingCompany.getVatType() : null;
 
@@ -851,10 +851,11 @@ public class ManagementCostAggregationService {
         void addAmount(
                 final OutsourcingCompanyVatType vatType,
                 final long amount) {
-            if (vatType == null || vatType == OutsourcingCompanyVatType.VAT_SEPARATE) {
-                vatSeparateTotal += amount;
-            } else if (vatType == OutsourcingCompanyVatType.NO_VAT) {
+            if (vatType == null || vatType == OutsourcingCompanyVatType.NO_VAT) {
+                // null이면 부가세 없음으로 처리
                 noVatTotal += amount;
+            } else if (vatType == OutsourcingCompanyVatType.VAT_SEPARATE) {
+                vatSeparateTotal += amount;
             } else if (vatType == OutsourcingCompanyVatType.VAT_INCLUDED) {
                 vatIncludedTotal += amount;
             }
