@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyDefaultDeductionsType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyType;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.enums.OutsourcingCompanyVatType;
 import com.lineinc.erp.api.server.domain.outsourcingcompany.service.v1.OutsourcingCompanyService;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.enums.OutsourcingCompanyContractType;
 import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.service.v1.OutsourcingCompanyContractService;
@@ -40,6 +41,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.Co
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyDetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyTypeResponse;
+import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyVatTypeResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractConstructionGroupResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractDriverResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcingcontract.dto.response.ContractEquipmentResponse;
@@ -106,6 +108,20 @@ public class CompanyController extends BaseController {
                 .map(type -> new CompanyTypeResponse(
                         type.name(),
                         type.getLabel()))
+                .toList();
+
+        return ResponseEntity.ok(SuccessResponse.of(responseList));
+    }
+
+    @Operation(summary = "부가세 타입 목록 조회")
+    @RequireMenuPermission(menu = AppConstants.MENU_OUTSOURCING_COMPANY, action = PermissionAction.VIEW)
+    @GetMapping("/vat-types")
+    public ResponseEntity<SuccessResponse<List<CompanyVatTypeResponse>>> getVatTypes() {
+        final List<CompanyVatTypeResponse> responseList = Arrays.stream(OutsourcingCompanyVatType.values())
+                .sorted(Comparator.comparingInt(OutsourcingCompanyVatType::getOrder))
+                .map(vatType -> new CompanyVatTypeResponse(
+                        vatType.name(),
+                        vatType.getLabel()))
                 .toList();
 
         return ResponseEntity.ok(SuccessResponse.of(responseList));
