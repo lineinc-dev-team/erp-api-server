@@ -584,7 +584,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 상세 정보를 조회합니다.
-     * 
+     *
      * @param request 조회 요청 파라미터 (현장아이디, 공정아이디, 일자)
      * @return 출역일보 상세 정보
      */
@@ -605,7 +605,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 기본 정보를 수정합니다. (현재: 날씨 데이터)
-     * 
+     *
      * @param searchRequest 조회 요청 파라미터 (현장아이디, 공정아이디, 일자)
      * @param request       수정 요청 정보
      */
@@ -667,7 +667,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 직원정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 직원정보 슬라이스
@@ -706,7 +706,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 직영/용역 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 직영/용역 정보 슬라이스
@@ -746,7 +746,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 직영/용역 용역 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 직영/용역 용역 정보 슬라이스
@@ -788,7 +788,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 직영/용역 외주 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 직영/용역 외주 정보 슬라이스
@@ -831,7 +831,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 외주 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 외주 정보 슬라이스
@@ -870,7 +870,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 유류 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 유류 정보 슬라이스
@@ -901,7 +901,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 장비 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 장비 정보 슬라이스
@@ -940,7 +940,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 파일 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 파일 정보 슬라이스
@@ -979,7 +979,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 증빙 파일 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param id       출역일보 아이디
      * @param fileType 증빙 파일 타입
      * @param pageable 페이징 정보
@@ -1770,7 +1770,7 @@ public class DailyReportService {
      * 출역일보 수정 권한을 검증합니다.
      * - 본사 직원(isHeadOffice=true): 언제든 수정 가능
      * - 현장 직원(isHeadOffice=false): PENDING 상태인 경우에만 수정 가능
-     * 
+     *
      * @param dailyReport 출역일보
      * @throws ResponseStatusException 수정 권한이 없을 때
      */
@@ -1790,6 +1790,32 @@ public class DailyReportService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     ValidationMessages.DAILY_REPORT_EDIT_NOT_ALLOWED);
         }
+    }
+
+    /**
+     * 출역일보 삭제
+     * 마감된 출역일보는 삭제할 수 없습니다.
+     */
+    @Transactional
+    public void deleteDailyReports(final List<Long> dailyReportIds) {
+        final List<DailyReport> dailyReports = new ArrayList<>();
+
+        for (final Long id : dailyReportIds) {
+            final DailyReport dailyReport = getDailyReportByIdOrThrow(id);
+
+            // 마감된 출역일보는 삭제 불가
+            if (dailyReport.getStatus() == DailyReportStatus.COMPLETED
+                    || dailyReport.getStatus() == DailyReportStatus.AUTO_COMPLETED) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        ValidationMessages.DAILY_REPORT_DELETE_NOT_ALLOWED);
+            }
+
+            // 출역일보 삭제 (soft delete)
+            dailyReport.markAsDeleted();
+            dailyReports.add(dailyReport);
+        }
+
+        dailyReportRepository.saveAll(dailyReports);
     }
 
     /**
@@ -1830,7 +1856,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 외주(공사) 그룹 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 외주(공사) 그룹 정보 슬라이스
@@ -1870,7 +1896,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 작업 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 작업 정보 슬라이스
@@ -1909,7 +1935,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 작업 디테일 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 작업 디테일 정보 슬라이스
@@ -1950,7 +1976,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 주요공정 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 주요공정 정보 슬라이스
@@ -1989,7 +2015,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 투입현황 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 투입현황 정보 슬라이스
@@ -2028,7 +2054,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 자재현황 정보를 슬라이스로 조회합니다.
-     * 
+     *
      * @param request  조회 요청 파라미터 (현장아이디, 공정아이디, 일자, 날씨)
      * @param pageable 페이징 정보
      * @return 출역일보 자재현황 정보 슬라이스
@@ -2067,7 +2093,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 작업 정보를 수정합니다.
-     * 
+     *
      * @param searchRequest 출역일보 검색 요청
      * @param request       작업 수정 요청
      */
@@ -2110,7 +2136,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 주요공정 정보를 수정합니다.
-     * 
+     *
      * @param searchRequest 출역일보 검색 요청
      * @param request       주요공정 수정 요청
      */
@@ -2145,7 +2171,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 투입현황 정보를 수정합니다.
-     * 
+     *
      * @param searchRequest 출역일보 검색 요청
      * @param request       투입현황 수정 요청
      */
@@ -2178,7 +2204,7 @@ public class DailyReportService {
 
     /**
      * 출역일보 자재현황 정보를 수정합니다.
-     * 
+     *
      * @param searchRequest 출역일보 검색 요청
      * @param request       자재현황 수정 요청
      */
