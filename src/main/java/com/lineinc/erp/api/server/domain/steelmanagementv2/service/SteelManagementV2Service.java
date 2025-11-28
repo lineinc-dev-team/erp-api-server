@@ -457,7 +457,7 @@ public class SteelManagementV2Service {
 
         final String weightStr = weight != null && weight != 0.0 ? numberFormat.format(weight) : "0";
         final String amountStr = amount != null && amount != 0L ? numberFormat.format(amount) : "0";
-        return weightStr + " / " + amountStr;
+        return weightStr + "T / " + amountStr;
     }
 
     private String getDetailExcelHeaderName(
