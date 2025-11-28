@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
+import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelSpecification;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.service.SteelManagementV2Service;
 import com.lineinc.erp.api.server.infrastructure.config.security.CustomUserDetails;
 import com.lineinc.erp.api.server.infrastructure.config.security.RequireMenuPermission;
@@ -30,6 +31,7 @@ import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementChangeHistoryV2Response;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2DetailResponse;
 import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelManagementV2Response;
+import com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response.SteelSpecificationResponse;
 import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import com.lineinc.erp.api.server.shared.dto.request.PageRequest;
 import com.lineinc.erp.api.server.shared.dto.request.SortRequest;
@@ -148,5 +150,18 @@ public class SteelManagementV2Controller extends BaseController {
                 steelManagementV2Service.getSteelManagementChangeHistoriesWithPaging(id, loginUser,
                         PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
+    }
+
+    @Operation(summary = "강재 규격 목록 조회")
+    @GetMapping("/specifications")
+    @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
+    public ResponseEntity<SuccessResponse<List<SteelSpecificationResponse>>> getSteelSpecifications() {
+        final List<SteelSpecificationResponse> responseList = List.of(SteelSpecification.values())
+                .stream()
+                .map(spec -> new SteelSpecificationResponse(
+                        spec.getSpecification(),
+                        spec.getUnitWeight()))
+                .toList();
+        return SuccessResponse.ok(responseList);
     }
 }
