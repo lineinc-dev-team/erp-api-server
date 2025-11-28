@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record LaborUpdateRequest(
         @Schema(description = "구분 설명", example = "기술공") String typeDescription,
         @Schema(description = "이름", example = "홍길동") String name,
+        @Schema(description = "외국인 이름", example = "John Smith") String foreignName,
         @Schema(description = "주민등록번호", example = "860101-1234567") String residentNumber,
         @Schema(description = "공종", example = "SCAFFOLDING") LaborWorkType workType,
         @Schema(description = "공종 설명", example = "콘크리트 공사") String workTypeDescription,

@@ -106,6 +106,7 @@ public class LaborService {
                 .outsourcingCompany(outsourcingCompany)
                 .outsourcingCompanyContract(outsourcingCompanyContract)
                 .name(request.name())
+                .foreignName(request.foreignName())
                 .residentNumber(request.residentNumber())
                 .address(request.address())
                 .detailAddress(request.detailAddress())

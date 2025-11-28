@@ -3,21 +3,6 @@ package com.lineinc.erp.api.server.domain.labor.entity;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.domain.labor.enums.LaborFileType;
-import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
-import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
-import com.lineinc.erp.api.server.domain.organization.entity.Grade;
-import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
-import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
-import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborUpdateRequest;
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,6 +18,18 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborFileType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborType;
+import com.lineinc.erp.api.server.domain.labor.enums.LaborWorkType;
+import com.lineinc.erp.api.server.domain.organization.entity.Grade;
+import com.lineinc.erp.api.server.domain.outsourcingcompany.entity.OutsourcingCompany;
+import com.lineinc.erp.api.server.domain.outsourcingcompanycontract.entity.OutsourcingCompanyContract;
+import com.lineinc.erp.api.server.interfaces.rest.v1.labor.dto.request.LaborUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
+import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,15 +47,15 @@ import lombok.experimental.SuperBuilder;
         @Index(columnList = "name"),
         @Index(columnList = "residentNumber"),
         @Index(columnList = "phoneNumber"),
-        @Index(columnList = "created_at")
-})
+        @Index(columnList = "created_at")})
 public class Labor extends BaseEntity {
 
     private static final String SEQUENCE_NAME = "labor_seq";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME,
+            allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
@@ -82,6 +79,13 @@ public class Labor extends BaseEntity {
     @DiffInclude
     @Column(nullable = false)
     private String name;
+
+    /**
+     * 외국인 이름
+     */
+    @DiffInclude
+    @Column
+    private String foreignName;
 
     /**
      * 공종
@@ -241,20 +245,23 @@ public class Labor extends BaseEntity {
      * 첨부파일 목록
      */
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.LABOR_MAPPED_BY, fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.LABOR_MAPPED_BY, fetch = FetchType.LAZY,
+            cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<LaborFile> files;
 
     /**
      * 변경 이력 목록
      */
     @DiffIgnore
-    @OneToMany(mappedBy = AppConstants.LABOR_MAPPED_BY, fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = AppConstants.LABOR_MAPPED_BY, fetch = FetchType.LAZY,
+            cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<LaborChangeHistory> changeHistories;
 
     /**
      * 파일 목록을 설정합니다.
      */
-    public void setFiles(final List<LaborFile> files) {
+    public void setFiles(
+            final List<LaborFile> files) {
         this.files = files;
         if (files != null) {
             files.forEach(file -> file.setLabor(this));
@@ -271,6 +278,7 @@ public class Labor extends BaseEntity {
             final Grade grade) {
         this.typeDescription = request.typeDescription();
         this.name = request.name();
+        this.foreignName = request.foreignName();
 
         // 주민번호가 마스킹되어 있으면 기존 값 유지
         final String requestedResidentNumber = request.residentNumber();
@@ -305,14 +313,16 @@ public class Labor extends BaseEntity {
     /**
      * 이전단가를 업데이트합니다.
      */
-    public void updatePreviousDailyWage(final Long previousDailyWage) {
+    public void updatePreviousDailyWage(
+            final Long previousDailyWage) {
         this.previousDailyWage = previousDailyWage;
     }
 
     /**
      * 첫 근무 시작일을 설정합니다.
      */
-    public void setFirstWorkDate(final OffsetDateTime firstWorkDate) {
+    public void setFirstWorkDate(
+            final OffsetDateTime firstWorkDate) {
         this.firstWorkDate = firstWorkDate;
     }
 
@@ -322,8 +332,8 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasFile() {
         return files != null && files.stream()
-                .anyMatch(file -> LaborFileType.BASIC.equals(file.getType()) &&
-                        file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
+                .anyMatch(file -> LaborFileType.BASIC.equals(file.getType()) && file.getFileUrl() != null
+                        && !file.getFileUrl().trim().isEmpty());
     }
 
     /**
@@ -331,8 +341,8 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasBankbook() {
         return files != null && files.stream()
-                .anyMatch(file -> LaborFileType.BANKBOOK.equals(file.getType()) &&
-                        file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
+                .anyMatch(file -> LaborFileType.BANKBOOK.equals(file.getType()) && file.getFileUrl() != null
+                        && !file.getFileUrl().trim().isEmpty());
     }
 
     /**
@@ -340,8 +350,8 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasIdCard() {
         return files != null && files.stream()
-                .anyMatch(file -> LaborFileType.ID_CARD.equals(file.getType()) &&
-                        file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
+                .anyMatch(file -> LaborFileType.ID_CARD.equals(file.getType()) && file.getFileUrl() != null
+                        && !file.getFileUrl().trim().isEmpty());
     }
 
     /**
@@ -349,8 +359,8 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasSignatureImage() {
         return files != null && files.stream()
-                .anyMatch(file -> LaborFileType.SIGNATURE_IMAGE.equals(file.getType()) &&
-                        file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
+                .anyMatch(file -> LaborFileType.SIGNATURE_IMAGE.equals(file.getType()) && file.getFileUrl() != null
+                        && !file.getFileUrl().trim().isEmpty());
     }
 
     /**
@@ -358,8 +368,8 @@ public class Labor extends BaseEntity {
      */
     public Boolean getHasLaborContract() {
         return files != null && files.stream()
-                .anyMatch(file -> LaborFileType.LABOR_CONTRACT.equals(file.getType()) &&
-                        file.getFileUrl() != null && !file.getFileUrl().trim().isEmpty());
+                .anyMatch(file -> LaborFileType.LABOR_CONTRACT.equals(file.getType()) && file.getFileUrl() != null
+                        && !file.getFileUrl().trim().isEmpty());
     }
 
     @Transient
@@ -397,14 +407,9 @@ public class Labor extends BaseEntity {
         }
         this.typeName = this.type != null ? this.type.getLabel() : null;
         this.workTypeName = this.workType != null ? this.workType.getLabel() : null;
-        this.hireDateFormat = this.hireDate != null
-                ? DateTimeFormatUtils.formatKoreaLocalDate(this.hireDate)
-                : null;
-        this.resignationDateFormat = this.resignationDate != null
-                ? DateTimeFormatUtils.formatKoreaLocalDate(this.resignationDate)
-                : null;
-        this.gradeName = Optional.ofNullable(this.grade)
-                .map(Grade::getName)
-                .orElse(null);
+        this.hireDateFormat = this.hireDate != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.hireDate) : null;
+        this.resignationDateFormat =
+                this.resignationDate != null ? DateTimeFormatUtils.formatKoreaLocalDate(this.resignationDate) : null;
+        this.gradeName = Optional.ofNullable(this.grade).map(Grade::getName).orElse(null);
     }
 }
