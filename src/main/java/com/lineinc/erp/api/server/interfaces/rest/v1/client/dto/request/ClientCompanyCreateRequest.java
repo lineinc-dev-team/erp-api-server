@@ -1,15 +1,16 @@
 package com.lineinc.erp.api.server.interfaces.rest.v1.client.dto.request;
 
 import java.util.List;
-import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.lineinc.erp.api.server.domain.clientcompany.enums.ClientCompanyPaymentMethod;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "발주처 등록 요청")
-public record ClientCompanyCreateRequest(@Schema(description = "발주처명", example = "삼성건설") @NotBlank String name,
+public record ClientCompanyCreateRequest(
+        @Schema(description = "발주처명", example = "삼성건설") @NotBlank String name,
         @Schema(description = "사업자등록번호", example = "123-45-67890") String businessNumber,
         @Schema(description = "대표자명", example = "홍길동") @NotBlank String ceoName,
         @Schema(description = "본사 주소", example = "서울시 강남구") @NotBlank String address,
