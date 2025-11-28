@@ -1,15 +1,9 @@
 package com.lineinc.erp.api.server.domain.managementcost.entity;
 
-import org.hibernate.annotations.SQLRestriction;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
-
-import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
-import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
-import com.lineinc.erp.api.server.shared.constant.AppConstants;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +11,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
+import org.hibernate.annotations.SQLRestriction;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
+import com.lineinc.erp.api.server.domain.common.entity.BaseEntity;
+import com.lineinc.erp.api.server.domain.managementcost.enums.ManagementCostFileType;
+import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
+import com.lineinc.erp.api.server.shared.constant.AppConstants;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +35,8 @@ public class ManagementCostFile extends BaseEntity {
     private static final String SEQUENCE_NAME = "management_cost_file_seq";
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME,
+            allocationSize = AppConstants.SEQUENCE_ALLOCATION_DEFAULT)
     private Long id;
 
     /**
@@ -73,10 +75,20 @@ public class ManagementCostFile extends BaseEntity {
     @DiffInclude
     private String memo;
 
-    public void updateFrom(final ManagementCostFileUpdateRequest request) {
+    /**
+     * 파일 타입 (기본/공과금)
+     */
+    @Enumerated(EnumType.STRING)
+    @DiffIgnore
+    @Column
+    private ManagementCostFileType type;
+
+    public void updateFrom(
+            final ManagementCostFileUpdateRequest request) {
         this.name = request.name();
         this.fileUrl = request.fileUrl();
         this.originalFileName = request.originalFileName();
         this.memo = request.memo();
+        this.type = request.type();
     }
 }

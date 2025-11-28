@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCost;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostChangeHistory;
 import com.lineinc.erp.api.server.domain.managementcost.entity.ManagementCostFile;
@@ -22,7 +20,6 @@ import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.
 import com.lineinc.erp.api.server.interfaces.rest.v1.managementcost.dto.request.ManagementCostFileUpdateRequest;
 import com.lineinc.erp.api.server.shared.util.EntitySyncUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,7 +31,8 @@ public class ManagementCostFileService {
     private final Javers javers;
     private final UserService userService;
 
-    public void createManagementCostFiles(final List<ManagementCostFileCreateRequest> files,
+    public void createManagementCostFiles(
+            final List<ManagementCostFileCreateRequest> files,
             final ManagementCost managementCost) {
         if (files != null) {
             for (final ManagementCostFileCreateRequest fileReq : files) {
@@ -43,6 +41,7 @@ public class ManagementCostFileService {
                         .name(fileReq.name())
                         .fileUrl(fileReq.fileUrl())
                         .originalFileName(fileReq.originalFileName())
+                        .type(fileReq.type())
                         .memo(fileReq.memo())
                         .build();
                 managementCostFileRepository.save(file);
@@ -51,28 +50,31 @@ public class ManagementCostFileService {
     }
 
     @Transactional
-    public void updateManagementCostFiles(final ManagementCost managementCost,
-            final List<ManagementCostFileUpdateRequest> requests, final Long userId) {
+    public void updateManagementCostFiles(
+            final ManagementCost managementCost,
+            final List<ManagementCostFileUpdateRequest> requests,
+            final Long userId) {
 
         // 변경 전 상태 저장 (Javers 스냅샷) - syncTransientFields 호출 후
-        final List<ManagementCostFile> beforeFiles = managementCost.getFiles().stream()
+        final List<ManagementCostFile> beforeFiles = managementCost.getFiles()
+                .stream()
                 .map(file -> JaversUtils.createSnapshot(javers, file, ManagementCostFile.class))
                 .toList();
 
         // EntitySyncUtils를 사용하여 파일 목록 동기화
-        EntitySyncUtils.syncList(
-                managementCost.getFiles(),
-                requests,
-                (final ManagementCostFileUpdateRequest dto) -> ManagementCostFile.builder()
+        EntitySyncUtils.syncList(managementCost.getFiles(), requests, (
+                final ManagementCostFileUpdateRequest dto) -> ManagementCostFile.builder()
                         .managementCost(managementCost)
                         .name(dto.name())
                         .fileUrl(dto.fileUrl())
                         .originalFileName(dto.originalFileName())
+                        .type(dto.type())
                         .memo(dto.memo())
                         .build());
 
         // 변경사항 감지 및 이력 저장
-        final List<ManagementCostFile> afterFiles = new ArrayList<>(managementCost.getFiles());
+        final List<ManagementCostFile> afterFiles = new ArrayList<>(
+                managementCost.getFiles());
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         // 추가된 파일
