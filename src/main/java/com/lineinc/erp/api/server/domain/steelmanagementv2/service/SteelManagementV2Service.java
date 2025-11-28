@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
@@ -20,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.lineinc.erp.api.server.domain.common.service.S3FileService;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.enums.ExcelDownloadHistoryType;
 import com.lineinc.erp.api.server.domain.exceldownloadhistory.service.ExcelDownloadHistoryService;
@@ -53,7 +51,6 @@ import com.lineinc.erp.api.server.shared.message.ValidationMessages;
 import com.lineinc.erp.api.server.shared.util.DateTimeFormatUtils;
 import com.lineinc.erp.api.server.shared.util.ExcelExportUtils;
 import com.lineinc.erp.api.server.shared.util.JaversUtils;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -87,19 +84,19 @@ public class SteelManagementV2Service {
         final SiteProcess siteProcess = siteProcessService.getSiteProcessByIdOrThrow(request.siteProcessId());
 
         if (!siteProcess.getSite().getId().equals(site.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    ValidationMessages.SITE_PROCESS_NOT_MATCH_SITE);
         }
         // 동일한 현장 및 공정에 대한 데이터가 이미 있는지 확인
         if (steelManagementV2Repository.existsBySiteAndSiteProcess(site, siteProcess)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     ValidationMessages.STEEL_MANAGEMENT_ALREADY_EXISTS);
         }
 
         // 강재수불부 V2 생성
-        SteelManagementV2 steelManagementV2 = SteelManagementV2.builder()
-                .site(site)
-                .siteProcess(siteProcess)
-                .build();
+        SteelManagementV2 steelManagementV2 = SteelManagementV2.builder().site(site).siteProcess(siteProcess).build();
         steelManagementV2 = steelManagementV2Repository.save(steelManagementV2);
 
         // 상세 항목 생성
@@ -121,6 +118,7 @@ public class SteelManagementV2Service {
                         .weight(detailRequest.weight())
                         .count(detailRequest.count())
                         .totalWeight(detailRequest.totalWeight())
+                        .length(detailRequest.length())
                         .unitPrice(detailRequest.unitPrice())
                         .amount(detailRequest.amount())
                         .vat(detailRequest.vat())
@@ -172,7 +170,8 @@ public class SteelManagementV2Service {
             final Long id,
             final SteelManagementDetailV2Type type) {
         final SteelManagementV2 steelManagementV2 = steelManagementV2Repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
         return SteelManagementV2DetailResponse.from(steelManagementV2, type);
     }
@@ -187,22 +186,26 @@ public class SteelManagementV2Service {
             final CustomUserDetails user) {
 
         final SteelManagementV2 steelManagementV2 = steelManagementV2Repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         ValidationMessages.STEEL_MANAGEMENT_NOT_FOUND));
 
-        final List<SteelManagementDetailV2> beforeDetails = steelManagementV2.getDetails().stream()
+        final List<SteelManagementDetailV2> beforeDetails = steelManagementV2.getDetails()
+                .stream()
                 .filter(detail -> detail.getType() == request.type())
                 .map(detail -> JaversUtils.createSnapshot(javers, detail, SteelManagementDetailV2.class))
                 .toList();
 
         // 2. 요청 ID 목록
-        final Set<Long> requestIds = request.details().stream()
+        final Set<Long> requestIds = request.details()
+                .stream()
                 .map(SteelManagementDetailV2UpdateRequest::id)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         // 3. 해당 타입의 기존 항목 중 요청에 없는 것은 논리삭제 (다른 타입은 건드리지 않음!)
-        steelManagementV2.getDetails().stream()
+        steelManagementV2.getDetails()
+                .stream()
                 .filter(detail -> detail.getType() == request.type())
                 .filter(detail -> detail.getId() != null && !requestIds.contains(detail.getId()))
                 .forEach(detail -> detail.markAsDeleted());
@@ -215,10 +218,12 @@ public class SteelManagementV2Service {
 
             if (dto.id() != null) {
                 // 기존 항목 수정
-                final SteelManagementDetailV2 existingDetail = steelManagementV2.getDetails().stream()
+                final SteelManagementDetailV2 existingDetail = steelManagementV2.getDetails()
+                        .stream()
                         .filter(d -> d.getId() != null && d.getId().equals(dto.id()))
                         .findFirst()
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
                                 ValidationMessages.STEEL_MANAGEMENT_DETAIL_NOT_FOUND));
                 existingDetail.updateFrom(dto);
             } else {
@@ -232,6 +237,7 @@ public class SteelManagementV2Service {
                         .weight(dto.weight())
                         .count(dto.count())
                         .totalWeight(dto.totalWeight())
+                        .length(dto.length())
                         .unitPrice(dto.unitPrice())
                         .amount(dto.amount())
                         .vat(dto.vat())
@@ -248,9 +254,8 @@ public class SteelManagementV2Service {
             }
         }
 
-        final List<SteelManagementDetailV2> afterDetails = new ArrayList<>(steelManagementV2.getDetails()).stream()
-                .filter(detail -> detail.getType() == request.type())
-                .toList();
+        final List<SteelManagementDetailV2> afterDetails = new ArrayList<>(
+                steelManagementV2.getDetails()).stream().filter(detail -> detail.getType() == request.type()).toList();
         final List<Map<String, String>> allChanges = new ArrayList<>();
 
         final Set<Long> beforeIds = beforeDetails.stream()
@@ -281,8 +286,8 @@ public class SteelManagementV2Service {
 
         if (!allChanges.isEmpty()) {
             final String changesJson = javers.getJsonConverter().toJson(allChanges);
-            final SteelManagementChangeHistoryV2Type historyType = SteelManagementChangeHistoryV2Type
-                    .valueOf(request.type().name());
+            final SteelManagementChangeHistoryV2Type historyType =
+                    SteelManagementChangeHistoryV2Type.valueOf(request.type().name());
             final SteelManagementChangeHistoryV2 changeHistory = SteelManagementChangeHistoryV2.builder()
                     .steelManagementV2(steelManagementV2)
                     .type(historyType)
@@ -303,8 +308,8 @@ public class SteelManagementV2Service {
             final Long id,
             final CustomUserDetails loginUser,
             final Pageable pageable) {
-        final Page<SteelManagementChangeHistoryV2> historyPage = changeHistoryRepository
-                .findBySteelManagementV2IdWithPaging(id, pageable);
+        final Page<SteelManagementChangeHistoryV2> historyPage =
+                changeHistoryRepository.findBySteelManagementV2IdWithPaging(id, pageable);
         return historyPage.map(history -> SteelManagementChangeHistoryV2Response.from(history, loginUser.getUserId()));
     }
 
@@ -319,24 +324,19 @@ public class SteelManagementV2Service {
             final List<String> fields) {
         final User userEntity = userService.getUserByIdOrThrow(user.getUserId());
         final List<Long> accessibleSiteIds = userService.getAccessibleSiteIds(userEntity);
-        final List<SteelManagementV2Response> responses = steelManagementV2Repository.findAllWithoutPaging(request,
-                sort, accessibleSiteIds);
+        final List<SteelManagementV2Response> responses =
+                steelManagementV2Repository.findAllWithoutPaging(request, sort, accessibleSiteIds);
 
-        final Workbook workbook = ExcelExportUtils.generateWorkbook(
-                responses,
-                fields,
-                this::getExcelHeaderName,
-                this::getExcelCellValue);
+        final Workbook workbook =
+                ExcelExportUtils.generateWorkbook(responses, fields, this::getExcelHeaderName, this::getExcelCellValue);
 
         // S3에 엑셀 파일 업로드
-        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
-                ExcelDownloadHistoryType.STEEL_MANAGEMENT.name());
+        final String fileUrl =
+                s3FileService.uploadExcelToS3(workbook, ExcelDownloadHistoryType.STEEL_MANAGEMENT.name());
 
         // 다운로드 이력 저장
-        excelDownloadHistoryService.recordDownload(
-                ExcelDownloadHistoryType.STEEL_MANAGEMENT,
-                userService.getUserByIdOrThrow(user.getUserId()),
-                fileUrl);
+        excelDownloadHistoryService.recordDownload(ExcelDownloadHistoryType.STEEL_MANAGEMENT,
+                userService.getUserByIdOrThrow(user.getUserId()), fileUrl);
 
         return workbook;
     }
@@ -353,48 +353,42 @@ public class SteelManagementV2Service {
         final SteelManagementV2DetailResponse detailResponse = getSteelManagementV2ById(steelManagementId, null);
 
         // 모든 상세 항목들을 타입별로 그룹화 (순서: 입고, 출고, 사장, 고철)
-        final LinkedHashMap<SteelManagementDetailV2Type, List<SteelManagementDetailV2Response>> detailsByType = detailResponse
-                .details().stream()
-                .collect(Collectors.groupingBy(
-                        SteelManagementDetailV2Response::typeCode,
-                        () -> {
-                            final LinkedHashMap<SteelManagementDetailV2Type, List<SteelManagementDetailV2Response>> orderedMap = new LinkedHashMap<>();
+        final LinkedHashMap<SteelManagementDetailV2Type, List<SteelManagementDetailV2Response>> detailsByType =
+                detailResponse.details()
+                        .stream()
+                        .collect(Collectors.groupingBy(SteelManagementDetailV2Response::typeCode, () -> {
+                            final LinkedHashMap<SteelManagementDetailV2Type, List<SteelManagementDetailV2Response>> orderedMap =
+                                    new LinkedHashMap<>();
                             orderedMap.put(SteelManagementDetailV2Type.INCOMING, new ArrayList<>());
                             orderedMap.put(SteelManagementDetailV2Type.OUTGOING, new ArrayList<>());
                             orderedMap.put(SteelManagementDetailV2Type.ON_SITE_STOCK, new ArrayList<>());
                             orderedMap.put(SteelManagementDetailV2Type.SCRAP, new ArrayList<>());
                             return orderedMap;
-                        },
-                        Collectors.toList()));
+                        }, Collectors.toList()));
 
         // 소계에 포함될 필드들 정의
-        final List<String> subtotalFields = List.of("weight", "count", "totalWeight", "unitPrice", "amount", "vat",
-                "total");
+        final List<String> subtotalFields =
+                List.of("weight", "count", "totalWeight", "unitPrice", "amount", "vat", "total");
 
         // 워크북 생성 (여러 시트 지원, 소계 포함)
-        final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbookWithSubtotal(
-                detailsByType,
-                fields,
-                (field, type) -> getDetailExcelHeaderName(field, type),
-                this::getDetailExcelCellValue,
-                SteelManagementDetailV2Type::getLabel,
-                3,
-                subtotalFields);
+        final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbookWithSubtotal(detailsByType, fields, (
+                field,
+                type) -> getDetailExcelHeaderName(field, type), this::getDetailExcelCellValue,
+                SteelManagementDetailV2Type::getLabel, 3, subtotalFields);
 
         // S3에 엑셀 파일 업로드
-        final String fileUrl = s3FileService.uploadExcelToS3(workbook,
-                ExcelDownloadHistoryType.STEEL_MANAGEMENT_DETAIL.name());
+        final String fileUrl =
+                s3FileService.uploadExcelToS3(workbook, ExcelDownloadHistoryType.STEEL_MANAGEMENT_DETAIL.name());
 
         // 다운로드 이력 저장
-        excelDownloadHistoryService.recordDownload(
-                ExcelDownloadHistoryType.STEEL_MANAGEMENT_DETAIL,
-                userService.getUserByIdOrThrow(user.getUserId()),
-                fileUrl);
+        excelDownloadHistoryService.recordDownload(ExcelDownloadHistoryType.STEEL_MANAGEMENT_DETAIL,
+                userService.getUserByIdOrThrow(user.getUserId()), fileUrl);
 
         return workbook;
     }
 
-    private String getExcelHeaderName(final String field) {
+    private String getExcelHeaderName(
+            final String field) {
         return switch (field) {
             case "siteName" -> "현장명";
             case "siteProcessName" -> "공정명";
@@ -413,60 +407,46 @@ public class SteelManagementV2Service {
         };
     }
 
-    private String getExcelCellValue(final SteelManagementV2Response response, final String field) {
+    private String getExcelCellValue(
+            final SteelManagementV2Response response,
+            final String field) {
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.KOREA);
         return switch (field) {
             case "siteName" -> response.site() != null ? response.site().name() : "";
             case "siteProcessName" -> response.siteProcess() != null ? response.siteProcess().name() : "";
-            case "incomingOwnMaterial" -> formatWeightAndAmount(
-                    response.incomingOwnMaterialTotalWeight(),
-                    response.incomingOwnMaterialAmount(),
-                    numberFormat);
-            case "incomingPurchase" -> formatWeightAndAmount(
-                    response.incomingPurchaseTotalWeight(),
-                    response.incomingPurchaseAmount(),
-                    numberFormat);
-            case "incomingRental" -> formatWeightAndAmount(
-                    response.incomingRentalTotalWeight(),
-                    response.incomingRentalAmount(),
-                    numberFormat);
-            case "outgoingOwnMaterial" -> formatWeightAndAmount(
-                    response.outgoingOwnMaterialTotalWeight(),
-                    response.outgoingOwnMaterialAmount(),
-                    numberFormat);
-            case "outgoingPurchase" -> formatWeightAndAmount(
-                    response.outgoingPurchaseTotalWeight(),
-                    response.outgoingPurchaseAmount(),
-                    numberFormat);
-            case "outgoingRental" -> formatWeightAndAmount(
-                    response.outgoingRentalTotalWeight(),
-                    response.outgoingRentalAmount(),
-                    numberFormat);
-            case "onSiteStock" ->
-                response.onSiteStockTotalWeight() != null && response.onSiteStockTotalWeight() != 0
-                        ? numberFormat.format(response.onSiteStockTotalWeight())
-                        : "";
-            case "scrap" -> formatWeightAndAmount(
-                    response.scrapTotalWeight(),
-                    response.scrapAmount(),
-                    numberFormat);
-            case "totalInvestmentAmount" ->
-                response.totalInvestmentAmount() != null
-                        ? numberFormat.format(response.totalInvestmentAmount())
-                        : "";
-            case "onSiteRemainingWeight" ->
-                response.onSiteRemainingWeight() != null
-                        ? numberFormat.format(response.onSiteRemainingWeight())
-                        : "";
-            case "createdAt" ->
-                response.createdAt() != null
-                        ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
-                        : "";
+            case "incomingOwnMaterial" -> formatWeightAndAmount(response.incomingOwnMaterialTotalWeight(),
+                    response.incomingOwnMaterialAmount(), numberFormat);
+            case "incomingPurchase" -> formatWeightAndAmount(response.incomingPurchaseTotalWeight(),
+                    response.incomingPurchaseAmount(), numberFormat);
+            case "incomingRental" -> formatWeightAndAmount(response.incomingRentalTotalWeight(),
+                    response.incomingRentalAmount(), numberFormat);
+            case "outgoingOwnMaterial" -> formatWeightAndAmount(response.outgoingOwnMaterialTotalWeight(),
+                    response.outgoingOwnMaterialAmount(), numberFormat);
+            case "outgoingPurchase" -> formatWeightAndAmount(response.outgoingPurchaseTotalWeight(),
+                    response.outgoingPurchaseAmount(), numberFormat);
+            case "outgoingRental" -> formatWeightAndAmount(response.outgoingRentalTotalWeight(),
+                    response.outgoingRentalAmount(), numberFormat);
+            case "onSiteStock" -> response.onSiteStockTotalWeight() != null && response.onSiteStockTotalWeight() != 0
+                    ? numberFormat.format(response.onSiteStockTotalWeight())
+                    : "";
+            case "scrap" -> formatWeightAndAmount(response.scrapTotalWeight(), response.scrapAmount(), numberFormat);
+            case "totalInvestmentAmount" -> response.totalInvestmentAmount() != null
+                    ? numberFormat.format(response.totalInvestmentAmount())
+                    : "";
+            case "onSiteRemainingWeight" -> response.onSiteRemainingWeight() != null
+                    ? numberFormat.format(response.onSiteRemainingWeight())
+                    : "";
+            case "createdAt" -> response.createdAt() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
+                    : "";
             default -> "";
         };
     }
 
-    private String formatWeightAndAmount(final Double weight, final Long amount, final NumberFormat numberFormat) {
+    private String formatWeightAndAmount(
+            final Double weight,
+            final Long amount,
+            final NumberFormat numberFormat) {
         // 둘 다 null이거나 둘 다 0인 경우 "-"만 표시
         final boolean weightIsEmpty = weight == null || weight == 0.0;
         final boolean amountIsEmpty = amount == null || amount == 0L;
@@ -480,7 +460,9 @@ public class SteelManagementV2Service {
         return weightStr + " / " + amountStr;
     }
 
-    private String getDetailExcelHeaderName(final String field, final SteelManagementDetailV2Type type) {
+    private String getDetailExcelHeaderName(
+            final String field,
+            final SteelManagementDetailV2Type type) {
         return switch (field) {
             case "name" -> "품명";
             case "specification" -> "규격";
@@ -503,7 +485,9 @@ public class SteelManagementV2Service {
         };
     }
 
-    private String getDetailExcelCellValue(final SteelManagementDetailV2Response response, final String field) {
+    private String getDetailExcelCellValue(
+            final SteelManagementDetailV2Response response,
+            final String field) {
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.KOREA);
         return switch (field) {
             case "name" -> response.name() != null ? response.name() : "";
@@ -516,20 +500,21 @@ public class SteelManagementV2Service {
             case "vat" -> response.vat() != null ? numberFormat.format(response.vat()) : "";
             case "total" -> response.total() != null ? numberFormat.format(response.total()) : "";
             case "category" -> response.categoryName() != null ? response.categoryName() : "";
-            case "outsourcingCompanyName" ->
-                response.outsourcingCompany() != null ? response.outsourcingCompany().name() : "";
-            case "incomingDate" ->
-                response.incomingDate() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.incomingDate())
-                        : "";
-            case "outgoingDate" ->
-                response.outgoingDate() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.outgoingDate())
-                        : "";
-            case "salesDate" ->
-                response.salesDate() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.salesDate())
-                        : "";
-            case "createdAt" ->
-                response.createdAt() != null ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
-                        : "";
+            case "outsourcingCompanyName" -> response.outsourcingCompany() != null
+                    ? response.outsourcingCompany().name()
+                    : "";
+            case "incomingDate" -> response.incomingDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(response.incomingDate())
+                    : "";
+            case "outgoingDate" -> response.outgoingDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(response.outgoingDate())
+                    : "";
+            case "salesDate" -> response.salesDate() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(response.salesDate())
+                    : "";
+            case "createdAt" -> response.createdAt() != null
+                    ? DateTimeFormatUtils.formatKoreaLocalDate(response.createdAt())
+                    : "";
             case "originalFileName" -> response.originalFileName() != null ? response.originalFileName() : "";
             case "memo" -> response.memo() != null ? response.memo() : "";
             default -> "";

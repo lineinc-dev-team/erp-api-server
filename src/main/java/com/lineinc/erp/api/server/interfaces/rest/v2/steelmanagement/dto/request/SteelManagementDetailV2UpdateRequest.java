@@ -1,9 +1,7 @@
 package com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.request;
 
 import java.time.LocalDate;
-
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "강재수불부 V2 상세 항목 수정 요청")
@@ -15,6 +13,7 @@ public record SteelManagementDetailV2UpdateRequest(
         @Schema(description = "무게 (톤)", example = "5.6") Double weight,
         @Schema(description = "본", example = "10.5") Double count,
         @Schema(description = "총무게 (톤)", example = "56.0") Double totalWeight,
+        @Schema(description = "길이 (m)", example = "12.5") Double length,
         @Schema(description = "단가 (원)", example = "12000") Long unitPrice,
         @Schema(description = "공급가 (원)", example = "672000") Long amount,
         @Schema(description = "부가세 (원)", example = "120000") Long vat,

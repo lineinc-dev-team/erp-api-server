@@ -1,12 +1,10 @@
 package com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.dto.response;
 
 import java.time.OffsetDateTime;
-
 import com.lineinc.erp.api.server.domain.steelmanagementv2.entity.SteelManagementDetailV2;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Category;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
 import com.lineinc.erp.api.server.interfaces.rest.v1.outsourcing.dto.response.CompanyResponse.CompanySimpleResponse;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "강재수불부 V2 상세 항목 응답")
@@ -20,6 +18,7 @@ public record SteelManagementDetailV2Response(
         @Schema(description = "무게 (톤)", example = "5.6") Double weight,
         @Schema(description = "본", example = "10.5") Double count,
         @Schema(description = "총무게 (톤)", example = "56.0") Double totalWeight,
+        @Schema(description = "길이 (m)", example = "12.5") Double length,
         @Schema(description = "단가 (원)", example = "12000") Long unitPrice,
         @Schema(description = "공급가 (원)", example = "672000") Long amount,
         @Schema(description = "부가세 (원)", example = "120000") Long vat,
@@ -33,11 +32,11 @@ public record SteelManagementDetailV2Response(
         @Schema(description = "판매일") OffsetDateTime salesDate,
         @Schema(description = "등록일시") OffsetDateTime createdAt,
         @Schema(description = "메모") String memo) {
-    public static SteelManagementDetailV2Response from(final SteelManagementDetailV2 entity) {
+    public static SteelManagementDetailV2Response from(
+            final SteelManagementDetailV2 entity) {
         return new SteelManagementDetailV2Response(
                 entity.getId(),
-                entity.getOutsourcingCompany() != null
-                        ? CompanySimpleResponse.from(entity.getOutsourcingCompany())
+                entity.getOutsourcingCompany() != null ? CompanySimpleResponse.from(entity.getOutsourcingCompany())
                         : null,
                 entity.getType(),
                 entity.getType() != null ? entity.getType().getLabel() : null,
@@ -46,6 +45,7 @@ public record SteelManagementDetailV2Response(
                 entity.getWeight(),
                 entity.getCount(),
                 entity.getTotalWeight(),
+                entity.getLength(),
                 entity.getUnitPrice(),
                 entity.getAmount(),
                 entity.getVat(),
