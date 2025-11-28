@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OutsourcingCompanyContractChangeType {
-
     BASIC("기본 정보"),
     CONTACT("담당자"),
     ATTACHMENT("첨부파일"),
