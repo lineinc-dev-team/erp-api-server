@@ -2,7 +2,8 @@ package com.lineinc.erp.api.server.interfaces.rest.v2.steelmanagement.controller
 
 import java.io.IOException;
 import java.util.List;
-
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lineinc.erp.api.server.domain.permission.enums.PermissionAction;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.enums.SteelManagementDetailV2Type;
 import com.lineinc.erp.api.server.domain.steelmanagementv2.service.SteelManagementV2Service;
@@ -38,15 +38,12 @@ import com.lineinc.erp.api.server.shared.dto.response.SuccessResponse;
 import com.lineinc.erp.api.server.shared.util.DownloadFieldUtils;
 import com.lineinc.erp.api.server.shared.util.PageableUtils;
 import com.lineinc.erp.api.server.shared.util.ResponseHeaderUtils;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -74,9 +71,9 @@ public class SteelManagementV2Controller extends BaseController {
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest,
             @Valid final SteelManagementV2ListRequest request) {
-        final Page<SteelManagementV2Response> page = steelManagementV2Service.getSteelManagementV2List(request,
-                user.getUserId(),
-                PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
+        final Page<SteelManagementV2Response> page =
+                steelManagementV2Service.getSteelManagementV2List(request, user.getUserId(),
+                        PageableUtils.createPageable(pageRequest.page(), pageRequest.size(), sortRequest.sort()));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 
@@ -85,7 +82,8 @@ public class SteelManagementV2Controller extends BaseController {
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.VIEW)
     public ResponseEntity<SuccessResponse<SteelManagementV2DetailResponse>> getSteelManagementV2Detail(
             @PathVariable final Long id,
-            @RequestParam(required = false) @Schema(description = "타입 필터 (입고/출고/사장/고철)", example = "INCOMING") final SteelManagementDetailV2Type type) {
+            @RequestParam(required = false) @Schema(description = "타입 필터 (입고/출고/사장/고철)",
+                    example = "INCOMING") final SteelManagementDetailV2Type type) {
         final SteelManagementV2DetailResponse response = steelManagementV2Service.getSteelManagementV2ById(id, type);
         return SuccessResponse.ok(response);
     }
@@ -104,8 +102,7 @@ public class SteelManagementV2Controller extends BaseController {
     @Operation(summary = "강재수불부 목록 엑셀 다운로드", description = "검색 조건에 맞는 강재수불부 목록을 엑셀 파일로 다운로드합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "엑셀 다운로드 성공"),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())
-    })
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content())})
     @GetMapping("/download")
     @RequireMenuPermission(menu = AppConstants.MENU_STEEL_MANAGEMENT, action = PermissionAction.EXCEL_DOWNLOAD)
     public void downloadSteelManagementsExcel(
@@ -117,11 +114,8 @@ public class SteelManagementV2Controller extends BaseController {
         final List<String> parsed = DownloadFieldUtils.parseFields(downloadRequest.fields());
         DownloadFieldUtils.validateFields(parsed, SteelManagementV2DownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 목록.xlsx");
-        try (Workbook workbook = steelManagementV2Service.downloadExcel(
-                user,
-                request,
-                PageableUtils.parseSort(sortRequest.sort()),
-                parsed)) {
+        try (Workbook workbook = steelManagementV2Service.downloadExcel(user, request,
+                PageableUtils.parseSort(sortRequest.sort()), parsed)) {
             workbook.write(response.getOutputStream());
         }
     }
@@ -137,10 +131,7 @@ public class SteelManagementV2Controller extends BaseController {
         final List<String> fieldsToUse = downloadRequest.getFieldsToUse();
         DownloadFieldUtils.validateFields(fieldsToUse, SteelManagementV2DetailDownloadRequest.ALLOWED_FIELDS);
         ResponseHeaderUtils.setExcelDownloadHeader(response, "강재수불부 상세 목록.xlsx");
-        try (Workbook workbook = steelManagementV2Service.downloadDetailExcel(
-                id,
-                user,
-                fieldsToUse)) {
+        try (Workbook workbook = steelManagementV2Service.downloadDetailExcel(id, user, fieldsToUse)) {
             workbook.write(response.getOutputStream());
         }
     }
@@ -153,9 +144,9 @@ public class SteelManagementV2Controller extends BaseController {
             @AuthenticationPrincipal final CustomUserDetails loginUser,
             @Valid final PageRequest pageRequest,
             @Valid final SortRequest sortRequest) {
-        final Page<SteelManagementChangeHistoryV2Response> page = steelManagementV2Service
-                .getSteelManagementChangeHistoriesWithPaging(
-                        id, loginUser, PageableUtils.createPageable(pageRequest, sortRequest));
+        final Page<SteelManagementChangeHistoryV2Response> page =
+                steelManagementV2Service.getSteelManagementChangeHistoriesWithPaging(id, loginUser,
+                        PageableUtils.createPageable(pageRequest, sortRequest));
         return SuccessResponse.ok(PagingResponse.from(page));
     }
 }

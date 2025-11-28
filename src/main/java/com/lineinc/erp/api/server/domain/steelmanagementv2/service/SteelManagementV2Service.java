@@ -368,7 +368,7 @@ public class SteelManagementV2Service {
 
         // 소계에 포함될 필드들 정의
         final List<String> subtotalFields =
-                List.of("weight", "count", "totalWeight", "unitPrice", "amount", "vat", "total");
+                List.of("weight", "count", "totalWeight", "unitPrice", "amount", "vat", "total", "length");
 
         // 워크북 생성 (여러 시트 지원, 소계 포함)
         final Workbook workbook = ExcelExportUtils.generateMultiSheetWorkbookWithSubtotal(detailsByType, fields, (
@@ -466,7 +466,7 @@ public class SteelManagementV2Service {
         return switch (field) {
             case "name" -> "품명";
             case "specification" -> "규격";
-            case "weight" -> "무게(톤)";
+            case "weight" -> "단위중량(톤)";
             case "count" -> "본";
             case "totalWeight" -> "총무게(톤)";
             case "unitPrice" -> "단가";
@@ -481,6 +481,7 @@ public class SteelManagementV2Service {
             case "createdAt" -> "등록";
             case "originalFileName" -> "증빙";
             case "memo" -> "비고";
+            case "length" -> "길이(m)";
             default -> "";
         };
     }
@@ -517,6 +518,7 @@ public class SteelManagementV2Service {
                     : "";
             case "originalFileName" -> response.originalFileName() != null ? response.originalFileName() : "";
             case "memo" -> response.memo() != null ? response.memo() : "";
+            case "length" -> response.length() != null ? numberFormat.format(response.length()) : "";
             default -> "";
         };
     }
